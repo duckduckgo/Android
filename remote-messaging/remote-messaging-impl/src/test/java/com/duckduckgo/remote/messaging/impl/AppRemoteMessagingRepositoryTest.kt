@@ -28,6 +28,7 @@ import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.fixtures.getMessageMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
@@ -62,7 +63,7 @@ class AppRemoteMessagingRepositoryTest {
 
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository = mock()
 
-    private val testee = AppRemoteMessagingRepository(remoteMessagingConfigRepository, dao, coroutineRule.testDispatcherProvider)
+    private val testee = AppRemoteMessagingRepository(remoteMessagingConfigRepository, dao, coroutineRule.testDispatcherProvider, getMessageMapper())
 
     @After
     fun after() {
@@ -188,7 +189,7 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss(),
+                    secondaryAction = Action.Dismiss,
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
@@ -208,7 +209,7 @@ class AppRemoteMessagingRepositoryTest {
                         primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                         primaryActionText = "actionText",
                         secondaryActionText = "actionText",
-                        secondaryAction = Action.Dismiss(),
+                        secondaryAction = Action.Dismiss,
                     ),
                     matchingRules = emptyList(),
                     exclusionRules = emptyList(),
@@ -231,7 +232,7 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss(),
+                    secondaryAction = Action.Dismiss,
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
@@ -260,7 +261,7 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss(),
+                    secondaryAction = Action.Dismiss,
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),
@@ -293,7 +294,7 @@ class AppRemoteMessagingRepositoryTest {
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss(),
+                    secondaryAction = Action.Dismiss,
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList(),

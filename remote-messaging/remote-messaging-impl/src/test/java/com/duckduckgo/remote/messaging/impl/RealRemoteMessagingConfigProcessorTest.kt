@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
+import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import java.util.*
@@ -43,7 +44,7 @@ class RealRemoteMessagingConfigProcessorTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val appBuildConfig: AppBuildConfig = mock()
-    private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(appBuildConfig)
+    private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(appBuildConfig, messageActionPlugins)
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
     private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock())
