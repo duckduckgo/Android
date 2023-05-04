@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContract
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnReportBreakageFrom
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -36,7 +37,12 @@ class ReportBreakageContract @Inject constructor(
         input: ReportBreakageScreen,
     ): Intent {
         return when (input) {
-            is ReportBreakageScreen.ListOfInstalledApps -> globalActivityStarter.startIntent(context, OpenVpnReportBreakageFrom(input.origin))!!
+            is ReportBreakageScreen.ListOfInstalledApps -> {
+                globalActivityStarter.startIntent(
+                    context,
+                    OpenVpnReportBreakageFrom(launchFrom = input.origin, breakageCategories = input.breakageCategories),
+                )!!
+            }
             is ReportBreakageScreen.IssueDescriptionForm -> {
                 globalActivityStarter.startIntent(
                     context,
@@ -44,6 +50,7 @@ class ReportBreakageContract @Inject constructor(
                         launchFrom = input.origin,
                         appName = input.appName,
                         appPackageId = input.appPackageId,
+                        breakageCategories = input.breakageCategories,
                     ),
                 )!!
             }
@@ -61,13 +68,17 @@ class ReportBreakageContract @Inject constructor(
     }
 }
 
-sealed class ReportBreakageScreen(open val origin: String) {
-    data class ListOfInstalledApps(override val origin: String) : ReportBreakageScreen(origin)
+sealed class ReportBreakageScreen(open val origin: String, open val breakageCategories: List<AppBreakageCategory>) {
+    data class ListOfInstalledApps(
+        override val origin: String,
+        override val breakageCategories: List<AppBreakageCategory>,
+    ) : ReportBreakageScreen(origin, breakageCategories)
     data class IssueDescriptionForm(
         override val origin: String,
+        override val breakageCategories: List<AppBreakageCategory>,
         val appName: String,
         val appPackageId: String,
-    ) : ReportBreakageScreen(origin)
+    ) : ReportBreakageScreen(origin, breakageCategories)
 }
 
 @Parcelize

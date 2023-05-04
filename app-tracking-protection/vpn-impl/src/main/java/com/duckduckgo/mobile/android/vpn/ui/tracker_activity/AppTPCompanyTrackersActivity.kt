@@ -45,7 +45,9 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTrackersActivityBinding
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
@@ -71,6 +73,10 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject
+    @AppTpBreakageCategories
+    lateinit var breakageCategories: List<AppBreakageCategory>
 
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
@@ -214,7 +220,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm("apptp", getAppName(), getPackage()))
+        reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm("apptp", breakageCategories, getAppName(), getPackage()))
     }
 
     override fun onBackPressed() {

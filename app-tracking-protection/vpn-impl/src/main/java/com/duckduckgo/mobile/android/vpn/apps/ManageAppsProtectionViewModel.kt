@@ -27,11 +27,13 @@ import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -48,6 +50,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
     private val pixel: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
+    @AppTpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -164,7 +167,11 @@ class ManageAppsProtectionViewModel @Inject constructor(
             excludedApps.manuallyExcludeApp(packageName)
             pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
-                command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm("apptp", appName, packageName)))
+                command.send(
+                    Command.LaunchFeedback(
+                        ReportBreakageScreen.IssueDescriptionForm("apptp", breakageCategories, appName, packageName),
+                    ),
+                )
             } else {
                 pixel.didSkipManuallyDisableAppProtectionDialog()
             }
@@ -263,7 +270,11 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun launchFeedback() {
         pixel.launchAppTPFeedback()
         viewModelScope.launch {
-            command.send(Command.LaunchFeedback(ReportBreakageScreen.ListOfInstalledApps("apptp")))
+            command.send(
+                Command.LaunchFeedback(
+                    ReportBreakageScreen.ListOfInstalledApps("apptp", breakageCategories),
+                ),
+            )
         }
     }
 
