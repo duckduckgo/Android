@@ -92,7 +92,7 @@ class NgVpnNetworkStack @Inject constructor(
             ),
             dns = emptySet(),
             routes = emptyMap(),
-            appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
+            appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().filter { it != "com.android.chrome" }.toSet(),
         ),
     )
 

@@ -177,10 +177,12 @@ class TrackerFeedAdapter @Inject constructor(
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
+                    // TODO: adjust here. Might eventually need adjustments in other places
+
                     val trackersCount = tracker.trackersTotalCount
                     val trackingCompanies = tracker.trackingCompanyBadges.size
                     val trackingAppName = item.trackingApp.appDisplayName
-                    val textToStyle = if (trackersCount == 1) {
+                    var textToStyle = if (trackersCount == 1) {
                         if (trackingCompanies == 1) {
                             resources.getString(
                                 R.string.atp_ActivityTrackersCompanyBlockedOnetimeOneCompany,
@@ -209,6 +211,14 @@ class TrackerFeedAdapter @Inject constructor(
                             )
                         }
                     }
+                    // TODO: ugly hack for now to avoid change DB + a bunch of files to indicate block/no block
+                    if (trackingAppName == "Chrome") {
+                        textToStyle = "$trackersCount unprotected requests in <b>Google Chrome</b> app"
+                    }
+
+                    // TODO: remove icons, adjust click listener activity
+                    // TODO: maybe commit to a new branch first
+
                     val styledText = HtmlCompat.fromHtml(textToStyle, FROM_HTML_MODE_COMPACT)
                     text = styledText
                 }
@@ -219,17 +229,18 @@ class TrackerFeedAdapter @Inject constructor(
                     .load(packageManager.safeGetApplicationIcon(item.trackingApp.packageId))
                     .error(item.trackingApp.appDisplayName.asIconDrawable())
                     .into(trackingAppIcon)
-
-                with(trackerBadgesView) {
-                    // click through recyclerview
-                    suppressLayout(false)
-                    (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
-                    suppressLayout(true)
-                }
+                //
+                // with(trackerBadgesView) {
+                //     // click through recyclerview
+                //     suppressLayout(false)
+                //     (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
+                //     suppressLayout(true)
+                // }
                 itemView.setOnClickListener {
                     startActivity(
                         context,
-                        AppTPCompanyTrackersActivity.intent(
+                        //AppTPCompanyTrackersActivity.intent(
+                        AppTPTransparencyActivity.intent(
                             context,
                             item.trackingApp.packageId,
                             item.trackingApp.appDisplayName,

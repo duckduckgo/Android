@@ -118,7 +118,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                 is TrackerFeedItem.TrackerFeedData -> {
                     if (trackerFeedItem.isAppInstalled()) {
                         startActivity(
-                            AppTPCompanyTrackersActivity.intent(
+                            AppTPTransparencyActivity.intent(
                                 requireContext(),
                                 trackerFeedItem.trackingApp.packageId,
                                 trackerFeedItem.trackingApp.appDisplayName,

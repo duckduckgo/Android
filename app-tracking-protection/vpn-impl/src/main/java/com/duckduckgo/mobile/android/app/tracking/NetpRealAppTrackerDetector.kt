@@ -62,6 +62,29 @@ class NetpRealAppTrackerDetector constructor(
         val packageId = appNameResolver.getPackageIdForUid(uid) ?: return null
 
         if (VpnExclusionList.isDdgApp(packageId) || packageId.isInExclusionList()) {
+            // if Chrome or search app... don't block but insert into DB
+            if (//packageId == "com.google.android.googlequicksearchbox:search" ||
+                packageId == "com.android.chrome") {
+                // TODO: different DB or diff entry in DB?
+                // will need to sort so same table may be good
+
+                val tracker = vpnAppTrackerBlockingDao.getTrackerBySubdomain("15.taboola.com")!!
+                val type = AppTrackerType.ThirdParty(tracker)
+
+                VpnTracker(
+                    trackerCompanyId = type.tracker.trackerCompanyId,
+                    company = type.tracker.owner.name,
+                    companyDisplayName = type.tracker.owner.displayName,
+                    domain = type.tracker.hostname,
+                    trackingApp = TrackingApp(packageId, "Chrome"),
+                ).run {
+                    appTrackerRecorder.insertTracker(this)
+                }
+
+                logcat { "shouldAllowDomain special exclusion case" }
+                return null
+            }
+
             logcat { "shouldAllowDomain: $packageId is excluded, allowing $domain" }
             return null
         }

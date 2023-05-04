@@ -81,6 +81,12 @@
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPTransparencyActivity"
+            android:exported="false"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait" />
+
         <service
             android:name=".service.state.VpnStateMonitorService"
             android:exported="false"/>

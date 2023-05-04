@@ -16,5 +16,14 @@
   -->
 
 <resources>
+    <plurals name="atp_TransparencyActivityMultipleRequests" instruction="Placeholder is the number of requests that are unprotected">
+        <item quantity="one">%1$d unprotected request in Google Chrome app</item>
+        <item quantity="other">%1$d unprotected requests in Google Chrome app</item>
+    </plurals>
+
+    <string name="atp_AboutChrome">Using the Google Chrome app to search or browse websites can put your privacy at risk. Google is known to use data like the terms your search for or the links you interact with to create a profile on you.\n\nRead more about Google’s policies <annotation type="read_more_link">here</annotation>.</string>
+
+    <string name="atp_BrowserDefaultText">Protect yourself by browsing with DuckDuckGo</string>
+    <string name="atp_BrowserDefaultCTA">Set DuckDuckGo as Default</string>
 
 </resources>
