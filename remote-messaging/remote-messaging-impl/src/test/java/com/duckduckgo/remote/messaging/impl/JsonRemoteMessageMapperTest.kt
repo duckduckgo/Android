@@ -31,6 +31,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigSingleActionC
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigTwoActionsContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.mediumContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.smallContent
+import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
@@ -45,7 +46,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
 
     @Test
     fun whenJsonMessageThenReturnMessage() {
-        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage(Locale.FRANCE, actionMappers)
+        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage(Locale.FRANCE, messageActionPlugins)
 
         assertEquals(testCase.expectedMessages, remoteMessages)
     }
