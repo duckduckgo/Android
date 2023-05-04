@@ -19,17 +19,20 @@ package com.duckduckgo.cookies.store
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieDao
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         FirstPartyCookiePolicyEntity::class,
         CookieExceptionEntity::class,
+        CookieEntity::class,
     ],
 )
 abstract class CookiesDatabase : RoomDatabase() {
     abstract fun cookiesDao(): CookiesDao
+    abstract fun contentScopeScriptsCookieDao(): ContentScopeScriptsCookieDao
 }
 
 val ALL_MIGRATIONS = emptyArray<Migration>()

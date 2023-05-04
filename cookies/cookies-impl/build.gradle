@@ -36,6 +36,7 @@ dependencies {
     implementation project(':cookies-store')
     implementation project(':browser-api')
     implementation project(':statistics')
+    implementation project(':content-scope-scripts-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation JakeWharton.timber
