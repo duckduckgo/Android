@@ -22,14 +22,12 @@
 
     <!--Label view attributes-->
     <declare-styleable name="LabelLinkView">
-        <attr name="android:text" />
         <attr name="leadingIcon"/>
         <attr name="linkUrl" format="string" />
     </declare-styleable>
 
     <!--Color attribute view attributes-->
     <declare-styleable name="ColorAttributeView">
-        <attr name="android:text"/>
         <attr name="colorFillColor"/>
         <attr name="colorStrokeColor"/>
     </declare-styleable>

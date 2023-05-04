@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'app.cash.paparazzi'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -63,4 +64,5 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+    testImplementation "com.google.testparameterinjector:test-parameter-injector:1.10"
 }

@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.squareup.anvil'
-apply plugin: 'app.cash.paparazzi'
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
 
@@ -402,7 +401,6 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation "com.google.testparameterinjector:test-parameter-injector:1.10"
 
     androidTestImplementation project(':common-test')
     testImplementation project(':common-test')

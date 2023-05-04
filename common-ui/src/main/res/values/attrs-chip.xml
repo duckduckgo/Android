@@ -20,7 +20,6 @@
     <!--Chip view-->
     <declare-styleable name="Chip">
         <attr name="chipBackground" format="reference" />
-        <attr name="android:text"/>
     </declare-styleable>
 
 </resources>

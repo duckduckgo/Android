@@ -137,4 +137,6 @@ fladle {
             localResultsDir.set("fladleResults")
         }
     }
-}apply plugin: 'android-reporting'
+}
+
+apply plugin: 'android-reporting'
