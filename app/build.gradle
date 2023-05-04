@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.squareup.anvil'
+apply plugin: "com.dropbox.dropshots"
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
 
