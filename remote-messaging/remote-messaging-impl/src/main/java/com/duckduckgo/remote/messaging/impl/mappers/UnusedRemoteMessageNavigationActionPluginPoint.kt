@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.api
+package com.duckduckgo.remote.messaging.impl.mappers
 
-interface MessageActionMapperPlugin {
-    fun evaluate(jsonMessageAction: JsonMessageAction): Action?
-}
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 
-data class JsonMessageAction(
-    val type: String,
-    val value: String,
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = MessageActionMapperPlugin::class,
 )
-
-sealed class JsonActionType(val jsonValue: String) {
-    object URL : JsonActionType("url")
-    object PLAYSTORE : JsonActionType("playstore")
-    object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
-    object DISMISS : JsonActionType("dismiss")
-    object APP_NAVIGATION : JsonActionType("appNavigation")
-    object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
-}
+@Suppress("unused")
+interface UnusedRemoteMessageNavigationActionPluginPoint

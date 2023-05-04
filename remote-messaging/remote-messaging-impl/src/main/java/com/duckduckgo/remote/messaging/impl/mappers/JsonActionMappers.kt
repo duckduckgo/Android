@@ -18,7 +18,6 @@ package com.duckduckgo.remote.messaging.impl.mappers
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.api.JsonActionType.APP_NAVIGATION
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
@@ -47,7 +46,7 @@ class UrlActionMapper @Inject constructor() : MessageActionMapperPlugin {
 class DismissActionMapper @Inject constructor() : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == DISMISS.jsonValue) {
-            Action.Dismiss()
+            Action.Dismiss
         } else {
             null
         }
@@ -73,7 +72,7 @@ class PlayStoreActionMapper @Inject constructor() : MessageActionMapperPlugin {
 class DefaultBrowserActionMapper @Inject constructor() : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == DEFAULT_BROWSER.jsonValue) {
-            Action.DefaultBrowser()
+            Action.DefaultBrowser
         } else {
             null
         }
