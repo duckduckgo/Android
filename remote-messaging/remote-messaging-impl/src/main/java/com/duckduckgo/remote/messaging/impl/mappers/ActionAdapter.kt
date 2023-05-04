@@ -17,11 +17,11 @@
 package com.duckduckgo.remote.messaging.impl.mappers
 
 import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.JsonActionType
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
-import java.lang.IllegalStateException
 
 class ActionAdapter constructor(
     private val actionMappers: Set<MessageActionMapperPlugin>,
@@ -31,7 +31,8 @@ class ActionAdapter constructor(
     }
 
     @FromJson fun userProfileFromJson(json: ActionJson): Action {
-        val jsonAction = JsonMessageAction(json.actionType, json.value)
+        val type = mapTypeBackwardsCompatible(json.actionType)
+        val jsonAction = JsonMessageAction(type, json.value)
         actionMappers.forEach {
             val action = it.evaluate(jsonAction)
             if (action != null) return action
@@ -39,6 +40,28 @@ class ActionAdapter constructor(
         throw IllegalStateException("No mapper found for action type ${json.actionType}")
     }
 
-    class ActionJson(val actionType: String, val value: String)
-}
+    // We will remove this method when it's safe (e.g: no current or incoming messages)
+    private fun mapTypeBackwardsCompatible(actionType: String): String {
+        return when (actionType) {
+            OldActionType.DEFAULT_BROWSER.toString() -> JsonActionType.DEFAULT_BROWSER.jsonValue
+            OldActionType.DISMISS.toString() -> JsonActionType.DISMISS.jsonValue
+            OldActionType.APP_TP_ONBOARDING.toString() -> JsonActionType.APP_TP_ONBOARDING.jsonValue
+            OldActionType.PLAYSTORE.toString() -> JsonActionType.PLAYSTORE.jsonValue
+            OldActionType.URL.toString() -> JsonActionType.URL.jsonValue
+            else -> actionType
+        }
+    }
 
+    class ActionJson(
+        val actionType: String,
+        val value: String,
+    )
+
+    private enum class OldActionType {
+        URL,
+        PLAYSTORE,
+        DEFAULT_BROWSER,
+        DISMISS,
+        APP_TP_ONBOARDING,
+    }
+}
