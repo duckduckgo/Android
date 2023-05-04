@@ -50,7 +50,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.Companion.RELOAD_RESULT_CODE
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope

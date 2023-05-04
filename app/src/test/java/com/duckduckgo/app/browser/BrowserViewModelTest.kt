@@ -33,7 +33,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.Companion.RELOAD_RESULT_CODE
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After

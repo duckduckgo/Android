@@ -70,7 +70,8 @@ import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -110,6 +111,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
     @AppCoroutineScope
@@ -403,7 +407,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchPrivacyDashboard() {
         currentTab?.tabId?.let {
-            startActivityForResult(PrivacyDashboardHybridActivity.intent(this, it), DASHBOARD_REQUEST_CODE)
+            val params = PrivacyDashboardHybridWithTabIdParam(it)
+            val intent = globalActivityStarter.startIntent(this, params)
+            startActivityForResult(intent, DASHBOARD_REQUEST_CODE)
         }
     }
 
