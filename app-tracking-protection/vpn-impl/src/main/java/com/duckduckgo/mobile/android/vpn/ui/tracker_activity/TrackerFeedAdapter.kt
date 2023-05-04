@@ -37,6 +37,7 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
@@ -216,9 +217,6 @@ class TrackerFeedAdapter @Inject constructor(
                         textToStyle = "$trackersCount unprotected requests in <b>Google Chrome</b> app"
                     }
 
-                    // TODO: remove icons, adjust click listener activity
-                    // TODO: maybe commit to a new branch first
-
                     val styledText = HtmlCompat.fromHtml(textToStyle, FROM_HTML_MODE_COMPACT)
                     text = styledText
                 }
@@ -229,13 +227,13 @@ class TrackerFeedAdapter @Inject constructor(
                     .load(packageManager.safeGetApplicationIcon(item.trackingApp.packageId))
                     .error(item.trackingApp.appDisplayName.asIconDrawable())
                     .into(trackingAppIcon)
-                //
-                // with(trackerBadgesView) {
-                //     // click through recyclerview
-                //     suppressLayout(false)
-                //     (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
-                //     suppressLayout(true)
-                // }
+
+                with(trackerBadgesView) {
+                    // click through recyclerview
+                    suppressLayout(false)
+                    (adapter as TrackerBadgeAdapter).updateData(listOf(TrackerCompanyBadge.PrivacyWarningIcon(), TrackerCompanyBadge.PrivacyWarningText()))
+                    suppressLayout(true)
+                }
                 itemView.setOnClickListener {
                     startActivity(
                         context,

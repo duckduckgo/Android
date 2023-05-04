@@ -66,6 +66,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         private var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
         private var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
         private var largeTextBadge: TextView = view.findViewById(R.id.tracker_company_large_badge_text)
+        private var privacyWarningTxt: TextView = view.findViewById(R.id.privacyWarningText)
 
         companion object {
             fun create(parent: ViewGroup): TrackerBadgeViewHolder {
@@ -79,6 +80,8 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             when (trackerInfo) {
                 is TrackerCompanyBadge.Company -> displayTrackerCompany(trackerInfo)
                 is TrackerCompanyBadge.Extra -> displayExtraBadge(trackerInfo)
+                is TrackerCompanyBadge.PrivacyWarningIcon -> displayPrivacyWarningIcon()
+                is TrackerCompanyBadge.PrivacyWarningText -> displayPrivacyWarningText()
             }
         }
 
@@ -126,6 +129,28 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                 textBadge.show()
                 largeTextBadge.hide()
             }
+        }
+
+        private fun displayPrivacyWarningIcon() {
+            iconBadge.setImageResource(R.drawable.ic_alert_yellow)
+            // textBadge.text = "Review App Privacy"
+
+            privacyWarningTxt.hide()
+
+            iconBadge.show()
+            textBadge.hide()
+            largeTextBadge.hide()
+        }
+
+        private fun displayPrivacyWarningText() {
+            privacyWarningTxt.show()
+
+            // largeTextBadge.text = "Review App Privacy"
+            // largeTextBadge.show()
+
+            iconBadge.hide()
+            textBadge.hide()
+            largeTextBadge.hide()
         }
     }
 
