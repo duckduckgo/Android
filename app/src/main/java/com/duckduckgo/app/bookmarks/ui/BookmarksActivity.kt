@@ -25,10 +25,12 @@ import android.text.SpannableString
 import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.ViewState
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
@@ -161,12 +163,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             this,
         ) { viewState ->
             viewState?.let { state ->
-                if (parentId == SavedSitesNames.BOOMARKS_ROOT) {
-                    favoritesAdapter.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
-                }
-                bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
-                bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
-                setSearchMenuItemVisibility()
+                renderViewState(parentId, state)
             }
         }
 
@@ -185,6 +182,16 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
             }
         }
+    }
+
+    @VisibleForTesting
+    fun renderViewState(parentId: String, viewState: ViewState){
+        if (parentId == SavedSitesNames.BOOMARKS_ROOT) {
+            favoritesAdapter.setItems(viewState.favorites.map { FavoritesAdapter.FavoriteItem(it) })
+        }
+        bookmarksAdapter.setItems(viewState.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, viewState.bookmarkFolders.isEmpty())
+        bookmarkFoldersAdapter.bookmarkFolderItems = viewState.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+        setSearchMenuItemVisibility()
     }
 
     private fun showImportedSavedSites(result: ImportSavedSitesResult) {

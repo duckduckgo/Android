@@ -18,28 +18,22 @@ package com.duckduckgo.screenshots
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.dropbox.dropshots.Dropshots
-import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import org.junit.Before
+import com.duckduckgo.mobile.android.themepreview.ui.AppComponentsActivity
 import org.junit.Rule
 import org.junit.Test
 
-class DaxOnboardingScreenshotTests {
+class AppComponentsTests {
 
     @get:Rule
-    val activityScenarioRule = ActivityScenarioRule(OnboardingActivity::class.java)
+    val activityScenarioRule = ActivityScenarioRule(AppComponentsActivity::class.java)
 
     @get:Rule
     val dropshots = Dropshots()
 
-    @Before
-    fun setup() {
-
-    }
-
-    @Test
-    fun whenDaxOnboardingStartsMatchesActivityScreenshot() {
+    @Test @ScreenshotTest
+    fun whenSavedSitesEmptyStateMatchesActivityScreenshot() {
         activityScenarioRule.scenario.onActivity {
-            dropshots.assertSnapshot(it, "DaxOnboarding")
+            dropshots.assertSnapshot(it, "ADS_Components")
         }
     }
 

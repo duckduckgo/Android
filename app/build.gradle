@@ -158,6 +158,24 @@ fladle {
             flakyTestAttempts.set(2)
             testShards.set(1)
         }
+        screenshotTests {
+            async.set(false)
+            variant.set("internalDebug")
+            flankVersion.set("21.+")
+            useOrchestrator.set(true)
+            environmentVariables.set([
+                    "clearPackageData": "true"
+            ])
+            testTargets.set([
+                    "annotation com.duckduckgo.screenshot.ScreenshotTests"
+            ])
+            devices.set([
+                    ["model": "redfin", "version": "30"]
+            ])
+            localResultsDir.set("fladleResults")
+            flakyTestAttempts.set(2)
+            testShards.set(1)
+        }
     }
 }
 
