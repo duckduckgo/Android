@@ -34,6 +34,7 @@ dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':windows-api')
     implementation project(path: ':navigation-api')
+    implementation project(path: ':remote-messaging-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
