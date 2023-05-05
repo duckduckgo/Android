@@ -154,7 +154,7 @@ class SitePermissionsAdapter(
                 R.string.sitePermissionsSettingsAllowedSitesTitle -> {
                     binding.sitePermissionsSectionHeader.apply {
                         showOverflowMenuIcon(true)
-                        setOnClickListener { showOverflowMenu(isListEmpty) }
+                        setOverflowMenuClickListener { showOverflowMenu(isListEmpty) }
                     }
                 }
                 else -> binding.sitePermissionsSectionHeader.showOverflowMenuIcon(false)
