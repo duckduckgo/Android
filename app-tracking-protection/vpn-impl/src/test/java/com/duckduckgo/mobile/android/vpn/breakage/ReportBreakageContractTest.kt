@@ -42,17 +42,20 @@ class ReportBreakageContractTest {
             .thenReturn(Intent(context, ReportBreakageCategorySingleChoiceActivity::class.java))
 
         val intent = ReportBreakageContract(globalActivityStarter)
-            .createIntent(context, ReportBreakageScreen.IssueDescriptionForm(ORIGIN, "myApp", "my.package.com"))
+            .createIntent(context, ReportBreakageScreen.IssueDescriptionForm(ORIGIN, emptyList(), "myApp", "my.package.com"))
 
         assertEquals(ReportBreakageCategorySingleChoiceActivity::class.java.canonicalName, intent.component?.className)
     }
 
     @Test
     fun whenCreateIntentForListOfInstalledAppsThenReturnCorrectIntent() {
-        whenever(globalActivityStarter.startIntent(context, OpenVpnReportBreakageFrom(ORIGIN)))
+        whenever(globalActivityStarter.startIntent(context, OpenVpnReportBreakageFrom(ORIGIN, emptyList())))
             .thenReturn(Intent(context, ReportBreakageAppListActivity::class.java))
 
-        val intent = ReportBreakageContract(globalActivityStarter).createIntent(context, ReportBreakageScreen.ListOfInstalledApps(ORIGIN))
+        val intent = ReportBreakageContract(globalActivityStarter).createIntent(
+            context,
+            ReportBreakageScreen.ListOfInstalledApps(ORIGIN, emptyList()),
+        )
 
         assertEquals(ReportBreakageAppListActivity::class.java.canonicalName, intent.component?.className)
     }

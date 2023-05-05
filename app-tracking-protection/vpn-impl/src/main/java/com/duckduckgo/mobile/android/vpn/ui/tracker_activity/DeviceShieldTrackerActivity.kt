@@ -56,11 +56,13 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionList
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.alwayson.AlwaysOnAlertDialogFragment
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
@@ -98,6 +100,10 @@ class DeviceShieldTrackerActivity :
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject
+    @AppTpBreakageCategories
+    lateinit var breakageCategories: List<AppBreakageCategory>
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
@@ -601,7 +607,7 @@ class DeviceShieldTrackerActivity :
 
     private fun launchFeedback() {
         deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
-        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps("apptp"))
+        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps("apptp", breakageCategories))
     }
 
     private fun reEnableAppTrackingProtection() {

@@ -68,9 +68,10 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         // The value should never be "unknown" we just do this because getParcelableExtra returns
         // nullable
         brokenApp = intent.getActivityParams(OpenVpnBreakageCategoryWithBrokenApp::class.java) ?: OpenVpnBreakageCategoryWithBrokenApp(
-            "unknown",
-            "unknown",
-            "unknown",
+            launchFrom = "unknown",
+            appName = "unknown",
+            appPackageId = "unknown",
+            breakageCategories = emptyList(),
         )
 
         setContentView(binding.root)
@@ -94,7 +95,8 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = viewModel.shuffledCategories.map { it.category }
+        viewModel.setCategories(brokenApp.breakageCategories)
+        val categories = brokenApp.breakageCategories.map { it.description }
         binding.categoriesSelection.onAction {
             RadioListAlertDialogBuilder(this)
                 .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
@@ -147,8 +149,8 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
                     reportedFrom = brokenApp.launchFrom,
                     appName = brokenApp.appName,
                     appPackageId = brokenApp.appPackageId,
-                    description = binding.appBreakageFormFeedbackInput.text.toString(),
-                    category = viewModel.viewState.value.categorySelected.toString(),
+                    description = binding.appBreakageFormFeedbackInput.text,
+                    category = viewModel.viewState.value.categorySelected?.key.toString(),
                     customMetadata =
                     Base64.encodeToString(
                         metadataReporter.getVpnStateMetadata(brokenApp.appPackageId).toByteArray(),
@@ -163,7 +165,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         val category =
-            viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
+            viewState.categorySelected?.let { viewState.categorySelected.description }.orEmpty()
         binding.categoriesSelection.text = category
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
     }

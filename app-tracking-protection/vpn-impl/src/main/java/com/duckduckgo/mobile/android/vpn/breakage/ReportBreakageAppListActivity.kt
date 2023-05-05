@@ -42,7 +42,9 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageAppListBinding
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnReportBreakageFrom
 import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
@@ -63,6 +65,10 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
 
     @Inject
     lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject
+    @AppTpBreakageCategories
+    lateinit var breakageCategories: List<AppBreakageCategory>
 
     private val viewModel: ReportBreakageAppListViewModel by bindViewModel()
 
@@ -205,6 +211,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
                 reportBreakage.launch(
                     ReportBreakageScreen.IssueDescriptionForm(
                         origin = runCatching { launchedFrom }.getOrDefault("unknown"),
+                        breakageCategories = breakageCategories,
                         appName = command.selectedApp.name,
                         appPackageId = command.selectedApp.packageName,
                     ),

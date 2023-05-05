@@ -16,10 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import javax.inject.Qualifier
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
 @Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-annotation class TcpNetworkSelector
+@Retention(RUNTIME)
+internal annotation class AppTpBreakageCategories
