@@ -29,15 +29,6 @@
         android:visibility="gone" />
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        android:id="@+id/privacyWarningText"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/keyline_5"
-        android:text="Review App Privacy"
-        android:gravity="start|top"
-        app:typography="h5"
-        android:visibility="gone"/>
-
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/tracker_company_badge_text"
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"

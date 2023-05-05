@@ -52,8 +52,11 @@
         app:panelText="Review App Privacy"
         android:visibility="gone"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:padding="@dimen/keyline_0"
         app:layout_constraintEnd_toStartOf="@id/entry_chevron"
         app:layout_constraintStart_toStartOf="@id/activity_message"
         app:layout_constraintTop_toBottomOf="@id/activity_message" />

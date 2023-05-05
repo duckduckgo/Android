@@ -178,6 +178,7 @@ class TrackerFeedAdapter @Inject constructor(
             tracker: TrackerFeedItem.TrackerFeedData?,
             onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
         ) {
+            var transparencyMode = false
             tracker?.let { item ->
                 with(activityMessage) {
                     // TODO: adjust here. Might eventually need adjustments in other places
@@ -217,6 +218,14 @@ class TrackerFeedAdapter @Inject constructor(
                     // TODO: ugly hack for now to avoid change DB + a bunch of files to indicate block/no block
                     if (trackingAppName == "Chrome") {
                         textToStyle = "$trackersCount unprotected requests in <b>Google Chrome</b> app"
+                        transparencyMode = true
+                    }
+                    else if (trackingAppName == "Search") {
+                        if (trackersCount > 1)
+                            textToStyle = "$trackersCount non-private searches in <b>Google</b> app"
+                        else
+                            textToStyle = "$trackersCount non-private search in <b>Google</b> app"
+                        transparencyMode = true
                     }
 
                     val styledText = HtmlCompat.fromHtml(textToStyle, FROM_HTML_MODE_COMPACT)
@@ -230,16 +239,20 @@ class TrackerFeedAdapter @Inject constructor(
                     .error(item.trackingApp.appDisplayName.asIconDrawable())
                     .into(trackingAppIcon)
 
-                with(privacyWarning) {
-                    show()
+                if (transparencyMode) {
+                    with(privacyWarning) {
+                        show()
+                    }
+                } else {
+                    with(trackerBadgesView) {
+                        // click through recyclerview
+                        suppressLayout(false)
+                        (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
+                        suppressLayout(true)
+                    }
                 }
 
-                // with(trackerBadgesView) {
-                //     // click through recyclerview
-                //     suppressLayout(false)
-                //     (adapter as TrackerBadgeAdapter).updateData(listOf(TrackerCompanyBadge.PrivacyWarningIcon()))
-                //     suppressLayout(true)
-                // }
+
                 itemView.setOnClickListener {
                     startActivity(
                         context,

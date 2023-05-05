@@ -21,9 +21,18 @@
         <item quantity="other">%1$d unprotected requests in Google Chrome app</item>
     </plurals>
 
+    <plurals name="atp_TransparencyActivityMultipleSearches" instruction="Placeholder is the number of searches that are unprotected">
+        <item quantity="one">You’ve performed %1$d unsafe search in the Google app.</item>
+        <item quantity="other">You’ve performed %1$d unsafe searches in the Google app</item>
+    </plurals>
+
     <string name="atp_AboutChrome">Using the Google Chrome app to search or browse websites can put your privacy at risk. Google is known to use data like the terms your search for or the links you interact with to create a profile on you.\n\nRead more about Google’s policies <annotation type="read_more_link">here</annotation>.</string>
+    <string name="atp_AboutSearch">Searches in the Google app or using the Google search bar on your homescreen are not private. Google is known to use data like the terms your search for or the links you interact with to create a profile on you.\n\nRead more about Google’s policies <annotation type="read_more_link">here</annotation>.</string>
 
     <string name="atp_BrowserDefaultText">Protect yourself by browsing with DuckDuckGo</string>
     <string name="atp_BrowserDefaultCTA">Set DuckDuckGo as Default</string>
+
+    <string name="atp_SearchDefaultText">Protect yourself by searching with DuckDuckGo</string>
+    <string name="atp_SearchDefaultCTA">Add DuckDuckGo to Homescreen</string>
 
 </resources>

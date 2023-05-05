@@ -110,11 +110,14 @@ class AppTPTransparencyActivity : DuckDuckGoActivity() {
                 .into(appIcon)
         }
 
-        binding.appInfo.addClickableLink(READ_MORE_ANNOTATION, getText(R.string.atp_AboutChrome)) {
+        val text = if (getAppName() == "Chrome") getText(R.string.atp_AboutChrome) else getText(R.string.atp_AboutSearch)
+        binding.appInfo.addClickableLink(READ_MORE_ANNOTATION, text) {
             startActivity(Intent(Intent.ACTION_VIEW, GOOGLE_POLICY_URL))
         }
 
-        binding.browserDefaultTxt.text = getString(R.string.atp_BrowserDefaultText)
+        binding.browserDefaultTxt.text = if (getAppName() == "Chrome") getString(R.string.atp_BrowserDefaultText) else getString(R.string.atp_SearchDefaultText)
+
+        binding.defaultCTA.text = if (getAppName() == "Chrome") getString(R.string.atp_BrowserDefaultCTA) else getString(R.string.atp_SearchDefaultCTA)
 
         observeViewModel()
         // binding.activityRecyclerView.adapter = itemsAdapter
@@ -146,7 +149,7 @@ class AppTPTransparencyActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         cachedState = viewState
         binding.unprotectedRequests.text = resources.getQuantityString(
-            R.plurals.atp_TransparencyActivityMultipleRequests,
+            if (getAppName() == "Chrome") R.plurals.atp_TransparencyActivityMultipleRequests else R.plurals.atp_TransparencyActivityMultipleSearches,
             viewState.totalTrackingAttempts,
             viewState.totalTrackingAttempts,
         )

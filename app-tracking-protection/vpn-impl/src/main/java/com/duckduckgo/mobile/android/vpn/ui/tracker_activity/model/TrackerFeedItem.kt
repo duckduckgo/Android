@@ -51,10 +51,6 @@ sealed class TrackerCompanyBadge {
     data class Extra(
         val amount: Int,
     ) : TrackerCompanyBadge()
-
-    class PrivacyWarningIcon : TrackerCompanyBadge()
-
-    class PrivacyWarningText : TrackerCompanyBadge()
 }
 
 data class AppsData(

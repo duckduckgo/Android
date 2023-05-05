@@ -21,11 +21,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.mobile.android.ui.view.InfoPanel
 import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
@@ -65,11 +63,9 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     class TrackerBadgeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        // private var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
-        // private var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
-        // private var largeTextBadge: TextView = view.findViewById(R.id.tracker_company_large_badge_text)
-        // private var privacyWarningTxt: TextView = view.findViewById(R.id.privacyWarningText)
-        private var privacyWarning: InfoPanel = view.findViewById(R.id.privacy_warning)
+        private var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
+        private var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
+        private var largeTextBadge: TextView = view.findViewById(R.id.tracker_company_large_badge_text)
 
         companion object {
             fun create(parent: ViewGroup): TrackerBadgeViewHolder {
@@ -83,28 +79,26 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             when (trackerInfo) {
                 is TrackerCompanyBadge.Company -> displayTrackerCompany(trackerInfo)
                 is TrackerCompanyBadge.Extra -> displayExtraBadge(trackerInfo)
-                is TrackerCompanyBadge.PrivacyWarningIcon -> displayPrivacyWarningIcon()
-                is TrackerCompanyBadge.PrivacyWarningText -> displayPrivacyWarningText()
             }
         }
 
         private fun displayTrackerCompany(trackerInfo: TrackerCompanyBadge.Company) {
-            // val badge = badgeIcon(iconBadge.context, trackerInfo.companyName)
-            // val textColor = iconBadge.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorPrimaryText)
-            // if (badge == null) {
-            //     iconBadge.setImageDrawable(
-            //         TextDrawable.builder()
-            //             .beginConfig()
-            //             .fontSize(50)
-            //             .endConfig()
-            //             .buildRound(trackerInfo.companyName.take(1)),
-            //     )
-            // } else {
-            //     iconBadge.setImageResource(badge)
-            // }
-            // iconBadge.show()
-            // textBadge.hide()
-            // largeTextBadge.hide()
+            val badge = badgeIcon(iconBadge.context, trackerInfo.companyName)
+            val textColor = iconBadge.context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorPrimaryText)
+            if (badge == null) {
+                iconBadge.setImageDrawable(
+                    TextDrawable.builder()
+                        .beginConfig()
+                        .fontSize(50)
+                        .endConfig()
+                        .buildRound(trackerInfo.companyName.take(1)),
+                )
+            } else {
+                iconBadge.setImageResource(badge)
+            }
+            iconBadge.show()
+            textBadge.hide()
+            largeTextBadge.hide()
         }
 
         private fun badgeIcon(
@@ -122,41 +116,16 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
 
         private fun displayExtraBadge(trackerInfo: TrackerCompanyBadge.Extra) {
-            // iconBadge.hide()
-            // if (trackerInfo.amount > 9) {
-            //     largeTextBadge.text = "+${trackerInfo.amount}"
-            //     largeTextBadge.show()
-            //     textBadge.hide()
-            // } else {
-            //     textBadge.text = "+${trackerInfo.amount}"
-            //     textBadge.show()
-            //     largeTextBadge.hide()
-            // }
-        }
-
-        private fun displayPrivacyWarningIcon() {
-            // iconBadge.setImageResource(R.drawable.ic_alert_yellow)
-            // textBadge.text = "Review App Privacy"
-
-            // privacyWarningTxt.hide()
-
-            // iconBadge.hide()
-            // textBadge.hide()
-            // largeTextBadge.hide()
-
-            privacyWarning.show()
-
-        }
-
-        private fun displayPrivacyWarningText() {
-            // privacyWarningTxt.show()
-
-            // largeTextBadge.text = "Review App Privacy"
-            // largeTextBadge.show()
-
-            // iconBadge.hide()
-            // textBadge.hide()
-            // largeTextBadge.hide()
+            iconBadge.hide()
+            if (trackerInfo.amount > 9) {
+                largeTextBadge.text = "+${trackerInfo.amount}"
+                largeTextBadge.show()
+                textBadge.hide()
+            } else {
+                textBadge.text = "+${trackerInfo.amount}"
+                textBadge.show()
+                largeTextBadge.hide()
+            }
         }
     }
 
