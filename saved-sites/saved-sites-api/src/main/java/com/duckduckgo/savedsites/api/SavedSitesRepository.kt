@@ -25,6 +25,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 /**
  * The Repository that represents all CRUD operations related to [SavedSites]
@@ -113,6 +114,21 @@ interface SavedSitesRepository {
     fun getBookmark(url: String): Bookmark?
 
     /**
+     * Returns [SavedSite] given an ID
+     * @param ID of the [SavedSite]
+     * @return [SavedSite] if found, or null if does not exist
+     */
+
+    /**
+     * Returns [Bookmark] given an ID
+     * @param ID of the [Bookmark]
+     * @return [Bookmark] if found, or null if does not exist
+     */
+    fun getBookmarkById(id: String): Bookmark?
+
+    fun getSavedSite(id: String): SavedSite?
+
+    /**
      * Returns all [Favorite] in the Database
      * @return [Flow] of all [Favorite] in the Database
      */
@@ -143,6 +159,13 @@ interface SavedSitesRepository {
      * @return [Favorite] if found or null if not found
      */
     fun getFavorite(url: String): Favorite?
+
+    /**
+     * Returns a [Favorite] given a domain
+     * @param id of the [Favorite]
+     * @return [Favorite] if found or null if not found
+     */
+    fun getFavoriteById(id: String): Favorite?
 
     /**
      * Returns if the user has any [Bookmark]
@@ -176,6 +199,7 @@ interface SavedSitesRepository {
      * @return [Favorite] inserted
      */
     fun insertFavorite(
+        id: String = "",
         url: String,
         title: String,
     ): Favorite
