@@ -16,9 +16,13 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 
 interface SavedSitesDuplicateFinder {
 
@@ -28,3 +32,17 @@ interface SavedSitesDuplicateFinder {
 
 }
 
+@ContributesBinding(AppScope::class)
+class RealSavedSitesDuplicateFinder(val repository: SavedSitesRepository): SavedSitesDuplicateFinder {
+    override fun isFolderDuplicate(bookmarkFolder: BookmarkFolder): Boolean {
+        return true
+    }
+
+    override fun isFavouriteDuplicate(favorite: Favorite): Boolean {
+        return true
+    }
+
+    override fun isBookmarkDuplicate(bookmark: Bookmark): Boolean {
+        return true
+    }
+}
