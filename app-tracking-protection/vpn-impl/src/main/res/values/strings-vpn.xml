@@ -417,4 +417,8 @@
     <string name="appTrackingProtectionNotifyMeTitle">Keep an eye on blocked trackers</string>
     <string name="appTrackingProtectionNotifyMeSubtitle">Get updates about blocked tracking attempts in your notification drawer.</string>
 
+    <!-- AppTP Widget -->
+    <string name="atp_WidgetLabel">DuckDuckGo App Tracking</string>
+    <string name="atp_WidgetBlockingDisabledText">Tracker blocking is disabled</string>
+
 </resources>

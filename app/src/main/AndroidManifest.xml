@@ -467,6 +467,18 @@
         </receiver>
 
         <receiver
+            android:name="com.duckduckgo.widget.AppTrackingWidget"
+            android:exported="false"
+            android:label="@string/atp_SettingsTitle">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/atp_widget_info" />
+        </receiver>
+
+        <receiver
             android:name="com.duckduckgo.widget.SearchAndFavoritesWidget"
             android:exported="false"
             android:label="@string/favoritesWidgetLabel">

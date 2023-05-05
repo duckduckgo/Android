@@ -672,6 +672,7 @@ class DeviceShieldTrackerActivity :
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 5
         private const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
         private const val TAG_APPTP_ENABLED_CTA_DIALOG = "AppTpEnabledCta"
+        private const val WIDGET_ATP_EXTRA = "WIDGET_APPTP_EXTRA"
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 
@@ -682,6 +683,14 @@ class DeviceShieldTrackerActivity :
             return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
                 putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
             }
+        }
+
+        fun fromWidget(
+            context: Context,
+        ): Intent {
+            val intent = Intent(context, DeviceShieldTrackerActivity::class.java)
+            intent.putExtra(WIDGET_ATP_EXTRA,true )
+            return intent
         }
     }
 }
