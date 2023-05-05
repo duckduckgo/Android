@@ -44,6 +44,20 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="10 trackers blocked in Uber app sdsadasdd" />
 
+    <com.duckduckgo.mobile.android.ui.view.InfoPanel
+        android:id="@+id/privacy_warning"
+        style="@style/Widget.DuckDuckGo.InfoPanel"
+        app:panelBackground="@drawable/info_panel_alert_background"
+        app:panelDrawable="@drawable/ic_info_panel_alert"
+        app:panelText="Review App Privacy"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintEnd_toStartOf="@id/entry_chevron"
+        app:layout_constraintStart_toStartOf="@id/activity_message"
+        app:layout_constraintTop_toBottomOf="@id/activity_message" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tracker_badges"
         android:layout_width="0dp"

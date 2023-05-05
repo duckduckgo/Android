@@ -32,6 +32,7 @@ import com.bumptech.glide.Glide
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
+import com.duckduckgo.mobile.android.ui.view.InfoPanel
 import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
@@ -166,6 +167,7 @@ class TrackerFeedAdapter @Inject constructor(
         var activityMessage: TextView = view.findViewById(R.id.activity_message)
         var timeSinceTrackerBlocked: TextView = view.findViewById(R.id.activity_time_since)
         var trackingAppIcon: ImageView = view.findViewById(R.id.tracking_app_icon)
+        var privacyWarning: InfoPanel = view.findViewById(R.id.privacy_warning)
         var trackerBadgesView: RecyclerView = view.findViewById<RecyclerView>(R.id.tracker_badges).apply {
             adapter = TrackerBadgeAdapter()
         }
@@ -228,12 +230,16 @@ class TrackerFeedAdapter @Inject constructor(
                     .error(item.trackingApp.appDisplayName.asIconDrawable())
                     .into(trackingAppIcon)
 
-                with(trackerBadgesView) {
-                    // click through recyclerview
-                    suppressLayout(false)
-                    (adapter as TrackerBadgeAdapter).updateData(listOf(TrackerCompanyBadge.PrivacyWarningIcon(), TrackerCompanyBadge.PrivacyWarningText()))
-                    suppressLayout(true)
+                with(privacyWarning) {
+                    show()
                 }
+
+                // with(trackerBadgesView) {
+                //     // click through recyclerview
+                //     suppressLayout(false)
+                //     (adapter as TrackerBadgeAdapter).updateData(listOf(TrackerCompanyBadge.PrivacyWarningIcon()))
+                //     suppressLayout(true)
+                // }
                 itemView.setOnClickListener {
                     startActivity(
                         context,
