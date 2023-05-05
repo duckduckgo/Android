@@ -15,7 +15,6 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widgetContainer"
     android:layout_width="match_parent"
@@ -23,7 +22,7 @@
     android:orientation="vertical"
     tools:ignore="DeprecatedWidgetInXml">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <TextView
         android:id="@+id/atpWidgetTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,10 +30,10 @@
         android:layout_marginTop="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_4"
+        android:textSize="16sp"
+        android:textStyle="bold"
         android:gravity="center"
-        android:text="@string/atp_WidgetLabel"
-        app:textType="primary"
-        app:typography="h2" />
+        android:text="@string/atp_WidgetLabel" />
 
     <LinearLayout
         android:id="@+id/atpWidgetBlockingEnabled"
@@ -49,40 +48,34 @@
             android:layout_gravity="center"
             android:src="@drawable/apptp_shield_enabled" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <TextView
             android:id="@+id/atpWidgetLastWeekText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/atp_ActivityPastWeek"
-            app:textType="primary" />
+            android:text="@string/atp_ActivityPastWeek" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <TextView
             android:id="@+id/atpWidgetBlockedText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingBottom="@dimen/keyline_1"
-            android:text="@string/atp_ActivityPastWeekBlocked"
-            app:textType="secondary"
-            app:typography="body2" />
+            android:text="@string/atp_ActivityPastWeekBlocked" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <TextView
             android:id="@+id/atpWidgetBlockingNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:typography="h2"
             tools:text="19,452" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <TextView
             android:id="@+id/atpWidgetTrackersText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingTop="@dimen/keyline_1"
-            app:textType="secondary"
-            app:typography="body2"
             tools:text="Trackers" />
     </LinearLayout>
     <LinearLayout
@@ -99,12 +92,11 @@
             android:layout_gravity="center"
             android:src="@drawable/apptp_shield_disabled" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <TextView
             android:id="@+id/atpWidgetBlockingDisabledText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/atp_WidgetBlockingDisabledText"
-            app:textType="primary" />
+            android:text="@string/atp_WidgetBlockingDisabledText" />
     </LinearLayout>
 </LinearLayout>

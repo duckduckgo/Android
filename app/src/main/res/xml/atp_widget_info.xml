@@ -17,8 +17,8 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialKeyguardLayout="@layout/atp_widget_light"
     android:initialLayout="@layout/atp_widget_light"
-    android:minWidth="110dp"
-    android:minHeight="100dp"
-    android:previewImage="@drawable/ic_apptb_default"
+    android:minWidth="140dp"
+    android:minHeight="140dp"
+    android:previewImage="@drawable/ic_apptb_default_small"
     android:updatePeriodMillis="3600000"
     android:widgetCategory="home_screen|keyguard" />
