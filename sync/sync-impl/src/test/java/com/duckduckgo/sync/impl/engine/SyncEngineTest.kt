@@ -17,21 +17,14 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.sync.TestSyncFixtures.bookmarkChanges
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.duckduckgo.sync.impl.BookmarksResponse
-import com.duckduckgo.sync.impl.DeviceDataResponse
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SettingsResponse
-import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState.FAIL
-import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import org.junit.Before
 import org.junit.Test
@@ -70,7 +63,7 @@ internal class SyncEngineTest {
         whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
         whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
             Success(
-                listOf(SyncChanges.empty())
+                listOf(SyncChanges.empty()),
             ),
         )
 
@@ -87,7 +80,7 @@ internal class SyncEngineTest {
         val fakeSyncablePlugin = FakeSyncablePlugin(localChanges)
         whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
         whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
-            Result.Error(400, "patch failed")
+            Result.Error(400, "patch failed"),
         )
 
         syncEngine.syncNow(ACCOUNT_CREATION)

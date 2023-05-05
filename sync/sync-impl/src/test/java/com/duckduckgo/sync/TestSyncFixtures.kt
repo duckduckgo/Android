@@ -43,8 +43,8 @@ import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.encodeB64
 import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
 import com.duckduckgo.sync.impl.parser.SyncBookmarksRequest
-import com.duckduckgo.sync.impl.parser.SyncRequest
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
+import com.duckduckgo.sync.impl.parser.SyncRequest
 import java.io.File
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -209,14 +209,16 @@ object TestSyncFixtures {
     }
 
     private fun someBookmarkEntries(): SyncRequest {
-        return SyncRequest(SyncBookmarksRequest(
-            listOf(
-                aBookmarkEntry(1),
-                aBookmarkEntry(2),
-                aBookmarkEntry(3),
-                aBookmarkFolderEntry(1, listOf(1, 2, 3)),
+        return SyncRequest(
+            SyncBookmarksRequest(
+                listOf(
+                    aBookmarkEntry(1),
+                    aBookmarkEntry(2),
+                    aBookmarkEntry(3),
+                    aBookmarkFolderEntry(1, listOf(1, 2, 3)),
+                ),
             ),
-        ))
+        )
     }
 
     val syncData = SyncDataRequest("timestamp", someBookmarkEntries().bookmarks)

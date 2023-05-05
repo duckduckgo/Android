@@ -156,7 +156,7 @@ class SavedSitesRepositoryTest {
     fun whenFavoriteIsAddedThenBookmarkIsAlsoAdded() {
         givenEmptyDBState()
 
-        repository.insertFavorite("favourite1","https://favorite.com", "favorite")
+        repository.insertFavorite("favourite1", "https://favorite.com", "favorite")
 
         assert(repository.getBookmark("https://favorite.com") != null)
         assert(repository.getFavorite("https://favorite.com") != null)
@@ -176,7 +176,7 @@ class SavedSitesRepositoryTest {
     fun whenFavoriteIsAddedAndThenRemovedThenBookmarkStillExists() {
         givenEmptyDBState()
 
-        val favorite = repository.insertFavorite("favourite1","https://favorite.com", "favorite")
+        val favorite = repository.insertFavorite("favourite1", "https://favorite.com", "favorite")
 
         assert(repository.getFavorite("https://favorite.com") != null)
 

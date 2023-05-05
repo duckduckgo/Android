@@ -54,7 +54,7 @@ class RealSyncCrypter(
                     title = encrypt(SavedSitesNames.FAVORITES_NAME, primaryKey),
                     children = favorites.map { it.id },
                     deleted = null,
-                    clientLastModified = DatabaseDateFormatter.iso8601()
+                    clientLastModified = DatabaseDateFormatter.iso8601(),
                 ),
             )
         }
@@ -133,7 +133,7 @@ class RealSyncCrypter(
             title = encrypt(bookmarkFolder.name, primaryKey),
             children = children,
             deleted = null,
-            clientLastModified = DatabaseDateFormatter.iso8601()
+            clientLastModified = DatabaseDateFormatter.iso8601(),
         )
     }
 
@@ -154,7 +154,7 @@ class RealSyncCrypter(
             title = encrypt(savedSite.title, primaryKey),
             url = encrypt(savedSite.url, primaryKey),
             deleted = null,
-            clientLastModified = DatabaseDateFormatter.iso8601()
+            clientLastModified = DatabaseDateFormatter.iso8601(),
         )
     }
 

@@ -181,7 +181,7 @@ data class SyncDataResponse(
             val devicessResponse = DeviceDataResponse("lastModified", emptyList())
             return SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
         }
-     }
+    }
 }
 
 enum class API_CODE(val code: Int) {

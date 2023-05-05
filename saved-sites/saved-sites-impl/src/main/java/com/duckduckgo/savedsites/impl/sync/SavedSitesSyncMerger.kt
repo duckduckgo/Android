@@ -33,8 +33,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncMerger::class)
@@ -79,7 +79,7 @@ class SavedSitesSyncMerger @Inject constructor(
         folderId: String,
         parentId: String,
         remoteUpdates: List<SyncBookmarkEntry>,
-        lastModified: String
+        lastModified: String,
     ) {
         Timber.d("Sync: merging folder $folderId with parentId $parentId")
         val remoteFolder = remoteUpdates.find { it.id == folderId }
@@ -117,7 +117,7 @@ class SavedSitesSyncMerger @Inject constructor(
     private fun decryptFolder(
         remoteEntry: SyncBookmarkEntry,
         parentId: String,
-        lastModified: String
+        lastModified: String,
     ): BookmarkFolder {
         val folder = BookmarkFolder(
             id = remoteEntry.id,
@@ -148,7 +148,7 @@ class SavedSitesSyncMerger @Inject constructor(
     private fun decryptFavourite(
         remoteEntry: SyncBookmarkEntry,
         position: Int,
-        lastModified: String
+        lastModified: String,
     ): Favorite {
         val favourite = Favorite(
             id = remoteEntry.id,
@@ -189,6 +189,5 @@ class SavedSitesSyncMerger @Inject constructor(
 
 class SyncBookmarkRemoteUpdates(
     val entries: List<SyncBookmarkEntry>,
-    val last_modified: String
+    val last_modified: String,
 )
-

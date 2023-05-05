@@ -21,8 +21,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
@@ -78,7 +76,7 @@ class SavedSitesSyncParser @Inject constructor(
 
     private fun addFolderContent(
         folderId: String,
-        updates: MutableList<SyncBookmarkEntry>
+        updates: MutableList<SyncBookmarkEntry>,
     ): List<SyncBookmarkEntry> {
         repository.getFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
@@ -162,7 +160,7 @@ data class SyncBookmarkEntry(
     val page: SyncBookmarkPage?,
     val folder: SyncFolderChildren?,
     val deleted: String?,
-    val client_last_modified: String?
+    val client_last_modified: String?,
 )
 
 fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
@@ -174,7 +172,7 @@ fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
 class SyncBookmarkUpdates(
     val updates: List<SyncBookmarkEntry>,
-    val modified_since: String = "0"
+    val modified_since: String = "0",
 )
 
-//e8b0c8ea-5e75-484f-8764-1dd82e9fe5b2
+// e8b0c8ea-5e75-484f-8764-1dd82e9fe5b2
