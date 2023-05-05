@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 
 class RealSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
@@ -244,6 +245,13 @@ class RealSavedSitesRepository(
         return favorites.firstOrNull { it.url == url }
     }
 
+    override fun getFavoriteById(id: String): Favorite? {
+        val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT).mapIndexed { index, entity ->
+            entity.mapToFavorite(index)
+        }
+        return favorites.firstOrNull { it.id == id }
+    }
+
     override fun getBookmarks(): Flow<List<Bookmark>> {
         return savedSitesEntitiesDao.entitiesByType(BOOKMARK).map { entities -> entities.mapToBookmarks() }
     }
@@ -258,6 +266,26 @@ class RealSavedSitesRepository(
             savedSitesRelationsDao.relationByEntityId(bookmark.entityId)?.let {
                 bookmark.mapToBookmark(it.folderId)
             }
+        } else {
+            null
+        }
+    }
+
+    override fun getBookmarkById(id: String): Bookmark? {
+        val bookmark = savedSitesEntitiesDao.entityById(id)
+        return if (bookmark != null) {
+            savedSitesRelationsDao.relationByEntityId(bookmark.entityId)?.let {
+                bookmark.mapToBookmark(it.folderId)
+            }
+        } else {
+            null
+        }
+    }
+
+    override fun getSavedSite(id: String): SavedSite? {
+        val savedSite = savedSitesEntitiesDao.entityById(id)
+        return if (savedSite != null) {
+            getFavoriteById(id) ?: getBookmarkById(id)
         } else {
             null
         }
@@ -285,13 +313,15 @@ class RealSavedSitesRepository(
     }
 
     override fun insertFavorite(
+        id: String,
         url: String,
         title: String,
     ): Favorite {
+        val idOrFallback = id.takeIf { it.isNotEmpty() } ?: UUID.randomUUID().toString()
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
         val existentBookmark = savedSitesEntitiesDao.entityByUrl(url)
         if (existentBookmark == null) {
-            val entity = Entity(title = titleOrFallback, url = url, type = BOOKMARK)
+            val entity = Entity(entityId = idOrFallback, title = titleOrFallback, url = url, type = BOOKMARK)
             savedSitesEntitiesDao.insert(entity)
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
@@ -308,7 +338,7 @@ class RealSavedSitesRepository(
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {
-                return insertFavorite(savedSite.url, savedSite.title)
+                return insertFavorite(savedSite.id, savedSite.url, savedSite.title)
             }
 
             is Bookmark -> {
@@ -473,7 +503,9 @@ class RealSavedSitesRepository(
         savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
     }
 
-    private fun Entity.mapToBookmark(relationId: String): Bookmark = Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified)
+    private fun Entity.mapToBookmark(relationId: String): Bookmark =
+        Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified)
+
     private fun Entity.mapToBookmarkFolder(relationId: String): BookmarkFolder =
         BookmarkFolder(id = this.entityId, name = this.title, parentId = relationId, lastModified = this.lastModified)
 

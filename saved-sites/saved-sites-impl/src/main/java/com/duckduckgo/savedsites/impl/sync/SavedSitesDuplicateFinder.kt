@@ -22,27 +22,79 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 
 interface SavedSitesDuplicateFinder {
 
-    fun isFolderDuplicate(bookmarkFolder: BookmarkFolder): Boolean
+    fun isFolderDuplicate(
+        bookmarkFolder: BookmarkFolder,
+        children: List<String>
+    ): Boolean
+
     fun isFavouriteDuplicate(favorite: Favorite): Boolean
     fun isBookmarkDuplicate(bookmark: Bookmark): Boolean
-
 }
 
 @ContributesBinding(AppScope::class)
-class RealSavedSitesDuplicateFinder(val repository: SavedSitesRepository): SavedSitesDuplicateFinder {
-    override fun isFolderDuplicate(bookmarkFolder: BookmarkFolder): Boolean {
-        return true
+class RealSavedSitesDuplicateFinder(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
+    override fun isFolderDuplicate(
+        bookmarkFolder: BookmarkFolder,
+        children: List<String>
+    ): Boolean {
+        val present = repository.getFolder(bookmarkFolder.id)
+        return if (present != null) {
+            val content = repository.getFolderContentSync(bookmarkFolder.id)
+            isFolderContentDuplicate(content, children)
+        } else {
+            false
+        }
+    }
+
+    private fun isFolderContentDuplicate(
+        content: Pair<List<Bookmark>, List<BookmarkFolder>>,
+        children: List<String>
+    ): Boolean {
+        val presentChildren = content.first.map { it.id }.plus(content.second.map { it.id }).sorted()
+        return if (presentChildren == children.sorted()) {
+            // content of the folder is the same, but is the content of each item also the same?
+            var sameBookmarks = false
+            content.first.forEach {
+               if (isBookmarkDuplicate(it)){
+                   sameBookmarks = true
+               }
+            }
+            sameBookmarks
+        } else {
+            false
+        }
     }
 
     override fun isFavouriteDuplicate(favorite: Favorite): Boolean {
-        return true
+        val present = repository.getFavoriteById(favorite.id)
+        return if (present != null) {
+            present.url == favorite.url && present.title == favorite.title
+        } else {
+            // same favourite might have a different ID
+            val presentUrl = repository.getFavorite(favorite.url)
+            if (presentUrl != null) {
+                presentUrl.title == favorite.title
+            } else {
+                false
+            }
+        }
     }
 
     override fun isBookmarkDuplicate(bookmark: Bookmark): Boolean {
-        return true
+        val present = repository.getBookmarkById(bookmark.id)
+        return if (present != null) {
+            present.url == bookmark.url && present.title == bookmark.title && present.parentId == bookmark.parentId
+        } else {
+            // same bookmarks might have a different ID
+            val presentUrl = repository.getBookmark(bookmark.url)
+            if (presentUrl != null) {
+                presentUrl.title == bookmark.title && presentUrl.parentId == bookmark.parentId
+            } else {
+                false
+            }
+        }
     }
 }

@@ -96,7 +96,7 @@ class SavedSitesExporterTest {
 
         savedSitesRepository.insertFolderBranch(folderBranch)
 
-        savedSitesRepository.insertFavorite("www.favorite.com", "Favorite")
+        savedSitesRepository.insertFavorite("favourite1","www.favorite.com", "Favorite")
 
         val testFile = File(filesDir, "test_bookmarks.html")
         val localUri = Uri.fromFile(testFile)
