@@ -31,7 +31,7 @@ sealed class SavedSite(
     open val id: String,
     open val title: String,
     open val url: String,
-    open val lastModified: String?
+    open val lastModified: String?,
 ) : Serializable {
     data class Favorite(
         override val id: String,

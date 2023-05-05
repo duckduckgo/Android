@@ -29,7 +29,7 @@ interface SyncEngine {
         APP_OPEN,
         FEATURE_READ,
         ACCOUNT_CREATION,
-        ACCOUNT_LOGIN
+        ACCOUNT_LOGIN,
     }
 
     /**

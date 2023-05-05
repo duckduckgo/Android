@@ -25,7 +25,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 
 /**
  * The Repository that represents all CRUD operations related to [SavedSites]

@@ -671,7 +671,13 @@ class BrowserTabViewModelTest {
     fun whenBookmarkAddedThenRepositoryIsUpdatedAndUserNotified() = runTest {
         val url = "http://www.example.com"
         val title = "A title"
-        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = title, url = url, parentId = UUID.randomUUID().toString(), lastModified = "timestamp")
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = title,
+            url = url,
+            parentId = UUID.randomUUID().toString(),
+            lastModified = "timestamp",
+        )
         whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url, title = title)
 
@@ -711,7 +717,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenQuickAccessInsertedThenRepositoryUpdated() {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com",lastModified = "timestamp", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
 
         testee.insertQuickAccessItem(savedSite)
 
@@ -720,7 +726,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenQuickAccessListChangedThenRepositoryUpdated() {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp",0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
         val savedSites = listOf(QuickAccessFavorite(savedSite))
 
         testee.onQuickAccessListChanged(savedSites)
@@ -1589,7 +1595,13 @@ class BrowserTabViewModelTest {
     fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = runTest {
         val url = "http://foo.com"
         val title = "Foo Title"
-        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = title, url = url, parentId = UUID.randomUUID().toString(), lastModified = "timestamp")
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = title,
+            url = url,
+            parentId = UUID.randomUUID().toString(),
+            lastModified = "timestamp",
+        )
         whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url)
         testee.titleReceived(newTitle = title)
@@ -1606,7 +1618,7 @@ class BrowserTabViewModelTest {
             title = "A title",
             url = "www.example.com",
             parentId = UUID.randomUUID().toString(),
-            lastModified = "timestamp"
+            lastModified = "timestamp",
         )
         whenever(mockSavedSitesRepository.insertBookmark(anyString(), anyString())).thenReturn(bookmark)
 
@@ -3168,7 +3180,13 @@ class BrowserTabViewModelTest {
     fun whenBookmarkAddedThenPersistFavicon() = runTest {
         val url = "http://example.com"
         val title = "A title"
-        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = title, url = url, parentId = UUID.randomUUID().toString(), lastModified = "timestamp")
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = title,
+            url = url,
+            parentId = UUID.randomUUID().toString(),
+            lastModified = "timestamp",
+        )
         whenever(mockSavedSitesRepository.insertBookmark(title = anyString(), url = anyString())).thenReturn(bookmark)
         loadUrl(url = url, title = title)
 
@@ -3691,7 +3709,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() = runTest {
         val url = "http://www.example.com"
-        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = "", url = url, parentId = UUID.randomUUID().toString(), lastModified = "timestamp")
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = "",
+            url = url,
+            parentId = UUID.randomUUID().toString(),
+            lastModified = "timestamp",
+        )
         whenever(mockSavedSitesRepository.getBookmark(url = url)).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
         loadUrl(url = url, isBrowserShowing = true)
@@ -3701,7 +3725,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEditBookmarkRequestedThenEditBookmarkPressedPixelIsFired() = runTest {
-        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = "title", url = "www.example.com", parentId = UUID.randomUUID().toString(), lastModified = "timestamp")
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = "title",
+            url = "www.example.com",
+            parentId = UUID.randomUUID().toString(),
+            lastModified = "timestamp",
+        )
         whenever(mockSavedSitesRepository.getBookmark("www.example.com")).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
         loadUrl("www.example.com", isBrowserShowing = true)
@@ -3711,7 +3741,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEditBookmarkRequestedThenEditDialogIsShownWithCorrectUrlAndTitle() = runTest {
-        val bookmark = Bookmark(id = UUID.randomUUID().toString(), title = "title", url = "www.example.com", parentId = UUID.randomUUID().toString(), lastModified = "timestamp")
+        val bookmark = Bookmark(
+            id = UUID.randomUUID().toString(),
+            title = "title",
+            url = "www.example.com",
+            parentId = UUID.randomUUID().toString(),
+            lastModified = "timestamp",
+        )
         whenever(mockSavedSitesRepository.getBookmark("www.example.com")).thenReturn(bookmark)
         bookmarksListFlow.send(listOf(bookmark))
         loadUrl("www.example.com", isBrowserShowing = true)
@@ -3756,7 +3792,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRemoveFavoriteRequestedThenDeleteConfirmationDialogIsShownWithCorrectUrlAndTitle() = runTest {
-        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "title", url = "www.example.com", position = 0, lastModified = "timestamp")
+        val favoriteSite = Favorite(
+            id = UUID.randomUUID().toString(),
+            title = "title",
+            url = "www.example.com",
+            position = 0,
+            lastModified = "timestamp",
+        )
         whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)

@@ -60,7 +60,9 @@ class SyncCrypterTest {
     @Before fun before() {
         syncCrypter = RealSyncCrypter(repository, nativeLib, store)
 
-        whenever(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "Bookmarks", "", 0, 0, ""))
+        whenever(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)).thenReturn(
+            BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "Bookmarks", "", 0, 0, ""),
+        )
         whenever(repository.getFolder(SavedSitesNames.FAVORITES_ROOT)).thenReturn(
             BookmarkFolder(SavedSitesNames.FAVORITES_ROOT, "Favorites", "", 0, 0, ""),
         )

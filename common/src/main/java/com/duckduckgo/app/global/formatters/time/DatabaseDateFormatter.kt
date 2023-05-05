@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.formatters.time
 
 import org.threeten.bp.Duration
-import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset

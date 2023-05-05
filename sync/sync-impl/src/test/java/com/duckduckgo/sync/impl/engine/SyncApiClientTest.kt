@@ -72,7 +72,7 @@ internal class SyncApiClientTest {
     }
 
     @Test
-    fun whenPatchAndBookmarkChangesThenApiIsSuccessful(){
+    fun whenPatchAndBookmarkChangesThenApiIsSuccessful() {
         val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(syncDataResponse))
@@ -82,7 +82,7 @@ internal class SyncApiClientTest {
     }
 
     @Test
-    fun whenPatchAndBookmarkChangesThenApiFails(){
+    fun whenPatchAndBookmarkChangesThenApiFails() {
         val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(patchAllError)
@@ -92,7 +92,7 @@ internal class SyncApiClientTest {
     }
 
     @Test
-    fun whenMappingChangesThenGeneratedObjectIsCorrect(){
+    fun whenMappingChangesThenGeneratedObjectIsCorrect() {
         val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
         val changes = apiClient.mapRequest(listOf(bookmarksChanges))
         assertTrue(changes.clientTimestamp.isNotEmpty())
@@ -109,7 +109,7 @@ internal class SyncApiClientTest {
     }
 
     @Test
-    fun whenGetAndApiFailsThenResultIsError(){
+    fun whenGetAndApiFailsThenResultIsError() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.getAllData(any())).thenReturn(getAllError)
 

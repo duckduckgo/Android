@@ -25,8 +25,8 @@ import com.duckduckgo.sync.impl.BookmarksResponse
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.impl.parser.SyncRequest
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
+import com.duckduckgo.sync.impl.parser.SyncRequest
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter

@@ -29,7 +29,6 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
@@ -72,7 +71,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun sendAllLocalData(){
+    private fun sendAllLocalData() {
         Timber.d("Sync: initiating first sync")
         val changes = initialSyncChanges()
 

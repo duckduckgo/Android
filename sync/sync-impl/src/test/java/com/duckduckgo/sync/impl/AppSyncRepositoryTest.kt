@@ -61,7 +61,6 @@ import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.engine.SyncEngineTest
 import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.test.runTest

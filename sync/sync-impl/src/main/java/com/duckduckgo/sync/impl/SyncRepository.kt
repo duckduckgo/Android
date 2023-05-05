@@ -69,7 +69,7 @@ class AppSyncRepository @Inject constructor(
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
     private val syncCrypter: SyncCrypter,
-    private val syncEngine: SyncEngine
+    private val syncEngine: SyncEngine,
 ) : SyncRepository {
     override fun isSignedInFlow(): Flow<Boolean> = syncStore.isSignedInFlow()
 

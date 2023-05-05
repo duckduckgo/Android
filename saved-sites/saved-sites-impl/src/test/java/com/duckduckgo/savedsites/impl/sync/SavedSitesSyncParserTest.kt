@@ -93,7 +93,7 @@ class SavedSitesSyncParserTest {
     }
 
     @Test
-    fun whenFirstSyncAndUsersHasFoldersThenChangesAreFormatted(){
+    fun whenFirstSyncAndUsersHasFoldersThenChangesAreFormatted() {
         val bookmarksRootFolder = aFolder(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "")
 
         whenever(repository.hasBookmarks()).thenReturn(true)
@@ -145,7 +145,7 @@ class SavedSitesSyncParserTest {
                     aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com"),
                 ),
                 listOf(
-                    subFolder
+                    subFolder,
                 ),
             ),
         )
