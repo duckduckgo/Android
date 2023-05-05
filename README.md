@@ -1,5 +1,6 @@
 # DuckDuckGo Android
 
+Hello Duck Duck Go Is an amazing community.
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## We are hiring!
