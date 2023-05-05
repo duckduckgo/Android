@@ -53,6 +53,11 @@ class SavedSitesSyncMerger @Inject constructor(
             return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect bookmarks null")
         }
 
+        if (bookmarks.last_modified != null) {
+            Timber.d("Sync: updating last_modified to ${bookmarks.last_modified}")
+            savedSitesSyncStore.modifiedSince = bookmarks.last_modified
+        }
+
         if (bookmarks.entries == null) {
             return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect entries null")
         }
@@ -64,9 +69,6 @@ class SavedSitesSyncMerger @Inject constructor(
 
         bookmarks.entries.find { it.id == SavedSitesNames.BOOMARKS_ROOT }
             ?: return SyncMergeResult.Error(reason = "Sync: merging failed, Bookmarks Root folder does not exist")
-
-        Timber.d("Sync: updating last_modified to ${bookmarks.last_modified}")
-        savedSitesSyncStore.modifiedSince = bookmarks.last_modified
 
         mergeFolder(SavedSitesNames.BOOMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified)
         mergeFolder(SavedSitesNames.FAVORITES_ROOT, "", bookmarks.entries, bookmarks.last_modified)
