@@ -150,7 +150,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
                     appName = brokenApp.appName,
                     appPackageId = brokenApp.appPackageId,
                     description = binding.appBreakageFormFeedbackInput.text,
-                    category = viewModel.viewState.value.categorySelected.toString(),
+                    category = viewModel.viewState.value.categorySelected?.key.toString(),
                     customMetadata =
                     Base64.encodeToString(
                         metadataReporter.getVpnStateMetadata(brokenApp.appPackageId).toByteArray(),
