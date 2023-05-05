@@ -76,7 +76,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="60dp"
                 android:layout_marginBottom="60dp"
-                android:src="@drawable/ic_red_dax"/>
+                android:src="@drawable/ic_dax_icon"/>
 
         </LinearLayout>
     </ScrollView>
