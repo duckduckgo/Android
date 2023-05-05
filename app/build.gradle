@@ -391,6 +391,7 @@ dependencies {
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.room.testing
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
     testImplementation "androidx.test:runner:_"
