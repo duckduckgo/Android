@@ -39,6 +39,7 @@ interface Client {
         val categories: List<String>? = null,
         val surrogate: String? = null,
         val isATracker: Boolean,
+        val ctlAction: String? = null,
     )
 
     val name: ClientName

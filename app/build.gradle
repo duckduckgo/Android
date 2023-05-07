@@ -279,6 +279,7 @@ dependencies {
     implementation project(':runtime-checks-impl')
     implementation project(':runtime-checks-store')
 
+    implementation project(':click-to-load-api')
     implementation project(':click-to-load-impl')
     implementation project(':click-to-load-store')
 

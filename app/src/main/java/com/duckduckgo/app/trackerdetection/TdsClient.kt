@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
+import com.duckduckgo.app.trackerdetection.model.Action.BLOCK_CTL_FB
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import java.net.URI
@@ -43,6 +44,7 @@ class TdsClient(
             categories = tracker.categories,
             surrogate = matches.surrogate,
             isATracker = matches.isATracker,
+            ctlAction = matches.ctlAction,
         )
     }
 
@@ -72,6 +74,10 @@ class TdsClient(
 
                 if (rule.action == IGNORE) {
                     return MatchedResult(shouldBlock = false, isATracker = true)
+                }
+
+                if (rule.action == BLOCK_CTL_FB && rule.surrogate?.isNotEmpty() == true) {
+                    return MatchedResult(shouldBlock = true, surrogate = rule.surrogate, isATracker = true, ctlAction = "block-ctl-fb")
                 }
 
                 if (rule.surrogate?.isNotEmpty() == true) {
@@ -123,5 +129,6 @@ class TdsClient(
         val shouldBlock: Boolean,
         val isATracker: Boolean,
         val surrogate: String? = null,
+        val ctlAction: String? = null,
     )
 }

@@ -449,6 +449,7 @@ class BrowserTabViewModel @Inject constructor(
             val includeShortcutToViewCredential: Boolean,
             val messageResourceId: Int,
         ) : Command()
+        class DisplayClickToLoadPlaceholders(val action: String) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -1665,6 +1666,9 @@ class BrowserTabViewModel @Inject constructor(
             onSiteChanged()
         }
         updateNetworkLeaderboard(event)
+        event.ctlAction?.let { action ->
+            command.postValue(DisplayClickToLoadPlaceholders(action))
+        }
     }
 
     private fun updateNetworkLeaderboard(event: TrackingEvent) {

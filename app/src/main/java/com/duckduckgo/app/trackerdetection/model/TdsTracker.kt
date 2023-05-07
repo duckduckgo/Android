@@ -36,6 +36,7 @@ enum class Action {
     BLOCK,
     IGNORE,
     UNSUPPORTED,
+    BLOCK_CTL_FB,
 }
 
 class Rule(

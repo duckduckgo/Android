@@ -364,6 +364,27 @@ class TrackerDetectorTest {
         )
     }
 
+    @Test
+    fun whenHasCtlActionReturnsTrackingEventWithCtlAction() {
+        trackerDetector.addClient(alwaysMatchingClientWithSurrogateAndCtlAction(CLIENT_A))
+        val expected = TrackingEvent(
+            documentUrl = "http://example.com/index.com",
+            trackerUrl = "http://thirdparty.com/update.js",
+            categories = null,
+            entity = null,
+            surrogateId = "testId",
+            status = TrackerStatus.BLOCKED,
+            type = TrackerType.OTHER,
+            ctlAction = "block-ctl-fb",
+        )
+        val actual = trackerDetector.evaluate(
+            "http://thirdparty.com/update.js",
+            "http://example.com/index.com",
+            requestHeaders = mapOf(),
+        )
+        assertEquals(expected, actual)
+    }
+
     private fun alwaysMatchingClient(name: ClientName): Client {
         val client: Client = mock()
         whenever(client.name).thenReturn(name)
@@ -376,6 +397,14 @@ class TrackerDetectorTest {
         whenever(client.name).thenReturn(name)
         whenever(client.matches(anyString(), anyString(), anyMap()))
             .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true))
+        return client
+    }
+
+    private fun alwaysMatchingClientWithSurrogateAndCtlAction(name: ClientName): Client {
+        val client: Client = mock()
+        whenever(client.name).thenReturn(name)
+        whenever(client.matches(anyString(), anyString(), anyMap()))
+            .thenReturn(Client.Result(matches = true, surrogate = "testId", isATracker = true, ctlAction = "block-ctl-fb"))
         return client
     }
 

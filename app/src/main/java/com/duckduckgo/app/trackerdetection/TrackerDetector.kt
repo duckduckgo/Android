@@ -109,7 +109,7 @@ class TrackerDetectorImpl @Inject constructor(
 
         Timber.v("$documentUrl resource $url WAS identified as a tracker and status=$status")
 
-        return TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type)
+        return TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type, result.ctlAction)
     }
 
     private fun firstParty(

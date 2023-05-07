@@ -57,9 +57,9 @@ class StateMessageHandlerPluginTest {
         val messageCaptor = argumentCaptor<String>()
         verify(mockResponseListener).onResponse(messageCaptor.capture())
         assertEquals(
-            messageCaptor.firstValue,
             "{\"feature\":\"clickToLoad\",\"messageType\":\"response\",\"response\":\"{ \\\"devMode\\\": false, " +
                 "\\\"youtubePreviewsEnabled\\\": false }\",\"responseMessageType\":\"getClickToLoadState\",\"type\":\"update\"}",
+            messageCaptor.firstValue,
         )
     }
 
@@ -70,9 +70,9 @@ class StateMessageHandlerPluginTest {
         val messageCaptor = argumentCaptor<String>()
         verify(mockResponseListener).onResponse(messageCaptor.capture())
         assertEquals(
-            messageCaptor.firstValue,
             "{\"feature\":\"clickToLoad\",\"messageType\":\"response\",\"response\":\"{ \\\"devMode\\\": true, " +
                 "\\\"youtubePreviewsEnabled\\\": false }\",\"responseMessageType\":\"getClickToLoadState\",\"type\":\"update\"}",
+            messageCaptor.firstValue,
         )
     }
 }

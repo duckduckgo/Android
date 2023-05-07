@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.trackerdetection.model.*
+import com.duckduckgo.app.trackerdetection.model.Action.BLOCK_CTL_FB
 import com.duckduckgo.app.trackerdetection.model.Action.UNSUPPORTED
 import com.squareup.moshi.FromJson
 import java.util.*
@@ -87,6 +88,7 @@ class ActionJsonAdapter {
     fun fromJson(actionName: String): Action {
         // If action not null but not supported, return unsupported.
         // Unsupported actions are always ignored.
+        if (actionName == "block-ctl-fb") return BLOCK_CTL_FB
         return Action.values().firstOrNull { it.name == actionName.uppercase(Locale.ROOT) } ?: UNSUPPORTED
     }
 }

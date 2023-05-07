@@ -4311,6 +4311,46 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenTrackerDetectedAndHasCtlActionThenDisplayClickToLoadPlaceholders() {
+        loadUrl("https://example.com")
+        val entity = TestEntity("Network1", "Network1", 10.0)
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = "https://example.com",
+                trackerUrl = "",
+                categories = null,
+                entity = entity,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
+                ctlAction = "block-ctl-fb",
+            ),
+        )
+        assertCommandIssued<Command.DisplayClickToLoadPlaceholders> {
+            assertEquals("block-ctl-fb", this.action)
+        }
+    }
+
+    @Test
+    fun whenTrackerDetectedAndCtlActionIsNullThenDoNotDisplayClickToLoadPlaceholders() {
+        loadUrl("https://example.com")
+        val entity = TestEntity("Network1", "Network1", 10.0)
+        testee.trackerDetected(
+            TrackingEvent(
+                documentUrl = "https://example.com",
+                trackerUrl = "",
+                categories = null,
+                entity = entity,
+                surrogateId = null,
+                status = TrackerStatus.BLOCKED,
+                type = TrackerType.OTHER,
+                ctlAction = null,
+            ),
+        )
+        assertCommandNotIssued<Command.DisplayClickToLoadPlaceholders>()
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }

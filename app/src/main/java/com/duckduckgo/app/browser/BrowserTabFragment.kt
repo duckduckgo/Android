@@ -186,6 +186,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.clicktoload.api.ClickToLoad
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
@@ -384,6 +385,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var contentScopeScripts: ContentScopeScripts
+
+    @Inject
+    lateinit var clickToLoad: ClickToLoad
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -1094,6 +1098,7 @@ class BrowserTabFragment :
                 messageResourceId = it.messageResourceId,
                 includeShortcutToViewCredential = it.includeShortcutToViewCredential,
             )
+            is Command.DisplayClickToLoadPlaceholders -> webView?.let { webView -> clickToLoad.displayClickToLoadPlaceholders(webView, it.action) }
             else -> {
                 // NO OP
             }

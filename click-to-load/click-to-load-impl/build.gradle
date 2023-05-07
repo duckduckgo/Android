@@ -37,6 +37,7 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':click-to-load-api')
     implementation project(path: ':click-to-load-store')
     implementation project(path: ':content-scope-scripts-api')
 

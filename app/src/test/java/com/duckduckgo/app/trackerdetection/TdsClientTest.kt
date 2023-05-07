@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.trackerdetection.Client.ClientName.TDS
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
+import com.duckduckgo.app.trackerdetection.model.Action.BLOCK_CTL_FB
 import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.Options
 import com.duckduckgo.app.trackerdetection.model.Rule
@@ -26,6 +27,7 @@ import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -103,6 +105,28 @@ class TdsClientTest {
         val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
         val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf())
         assertFalse(result.matches)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleWithNoExceptionsAndRuleActionBlockCtlFbAndHasSurrogateThenMatchesIsTrue() {
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK_CTL_FB, null, "testId", null)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
+        val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
+        val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf())
+        assertTrue(result.matches)
+        assertEquals("testId", result.surrogate)
+        assertEquals("block-ctl-fb", result.ctlAction)
+    }
+
+    @Test
+    fun whenUrlMatchesRuleWithNoExceptionsAndRuleActionBlockCtlFbAndSurrogateIsNullThenMatchesIsTrue() {
+        val rule = Rule("api\\.tracker\\.com\\/auth", BLOCK_CTL_FB, null, null, null)
+        val data = listOf(TdsTracker("tracker.com", BLOCK, OWNER, CATEGORY, listOf(rule)))
+        val testee = TdsClient(TDS, data, mockUrlToTypeMapper)
+        val result = testee.matches("http://api.tracker.com/auth/script.js", DOCUMENT_URL, mapOf())
+        assertTrue(result.matches)
+        assertNull(result.surrogate)
+        assertNull(result.ctlAction)
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.clicktoload.api
 
-data class TrackingEvent(
-    val documentUrl: String,
-    val trackerUrl: String,
-    val categories: List<String>?,
-    val entity: Entity?,
-    val surrogateId: String?,
-    val status: TrackerStatus,
-    val type: TrackerType,
-    val ctlAction: String? = null,
-)
+import android.webkit.WebView
 
-enum class TrackerType {
-    AD,
-    OTHER,
-}
+/** Public interface for the Click to Load feature */
+interface ClickToLoad {
 
-enum class TrackerStatus {
-    BLOCKED,
-    USER_ALLOWED,
-    AD_ALLOWED,
-    SITE_BREAKAGE_ALLOWED,
-    SAME_ENTITY_ALLOWED,
-    ALLOWED,
+    /**
+     * This method sends a message to the content scope scripts to refresh the Click to Load placeholders.
+     * It requires a [WebView] instance and an action [String].
+     */
+    fun displayClickToLoadPlaceholders(webView: WebView, action: String)
 }
