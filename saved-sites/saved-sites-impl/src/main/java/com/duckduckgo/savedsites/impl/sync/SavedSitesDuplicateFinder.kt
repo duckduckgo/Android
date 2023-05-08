@@ -26,53 +26,81 @@ import javax.inject.Inject
 
 interface SavedSitesDuplicateFinder {
 
-    fun isFolderDuplicate(
+    fun findFolderDuplicate(
         bookmarkFolder: BookmarkFolder,
-    ): Boolean
+    ): SavedSitesDuplicateResult
 
-    fun isFavouriteDuplicate(favorite: Favorite): Boolean
-    fun isBookmarkDuplicate(bookmark: Bookmark): Boolean
+    fun findFavouriteDuplicate(favorite: Favorite): SavedSitesDuplicateResult
+    fun findBookmarkDuplicate(bookmark: Bookmark): SavedSitesDuplicateResult
+}
+
+sealed class SavedSitesDuplicateResult {
+    object NotDuplicate : SavedSitesDuplicateResult()
+    data class Duplicate(val id: String) : SavedSitesDuplicateResult()
 }
 
 @ContributesBinding(AppScope::class)
 class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
-    override fun isFolderDuplicate(
-        bookmarkFolder: BookmarkFolder,
-    ): Boolean {
+    override fun findFolderDuplicate(bookmarkFolder: BookmarkFolder): SavedSitesDuplicateResult {
         val present = repository.getFolder(bookmarkFolder.id)
         return if (present != null) {
-            present.parentId == bookmarkFolder.parentId
+            SavedSitesDuplicateResult.Duplicate(present.id)
         } else {
-            false
-        }
-    }
-
-    override fun isFavouriteDuplicate(favorite: Favorite): Boolean {
-        val present = repository.getFavoriteById(favorite.id)
-        return if (present != null) {
-            present.url == favorite.url && present.title == favorite.title
-        } else {
-            // same favourite might have a different ID
-            val presentUrl = repository.getFavorite(favorite.url)
-            if (presentUrl != null) {
-                presentUrl.title == favorite.title
+            val existingFolder = repository.getFolderByName(bookmarkFolder.name)
+            if (existingFolder != null) {
+                if (existingFolder.parentId == bookmarkFolder.parentId) {
+                    SavedSitesDuplicateResult.Duplicate(existingFolder.id)
+                } else {
+                    SavedSitesDuplicateResult.NotDuplicate
+                }
             } else {
-                false
+                SavedSitesDuplicateResult.NotDuplicate
             }
         }
     }
 
-    override fun isBookmarkDuplicate(bookmark: Bookmark): Boolean {
+    override fun findFavouriteDuplicate(favorite: Favorite): SavedSitesDuplicateResult {
+        val present = repository.getFavoriteById(favorite.id)
+        return if (present != null) {
+            if (present.url == favorite.url && present.title == favorite.title) {
+                SavedSitesDuplicateResult.Duplicate(present.id)
+            } else {
+                SavedSitesDuplicateResult.NotDuplicate
+            }
+        } else {
+            // same favourite might have a different ID
+            val presentUrl = repository.getFavorite(favorite.url)
+            if (presentUrl != null) {
+                if (presentUrl.title == favorite.title) {
+                    SavedSitesDuplicateResult.Duplicate(presentUrl.id)
+                } else {
+                    SavedSitesDuplicateResult.NotDuplicate
+                }
+            } else {
+                SavedSitesDuplicateResult.NotDuplicate
+            }
+        }
+    }
+
+    override fun findBookmarkDuplicate(bookmark: Bookmark): SavedSitesDuplicateResult {
         val present = repository.getBookmarkById(bookmark.id)
         return if (present != null) {
-            present.url == bookmark.url && present.title == bookmark.title && present.parentId == bookmark.parentId
+            if (present.url == bookmark.url && present.title == bookmark.title && present.parentId == bookmark.parentId) {
+                SavedSitesDuplicateResult.Duplicate(present.id)
+            } else {
+                SavedSitesDuplicateResult.NotDuplicate
+            }
         } else {
             // same bookmarks might have a different ID
             val presentUrl = repository.getBookmark(bookmark.url)
             if (presentUrl != null) {
-                presentUrl.title == bookmark.title && presentUrl.parentId == bookmark.parentId
+                if (presentUrl.title == bookmark.title && presentUrl.parentId == bookmark.parentId) {
+                    SavedSitesDuplicateResult.Duplicate(presentUrl.id)
+                } else {
+                    SavedSitesDuplicateResult.NotDuplicate
+                }
             } else {
-                false
+                SavedSitesDuplicateResult.NotDuplicate
             }
         }
     }

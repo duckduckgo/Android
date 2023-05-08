@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 
 class FakeSyncablePlugin(val changes: SyncChanges) : SyncablePlugin {
@@ -27,7 +28,7 @@ class FakeSyncablePlugin(val changes: SyncChanges) : SyncablePlugin {
     override fun syncChanges(
         changes: List<SyncChanges>,
         timestamp: String,
-    ) {
-        // no - op
+    ): SyncMergeResult<Boolean> {
+        return SyncMergeResult.Success(false)
     }
 }

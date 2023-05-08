@@ -89,10 +89,15 @@ class SavedSitesSyncMerger @Inject constructor(
         } else {
             remoteFolder.folder?.let {
                 val folder = decryptFolder(remoteFolder, parentId, lastModified)
-                if (duplicateFinder.isFolderDuplicate(folder)) {
-                    savedSitesRepository.replace(folderId, folder.id)
-                } else {
-                    savedSitesRepository.insert(folder)
+                when (val result = duplicateFinder.findFolderDuplicate(folder)) {
+                    is SavedSitesDuplicateResult.Duplicate -> {
+                        Timber.d("Sync: folder $folderId exists locally, replacing content")
+                        savedSitesRepository.replaceFolder(folderId, result.id)
+                    }
+                    is SavedSitesDuplicateResult.NotDuplicate -> {
+                        Timber.d("Sync: folder $folderId not present locally")
+                        savedSitesRepository.insert(folder)
+                    }
                 }
             }
 
@@ -106,10 +111,31 @@ class SavedSitesSyncMerger @Inject constructor(
                         childEntry.isBookmark() -> {
                             if (remoteFolder.isFavouritesRoot()) {
                                 Timber.d("Sync: child $child is a Favourite")
-                                savedSitesRepository.insert(decryptFavourite(childEntry, position, lastModified))
+                                val favourite = decryptFavourite(childEntry, position, lastModified)
+                                when (val result = duplicateFinder.findFavouriteDuplicate(favourite)) {
+                                    is SavedSitesDuplicateResult.Duplicate -> {
+                                        Timber.d("Sync: child $child exists locally, replacing")
+                                        savedSitesRepository.replaceFavourite(favourite, result.id)
+                                    }
+                                    is SavedSitesDuplicateResult.NotDuplicate -> {
+                                        Timber.d("Sync: child $child not present locally")
+                                        savedSitesRepository.insert(favourite)
+                                    }
+                                }
                             } else {
+                                // eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6IkhqQnMwd2lza0tyTzZGSmF1b0psMjQ2Qko5T01XK1V1Rk92QTVYN1ovdU09IiwidXNlcl9pZCI6ImI3ZDNlMzFiLTk5MzctNDE3Zi05NjU4LWNhNzI0NjkxZGE2NSJ9fQ==
                                 Timber.d("Sync: child $child is a Bookmark")
-                                savedSitesRepository.insert(decryptBookmark(childEntry, folderId, lastModified))
+                                val bookmark = decryptBookmark(childEntry, folderId, lastModified)
+                                when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
+                                    is SavedSitesDuplicateResult.Duplicate -> {
+                                        Timber.d("Sync: child $child exists locally, replacing")
+                                        savedSitesRepository.replaceBookmark(bookmark, result.id)
+                                    }
+                                    is SavedSitesDuplicateResult.NotDuplicate -> {
+                                        Timber.d("Sync: child $child not present locally")
+                                        savedSitesRepository.insert(bookmark)
+                                    }
+                                }
                             }
                         }
 
