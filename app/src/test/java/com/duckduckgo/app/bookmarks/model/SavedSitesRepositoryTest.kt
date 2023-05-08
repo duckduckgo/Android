@@ -979,6 +979,40 @@ class SavedSitesRepositoryTest {
         Assert.assertEquals(updatedBookmark.id, bookmarkUpdated.id)
     }
 
+    @Test
+    fun whenFolderIsReplacedThenLocalDataIsUpdated() = runTest {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        repository.insert(rootFolder)
+
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        repository.insert(parentFolder)
+
+        val bookmarks = givenSomeBookmarks(10)
+        savedSitesEntitiesDao.insertList(bookmarks)
+
+        val subFolder = givenFolderWithContent(parentFolder.id, bookmarks)
+        savedSitesRelationsDao.insertList(subFolder)
+
+        repository.replace("folder2", parentFolder.id)
+
+        repository.insert(
+            Bookmark(
+                id = "bookmark1",
+                title = "title",
+                url = "foo.com",
+                lastModified = "timestamp",
+                parentId = "folder2",
+            ),
+        )
+
+        repository.getSavedSites("folder2").test {
+            val savedSites = awaitItem()
+            assertTrue(savedSites.bookmarks.size == 11)
+            assertTrue(savedSites.favorites.isEmpty())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private fun givenNoFavoritesStored() {
         Assert.assertFalse(repository.hasFavorites())
     }
