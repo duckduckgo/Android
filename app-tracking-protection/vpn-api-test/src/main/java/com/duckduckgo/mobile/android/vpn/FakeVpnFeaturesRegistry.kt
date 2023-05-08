@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn
 
-import kotlinx.coroutines.flow.Flow
-
 class FakeVpnFeaturesRegistry : VpnFeaturesRegistry {
     private val features = mutableSetOf<String>()
 
@@ -39,10 +37,6 @@ class FakeVpnFeaturesRegistry : VpnFeaturesRegistry {
 
     override suspend fun refreshFeature(feature: VpnFeature) {
         // no-op
-    }
-
-    override fun registryChanges(): Flow<Pair<String, Boolean>> {
-        TODO("Not yet implemented")
     }
 
     override fun getRegisteredFeatures(): List<VpnFeature> {

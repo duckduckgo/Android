@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import app.cash.turbine.test
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -149,36 +148,6 @@ class VpnFeaturesRegistryImplTest {
 
         assertTrue(vpnServiceWrapper.isServiceRunning())
         assertEquals(0, vpnServiceWrapper.restartCount)
-    }
-
-    @Test
-    fun whenRegisterFeatureThenEmitChange() = runTest {
-        vpnFeaturesRegistry.registryChanges().test {
-            vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
-            vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
-            assertEquals(TestVpnFeatures.FOO.featureName to true, awaitItem())
-            assertEquals(TestVpnFeatures.BAR.featureName to true, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUnregisterNotRegisterFeatureThenNoEmission() = runTest {
-        vpnFeaturesRegistry.registryChanges().test {
-            vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun whenUnregisterRegisteredFeatureThenEmitChange() = runTest {
-        vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
-        vpnFeaturesRegistry.registryChanges().test {
-            vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
-            assertEquals(TestVpnFeatures.FOO.featureName to true, awaitItem())
-            assertEquals(TestVpnFeatures.FOO.featureName to false, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     private enum class TestVpnFeatures(override val featureName: String) : VpnFeature {
