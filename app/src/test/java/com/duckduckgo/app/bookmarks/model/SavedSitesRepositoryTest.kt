@@ -980,7 +980,18 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenFolderIsReplacedThenLocalDataIsUpdated() = runTest {
+    fun whenFavouritesDuplicatedThenLocalDataIsReplaced() = runTest {
+        val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
+        val favoritetwo = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 1)
+        val favoritethree = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 2)
+
+        givenFavoriteStored(favoriteone)
+        givenFavoriteStored(favoritetwo)
+        givenFavoriteStored(favoritethree)
+    }
+
+    @Test
+    fun whenSubFolderIsReplacedThenLocalDataIsUpdated() = runTest {
         val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 

@@ -89,7 +89,7 @@ class SavedSitesSyncMerger @Inject constructor(
         } else {
             remoteFolder.folder?.let {
                 val folder = decryptFolder(remoteFolder, parentId, lastModified)
-                if (duplicateFinder.isFolderDuplicate(folder, it.children)) {
+                if (duplicateFinder.isFolderDuplicate(folder)) {
                     savedSitesRepository.replace(folderId, folder.id)
                 } else {
                     savedSitesRepository.insert(folder)
@@ -122,7 +122,6 @@ class SavedSitesSyncMerger @Inject constructor(
             }
 
             savedSitesRepository.insert(decryptFolder(remoteFolder, parentId, lastModified))
-
         }
     }
 
