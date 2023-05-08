@@ -30,6 +30,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import org.junit.Assert
@@ -75,9 +76,9 @@ class SavedSitesDuplicateFinderTest {
         val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(bookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(bookmark)
 
-        Assert.assertTrue(result)
+        Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(bookmark.id))
     }
 
     @Test
@@ -86,9 +87,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedBookmark = Bookmark("bookmark2", "title", "www.examples.com", "folder2", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(updatedBookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -97,9 +98,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedBookmark = Bookmark("bookmark2", "title", "www.example.com", "folder2", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(updatedBookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
-        Assert.assertTrue(result)
+        Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(bookmark.id))
     }
 
     @Test
@@ -108,9 +109,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedBookmark = Bookmark("bookmark1", "title", "www.examples.com", "folder2", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(updatedBookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -119,9 +120,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedBookmark = Bookmark("bookmark1", "title1", "www.example.com", "folder2", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(updatedBookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -130,9 +131,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedBookmark = Bookmark("bookmark2", "title1", "www.example.com", "folder2", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(updatedBookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -141,9 +142,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder3", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(updatedBookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -152,18 +153,18 @@ class SavedSitesDuplicateFinderTest {
         val updatedBookmark = Bookmark("bookmark2", "title", "www.example.com", "folder3", "timestamp")
         repository.insert(bookmark)
 
-        val result = duplicateFinder.isBookmarkDuplicate(updatedBookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(updatedBookmark)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
     fun whenBookmarkNotPresentThenDuplicateIsNotFound() {
         val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
 
-        val result = duplicateFinder.isBookmarkDuplicate(bookmark)
+        val result = duplicateFinder.findBookmarkDuplicate(bookmark)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -171,9 +172,9 @@ class SavedSitesDuplicateFinderTest {
         val favourite = Favorite("bookmark1", "title", "www.example.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.isFavouriteDuplicate(favourite)
+        val result = duplicateFinder.findFavouriteDuplicate(favourite)
 
-        Assert.assertTrue(result)
+        Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(favourite.id))
     }
 
     @Test
@@ -182,9 +183,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedFavourite = Favorite("bookmark2", "title", "www.example.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.isFavouriteDuplicate(updatedFavourite)
+        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite)
 
-        Assert.assertTrue(result)
+        Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(favourite.id))
     }
 
     @Test
@@ -193,9 +194,9 @@ class SavedSitesDuplicateFinderTest {
         val updatedFavourite = Favorite("bookmark1", "title", "www.examples.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.isFavouriteDuplicate(updatedFavourite)
+        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -204,27 +205,27 @@ class SavedSitesDuplicateFinderTest {
         val updatedFavourite = Favorite("bookmark1", "title1", "www.example.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.isFavouriteDuplicate(updatedFavourite)
+        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
     fun whenFavouriteNotPresentThenDuplicateIsFound() {
         val favourite = Favorite("bookmark1", "title", "www.example.com", "timestamp", 0)
 
-        val result = duplicateFinder.isFavouriteDuplicate(favourite)
+        val result = duplicateFinder.findFavouriteDuplicate(favourite)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
     fun whenFolderNotPresentThenDuplicateIsNotFound() {
         val folder = BookmarkFolder("folder", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
 
-        val result = duplicateFinder.isFolderDuplicate(folder)
+        val result = duplicateFinder.findFolderDuplicate(folder)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
@@ -233,19 +234,41 @@ class SavedSitesDuplicateFinderTest {
         val folder1 = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
         repository.insert(folder)
 
-        val result = duplicateFinder.isFolderDuplicate(folder1)
+        val result = duplicateFinder.findFolderDuplicate(folder1)
 
-        Assert.assertTrue(result)
+        Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(folder.id))
     }
 
     @Test
-    fun whenFolderPresentWithDifferentiParentIdThenDuplicateIsNotFound() {
+    fun whenFolderPresentWithDifferentParentIdThenDuplicateIsNotFound() {
         val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
         val folder1 = BookmarkFolder("folder2", "Folder", folder.id, 2, 1, "timestamp")
         repository.insert(folder)
 
-        val result = duplicateFinder.isFolderDuplicate(folder1)
+        val result = duplicateFinder.findFolderDuplicate(folder1)
 
-        Assert.assertFalse(result)
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
+    }
+
+    @Test
+    fun whenFolderPresentWithSameTitleDifferentParentIdThenDuplicateIsNotFound() {
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder1 = BookmarkFolder("folder2", "Folder", folder.id, 2, 1, "timestamp")
+        repository.insert(folder)
+
+        val result = duplicateFinder.findFolderDuplicate(folder1)
+
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
+    }
+
+    @Test
+    fun whenFolderPresentWithSameTitleAndParentIdThenDuplicateIsNotFound() {
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder1 = BookmarkFolder("folder2", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        repository.insert(folder)
+
+        val result = duplicateFinder.findFolderDuplicate(folder1)
+
+        Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(folder.id))
     }
 }

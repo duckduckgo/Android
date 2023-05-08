@@ -167,7 +167,7 @@ class SyncActivityViewModelTest {
     fun whenLogoutSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true)).also {
-            isSignedInFlow.emit(false)
+            Result.Success(false)
         }
 
         testee.viewState().test {
@@ -222,7 +222,7 @@ class SyncActivityViewModelTest {
     fun whenDeleteAccountSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
         whenever(syncRepository.deleteAccount()).thenReturn(Result.Success(true)).also {
-            isSignedInFlow.emit(false)
+            Result.Success(false)
         }
 
         testee.viewState().test {
@@ -399,7 +399,7 @@ class SyncActivityViewModelTest {
 
     private fun givenAuthenticatedUser() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
-        isSignedInFlow = MutableStateFlow(true)
+        val isSignedInFlow = MutableStateFlow(true)
         whenever(syncRepository.isSignedInFlow()).thenReturn(isSignedInFlow)
         whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)

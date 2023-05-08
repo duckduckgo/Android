@@ -95,7 +95,7 @@ internal class SyncApiClientTest {
     fun whenMappingChangesThenGeneratedObjectIsCorrect() {
         val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
         val changes = apiClient.mapRequest(listOf(bookmarksChanges))
-        assertTrue(changes.clientTimestamp.isNotEmpty())
+        assertTrue(changes.client_timestamp.isNotEmpty())
         assertTrue(changes.bookmarks.updates.size == 4)
     }
 

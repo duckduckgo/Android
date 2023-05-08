@@ -425,13 +425,31 @@ class RealSavedSitesRepository(
         }
     }
 
-    override fun replace(
+    override fun replaceFolder(
         remoteId: String,
         localId: String,
     ) {
         savedSitesEntitiesDao.updateId(localId, remoteId)
         savedSitesRelationsDao.updateFolderId(localId, remoteId)
         savedSitesRelationsDao.updateEntityId(localId, remoteId)
+    }
+
+    override fun replaceBookmark(
+        bookmark: Bookmark,
+        localId: String,
+    ) {
+        savedSitesEntitiesDao.updateId(localId, bookmark.id)
+        savedSitesRelationsDao.updateEntityId(localId, bookmark.id)
+        updateBookmark(bookmark, bookmark.parentId)
+    }
+
+    override fun replaceFavourite(
+        favorite: Favorite,
+        localId: String,
+    ) {
+        savedSitesEntitiesDao.updateId(localId, favorite.id)
+        savedSitesRelationsDao.updateEntityId(localId, favorite.id)
+        updateFavourite(favorite)
     }
 
     override fun delete(folder: BookmarkFolder) {

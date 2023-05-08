@@ -1004,7 +1004,7 @@ class SavedSitesRepositoryTest {
         val subFolder = givenFolderWithContent(parentFolder.id, bookmarks)
         savedSitesRelationsDao.insertList(subFolder)
 
-        repository.replace("folder2", parentFolder.id)
+        repository.replaceFolder("folder2", parentFolder.id)
 
         repository.insert(
             Bookmark(
@@ -1022,6 +1022,90 @@ class SavedSitesRepositoryTest {
             assertTrue(savedSites.favorites.isEmpty())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenBookmarkIsReplacedWithDifferentIdThenDataIsUpdated() {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        repository.insert(rootFolder)
+
+        val bookmark = repository.insert(
+            Bookmark(
+                id = "bookmark1",
+                title = "title",
+                url = "foo.com",
+                lastModified = "timestamp",
+                parentId = "folder2",
+            ),
+        ) as Bookmark
+
+        val updatedBookmark = bookmark.copy(id = "bookmark2")
+
+        repository.replaceBookmark(updatedBookmark, bookmark.id)
+
+        val bookmarkUpdated = repository.getBookmark(bookmark.url)!!
+
+        Assert.assertTrue(bookmark.id == bookmarkUpdated.id)
+        Assert.assertTrue(bookmark.url == bookmarkUpdated.url)
+        Assert.assertTrue(bookmark.title == bookmarkUpdated.title)
+    }
+
+    @Test
+    fun whenBookmarkIsReplacedWithSameIdThenDataIsUpdated() {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        repository.insert(rootFolder)
+
+        val bookmark = repository.insert(
+            Bookmark(
+                id = "bookmark1",
+                title = "title",
+                url = "foo.com",
+                lastModified = "timestamp",
+                parentId = "folder2",
+            ),
+        ) as Bookmark
+
+        val updatedBookmark = bookmark.copy(title = "title2")
+
+        repository.replaceBookmark(updatedBookmark, bookmark.id)
+
+        val bookmarkUpdated = repository.getBookmark(bookmark.url)!!
+
+        Assert.assertTrue(bookmark.id == bookmarkUpdated.id)
+        Assert.assertTrue(bookmark.url == bookmarkUpdated.url)
+        Assert.assertTrue("title2" == bookmarkUpdated.title)
+    }
+
+    @Test
+    fun whenFavouriteIsReplacedWithSameIdThenDataIsUpdated() {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
+        givenFavoriteStored(favorite)
+
+        val favoriteUpdated = Favorite("favorite1", "Favorite New", "http://favexample.com", "timestamp", 0)
+        repository.replaceFavourite(favoriteUpdated, favorite.id)
+
+        val favoriteStored = repository.getFavoriteById(favorite.id)!!
+
+        Assert.assertTrue(favoriteUpdated.id == favoriteStored.id)
+        Assert.assertTrue(favoriteUpdated.url == favoriteStored.url)
+        Assert.assertTrue(favoriteUpdated.title == favoriteStored.title)
+    }
+
+    @Test
+    fun whenFavouriteIsReplacedWithDifferentIdThenDataIsUpdated() {
+        val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
+        givenFavoriteStored(favorite)
+
+        val favoriteUpdated = Favorite("favorite2", "Favorite New", "http://favexample.com", "timestamp", 0)
+        repository.replaceFavourite(favoriteUpdated, favorite.id)
+
+        val favoriteNulled = repository.getFavoriteById(favorite.id)
+        Assert.assertTrue(favoriteNulled == null)
+
+        val favoriteStored = repository.getFavoriteById(favoriteUpdated.id)!!
+        Assert.assertTrue(favoriteUpdated.id == favoriteStored.id)
+        Assert.assertTrue(favoriteUpdated.url == favoriteStored.url)
+        Assert.assertTrue(favoriteUpdated.title == favoriteStored.title)
     }
 
     private fun givenNoFavoritesStored() {
