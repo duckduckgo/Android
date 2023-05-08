@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Uzorak za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu vaših prijava.</string>
     <string name="managementDisabledModeTitle">Osigurajte svoj uređaj da biste spremili prijave</string>
 
-    <string name="saveLoginDialogTitle">Želiš li spremiti prijavu?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Želiš li spremiti lozinku?</string>
     <string name="saveLoginDialogButtonSave">Spremi prijavu</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Ne sada</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prijave se sigurno spremaju samo na ovom uređaju i njima se može upravljati iz izbornika Automatsko popunjavanje u Postavkama.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Želiš li da DuckDuckGo spremi tvoju prijavu?</string>
+    <string name="saveLoginDialogSubtitle">Prijave se sigurno spremaju samo na ovom uređaju i njima se može upravljati iz izbornika Automatsko popunjavanje u Postavkama.</string>
+    <string name="saveLoginDialogTitle">Želiš li da DuckDuckGo spremi tvoju prijavu?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 
     <string name="useSavedLoginDialogTitle">Koristiti spremljene podatke za prijavu?</string>

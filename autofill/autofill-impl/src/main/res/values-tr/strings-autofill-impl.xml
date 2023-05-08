@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
     <string name="managementDisabledModeTitle">Giriş bilgilerini kaydetmek için cihazınızın güvenliğini sağlayın</string>
 
-    <string name="saveLoginDialogTitle">Giriş kaydedilsin mi?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Şifre kaydedilsin mi?</string>
     <string name="saveLoginDialogButtonSave">Girişi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Şimdi Değil</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Giriş bilgileri yalnızca bu cihazda güvenli bir şekilde saklanır ve Ayarlar\'daki Giriş Bilgileri menüsünden yönetilebilir.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">DuckDuckGo\'nun Girişinizi kaydetmesini istiyor musunuz?</string>
+    <string name="saveLoginDialogSubtitle">Giriş bilgileri yalnızca bu cihazda güvenli bir şekilde saklanır ve Ayarlar\'daki Giriş Bilgileri menüsünden yönetilebilir.</string>
+    <string name="saveLoginDialogTitle">DuckDuckGo\'nun Girişinizi kaydetmesini istiyor musunuz?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
     <string name="useSavedLoginDialogTitle">Kayıtlı Giriş kullanılsın mı?</string>

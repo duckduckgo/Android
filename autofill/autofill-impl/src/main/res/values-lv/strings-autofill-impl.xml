@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Lai aizsargātu jūsu pieteikšanās datus, ir nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskā aizsardzība.</string>
     <string name="managementDisabledModeTitle">Aizsargājiet savu ierīci, lai saglabātu pieteikšanās datus</string>
 
-    <string name="saveLoginDialogTitle">Saglabāt pieteikšanās datus?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Saglabāt paroli?</string>
     <string name="saveLoginDialogButtonSave">Saglabāt pieteikšanās datus</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginDialogNotNow">Ne tagad</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Pieteikšanās dati tiek droši saglabāti tikai šajā ierīcē, un tos var pārvaldīt no iestatījumu izvēlnes Pieteikšanās dati.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vai vēlies, lai DuckDuckGo saglabātu tavus pieteikšanās datus?</string>
+    <string name="saveLoginDialogSubtitle">Pieteikšanās dati tiek droši saglabāti tikai šajā ierīcē, un tos var pārvaldīt no iestatījumu izvēlnes Pieteikšanās dati.</string>
+    <string name="saveLoginDialogTitle">Vai vēlies, lai DuckDuckGo saglabātu tavus pieteikšanās datus?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
 
     <string name="useSavedLoginDialogTitle">Vai izmantot saglabātos pieteikšanās datus?</string>

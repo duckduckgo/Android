@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Sisselogimise kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="managementDisabledModeTitle">Sisselogimise salvestamiseks kaitske oma seadet</string>
 
-    <string name="saveLoginDialogTitle">Kas salvestada sisselogimisandmed?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Kas salvestada parool?</string>
     <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Mitte praegu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes ja neid saab hallata sätete menüüst Sisselogimisandmed.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
+    <string name="saveLoginDialogSubtitle">Sisselogimisandmed salvestatakse turvaliselt ainult selles seadmes ja neid saab hallata sätete menüüst Sisselogimisandmed.</string>
+    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimisandmeid?</string>
