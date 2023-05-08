@@ -222,39 +222,29 @@ class SavedSitesDuplicateFinderTest {
     fun whenFolderNotPresentThenDuplicateIsNotFound() {
         val folder = BookmarkFolder("folder", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
 
-        val result = duplicateFinder.isFolderDuplicate(folder, emptyList())
+        val result = duplicateFinder.isFolderDuplicate(folder)
 
         Assert.assertFalse(result)
     }
 
     @Test
-    fun whenFolderPresentWithSameContentThenDuplicateIsFound() {
-        val folder = BookmarkFolder("folder", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
-        val bookmark1 = Bookmark("bookmark1", "title", "www.example1.com", folder.id, "timestamp")
-        val bookmark2 = Bookmark("bookmark2", "title", "www.example2.com", folder.id, "timestamp")
-        val folder1 = BookmarkFolder("folder", "Folder", folder.id, 2, 1, "timestamp")
+    fun whenFolderPresentWithSameParentIdThenDuplicateIsFound() {
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder1 = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
         repository.insert(folder)
-        repository.insert(bookmark1)
-        repository.insert(bookmark2)
-        repository.insert(folder1)
 
-        val result = duplicateFinder.isFolderDuplicate(folder, listOf(bookmark1.id, bookmark2.id, folder1.id))
+        val result = duplicateFinder.isFolderDuplicate(folder1)
 
         Assert.assertTrue(result)
     }
 
     @Test
-    fun whenFolderPresentWithDifferentBookmarksThenDuplicateIsNotFound() {
-        val folder = BookmarkFolder("folder", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
-        val bookmark1 = Bookmark("bookmark1", "title", "www.example1.com", folder.id, "timestamp")
-        val bookmark2 = Bookmark("bookmark2", "title", "www.example2.com", folder.id, "timestamp")
-        val folder1 = BookmarkFolder("folder", "Folder", folder.id, 2, 1, "timestamp")
+    fun whenFolderPresentWithDifferentiParentIdThenDuplicateIsNotFound() {
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder1 = BookmarkFolder("folder2", "Folder", folder.id, 2, 1, "timestamp")
         repository.insert(folder)
-        repository.insert(bookmark1)
-        repository.insert(bookmark2)
-        repository.insert(folder1)
 
-        val result = duplicateFinder.isFolderDuplicate(folder, listOf(bookmark1.id, folder1.id))
+        val result = duplicateFinder.isFolderDuplicate(folder1)
 
         Assert.assertFalse(result)
     }

@@ -28,7 +28,6 @@ interface SavedSitesDuplicateFinder {
 
     fun isFolderDuplicate(
         bookmarkFolder: BookmarkFolder,
-        children: List<String>,
     ): Boolean
 
     fun isFavouriteDuplicate(favorite: Favorite): Boolean
@@ -39,31 +38,10 @@ interface SavedSitesDuplicateFinder {
 class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
     override fun isFolderDuplicate(
         bookmarkFolder: BookmarkFolder,
-        children: List<String>,
     ): Boolean {
         val present = repository.getFolder(bookmarkFolder.id)
         return if (present != null) {
-            val content = repository.getFolderContentSync(bookmarkFolder.id)
-            isFolderContentDuplicate(content, children)
-        } else {
-            false
-        }
-    }
-
-    private fun isFolderContentDuplicate(
-        content: Pair<List<Bookmark>, List<BookmarkFolder>>,
-        children: List<String>,
-    ): Boolean {
-        val presentChildren = content.first.map { it.id }.plus(content.second.map { it.id }).sorted()
-        return if (presentChildren == children.sorted()) {
-            // content of the folder is the same, but is the content of each item also the same?
-            var sameBookmarks = false
-            content.first.forEach {
-                if (isBookmarkDuplicate(it)) {
-                    sameBookmarks = true
-                }
-            }
-            sameBookmarks
+            present.parentId == bookmarkFolder.parentId
         } else {
             false
         }
