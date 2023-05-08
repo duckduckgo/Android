@@ -39,8 +39,11 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
+import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
+import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
@@ -49,6 +52,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.CheckVPNPermission
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.OpenVPNSettings
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.RequestVPNPermission
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connected
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Connecting
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState.Disconnected
@@ -77,6 +81,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     private val reconnectNotifications: NetPReconnectNotifications,
     private val externalVpnDetector: ExternalVpnDetector,
     private val networkProtectionPixels: NetworkProtectionPixels,
+    @NetpBreakageCategories private val netpBreakageCategories: List<AppBreakageCategory>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var reconnectStateFlow = MutableStateFlow(networkProtectionRepository.reconnectStatus)
@@ -258,6 +263,19 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         tryShowAlwaysOnPromotion()
     }
 
+    fun onReportIssuesClicked() {
+        sendCommand(
+            ShowIssueReportingPage(
+                OpenVpnBreakageCategoryWithBrokenApp(
+                    launchFrom = "netp",
+                    appName = "",
+                    appPackageId = "",
+                    breakageCategories = netpBreakageCategories,
+                ),
+            ),
+        )
+    }
+
     private fun tryShowAlwaysOnPromotion() {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (shouldShowAlwaysOnPromotion()) {
@@ -318,6 +336,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         object ShowAlwaysOnPromotionDialog : Command()
         object ShowAlwaysOnLockdownDialog : Command()
         object OpenVPNSettings : Command()
+        data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
     }
 
     data class ViewState(

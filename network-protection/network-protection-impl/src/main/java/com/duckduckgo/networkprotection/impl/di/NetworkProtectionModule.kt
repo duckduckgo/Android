@@ -16,8 +16,12 @@
 
 package com.duckduckgo.networkprotection.impl.di
 
+import android.content.Context
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistDataStoreSharedPreferences
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository
@@ -42,4 +46,25 @@ class DataModule {
     fun provideNetPWaitlistRepository(
         vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
     ): NetPWaitlistRepository = RealNetPWaitlistRepository(NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider))
+}
+
+@Module
+@ContributesTo(ActivityScope::class)
+object NetPBreakageCategoriesModule {
+    @Provides
+    @NetpBreakageCategories
+    fun provideAppTrackerBreakageCategories(context: Context): List<AppBreakageCategory> {
+        return mutableListOf(
+            AppBreakageCategory("crashes", context.getString(R.string.netpReportBreakageCategoryCrashes)),
+            AppBreakageCategory("messages", context.getString(R.string.netpReportBreakageCategoryMessages)),
+            AppBreakageCategory("calls", context.getString(R.string.netpReportBreakageCategoryCalls)),
+            AppBreakageCategory("content", context.getString(R.string.netpReportBreakageCategoryContent)),
+            AppBreakageCategory("connection", context.getString(R.string.netpReportBreakageCategoryConnection)),
+            AppBreakageCategory("iot", context.getString(R.string.netpReportBreakageCategoryIot)),
+        ).apply {
+            shuffle()
+            add(AppBreakageCategory("featurerequest", context.getString(R.string.netpReportBreakageCategoryFeatureRequest)))
+            add(AppBreakageCategory("other", context.getString(R.string.netpReportBreakageCategoryOther)))
+        }
+    }
 }

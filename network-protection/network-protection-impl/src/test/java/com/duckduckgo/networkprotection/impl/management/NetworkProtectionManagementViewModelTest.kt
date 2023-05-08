@@ -29,6 +29,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.E
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
+import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -42,6 +44,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ResetToggle
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnPromotionDialog
+import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowIssueReportingPage
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowVpnConflictDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
@@ -92,6 +95,7 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
     private lateinit var testee: NetworkProtectionManagementViewModel
+    private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
 
     @Before
     fun setUp() {
@@ -105,6 +109,7 @@ class NetworkProtectionManagementViewModelTest {
             reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
+            testbreakageCategories,
         )
     }
 
@@ -310,6 +315,7 @@ class NetworkProtectionManagementViewModelTest {
             reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
+            testbreakageCategories,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -345,6 +351,7 @@ class NetworkProtectionManagementViewModelTest {
             reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
+            testbreakageCategories,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -380,6 +387,7 @@ class NetworkProtectionManagementViewModelTest {
             reconnectNotifications,
             externalVpnDetector,
             networkProtectionPixels,
+            testbreakageCategories,
         )
 
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
@@ -537,6 +545,26 @@ class NetworkProtectionManagementViewModelTest {
 
         testee.commands().test {
             testee.onCreate(mock())
+            this.ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenOnReportIssuesClickedThenEmitShowIssueReportingPageCommand() = runTest {
+        testee.onReportIssuesClicked()
+
+        testee.commands().test {
+            assertEquals(
+                ShowIssueReportingPage(
+                    OpenVpnBreakageCategoryWithBrokenApp(
+                        launchFrom = "netp",
+                        appName = "",
+                        appPackageId = "",
+                        breakageCategories = testbreakageCategories,
+                    ),
+                ),
+                this.awaitItem(),
+            )
             this.ensureAllEventsConsumed()
         }
     }
