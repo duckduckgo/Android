@@ -60,6 +60,9 @@ interface SavedSitesEntitiesDao {
     )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
+    @Delete()
+    fun hardDelete(entity: Entity)
+
     @Query("update entities set deleted = 1, lastModified = :lastModified where entityId = :id")
     fun delete(id: String, lastModified: String = DatabaseDateFormatter.iso8601())
 
@@ -75,6 +78,9 @@ interface SavedSitesEntitiesDao {
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     fun update(entity: Entity)
+
+    @Query("update entities set entityId = :newId where entityId = :oldId")
+    fun updateId(oldId: String, newId: String)
 
     @Query("update entities set lastModified = :lastModified where entityId = :entityId")
     fun updateModified(entityId: String, lastModified: String = DatabaseDateFormatter.iso8601())

@@ -22,6 +22,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 interface SavedSitesDuplicateFinder {
 
@@ -35,7 +36,7 @@ interface SavedSitesDuplicateFinder {
 }
 
 @ContributesBinding(AppScope::class)
-class RealSavedSitesDuplicateFinder(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
+class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
     override fun isFolderDuplicate(
         bookmarkFolder: BookmarkFolder,
         children: List<String>,

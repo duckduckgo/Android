@@ -35,11 +35,12 @@ class SavedSitesSyncMergerTest {
     private val repository: SavedSitesRepository = mock()
     private val syncCrypto: SyncCrypto = mock()
     private val savedSitesSyncStore: FeatureSyncStore = mock()
+    private val duplicateFinder: SavedSitesDuplicateFinder = mock()
     private lateinit var parser: SavedSitesSyncMerger
 
     @Before
     fun before() {
-        parser = SavedSitesSyncMerger(repository, savedSitesSyncStore, syncCrypto)
+        parser = SavedSitesSyncMerger(repository, savedSitesSyncStore, duplicateFinder, syncCrypto)
 
         whenever(syncCrypto.decrypt(ArgumentMatchers.anyString()))
             .thenAnswer { invocation -> invocation.getArgument(0) }

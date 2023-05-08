@@ -31,6 +31,7 @@ import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
+import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.crypto.EncryptResult

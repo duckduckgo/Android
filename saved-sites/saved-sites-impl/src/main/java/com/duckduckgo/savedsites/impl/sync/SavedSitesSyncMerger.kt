@@ -41,6 +41,7 @@ import timber.log.Timber
 class SavedSitesSyncMerger @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesSyncStore: FeatureSyncStore,
+    private val duplicateFinder: SavedSitesDuplicateFinder,
     private val syncCrypto: SyncCrypto,
 ) : SyncMerger, SyncablePlugin {
 
@@ -86,7 +87,15 @@ class SavedSitesSyncMerger @Inject constructor(
         if (remoteFolder == null) {
             Timber.d("Sync: can't find folder $folderId")
         } else {
-            savedSitesRepository.insert(decryptFolder(remoteFolder, parentId, lastModified))
+            remoteFolder.folder?.let {
+                val folder = decryptFolder(remoteFolder, parentId, lastModified)
+                if (duplicateFinder.isFolderDuplicate(folder, it.children)) {
+                    savedSitesRepository.replace(folderId, folder.id)
+                } else {
+                    savedSitesRepository.insert(folder)
+                }
+            }
+
             remoteFolder.folder?.children?.forEachIndexed { position, child ->
                 Timber.d("Sync: merging child $child")
                 val childEntry = remoteUpdates.find { it.id == child }
@@ -111,6 +120,9 @@ class SavedSitesSyncMerger @Inject constructor(
                     }
                 }
             }
+
+            savedSitesRepository.insert(decryptFolder(remoteFolder, parentId, lastModified))
+
         }
     }
 

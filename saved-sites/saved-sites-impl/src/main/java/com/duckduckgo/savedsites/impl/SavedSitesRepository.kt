@@ -425,6 +425,15 @@ class RealSavedSitesRepository(
         }
     }
 
+    override fun replace(
+        remoteId: String,
+        localId: String,
+    ) {
+        savedSitesEntitiesDao.updateId(localId, remoteId)
+        savedSitesRelationsDao.updateFolderId(localId, remoteId)
+        savedSitesRelationsDao.updateEntityId(localId, remoteId)
+    }
+
     override fun delete(folder: BookmarkFolder) {
         val relations = savedSitesEntitiesDao.entitiesInFolderSync(folder.id)
         val entities = mutableListOf<Entity>()

@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +44,12 @@ interface SavedSitesRelationsDao {
 
     @Query("select * from relations where folderId =:folderId")
     fun relationsObservable(folderId: String): Single<List<Relation>>
+
+    @Query("update relations set folderId = :newId where folderId = :oldId")
+    fun updateFolderId(oldId: String, newId: String)
+
+    @Query("update relations set entityId = :newId where entityId = :oldId")
+    fun updateEntityId(oldId: String, newId: String)
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
