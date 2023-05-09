@@ -40,7 +40,13 @@ internal class SyncApiClientTest {
     private val syncApi: SyncApi = mock()
     private lateinit var apiClient: AppSyncApiClient
 
-    private val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
+    private val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":" +
+        "\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\"" +
+        ":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"}" +
+        ",\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"}," +
+        "\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\"" +
+        ":[\"bookmark3\",\"bookmark4\"]},\"id\"" +
+        ":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
     val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
     val settingsResponse = SettingsResponse("lastModified", emptyList())
     val devicessResponse = DeviceDataResponse("lastModified", emptyList())
