@@ -21,7 +21,7 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -32,7 +32,7 @@ import org.threeten.bp.LocalDateTime
 
 @ContributesMultibinding(VpnScope::class)
 class VpnLastTrackersBlockedCollector @Inject constructor(
-    private val vpnDatabase: VpnDatabase,
+    private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val moshi: Moshi,
 ) : VpnStateCollectorPlugin {
@@ -43,7 +43,7 @@ class VpnLastTrackersBlockedCollector @Inject constructor(
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return withContext(dispatcherProvider.io()) {
             val result = mutableMapOf<String, List<String>>()
-            vpnDatabase.vpnTrackerDao().getTrackersBetweenSync(dateOfLastDay(), noEndDate())
+            appTrackerBlockingRepository.getVpnTrackersSync({ dateOfLastDay() }, noEndDate())
                 .filter { tracker -> appPackageId?.let { tracker.trackingApp.packageId == it } ?: true }
                 .groupBy { it.trackingApp.packageId }
                 .mapValues { entry -> entry.value.map { it.domain } }

@@ -19,16 +19,17 @@ package com.duckduckgo.macos_impl
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.macos_impl.MacOsViewModel.Command
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
@@ -43,6 +44,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(MacOsScreenWithEmptyParams::class)
 class MacOsActivity : DuckDuckGoActivity() {
 
     private val viewModel: MacOsViewModel by bindViewModel()
@@ -110,12 +112,6 @@ class MacOsActivity : DuckDuckGoActivity() {
             startActivity(Intent.createChooser(share, getString(R.string.macos_share_title), pi.intentSender))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
-        }
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, MacOsActivity::class.java)
         }
     }
 }

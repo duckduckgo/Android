@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.di
 
 import android.content.Context
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.crypto.SyncLib
@@ -34,6 +35,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
@@ -41,8 +43,11 @@ object SyncStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesSyncStore(sharedPrefsProvider: SharedPrefsProvider): SyncStore {
-        return SyncSharedPrefsStore(sharedPrefsProvider)
+    fun providesSyncStore(
+        sharedPrefsProvider: SharedPrefsProvider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+    ): SyncStore {
+        return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope)
     }
 
     @Provides

@@ -28,7 +28,7 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -54,7 +54,7 @@ import org.threeten.bp.LocalDateTime
 class SendTrackerDebugReceiver @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val vpnDatabase: VpnDatabase,
+    private val appTrackerBlockingRepository: AppTrackerBlockingStatsRepository,
     private val dispatchers: DispatcherProvider,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
@@ -89,7 +89,7 @@ class SendTrackerDebugReceiver @Inject constructor(
                     ),
                 )
             }
-            vpnDatabase.vpnTrackerDao().insert(insertionList)
+            appTrackerBlockingRepository.insert(insertionList)
         }
     }
 

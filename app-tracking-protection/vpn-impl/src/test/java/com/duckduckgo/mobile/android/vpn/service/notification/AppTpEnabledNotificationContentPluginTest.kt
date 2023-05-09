@@ -26,13 +26,13 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -55,7 +55,6 @@ class AppTpEnabledNotificationContentPluginTest {
 
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
     private lateinit var db: VpnDatabase
-    private lateinit var vpnTrackerDao: VpnTrackerDao
 
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
     private val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
@@ -66,7 +65,6 @@ class AppTpEnabledNotificationContentPluginTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        vpnTrackerDao = db.vpnTrackerDao()
         appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
         vpnFeaturesRegistry = FakeVpnFeaturesRegistry().apply {
@@ -130,7 +128,9 @@ class AppTpEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentOneCompanyThenReturnsCorrectUpdatedNotificationContent() = runTest {
         plugin.getUpdatedContent().test {
-            vpnTrackerDao.insert(aTrackerAndCompany())
+            val trackers = listOf(aTrackerAndCompany())
+            appTrackerBlockingStatsRepository.insert(trackers)
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
 
             skipItems(1)
             val item = awaitItem()
@@ -147,7 +147,9 @@ class AppTpEnabledNotificationContentPluginTest {
         vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
 
         plugin.getUpdatedContent().test {
-            vpnTrackerDao.insert(aTrackerAndCompany())
+            val trackers = listOf(aTrackerAndCompany())
+            appTrackerBlockingStatsRepository.insert(trackers)
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
 
             skipItems(1)
             val item = awaitItem()
@@ -162,16 +164,16 @@ class AppTpEnabledNotificationContentPluginTest {
     @Test
     fun getUpdateContentMultipleDifferentAppsThenReturnsCorrectUpdatedNotificationContent() = runTest {
         plugin.getUpdatedContent().test {
-            vpnTrackerDao.insert(
+            val trackers = listOf(
                 aTrackerAndCompany(
                     appContainingTracker = trackingApp2(),
                 ),
-            )
-            vpnTrackerDao.insert(
                 aTrackerAndCompany(
                     appContainingTracker = trackingApp1(),
                 ),
             )
+            appTrackerBlockingStatsRepository.insert(trackers)
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
 
             val item = expectMostRecentItem()
 
@@ -187,16 +189,16 @@ class AppTpEnabledNotificationContentPluginTest {
         vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
 
         plugin.getUpdatedContent().test {
-            vpnTrackerDao.insert(
+            val trackers = listOf(
                 aTrackerAndCompany(
                     appContainingTracker = trackingApp2(),
                 ),
-            )
-            vpnTrackerDao.insert(
                 aTrackerAndCompany(
                     appContainingTracker = trackingApp1(),
                 ),
             )
+            appTrackerBlockingStatsRepository.insert(trackers)
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
 
             skipItems(1)
             val item = awaitItem()
@@ -209,10 +211,26 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
+    fun getUpdateContentTrackersWithoutEntityThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        plugin.getUpdatedContent().test {
+            appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
+
+            val item = expectMostRecentItem()
+
+            item.assertTitleEquals("Scanning for tracking activity… beep… boop")
+            item.assertMessageEquals("")
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun getUpdateContentMultipleSameThenReturnsCorrectUpdatedNotificationContent() = runTest {
         plugin.getUpdatedContent().test {
-            vpnTrackerDao.insert(aTrackerAndCompany())
-            vpnTrackerDao.insert(aTrackerAndCompany())
+            appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(
+                listOf(aTrackerAndCompany().asEntity()),
+            )
 
             val item = expectMostRecentItem()
 
@@ -228,8 +246,7 @@ class AppTpEnabledNotificationContentPluginTest {
         vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
 
         plugin.getUpdatedContent().test {
-            vpnTrackerDao.insert(aTrackerAndCompany())
-            vpnTrackerDao.insert(aTrackerAndCompany())
+            appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
 
             val item = expectMostRecentItem()
 
@@ -270,6 +287,14 @@ class AppTpEnabledNotificationContentPluginTest {
 
     private fun trackingApp1() = TrackingApp("package1", "app1")
     private fun trackingApp2() = TrackingApp("package2", "app2")
+    private fun VpnTracker.asEntity(): AppTrackerEntity {
+        return AppTrackerEntity(
+            trackerCompanyId = this.trackerCompanyId,
+            entityName = "name",
+            score = 0,
+            signals = emptyList(),
+        )
+    }
 }
 
 private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTitleEquals(expected: String) {

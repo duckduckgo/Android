@@ -137,7 +137,7 @@
                 android:layout_gravity="center"
                 android:layout_width="@dimen/keyline_6"
                 android:layout_height="@dimen/keyline_6"
-                android:src="@drawable/ic_red_dax"/>
+                android:src="@drawable/ic_dax_icon"/>
 
         </LinearLayout>
     </ScrollView>

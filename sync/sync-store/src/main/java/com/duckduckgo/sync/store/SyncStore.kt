@@ -2,6 +2,10 @@ package com.duckduckgo.sync.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 interface SyncStore {
     var userId: String?
@@ -10,16 +14,28 @@ interface SyncStore {
     var token: String?
     var primaryKey: String?
     var secretKey: String?
-    var recoveryCode: String?
-    fun clearAll(keepRecoveryCode: Boolean = true)
+    fun isSignedInFlow(): Flow<Boolean>
+    fun isSignedIn(): Boolean
+    fun storeCredentials(
+        userId: String,
+        deviceId: String,
+        deviceName: String,
+        primaryKey: String,
+        secretKey: String,
+        token: String,
+    )
+    fun clearAll()
 }
 
 class SyncSharedPrefsStore
 constructor(
     private val sharedPrefsProv: SharedPrefsProvider,
+    private val appCoroutineScope: CoroutineScope,
 ) : SyncStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
+
+    private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
@@ -97,23 +113,34 @@ constructor(
                 }
             }
         }
-    override var recoveryCode: String?
-        get() = encryptedPreferences?.getString(KEY_RECOVERY_CODE, null)
-        set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) {
-                    remove(KEY_RECOVERY_CODE)
-                } else {
-                    putString(KEY_RECOVERY_CODE, value)
-                }
-            }
-        }
 
-    override fun clearAll(keepRecoveryCode: Boolean) {
-        val recoveryCodeBackup = recoveryCode
+    override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
+
+    override fun isSignedIn() = !primaryKey.isNullOrEmpty() && !userId.isNullOrEmpty()
+
+    override fun storeCredentials(
+        userId: String,
+        deviceId: String,
+        deviceName: String,
+        primaryKey: String,
+        secretKey: String,
+        token: String,
+    ) {
+        this.userId = userId
+        this.deviceId = deviceId
+        this.deviceName = deviceName
+        this.token = token
+        this.primaryKey = primaryKey
+        this.secretKey = secretKey
+
+        appCoroutineScope.launch {
+            isSignedInStateFlow.emit(true)
+        }
+    }
+    override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
-        if (keepRecoveryCode) {
-            recoveryCode = recoveryCodeBackup
+        appCoroutineScope.launch {
+            isSignedInStateFlow.emit(false)
         }
     }
 
@@ -125,6 +152,5 @@ constructor(
         private const val KEY_TOKEN = "KEY_TOKEN"
         private const val KEY_PK = "KEY_PK"
         private const val KEY_SK = "KEY_SK"
-        private const val KEY_RECOVERY_CODE = "KEY_RECOVERY_CODE"
     }
 }

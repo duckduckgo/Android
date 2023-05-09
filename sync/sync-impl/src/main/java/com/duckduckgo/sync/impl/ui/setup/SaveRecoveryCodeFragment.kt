@@ -23,21 +23,30 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.RecoveryCodePDF
+import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.FragmentRecoveryCodeBinding
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewState
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -46,6 +55,18 @@ import kotlinx.coroutines.flow.onEach
 class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_code) {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var storagePermission: PermissionRequest
+
+    @Inject
+    lateinit var recoveryCodePDF: RecoveryCodePDF
+
+    @Inject
+    lateinit var shareAction: ShareAction
 
     private val binding: FragmentRecoveryCodeBinding by viewBinding()
 
@@ -60,12 +81,20 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
         super.onViewCreated(view, savedInstanceState)
         observeUiEvents()
         configureListeners()
+        registerForPermission()
+    }
+    private fun registerForPermission() {
+        storagePermission.registerResultsCallback(this) {
+            binding.root.makeSnackbarWithNoBottomInset(R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
+        }
     }
 
     private fun configureListeners() {
         binding.footerPrimaryButton.setOnClickListener {
+            viewModel.onSaveRecoveryCodeClicked()
         }
         binding.footerSecondaryButton.setOnClickListener {
+            viewModel.onCopyCodeClicked()
         }
         binding.footerNextButton.setOnClickListener {
             viewModel.onNextClicked()
@@ -90,7 +119,21 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
     private fun processCommand(it: Command) {
         when (it) {
             Error -> requireActivity().finish()
-            Finish -> requireActivity().finish()
+            is Finish -> {
+                requireActivity().finish()
+            }
+            is RecoveryCodePDFSuccess -> {
+                shareAction.shareFile(requireContext(), it.recoveryCodePDFFile)
+            }
+            CheckIfUserHasStoragePermission -> {
+                storagePermission.invokeOrRequestPermission {
+                    viewModel.generateRecoveryCode(requireContext())
+                }
+            }
+
+            is ShowMessage -> {
+                Snackbar.make(binding.root, it.message, Snackbar.LENGTH_LONG).show()
+            }
         }
     }
 

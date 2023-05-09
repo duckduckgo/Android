@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.widget.CompoundButton
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -44,13 +45,16 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTrackersActivityBinding
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -68,6 +72,12 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
+    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject
+    @AppTpBreakageCategories
+    lateinit var breakageCategories: List<AppBreakageCategory>
+
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
 
@@ -77,11 +87,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var cachedState: ViewState? = null
 
-    private val reportBreakage = registerForActivityResult(ReportBreakageContract()) {
-        if (!it.isEmpty()) {
-            Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
-        }
-    }
+    private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
     private val toggleAppSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppPermissionToggled(isChecked, getPackage())
@@ -89,6 +95,12 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        reportBreakage = registerForActivityResult(reportBreakageContract.get()) {
+            if (!it.isEmpty()) {
+                Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
+            }
+        }
 
         setContentView(binding.root)
         with(binding.includeToolbar) {
@@ -208,7 +220,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm(getAppName(), getPackage()))
+        reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm("apptp", breakageCategories, getAppName(), getPackage()))
     }
 
     override fun onBackPressed() {

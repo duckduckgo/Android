@@ -68,7 +68,7 @@
             android:layout_gravity="center"
             android:layout_marginEnd="16dp"
             android:importantForAccessibility="no"
-            tools:srcCompat="@drawable/ic_app_icon_red_round" />
+            tools:srcCompat="@mipmap/ic_launcher_red_round" />
 
     </LinearLayout>
 

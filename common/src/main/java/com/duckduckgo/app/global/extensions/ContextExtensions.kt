@@ -16,27 +16,9 @@
 
 package com.duckduckgo.app.global.extensions
 
-import android.app.ActivityManager
 import android.content.Context
-import android.content.Context.ACTIVITY_SERVICE
-import android.os.Build.VERSION_CODES.R
 import android.provider.Settings
-import androidx.annotation.RequiresApi
-import java.util.*
 import timber.log.Timber
-
-@RequiresApi(R)
-fun Context.historicalExitReasonsByProcessName(
-    name: String,
-    n: Int = 10,
-): List<String> {
-    val activityManager = applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
-
-    return activityManager.getHistoricalProcessExitReasons(null, 0, 0)
-        .filter { it.processName == name }
-        .take(n)
-        .map { "[${Date(it.timestamp)} - Reason: ${it.reason}: ${it.description}" }
-}
 
 fun Context.isPrivateDnsActive(): Boolean {
     var dnsMode = Settings.Global.getString(contentResolver, "private_dns_mode")

@@ -26,6 +26,7 @@ import android.os.ResultReceiver
 import android.provider.Settings
 import android.view.Menu
 import android.widget.CompoundButton
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -55,11 +56,13 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionList
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.alwayson.AlwaysOnAlertDialogFragment
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
@@ -70,6 +73,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.DisableVpnDial
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.combine
@@ -95,6 +99,12 @@ class DeviceShieldTrackerActivity :
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
+    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject
+    @AppTpBreakageCategories
+    lateinit var breakageCategories: List<AppBreakageCategory>
+
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var deviceShieldSwitch: SwitchView
@@ -111,11 +121,7 @@ class DeviceShieldTrackerActivity :
 
     private val viewModel: DeviceShieldTrackerActivityViewModel by bindViewModel()
 
-    private val reportBreakage = registerForActivityResult(ReportBreakageContract()) {
-        if (!it.isEmpty()) {
-            Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
-        }
-    }
+    private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
     private val enableAppTPSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppTPToggleSwitched(isChecked)
@@ -123,6 +129,12 @@ class DeviceShieldTrackerActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        reportBreakage = registerForActivityResult(reportBreakageContract.get()) {
+            if (!it.isEmpty()) {
+                Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
+            }
+        }
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.trackersToolbar)
@@ -595,7 +607,7 @@ class DeviceShieldTrackerActivity :
 
     private fun launchFeedback() {
         deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
-        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
+        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps("apptp", breakageCategories))
     }
 
     private fun reEnableAppTrackingProtection() {

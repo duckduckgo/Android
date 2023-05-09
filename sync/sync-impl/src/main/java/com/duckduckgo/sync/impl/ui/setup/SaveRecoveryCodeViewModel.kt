@@ -16,20 +16,27 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.content.Context
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.ViewMode.SignedIn
+import java.io.File
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -42,7 +49,9 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class SaveRecoveryCodeViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
+    private val recoveryCodePDF: RecoveryCodePDF,
     private val syncRepository: SyncRepository,
+    private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -66,6 +75,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
                 is Error -> {
                     command.send(Command.Error)
                 }
+
                 is Success -> {
                     syncRepository.getRecoveryCode()?.let {
                         val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
@@ -92,12 +102,37 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     sealed class Command {
         object Finish : Command()
+        data class ShowMessage(val message: Int) : Command()
         object Error : Command()
+        object CheckIfUserHasStoragePermission : Command()
+        data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
     }
 
     fun onNextClicked() {
         viewModelScope.launch {
             command.send(Finish)
+        }
+    }
+
+    fun onCopyCodeClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
+            clipboard.copyToClipboard(recoveryCodeB64)
+            command.send(ShowMessage(R.string.sync_code_copied_message))
+        }
+    }
+
+    fun onSaveRecoveryCodeClicked() {
+        viewModelScope.launch {
+            command.send(CheckIfUserHasStoragePermission)
+        }
+    }
+
+    fun generateRecoveryCode(viewContext: Context) {
+        viewModelScope.launch(dispatchers.io()) {
+            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
+            val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
+            command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
         }
     }
 }

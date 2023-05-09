@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.2.2" type="baseline" client="gradle" dependencies="false" name="AGP (7.2.2)" variant="all" version="7.2.2">
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Default&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtuDefault&quot; android:title=&quot;Default&quot; />"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="18"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1500&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu1500&quot; android:title=&quot;1500&quot; />"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="19"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1420&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu1420&quot; android:title=&quot;1420&quot; />"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="20"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1300&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu1300&quot; android:title=&quot;1300&quot; />"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="21"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1280&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu1280&quot; android:title=&quot;1280&quot; />"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="22"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1100&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu1100&quot; android:title=&quot;1100&quot; />"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="23"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;1000&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu1000&quot; android:title=&quot;1000&quot; />"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="24"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;500&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu500&quot; android:title=&quot;500&quot; />"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="25"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;200&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu200&quot; android:title=&quot;200&quot; />"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="26"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;100&quot;, should use `@string` resource"
+        errorLine1="    &lt;item android:id=&quot;@+id/mtu100&quot; android:title=&quot;100&quot; />"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/menu/mtu_size_menu.xml"
+            line="27"
+            column="36"/>
+    </issue>
+
+</issues>

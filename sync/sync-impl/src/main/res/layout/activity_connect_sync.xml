@@ -63,6 +63,7 @@
         android:layout_height="wrap_content"
         app:primaryText="Show QR Code"
         app:leadingIcon="@drawable/ic_qr_24"
+        android:visibility="gone"
         app:leadingIconBackground="circular"/>
 
 </LinearLayout>

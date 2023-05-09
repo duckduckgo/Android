@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
@@ -72,7 +72,7 @@ constructor(
     }
 
     private suspend fun aggregateDataPerApp(
-        trackerData: List<VpnTrackerCompanySignal>,
+        trackerData: List<VpnTrackerWithEntity>,
         packageName: String,
     ): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()

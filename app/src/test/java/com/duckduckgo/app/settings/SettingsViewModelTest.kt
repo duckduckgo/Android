@@ -27,6 +27,7 @@ import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
+import com.duckduckgo.app.settings.SettingsViewModel.NetPState
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
@@ -44,6 +45,12 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -52,6 +59,7 @@ import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -122,6 +130,12 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var deviceSyncState: DeviceSyncState
 
+    @Mock
+    private lateinit var mockVpnStateMonitor: VpnStateMonitor
+
+    @Mock
+    private lateinit var mockNetPWaitlistRepository: NetPWaitlistRepository
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -142,6 +156,8 @@ class SettingsViewModelTest {
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
         whenever(windowsWaitlist.getWaitlistState()).thenReturn(WindowsWaitlistState.NotJoinedQueue)
 
+        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
+
         testee = SettingsViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
@@ -160,6 +176,8 @@ class SettingsViewModelTest {
             windowsWaitlist,
             windowsFeature,
             deviceSyncState,
+            mockVpnStateMonitor,
+            mockNetPWaitlistRepository,
         )
 
         runTest {
@@ -799,6 +817,39 @@ class SettingsViewModelTest {
             assertTrue(viewState.showSyncSetting)
             assertTrue(viewState.syncEnabled)
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNetPVpnStateIsEnabledThenViewStateNetPStateShouldBeConnected() = runTest {
+        whenever(mockVpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(flowOf(VpnState(state = VpnRunningState.ENABLED)))
+
+        testee.startPollingNetPEnableState()
+
+        testee.viewState().test {
+            assertEquals(NetPState.CONNECTED, awaitItem().networkProtectionState)
+        }
+    }
+
+    @Test
+    fun whenNetPVpnStateIsEnablingThenViewStateNetPStateShouldBeConnecting() = runTest {
+        whenever(mockVpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(flowOf(VpnState(state = VpnRunningState.ENABLING)))
+
+        testee.startPollingNetPEnableState()
+
+        testee.viewState().test {
+            assertEquals(NetPState.CONNECTING, awaitItem().networkProtectionState)
+        }
+    }
+
+    @Test
+    fun whenNetPVpnStateIsDisabledThenViewStateNetPStateShouldBeDisconnected() = runTest {
+        whenever(mockVpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(flowOf(VpnState(state = VpnRunningState.DISABLED)))
+
+        testee.startPollingNetPEnableState()
+
+        testee.viewState().test {
+            assertEquals(NetPState.DISCONNECTED, awaitItem().networkProtectionState)
         }
     }
 

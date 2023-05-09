@@ -24,4 +24,12 @@
     <string name="syncSettingsDisabled">Off</string>
     <string name="syncSettingsEnabled">On</string>
 
+    <!-- Network Protection -->
+    <string name="netpSettingsTitle">Network Protection</string>
+    <string name="netpSettingsNeverEnabled">Secure your network connection</string>
+    <string name="netpSettingsConnecting">Connecting</string>
+    <string name="netpSettingsConnected">Connected</string>
+    <string name="netpSettingsDisconnected">Disconnected</string>
+    <string name="netpUnlockedSnackbar">You\'ve unlocked Network Protection beta!</string>
+    <string name="netpUnlockedSnackbarAction">Open</string>
 </resources>

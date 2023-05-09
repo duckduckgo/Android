@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
@@ -78,20 +78,20 @@ class AppTPCompanyTrackersViewModelTest {
         viewModel.loadData(date, packageName)
     }
 
-    private fun getTrackersFlow(trackers: List<VpnTrackerCompanySignal>): Flow<List<VpnTrackerCompanySignal>> = flow {
+    private fun getTrackersFlow(trackers: List<VpnTrackerWithEntity>): Flow<List<VpnTrackerWithEntity>> = flow {
         while (true) {
             emit(trackers)
         }
     }
 
-    private fun someTrackers(): List<VpnTrackerCompanySignal> {
+    private fun someTrackers(): List<VpnTrackerWithEntity> {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val domain = "example.com"
         val trackerCompanyId: Int = -1
         val timestamp: String = DatabaseDateFormatter.bucketByHour()
 
         return listOf(
-            VpnTrackerCompanySignal(
+            VpnTrackerWithEntity(
                 VpnTracker(
                     trackerCompanyId = trackerCompanyId,
                     domain = domain,

@@ -57,17 +57,17 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "mi", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mj", weight = 1.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
+            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
 
             // Experiment: Increase retention through AppTP promotions
-            Variant(key = "ze", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "ze", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "zh", weight = 0.0, features = listOf(OneEasyStepForPrivacyRemoteMessage), filterBy = { noFilter() }),
-            Variant(key = "zi", weight = 0.0, features = listOf(BlockingTrackersAcrossWebRemoteMessage), filterBy = { noFilter() }),
+            Variant(key = "zi", weight = 1.0, features = listOf(BlockingTrackersAcrossWebRemoteMessage), filterBy = { noFilter() }),
             Variant(key = "zl", weight = 0.0, features = listOf(NextLevelPrivacyRemoteMessage), filterBy = { noFilter() }),
             Variant(key = "zm", weight = 0.0, features = listOf(OneEasyStepForPrivacyNotification), filterBy = { noFilter() }),
-            Variant(key = "zn", weight = 0.0, features = listOf(NextLevelPrivacyNotification), filterBy = { noFilter() }),
-            Variant(key = "zo", weight = 0.0, features = listOf(DaxDialogMessage), filterBy = { noFilter() }),
+            Variant(key = "zn", weight = 1.0, features = listOf(NextLevelPrivacyNotification), filterBy = { noFilter() }),
+            Variant(key = "zo", weight = 1.0, features = listOf(DaxDialogMessage), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(

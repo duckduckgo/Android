@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branchName:
-        description: 'Branch pull reference tests from the reference tests repo'
+        description: 'Branch to pull reference tests from the reference tests repo'
         type: string
         required: true
         default: 'main'
@@ -65,6 +65,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup jq
+        uses: dcarbone/install-jq-action@v1.0.1
+        with:
+          force: true
+
       - name: Install copy-files-from-to
         run: npm install -g copy-files-from-to
 
@@ -98,6 +103,15 @@ jobs:
       - name: Bundle the Android CI tests report
         if: always()
         run: find . -type d -name 'fladleResults' | zip -@ -r android-tests-report.zip
+
+      - name: Generate json file with failures
+        if: ${{ failure() }}
+        run: cat build/fladle/fladleResults/HtmlErrorReport.html | cut -d\`  -f2 >> results.json
+
+      - name: Print failure report
+        if: ${{ failure() }}
+        run: |
+          jq -r '.[] | .label as $id | .items[] | "Test:", $id, "Failure:", .label, "URL:", .url, "\n"' results.json  
 
       - name: Upload the Android CI tests report
         if: always()

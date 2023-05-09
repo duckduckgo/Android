@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.breakage
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
@@ -24,6 +23,7 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -35,6 +35,8 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleCh
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageCategorySingleChoiceViewModel.ViewState
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityReportBreakageCategorySingleChoiceBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
+import com.duckduckgo.navigation.api.getActivityParams
 import dagger.WrongScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
@@ -45,6 +47,7 @@ import kotlinx.coroutines.launch
     correctScope = ActivityScope::class,
 )
 @InjectWith(VpnScope::class)
+@ContributeToActivityStarter(OpenVpnBreakageCategoryWithBrokenApp::class)
 class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -57,14 +60,19 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private lateinit var brokenApp: BrokenApp
+    private lateinit var brokenApp: OpenVpnBreakageCategoryWithBrokenApp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // The value should never be "unknown" we just do this because getParcelableExtra returns
         // nullable
-        brokenApp = intent.getParcelableExtra(APP_PACKAGE_ID_EXTRA) ?: BrokenApp("unknown", "unknown")
+        brokenApp = intent.getActivityParams(OpenVpnBreakageCategoryWithBrokenApp::class.java) ?: OpenVpnBreakageCategoryWithBrokenApp(
+            launchFrom = "unknown",
+            appName = "unknown",
+            appPackageId = "unknown",
+            breakageCategories = emptyList(),
+        )
 
         setContentView(binding.root)
         configureListeners()
@@ -87,7 +95,8 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = viewModel.shuffledCategories.map { it.category }
+        viewModel.setCategories(brokenApp.breakageCategories)
+        val categories = brokenApp.breakageCategories.map { it.description }
         binding.categoriesSelection.onAction {
             RadioListAlertDialogBuilder(this)
                 .setTitle(getString(R.string.atp_ReportBreakageCategoriesTitle))
@@ -137,10 +146,11 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             val issue =
                 IssueReport(
+                    reportedFrom = brokenApp.launchFrom,
                     appName = brokenApp.appName,
                     appPackageId = brokenApp.appPackageId,
-                    description = binding.appBreakageFormFeedbackInput.text.toString(),
-                    category = viewModel.viewState.value.categorySelected.toString(),
+                    description = binding.appBreakageFormFeedbackInput.text,
+                    category = viewModel.viewState.value.categorySelected?.key.toString(),
                     customMetadata =
                     Base64.encodeToString(
                         metadataReporter.getVpnStateMetadata(brokenApp.appPackageId).toByteArray(),
@@ -155,19 +165,8 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         val category =
-            viewState.categorySelected?.let { getString(viewState.categorySelected.category) }.orEmpty()
+            viewState.categorySelected?.let { viewState.categorySelected.description }.orEmpty()
         binding.categoriesSelection.text = category
         binding.ctaNextFormSubmit.isEnabled = viewState.submitAllowed
-    }
-
-    companion object {
-
-        private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
-
-        internal fun intent(context: Context, brokenApp: BrokenApp): Intent {
-            return Intent(context, ReportBreakageCategorySingleChoiceActivity::class.java).apply {
-                putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
-            }
-        }
     }
 }

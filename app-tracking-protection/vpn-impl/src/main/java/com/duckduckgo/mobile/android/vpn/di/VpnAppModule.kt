@@ -20,12 +20,15 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import androidx.room.Room
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
 import com.duckduckgo.mobile.android.vpn.VpnServiceWrapper
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.remote_config.*
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
@@ -98,5 +101,13 @@ object VpnAppModule {
         sharedPreferencesProvider: VpnSharedPreferencesProvider,
     ): VpnFeaturesRegistry {
         return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider)
+    }
+
+    @Provides
+    fun provideAppTrackerBlockingStatsRepository(
+        vpnDatabase: VpnDatabase,
+        dispatchers: DispatcherProvider,
+    ): AppTrackerBlockingStatsRepository {
+        return RealAppTrackerBlockingStatsRepository(vpnDatabase, dispatchers)
     }
 }

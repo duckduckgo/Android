@@ -30,8 +30,7 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -53,9 +52,6 @@ class TrackersDbCleanerSchedulerModule {
     ): MainProcessLifecycleObserver {
         return TrackersDbCleanerScheduler(workManager)
     }
-
-    @Provides
-    fun providesVpnTrackerDao(vpnDatabase: VpnDatabase): VpnTrackerDao = vpnDatabase.vpnTrackerDao()
 }
 
 class TrackersDbCleanerScheduler(private val workManager: WorkManager) : MainProcessLifecycleObserver {
@@ -84,12 +80,12 @@ class TrackersDbCleanerWorker(
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
 
     @Inject
-    lateinit var appTrackersDao: VpnTrackerDao
+    lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 
     @WorkerThread
     override suspend fun doWork(): Result {
         webTrackersBlockedDao.deleteOldDataUntil(dateOfLastWeek())
-        appTrackersDao.deleteOldDataUntil(dateOfLastWeek())
+        appTrackerBlockingStatsRepository.deleteTrackersUntil(dateOfLastWeek())
 
         Timber.i("Clear trackers dao job finished; returning SUCCESS")
         return Result.success()

@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@duckduckgo/autoconsent": "^4.1.1",
-    "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#6.4.3",
-    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#4.12.0",
+    "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#6.5.1",
+    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#4.16.0",
     "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#1.4.0",
     "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1682070153"
   }

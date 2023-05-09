@@ -19,7 +19,6 @@ package com.duckduckgo.app.anr
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.AnrEntity
 import com.duckduckgo.app.anrs.store.ExceptionEntity
-import logcat.asLog
 import okio.ByteString.Companion.encode
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -66,7 +65,7 @@ internal fun CrashLogger.Crash.asCrashEntity(
     processName: String,
 ): ExceptionEntity {
     val timestamp = FORMATTER_SECONDS.format(LocalDateTime.now())
-    val stacktrace = this.t.asLog()
+    val stacktrace = this.t.stackTrace.asStringArray().toString()
     return ExceptionEntity(
         hash = (stacktrace + timestamp).encode().md5().hex(),
         shortName = this.shortName,

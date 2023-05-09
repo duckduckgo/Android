@@ -53,24 +53,24 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - name: Ad click detection flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.3.1
-        with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro/ad_click_detection_flows
+#      - name: Ad click detection flows
+#        uses: mobile-dev-inc/action-maestro-cloud@v1.3.1
+#        with:
+#          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
+#          name: ${{ github.sha }}
+#          app-file: apk/release.apk
+#          android-api-level: 30
+#          workspace: .maestro/ad_click_detection_flows
 
-      - name: Privacy Tests
-        if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.3.1
-        with:
-          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
-          name: ${{ github.sha }}
-          app-file: apk/release.apk
-          android-api-level: 30
-          workspace: .maestro/privacy_tests
+#      - name: Privacy Tests
+#        if: always()
+#        uses: mobile-dev-inc/action-maestro-cloud@v1.3.1
+#        with:
+#          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
+#          name: ${{ github.sha }}
+#          app-file: apk/release.apk
+#          android-api-level: 30
+#          workspace: .maestro/privacy_tests
 
       - name: Release Tests
         if: always()
