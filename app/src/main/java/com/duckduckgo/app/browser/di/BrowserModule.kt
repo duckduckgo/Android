@@ -49,6 +49,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -214,6 +215,7 @@ class BrowserModule {
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
+        context: Context,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -225,6 +227,8 @@ class BrowserModule {
             adClickManager,
             cloakedCnameDetector,
             requestFilterer,
+            DefaultDispatcherProvider(),
+            context
         )
 
     @Provides

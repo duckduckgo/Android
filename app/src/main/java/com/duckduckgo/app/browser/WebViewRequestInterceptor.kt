@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -39,6 +41,9 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.duckduckgo.app.browser.ClassifyJS
+import java.io.File
+import java.nio.charset.StandardCharsets
 
 interface RequestInterceptor {
 
@@ -70,10 +75,21 @@ class WebViewRequestInterceptor(
     private val cloakedCnameDetector: CloakedCnameDetector,
     private val requestFilterer: RequestFilterer,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val context: Context
+
 ) : RequestInterceptor {
+
+    // initialize the classifier
+    private val classifyJS = ClassifyJS(context)
+    private val downloadsDirectory: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val file = File(downloadsDirectory, "test.txt")
 
     override fun onPageStarted(url: String) {
         requestFilterer.registerOnPageCreated(url)
+
+        if (!file.exists()) {
+            file.createNewFile()
+        }
     }
 
     /**
@@ -91,8 +107,23 @@ class WebViewRequestInterceptor(
         webView: WebView,
         documentUrl: String?,
         webViewClientListener: WebViewClientListener?,
-    ): WebResourceResponse? {
+
+        ): WebResourceResponse? {
         val url = request.url
+        val urlString = url.toString()
+        if (!urlString.contains("/player/") && urlString.contains(".js")) {
+            val urlTillJs = url.toString().substring(0, url.toString().indexOf(".js") + 3)
+            val pred = classifyJS.predict(urlTillJs)
+            Timber.d("Prediction: " + pred.first + " " + pred.second)
+            if (pred.first == "ads"  || pred.first == "analytics" || pred.first == "social" || pred.first == "marketing") { //|| pred.first == "marketing" || pred.first == "social"
+                if (pred.second > 0.8) {
+                    file.appendText("$urlTillJs, ${pred.first}, ${pred.second}\n", StandardCharsets.UTF_8)
+                    return WebResourceResponse(null, null, null)
+                }
+            }
+
+
+        }
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUrl)) return WebResourceResponse(null, null, null)
 
