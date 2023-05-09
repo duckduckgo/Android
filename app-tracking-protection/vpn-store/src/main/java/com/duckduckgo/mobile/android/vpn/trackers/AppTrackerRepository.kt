@@ -40,6 +40,8 @@ interface AppTrackerRepository {
 
     fun manuallyExcludedApp(packageName: String)
 
+    fun manuallyExcludedApps(packageNames: List<String>)
+
     fun manuallyEnabledApp(packageName: String)
 
     fun restoreDefaultProtectedList()
@@ -93,6 +95,10 @@ class RealAppTrackerRepository(
 
     override fun manuallyExcludedApp(packageName: String) {
         vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(AppTrackerManualExcludedApp(packageName, false))
+    }
+
+    override fun manuallyExcludedApps(packageNames: List<String>) {
+        vpnAppTrackerBlockingDao.insertIntoManualAppExclusionList(packageNames.map { AppTrackerManualExcludedApp(it, false) })
     }
 
     override fun manuallyEnabledApp(packageName: String) {
