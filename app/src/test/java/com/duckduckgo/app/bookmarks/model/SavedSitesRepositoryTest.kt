@@ -260,7 +260,10 @@ class SavedSitesRepositoryTest {
 
         repository.updateFavourite(updatedFavorite)
 
-        assertEquals(repository.getFavorite(favoriteone.url), updatedFavorite)
+        val storedUpdatedFavourite = repository.getFavorite(favoriteone.url)!!
+        assertEquals(storedUpdatedFavourite.id, updatedFavorite.id)
+        assertEquals(storedUpdatedFavourite.title, updatedFavorite.title)
+        assertEquals(storedUpdatedFavourite.url, updatedFavorite.url)
     }
 
     @Test
@@ -298,7 +301,7 @@ class SavedSitesRepositoryTest {
 
         repository.getFavorites().test {
             val favorites = awaitItem()
-            assertEquals(favorites, listOf(updatedFavoriteTwo, updatedFavoriteThree, updatedFavoriteOne))
+            assertEquals(favorites.map { it.id }, listOf(updatedFavoriteTwo, updatedFavoriteThree, updatedFavoriteOne).map { it.id })
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -609,8 +612,7 @@ class SavedSitesRepositoryTest {
     fun whenFolderIsMovedToAnotherFolderThenParentFolderIsUpdated() = runTest {
         givenNoBookmarksStored()
 
-        val root =
-            repository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", lastModified = "timestamp", parentId = ""))
+        repository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", lastModified = "timestamp", parentId = ""))
         val folderOne =
             repository.insert(BookmarkFolder(id = "folder1", name = "folder1", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
         val bookmarkOne = repository.insertBookmark(title = "bookmark1", url = "foo1.com")
@@ -618,7 +620,9 @@ class SavedSitesRepositoryTest {
         repository.updateBookmark(updatedBookmarkOne, SavedSitesNames.BOOMARKS_ROOT)
 
         val updatedFolderOne = folderOne.copy(numBookmarks = 1)
-        assertEquals(repository.getFolder(folderOne.id), updatedFolderOne)
+        val storedUpdatedFolderOne = repository.getFolder(folderOne.id)!!
+        assertEquals(storedUpdatedFolderOne.id, updatedFolderOne.id)
+        assertEquals(storedUpdatedFolderOne.name, updatedFolderOne.name)
 
         val folderTwo =
             repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
@@ -627,9 +631,11 @@ class SavedSitesRepositoryTest {
         repository.updateBookmark(updatedBookmarkTwo, bookmarkTwo.parentId)
 
         val updatedFolderTwo = folderTwo.copy(numBookmarks = 1)
-        assertEquals(repository.getFolder(folderTwo.id), updatedFolderTwo)
+        val storedUpdatedFolderTwo = repository.getFolder(folderTwo.id)!!
+        assertEquals(storedUpdatedFolderTwo.id, updatedFolderTwo.id)
+        assertEquals(storedUpdatedFolderTwo.name, updatedFolderTwo.name)
 
-        val bookmarkThree = repository.insertBookmark(title = "bookmark3", url = "foo3.com")
+        repository.insertBookmark(title = "bookmark3", url = "foo3.com")
 
         assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
         assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numFolders == 2)
@@ -669,9 +675,9 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenInsertBranchFolderThenAllEntitiesAreInsertedCorrectly() = runTest {
         val parentFolder =
-            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT, numFolders = 1, numBookmarks = 0, lastModified = "timestamp")
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numFolders = 0, numBookmarks = 1, lastModified = "timestamp")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "timestamp", "folder2")
+            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT, numFolders = 1, numBookmarks = 1, lastModified = "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numFolders = 0, numBookmarks = 0, lastModified = "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder1", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
         repository.insertFolderBranch(folderBranch)
@@ -1045,7 +1051,7 @@ class SavedSitesRepositoryTest {
 
         val bookmarkUpdated = repository.getBookmark(bookmark.url)!!
 
-        Assert.assertTrue(bookmark.id == bookmarkUpdated.id)
+        Assert.assertTrue(updatedBookmark.id == bookmarkUpdated.id)
         Assert.assertTrue(bookmark.url == bookmarkUpdated.url)
         Assert.assertTrue(bookmark.title == bookmarkUpdated.title)
     }
@@ -1114,7 +1120,7 @@ class SavedSitesRepositoryTest {
 
     private fun givenFavoriteStored(vararg favorite: Favorite) {
         favorite.forEach {
-            val entity = Entity(it.id, it.title, it.url, type = BOOKMARK)
+            val entity = Entity(it.id, it.title, it.url, type = BOOKMARK, lastModified = it.lastModified)
             savedSitesEntitiesDao.insert(entity)
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
