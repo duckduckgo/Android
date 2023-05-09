@@ -108,7 +108,9 @@ class SavedSitesSyncParserTest {
             listOf(
                 aFavorite(
                     "bookmark1",
-                    "Bookmark 1", "https://bookmark1.com", 0,
+                    "Bookmark 1",
+                    "https://bookmark1.com",
+                    0,
                 ),
             ),
         )
@@ -147,7 +149,9 @@ class SavedSitesSyncParserTest {
             listOf(
                 aFavorite(
                     "bookmark1",
-                    "Bookmark 1", "https://bookmark1.com", 0,
+                    "Bookmark 1",
+                    "https://bookmark1.com",
+                    0,
                 ),
             ),
         )
