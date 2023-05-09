@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl
 
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
@@ -343,10 +344,16 @@ class RealSavedSitesRepository(
 
             is Bookmark -> {
                 // a bookmark will have a parent folder that we must respect
-                val entity = Entity(entityId = savedSite.id, title = titleOrFallback, url = savedSite.url, type = BOOKMARK)
+                val entity = Entity(
+                    entityId = savedSite.id,
+                    title = titleOrFallback,
+                    url = savedSite.url,
+                    type = BOOKMARK,
+                    lastModified = savedSite.lastModified ?: DatabaseDateFormatter.iso8601(),
+                )
                 savedSitesEntitiesDao.insert(entity)
                 savedSitesRelationsDao.insert(Relation(folderId = savedSite.parentId, entityId = entity.entityId))
-                savedSitesEntitiesDao.updateModified(savedSite.parentId)
+                savedSitesEntitiesDao.updateModified(savedSite.parentId, entity.lastModified!!)
                 entity.mapToBookmark(savedSite.parentId)
             }
         }
@@ -407,7 +414,13 @@ class RealSavedSitesRepository(
     }
 
     override fun insert(folder: BookmarkFolder): BookmarkFolder {
-        val entity = Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER)
+        val entity = Entity(
+            entityId = folder.id,
+            title = folder.name,
+            url = "",
+            lastModified = folder.lastModified ?: DatabaseDateFormatter.iso8601(),
+            type = FOLDER,
+        )
         savedSitesEntitiesDao.insert(entity)
         savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
         return folder
@@ -416,7 +429,15 @@ class RealSavedSitesRepository(
     override fun update(folder: BookmarkFolder) {
         val oldFolder = getFolder(folder.id) ?: return
 
-        savedSitesEntitiesDao.update(Entity(entityId = folder.id, title = folder.name, url = "", type = FOLDER))
+        savedSitesEntitiesDao.update(
+            Entity(
+                entityId = folder.id,
+                title = folder.name,
+                url = "",
+                type = FOLDER,
+                lastModified = folder.lastModified ?: DatabaseDateFormatter.iso8601(),
+            ),
+        )
 
         // has folder parent changed?
         if (oldFolder.parentId != folder.id) {

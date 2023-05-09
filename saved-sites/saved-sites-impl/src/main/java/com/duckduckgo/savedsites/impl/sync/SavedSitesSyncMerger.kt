@@ -95,7 +95,7 @@ class SavedSitesSyncMerger @Inject constructor(
                         savedSitesRepository.replaceFolder(folderId, result.id)
                     }
                     is SavedSitesDuplicateResult.NotDuplicate -> {
-                        Timber.d("Sync: folder $folderId not present locally")
+                        Timber.d("Sync: folder $folderId not present locally, inserting")
                         savedSitesRepository.insert(folder)
                     }
                 }
@@ -118,7 +118,7 @@ class SavedSitesSyncMerger @Inject constructor(
                                         savedSitesRepository.replaceFavourite(favourite, result.id)
                                     }
                                     is SavedSitesDuplicateResult.NotDuplicate -> {
-                                        Timber.d("Sync: child $child not present locally")
+                                        Timber.d("Sync: child $child not present locally, inserting")
                                         savedSitesRepository.insert(favourite)
                                     }
                                 }
@@ -132,7 +132,7 @@ class SavedSitesSyncMerger @Inject constructor(
                                         savedSitesRepository.replaceBookmark(bookmark, result.id)
                                     }
                                     is SavedSitesDuplicateResult.NotDuplicate -> {
-                                        Timber.d("Sync: child $child not present locally")
+                                        Timber.d("Sync: child $child not present locally, inserting")
                                         savedSitesRepository.insert(bookmark)
                                     }
                                 }
@@ -146,8 +146,6 @@ class SavedSitesSyncMerger @Inject constructor(
                     }
                 }
             }
-
-            savedSitesRepository.insert(decryptFolder(remoteFolder, parentId, lastModified))
         }
     }
 
