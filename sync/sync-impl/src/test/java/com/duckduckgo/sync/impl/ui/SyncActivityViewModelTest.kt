@@ -24,7 +24,6 @@ import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
-import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
@@ -62,12 +61,11 @@ class SyncActivityViewModelTest {
     private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncRepository: SyncRepository = mock()
-    private val syncEngine: SyncEngine = mock()
+    lateinit var isSignedInFlow: MutableStateFlow<Boolean>
 
     private val testee = SyncActivityViewModel(
         qrEncoder = qrEncoder,
         syncRepository = syncRepository,
-        syncEngine = syncEngine,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         recoveryCodePDF = recoveryPDF,
     )
@@ -167,7 +165,7 @@ class SyncActivityViewModelTest {
     fun whenLogoutSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true)).also {
-            Result.Success(false)
+            isSignedInFlow.emit(false)
         }
 
         testee.viewState().test {
@@ -222,7 +220,7 @@ class SyncActivityViewModelTest {
     fun whenDeleteAccountSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
         whenever(syncRepository.deleteAccount()).thenReturn(Result.Success(true)).also {
-            Result.Success(false)
+            isSignedInFlow.emit(false)
         }
 
         testee.viewState().test {
@@ -399,7 +397,7 @@ class SyncActivityViewModelTest {
 
     private fun givenAuthenticatedUser() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
-        val isSignedInFlow = MutableStateFlow(true)
+        isSignedInFlow = MutableStateFlow(true)
         whenever(syncRepository.isSignedInFlow()).thenReturn(isSignedInFlow)
         whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)

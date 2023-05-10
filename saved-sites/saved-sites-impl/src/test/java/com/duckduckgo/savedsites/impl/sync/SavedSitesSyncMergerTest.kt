@@ -18,7 +18,6 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
