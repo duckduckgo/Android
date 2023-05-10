@@ -47,6 +47,7 @@ class SavedSitesSyncParser @Inject constructor(
             // when since isEmpty it means we want all changes
             parseAllBookmarks()
         } else {
+
             SyncChanges(BOOKMARKS, "")
         }
     }

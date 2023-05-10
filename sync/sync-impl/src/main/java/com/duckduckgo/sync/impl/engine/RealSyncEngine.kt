@@ -148,7 +148,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun getChanges(timestamp: String = ""): List<SyncChanges> {
-        Timber.d("Sync: gathering changes from $timestamp")
+        Timber.d("Sync: gathering changes since $timestamp")
         return plugins.getPlugins().map {
             it.getChanges(timestamp)
         }.filterNot { it.isEmpty() }

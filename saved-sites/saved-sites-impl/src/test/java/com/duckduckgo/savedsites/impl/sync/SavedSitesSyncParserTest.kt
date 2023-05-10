@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
@@ -58,6 +59,8 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenFirstSyncAndUsersHasFavoritesThenChangesAreFormatted() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_favourites.json")
+
         val favoritesFolder = aFolder(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "")
         val bookmarksRootFolder = aFolder(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "")
 
@@ -86,19 +89,12 @@ class SavedSitesSyncParserTest {
         )
 
         val syncChanges = parser.getChanges("")
-        assertEquals(
-            syncChanges.updatesJSON,
-            "{\"bookmarks\":{\"modified_since\":\"0\",\"updates\":[{\"client_last_modified\":\"timestamp\"," +
-                "\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":" +
-                "\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"}" +
-                ",{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"}," +
-                "\"title\":\"Bookmark 4\"},{\"client_last_modified\"" +
-                ":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
-        )
+        assertEquals(syncChanges.updatesJSON, updatesJSON)
     }
 
     @Test
     fun whenFirstSyncAndUsersHasFoldersThenChangesAreFormatted() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_folders.json")
         val bookmarksRootFolder = aFolder(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "")
 
         whenever(repository.hasBookmarks()).thenReturn(true)
@@ -125,17 +121,12 @@ class SavedSitesSyncParserTest {
         )
 
         val syncChanges = parser.getChanges("")
-        assertEquals(
-            syncChanges.updatesJSON,
-            "{\"bookmarks\":{\"modified_since\":\"0\",\"updates\":[{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\"" +
-                ":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page" +
-                "\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\"" +
-                ":[\"bookmark3\",\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
-        )
+        assertEquals(syncChanges.updatesJSON, updatesJSON)
     }
 
     @Test
     fun whenFirstSyncAndUsersHasFavoritesAndSubfoldersThenChangesAreFormatted() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_folders_and_favourites.json")
         val favoritesFolder = aFolder(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "")
         val bookmarksRootFolder = aFolder(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "")
         val subFolder = aFolder("1a8736c1-83ff-48ce-9f01-797887455891", "folder", SavedSitesNames.BOOMARKS_ROOT)
@@ -186,20 +177,7 @@ class SavedSitesSyncParserTest {
         )
 
         val syncChanges = parser.getChanges("")
-        assertEquals(
-            syncChanges.updatesJSON,
-            "{\"bookmarks\":{\"modified_since\":\"0\",\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":" +
-                "[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\"," +
-                "\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\"" +
-                ",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"},{\"client_last_modified\"" +
-                ":\"timestamp\",\"id\":\"bookmark5\"," +
-                "\"page\":{\"url\":\"https://bookmark1.com\"},\"title\":\"Bookmark 5\"},{\"client_last_modified\":\"timestamp\",\"id\"" +
-                ":\"bookmark6\"," +
-                "\"page\":{\"url\":\"https://bookmark2.com\"},\"title\":\"Bookmark 6\"},{\"client_last_modified\":\"timestamp\",\"folder\":" +
-                "{\"children\":[\"bookmark5\",\"bookmark6\"]},\"id\":\"1a8736c1-83ff-48ce-9f01-797887455891\",\"title\":\"folder\"}," +
-                "{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"" +
-                ",\"1a8736c1-83ff-48ce-9f01-797887455891\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}",
-        )
+        assertEquals(syncChanges.updatesJSON, updatesJSON)
     }
 
     private fun aFolder(
