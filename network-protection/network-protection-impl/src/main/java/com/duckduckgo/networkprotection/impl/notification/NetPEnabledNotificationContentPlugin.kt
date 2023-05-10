@@ -26,9 +26,10 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationPriority
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementActivity
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -80,9 +81,10 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 @ContributesBinding(VpnScope::class)
 class NetPEnabledNotificationIntentProvider @Inject constructor(
     private val context: Context,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : NetPEnabledNotificationContentPlugin.IntentProvider {
     override fun getOnPressNotificationIntent(): PendingIntent? {
-        val intent = NetworkProtectionManagementActivity.intent(context)
+        val intent = globalActivityStarter.startIntent(context, NetworkProtectionManagementScreenNoParams)
         return TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

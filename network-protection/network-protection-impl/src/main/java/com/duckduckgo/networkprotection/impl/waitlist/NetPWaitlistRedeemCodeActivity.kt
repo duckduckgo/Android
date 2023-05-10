@@ -16,8 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
@@ -25,18 +23,22 @@ import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpWaitlistRedeemCodeBinding
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeActivity.Launch.NetPWaitlistRedeemCodeScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(NetPWaitlistRedeemCodeScreenNoParams::class)
 class NetPWaitlistRedeemCodeActivity : DuckDuckGoActivity() {
 
     private val viewModel: NetPWaitlistRedeemCodeViewModel by bindViewModel()
@@ -117,9 +119,8 @@ class NetPWaitlistRedeemCodeActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, NetPWaitlistRedeemCodeActivity::class.java)
-        }
+    companion object Launch {
+        // This activity is not part of the NetP public API so its model to launch it remains here
+        internal object NetPWaitlistRedeemCodeScreenNoParams : ActivityParams
     }
 }
