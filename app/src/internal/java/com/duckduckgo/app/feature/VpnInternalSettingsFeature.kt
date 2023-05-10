@@ -19,12 +19,15 @@ package com.duckduckgo.app.feature
 import android.content.Context
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.vpn.internal.feature.VpnInternalSettingsActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.vpn.internal.feature.LaunchVpnInternalScreenWithEmptyParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class VpnInternalSettingsFeature @Inject constructor() : InternalFeaturePlugin {
+class VpnInternalSettingsFeature @Inject constructor(
+    private val globalActivityStarter: GlobalActivityStarter,
+) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
         return "AppTP dev settings"
     }
@@ -34,6 +37,6 @@ class VpnInternalSettingsFeature @Inject constructor() : InternalFeaturePlugin {
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
-        activityContext.startActivity(VpnInternalSettingsActivity.intent(activityContext))
+        globalActivityStarter.start(activityContext, LaunchVpnInternalScreenWithEmptyParams)
     }
 }
