@@ -19,9 +19,6 @@ package com.duckduckgo.sync.store.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 
 @Entity(
     tableName = "sync_attempts",

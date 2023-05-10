@@ -67,6 +67,4 @@ class AppLifecycleSyncObserverTest {
 
         verify(mockSyncEngine).syncNow(APP_OPEN)
     }
-
 }
-

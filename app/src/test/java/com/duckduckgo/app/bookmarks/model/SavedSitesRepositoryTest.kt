@@ -25,6 +25,7 @@ import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenFolderWithContent
 import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeBookmarks
 import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeFolders
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
@@ -51,6 +52,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.threeten.bp.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -1112,6 +1114,83 @@ class SavedSitesRepositoryTest {
         Assert.assertTrue(favoriteUpdated.id == favoriteStored.id)
         Assert.assertTrue(favoriteUpdated.url == favoriteStored.url)
         Assert.assertTrue(favoriteUpdated.title == favoriteStored.title)
+    }
+
+    @Test
+    fun whenBookmarkModifiedAfterThresholdThenGetModifiedSinceHasBookmarks() {
+        val modifiedEarlierTime = LocalDateTime.now().minusHours(2)
+        val since = LocalDateTime.now().minusHours(1)
+        val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(modifiedEarlierTime))
+        savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
+
+        val bookmarks = givenSomeBookmarks(3)
+        savedSitesEntitiesDao.insertList(bookmarks)
+
+        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks.plus(bookmarks))
+        savedSitesRelationsDao.insertList(relation)
+
+        val modifiedSinceBookmarks = repository.getBookmarksModifiedSince(DatabaseDateFormatter.iso8601(since))
+        assertEquals(bookmarks.size, modifiedSinceBookmarks.size)
+    }
+
+    @Test
+    fun whenBookmarkModifiedBeforeThresholdThenGetModifiedSinceIsEmpty() {
+        val modifiedEarlierTime = LocalDateTime.now().minusHours(2)
+        val since = LocalDateTime.now().minusHours(1)
+        val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(modifiedEarlierTime))
+        savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
+
+        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks)
+        savedSitesRelationsDao.insertList(relation)
+
+        val modifiedSinceBookmarks = repository.getBookmarksModifiedSince(DatabaseDateFormatter.iso8601(since))
+        assertTrue(modifiedSinceBookmarks.isEmpty())
+    }
+
+    @Test
+    fun whenFolderModifiedAfterThresholdThenGetModifiedSinceHasFolders() {
+        val modifiedEarlierTime = LocalDateTime.now().minusHours(1)
+        val since = LocalDateTime.now().minusHours(2)
+
+        val rootFolder = BookmarkFolder(
+            id = SavedSitesNames.BOOMARKS_ROOT,
+            name = "root",
+            lastModified = DatabaseDateFormatter.iso8601(modifiedEarlierTime),
+            parentId = "",
+        )
+        repository.insert(rootFolder)
+
+        val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(modifiedEarlierTime))
+        savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
+
+        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks)
+        savedSitesRelationsDao.insertList(relation)
+
+        val modifiedSinceFolders = repository.getFoldersModifiedSince(DatabaseDateFormatter.iso8601(since))
+        assertEquals(1, modifiedSinceFolders.size)
+    }
+
+    @Test
+    fun whenFolderModifiedBeforeThresholdThenGetModifiedSinceIsEmpty() {
+        val modifiedEarlierTime = LocalDateTime.now().minusHours(2)
+        val since = LocalDateTime.now().minusHours(1)
+
+        val rootFolder = BookmarkFolder(
+            id = SavedSitesNames.BOOMARKS_ROOT,
+            name = "root",
+            lastModified = DatabaseDateFormatter.iso8601(modifiedEarlierTime),
+            parentId = "",
+        )
+        repository.insert(rootFolder)
+
+        val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(modifiedEarlierTime))
+        savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
+
+        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks)
+        savedSitesRelationsDao.insertList(relation)
+
+        val modifiedSinceFolders = repository.getFoldersModifiedSince(DatabaseDateFormatter.iso8601(since))
+        assertTrue(modifiedSinceFolders.isEmpty())
     }
 
     private fun givenNoFavoritesStored() {

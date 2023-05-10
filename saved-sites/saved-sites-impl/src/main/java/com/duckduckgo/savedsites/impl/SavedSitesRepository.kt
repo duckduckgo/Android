@@ -38,8 +38,10 @@ import io.reactivex.Single
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import org.threeten.bp.OffsetDateTime
 
 class RealSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
@@ -544,6 +546,36 @@ class RealSavedSitesRepository(
         return savedSitesEntitiesDao.lastModified().map { it.mapToFavorite(0) }
     }
 
+    override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
+        val folders = savedSitesEntitiesDao.entitiesByTypeSync(FOLDER).filter { it.modifiedSince(since) }
+        return folders.map { mapBookmarkFolder(it) }
+    }
+
+    private fun mapBookmarkFolder(entity: Entity): BookmarkFolder {
+        val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
+        val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
+        val numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, BOOKMARK)
+        return BookmarkFolder(
+            entity.entityId,
+            entity.title,
+            relation?.folderId ?: "",
+            numFolders = numFolders,
+            numBookmarks = numBookmarks,
+            lastModified = entity.lastModified ?: "",
+        )
+    }
+
+    override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
+        val bookmarks = savedSitesEntitiesDao.entitiesByTypeSync(BOOKMARK).filter { it.modifiedSince(since) }
+        return bookmarks.map { mapToBookmark(it)!! }
+    }
+
+    private fun mapToBookmark(entity: Entity): Bookmark? {
+        return savedSitesRelationsDao.relationByEntityId(entity.entityId)?.let {
+            entity.mapToBookmark(it.folderId)
+        }
+    }
+
     override fun updateWithPosition(favorites: List<Favorite>) {
         savedSitesRelationsDao.delete(SavedSitesNames.FAVORITES_ROOT)
         val relations = favorites.map { Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = it.id) }
@@ -559,6 +591,16 @@ class RealSavedSitesRepository(
 
     private fun Entity.mapToFavorite(index: Int = 0): Favorite =
         Favorite(this.entityId, this.title, this.url.orEmpty(), lastModified = this.lastModified, index)
+
+    private fun Entity.modifiedSince(since: String): Boolean {
+        return if (this.lastModified == null) {
+            true
+        } else {
+            val entityModified = OffsetDateTime.parse(this.lastModified)
+            val sinceModified = OffsetDateTime.parse(since)
+            entityModified.isAfter(sinceModified)
+        }
+    }
 
     private fun List<Entity>.mapToBookmarks(folderId: String = SavedSitesNames.BOOMARKS_ROOT): List<Bookmark> =
         this.map { it.mapToBookmark(folderId) }

@@ -34,6 +34,24 @@ class DatabaseDateFormatterTest {
         assertEquals("2020-12-25T13:14:15", formatted)
     }
 
+    @Test
+    fun whenIso8601isUsedThenDateIsFormatted() {
+        val formatted = DatabaseDateFormatter.iso8601(fixedTime())
+        assertEquals("2020-12-25T13:14:15.000000016Z", formatted)
+    }
+
+    @Test
+    fun whenIso8601isParsedThenDateIsCorrect() {
+        val now = LocalDateTime.now()
+
+        val format = DatabaseDateFormatter.iso8601(now)
+
+        val offsetDateMillis = DatabaseDateFormatter.millisIso8601(now)
+        val formatted = DatabaseDateFormatter.parseMillisIso8601(offsetDateMillis)
+
+        assertEquals(format, formatted)
+    }
+
     private fun fixedTime(): LocalDateTime {
         return LocalDateTime.of(2020, 12, 25, 13, 14, 15, 16)
     }
