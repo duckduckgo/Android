@@ -55,7 +55,7 @@ class SavedSitesSyncMerger @Inject constructor(
         }
 
         if (bookmarks.last_modified != null) {
-            Timber.d("Sync: updating last_modified to ${bookmarks.last_modified}")
+            Timber.d("Sync: updating bookmarks last_modified to ${bookmarks.last_modified}")
             savedSitesSyncStore.modifiedSince = bookmarks.last_modified
         }
 
