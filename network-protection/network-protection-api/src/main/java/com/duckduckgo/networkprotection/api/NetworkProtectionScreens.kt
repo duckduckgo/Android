@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.networkprotection.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-dependencies {
-    implementation project(':navigation-api')
-}
+/**
+ * Use this model to launch the NetworkProtectionManagement screen
+ */
+object NetworkProtectionManagementScreenNoParams : ActivityParams
 
-android {
-    namespace 'com.duckduckgo.networkprotection.api'
-}
+/**
+ * Use this model to launch the NetPWaitlist screen
+ */
+object NetPWaitlistScreenNoParams : ActivityParams
