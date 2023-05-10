@@ -22,7 +22,6 @@ import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import java.util.UUID
-import kotlinx.coroutines.flow.*
 import logcat.logcat
 
 private const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.feature.registry.v1"
@@ -31,17 +30,10 @@ private const val IS_INITIALIZED = "IS_INITIALIZED"
 internal class VpnFeaturesRegistryImpl(
     private val vpnServiceWrapper: VpnServiceWrapper,
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
-) : VpnFeaturesRegistry, SharedPreferences.OnSharedPreferenceChangeListener {
+) : VpnFeaturesRegistry {
 
-    private val preferences: SharedPreferences
-        get() = sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
-
-    private val registryInitialValue = Pair("", false)
-    private val _registry = MutableStateFlow(registryInitialValue)
-
-    init {
-        // we don't need to unregister the listener
-        preferences.registerOnSharedPreferenceChangeListener(this)
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(PREFS_FILENAME, multiprocess = true, migrate = false)
     }
 
     @Synchronized
@@ -82,21 +74,8 @@ internal class VpnFeaturesRegistryImpl(
         vpnServiceWrapper.restartVpnService(forceRestart = false)
     }
 
-    override fun registryChanges(): Flow<Pair<String, Boolean>> {
-        return _registry.asStateFlow()
-            .filter {
-                logcat { "change $it" }
-                it != registryInitialValue && it.first != IS_INITIALIZED
-            }
-    }
-
     override fun getRegisteredFeatures(): List<VpnFeature> {
         return registeredFeatures().keys.map { VpnFeature { it } }
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        logcat { "onSharedPreferenceChanged($key)" }
-        _registry.update { Pair(key, sharedPreferences.contains(key)) }
     }
 
     private fun registeredFeatures(): Map<String, Any?> {
