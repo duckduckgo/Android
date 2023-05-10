@@ -23,8 +23,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.api.engine.SyncEngine
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
