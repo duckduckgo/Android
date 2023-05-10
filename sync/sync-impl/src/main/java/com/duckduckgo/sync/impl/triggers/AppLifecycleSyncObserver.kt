@@ -17,11 +17,16 @@
 package com.duckduckgo.sync.impl.triggers
 
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,13 +34,20 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
-class BrowserLifecycleObserver @Inject constructor(
+class AppLifecycleSyncObserver @Inject constructor(
+    @AppCoroutineScope val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val deviceSyncState: DeviceSyncState,
     private val syncEngine: SyncEngine,
-) : MainProcessLifecycleObserver {
+    ) : MainProcessLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        Timber.d("Sync: App started, triggering sync")
-        syncEngine.syncNow(APP_OPEN)
+        if (deviceSyncState.isUserSignedInOnDevice()){
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                Timber.d("Sync: App started, triggering sync")
+                syncEngine.syncNow(APP_OPEN)
+            }
+        }
     }
 }

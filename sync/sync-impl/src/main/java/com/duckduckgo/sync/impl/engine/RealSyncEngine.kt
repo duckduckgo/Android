@@ -50,30 +50,30 @@ class RealSyncEngine @Inject constructor(
     override fun syncNow(trigger: SyncTrigger) {
         Timber.d("Sync: petition to sync now trigger: $trigger")
         when (trigger) {
-            BACKGROUND_SYNC -> scheduleSync()
-            APP_OPEN -> performSync()
-            FEATURE_READ -> performSync()
+            BACKGROUND_SYNC -> scheduleSync(trigger)
+            APP_OPEN -> performSync(trigger)
+            FEATURE_READ -> performSync(trigger)
             ACCOUNT_CREATION -> sendAllLocalData()
             ACCOUNT_LOGIN -> receiveRemoteChange()
         }
     }
 
-    private fun scheduleSync() {
+    private fun scheduleSync(trigger: SyncTrigger) {
         when (syncScheduler.scheduleOperation()) {
             DISCARD -> {
-                Timber.d("Sync: petition to sync denied, debouncing")
+                Timber.d("Sync: petition to sync debounced")
             }
 
             EXECUTE -> {
                 Timber.d("Sync: petition to sync accepted, syncing now")
-                performSync()
+                performSync(trigger)
             }
         }
     }
 
     private fun sendAllLocalData() {
         Timber.d("Sync: initiating first sync")
-        val changes = initialSyncChanges()
+        val changes = getChanges()
 
         if (changes.isEmpty()) {
             Timber.d("Sync: local data empty, nothing to send")
@@ -81,11 +81,11 @@ class RealSyncEngine @Inject constructor(
         }
 
         Timber.d("Sync: sending local changes $changes")
-        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Initial sync"))
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS))
         sendLocalChanges(changes)
     }
 
-    private fun performSync() {
+    private fun performSync(trigger: SyncTrigger) {
         // is this the first ever sync? we need to PATCH all data
         // is this triggered after a login? We need to call GET and then PATCH
         // is this a triggered sync? we need to PATCH all data modified after last sync
@@ -95,7 +95,7 @@ class RealSyncEngine @Inject constructor(
         // send changes to observers
         val changes = getListOfChanges()
 
-        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Manual launch"))
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
         if (changes.isEmpty()) {
             Timber.d("Sync: no changes to sync, asking for remote changes")
@@ -141,20 +141,13 @@ class RealSyncEngine @Inject constructor(
     private fun getListOfChanges(): List<SyncChanges> {
         val lastAttempt = syncStateRepository.current()
         return if (lastAttempt == null) {
-            initialSyncChanges()
+            getChanges()
         } else {
             getChanges(lastAttempt.timestamp)
         }
     }
 
-    private fun initialSyncChanges(): List<SyncChanges> {
-        Timber.d("Sync: initialSync")
-        return plugins.getPlugins().map {
-            it.getChanges("")
-        }.filterNot { it.isEmpty() }
-    }
-
-    private fun getChanges(timestamp: String): List<SyncChanges> {
+    private fun getChanges(timestamp: String = ""): List<SyncChanges> {
         Timber.d("Sync: gathering changes from $timestamp")
         return plugins.getPlugins().map {
             it.getChanges(timestamp)
@@ -163,7 +156,7 @@ class RealSyncEngine @Inject constructor(
 
     override fun notifyDataChanged() {
         Timber.d("Sync: notifyDataChanged")
-        performSync()
+        performSync(FEATURE_READ)
     }
 
     private fun persistChanges(remoteChanges: List<SyncChanges>) {
