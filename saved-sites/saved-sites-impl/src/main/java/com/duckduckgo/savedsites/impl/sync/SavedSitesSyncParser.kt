@@ -56,10 +56,6 @@ class SavedSitesSyncParser @Inject constructor(
 
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
-        // get all entities with modified date > since
-        // for each entity
-        // if folder -> query folder content -> add children
-        // if bookmark // favourite -> add json to object
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         val folders = repository.getFoldersModifiedSince(since)
