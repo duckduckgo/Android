@@ -55,6 +55,7 @@ class NetpRealAppTrackerDetector constructor(
     override fun evaluate(domain: String, uid: Int): AppTrackerDetector.AppTracker? {
         // Check if AppTP is enabled first
         if (isAppTpDisabled) {
+            logcat { "App tracker detector is DISABLED" }
             return null
         }
 

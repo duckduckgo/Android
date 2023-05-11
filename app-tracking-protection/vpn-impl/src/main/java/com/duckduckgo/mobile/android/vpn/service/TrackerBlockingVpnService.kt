@@ -46,6 +46,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
+import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
@@ -124,9 +125,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
     }
 
-    private val vpnNetworkStack by lazy {
-        vpnNetworkStackProvider.provideNetworkStack()
-    }
+    private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(provider = { vpnNetworkStackProvider.provideNetworkStack() })
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -168,10 +167,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         AndroidInjection.inject(this)
 
         logcat { "VPN log: onCreate, creating the ${vpnNetworkStack.name} network stack" }
-        if (vpnNetworkStack.onCreateVpn().isFailure) {
-            // report and proceed
-            deviceShieldPixels.reportErrorCreatingVpnNetworkStack()
-        }
+        vpnNetworkStack.onCreateVpnWithErrorReporting()
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -218,6 +214,18 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 
     private suspend fun startVpn(currentTunFd: ParcelFileDescriptor?) = withContext(Dispatchers.IO) {
+        fun updateNetworkStackUponRestart() {
+            logcat { "VPN log: updating the networking stack" }
+            logcat { "VPN log: CURRENT network ${vpnNetworkStack.name}" }
+            // stop the current networking stack
+            vpnNetworkStack.onStopVpn(VpnStopReason.RESTART)
+            vpnNetworkStack.onDestroyVpn()
+            // maybe we have changed the networking stack
+            vpnNetworkStack = vpnNetworkStackProvider.provideNetworkStack()
+            vpnNetworkStack.onCreateVpnWithErrorReporting()
+            logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
+        }
+
         logcat { "VPN log: Starting VPN" }
         val restarting = currentTunFd != null
 
@@ -246,7 +254,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // keep old tunnel open or create a temp one to avoid leaks as much as we can
         val tempTunFd = currentTunFd?.let {
             logcat { "VPN log: restarting the tunnel" }
-            vpnNetworkStack.onStopVpn(VpnStopReason.RESTART)
+            updateNetworkStackUponRestart()
             it
         } ?: createTempTunnel()
 
@@ -308,7 +316,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             allowFamily(AF_INET6)
             addAddress(InetAddress.getByName("10.0.0.2"), 32)
             addAddress(InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1"), 32)
+            // nobody will be listening here we just want to make sure no app has connection
             addDnsServer("10.0.0.1")
+            // just so that we can connect to our BE
+            // TODO should we protect all comms with our controller BE? other VPNs do that
+            safelyAddDisallowedApps(listOf("com.duckduckgo.mobile.android", "com.duckduckgo.mobile.android.debug"))
             setBlocking(true)
             setMtu(1280)
             prepare(this@TrackerBlockingVpnService)
@@ -800,6 +812,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
         private const val ACTION_RESTART_VPN = "ACTION_RESTART_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
+    }
+
+    private fun VpnNetworkStack.onCreateVpnWithErrorReporting() {
+        if (this.onCreateVpn().isFailure) {
+            logcat { "VPN log: error creating the VPN network ${this.name}" }
+            // report and proceed
+            deviceShieldPixels.reportErrorCreatingVpnNetworkStack()
+        } else {
+            logcat { "VPN log: VPN network ${this.name} created" }
+        }
     }
 }
 
