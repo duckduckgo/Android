@@ -16,12 +16,17 @@
 
 package com.duckduckgo.sync.api.engine
 
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
+
 interface SyncMerger {
     /**
      * Output of the [SyncEngine]
      * This is called for each feature with the changes that come from the server
      */
-    fun merge(changes: SyncChanges): SyncMergeResult<Boolean>
+    fun merge(
+        changes: SyncChanges,
+        conflictResolution: SyncConflictResolution
+    ): SyncMergeResult<Boolean>
 }
 
 sealed class SyncMergeResult<out R> {

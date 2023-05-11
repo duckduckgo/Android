@@ -31,6 +31,13 @@ interface SyncablePlugin {
      */
     fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String,
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean>
+
+    enum class SyncConflictResolution {
+        DEDUPLICATION,
+        REMOTE_WINS,
+        LOCAL_WINS,
+        TIMESTAMP,
+    }
 }

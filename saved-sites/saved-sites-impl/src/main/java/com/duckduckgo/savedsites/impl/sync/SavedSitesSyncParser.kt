@@ -30,6 +30,7 @@ import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncParser
 import com.duckduckgo.sync.api.engine.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -176,7 +177,7 @@ class SavedSitesSyncParser @Inject constructor(
 
     override fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String,
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         return SyncMergeResult.Success(true)
     }

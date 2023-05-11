@@ -28,6 +28,7 @@ import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMerger
 import com.duckduckgo.sync.api.engine.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -45,7 +46,10 @@ class SavedSitesSyncMerger @Inject constructor(
     private val syncCrypto: SyncCrypto,
 ) : SyncMerger, SyncablePlugin {
 
-    override fun merge(changes: SyncChanges): SyncMergeResult<Boolean> {
+    override fun merge(
+        changes: SyncChanges,
+        conflictResolution: SyncConflictResolution
+    ): SyncMergeResult<Boolean> {
         Timber.d("Sync: merging remote bookmarks changes $changes")
 
         val bookmarks = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.updatesJSON) }.getOrNull()
@@ -71,8 +75,15 @@ class SavedSitesSyncMerger @Inject constructor(
         bookmarks.entries.find { it.id == SavedSitesNames.BOOMARKS_ROOT }
             ?: return SyncMergeResult.Error(reason = "Sync: merging failed, Bookmarks Root folder does not exist")
 
-        mergeFolder(SavedSitesNames.BOOMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified)
-        mergeFolder(SavedSitesNames.FAVORITES_ROOT, "", bookmarks.entries, bookmarks.last_modified)
+        val processIds: MutableList<String> = mutableListOf()
+        val allResponseIds = bookmarks.entries.map { it.id }
+
+        mergeFolder(SavedSitesNames.BOOMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+        mergeFolder(SavedSitesNames.FAVORITES_ROOT, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+
+        val unprocessedIds = allResponseIds.filterNot { processIds.contains(it) }
+        Timber.d("Sync: there are ${unprocessedIds.size} items orphaned")
+
         return SyncMergeResult.Success(true)
     }
 
@@ -81,6 +92,8 @@ class SavedSitesSyncMerger @Inject constructor(
         parentId: String,
         remoteUpdates: List<SyncBookmarkEntry>,
         lastModified: String,
+        processIds: MutableList<String>,
+        conflictResolution: SyncConflictResolution,
     ) {
         Timber.d("Sync: merging folder $folderId with parentId $parentId")
         val remoteFolder = remoteUpdates.find { it.id == folderId }
@@ -89,11 +102,13 @@ class SavedSitesSyncMerger @Inject constructor(
         } else {
             remoteFolder.folder?.let {
                 val folder = decryptFolder(remoteFolder, parentId, lastModified)
+                processIds.add(folder.id)
                 when (val result = duplicateFinder.findFolderDuplicate(folder)) {
                     is SavedSitesDuplicateResult.Duplicate -> {
                         Timber.d("Sync: folder $folderId exists locally, replacing content")
                         savedSitesRepository.replaceFolder(folderId, result.id)
                     }
+
                     is SavedSitesDuplicateResult.NotDuplicate -> {
                         Timber.d("Sync: folder $folderId not present locally, inserting")
                         savedSitesRepository.insert(folder)
@@ -103,6 +118,7 @@ class SavedSitesSyncMerger @Inject constructor(
 
             remoteFolder.folder?.children?.forEachIndexed { position, child ->
                 Timber.d("Sync: merging child $child")
+                processIds.add(child)
                 val childEntry = remoteUpdates.find { it.id == child }
                 if (childEntry == null) {
                     Timber.d("Sync: can't find child $child")
@@ -117,13 +133,13 @@ class SavedSitesSyncMerger @Inject constructor(
                                         Timber.d("Sync: child $child exists locally, replacing")
                                         savedSitesRepository.replaceFavourite(favourite, result.id)
                                     }
+
                                     is SavedSitesDuplicateResult.NotDuplicate -> {
                                         Timber.d("Sync: child $child not present locally, inserting")
                                         savedSitesRepository.insert(favourite)
                                     }
                                 }
                             } else {
-                                // eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6IkhqQnMwd2lza0tyTzZGSmF1b0psMjQ2Qko5T01XK1V1Rk92QTVYN1ovdU09IiwidXNlcl9pZCI6ImI3ZDNlMzFiLTk5MzctNDE3Zi05NjU4LWNhNzI0NjkxZGE2NSJ9fQ==
                                 Timber.d("Sync: child $child is a Bookmark")
                                 val bookmark = decryptBookmark(childEntry, folderId, lastModified)
                                 when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
@@ -131,6 +147,7 @@ class SavedSitesSyncMerger @Inject constructor(
                                         Timber.d("Sync: child $child exists locally, replacing")
                                         savedSitesRepository.replaceBookmark(bookmark, result.id)
                                     }
+
                                     is SavedSitesDuplicateResult.NotDuplicate -> {
                                         Timber.d("Sync: child $child not present locally, inserting")
                                         savedSitesRepository.insert(bookmark)
@@ -141,7 +158,7 @@ class SavedSitesSyncMerger @Inject constructor(
 
                         childEntry.isFolder() -> {
                             Timber.d("Sync: child $child is a Folder")
-                            mergeFolder(childEntry.id, folderId, remoteUpdates, lastModified)
+                            mergeFolder(childEntry.id, folderId, remoteUpdates, lastModified, processIds, conflictResolution)
                         }
                     }
                 }
@@ -202,11 +219,11 @@ class SavedSitesSyncMerger @Inject constructor(
 
     override fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String,
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-        Timber.d("Sync: received remote changes from $timestamp")
+        Timber.d("Sync: received remote changes, merging with resolution $conflictResolution")
         changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
-            val result = merge(bookmarkChanges)
+            val result = merge(bookmarkChanges, conflictResolution)
             Timber.d("Sync: merging finished with $result")
             return SyncMergeResult.Success(true)
         }
