@@ -22,6 +22,7 @@ import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncMergeResult
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import junit.framework.Assert.assertTrue
 import org.junit.Before
@@ -49,7 +50,16 @@ class SavedSitesSyncMergerTest {
 
     @Test
     fun whenMergingCorruptListOfChangesThenResultIsError() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/corrupted_data.json")
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_invalid_data.json")
+        val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
+        val result = parser.merge(corruptedChanges)
+
+        assertTrue(result is SyncMergeResult.Error)
+    }
+
+    @Test
+    fun whenMergingNullEntriesThenResultIsError() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_null_entries.json")
         val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
         val result = parser.merge(corruptedChanges)
 
@@ -65,7 +75,7 @@ class SavedSitesSyncMergerTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/first_sync_get_data.json")
         val remoteChanges = SyncChanges(BOOKMARKS, updatesJSON)
 
-        val result = parser.syncChanges(listOf(remoteChanges), "")
+        val result = parser.syncChanges(listOf(remoteChanges), DEDUPLICATION)
 
         assertTrue(result is SyncMergeResult.Success)
     }

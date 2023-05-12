@@ -25,6 +25,7 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncDataValidationResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMerger
 import com.duckduckgo.sync.api.engine.SyncablePlugin
@@ -46,34 +47,59 @@ class SavedSitesSyncMerger @Inject constructor(
     private val syncCrypto: SyncCrypto,
 ) : SyncMerger, SyncablePlugin {
 
+    override fun getChanges(since: String): SyncChanges {
+        return SyncChanges.empty()
+    }
+
+    override fun syncChanges(
+        changes: List<SyncChanges>,
+        conflictResolution: SyncConflictResolution,
+    ): SyncMergeResult<Boolean> {
+        Timber.d("Sync: received remote changes, merging with resolution $conflictResolution")
+        changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
+            val result = merge(bookmarkChanges, conflictResolution)
+            Timber.d("Sync: merging finished with $result")
+            return SyncMergeResult.Success(true)
+        }
+        return SyncMergeResult.Success(false)
+    }
+
     override fun merge(
         changes: SyncChanges,
         conflictResolution: SyncConflictResolution
     ): SyncMergeResult<Boolean> {
-        Timber.d("Sync: merging remote bookmarks changes $changes")
+        return when (val validation = validateChanges(changes)) {
+            is SyncDataValidationResult.Error -> SyncMergeResult.Error(reason = validation.reason)
+            is SyncDataValidationResult.Success -> completeMerge(validation.data, conflictResolution)
+            else -> SyncMergeResult.Error(reason = "Something went wrong")
+        }
+    }
 
+    private fun validateChanges(changes: SyncChanges): SyncDataValidationResult<SyncBookmarkRemoteUpdates> {
         val bookmarks = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.updatesJSON) }.getOrNull()
 
         if (bookmarks == null) {
-            return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect bookmarks null")
-        }
-
-        if (bookmarks.last_modified != null) {
-            Timber.d("Sync: updating bookmarks last_modified to ${bookmarks.last_modified}")
-            savedSitesSyncStore.modifiedSince = bookmarks.last_modified
+            return SyncDataValidationResult.Error(reason = "Sync: merging failed, JSON format incorrect bookmarks null")
         }
 
         if (bookmarks.entries == null) {
-            return SyncMergeResult.Error(reason = "Sync: merging failed, JSON format incorrect entries null")
+            return SyncDataValidationResult.Error(reason = "Sync: merging failed, JSON format incorrect entries null")
         }
+
+        return SyncDataValidationResult.Success(bookmarks)
+    }
+
+    private fun completeMerge(
+        bookmarks: SyncBookmarkRemoteUpdates,
+        conflictResolution: SyncConflictResolution
+    ): SyncMergeResult<Boolean> {
+        Timber.d("Sync: updating bookmarks last_modified to ${bookmarks.last_modified}")
+        savedSitesSyncStore.modifiedSince = bookmarks.last_modified
 
         if (bookmarks.entries.isEmpty()) {
             Timber.d("Sync: merging completed, no entries to merge")
             return SyncMergeResult.Success(false)
         }
-
-        bookmarks.entries.find { it.id == SavedSitesNames.BOOMARKS_ROOT }
-            ?: return SyncMergeResult.Error(reason = "Sync: merging failed, Bookmarks Root folder does not exist")
 
         val processIds: MutableList<String> = mutableListOf()
         val allResponseIds = bookmarks.entries.map { it.id }
@@ -85,6 +111,11 @@ class SavedSitesSyncMerger @Inject constructor(
         Timber.d("Sync: there are ${unprocessedIds.size} items orphaned")
 
         return SyncMergeResult.Success(true)
+    }
+
+    sealed class DataValidation {
+        data class Error(val reason: String) : DataValidation()
+        data class Success(val updates: SyncBookmarkRemoteUpdates) : DataValidation()
     }
 
     private fun mergeFolder(
@@ -211,23 +242,6 @@ class SavedSitesSyncMerger @Inject constructor(
         )
         Timber.d("Sync: decrypted $favourite")
         return favourite
-    }
-
-    override fun getChanges(since: String): SyncChanges {
-        return SyncChanges.empty()
-    }
-
-    override fun syncChanges(
-        changes: List<SyncChanges>,
-        conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
-        Timber.d("Sync: received remote changes, merging with resolution $conflictResolution")
-        changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
-            val result = merge(bookmarkChanges, conflictResolution)
-            Timber.d("Sync: merging finished with $result")
-            return SyncMergeResult.Success(true)
-        }
-        return SyncMergeResult.Success(false)
     }
 
     private class Adapters {

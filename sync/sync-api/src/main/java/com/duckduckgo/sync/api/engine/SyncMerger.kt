@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.api.engine
 
 import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.TIMESTAMP
 
 interface SyncMerger {
     /**
@@ -25,7 +26,7 @@ interface SyncMerger {
      */
     fun merge(
         changes: SyncChanges,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution = TIMESTAMP
     ): SyncMergeResult<Boolean>
 }
 
@@ -41,6 +42,21 @@ sealed class SyncMergeResult<out R> {
         return when (this) {
             is Success<*> -> "Success[data=$data]"
             is Error -> "Error[exception=$code, $reason]"
+        }
+    }
+}
+
+sealed class SyncDataValidationResult<out R> {
+
+    data class Success<out T>(val data: T) : SyncDataValidationResult<T>()
+    data class Error(
+        val reason: String,
+    ) : SyncDataValidationResult<Nothing>()
+
+    override fun toString(): String {
+        return when (this) {
+            is Success<*> -> "Success[data=$data]"
+            is Error -> "Error[reason= $reason]"
         }
     }
 }
