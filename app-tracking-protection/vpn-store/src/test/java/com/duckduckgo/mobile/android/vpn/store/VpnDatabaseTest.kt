@@ -34,7 +34,7 @@ class VpnDatabaseTest {
 
     @get:Rule
     val testHelper =
-        MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), VpnDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
+        MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), VpnDatabase::class.qualifiedName!!, FrameworkSQLiteOpenHelperFactory())
 
     @Test
     fun whenTestingAllMigrationsThenSucceeds() {
