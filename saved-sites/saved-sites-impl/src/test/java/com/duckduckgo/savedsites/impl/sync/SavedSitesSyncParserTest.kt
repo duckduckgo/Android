@@ -200,6 +200,35 @@ class SavedSitesSyncParserTest {
         assertEquals(syncChanges.updatesJSON, updatesJSON)
     }
 
+    @Test
+    fun whenGettingChangesFaterLastSyncAreEmptyThenChangesAreEmpty() {
+        val modificationTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now())
+
+        whenever(repository.hasBookmarks()).thenReturn(true)
+        whenever(repository.hasFavorites()).thenReturn(true)
+        whenever(repository.getFolder(favoritesFolder.id)).thenReturn(favoritesFolder.copy(lastModified = modificationTimestamp))
+        whenever(repository.getFolder(bookmarksRootFolder.id)).thenReturn(bookmarksRootFolder.copy(lastModified = modificationTimestamp))
+        whenever(repository.getFavoritesSync()).thenReturn(
+            listOf(favourite.copy(lastModified = modificationTimestamp)),
+        )
+        whenever(repository.getFolderContentSync(favoritesFolder.id)).thenReturn(
+            Pair(
+                listOf(bookmark3.copy(lastModified = modificationTimestamp), bookmark4.copy(lastModified = modificationTimestamp)),
+                emptyList(),
+            ),
+        )
+        whenever(repository.getFolderContentSync(bookmarksRootFolder.id)).thenReturn(
+            Pair(
+                listOf(bookmark3.copy(lastModified = modificationTimestamp), bookmark4.copy(lastModified = modificationTimestamp)),
+                emptyList(),
+            ),
+        )
+
+        val syncChanges = parser.getChanges(lastSyncTimestamp)
+        assertTrue(syncChanges.isEmpty())
+    }
+
     private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
         return SyncBookmarkEntry(
             id = savedSite.id,

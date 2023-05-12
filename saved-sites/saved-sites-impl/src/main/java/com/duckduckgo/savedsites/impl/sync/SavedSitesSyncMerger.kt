@@ -125,7 +125,7 @@ class SavedSitesSyncMerger @Inject constructor(
         }
 
         val unprocessedIds = allResponseIds.filterNot { processIds.contains(it) }
-        Timber.d("Sync: there are ${unprocessedIds.size} items orphaned")
+        Timber.d("Sync: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
 
         return SyncMergeResult.Success(true)
     }

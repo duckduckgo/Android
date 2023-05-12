@@ -336,28 +336,6 @@ class AppSyncRepositoryTest {
     }
 
     @Test
-    fun whenInitialPatchSucceedsThenReturnSuccess() = runTest {
-        whenever(syncStore.token).thenReturn(token)
-        whenever(syncCrypter.generateAllData()).thenReturn(syncData)
-        whenever(syncApi.patch(token, syncData)).thenReturn(patchAllSuccess)
-
-        val result = syncRepo.sendAllData()
-
-        assertTrue(result is Result.Success)
-    }
-
-    @Test
-    fun whenInitialPatchFailsThenReturnError() = runTest {
-        whenever(syncStore.token).thenReturn(token)
-        whenever(syncCrypter.generateAllData()).thenReturn(syncData)
-        whenever(syncApi.patch(token, syncData)).thenReturn(patchAllError)
-
-        val result = syncRepo.sendAllData()
-
-        assertTrue(result is Result.Error)
-    }
-
-    @Test
     fun whenGenerateRecoveryCodeAsStringThenReturnExpectedJson() {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.userId).thenReturn(userId)

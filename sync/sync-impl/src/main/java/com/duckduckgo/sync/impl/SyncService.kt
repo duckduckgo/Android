@@ -28,6 +28,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 @ContributesServiceApi(AppScope::class)
 interface SyncService {
@@ -77,6 +78,9 @@ interface SyncService {
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/data")
     fun data(@Header("Authorization") token: String): Call<SyncDataResponse>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
+    fun dataSince(@Header("Authorization") token: String, @Query("since") since: String): Call<SyncDataResponse>
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
     fun bookmarks(

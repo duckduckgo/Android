@@ -68,7 +68,7 @@ interface SyncApi {
         bookmarks: SyncDataRequest,
     ): Result<SyncDataResponse?>
 
-    fun getAllData(token: String): Result<SyncDataResponse>
+    fun getAllData(token: String, since: String): Result<SyncDataResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -236,9 +236,13 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun getAllData(token: String): Result<SyncDataResponse> {
+    override fun getAllData(token: String, since: String): Result<SyncDataResponse> {
         val response = runCatching {
-            val patchCall = syncService.data("Bearer $token")
+            val patchCall = if (since.isNotEmpty()){
+                syncService.dataSince("Bearer $token", since)
+            } else {
+                syncService.data("Bearer $token")
+            }
             patchCall.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())

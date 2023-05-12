@@ -310,7 +310,7 @@ class RealSavedSitesRepository(
         val entity = Entity(title = titleOrFallback, url = url, type = BOOKMARK)
         savedSitesEntitiesDao.insert(entity)
         savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
-        savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOMARKS_ROOT)
+        savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOMARKS_ROOT, entity.lastModified!!)
 
         return entity.mapToBookmark(SavedSitesNames.BOOMARKS_ROOT)
     }
@@ -322,20 +322,22 @@ class RealSavedSitesRepository(
     ): Favorite {
         val idOrFallback = id.takeIf { it.isNotEmpty() } ?: UUID.randomUUID().toString()
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
-        val existentBookmark = savedSitesEntitiesDao.entityById(id)
-        if (existentBookmark == null) {
+        val existentBookmark = savedSitesEntitiesDao.entityByUrl(url)
+        return if (existentBookmark == null) {
             val entity = Entity(entityId = idOrFallback, title = titleOrFallback, url = url, type = BOOKMARK)
             savedSitesEntitiesDao.insert(entity)
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
             savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOMARKS_ROOT)
             savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
+            getFavoriteById(entity.entityId)!!
         } else {
-            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = id))
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existentBookmark.entityId))
             savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
             savedSitesEntitiesDao.updateModified(id)
+            getFavorite(url)!!
         }
-        return getFavorite(url)!!
+
     }
 
     override fun insert(savedSite: SavedSite): SavedSite {

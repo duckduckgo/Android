@@ -55,8 +55,6 @@ interface SyncRepository {
     fun getConnectQR(): Result<String>
     fun connectDevice(contents: String): Result<Boolean>
     fun pollConnectionKeys(): Result<Boolean>
-    fun sendAllData(): Result<Boolean>
-    fun fetchAllData(): Result<Boolean>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
 }
 
@@ -324,46 +322,6 @@ class AppSyncRepository @Inject constructor(
                 if (decryptResult.result != 0L) return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
                 syncEngine.syncNow(ACCOUNT_LOGIN)
-                Result.Success(true)
-            }
-        }
-    }
-
-    @WorkerThread
-    override fun sendAllData(): Result<Boolean> {
-        val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Result.Error(reason = "Token Empty")
-
-        val allData = syncCrypter.generateAllData()
-        val allDataJSON = Adapters.patchAdapter.toJson(allData)
-        Timber.d("SYNC: initial patch data generated $allDataJSON")
-        return when (val result = syncApi.patch(token, allData)) {
-            is Result.Error -> {
-                result
-            }
-
-            is Result.Success -> {
-                Result.Success(true)
-            }
-        }
-    }
-
-    @WorkerThread
-    override fun fetchAllData(): Result<Boolean> {
-        val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Result.Error(reason = "Token Empty")
-
-        return when (val result = syncApi.getAllData(token)) {
-            is Error -> {
-                result.removeKeysIfInvalid()
-                Error(reason = "SYNC get data failed $result")
-            }
-
-            is Result.Success -> {
-                // we only care about bookmarks for now
-                syncCrypter.store(result.data.bookmarks.entries)
                 Result.Success(true)
             }
         }

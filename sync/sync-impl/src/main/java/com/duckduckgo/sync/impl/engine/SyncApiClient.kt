@@ -36,7 +36,7 @@ import timber.log.Timber
 
 interface SyncApiClient {
     fun patch(changes: List<SyncChanges>): Result<List<SyncChanges>>
-    fun get(): Result<List<SyncChanges>>
+    fun get(since: String): Result<List<SyncChanges>>
 }
 
 @ContributesBinding(AppScope::class)
@@ -72,12 +72,12 @@ class AppSyncApiClient @Inject constructor(
         }
     }
 
-    override fun get(): Result<List<SyncChanges>> {
+    override fun get(since: String): Result<List<SyncChanges>> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
-        return when (val result = syncApi.getAllData(token)) {
+        return when (val result = syncApi.getAllData(token, since)) {
             is Result.Error -> {
                 result
             }

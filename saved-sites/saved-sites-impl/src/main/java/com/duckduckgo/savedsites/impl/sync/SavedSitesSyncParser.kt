@@ -46,6 +46,18 @@ class SavedSitesSyncParser @Inject constructor(
     private val savedSitesSyncStore: FeatureSyncStore,
     private val syncCrypto: SyncCrypto,
 ) : SyncParser, SyncablePlugin {
+
+    override fun getChanges(since: String): SyncChanges {
+        return parseChanges(since)
+    }
+
+    override fun syncChanges(
+        changes: List<SyncChanges>,
+        conflictResolution: SyncConflictResolution,
+    ): SyncMergeResult<Boolean> {
+        return SyncMergeResult.Success(true)
+    }
+
     override fun parseChanges(since: String): SyncChanges {
         val updates = if (since.isEmpty()) {
             allContent()
@@ -163,23 +175,17 @@ class SavedSitesSyncParser @Inject constructor(
         )
     }
 
-    override fun getChanges(since: String): SyncChanges {
-        return parseChanges(since)
-    }
 
     private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChanges {
-        val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
-        val patch = SyncDataRequest(bookmarkUpdates)
-        val allDataJSON = Adapters.patchAdapter.toJson(patch)
+        return if (updates.isEmpty()){
+            SyncChanges.empty()
+        } else {
+            val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
+            val patch = SyncDataRequest(bookmarkUpdates)
+            val allDataJSON = Adapters.patchAdapter.toJson(patch)
+            SyncChanges(BOOKMARKS, allDataJSON)
+        }
 
-        return SyncChanges(BOOKMARKS, allDataJSON)
-    }
-
-    override fun syncChanges(
-        changes: List<SyncChanges>,
-        conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
-        return SyncMergeResult.Success(true)
     }
 
     private class Adapters {
