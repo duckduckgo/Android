@@ -53,7 +53,7 @@ class NetpAppTrackerDetectorTest {
         whenever(appNameResolver.getAppNameForPackageId(AppNameResolver.OriginatingApp.unknown().packageId))
             .thenReturn(AppNameResolver.OriginatingApp.unknown())
         whenever(packageManager.getApplicationInfo(any(), eq(0))).thenReturn(ApplicationInfo())
-        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
 
         appTrackerDetector = NetpRealAppTrackerDetector(
             appTrackerRepository,
@@ -143,7 +143,7 @@ class NetpAppTrackerDetectorTest {
     }
 
     @Test
-    fun whenEvaluateThirdPartyTrackerAndoverriddenSystemAppAndInExclusionListAndReturnNull() {
+    fun whenEvaluateThirdPartyTrackerAndOverriddenSystemAppAndInExclusionListAndReturnNull() {
         whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
             .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
         whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
@@ -164,7 +164,7 @@ class NetpAppTrackerDetectorTest {
     }
 
     @Test
-    fun whenEvaluateThirdPartyTrackerAndoverriddenSystemAppThenReturnTracker() {
+    fun whenEvaluateThirdPartyTrackerAndOverriddenSystemAppThenReturnTracker() {
         whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
             .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
         whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
@@ -331,7 +331,7 @@ class NetpAppTrackerDetectorTest {
 
     @Test
     fun whenAppTpDisabledReturnNull() {
-        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
 
         val appTrackerDetectorDisabled = NetpRealAppTrackerDetector(
             appTrackerRepository,
