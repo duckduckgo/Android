@@ -190,6 +190,10 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             whenever(mockRequest.requestHeaders).thenReturn(mapOf(Pair("Accept", "image/*")))
         }
 
+        if (testCase.requestType == "stylesheet") {
+            whenever(mockRequest.requestHeaders).thenReturn(mapOf(Pair("Accept", "text/css")))
+        }
+
         val response = testee.shouldIntercept(
             request = mockRequest,
             documentUrl = testCase.siteURL,
