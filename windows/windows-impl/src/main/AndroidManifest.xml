@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +15,24 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.duckduckgo.windows.impl">
+    package="com.duckduckgo.windows.impl">
     <application>
         <activity
-                android:name=".waitlist.ui.WindowsWaitlistActivity"
-                android:label="@string/windows_app"
-                android:screenOrientation="portrait"
-                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+            android:name=".waitlist.ui.WindowsWaitlistActivity"
+            android:label="@string/windows_app"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+
+        <activity
+            android:name=".ui.WindowsActivity"
+            android:exported="false"
+            android:label="@string/windows_app"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:screenOrientation="portrait" />
+
         <receiver android:name=".waitlist.ui.WindowsInviteShareBroadcastReceiver" />
+        <receiver
+            android:name=".WindowsLinkShareBroadcastReceiver"
+            android:exported="false" />
     </application>
 </manifest>

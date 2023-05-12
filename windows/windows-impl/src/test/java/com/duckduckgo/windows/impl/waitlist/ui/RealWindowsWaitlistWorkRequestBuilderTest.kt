@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.windows.impl.ui
+package com.duckduckgo.windows.impl.waitlist.ui
 
-import com.duckduckgo.windows.impl.waitlist.ui.RealWindowsWaitlistWorkRequestBuilder
 import org.junit.Assert.*
 import org.junit.Test
 

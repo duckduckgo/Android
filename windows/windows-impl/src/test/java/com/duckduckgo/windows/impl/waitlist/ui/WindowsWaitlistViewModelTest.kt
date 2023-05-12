@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.windows.impl.ui
+package com.duckduckgo.windows.impl.waitlist.ui
 
 import android.content.Context
 import android.util.Log
@@ -36,13 +36,10 @@ import com.duckduckgo.windows.impl.waitlist.api.WindowsInviteCodeResponse
 import com.duckduckgo.windows.impl.waitlist.api.WindowsWaitlistResponse
 import com.duckduckgo.windows.impl.waitlist.api.WindowsWaitlistService
 import com.duckduckgo.windows.impl.waitlist.api.WindowsWaitlistStatusResponse
-import com.duckduckgo.windows.impl.waitlist.ui.RealWindowsWaitlistWorkRequestBuilder
-import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.CopyInviteToClipboard
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.GoToMacClientSettings
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistViewModel.Command.ShowErrorMessage
-import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistWorkRequestBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*

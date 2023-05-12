@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos_impl
+package com.duckduckgo.windows.impl.ui
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,29 +28,29 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
-import com.duckduckgo.macos_impl.MacOsViewModel.Command
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsWaitlistClientSettings
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
-import com.duckduckgo.macos_impl.MacOsViewModel.ViewState
-import com.duckduckgo.macos_impl.databinding.ActivityMacosBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
-import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
+import com.duckduckgo.windows.impl.R
+import com.duckduckgo.windows.impl.WindowsLinkShareBroadcastReceiver
+import com.duckduckgo.windows.impl.databinding.ActivityWindowsBinding
+import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command
+import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.GoToMacClientSettings
+import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(MacOsScreenWithEmptyParams::class)
-class MacOsActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(WindowsScreenWithEmptyParams::class)
+class WindowsActivity : DuckDuckGoActivity() {
 
-    private val viewModel: MacOsViewModel by bindViewModel()
-    private val binding: ActivityMacosBinding by viewBinding()
+    private val viewModel: WindowsViewModel by bindViewModel()
+    private val binding: ActivityWindowsBinding by viewBinding()
 
-    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -60,8 +58,6 @@ class MacOsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }
-            .launchIn(lifecycleScope)
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
@@ -70,56 +66,45 @@ class MacOsActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
     }
 
-    private fun render(viewState: ViewState) {
-        binding.lookingForWindowsVersionButton.isVisible = viewState.windowsFeatureEnabled
-    }
-
     private fun configureUiEventHandlers() {
-        binding.shareButton.setOnClickListener {
+        binding.windowsShareButton.setOnClickListener {
             viewModel.onShareClicked()
         }
 
-        binding.lookingForWindowsVersionButton.setOnClickListener {
-            viewModel.onGoToWindowsClicked()
+        binding.lookingForMacVersionButton.setOnClickListener {
+            viewModel.onGoToMacClicked()
         }
     }
 
     private fun executeCommand(command: Command) {
         when (command) {
             is ShareLink -> launchSharePageChooser()
-            is GoToWindowsWaitlistClientSettings -> launchWindowsWaitlistClientSettings()
-            is GoToWindowsClientSettings -> launchWindowsClientSettings()
+            is GoToMacClientSettings -> launchMacClientSettings()
         }
     }
 
-    private fun launchWindowsWaitlistClientSettings() {
-        globalActivityStarter.start(this, WindowsWaitlistScreenWithEmptyParams)
-        finish()
-    }
-
-    private fun launchWindowsClientSettings() {
-        globalActivityStarter.start(this, WindowsScreenWithEmptyParams)
-        finish()
-    }
-
-    @SuppressLint("UnspecifiedImmutableFlag")
     private fun launchSharePageChooser() {
         val share = Intent(Intent.ACTION_SEND).apply {
             type = "text/html"
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.macos_share_text))
-            putExtra(Intent.EXTRA_TITLE, getString(R.string.macos_share_title))
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.windows_share_text))
+            putExtra(Intent.EXTRA_TITLE, getString(R.string.windows_share_title))
         }
 
         val pi = PendingIntent.getBroadcast(
             this,
             0,
-            Intent(this, MacOsLinkShareBroadcastReceiver::class.java),
+            Intent(this, WindowsLinkShareBroadcastReceiver::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         try {
-            startActivity(Intent.createChooser(share, getString(R.string.macos_share_title), pi.intentSender))
+            startActivity(Intent.createChooser(share, getString(R.string.windows_share_title), pi.intentSender))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }
+    }
+
+    private fun launchMacClientSettings() {
+        globalActivityStarter.start(this, MacOsScreenWithEmptyParams)
+        finish()
     }
 }
