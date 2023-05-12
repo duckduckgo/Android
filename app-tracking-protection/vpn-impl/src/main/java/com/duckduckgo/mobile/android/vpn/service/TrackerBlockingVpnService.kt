@@ -290,13 +290,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             return@withContext
         }
 
-        if (!restarting) {
-            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+        vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+            if (restarting) {
+                logcat { "VPN log: onVpnReconfigured ${it.javaClass} callback" }
+                it.onVpnReconfigured(this)
+            } else {
                 logcat { "VPN log: onVpnStarted ${it.javaClass} callback" }
                 it.onVpnStarted(this)
             }
-        } else {
-            logcat { "VPN log: skipping service callbacks while restarting" }
         }
 
         Intent(applicationContext, VpnStateMonitorService::class.java).also {

@@ -29,6 +29,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -52,6 +53,11 @@ class VpnTrackerNotificationUpdates @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
+        logcat { "Notification updates: onVpnReconfigured" }
+        onVpnStarted(coroutineScope)
     }
 
     override fun onVpnStopped(
