@@ -46,7 +46,7 @@ class NetpRealAppTrackerDetector constructor(
 ) : AppTrackerDetector {
 
     private val isAppTpDisabled by lazy {
-        !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+        !vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
     }
 
     // cache packageId -> app name

@@ -27,12 +27,20 @@ class FakeVpnFeaturesRegistry : VpnFeaturesRegistry {
         features.remove(feature.featureName)
     }
 
-    override fun isFeatureRegistered(feature: VpnFeature): Boolean {
+    override fun isFeatureRunning(feature: VpnFeature): Boolean {
         return features.contains(feature.featureName)
     }
 
-    override fun isAnyFeatureRegistered(): Boolean {
+    override fun isFeatureRegistered(feature: VpnFeature): Boolean {
+        return isFeatureRunning(feature)
+    }
+
+    override fun isAnyFeatureRunning(): Boolean {
         return features.isNotEmpty()
+    }
+
+    override fun isAnyFeatureRegistered(): Boolean {
+        return isAnyFeatureRunning()
     }
 
     override suspend fun refreshFeature(feature: VpnFeature) {

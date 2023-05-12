@@ -52,7 +52,7 @@ class NetPCohortUpdaterTest {
 
     @Test
     fun whenNetPIsNotRegisteredThenDoNothingWithCohort() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         testee.onVpnStarted(coroutineRule.testScope)
 
@@ -61,7 +61,7 @@ class NetPCohortUpdaterTest {
 
     @Test
     fun whenNetPIsRegisteredAndCohortNotSetThenUpdateCohort() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(cohortStore.cohortLocalDate).thenReturn(null)
 
         testee.onVpnStarted(coroutineRule.testScope)
@@ -71,7 +71,7 @@ class NetPCohortUpdaterTest {
 
     @Test
     fun whenNetPIsRegisteredAndCohortetThenDoNothingWithCohort() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(cohortStore.cohortLocalDate).thenReturn(LocalDate.of(2023, 1, 1))
 
         testee.onVpnStarted(coroutineRule.testScope)

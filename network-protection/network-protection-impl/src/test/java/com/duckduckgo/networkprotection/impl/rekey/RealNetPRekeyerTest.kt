@@ -57,7 +57,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun whenNetPIsNotRegisteredThenDoRekeyShouldNotRefreshFeature() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NETP_VPN)).thenReturn(false)
 
         testee.doRekey()
 
@@ -69,7 +69,7 @@ class RealNetPRekeyerTest {
 
     @Test
     fun whenNetPIsRegisteredThenDoRekeyShouldRefreshFeature() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NETP_VPN)).thenReturn(true)
 
         testee.doRekey()
 

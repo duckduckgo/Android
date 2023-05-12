@@ -92,7 +92,7 @@ class RealCohortStore @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+            if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
                 // skip if already stored
                 getCohortStoredLocalDate()?.let { return@launch }
 

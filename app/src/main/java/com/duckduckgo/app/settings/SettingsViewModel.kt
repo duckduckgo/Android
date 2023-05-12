@@ -198,7 +198,7 @@ class SettingsViewModel @Inject constructor(
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
-                    appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
+                    appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
@@ -219,7 +219,7 @@ class SettingsViewModel @Inject constructor(
     fun startPollingAppTpEnableState() {
         viewModelScope.launch {
             while (isActive) {
-                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
                         appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),

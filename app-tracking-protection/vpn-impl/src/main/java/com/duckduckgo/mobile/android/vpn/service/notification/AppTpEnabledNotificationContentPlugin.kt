@@ -53,7 +53,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
-        return if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        return if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 message = SpannableStringBuilder(),
@@ -73,7 +73,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
         return repository.getVpnTrackers({ dateOfLastHour() })
             .map { trackersBlocked ->
                 val trackingApps = trackersBlocked.trackingApps()
-                val isEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+                val isEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
                 val notificationText = if (!isEnabled) {
                     ""
                 } else if (trackersBlocked.isEmpty() || trackingApps.isEmpty()) {
@@ -95,7 +95,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     }
 
     override fun isActive(): Boolean {
-        return vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+        return vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
     }
 
     // This fun interface is provided just for testing purposes

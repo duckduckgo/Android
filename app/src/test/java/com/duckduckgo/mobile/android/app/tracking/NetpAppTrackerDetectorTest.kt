@@ -53,7 +53,7 @@ class NetpAppTrackerDetectorTest {
         whenever(appNameResolver.getAppNameForPackageId(AppNameResolver.OriginatingApp.unknown().packageId))
             .thenReturn(AppNameResolver.OriginatingApp.unknown())
         whenever(packageManager.getApplicationInfo(any(), eq(0))).thenReturn(ApplicationInfo())
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
 
         appTrackerDetector = NetpRealAppTrackerDetector(
             appTrackerRepository,
@@ -331,7 +331,7 @@ class NetpAppTrackerDetectorTest {
 
     @Test
     fun whenAppTpDisabledReturnNull() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
 
         val appTrackerDetectorDisabled = NetpRealAppTrackerDetector(
             appTrackerRepository,

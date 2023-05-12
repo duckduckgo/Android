@@ -73,7 +73,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Test
     fun whenOnVpnConnectivityLossCalledOnceThenInitiateRecoveryByReconnecting() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         testee.onVpnConnectivityLoss(coroutineRule.testScope)
 
         assertEquals(Reconnecting, repository.reconnectStatus)
@@ -84,7 +84,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Test
     fun whenOnVpnConnectivityLossCalledTwiceThenGiveUpRecoveringAndUnregisterNetp() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         repository.reconnectAttemptCount = 1
         testee.onVpnConnectivityLoss(coroutineRule.testScope)
 
@@ -98,7 +98,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Test
     fun whenOnVpnConnectedAndNotReconnectingThenDoNothing() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         repository.reconnectStatus = NotReconnecting
         testee.onVpnConnected(coroutineRule.testScope)
 
@@ -109,7 +109,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Test
     fun whenOnVpnConnectedAndReconnectingFailedThenResetStatusToNotReconnecting() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         repository.reconnectStatus = ReconnectingFailed
         testee.onVpnConnected(coroutineRule.testScope)
 
@@ -120,7 +120,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Test
     fun whenOnVpnConnectedAndReconnectingThenRecoverSuccessfully() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         repository.reconnectStatus = Reconnecting
         testee.onVpnConnected(coroutineRule.testScope)
 
@@ -132,7 +132,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Test
     fun whenNetpVpnFeatureIsNotRegisteredThenOnVpnConnectedDoesNothing() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         testee.onVpnConnected(coroutineRule.testScope)
 
@@ -144,7 +144,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Test
     fun whenNetpVpnFeatureIsNotRegisteredThenOnVpnConnectivityLossDoesNothing() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         testee.onVpnConnectivityLoss(coroutineRule.testScope)
 

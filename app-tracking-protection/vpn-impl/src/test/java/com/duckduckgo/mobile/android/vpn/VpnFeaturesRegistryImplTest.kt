@@ -62,8 +62,8 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
 
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.BAR))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.BAR))
         assertTrue(vpnServiceWrapper.isServiceRunning())
     }
 
@@ -73,8 +73,8 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
         vpnServiceWrapper.startService()
 
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.BAR))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.BAR))
     }
 
     @Test
@@ -86,7 +86,7 @@ class VpnFeaturesRegistryImplTest {
     fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredThenReturnTrue() {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
 
-        assertTrue(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertTrue(vpnFeaturesRegistry.isAnyFeatureRunning())
         assertTrue(vpnServiceWrapper.isServiceRunning())
     }
 
@@ -95,7 +95,7 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnServiceWrapper.stopService()
 
-        assertFalse(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertFalse(vpnFeaturesRegistry.isAnyFeatureRunning())
         assertFalse(vpnServiceWrapper.isServiceRunning())
     }
 
@@ -104,7 +104,7 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
 
-        assertFalse(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
+        assertFalse(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
     }
 
     @Test

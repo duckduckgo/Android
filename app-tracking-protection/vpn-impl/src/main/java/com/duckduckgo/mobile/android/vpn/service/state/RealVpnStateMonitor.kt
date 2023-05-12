@@ -57,7 +57,7 @@ class RealVpnStateMonitor @Inject constructor(
             }
             .onEach { logcat { "service state value $it" } }
             .map { vpnState ->
-                val isFeatureEnabled = vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)
+                val isFeatureEnabled = vpnFeaturesRegistry.isFeatureRunning(vpnFeature)
 
                 if (!isFeatureEnabled) {
                     vpnState.copy(state = VpnRunningState.DISABLED)
@@ -68,7 +68,7 @@ class RealVpnStateMonitor @Inject constructor(
             .onStart {
                 val vpnState = mapState(vpnServiceStateStatsDao.getLastStateStats())
                 VpnState(
-                    state = if (vpnFeaturesRegistry.isFeatureRegistered(vpnFeature)) VpnRunningState.ENABLED else VpnRunningState.DISABLED,
+                    state = if (vpnFeaturesRegistry.isFeatureRunning(vpnFeature)) VpnRunningState.ENABLED else VpnRunningState.DISABLED,
                     alwaysOnState = vpnState.alwaysOnState,
                     stopReason = vpnState.stopReason,
                 ).also { emit(it) }
@@ -94,7 +94,7 @@ class RealVpnStateMonitor @Inject constructor(
         fun vpnKilledBySystem(): Boolean {
             val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
             return lastHeartBeat?.type == VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE &&
-                !vpnFeaturesRegistry.isAnyFeatureRegistered()
+                !vpnFeaturesRegistry.isAnyFeatureRunning()
         }
 
         return vpnUnexpectedlyDisabled() || vpnKilledBySystem()

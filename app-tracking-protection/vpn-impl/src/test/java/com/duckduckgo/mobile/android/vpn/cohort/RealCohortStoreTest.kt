@@ -79,7 +79,7 @@ class RealCohortStoreTest {
 
     @Test
     fun whenInitialCohortFirstCalledThenStoreInitialCohort() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
         (cohortStore as RealCohortStore).onVpnStarted(TestScope())
 
         assertEquals(LocalDate.now(), cohortStore.getCohortStoredLocalDate())
@@ -87,7 +87,7 @@ class RealCohortStoreTest {
 
     @Test
     fun whenInitialCohortSubsequentCalledThenNoop() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
         val date = LocalDate.now().plusDays(3)
         cohortStore.setCohortLocalDate(date)
 
@@ -98,7 +98,7 @@ class RealCohortStoreTest {
 
     @Test
     fun whenAppTpNotRegisteredThenDoNothingWithCohort() {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
         (cohortStore as RealCohortStore).onVpnStarted(TestScope())
 
         assertNull(cohortStore.getCohortStoredLocalDate())
