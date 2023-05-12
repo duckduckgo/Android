@@ -251,16 +251,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
-        // keep old tunnel open or create a temp one to avoid leaks as much as we can
-        val tempTunFd = currentTunFd?.let {
+        // Create a null route tunnel so that leaks can't scape
+        createNullRouteTempTunnel()
+        // let Android time to create the tunnel before we possibly update the networks that will close the old tunnel
+        delay(100)
+        currentTunFd?.let {
             logcat { "VPN log: restarting the tunnel" }
             updateNetworkStackUponRestart()
             it
-        } ?: createTempTunnel()
+        }
 
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
-                createTunnelInterface(it, tempTunFd)
+                createTunnelInterface(it)
             } else {
                 logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
                 stopVpn(VpnStopReason.ERROR, false)
@@ -310,7 +313,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
     }
 
-    private fun createTempTunnel(): ParcelFileDescriptor? {
+    private fun createNullRouteTempTunnel(): ParcelFileDescriptor? {
         checkMainThread()
 
         return Builder().run {
@@ -333,7 +336,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     private suspend fun createTunnelInterface(
         tunnelConfig: VpnTunnelConfig,
-        oldTunnel: ParcelFileDescriptor?,
     ) {
         tunInterface = Builder().run {
             tunnelConfig.addresses.forEach { addAddress(it.key, it.value) }
@@ -435,9 +437,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             // Apparently we always need to call prepare, even tho not clear in docs
             // without this prepare, establish() returns null after device reboot
             prepare(this@TrackerBlockingVpnService.applicationContext)
-            establish().also {
-                runCatching { oldTunnel?.close() }.onFailure { logcat(ERROR) { "VPN log: Error closing old tunnel" } }
-            }
+            establish()
         }
 
         if (tunInterface == null) {
@@ -659,7 +659,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                     if (vpnState.alwaysOnState.alwaysOnEnabled) deviceShieldPixels.reportAlwaysOnEnabledDaily()
                     if (vpnState.alwaysOnState.alwaysOnLockedDown) deviceShieldPixels.reportAlwaysOnLockdownEnabledDaily()
 
-                    vpnServiceStateStatsDao.insert(vpnState).also { logcat { "VPN log: state: $vpnState" } }
+                    vpnServiceStateStatsDao.insert(vpnState).also { logcat { "state: $vpnState" } }
                 }
             }
         }
