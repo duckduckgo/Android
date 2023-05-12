@@ -322,7 +322,7 @@ class RealSavedSitesRepository(
     ): Favorite {
         val idOrFallback = id.takeIf { it.isNotEmpty() } ?: UUID.randomUUID().toString()
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
-        val existentBookmark = savedSitesEntitiesDao.entityByUrl(url)
+        val existentBookmark = savedSitesEntitiesDao.entityById(id)
         if (existentBookmark == null) {
             val entity = Entity(entityId = idOrFallback, title = titleOrFallback, url = url, type = BOOKMARK)
             savedSitesEntitiesDao.insert(entity)
@@ -331,8 +331,9 @@ class RealSavedSitesRepository(
             savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOMARKS_ROOT)
             savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         } else {
-            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existentBookmark.entityId))
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = id))
             savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
+            savedSitesEntitiesDao.updateModified(id)
         }
         return getFavorite(url)!!
     }
