@@ -3,11 +3,11 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.8.20'
+        kotlin_version = '1.8.10'
         spotless = "6.1.2"
-        anvil_version = "2.4.5"
-        gradle_plugin = '7.2.2' // When updating, also update lint_version
-        lint_version = '30.2.2' // This value must always be gradle_plugin + 23
+        anvil_version = "2.4.4"
+        gradle_plugin = "7.2.2" // When updating, also update lint_version
+        lint_version = "30.2.2" // This value must always be gradle_plugin + 23
         min_sdk = 23
         target_sdk = 33
         compile_sdk = 33
