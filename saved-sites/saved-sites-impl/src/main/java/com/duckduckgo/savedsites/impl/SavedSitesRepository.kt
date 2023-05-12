@@ -454,8 +454,18 @@ class RealSavedSitesRepository(
         localId: String,
     ) {
         savedSitesEntitiesDao.updateId(localId, remoteId)
-        savedSitesRelationsDao.updateFolderId(localId, remoteId)
         savedSitesRelationsDao.updateEntityId(localId, remoteId)
+        savedSitesRelationsDao.updateFolderId(localId, remoteId)
+    }
+
+    override fun replaceFolderContent(
+        folder: BookmarkFolder,
+        localId: String,
+    ) {
+        savedSitesEntitiesDao.updateId(localId, folder.id)
+        savedSitesRelationsDao.updateEntityId(localId, folder.id)
+        savedSitesRelationsDao.updateFolderId(localId, folder.id)
+        update(folder)
     }
 
     override fun replaceBookmark(

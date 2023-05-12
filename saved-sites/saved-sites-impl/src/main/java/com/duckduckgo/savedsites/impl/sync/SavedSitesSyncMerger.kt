@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.impl.sync
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -31,12 +32,15 @@ import com.duckduckgo.sync.api.engine.SyncMerger
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.DEDUPLICATION
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.REMOTE_WINS
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.TIMESTAMP
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
@@ -67,11 +71,11 @@ class SavedSitesSyncMerger @Inject constructor(
 
     override fun merge(
         changes: SyncChanges,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         return when (val validation = validateChanges(changes)) {
             is SyncDataValidationResult.Error -> SyncMergeResult.Error(reason = validation.reason)
-            is SyncDataValidationResult.Success -> continueMergeOperation(validation.data, conflictResolution)
+            is SyncDataValidationResult.Success -> processEntries(validation.data, conflictResolution)
             else -> SyncMergeResult.Error(reason = "Something went wrong")
         }
     }
@@ -90,9 +94,9 @@ class SavedSitesSyncMerger @Inject constructor(
         return SyncDataValidationResult.Success(bookmarks)
     }
 
-    private fun continueMergeOperation(
+    private fun processEntries(
         bookmarks: SyncBookmarkRemoteUpdates,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         Timber.d("Sync: updating bookmarks last_modified to ${bookmarks.last_modified}")
         savedSitesSyncStore.modifiedSince = bookmarks.last_modified
@@ -102,7 +106,7 @@ class SavedSitesSyncMerger @Inject constructor(
             return SyncMergeResult.Success(false)
         }
 
-        //Iterate over received items and find:
+        // Iterate over received items and find:
         // 1. All folders without a parent in the payload
         // 2. All bookmarks without a parent in the payload
 
@@ -111,12 +115,12 @@ class SavedSitesSyncMerger @Inject constructor(
 
         if (allResponseIds.contains(SavedSitesNames.BOOMARKS_ROOT)) {
             Timber.d("Sync: bookmarks root found, traversing from there")
-            mergeFolder(SavedSitesNames.BOOMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+            processFolder(SavedSitesNames.BOOMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
         }
 
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
             Timber.d("Sync: favourites root found, traversing from there")
-            mergeFavourites(bookmarks.entries, bookmarks.last_modified, conflictResolution)
+            processFavourites(bookmarks.entries, bookmarks.last_modified, conflictResolution)
             processIds.add(SavedSitesNames.FAVORITES_ROOT)
         }
 
@@ -126,7 +130,7 @@ class SavedSitesSyncMerger @Inject constructor(
         return SyncMergeResult.Success(true)
     }
 
-    private fun mergeFolder(
+    private fun processFolder(
         folderId: String,
         parentId: String,
         remoteUpdates: List<SyncBookmarkEntry>,
@@ -142,27 +146,47 @@ class SavedSitesSyncMerger @Inject constructor(
             remoteFolder.folder?.let {
                 val folder = decryptFolder(remoteFolder, parentId, lastModified)
                 processIds.add(folder.id)
-                if (folder.id != SavedSitesNames.BOOMARKS_ROOT) {
-                    if (conflictResolution == DEDUPLICATION) {
-                        // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
-                        when (val result = duplicateFinder.findFolderDuplicate(folder)) {
-                            is SavedSitesDuplicateResult.Duplicate -> {
-                                Timber.d("Sync: folder $folderId exists locally, replacing content")
-                                savedSitesRepository.replaceFolder(folderId, result.id)
-                            }
+                if (conflictResolution == DEDUPLICATION) {
+                    // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
+                    when (val result = duplicateFinder.findFolderDuplicate(folder)) {
+                        is SavedSitesDuplicateResult.Duplicate -> {
+                            Timber.d("Sync: folder $folderId has a local duplicate in {${result.id}, replacing content")
+                            savedSitesRepository.replaceFolderContent(folder, result.id)
+                        }
 
-                            is SavedSitesDuplicateResult.NotDuplicate -> {
-                                Timber.d("Sync: folder $folderId not present locally, inserting")
-                                savedSitesRepository.insert(folder)
+                        is SavedSitesDuplicateResult.NotDuplicate -> {
+                            Timber.d("Sync: folder $folderId not present locally, inserting")
+                            savedSitesRepository.insert(folder)
+                        }
+                    }
+                } else {
+                    // if there's a folder with the same id locally we check the conflict resolution
+                    // if TIMESTAMP -> new timestamp wins
+                    // if REMOTE -> remote object wins and replaces local
+                    // if LOCAL -> local object wins and no changes are applied
+                    val localFolder = savedSitesRepository.getFolder(folder.id)
+                    if (localFolder != null) {
+                        when (conflictResolution) {
+                            REMOTE_WINS -> {
+                                Timber.d("Sync: folder $folderId exists locally, replacing content")
+                                savedSitesRepository.replaceFolderContent(folder, folder.id)
+                            }
+                            TIMESTAMP -> {
+                                if (folder.modifiedAfter(localFolder.lastModified)) {
+                                    Timber.d("Sync: folder $folderId modified after local folder, replacing content")
+                                    savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                } else {
+                                    Timber.d("Sync: folder $folderId modified before local folder, nothing to do")
+                                }
+                            }
+                            else -> {
+                                Timber.d("Sync: local folder wins over remote, nothing to do")
                             }
                         }
                     } else {
-                        // if there's a bookmark with the same id locally we check the conflict resolution
-                        // if TIMESTAMP -> new timestamp wins
-                        // if REMOTE -> remote object wins and replaces local
-                        // if LOCAL -> local object wins and no changes are applied
+                        Timber.d("Sync: folder $folderId not present locally, inserting")
+                        savedSitesRepository.insert(folder)
                     }
-
                 }
             }
 
@@ -181,7 +205,7 @@ class SavedSitesSyncMerger @Inject constructor(
                                 // if there's a bookmark duplicate locally (url and name) then we replace it
                                 when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
                                     is SavedSitesDuplicateResult.Duplicate -> {
-                                        Timber.d("Sync: child $child exists locally, replacing")
+                                        Timber.d("Sync: child $child has a local duplicate in ${result.id}, replacing")
                                         savedSitesRepository.replaceBookmark(bookmark, result.id)
                                     }
 
@@ -191,19 +215,30 @@ class SavedSitesSyncMerger @Inject constructor(
                                     }
                                 }
                             } else {
-
                                 // if there's a bookmark with the same id locally we check the conflict resolution
                                 // if TIMESTAMP -> new timestamp wins
                                 // if REMOTE -> remote object wins and replaces local
                                 // if LOCAL -> local object wins and no changes are applied
-                            }
-                            when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
-                                is SavedSitesDuplicateResult.Duplicate -> {
-                                    Timber.d("Sync: child $child exists locally, replacing")
-                                    savedSitesRepository.replaceBookmark(bookmark, result.id)
-                                }
-
-                                is SavedSitesDuplicateResult.NotDuplicate -> {
+                                val storedBookmark = savedSitesRepository.getBookmarkById(child)
+                                if (storedBookmark != null) {
+                                    when (conflictResolution) {
+                                        REMOTE_WINS -> {
+                                            Timber.d("Sync: child $child exists locally, replacing")
+                                            savedSitesRepository.replaceBookmark(bookmark, child)
+                                        }
+                                        TIMESTAMP -> {
+                                            if (bookmark.modifiedAfter(storedBookmark.lastModified)) {
+                                                Timber.d("Sync: bookmark ${bookmark.id} modified after local bookmark, replacing content")
+                                                savedSitesRepository.replaceBookmark(bookmark, child)
+                                            } else {
+                                                Timber.d("Sync: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
+                                            }
+                                        }
+                                        else -> {
+                                            Timber.d("Sync: local bookmark wins over remote, nothing to do")
+                                        }
+                                    }
+                                } else {
                                     Timber.d("Sync: child $child not present locally, inserting")
                                     savedSitesRepository.insert(bookmark)
                                 }
@@ -212,7 +247,7 @@ class SavedSitesSyncMerger @Inject constructor(
 
                         childEntry.isFolder() -> {
                             Timber.d("Sync: child $child is a Folder")
-                            mergeFolder(childEntry.id, folderId, remoteUpdates, lastModified, processIds, conflictResolution)
+                            processFolder(childEntry.id, folderId, remoteUpdates, lastModified, processIds, conflictResolution)
                         }
                     }
                 }
@@ -239,10 +274,10 @@ class SavedSitesSyncMerger @Inject constructor(
      * If we need to deduplicate (account login) then we want to replace favourite if exist
      * otherwise we add them to the favourites folder
      */
-    private fun mergeFavourites(
+    private fun processFavourites(
         entries: List<SyncBookmarkEntry>,
         lastModified: String,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ) {
         val favourites = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT }!!
         favourites.folder?.children?.forEachIndexed { position, child ->
@@ -318,3 +353,31 @@ class SyncBookmarkRemoteUpdates(
     val entries: List<SyncBookmarkEntry>,
     val last_modified: String,
 )
+
+fun BookmarkFolder.modifiedAfter(after: String?): Boolean {
+    return if (this.lastModified == null) {
+        true
+    } else {
+        if (after == null) {
+            false
+        } else {
+            val entityModified = OffsetDateTime.parse(this.lastModified)
+            val sinceModified = OffsetDateTime.parse(after)
+            entityModified.isAfter(sinceModified)
+        }
+    }
+}
+
+fun SavedSite.modifiedAfter(after: String?): Boolean {
+    return if (this.lastModified == null) {
+        true
+    } else {
+        if (after == null) {
+            false
+        } else {
+            val entityModified = OffsetDateTime.parse(this.lastModified)
+            val sinceModified = OffsetDateTime.parse(after)
+            entityModified.isAfter(sinceModified)
+        }
+    }
+}

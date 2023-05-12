@@ -26,7 +26,7 @@ interface SyncMerger {
      */
     fun merge(
         changes: SyncChanges,
-        conflictResolution: SyncConflictResolution = TIMESTAMP
+        conflictResolution: SyncConflictResolution = TIMESTAMP,
     ): SyncMergeResult<Boolean>
 }
 

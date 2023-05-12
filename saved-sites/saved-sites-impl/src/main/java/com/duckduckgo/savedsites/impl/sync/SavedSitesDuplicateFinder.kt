@@ -43,7 +43,7 @@ sealed class SavedSitesDuplicateResult {
 class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
     override fun findFolderDuplicate(bookmarkFolder: BookmarkFolder): SavedSitesDuplicateResult {
         val existingFolder = repository.getFolderByName(bookmarkFolder.name)
-       return if (existingFolder != null) {
+        return if (existingFolder != null) {
             if (existingFolder.parentId == bookmarkFolder.parentId) {
                 SavedSitesDuplicateResult.Duplicate(existingFolder.id)
             } else {

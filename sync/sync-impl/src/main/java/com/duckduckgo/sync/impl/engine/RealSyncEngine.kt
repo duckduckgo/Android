@@ -90,7 +90,7 @@ class RealSyncEngine @Inject constructor(
         sendLocalChanges(changes, REMOTE_WINS)
     }
 
-    private fun mergeRemoteData(){
+    private fun mergeRemoteData() {
         Timber.d("Sync: merging remote data")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
         receiveRemoteChange(DEDUPLICATION)
@@ -122,7 +122,7 @@ class RealSyncEngine @Inject constructor(
 
     private fun sendLocalChanges(
         changes: List<SyncChanges>,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ) {
         when (val result = syncApiClient.patch(changes)) {
             is Error -> {

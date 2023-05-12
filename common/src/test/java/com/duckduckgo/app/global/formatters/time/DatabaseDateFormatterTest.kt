@@ -45,7 +45,6 @@ class DatabaseDateFormatterTest {
         val now = LocalDateTime.now()
 
         val format = DatabaseDateFormatter.iso8601(now)
-
         val offsetDateMillis = DatabaseDateFormatter.millisIso8601(now)
         val formatted = DatabaseDateFormatter.parseMillisIso8601(offsetDateMillis)
 
