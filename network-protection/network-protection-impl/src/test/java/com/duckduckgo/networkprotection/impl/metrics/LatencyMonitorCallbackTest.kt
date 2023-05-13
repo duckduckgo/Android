@@ -70,14 +70,14 @@ class LatencyMonitorCallbackTest {
 
     @Test
     fun onNativeStartedNetpOffDoNotEnqueueWork() {
-        whenever(mockVpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(false)
+        whenever(mockVpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
         testee.onVpnStarted(coroutineRule.testScope)
         verifyNoInteractions(mockWorkManager)
     }
 
     @Test
     fun onNativeStartedNetpOnEnqueueWork() {
-        whenever(mockVpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(mockVpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         testee.onVpnStarted(coroutineRule.testScope)
         verify(mockWorkManager).enqueueUniquePeriodicWork(
             eq(LatencyMonitorCallback.NETP_LATENCY_MONITOR_WORKER_TAG),

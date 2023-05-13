@@ -44,7 +44,7 @@ class NetPTimezoneMonitor @Inject constructor(
     private val context: Context,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (!vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+        if (!vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             logcat { "NetP not enabled, skip registering timezone monitor" }
             return
         }

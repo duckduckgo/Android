@@ -42,7 +42,7 @@ class RealNetPRekeyer @Inject constructor(
     override suspend fun doRekey() {
         logcat { "Rekeying client" }
         networkProtectionRepository.privateKey = null
-        if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             logcat { "Restarting VPN after clearing client keys" }
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
         } else {

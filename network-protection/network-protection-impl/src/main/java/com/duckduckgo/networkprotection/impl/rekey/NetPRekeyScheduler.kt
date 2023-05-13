@@ -38,7 +38,7 @@ class NetPRekeyScheduler @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             logcat { "NetPRekeyScheduler onVpnStarted called with NetP enabled" }
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
