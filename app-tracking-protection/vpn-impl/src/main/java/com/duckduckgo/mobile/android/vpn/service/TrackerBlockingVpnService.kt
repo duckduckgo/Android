@@ -72,7 +72,6 @@ import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
-@Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
 
@@ -108,6 +107,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     private val startVpnLock = Object()
 
     private val alwaysOnStateJob = ConflatedJob()
+
+    private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     private val isInterceptDnsTrafficEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
@@ -198,14 +199,14 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         when (val action = intent?.action) {
             ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
                 notifyVpnStart()
-                launch { startVpn(tunInterface) }
+                launch(serviceDispatcher) { startVpn(tunInterface) }
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                launch { stopVpn(VpnStopReason.SELF_STOP) }
+                launch(serviceDispatcher) { stopVpn(VpnStopReason.SELF_STOP) }
             }
             ACTION_RESTART_VPN -> {
-                launch { startVpn(tunInterface) }
+                launch(serviceDispatcher) { startVpn(tunInterface) }
             }
             else -> logcat(ERROR) { "Unknown intent action: $action" }
         }
@@ -213,7 +214,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         return returnCode
     }
 
-    private suspend fun startVpn(currentTunFd: ParcelFileDescriptor?) = withContext(Dispatchers.IO) {
+    private suspend fun startVpn(currentTunFd: ParcelFileDescriptor?) = withContext(serviceDispatcher) {
         fun updateNetworkStackUponRestart() {
             logcat { "VPN log: updating the networking stack" }
             logcat { "VPN log: CURRENT network ${vpnNetworkStack.name}" }
@@ -534,7 +535,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     private suspend fun stopVpn(
         reason: VpnStopReason,
         hasVpnAlreadyStarted: Boolean = true,
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(serviceDispatcher) {
         logcat { "VPN log: Stopping VPN. $reason" }
 
         vpnNetworkStack.onStopVpn(reason)
