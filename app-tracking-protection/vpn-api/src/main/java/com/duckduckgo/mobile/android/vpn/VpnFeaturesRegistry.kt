@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn
 
-import kotlinx.coroutines.flow.Flow
-
 /**
  * Use this class to register features that required VPN access.
  *
@@ -52,15 +50,6 @@ interface VpnFeaturesRegistry {
      * Refreshing the feature will cause the VPN to be stopped/restarted if it is enabled and the feature is already registered.
      */
     suspend fun refreshFeature(feature: VpnFeature)
-
-    /**
-     * Subscribe to this flow to get changes of the VPN feature registrations.
-     * The flow is a hot flow with no cache, ie. only emits new values upon subscription.
-     *
-     * When a VPN feature is (re)registered it will emit a pair with the name of the feature and `true`
-     * When a VPN feature is (re)unregistered it will emit a pair with the name of the feature and `false`
-     */
-    fun registryChanges(): Flow<Pair<String, Boolean>>
 
     fun getRegisteredFeatures(): List<VpnFeature>
 }

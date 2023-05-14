@@ -18,6 +18,8 @@ package com.duckduckgo.vpn.internal.feature
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
@@ -31,6 +33,8 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
+import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -69,6 +73,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var debugLoggingReceiver: DebugLoggingReceiver? = null
+    private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
     private val debugLoggingToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
         if (toggleState) {
@@ -101,27 +106,41 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
                 val canProtect = mappedManualExclusionList.isEmpty() ||
                     !mappedManualExclusionList.zip(mappedExclusionList).all { (one, other) -> one == other }
+                val canUnprotect = mappedManualExclusionList.isEmpty() ||
+                    !mappedManualExclusionList.zip(installedApps.asIterable()).all { (one, other) -> one == other.packageName }
                 val canRestoreDefaults = mappedManualExclusionList.isNotEmpty()
 
-                canProtect to canRestoreDefaults
+                Triple(canProtect, canUnprotect, canRestoreDefaults)
             }
+            .onStart { refreshInstalledApps() }
             .flowOn(dispatchers.io())
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach {
                 val canProtect = it.first
-                val canRestoreDefaults = it.second
+                val canUnprotect = it.second
+                val canRestoreDefaults = it.third
 
                 binding.restoreDefaultAppProtections.isEnabled = canRestoreDefaults
                 binding.protectAllApps.isEnabled = canProtect
+                binding.unprotectAllApps.isEnabled = canUnprotect
             }
             .flowOn(dispatchers.main())
             .launchIn(lifecycleScope)
 
         binding.protectAllApps.setOnClickListener {
             lifecycleScope.launch(dispatchers.io()) {
+                appTrackerRepository.restoreDefaultProtectedList()
                 for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
                     appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
                 }
+                vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+            }
+        }
+
+        binding.unprotectAllApps.setOnClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                appTrackerRepository.restoreDefaultProtectedList()
+                appTrackerRepository.manuallyExcludedApps(installedApps.asIterable().map { it.packageName })
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
         }
@@ -131,6 +150,24 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 appTrackerRepository.restoreDefaultProtectedList()
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             }
+        }
+    }
+
+    private fun refreshInstalledApps() {
+        installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+            .asSequence()
+            .filterNot { shouldNotBeShown(it) }
+    }
+
+    private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
+        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
+    }
+
+    private fun isSystemAppAndNotOverridden(appInfo: ApplicationInfo): Boolean {
+        return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(appInfo.packageName)) {
+            false
+        } else {
+            appInfo.isSystemApp()
         }
     }
 

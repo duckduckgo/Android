@@ -74,6 +74,10 @@ class FakeAppTrackerRepository : AppTrackerRepository {
         manualExclusionList[packageName] = false
     }
 
+    override fun manuallyExcludedApps(packageNames: List<String>) {
+        packageNames.forEach { manualExclusionList[it] = false }
+    }
+
     override fun manuallyEnabledApp(packageName: String) {
         manualExclusionList[packageName] = true
     }
