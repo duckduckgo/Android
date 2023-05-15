@@ -225,11 +225,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                     autofillStore.deleteCredentials(it.autologinId)
                 }
 
-                DiscardAutoLoginId -> {
+                is DiscardAutoLoginId -> {
                     autoSavedLoginsMonitor?.clearAutoSavedLoginId(tabId)
                 }
 
-                PromptToSave -> {
+                is PromptToSave -> {
                     callback?.onCredentialsAvailableToSave(currentUrl, credentials)
                 }
 

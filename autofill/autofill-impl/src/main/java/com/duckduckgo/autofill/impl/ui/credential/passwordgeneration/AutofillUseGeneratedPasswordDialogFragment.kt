@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Rect
-import android.os.Build
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.LayoutInflater

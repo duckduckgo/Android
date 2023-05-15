@@ -17,6 +17,7 @@
 package com.duckduckgo.deviceauth.impl
 
 import android.os.Build
+import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -46,6 +47,7 @@ class RealDeviceAuthenticator @Inject constructor(
         }
     }
 
+    @UiThread
     override fun authenticate(
         featureToAuth: Features,
         fragment: Fragment,
@@ -58,6 +60,7 @@ class RealDeviceAuthenticator @Inject constructor(
         }
     }
 
+    @UiThread
     override fun authenticate(
         featureToAuth: Features,
         fragmentActivity: FragmentActivity,

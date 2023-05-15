@@ -566,21 +566,21 @@ class BrowserTabFragment :
             currentUrl: String,
             credentials: LoginCredentials,
         ) {
+            val username = credentials.username
+            val password = credentials.password
+
+            if (username == null && password == null) {
+                Timber.w("Not saving credentials with null username and password")
+                return
+            }
+
+            val matchType = existingCredentialMatchDetector.determine(currentUrl, username, password)
+            Timber.v("MatchType is %s", matchType.javaClass.simpleName)
+
+            // we need this delay to ensure web navigation / form submission events aren't blocked
+            delay(100)
+
             withContext(dispatchers.main()) {
-                val username = credentials.username
-                val password = credentials.password
-
-                if (username == null && password == null) {
-                    Timber.w("Not saving credentials with null username and password")
-                    return@withContext
-                }
-
-                val matchType = existingCredentialMatchDetector.determine(currentUrl, username, password)
-                Timber.v("MatchType is %s", matchType.javaClass.simpleName)
-
-                // we need this delay to ensure web navigation / form submission events aren't blocked
-                delay(100)
-
                 when (matchType) {
                     ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
                     UsernameMatch -> showAutofillDialogUpdatePassword(currentUrl, credentials)
@@ -1153,6 +1153,7 @@ class BrowserTabFragment :
                 messageResourceId = it.messageResourceId,
                 includeShortcutToViewCredential = it.includeShortcutToViewCredential,
             )
+
             else -> {
                 // NO OP
             }
@@ -1939,11 +1940,13 @@ class BrowserTabFragment :
         browserAutofill.addJsInterface(it, autofillCallback, tabId)
 
         setFragmentResultListener(CredentialAutofillPickerDialog.resultKey(tabId)) { _, result ->
-            autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
+            launch(dispatchers.io()) {
+                autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this@BrowserTabFragment, viewModel)
+            }
         }
 
         setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(tabId)) { _, result ->
-            launch {
+            launch(dispatchers.io()) {
                 autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)?.let {
                     viewModel.onShowUserCredentialsSaved(it)
                 }
@@ -1951,10 +1954,24 @@ class BrowserTabFragment :
         }
 
         setFragmentResultListener(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(tabId)) { _, _ ->
-            launch {
+            launch(dispatchers.io()) {
                 this@BrowserTabFragment.context?.let {
                     autofillCredentialsSelectionResultHandler.processPromptToDisableAutofill(this@BrowserTabFragment.requireContext(), viewModel)
                 }
+            }
+        }
+
+        setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyCredentialUpdated(tabId)) { _, result ->
+            launch(dispatchers.io()) {
+                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)?.let {
+                    viewModel.onShowUserCredentialsUpdated(it)
+                }
+            }
+        }
+
+        setFragmentResultListener(UseGeneratedPasswordDialog.resultKey(tabId)) { _, result ->
+            launch(dispatchers.io()) {
+                autofillCredentialsSelectionResultHandler.processGeneratePasswordResult(result, viewModel, tabId)
             }
         }
 
@@ -1964,20 +1981,6 @@ class BrowserTabFragment :
 
         setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(tabId)) { _, _ ->
             autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptDismissed()
-        }
-
-        setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyCredentialUpdated(tabId)) { _, result ->
-            launch {
-                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)?.let {
-                    viewModel.onShowUserCredentialsUpdated(it)
-                }
-            }
-        }
-
-        setFragmentResultListener(UseGeneratedPasswordDialog.resultKey(tabId)) { _, result ->
-            launch {
-                autofillCredentialsSelectionResultHandler.processGeneratePasswordResult(result, viewModel, tabId)
-            }
         }
     }
 

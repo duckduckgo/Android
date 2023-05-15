@@ -66,7 +66,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
 ) {
 
-    fun processAutofillCredentialSelectionResult(
+    suspend fun processAutofillCredentialSelectionResult(
         result: Bundle,
         browserTabFragment: Fragment,
         credentialInjector: CredentialInjector,
@@ -82,24 +82,27 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
 
         pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN)
-        deviceAuthenticator.authenticate(AUTOFILL_TO_USE_CREDENTIALS, browserTabFragment) {
-            when (it) {
-                Success -> {
-                    Timber.v("Autofill: user selected credential to use, and successfully authenticated")
-                    pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
-                    credentialInjector.shareCredentialsWithPage(originalUrl, selectedCredentials)
-                }
 
-                UserCancelled -> {
-                    Timber.d("Autofill: user selected credential to use, but cancelled without authenticating")
-                    pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED)
-                    credentialInjector.returnNoCredentialsWithPage(originalUrl)
-                }
+        withContext(dispatchers.main()) {
+            deviceAuthenticator.authenticate(AUTOFILL_TO_USE_CREDENTIALS, browserTabFragment) {
+                when (it) {
+                    Success -> {
+                        Timber.v("Autofill: user selected credential to use, and successfully authenticated")
+                        pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
+                        credentialInjector.shareCredentialsWithPage(originalUrl, selectedCredentials)
+                    }
 
-                is Error -> {
-                    Timber.w("Autofill: user selected credential to use, but there was an error when authenticating: ${it.reason}")
-                    pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE)
-                    credentialInjector.returnNoCredentialsWithPage(originalUrl)
+                    UserCancelled -> {
+                        Timber.d("Autofill: user selected credential to use, but cancelled without authenticating")
+                        pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED)
+                        credentialInjector.returnNoCredentialsWithPage(originalUrl)
+                    }
+
+                    is Error -> {
+                        Timber.w("Autofill: user selected credential to use, but there was an error when authenticating: ${it.reason}")
+                        pixel.fire(AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE)
+                        credentialInjector.returnNoCredentialsWithPage(originalUrl)
+                    }
                 }
             }
         }
