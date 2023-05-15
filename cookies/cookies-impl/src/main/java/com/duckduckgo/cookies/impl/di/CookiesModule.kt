@@ -28,6 +28,8 @@ import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.RealCookieRepository
 import com.duckduckgo.cookies.store.RealCookiesFeatureToggleRepository
 import com.duckduckgo.cookies.store.RealCookiesFeatureToggleStore
+import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieRepository
+import com.duckduckgo.cookies.store.contentscopescripts.RealContentScopeScriptsCookieRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -68,5 +70,15 @@ object CookiesModule {
     @Provides
     fun provideCookiesFeatureToggleStore(context: Context): CookiesFeatureToggleStore {
         return RealCookiesFeatureToggleStore(context)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideContentScopeScriptsCookieRepository(
+        database: CookiesDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+    ): ContentScopeScriptsCookieRepository {
+        return RealContentScopeScriptsCookieRepository(database, coroutineScope, dispatcherProvider)
     }
 }
