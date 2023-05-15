@@ -281,6 +281,65 @@
                 }
             ],
             "default": "block"
+        },
+        "format.test": {
+            "domain": "format.test",
+            "owner": {
+                "name": "Tests for formatting",
+                "displayName": "Tests for formatting"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block",
+            "rules": [
+                {
+                    "rule": "format\\.test/test1\\.js",
+                    "comment": "Unescaped slash should be allowed.",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "format\\.test/[0-9]+/test2\\.js",
+                    "comment": "Simple regexp",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "format\\.test/a{3,5}(b|c)[d-f]+g*h?./test3\\.js",
+                    "comment": "Complex regexp",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "sub1\\.sub2\\.format\\.test/test4\\.js",
+                    "comment": "With subdomain",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "sub1\\.sub2\\.format\\.test/(a|[bc])/test4a\\.js",
+                    "comment": "With subdomain and regexp",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "sub1\\.format\\.test/sub2\\.format\\.test/test4b\\.js",
+                    "comment": "Domain in rule",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "^https?:\/\/([^./]+\\.)*sub1\\.sub2\\.format\\.test/test4c\\.js$",
+                    "comment": "With subdomain and explicit anchoring",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "format.test/test5\\.js",
+                    "comment": "No escape on the domain.",
+                    "action": "ignore"
+                },
+                {
+                    "rule": "sub1.sub2.format.test/test6\\.js",
+                    "comment": "No escape on the domain with subdomain.",
+                    "action": "ignore"
+                }
+            ]
         }
     },
     "entities": {
@@ -296,6 +355,13 @@
             ],
             "prevalence": 0.1,
             "displayName": "Test Site for Tracker Blocking"
+        },
+        "Tests for formatting": {
+            "domains": [
+                "format.test"
+            ],
+            "prevalence": 0.1,
+            "displayName": "Tests for formatting"
         },
         "Ignore Site for Tracker Blocking": {
             "domains": [
@@ -324,6 +390,7 @@
         "bad.third-party.site": "Test Site for Tracker Blocking",
         "sometimes-bad.third-party.site": "Test Site for Tracker Blocking",
         "broken.third-party.site": "Test Site for Tracker Blocking",
+        "format.test": "Tests for formatting",
         "third-party.site": "Test Site for Tracker Blocking",
         "tracker.test": "Test Site for Tracker Blocking",
         "options1.test": "Test Site for Tracker Blocking",

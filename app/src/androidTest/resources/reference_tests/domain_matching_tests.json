@@ -364,6 +364,191 @@
                 "exceptPlatforms": [
                     "ios-browser"
                 ]
+            },
+            {
+                "name": "format.test - supports unescaped slashes",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/test1.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - supports simple regexp - matching request",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/1/test2.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - supports simple regexp - nonmatching request",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/a/test2.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - supports complex regexp - matching request 1",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/aaabdfdggggi/test3.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - supports complex regexp - matching request 2",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/aaaacfej/test3.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - supports complex regexp - nonmatching request 1",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/aabdfdggggi/test3.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - supports complex regexp - nonmatching request 2",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/aaaacf/test3.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain - match on sub subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub0.sub1.sub2.format.test/test4.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - with subdomain - don't match on just lower subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1.format.test/test4.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain - match on full subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1.sub2.format.test/test4.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - with subdomain - don't match for incorrect subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1nsub2.format.test/test4.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain - don't match on incorrect subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub0.sub2.format.test/test4.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain and regexp - match on sub subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub0.sub1.sub2.format.test/a/test4a.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - with subdomain and regexp - don't match on just lower subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1.format.test/a/test4a.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain and regexp - match on full subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1.sub2.format.test/a/test4a.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - with subdomain and regexp - don't match for incorrect subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1nsub2.format.test/a/test4a.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain and regexp - don't match on incorrect subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub0.sub2.format.test/a/test4a.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - domain in rule - match on full request",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1.format.test/sub2.format.test/test4b.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - domain in rule - don't match the inner request",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub2.format.test/test4b.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain and explicit anchoring - don't match for incorrect subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1nsub2.format.test/test4c.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain and explicit anchoring - match on extra subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub0.sub1.sub2.format.test/test4c.js",
+                "requestType": "script",
+                "expectAction": "ignore",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
+            },
+            {
+                "name": "format.test - with subdomain and explicit anchoring - don't match on incorrect subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub0.sub2.format.test/test4c.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - with subdomain and explicit anchoring - don't match on extended subdomain",
+                "siteURL": "https://example.com",
+                "requestURL": "https://ssub1.sub2.format.test/test4c.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - no escape on domain - matching request",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/test5.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - no escape on subdomain - match with periods",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1.sub2.format.test/test6.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - no escape on subdomain - match with replacements",
+                "siteURL": "https://example.com",
+                "requestURL": "https://sub1asub2.format.test/test6.js",
+                "requestType": "script",
+                "expectAction": "ignore"
             }
         ]
     },
