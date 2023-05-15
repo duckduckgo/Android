@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Для защиты логинов требуются биометрические данные, графический ключ или ПИН-код.</string>
     <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы сохранять логины</string>
 
-    <string name="saveLoginDialogTitle">Сохранить логин?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Сохранить пароль?</string>
     <string name="saveLoginDialogButtonSave">Сохранить логин</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сейчас</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Логины надежно хранятся только на этом устройстве. Ими можно управлять в меню «Логины» в «Настройках».</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
+    <string name="saveLoginDialogSubtitle">Логины надежно хранятся только на этом устройстве. Ими можно управлять в меню «Логины» в «Настройках».</string>
+    <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
     <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>

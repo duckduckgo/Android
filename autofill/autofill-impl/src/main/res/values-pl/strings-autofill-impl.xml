@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Aby chronić dane logowania, korzystaj z blokady urządzenia za pomocą wzoru, kodu PIN lub danych biometrycznych.</string>
     <string name="managementDisabledModeTitle">Zabezpiecz urządzenie, aby chronić dane logowania</string>
 
-    <string name="saveLoginDialogTitle">Zapisać logowanie?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Zapisać hasło?</string>
     <string name="saveLoginDialogButtonSave">Zapisz logowanie</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginDialogNotNow">Nie teraz</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Dane logowania są bezpiecznie przechowywane wyłącznie na tym urządzeniu i można nimi zarządzać w sekcji Loginy menu Ustawienia.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Czy chcesz zapisać dane logowania w DuckDuckGo?</string>
+    <string name="saveLoginDialogSubtitle">Dane logowania są bezpiecznie przechowywane wyłącznie na tym urządzeniu i można nimi zarządzać w sekcji Loginy menu Ustawienia.</string>
+    <string name="saveLoginDialogTitle">Czy chcesz zapisać dane logowania w DuckDuckGo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
     <string name="useSavedLoginDialogTitle">Czy chcesz użyć zapisanego loginu?</string>

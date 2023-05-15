@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine logins.</string>
     <string name="managementDisabledModeTitle">Beskyt din enhed for at gemme logins</string>
 
-    <string name="saveLoginDialogTitle">Gem login?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Gem adgangskode?</string>
     <string name="saveLoginDialogButtonSave">Gem login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Ikke nu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins gemmes kun sikkert på denne enhed og kan administreres fra menuen Automatisk udfyldning i Indstillinger.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Skal DuckDuckGo gemme dit login?</string>
+    <string name="saveLoginDialogSubtitle">Logins gemmes kun sikkert på denne enhed og kan administreres fra menuen Automatisk udfyldning i Indstillinger.</string>
+    <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme dit login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruge et gemt login?</string>

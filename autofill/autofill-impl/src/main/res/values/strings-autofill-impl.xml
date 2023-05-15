@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Logins.</string>
     <string name="managementDisabledModeTitle">Secure your device to save Logins</string>
 
-    <string name="saveLoginDialogTitle">Save login?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Save password?</string>
     <string name="saveLoginDialogButtonSave">Save Login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Not Now</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Logins are stored securely on this device only, and can be managed from the Logins menu in Settings.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Do you want DuckDuckGo to save your Login?</string>
+    <string name="saveLoginDialogSubtitle">Logins are stored securely on this device only, and can be managed from the Logins menu in Settings.</string>
+    <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your Login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
     <string name="useSavedLoginDialogTitle">Use a saved Login?</string>

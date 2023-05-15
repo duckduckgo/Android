@@ -23,7 +23,6 @@ import com.duckduckgo.autofill.api.InternalTestUserChecker
 
 interface AutofillPrefsStore {
     var isEnabled: Boolean
-    var showOnboardingWhenOfferingToSaveLogin: Boolean
     var autofillDeclineCount: Int
     var monitorDeclineCounts: Boolean
     var hasEverBeenPromptedToSaveLogin: Boolean
@@ -43,10 +42,6 @@ class RealAutofillPrefsStore constructor(
         set(value) = prefs.edit {
             putBoolean(AUTOFILL_ENABLED, value)
         }
-
-    override var showOnboardingWhenOfferingToSaveLogin: Boolean
-        get() = prefs.getBoolean(SHOW_SAVE_LOGIN_ONBOARDING, true)
-        set(value) = prefs.edit { putBoolean(SHOW_SAVE_LOGIN_ONBOARDING, value) }
 
     override var hasEverBeenPromptedToSaveLogin: Boolean
         get() = prefs.getBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, false)

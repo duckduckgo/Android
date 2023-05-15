@@ -16,14 +16,11 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.saving
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -36,55 +33,9 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
     @Inject
     lateinit var autofillStore: AutofillStore
 
-    fun showOnboarding(): Boolean {
-        // hardcoding this to always show onboarding-style dialog for now; instead of querying autofillStore.showOnboardingWhenOfferingToSaveLogin
-        return true
-    }
-
-    fun determineTextResources(credentials: LoginCredentials): DisplayStringResourceIds {
-        val title: Int = determineTitle(credentials)
-        val ctaButton: Int = determineCtaButtonText(credentials)
-
-        return DisplayStringResourceIds(
-            title = title,
-            ctaButton = ctaButton,
-        )
-    }
-
-    @StringRes
-    private fun determineTitle(credentials: LoginCredentials): Int {
-        if (showOnboarding()) {
-            return R.string.saveLoginDialogFirstTimeOnboardingExplanationTitle
-        }
-
-        return if (credentials.username == null) {
-            R.string.saveLoginMissingUsernameDialogTitle
-        } else {
-            R.string.saveLoginDialogTitle
-        }
-    }
-
-    @StringRes
-    private fun determineCtaButtonText(credentials: LoginCredentials): Int {
-        if (showOnboarding()) {
-            return R.string.saveLoginDialogButtonSave
-        }
-
-        return if (credentials.username == null) {
-            R.string.saveLoginMissingUsernameDialogButtonSave
-        } else {
-            R.string.saveLoginDialogButtonSave
-        }
-    }
-
     fun userPromptedToSaveCredentials() {
         viewModelScope.launch(dispatchers.io()) {
             autofillStore.hasEverBeenPromptedToSaveLogin = true
         }
     }
-
-    data class DisplayStringResourceIds(
-        @StringRes val title: Int,
-        @StringRes val ctaButton: Int,
-    )
 }

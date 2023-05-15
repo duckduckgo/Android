@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Een vergrendelingspatroon, pincode of biometrische gegevens zijn noodzakelijk om je aanmeldgegevens te beschermen.</string>
     <string name="managementDisabledModeTitle">Beveilig je apparaat om aanmeldgegevens op te slaan</string>
 
-    <string name="saveLoginDialogTitle">Aanmeldgegevens opslaan?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Wachtwoord opslaan?</string>
     <string name="saveLoginDialogButtonSave">Login opslaan</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginDialogNotNow">Niet nu</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Aanmeldgegevens worden enkel op dit apparaat veilig opgeslagen en kunnen worden beheerd via het menu Aanmeldgegevens in Instellingen.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Wil je dat DuckDuckGo je login opslaat?</string>
+    <string name="saveLoginDialogSubtitle">Aanmeldgegevens worden enkel op dit apparaat veilig opgeslagen en kunnen worden beheerd via het menu Aanmeldgegevens in Instellingen.</string>
+    <string name="saveLoginDialogTitle">Wil je dat DuckDuckGo je login opslaat?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
     <string name="useSavedLoginDialogTitle">Opgeslagen aanmeldgegevens gebruiken?</string>

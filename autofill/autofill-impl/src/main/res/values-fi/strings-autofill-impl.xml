@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="managementDisabledModeTitle">Suojaa laitteesi kirjautumistietojen tallentamiseksi</string>
 
-    <string name="saveLoginDialogTitle">Tallennetaanko kirjautumistiedot?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Tallennetaanko salasana?</string>
     <string name="saveLoginDialogButtonSave">Tallenna kirjautumistiedot</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginDialogNotNow">Ei nyt</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tähän laitteeseen. Niitä voi hallita asetusten kirjautumistiedot-valikosta.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
+    <string name="saveLoginDialogSubtitle">Kirjautumistiedot tallennetaan turvallisesti vain tähän laitteeseen. Niitä voi hallita asetusten kirjautumistiedot-valikosta.</string>
+    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
     <string name="useSavedLoginDialogTitle">Käytä tallennettuja kirjautumistietoja?</string>

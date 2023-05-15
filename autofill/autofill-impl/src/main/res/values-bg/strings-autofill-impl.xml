@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">За защита на данните за вход е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
     <string name="managementDisabledModeTitle">Защитете устройството, за да можете да запазвате данни за вход</string>
 
-    <string name="saveLoginDialogTitle">Запазване на данните за вход?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Запазване на паролата?</string>
     <string name="saveLoginDialogButtonSave">Запазване на данните за вход</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не сега</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Данните за вход се съхраняват защитени само на това устройство и могат да се управляват от менюто Данни за вход в Настройки.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Искате ли DuckDuckGo да запази данните за вход?</string>
+    <string name="saveLoginDialogSubtitle">Данните за вход се съхраняват защитени само на това устройство и могат да се управляват от менюто Данни за вход в Настройки.</string>
+    <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази данните за вход?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
     <string name="useSavedLoginDialogTitle">Да се използват ли запазените данни за вход?</string>

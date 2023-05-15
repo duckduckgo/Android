@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
     <string name="managementDisabledModeTitle">Zabezpečte svoje zariadenie a uložte prihlasovacie údaje</string>
 
-    <string name="saveLoginDialogTitle">Uložiť prihlasovacie údaje?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Uložiť heslo?</string>
     <string name="saveLoginDialogButtonSave">Uložiť prihlasovacie údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložiť heslo</string>
     <string name="saveLoginDialogNotNow">Teraz nie</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prihlasovacie údaje sú zabezpečene uložené len v tomto zariadení a môžete ich spravovať v ponuke Prihlasovacie údaje v Nastaveniach.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
+    <string name="saveLoginDialogSubtitle">Prihlasovacie údaje sú zabezpečene uložené len v tomto zariadení a môžete ich spravovať v ponuke Prihlasovacie údaje v Nastaveniach.</string>
+    <string name="saveLoginDialogTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použiť uložené prihlasovacie údaje?</string>

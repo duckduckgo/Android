@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Es sind ein Entsperrmuster, eine PIN oder biometrische Daten erforderlich, um deine Anmeldedaten zu schützen.</string>
     <string name="managementDisabledModeTitle">Sichere dein Gerät, um Anmeldungen zu speichern</string>
 
-    <string name="saveLoginDialogTitle">Anmeldedaten speichern?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Passwort speichern?</string>
     <string name="saveLoginDialogButtonSave">Anmeldedaten speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Jetzt nicht</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
+    <string name="saveLoginDialogSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
+    <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
     <string name="useSavedLoginDialogTitle">Gespeicherte Anmeldedaten verwenden?</string>

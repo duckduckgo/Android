@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos identifiants.</string>
     <string name="managementDisabledModeTitle">Sécurisez votre appareil pour enregistrer des identifiants</string>
 
-    <string name="saveLoginDialogTitle">Enregistrer l\'identifiant ?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Enregistrer le mot de passe ?</string>
     <string name="saveLoginDialogButtonSave">Enregistrer l\'identifiant</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Pas maintenant</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Les identifiants sont stockés en toute sécurité sur cet appareil uniquement et peuvent être gérés à partir du menu Identifiants dans Paramètres.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Voulez-vous que DuckDuckGo enregistre votre identifiant ?</string>
+    <string name="saveLoginDialogSubtitle">Les identifiants sont stockés en toute sécurité sur cet appareil uniquement et peuvent être gérés à partir du menu Identifiants dans Paramètres.</string>
+    <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre identifiant ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
     <string name="useSavedLoginDialogTitle">Utiliser un identifiant enregistré ?</string>

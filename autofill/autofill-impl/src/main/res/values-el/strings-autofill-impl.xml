@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Για προστασία των «Συνδέσεών» σας απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
     <string name="managementDisabledModeTitle">Ασφαλίστε τη συσκευή σας για να αποθηκεύετε τις «Συνδέσεις»</string>
 
-    <string name="saveLoginDialogTitle">Αποθήκευση σύνδεσης;</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Αποθήκευση κωδικού πρόσβασης;</string>
     <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Όχι τώρα</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια μόνο σε αυτή τη συσκευή και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
+    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια μόνο σε αυτή τη συσκευή και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
+    <string name="saveLoginDialogTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένων στοιχείων σύνδεσης;</string>

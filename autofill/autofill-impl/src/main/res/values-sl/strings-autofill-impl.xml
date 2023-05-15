@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Za zaščito prijav je potreben vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
     <string name="managementDisabledModeTitle">Zavarujte svojo napravo, če želite shraniti prijave</string>
 
-    <string name="saveLoginDialogTitle">Želite shraniti prijavo?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Želite shraniti geslo?</string>
     <string name="saveLoginDialogButtonSave">Shrani prijavo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne zdaj</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prijave so varno shranjene samo v tej napravi in jih lahko upravljate v meniju Prijave v Nastavitvah.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
+    <string name="saveLoginDialogSubtitle">Prijave so varno shranjene samo v tej napravi in jih lahko upravljate v meniju Prijave v Nastavitvah.</string>
+    <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Želite uporabiti shranjene podatke za prijavo?</string>

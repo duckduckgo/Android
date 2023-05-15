@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Prisijungimams apsaugoti reikia naudoti prietaiso užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad išsaugotumėte prisijungimus</string>
 
-    <string name="saveLoginDialogTitle">Išsaugoti prisijungimą?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Išsaugoti slaptažodį?</string>
     <string name="saveLoginDialogButtonSave">Išsaugoti prisijungimą</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Ne dabar</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Prisijungimai saugiai laikomi tik šiame įrenginyje, o juos galima tvarkyti nustatymuose, prisijungimų meniu.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų prisijungimą?</string>
+    <string name="saveLoginDialogSubtitle">Prisijungimai saugiai laikomi tik šiame įrenginyje, o juos galima tvarkyti nustatymuose, prisijungimų meniu.</string>
+    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų prisijungimą?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
     <string name="useSavedLoginDialogTitle">Naudoti išsaugotą prisijungimą?</string>
