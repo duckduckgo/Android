@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Rect
 import android.os.Build
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.TouchDelegate
@@ -101,7 +102,7 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
 
         binding.copyPasswordButton.setOnClickListener {
             clipboardInteractor.copyToClipboard(binding.generatedPassword.text.toString(), isSensitive = true)
-            if (appBuildConfig.sdkInt <= Build.VERSION_CODES.S_V2) {
+            if (shouldShowCopiedTextToast()) {
                 Toast.makeText(context, R.string.autofillManagementPasswordCopied, Toast.LENGTH_SHORT).show()
             }
         }
@@ -119,6 +120,16 @@ class AutofillUseGeneratedPasswordDialogFragment : BottomSheetDialogFragment(), 
                 (parent as View).touchDelegate = TouchDelegate(touchableArea, this)
             }
         }
+    }
+
+    private fun shouldShowCopiedTextToast(): Boolean {
+        // Samsung on Android 12 shows its own toast when copying text, so we don't want to show our own
+        if (appBuildConfig.manufacturer == "samsung" && (appBuildConfig.sdkInt == VERSION_CODES.S || appBuildConfig.sdkInt == VERSION_CODES.S_V2)) {
+            return false
+        }
+
+        // From Android 13, the system shows its own toast when copying text, so we don't want to show our own
+        return appBuildConfig.sdkInt <= VERSION_CODES.S_V2
     }
 
     private fun configureGeneratePasswordButton(
