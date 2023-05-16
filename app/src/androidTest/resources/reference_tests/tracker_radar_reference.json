@@ -205,6 +205,119 @@
                 }
             ]
         },
+        "options3.test": {
+            "domain": "options3.test",
+            "owner": {
+                "name": "Test Site for Tracker Blocking",
+                "displayName": "Bad Third Party Site",
+                "privacyPolicy": "",
+                "url": "http://tracker.test"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block",
+            "rules": [
+                {
+                    "rule": "options3\\.test\\/script\\.js",
+                    "options": {
+                        "domains": [
+                            "example.com"
+                        ]
+                    },
+                    "surrogate": "tracker"
+                },
+                {
+                    "rule": "options3\\.test\\/s",
+                    "options": {
+                        "domains": [
+                            "example3.com"
+                        ]
+                    }
+                },
+                {
+                    "rule": "options3\\.test\\/script2\\.js",
+                    "options": {
+                        "domains": [
+                            "example2.com"
+                        ]
+                    }
+                },
+                {
+                    "rule": "options3\\.test\\/script\\.js",
+                    "exceptions": {
+                        "types": [
+                            "script"
+                        ]
+                    }
+                },
+                {
+                    "rule": "options3\\.test",
+                    "exceptions": {
+                        "types": [
+                            "image"
+                        ]
+                    }
+                }
+            ]
+        },
+        "options-trailing-exception.test": {
+            "domain": "options-trailing-exception.test",
+            "owner": {
+                "name": "Tests for options algorithms",
+                "displayName": "Tests for options algorithms"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block",
+            "rules": [
+                {
+                    "rule": "options-trailing-exception\\.test\\/script\\.js",
+                    "options": {
+                        "domains": [
+                            "example.com"
+                        ]
+                    }
+                },
+                {
+                    "rule": "options-trailing-exception\\.test\\/script\\.js",
+                    "exceptions": {
+                        "types": [
+                            "stylesheet"
+                        ]
+                    }
+                }
+            ]
+        },
+        "options-trailing-ignore.test": {
+            "domain": "options-trailing-ignore.test",
+            "owner": {
+                "name": "Tests for options algorithms",
+                "displayName": "Tests for options algorithms"
+            },
+            "prevalence": 0.1,
+            "fingerprinting": 3,
+            "cookies": 0.1,
+            "categories": [],
+            "default": "block",
+            "rules": [
+                {
+                    "rule": "options-trailing-ignore\\.test\\/script\\.js",
+                    "options": {
+                        "domains": [
+                            "example.com"
+                        ]
+                    }
+                },
+                {
+                    "rule": "options-trailing-ignore\\.test\\/script\\.js",
+                    "action": "ignore"
+                }
+            ]
+        },
         "ignore.test": {
             "domain": "ignore.test",
             "owner": {
@@ -351,7 +464,8 @@
                 "third-party.site",
                 "tracker.test",
                 "options1.test",
-                "options2.test"
+                "options2.test",
+                "options3.test"
             ],
             "prevalence": 0.1,
             "displayName": "Test Site for Tracker Blocking"
@@ -370,6 +484,14 @@
             ],
             "prevalence": 0.1,
             "displayName": "Ignore Site for Tracker Blocking"
+        },
+        "Tests for options algorithms": {
+            "domains": [
+                "options-trailing-exception.test",
+                "options-trailing-ignore.test"
+            ],
+            "prevalence": 0.1,
+            "displayName": "Tests for options algorithms"
         },
         "Test Site for Surrogates": {
             "domains": [
@@ -395,6 +517,9 @@
         "tracker.test": "Test Site for Tracker Blocking",
         "options1.test": "Test Site for Tracker Blocking",
         "options2.test": "Test Site for Tracker Blocking",
+        "options3.test": "Test Site for Tracker Blocking",
+        "options-trailing-exception.test": "Tests for options algorithms",
+        "options-trailing-ignore.test": "Tests for options algorithms",
         "ignore.test": "Ignore Site for Tracker Blocking",
         "sub.ignore.test": "Ignore Site for Tracker Blocking",
         "surrogates.test": "Test Site for Surrogates",
