@@ -21,7 +21,7 @@
     <string name="windows_waitlist_title">Kokeile Windows-laitteen DuckDuckGo-sovellusta!</string>
     <string name="windows_title">Hanki DuckDuckGo Windowsille!</string>
     <string name="windows_waitlist_description">DuckDuckGon Windows-sovellus tarjoaa kaiken, mitä tarvitset selaamiseen yksityisemmin. Siinä on yksityinen haku, jäljittäjien esto, pakotettu salaus ja evästeiden ponnahdusikkunoiden esto, ja tulossa on vielä lisää luokkansa parhaita suojauksia.</string>
-    <string name="windows_description">Windowsin DuckDuckGo-sovellus tarjoaa kaipaamaasi nopeutta, odottamasi selaustoiminnot ja luokkansa parhaat Privacy Essentials -ominaisuudet.\n\nSiirry Windows-tietokoneella osoitteeseen:</string>
+    <string name="windows_description">DuckDuckGon Windows-sovellus tarjoaa kaiken, mitä tarvitset selaamiseen yksityisemmin. Siinä on yksityinen haku, jäljittäjien esto, pakotettu salaus ja evästeiden ponnahdusikkunoiden esto, ja tulossa on vielä lisää luokkansa parhaita suojauksia.\n\nSiirry Windows-tietokoneella osoitteeseen:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Jaa linkki</string>
     <string name="windows_share_text">Oletko valmis aloittamaan yksityisen selaamisen Windowsilla?Lataa sovellus Windows-laitteellesi osoitteesta:\nduckduckgo.com/windows</string>
