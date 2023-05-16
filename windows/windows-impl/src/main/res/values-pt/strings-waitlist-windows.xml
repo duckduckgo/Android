@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">Aplicação DuckDuckGo para Windows</string>
     <string name="windows_waitlist_title">Obtenha acesso antecipado para experimentar o DuckDuckGo para Windows!</string>
+    <string name="windows_title">Obtém o DuckDuckGo para Windows!</string>
     <string name="windows_waitlist_description">O DuckDuckGo tem tudo o que precisa para navegar com mais privacidade — pesquisa privada, bloqueio de rastreadores, encriptação forçada e bloqueio de pop-ups de cookies — e há mais proteções líderes de mercado a caminho.</string>
+    <string name="windows_description">O DuckDuckGo para Windows tem a velocidade de que precisas, as funcionalidades de navegação que esperas e os nossos Privacy Essentials líderes no setor.\n\nNo teu computador Windows, acede a:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Partilhar ligação</string>
+    <string name="windows_share_text">A postos para começar a navegar em privado no Windows?Visita este URL no teu computador com Windows para transferir:\n duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Procura a versão para Mac?</string>
     <string name="windows_join_waitlist">Adira à Lista de Espera Privada</string>
     <string name="windows_join_waitlist_error">Ocorreu um erro ao entrar na Lista de Espera, tente novamente mais tarde</string>

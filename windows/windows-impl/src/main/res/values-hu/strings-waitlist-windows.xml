@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">DuckDuckGo alkalmazás Windowshoz</string>
     <string name="windows_waitlist_title">Szerezz korai hozzáférést a windowsos DuckDuckGo alkalmazáshoz.</string>
+    <string name="windows_title">Töltsd le a DuckDuckGo Windows verzióját!</string>
     <string name="windows_waitlist_description">A windowsos DuckDuckGo tartalmazza mindazt, ami a privát böngészéshez szükséges – támogatja a privát keresést, a nyomkövetők blokkolását, a kényszerített titkosítást és a felugró sütiablakok blokkolását, valamint további, a kategóriájában legjobb védelmet nyújtó megoldásokat kínál.</string>
+    <string name="windows_description">A DuckDuckGo Windows verziója gyors, böngészési funkciókban gazdag, és kategóriája legjobb adatvédelmi megoldásait kínálja.\n\nWindowsos számítógépen lépj erre az oldalra:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Link megosztása</string>
+    <string name="windows_share_text">Készen állsz a privát böngészésre a Windowson?\n\nWindowsos számítógépen látogass el erre a címre a letöltéshez:\nduckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">A Macre készült verziót keresed?</string>
     <string name="windows_join_waitlist">Csatlakozz a privát várólistához</string>
     <string name="windows_join_waitlist_error">Hiba történt a várólistához való csatlakozás közben. Kérjük, próbáld újra később.</string>

@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">Aplikácia DuckDuckGo pre Windows</string>
     <string name="windows_waitlist_title">Získajte skorý prístup a vyskúšajte DuckDuckGo pre Windows!</string>
+    <string name="windows_title">Získajte DuckDuckGo pre Windows!</string>
     <string name="windows_waitlist_description">DuckDuckGo pre Windows má všetko, čo potrebujete na prehľadávanie s väčšou mierou súkromia — súkromné vyhľadávanie, blokovanie sledovania, vynútené šifrovanie, blokovanie automaticky zobrazených okien so súbormi cookie a ďalšie špičkové prvky ochrany.</string>
+    <string name="windows_description">DuckDuckGo pre Mac má rýchlosť, ktorú potrebujete, funkcie prehliadania, ktoré očakávate, a prichádza vybavený našimi prvotriednymi nástrojmi na ochranu súkromia.\n\nV počítači so systémom Windows prejdite na:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Zdieľať odkaz</string>
+    <string name="windows_share_text">Ste pripravení začať súkromne prehliadať v systéme Windows?\n\nNa stiahnutie navštívte túto URL adresu v počítači so systémom Windows:\nduckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Hľadáte verziu pre Mac?</string>
     <string name="windows_join_waitlist">Pridajte sa do súkromného zoznamu čakateľov</string>
     <string name="windows_join_waitlist_error">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>

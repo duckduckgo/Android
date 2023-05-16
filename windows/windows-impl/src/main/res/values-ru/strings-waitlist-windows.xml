@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">Приложение DuckDuckGo для Windows</string>
     <string name="windows_waitlist_title">Ранний доступ к DuckDuckGo для Windows</string>
+    <string name="windows_title">DuckDuckGo для Windows!</string>
     <string name="windows_waitlist_description">В DuckDuckGo для Windows есть все необходимое для защиты данных в Сети: приватный поиск, принудительное шифрование, блокировка трекеров и всплывающих куки, а также перспектива разработок передовых средств обеспечения безопасности.</string>
+    <string name="windows_description">Приложение DuckDuckGo для Windows — это высокая скорость, функциональность и беспрецедентная конфиденциальность.\n\nПерейдите на компьютере Windows по ссылке:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Поделиться ссылкой</string>
+    <string name="windows_share_text">Конфиденциальность в Интернете на Windows?Загрузите наше приложение по ссылке:\nduckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Ищете версию для Mac?</string>
     <string name="windows_join_waitlist">Приглашаем встать в очередь</string>
     <string name="windows_join_waitlist_error">При постановке в очередь произошла ошибка. Пожалуйста, повторите попытку позже.</string>

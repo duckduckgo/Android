@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">„DuckDuckGo“ programa, skirta „Windows“</string>
     <string name="windows_waitlist_title">Gaukite ankstyvą prieigą ir išbandykite „DuckDuckGo“, skirtą „Windows“!</string>
+    <string name="windows_title">Gaukite „DuckDuckGo“, skirtą „Windows“!</string>
     <string name="windows_waitlist_description">„Windows“ skirta „DuckDuckGo“ turi viską, ko reikia norint naršyti dar privačiau – privačią paiešką, stebėjimo priemonių blokavimą, priverstinį šifravimą ir iššokančiųjų slapukų langų blokavimą bei dar daugiau geriausių savo klasėje apsaugos priemonių.</string>
+    <string name="windows_description">„Windows“ skirta „DuckDuckGo“ pasižymi jums reikiama sparta, naršyklės funkcijomis ir aukščiausios klasės privatumo įrankiais.\n\n„Windows“ kompiuteryje eikite į:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Bendrinti nuorodą</string>
+    <string name="windows_share_text">Pasiruošę pradėti privačiai naršyti sistemoje „Windows“?\n\nNorėdami atsisiųsti, „Windows“ kompiuteryje apsilankykite šiuo URL adresu:\nduckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Ieškote „Mac“ versijos?</string>
     <string name="windows_join_waitlist">Prisijungti prie privataus laukimo sąrašo</string>
     <string name="windows_join_waitlist_error">Prisijungiant prie laukimo sąrašo įvyko klaida, bandykite dar kartą vėliau</string>

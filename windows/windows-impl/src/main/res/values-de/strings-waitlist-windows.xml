@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">DuckDuckGo-App für Windows</string>
     <string name="windows_waitlist_title">Erhalte frühen Zugriff, um DuckDuckGo für Windows auszuprobieren!</string>
+    <string name="windows_title">Hol dir DuckDuckGo für Windows!</string>
     <string name="windows_waitlist_description">DuckDuckGo für Windows bietet alles, was du brauchst, um mit mehr Privatsphäre zu browsen – private Suche, Tracker-Blockade, erzwungene Verschlüsselung und Blockierung von Cookie-Pop-ups sowie weitere erstklassige Schutzmaßnahmen.</string>
+    <string name="windows_description">DuckDuckGo für Windows hat die Geschwindigkeit, die du brauchst, die Browserfunktionen, die du erwartest, und ist vollgepackt mit unseren grundlegenden Funktionen für den Datenschutz.\n\nÖffne auf deinem Windows-Computer die folgende Website:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Link teilen</string>
+    <string name="windows_share_text">Bist du bereit, privat auf Windows zu browsen?\n\nRufe für den Download diese URL auf deinem Windows-Computer auf:\nduckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Suchst du nach der Mac-Version?</string>
     <string name="windows_join_waitlist">Auf die private Warteliste setzen</string>
     <string name="windows_join_waitlist_error">Bei der Aktion „Auf die Warteliste setzen“ ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später noch einmal.</string>
