@@ -98,12 +98,12 @@ class SavedSitesParserTest {
             id = "bookmark1",
             title = "example",
             url = "www.example.com",
-            SavedSitesNames.BOOMARKS_ROOT,
+            SavedSitesNames.BOOKMARKS_ROOT,
             lastModified = "timestamp",
         )
         val favorite = SavedSite.Favorite(id = "fav1", title = "example", url = "www.example.com", lastModified = "timestamp", 0)
 
-        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOKMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
         node.add(TreeNode(FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
 
         val result = parser.generateHtml(node, listOf(favorite))
@@ -130,7 +130,7 @@ class SavedSitesParserTest {
 
     @Test
     fun whenNoSavedSitesExistThenNothingIsGenerated() = runTest {
-        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOKMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
 
         val result = parser.generateHtml(node, emptyList())
         val expectedHtml = ""
@@ -333,7 +333,7 @@ class SavedSitesParserTest {
                                 "bookmark1",
                                 title = title,
                                 url = link,
-                                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                                parentId = SavedSitesNames.BOOKMARKS_ROOT,
                                 lastModified = "timestamp",
                             ),
                         )

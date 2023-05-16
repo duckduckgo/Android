@@ -38,6 +38,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import org.threeten.bp.OffsetDateTime
+import kotlin.math.sin
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncParser::class)
@@ -72,8 +73,21 @@ class SavedSitesSyncParser @Inject constructor(
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         val folders = repository.getFoldersModifiedSince(since)
-        folders.forEach {
-            addFolderContent(it.id, updates, since)
+        folders.forEach { folder ->
+            if (folder.deleted == null) {
+                addFolderContent(folder.id, updates, since)
+            } else {
+                updates.add(deletedEntry(folder.id, folder.deleted!!))
+            }
+        }
+
+        // bookmarks that were deleted won't be part of the previous check
+        // we need to add them
+        val bookmarks = repository.getBookmarksModifiedSince(since)
+        bookmarks.forEach { bookmark ->
+            if (bookmark.deleted != null) {
+                updates.add(deletedEntry(bookmark.id, bookmark.deleted!!))
+            }
         }
 
         return updates
@@ -98,7 +112,7 @@ class SavedSitesSyncParser @Inject constructor(
             }
         }
 
-        return addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates)
+        return addFolderContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
     }
 
     private fun addFolderContent(
@@ -106,20 +120,28 @@ class SavedSitesSyncParser @Inject constructor(
         updates: MutableList<SyncBookmarkEntry>,
         lastModified: String = "",
     ): List<SyncBookmarkEntry> {
-        repository.getFolderContentSync(folderId).apply {
+        repository.getAllFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
             if (folder != null) {
                 val childrenIds = mutableListOf<String>()
                 for (bookmark in this.first) {
-                    childrenIds.add(bookmark.id)
-                    if (bookmark.modifiedSince(lastModified)) {
-                        updates.add(encryptSavedSite(bookmark))
+                    if (bookmark.deleted != null) {
+                        updates.add(deletedEntry(bookmark.id, bookmark.deleted!!))
+                    } else {
+                        childrenIds.add(bookmark.id)
+                        if (bookmark.modifiedSince(lastModified)) {
+                            updates.add(encryptSavedSite(bookmark))
+                        }
                     }
                 }
                 for (eachFolder in this.second) {
-                    childrenIds.add(eachFolder.id)
-                    if (eachFolder.modifiedSince(lastModified)) {
-                        addFolderContent(eachFolder.id, updates)
+                    if (eachFolder.deleted != null) {
+                        updates.add(deletedEntry(eachFolder.id, eachFolder.deleted!!))
+                    } else {
+                        if (eachFolder.modifiedSince(lastModified)) {
+                            childrenIds.add(eachFolder.id)
+                            addFolderContent(eachFolder.id, updates)
+                        }
                     }
                 }
                 updates.add(encryptFolder(folder, childrenIds))
@@ -170,14 +192,27 @@ class SavedSitesSyncParser @Inject constructor(
             title = syncCrypto.encrypt(bookmarkFolder.name),
             folder = SyncFolderChildren(children),
             page = null,
-            deleted = null,
+            deleted = bookmarkFolder.deleted,
             client_last_modified = bookmarkFolder.lastModified ?: DatabaseDateFormatter.iso8601(),
         )
     }
 
+    private fun deletedEntry(
+        id: String,
+        deleted: String
+    ): SyncBookmarkEntry {
+        return SyncBookmarkEntry(
+            id = id,
+            title = null,
+            folder = null,
+            page = null,
+            deleted = deleted,
+            client_last_modified = null,
+        )
+    }
 
     private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChanges {
-        return if (updates.isEmpty()){
+        return if (updates.isEmpty()) {
             SyncChanges.empty()
         } else {
             val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
@@ -185,7 +220,6 @@ class SavedSitesSyncParser @Inject constructor(
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
             SyncChanges(BOOKMARKS, allDataJSON)
         }
-
     }
 
     private class Adapters {
@@ -202,7 +236,7 @@ data class SyncFolderChildren(val children: List<String>)
 
 data class SyncBookmarkEntry(
     val id: String,
-    val title: String,
+    val title: String?,
     val page: SyncBookmarkPage?,
     val folder: SyncFolderChildren?,
     val deleted: String?,
@@ -210,8 +244,9 @@ data class SyncBookmarkEntry(
 )
 
 fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
+fun SyncBookmarkEntry.titleOrFallback(): String = this.title ?: "Bookmark"
 
-fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.BOOMARKS_ROOT
+fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.BOOKMARKS_ROOT
 fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.FAVORITES_ROOT
 fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
 

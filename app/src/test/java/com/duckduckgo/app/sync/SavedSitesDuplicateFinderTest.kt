@@ -221,7 +221,7 @@ class SavedSitesDuplicateFinderTest {
 
     @Test
     fun whenFolderNotPresentThenDuplicateIsNotFound() {
-        val folder = BookmarkFolder("folder", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder = BookmarkFolder("folder", "Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
 
         val result = duplicateFinder.findFolderDuplicate(folder)
 
@@ -230,8 +230,8 @@ class SavedSitesDuplicateFinderTest {
 
     @Test
     fun whenFolderPresentWithSameParentIdThenDuplicateIsFound() {
-        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
-        val folder1 = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val folder1 = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         repository.insert(folder)
 
         val result = duplicateFinder.findFolderDuplicate(folder1)
@@ -241,7 +241,7 @@ class SavedSitesDuplicateFinderTest {
 
     @Test
     fun whenFolderPresentWithDifferentParentIdThenDuplicateIsNotFound() {
-        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val folder1 = BookmarkFolder("folder2", "Folder", folder.id, 2, 1, "timestamp")
         repository.insert(folder)
 
@@ -252,7 +252,7 @@ class SavedSitesDuplicateFinderTest {
 
     @Test
     fun whenFolderPresentWithSameTitleDifferentParentIdThenDuplicateIsNotFound() {
-        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val folder1 = BookmarkFolder("folder2", "Folder", folder.id, 2, 1, "timestamp")
         repository.insert(folder)
 
@@ -263,8 +263,8 @@ class SavedSitesDuplicateFinderTest {
 
     @Test
     fun whenFolderPresentWithSameTitleAndParentIdThenDuplicateIsNotFound() {
-        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
-        val folder1 = BookmarkFolder("folder2", "Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val folder = BookmarkFolder("folder1", "Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val folder1 = BookmarkFolder("folder2", "Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         repository.insert(folder)
 
         val result = duplicateFinder.findFolderDuplicate(folder1)

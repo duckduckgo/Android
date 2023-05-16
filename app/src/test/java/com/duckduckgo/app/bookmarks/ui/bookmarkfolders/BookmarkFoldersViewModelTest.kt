@@ -60,8 +60,8 @@ class BookmarkFoldersViewModelTest {
         ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
 
     private val folderStructure = mutableListOf(
-        BookmarkFolderItem(1, BookmarkFolder("folder1", "folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp"), true),
-        BookmarkFolderItem(1, BookmarkFolder("folder2", "a folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp"), false),
+        BookmarkFolderItem(1, BookmarkFolder("folder1", "folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp"), true),
+        BookmarkFolderItem(1, BookmarkFolder("folder2", "a folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp"), false),
     )
 
     private val testee: BookmarkFoldersViewModel by lazy {
@@ -78,7 +78,7 @@ class BookmarkFoldersViewModelTest {
 
     @Test
     fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() = runTest {
-        val selectedFolderId = SavedSitesNames.BOOMARKS_ROOT
+        val selectedFolderId = SavedSitesNames.BOOKMARKS_ROOT
         val rootFolderName = "Bookmarks"
         val folder = BookmarkFolder("folder2", "a folder", "folder1", 0, 0, "timestamp")
 
@@ -105,7 +105,7 @@ class BookmarkFoldersViewModelTest {
     @Test
     fun newFolderAddedThenCallRepoAndUpdateViewState() = runTest {
         val newFolder = BookmarkFolder("folder3", "new folder", "folder1", 0, 0, "timestamp")
-        val selectedFolderId = SavedSitesNames.BOOMARKS_ROOT
+        val selectedFolderId = SavedSitesNames.BOOKMARKS_ROOT
 
         testee.newFolderAdded(selectedFolderId, newFolder)
         folderStructure.add(BookmarkFolderItem(1, newFolder))

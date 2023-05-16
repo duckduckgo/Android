@@ -59,7 +59,7 @@ class RealSyncCrypter(
             )
         }
 
-        val bookmarks = addFolderContent(SavedSitesNames.BOOMARKS_ROOT, updates, primaryKey)
+        val bookmarks = addFolderContent(SavedSitesNames.BOOKMARKS_ROOT, updates, primaryKey)
 
         val bookmarkUpdates = SyncRequest(SyncBookmarksRequest(bookmarks))
         return SyncDataRequest("", bookmarkUpdates.bookmarks)
@@ -95,7 +95,7 @@ class RealSyncCrypter(
 
         folders.forEach { folder ->
             val bookmarkFolder = decryptFolder(folder, primaryKey, folder.id)
-            if (bookmarkFolder.id != SavedSitesNames.BOOMARKS_ROOT && bookmarkFolder.id != SavedSitesNames.FAVORITES_ROOT) {
+            if (bookmarkFolder.id != SavedSitesNames.BOOKMARKS_ROOT && bookmarkFolder.id != SavedSitesNames.FAVORITES_ROOT) {
                 repository.insert(bookmarkFolder)
             }
 

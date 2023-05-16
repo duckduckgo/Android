@@ -106,17 +106,18 @@ class SavedSitesSyncMerger @Inject constructor(
             return SyncMergeResult.Success(false)
         }
 
+        val processIds: MutableList<String> = mutableListOf()
+        val allResponseIds = bookmarks.entries.map { it.id }
+
+        if (allResponseIds.contains(SavedSitesNames.BOOKMARKS_ROOT)) {
+            Timber.d("Sync: bookmarks root found, traversing from there")
+            processFolder(SavedSitesNames.BOOKMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+        }
+
         // Iterate over received items and find:
         // 1. All folders without a parent in the payload
         // 2. All bookmarks without a parent in the payload
 
-        val processIds: MutableList<String> = mutableListOf()
-        val allResponseIds = bookmarks.entries.map { it.id }
-
-        if (allResponseIds.contains(SavedSitesNames.BOOMARKS_ROOT)) {
-            Timber.d("Sync: bookmarks root found, traversing from there")
-            processFolder(SavedSitesNames.BOOMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
-        }
 
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
             Timber.d("Sync: favourites root found, traversing from there")
@@ -262,7 +263,7 @@ class SavedSitesSyncMerger @Inject constructor(
     ): BookmarkFolder {
         val folder = BookmarkFolder(
             id = remoteEntry.id,
-            name = syncCrypto.decrypt(remoteEntry.title),
+            name = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             parentId = parentId,
             lastModified = remoteEntry.client_last_modified ?: lastModified,
         )
@@ -315,7 +316,7 @@ class SavedSitesSyncMerger @Inject constructor(
     ): Bookmark {
         val bookmark = Bookmark(
             id = remoteEntry.id,
-            title = syncCrypto.decrypt(remoteEntry.title),
+            title = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             url = syncCrypto.decrypt(remoteEntry.page!!.url),
             parentId = parentId,
             lastModified = remoteEntry.client_last_modified ?: lastModified,
@@ -331,7 +332,7 @@ class SavedSitesSyncMerger @Inject constructor(
     ): Favorite {
         val favourite = Favorite(
             id = remoteEntry.id,
-            title = syncCrypto.decrypt(remoteEntry.title),
+            title = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             url = syncCrypto.decrypt(remoteEntry.page!!.url),
             lastModified = remoteEntry.client_last_modified ?: lastModified,
             position = position,

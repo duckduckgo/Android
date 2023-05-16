@@ -553,14 +553,14 @@ class AutoCompleteApiTest {
         id: String = UUID.randomUUID().toString(),
         title: String = "title",
         url: String = "https://example.com",
-    ) = Bookmark(id, title, url, SavedSitesNames.BOOMARKS_ROOT, DatabaseDateFormatter.iso8601())
+    ) = Bookmark(id, title, url, SavedSitesNames.BOOKMARKS_ROOT, DatabaseDateFormatter.iso8601())
 
     private fun bookmarks() = listOf(
         Bookmark(
             UUID.randomUUID().toString(),
             "title",
             "https://example.com",
-            SavedSitesNames.BOOMARKS_ROOT,
+            SavedSitesNames.BOOKMARKS_ROOT,
             DatabaseDateFormatter.iso8601(),
         ),
     )

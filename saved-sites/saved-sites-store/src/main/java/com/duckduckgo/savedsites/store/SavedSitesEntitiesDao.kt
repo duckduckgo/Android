@@ -60,6 +60,12 @@ interface SavedSitesEntitiesDao {
     )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
+    @Query(
+        "select * from entities inner join relations on entities.entityId = relations.entityId " +
+            "where relations.folderId = :folderId",
+    )
+    fun allEntitiesInFolderSync(folderId: String): List<Entity>
+
     @Delete()
     fun hardDelete(entity: Entity)
 
@@ -68,7 +74,7 @@ interface SavedSitesEntitiesDao {
 
     @Query("update entities set deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
     fun deleteAll(
-        bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
+        bookmarksRoot: String = SavedSitesNames.BOOKMARKS_ROOT,
         favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
         lastModified: String = DatabaseDateFormatter.iso8601(),
     )
@@ -115,4 +121,7 @@ interface SavedSitesEntitiesDao {
 
     @Query("select * from entities where type = :type and entities.deleted = 0")
     fun entitiesByTypeSync(type: EntityType): List<Entity>
+
+    @Query("select * from entities where type = :type")
+    fun allEntitiesByTypeSync(type: EntityType): List<Entity>
 }

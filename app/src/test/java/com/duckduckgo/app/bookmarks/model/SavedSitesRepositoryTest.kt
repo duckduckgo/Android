@@ -85,7 +85,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenNoDataThenFolderContentisEmpty() = runTest {
-        repository.getFolderContent(SavedSitesNames.BOOMARKS_ROOT).test {
+        repository.getFolderContent(SavedSitesNames.BOOKMARKS_ROOT).test {
             val result = awaitItem()
             assert(result.first.isEmpty())
             assert(result.second.isEmpty())
@@ -99,10 +99,10 @@ class SavedSitesRepositoryTest {
         val entities = givenSomeBookmarks(totalBookmarks)
         savedSitesEntitiesDao.insertList(entities)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, entities)
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, entities)
         savedSitesRelationsDao.insertList(relation)
 
-        repository.getFolderContent(SavedSitesNames.BOOMARKS_ROOT).test {
+        repository.getFolderContent(SavedSitesNames.BOOKMARKS_ROOT).test {
             val result = awaitItem()
             assert(result.first.size == totalBookmarks)
             assert(result.second.isEmpty())
@@ -121,10 +121,10 @@ class SavedSitesRepositoryTest {
         val folders = givenSomeFolders(totalFolders)
         savedSitesEntitiesDao.insertList(folders)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, entities.plus(folders))
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, entities.plus(folders))
         savedSitesRelationsDao.insertList(relation)
 
-        repository.getFolderContent(SavedSitesNames.BOOMARKS_ROOT).test {
+        repository.getFolderContent(SavedSitesNames.BOOKMARKS_ROOT).test {
             val result = awaitItem()
             assert(result.first.size == totalBookmarks)
             assert(result.second.size == totalFolders)
@@ -143,7 +143,7 @@ class SavedSitesRepositoryTest {
         val folders = givenSomeFolders(totalFolders)
         savedSitesEntitiesDao.insertList(folders)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, entities.plus(folders))
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, entities.plus(folders))
         savedSitesRelationsDao.insertList(relation)
 
         repository.getFolderContent("12").test {
@@ -274,13 +274,13 @@ class SavedSitesRepositoryTest {
         givenFavoriteStored(favoriteone)
 
         val folder =
-            repository.insert(BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
 
         val bookmark = repository.getBookmark(favoriteone.url)
         assertNotNull(bookmark)
 
         val updatedBookmark = bookmark!!.copy(parentId = folder.id)
-        repository.updateBookmark(updatedBookmark, SavedSitesNames.BOOMARKS_ROOT)
+        repository.updateBookmark(updatedBookmark, SavedSitesNames.BOOKMARKS_ROOT)
 
         assertNotNull(repository.getFavorite(favoriteone.url))
     }
@@ -403,7 +403,7 @@ class SavedSitesRepositoryTest {
                 title = "title",
                 url = "foo.com",
                 lastModified = "timestamp",
-                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                parentId = SavedSitesNames.BOOKMARKS_ROOT,
             ),
         )
 
@@ -418,7 +418,7 @@ class SavedSitesRepositoryTest {
                 title = "title",
                 url = "foo.com",
                 lastModified = "timestamp",
-                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                parentId = SavedSitesNames.BOOKMARKS_ROOT,
             ),
         )
         val bookmarkInserted = repository.getBookmark(bookmark.url)
@@ -436,11 +436,11 @@ class SavedSitesRepositoryTest {
                 title = "title",
                 url = "foo.com",
                 lastModified = "timestamp",
-                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                parentId = SavedSitesNames.BOOKMARKS_ROOT,
             ),
         )
         val updatedBookmark =
-            Bookmark(id = bookmark.id, title = "new title", url = "example.com", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+            Bookmark(id = bookmark.id, title = "new title", url = "example.com", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
 
         repository.updateBookmark(updatedBookmark, "folder1")
         val bookmarkUpdated = repository.getBookmark(updatedBookmark.url)!!
@@ -458,7 +458,7 @@ class SavedSitesRepositoryTest {
                 title = "title",
                 url = "foo.com",
                 lastModified = "timestamp",
-                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                parentId = SavedSitesNames.BOOKMARKS_ROOT,
             ),
         )
         val updatedBookmark = Bookmark(id = bookmark.id, title = "title", url = "foo.com", lastModified = "timestamp", parentId = "folder2")
@@ -479,7 +479,7 @@ class SavedSitesRepositoryTest {
                 title = "title",
                 url = "foo.com",
                 lastModified = "timestamp",
-                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                parentId = SavedSitesNames.BOOKMARKS_ROOT,
             ),
         )
         repository.delete(bookmark)
@@ -529,7 +529,7 @@ class SavedSitesRepositoryTest {
 
         repository.insertBookmark(title = "root", url = "foo.com")
         val folder =
-            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
 
         val bookmarkOne = repository.insertBookmark(title = "one", url = "fooone.com")
         repository.updateBookmark(bookmarkOne.copy(parentId = folder.id), bookmarkOne.parentId)
@@ -551,7 +551,7 @@ class SavedSitesRepositoryTest {
 
         repository.insertBookmark(title = "root", url = "foo.com")
         val folder =
-            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
 
         val bookmarkOne = repository.insertBookmark(title = "one", url = "fooone.com")
         repository.updateBookmark(bookmarkOne.copy(parentId = folder.id), bookmarkOne.parentId)
@@ -576,9 +576,9 @@ class SavedSitesRepositoryTest {
 
         val bookmark = repository.insertBookmark(title = "bookmark1", url = "foo.com")
         val folderTwo =
-            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
 
-        repository.getFolderContent(SavedSitesNames.BOOMARKS_ROOT).test {
+        repository.getFolderContent(SavedSitesNames.BOOKMARKS_ROOT).test {
             val result = awaitItem()
             assertEquals(listOf(bookmark), result.first)
 
@@ -597,16 +597,16 @@ class SavedSitesRepositoryTest {
 
         val bookmark = repository.insertBookmark(title = "bookmark1", url = "foo.com")
         val root =
-            repository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", lastModified = "timestamp", parentId = ""))
+            repository.insert(BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "Bookmarks", lastModified = "timestamp", parentId = ""))
         val folderTwo =
-            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
 
-        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOKMARKS_ROOT)!!.numBookmarks == 1)
 
         val updatedBookmark = bookmark.copy(parentId = folderTwo.id)
         repository.updateBookmark(updatedBookmark, bookmark.parentId)
 
-        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 0)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOKMARKS_ROOT)!!.numBookmarks == 0)
         assertTrue(repository.getFolder(folderTwo.id)!!.numBookmarks == 1)
     }
 
@@ -614,12 +614,12 @@ class SavedSitesRepositoryTest {
     fun whenFolderIsMovedToAnotherFolderThenParentFolderIsUpdated() = runTest {
         givenNoBookmarksStored()
 
-        repository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", lastModified = "timestamp", parentId = ""))
+        repository.insert(BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "Bookmarks", lastModified = "timestamp", parentId = ""))
         val folderOne =
-            repository.insert(BookmarkFolder(id = "folder1", name = "folder1", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder1", name = "folder1", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
         val bookmarkOne = repository.insertBookmark(title = "bookmark1", url = "foo1.com")
         val updatedBookmarkOne = bookmarkOne.copy(parentId = folderOne.id)
-        repository.updateBookmark(updatedBookmarkOne, SavedSitesNames.BOOMARKS_ROOT)
+        repository.updateBookmark(updatedBookmarkOne, SavedSitesNames.BOOKMARKS_ROOT)
 
         val updatedFolderOne = folderOne.copy(numBookmarks = 1)
         val storedUpdatedFolderOne = repository.getFolder(folderOne.id)!!
@@ -627,7 +627,7 @@ class SavedSitesRepositoryTest {
         assertEquals(storedUpdatedFolderOne.name, updatedFolderOne.name)
 
         val folderTwo =
-            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder2", name = "folder2", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
         val bookmarkTwo = repository.insertBookmark(title = "bookmark2", url = "foo2.com")
         val updatedBookmarkTwo = bookmarkTwo.copy(parentId = folderTwo.id)
         repository.updateBookmark(updatedBookmarkTwo, bookmarkTwo.parentId)
@@ -639,19 +639,19 @@ class SavedSitesRepositoryTest {
 
         repository.insertBookmark(title = "bookmark3", url = "foo3.com")
 
-        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
-        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numFolders == 2)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOKMARKS_ROOT)!!.numBookmarks == 1)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOKMARKS_ROOT)!!.numFolders == 2)
 
         repository.update(folderTwo.copy(parentId = folderOne.id))
 
-        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numBookmarks == 1)
-        assertTrue(repository.getFolder(SavedSitesNames.BOOMARKS_ROOT)!!.numFolders == 1)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOKMARKS_ROOT)!!.numBookmarks == 1)
+        assertTrue(repository.getFolder(SavedSitesNames.BOOKMARKS_ROOT)!!.numFolders == 1)
     }
 
     @Test
     fun whenFolderNameUpdatedThenRepositoryReturnsUpdatedFolder() = runTest {
         val folder =
-            repository.insert(BookmarkFolder(id = "folder", name = "folder", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT))
+            repository.insert(BookmarkFolder(id = "folder", name = "folder", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT))
         assertEquals(repository.getFolder(folder.id), folder)
 
         val folderUpdated = folder.copy(name = "folder updated")
@@ -662,7 +662,7 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenFolderParentUpdatedThenRepositoryReturnsUpdatedFolder() = runTest {
         val folderRoot =
-            repository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "folder", lastModified = "timestamp", parentId = ""))
+            repository.insert(BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "folder", lastModified = "timestamp", parentId = ""))
         val folderTwo = repository.insert(BookmarkFolder(id = "folder2", name = "folder two", lastModified = "timestamp", parentId = folderRoot.id))
         val folder = repository.insert(BookmarkFolder(id = "folder", name = "folder", lastModified = "timestamp", parentId = folderRoot.id))
 
@@ -677,7 +677,7 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenInsertBranchFolderThenAllEntitiesAreInsertedCorrectly() = runTest {
         val parentFolder =
-            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT, numFolders = 1, numBookmarks = 1, lastModified = "timestamp")
+            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, numFolders = 1, numBookmarks = 1, lastModified = "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numFolders = 0, numBookmarks = 0, lastModified = "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder1", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
@@ -691,7 +691,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenChildFolderWithBookmarkThenGetFolderBranchReturnsFolderBranch() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
@@ -706,7 +706,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenChildFoldersWithBookmarksThenGetFolderBranchReturnsFolderBranch() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val parentBookmark = Bookmark("bookmark1", "title1", "www.example1.com", "folder1", "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark2", "title2", "www.example2.com", "folder2", "timestamp")
@@ -730,8 +730,8 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenChildFoldersWithBookmarksInRootThenGetFolderBranchReturnsFolderBranch() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT, 0, 0, "timestamp")
-        val parentBookmark = Bookmark("bookmark1", "title1", "www.example1.com", SavedSitesNames.BOOMARKS_ROOT, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val parentBookmark = Bookmark("bookmark1", "title1", "www.example1.com", SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark2", "title2", "www.example2.com", "folder2", "timestamp")
         val childSecondFolder = BookmarkFolder("folder3", "Parent Folder", "folder2", 0, 0, "timestamp")
@@ -755,7 +755,7 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenBranchFolderDeletedThenNothingIsRetrieved() = runTest {
         val parentFolder =
-            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT, numBookmarks = 0, numFolders = 1, lastModified = "timestamp")
+            BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, numBookmarks = 0, numFolders = 1, lastModified = "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", numBookmarks = 1, numFolders = 0, lastModified = "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
@@ -775,10 +775,10 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenBuildFlatStructureThenReturnFolderListWithDepth() = runTest {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         val childFolder = BookmarkFolder(id = "folder2", name = "another name", lastModified = "timestamp", parentId = "folder1")
-        val folder = BookmarkFolder(id = "folder3", name = "folder name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val folder = BookmarkFolder(id = "folder3", name = "folder name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
 
         repository.insert(rootFolder)
         repository.insert(parentFolder)
@@ -799,10 +799,10 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenBuildFlatStructureThenReturnFolderListWithDepthWithoutCurrentFolderBranch() = runTest {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         val childFolder = BookmarkFolder(id = "folder2", name = "another name", lastModified = "timestamp", parentId = parentFolder.id)
-        val folder = BookmarkFolder(id = "folder3", name = "folder name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val folder = BookmarkFolder(id = "folder3", name = "folder name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
 
         repository.insert(rootFolder)
         repository.insert(parentFolder)
@@ -821,7 +821,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenFolderIsDeletedThenRemovedFromDb() {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
         assertEquals(repository.getFolder(rootFolder.id), rootFolder)
@@ -835,10 +835,10 @@ class SavedSitesRepositoryTest {
         val totalBookmarks = 10
         val totalFolders = 3
 
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
-        val parentFolder = BookmarkFolder(name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val parentFolder = BookmarkFolder(name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         repository.insert(parentFolder)
 
         givenFolderWithEntities(parentFolder.id, totalBookmarks, totalFolders)
@@ -852,7 +852,7 @@ class SavedSitesRepositoryTest {
             cancelAndConsumeRemainingEvents()
         }
 
-        repository.getFolderContent(SavedSitesNames.BOOMARKS_ROOT).test {
+        repository.getFolderContent(SavedSitesNames.BOOKMARKS_ROOT).test {
             val result = awaitItem()
 
             val folder = result.second.first()
@@ -873,10 +873,10 @@ class SavedSitesRepositoryTest {
         val bookmarks = givenSomeBookmarks(10)
         savedSitesEntitiesDao.insertList(bookmarks)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, bookmarks)
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, bookmarks)
         savedSitesRelationsDao.insertList(relation)
 
-        repository.getSavedSites(SavedSitesNames.BOOMARKS_ROOT).test {
+        repository.getSavedSites(SavedSitesNames.BOOKMARKS_ROOT).test {
             val savedSites = awaitItem()
             assertTrue(savedSites.bookmarks.size == 12)
             assertTrue(savedSites.favorites.size == 2)
@@ -894,7 +894,7 @@ class SavedSitesRepositoryTest {
         val subFolderId = folder.first().entityId
         savedSitesEntitiesDao.insertList(folder)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, folder)
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, folder)
         savedSitesRelationsDao.insertList(relation)
 
         val bookmarks = givenSomeBookmarks(10)
@@ -903,7 +903,7 @@ class SavedSitesRepositoryTest {
         val subFolder = givenFolderWithContent(subFolderId, bookmarks)
         savedSitesRelationsDao.insertList(subFolder)
 
-        repository.getSavedSites(SavedSitesNames.BOOMARKS_ROOT).test {
+        repository.getSavedSites(SavedSitesNames.BOOKMARKS_ROOT).test {
             val savedSites = awaitItem()
             assertTrue(savedSites.bookmarks.size == 2)
             assertTrue(savedSites.favorites.size == 2)
@@ -922,10 +922,10 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenUserHasBookmarksThenBookmarksTreeReturnsSavedSites() = runTest {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         repository.insert(parentFolder)
 
         val totalBookmarks = 10
@@ -940,10 +940,10 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenDeleteBookmarkIsUndoneThenFolderStillHasBookmark() = runTest {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         repository.insert(parentFolder)
 
         val bookmark = repository.insertBookmark("https://favorite.com", "favorite")
@@ -976,7 +976,7 @@ class SavedSitesRepositoryTest {
                 title = "title",
                 url = "foo.com",
                 lastModified = "timestamp",
-                parentId = SavedSitesNames.BOOMARKS_ROOT,
+                parentId = SavedSitesNames.BOOKMARKS_ROOT,
             ),
         )
         val updatedBookmark = Bookmark(id = bookmark.id, title = "title", url = "foo.com", lastModified = "timestamp", parentId = "folder2")
@@ -1000,10 +1000,10 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenSubFolderIsReplacedThenLocalDataIsUpdated() = runTest {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         repository.insert(parentFolder)
 
         val bookmarks = givenSomeBookmarks(10)
@@ -1034,7 +1034,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenBookmarkIsReplacedWithDifferentIdThenDataIsUpdated() {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
         val bookmark = repository.insert(
@@ -1060,7 +1060,7 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenBookmarkIsReplacedWithSameIdThenDataIsUpdated() {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
         val bookmark = repository.insert(
@@ -1126,7 +1126,7 @@ class SavedSitesRepositoryTest {
         val bookmarks = givenSomeBookmarks(3)
         savedSitesEntitiesDao.insertList(bookmarks)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks.plus(bookmarks))
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, modifiedEarlierBookmarks.plus(bookmarks))
         savedSitesRelationsDao.insertList(relation)
 
         val modifiedSinceBookmarks = repository.getBookmarksModifiedSince(DatabaseDateFormatter.iso8601(since))
@@ -1140,7 +1140,7 @@ class SavedSitesRepositoryTest {
         val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(modifiedEarlierTime))
         savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks)
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, modifiedEarlierBookmarks)
         savedSitesRelationsDao.insertList(relation)
 
         val modifiedSinceBookmarks = repository.getBookmarksModifiedSince(DatabaseDateFormatter.iso8601(since))
@@ -1153,7 +1153,7 @@ class SavedSitesRepositoryTest {
         val since = LocalDateTime.now().minusHours(2)
 
         val rootFolder = BookmarkFolder(
-            id = SavedSitesNames.BOOMARKS_ROOT,
+            id = SavedSitesNames.BOOKMARKS_ROOT,
             name = "root",
             lastModified = DatabaseDateFormatter.iso8601(modifiedEarlierTime),
             parentId = "",
@@ -1163,7 +1163,7 @@ class SavedSitesRepositoryTest {
         val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(modifiedEarlierTime))
         savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks)
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, modifiedEarlierBookmarks)
         savedSitesRelationsDao.insertList(relation)
 
         val modifiedSinceFolders = repository.getFoldersModifiedSince(DatabaseDateFormatter.iso8601(since))
@@ -1176,7 +1176,7 @@ class SavedSitesRepositoryTest {
         val since = LocalDateTime.now().minusHours(1)
 
         val rootFolder = BookmarkFolder(
-            id = SavedSitesNames.BOOMARKS_ROOT,
+            id = SavedSitesNames.BOOKMARKS_ROOT,
             name = "root",
             lastModified = DatabaseDateFormatter.iso8601(modifiedEarlierTime),
             parentId = "",
@@ -1186,7 +1186,7 @@ class SavedSitesRepositoryTest {
         val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(modifiedEarlierTime))
         savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
 
-        val relation = givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, modifiedEarlierBookmarks)
+        val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, modifiedEarlierBookmarks)
         savedSitesRelationsDao.insertList(relation)
 
         val modifiedSinceFolders = repository.getFoldersModifiedSince(DatabaseDateFormatter.iso8601(since))
@@ -1195,10 +1195,10 @@ class SavedSitesRepositoryTest {
 
     @Test
     fun whenSubFolderContentIsReplacedThenLocalDataIsUpdated() = runTest {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
         repository.insert(rootFolder)
 
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         repository.insert(parentFolder)
 
         val bookmarks = givenSomeBookmarks(10)
@@ -1207,7 +1207,7 @@ class SavedSitesRepositoryTest {
         val subFolder = givenFolderWithContent(parentFolder.id, bookmarks)
         savedSitesRelationsDao.insertList(subFolder)
 
-        val remoteFolder = BookmarkFolder(id = "folder2", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOMARKS_ROOT)
+        val remoteFolder = BookmarkFolder(id = "folder2", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
         repository.replaceFolderContent(remoteFolder, parentFolder.id)
 
         val storedFolder = repository.getFolder(remoteFolder.id)!!
@@ -1232,7 +1232,7 @@ class SavedSitesRepositoryTest {
             val entity = Entity(it.id, it.title, it.url, type = BOOKMARK, lastModified = it.lastModified)
             savedSitesEntitiesDao.insert(entity)
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
-            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = entity.entityId))
         }
     }
 
@@ -1265,7 +1265,7 @@ class SavedSitesRepositoryTest {
     }
 
     private fun givenEmptyDBState() {
-        savedSitesRelationsDao.insertList(givenFolderWithContent(SavedSitesNames.BOOMARKS_ROOT, emptyList()))
+        savedSitesRelationsDao.insertList(givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, emptyList()))
         savedSitesRelationsDao.insertList(givenFolderWithContent(SavedSitesNames.FAVORITES_ROOT, emptyList()))
     }
 }
