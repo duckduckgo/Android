@@ -167,10 +167,10 @@
     <string name="atp_ReportBreakageAppNextCta">Naslednji</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opišite, kaj se dogaja, kaj ste pričakovali, da se bo zgodilo, in ukrepe, ki so pripeljali do težave.</string>
     <string name="atp_ReportBreakageFormInputHint">Povejte nam več o vaši težavi</string>
-    <string name="atp_ReportBreakageFormCheckboxText">S klikom na »Pošlji« se strinjam, da lahko DuckDuckGo uporabi informacije v tem poročilu za namene izboljšanja zaščite pred sledenjem aplikacijam.
+    <string name="atp_ReportBreakageFormCheckboxText">S klikom gumba »Pošlji« se strinjam, da lahko DuckDuckGo podatke iz tega poročila uporabi za namene izboljšanja funkcij aplikacije.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Poleg podatkov, vnesenih v ta obrazec, bo poročilo o težavah z aplikacijo vsebovalo:<br/>– Ime paketa aplikacije<br/>– Seznam sledilnikov, blokiranih v aplikaciji<br/>– Ali je omogočena zaščita pred sledenjem aplikacij<br/>– Skupna diagnostika aplikacije DuckDuckGo<br/>]]>
+        <![CDATA[Poleg podatkov, vnesenih v ta obrazec, bo poročilo o težavah z aplikacijo vsebovalo naslednje:<br/>• ime paketa aplikacije<br/>• seznam sledilnikov, blokiranih v aplikaciji<br/>• ali so omogočene posamezne funkcije DuckDuckGo<br/>• skupna diagnostika aplikacije DuckDuckGo<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Poročilo poslano, hvala! Vaše povratne informacije nam pomagajo izboljšati zaščito pred sledenjem aplikacijam za vse.</string>
     <string name="atp_ThanksForTheFeedback">Hvala za povratne informacije!</string>
