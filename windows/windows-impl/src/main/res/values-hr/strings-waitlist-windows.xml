@@ -21,7 +21,7 @@
     <string name="windows_waitlist_title">Možeš dobiti rani pristup da isprobaš DuckDuckGo za Windows!</string>
     <string name="windows_title">Nabavi DuckDuckGo za Windows!</string>
     <string name="windows_waitlist_description">DuckDuckGo za Windows ima sve što ti je potrebno za pregledavanje s više privatnosti - privatno pretraživanje, blokiranje praćenja, prisilno šifriranje i blokiranje skočnih prozora kolačića, a u skoroj budućnosti dodat ćemo još vrhunskih značajki zaštite.</string>
-    <string name="windows_description">Aplikacija DuckDuckGo za Windows pruža ti potrebnu brzinu i značajke pretraživanja kakve očekuješ, a isporučuje se s našim najboljim alatima za privatnost u svojoj klasi - privacy essentials.\n\nNa računalu sa sustavom Windows idi na:</string>
+    <string name="windows_description">DuckDuckGo za Windows ima sve što ti je potrebno za pregledavanje s više privatnosti - privatno pretraživanje, blokiranje praćenja, prisilno šifriranje i blokiranje skočnih prozora kolačića, a u skoroj budućnosti dodat ćemo još vrhunskih značajki zaštite.\n\nNa računalu sa sustavom Windows idi na:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Podijeli poveznicu</string>
     <string name="windows_share_text">Spreman za privatno pregledavanje u sustavu Windows?\n\nPosjeti ovaj URL na svom Windows računalu za preuzimanje:\n duckduckgo.com/windows</string>
