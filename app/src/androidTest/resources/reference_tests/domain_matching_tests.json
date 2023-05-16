@@ -366,6 +366,81 @@
                 ]
             },
             {
+                "name": "options3 - ignore on non-matching options (fallback exception)",
+                "siteURL": "https://example2.com",
+                "requestURL": "https://options3.test/script.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "options3 - block on non-matching options (non-matching exception)",
+                "siteURL": "https://example4.com",
+                "requestURL": "https://options3.test/script.js",
+                "requestType": "stylesheet",
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
+            },
+            {
+                "name": "options3 - block on matching options (fallthrough subpath)",
+                "siteURL": "https://example3.com",
+                "requestURL": "https://options3.test/script.js",
+                "requestType": "script",
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
+            },
+            {
+                "name": "options3 - block on matching options (fallthrough)",
+                "siteURL": "https://example2.com",
+                "requestURL": "https://options3.test/script2.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "options3 - block on matching options (subpath match)",
+                "siteURL": "https://example3.com",
+                "requestURL": "https://options3.test/script2.js",
+                "requestType": "script",
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
+            },
+            {
+                "name": "options-trailing-exception - block on options match",
+                "siteURL": "https://example.com",
+                "requestURL": "https://options-trailing-exception.test/script.js",
+                "requestType": "stylesheet",
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
+            },
+            {
+                "name": "options-trailing-exception - ignore on no options match",
+                "siteURL": "https://example2.com",
+                "requestURL": "https://options-trailing-exception.test/script.js",
+                "requestType": "stylesheet",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "options-trailing-ignore - block on options match",
+                "siteURL": "https://example.com",
+                "requestURL": "https://options-trailing-ignore.test/script.js",
+                "requestType": "stylesheet",
+                "expectAction": "block"
+            },
+            {
+                "name": "options-trailing-ignore - ignore on no options match",
+                "siteURL": "https://example2.com",
+                "requestURL": "https://options-trailing-ignore.test/script.js",
+                "requestType": "stylesheet",
+                "expectAction": "ignore"
+            },
+            {
                 "name": "format.test - supports unescaped slashes",
                 "siteURL": "https://example.com",
                 "requestURL": "https://format.test/test1.js",
@@ -631,6 +706,15 @@
                 "name": "options2 - block on matching options with surrogate",
                 "siteURL": "https://example.com",
                 "requestURL": "https://options2.test/script.js",
+                "requestType": "script",
+                "expectAction": "redirect",
+                "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
+                "expectExpression": "window.surrogate1 === true"
+            },
+            {
+                "name": "options3 - block on matching options with surrogate",
+                "siteURL": "https://example.com",
+                "requestURL": "https://options3.test/script.js",
                 "requestType": "script",
                 "expectAction": "redirect",
                 "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
