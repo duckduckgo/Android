@@ -38,6 +38,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import kotlin.math.sin
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
@@ -70,6 +71,7 @@ class SavedSitesSyncParser @Inject constructor(
 
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
+        Timber.d("Sync: generating changes since $since")
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         val folders = repository.getFoldersModifiedSince(since)
@@ -95,10 +97,12 @@ class SavedSitesSyncParser @Inject constructor(
 
     @VisibleForTesting
     fun allContent(): List<SyncBookmarkEntry> {
+        Timber.d("Sync: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
 
         if (!hasFavorites && !hasBookmarks) {
+            Timber.d("Sync: nothing to generate, favourites and bookmarks empty")
             return emptyList()
         }
 
@@ -138,8 +142,8 @@ class SavedSitesSyncParser @Inject constructor(
                     if (eachFolder.deleted != null) {
                         updates.add(deletedEntry(eachFolder.id, eachFolder.deleted!!))
                     } else {
+                        childrenIds.add(eachFolder.id)
                         if (eachFolder.modifiedSince(lastModified)) {
-                            childrenIds.add(eachFolder.id)
                             addFolderContent(eachFolder.id, updates)
                         }
                     }

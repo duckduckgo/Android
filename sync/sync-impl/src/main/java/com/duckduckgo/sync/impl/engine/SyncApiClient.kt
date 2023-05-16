@@ -77,13 +77,18 @@ class AppSyncApiClient @Inject constructor(
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
-        return when (val result = syncApi.getAllData(token, since)) {
+        return when (val result = syncApi.getBookmarks(token, since)) {
             is Result.Error -> {
-                result
+                if (result.code == 304){
+                    // 304 - not modified means no changes to parse
+                    Result.Success(emptyList())
+                } else {
+                    result
+                }
             }
 
             is Result.Success -> {
-                val remoteChanges = mapResponse(result.data)
+                val remoteChanges = mapBookmarksResponse(result.data)
                 Result.Success(remoteChanges)
             }
         }
@@ -100,6 +105,12 @@ class AppSyncApiClient @Inject constructor(
     fun mapResponse(response: SyncDataResponse): List<SyncChanges> {
         val bookmarksJSON = Adapters.bookmarksResponseAdapter.toJson(response.bookmarks)
         Timber.d("Sync: responses mapped to $bookmarksJSON")
+        return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
+    }
+
+    private fun mapBookmarksResponse(response: BookmarksResponse): List<SyncChanges> {
+        val bookmarksJSON = Adapters.bookmarksResponseAdapter.toJson(response)
+        Timber.d("Sync: bookmarks responses mapped to $bookmarksJSON")
         return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
     }
 

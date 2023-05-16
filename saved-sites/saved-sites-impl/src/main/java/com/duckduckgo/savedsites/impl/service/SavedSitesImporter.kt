@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.service
 
 import android.content.ContentResolver
 import android.net.Uri
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -88,6 +89,11 @@ class RealSavedSitesImporter(
                     savedSitesRelationsDao.insertList(chunk.map { it.first })
                     savedSitesEntitiesDao.insertList(chunk.map { it.second })
                 }
+            }
+
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOKMARKS_ROOT, DatabaseDateFormatter.iso8601())
+            if (savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.isNotEmpty()){
+                savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, DatabaseDateFormatter.iso8601())
             }
 
             ImportSavedSitesResult.Success(savedSites)

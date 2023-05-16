@@ -68,7 +68,7 @@ interface SyncApi {
         bookmarks: SyncDataRequest,
     ): Result<SyncDataResponse?>
 
-    fun getAllData(token: String, since: String): Result<SyncDataResponse>
+    fun getBookmarks(token: String, since: String): Result<BookmarksResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -236,12 +236,12 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun getAllData(token: String, since: String): Result<SyncDataResponse> {
+    override fun getBookmarks(token: String, since: String): Result<BookmarksResponse> {
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()){
-                syncService.dataSince("Bearer $token", since)
+                syncService.bookmarksSince("Bearer $token", since)
             } else {
-                syncService.data("Bearer $token")
+                syncService.bookmarks("Bearer $token")
             }
             patchCall.execute()
         }.getOrElse { throwable ->
@@ -250,7 +250,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
         return onSuccess(response) {
             val data = response.body() ?: throw IllegalStateException("Sync: get data not parsed")
-            val allDataJSON = ResponseAdapters.dataAdapter.toJson(data)
+            val allDataJSON = ResponseAdapters.bookmarksAdapter.toJson(data)
             Timber.i("Sync: get data $allDataJSON")
             Result.Success(data)
         }
@@ -262,6 +262,9 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
             val dataAdapter: JsonAdapter<SyncDataResponse> =
                 moshi.adapter(SyncDataResponse::class.java)
+
+            val bookmarksAdapter: JsonAdapter<BookmarksResponse> =
+                moshi.adapter(BookmarksResponse::class.java)
         }
     }
 
@@ -280,7 +283,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                 } ?: Result.Error(code = response.code(), reason = response.message().toString())
             }
         }.getOrElse {
-            return Result.Error(reason = response.message())
+            return Result.Error(response.code(), reason = response.message())
         }
     }
 

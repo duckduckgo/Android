@@ -139,13 +139,13 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun receiveRemoteChange(conflictResolution: SyncConflictResolution) {
-        val lastAttempt = syncStateRepository.current()
-        val since =  if (lastAttempt == null) {
+        val lastCompleted = syncStateRepository.lastCompleted()
+        val since = if (lastCompleted == null) {
             Timber.d("Sync: get all remote changes")
             ""
         } else {
-            Timber.d("Sync: get remote changes since $lastAttempt")
-            lastAttempt.timestamp
+            Timber.d("Sync: get remote changes since $lastCompleted")
+            lastCompleted.timestamp
         }
 
         when (val result = syncApiClient.get(since)) {
@@ -184,7 +184,10 @@ class RealSyncEngine @Inject constructor(
         performSync(FEATURE_READ)
     }
 
-    private fun persistChanges(remoteChanges: List<SyncChanges>, conflictResolution: SyncConflictResolution) {
+    private fun persistChanges(
+        remoteChanges: List<SyncChanges>,
+        conflictResolution: SyncConflictResolution
+    ) {
         plugins.getPlugins().map {
             it.syncChanges(remoteChanges, conflictResolution)
         }

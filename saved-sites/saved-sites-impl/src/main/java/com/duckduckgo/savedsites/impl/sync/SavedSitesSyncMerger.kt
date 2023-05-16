@@ -118,7 +118,6 @@ class SavedSitesSyncMerger @Inject constructor(
         // 1. All folders without a parent in the payload
         // 2. All bookmarks without a parent in the payload
 
-
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
             Timber.d("Sync: favourites root found, traversing from there")
             processFavourites(bookmarks.entries, bookmarks.last_modified, conflictResolution)
@@ -151,13 +150,22 @@ class SavedSitesSyncMerger @Inject constructor(
                     // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
                     when (val result = duplicateFinder.findFolderDuplicate(folder)) {
                         is SavedSitesDuplicateResult.Duplicate -> {
-                            Timber.d("Sync: folder $folderId has a local duplicate in {${result.id}, replacing content")
-                            savedSitesRepository.replaceFolderContent(folder, result.id)
+                            if (folder.deleted != null){
+                                Timber.d("Sync: folder $folderId has a local duplicate in {${result.id} and needs to be deleted")
+                                savedSitesRepository.delete(folder)
+                            } else {
+                                Timber.d("Sync: folder $folderId has a local duplicate in {${result.id}, replacing content")
+                                savedSitesRepository.replaceFolderContent(folder, result.id)
+                            }
                         }
 
                         is SavedSitesDuplicateResult.NotDuplicate -> {
-                            Timber.d("Sync: folder $folderId not present locally, inserting")
-                            savedSitesRepository.insert(folder)
+                            if (folder.deleted != null){
+                                Timber.d("Sync: folder $folderId not present locally but was deleted, nothing to do")
+                            } else {
+                                Timber.d("Sync: folder $folderId not present locally, inserting")
+                                savedSitesRepository.insert(folder)
+                            }
                         }
                     }
                 } else {
@@ -169,24 +177,40 @@ class SavedSitesSyncMerger @Inject constructor(
                     if (localFolder != null) {
                         when (conflictResolution) {
                             REMOTE_WINS -> {
-                                Timber.d("Sync: folder $folderId exists locally, replacing content")
-                                savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                if (folder.deleted != null){
+                                    Timber.d("Sync: folder $folderId exists locally but was deleted remotely, deleting locally too")
+                                    savedSitesRepository.delete(localFolder)
+                                } else {
+                                    Timber.d("Sync: folder $folderId exists locally, replacing content")
+                                    savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                }
                             }
+
                             TIMESTAMP -> {
                                 if (folder.modifiedAfter(localFolder.lastModified)) {
-                                    Timber.d("Sync: folder $folderId modified after local folder, replacing content")
-                                    savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                    if (folder.deleted != null){
+                                        Timber.d("Sync: folder $folderId deleted after local folder")
+                                        savedSitesRepository.delete(localFolder)
+                                    } else {
+                                        Timber.d("Sync: folder $folderId modified after local folder, replacing content")
+                                        savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                    }
                                 } else {
                                     Timber.d("Sync: folder $folderId modified before local folder, nothing to do")
                                 }
                             }
+
                             else -> {
                                 Timber.d("Sync: local folder wins over remote, nothing to do")
                             }
                         }
                     } else {
-                        Timber.d("Sync: folder $folderId not present locally, inserting")
-                        savedSitesRepository.insert(folder)
+                        if (folder.deleted != null){
+                            Timber.d("Sync: folder $folderId not present locallybut was deleted, nothing to do")
+                        } else {
+                            Timber.d("Sync: folder $folderId not present locally, inserting")
+                            savedSitesRepository.insert(folder)
+                        }
                     }
                 }
             }
@@ -227,6 +251,7 @@ class SavedSitesSyncMerger @Inject constructor(
                                             Timber.d("Sync: child $child exists locally, replacing")
                                             savedSitesRepository.replaceBookmark(bookmark, child)
                                         }
+
                                         TIMESTAMP -> {
                                             if (bookmark.modifiedAfter(storedBookmark.lastModified)) {
                                                 Timber.d("Sync: bookmark ${bookmark.id} modified after local bookmark, replacing content")
@@ -235,6 +260,7 @@ class SavedSitesSyncMerger @Inject constructor(
                                                 Timber.d("Sync: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
                                             }
                                         }
+
                                         else -> {
                                             Timber.d("Sync: local bookmark wins over remote, nothing to do")
                                         }
@@ -266,6 +292,7 @@ class SavedSitesSyncMerger @Inject constructor(
             name = syncCrypto.decrypt(remoteEntry.titleOrFallback()),
             parentId = parentId,
             lastModified = remoteEntry.client_last_modified ?: lastModified,
+            deleted = remoteEntry.deleted,
         )
         Timber.d("Sync: decrypted $folder")
         return folder
@@ -320,6 +347,7 @@ class SavedSitesSyncMerger @Inject constructor(
             url = syncCrypto.decrypt(remoteEntry.page!!.url),
             parentId = parentId,
             lastModified = remoteEntry.client_last_modified ?: lastModified,
+            deleted = remoteEntry.deleted,
         )
         Timber.d("Sync: decrypted $bookmark")
         return bookmark
