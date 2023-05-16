@@ -26,6 +26,7 @@ import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.API_CODE.INVALID_LOGIN_CREDENTIALS
 import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.store.SyncStore
@@ -66,7 +67,7 @@ class AppSyncRepository @Inject constructor(
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
-    private val syncCrypter: SyncCrypter,
+    private val syncStateRepository: SyncStateRepository,
     private val syncEngine: SyncEngine,
 ) : SyncRepository {
     override fun isSignedInFlow(): Flow<Boolean> = syncStore.isSignedInFlow()
@@ -222,6 +223,7 @@ class AppSyncRepository @Inject constructor(
             is Result.Success -> {
                 if (logoutThisDevice) {
                     syncStore.clearAll()
+                    syncStateRepository.clearAll()
                 }
                 Result.Success(true)
             }

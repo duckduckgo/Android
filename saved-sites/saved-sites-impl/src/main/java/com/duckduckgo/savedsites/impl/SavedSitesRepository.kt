@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 
 class RealSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
@@ -349,6 +350,7 @@ class RealSavedSitesRepository(
     }
 
     override fun insert(savedSite: SavedSite): SavedSite {
+        Timber.d("Sync: inserting Saved Site $savedSite")
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {
@@ -422,8 +424,8 @@ class RealSavedSitesRepository(
         }
 
         savedSitesEntitiesDao.update(Entity(bookmark.id, bookmark.title, bookmark.url, BOOKMARK))
-        savedSitesEntitiesDao.updateModified(fromFolderId)
-        savedSitesEntitiesDao.updateModified(bookmark.parentId)
+        savedSitesEntitiesDao.updateModified(fromFolderId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
+        savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
     }
 
     override fun insert(folder: BookmarkFolder): BookmarkFolder {
@@ -592,12 +594,17 @@ class RealSavedSitesRepository(
 
     override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
         val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedSince(since) }
+        Timber.d("Sync: bookmarks modified since $since are $bookmarks")
         return bookmarks.map { mapToBookmark(it)!! }
     }
 
     private fun mapToBookmark(entity: Entity): Bookmark? {
-        return savedSitesRelationsDao.relationByEntityId(entity.entityId)?.let {
-            entity.mapToBookmark(it.folderId)
+        val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
+        return if (relation != null) {
+            entity.mapToBookmark(relation.folderId)
+        } else {
+            // bookmark was deleted, we can make the parent id up
+            entity.mapToBookmark(SavedSitesNames.BOOKMARKS_ROOT)
         }
     }
 
@@ -619,7 +626,7 @@ class RealSavedSitesRepository(
 
     private fun Entity.modifiedSince(since: String): Boolean {
         return if (this.lastModified == null) {
-            true
+            false
         } else {
             val entityModified = OffsetDateTime.parse(this.lastModified)
             val sinceModified = OffsetDateTime.parse(since)

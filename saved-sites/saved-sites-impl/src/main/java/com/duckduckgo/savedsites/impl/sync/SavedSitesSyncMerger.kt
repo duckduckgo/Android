@@ -60,13 +60,18 @@ class SavedSitesSyncMerger @Inject constructor(
         changes: List<SyncChanges>,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-        Timber.d("Sync: received remote changes, merging with resolution $conflictResolution")
         changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
+            Timber.d("Sync: received remote changes, merging with resolution $conflictResolution")
             val result = merge(bookmarkChanges, conflictResolution)
-            Timber.d("Sync: merging finished with $result")
+            Timber.d("Sync: merging bookmarks finished with $result")
             return SyncMergeResult.Success(true)
         }
+        Timber.d("Sync: no bookmarks to merge")
         return SyncMergeResult.Success(false)
+    }
+
+    override fun onFeatureRemoved() {
+        savedSitesSyncStore.modifiedSince = "0"
     }
 
     override fun merge(
@@ -117,6 +122,7 @@ class SavedSitesSyncMerger @Inject constructor(
         // Iterate over received items and find:
         // 1. All folders without a parent in the payload
         // 2. All bookmarks without a parent in the payload
+
 
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
             Timber.d("Sync: favourites root found, traversing from there")

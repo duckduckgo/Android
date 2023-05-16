@@ -68,7 +68,7 @@ interface SyncApi {
         bookmarks: SyncDataRequest,
     ): Result<SyncDataResponse?>
 
-    fun getBookmarks(token: String, since: String): Result<BookmarksResponse>
+    fun getBookmarks(token: String, since: String): Result<SyncDataResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -236,7 +236,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun getBookmarks(token: String, since: String): Result<BookmarksResponse> {
+    override fun getBookmarks(token: String, since: String): Result<SyncDataResponse> {
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()){
                 syncService.bookmarksSince("Bearer $token", since)
@@ -250,7 +250,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
         return onSuccess(response) {
             val data = response.body() ?: throw IllegalStateException("Sync: get data not parsed")
-            val allDataJSON = ResponseAdapters.bookmarksAdapter.toJson(data)
+            val allDataJSON = ResponseAdapters.dataAdapter.toJson(data)
             Timber.i("Sync: get data $allDataJSON")
             Result.Success(data)
         }

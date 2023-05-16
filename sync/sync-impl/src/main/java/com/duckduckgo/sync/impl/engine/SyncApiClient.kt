@@ -88,7 +88,7 @@ class AppSyncApiClient @Inject constructor(
             }
 
             is Result.Success -> {
-                val remoteChanges = mapBookmarksResponse(result.data)
+                val remoteChanges = mapResponse(result.data)
                 Result.Success(remoteChanges)
             }
         }

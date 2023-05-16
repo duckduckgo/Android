@@ -85,10 +85,10 @@ interface SyncService {
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
     fun bookmarks(
         @Header("Authorization") token: String,
-    ): Call<BookmarksResponse>
+    ): Call<SyncDataResponse>
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
-    fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<BookmarksResponse>
+    fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<SyncDataResponse>
 
 }
 
@@ -178,16 +178,12 @@ data class DeviceDataResponse(
 )
 
 data class SyncDataResponse(
-    val bookmarks: BookmarksResponse,
-    val settings: SettingsResponse,
-    val devices: DeviceDataResponse,
+    val bookmarks: BookmarksResponse
 ) {
     companion object {
         fun empty(): SyncDataResponse {
             val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-            val settingsResponse = SettingsResponse("lastModified", emptyList())
-            val devicessResponse = DeviceDataResponse("lastModified", emptyList())
-            return SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
+            return SyncDataResponse(bookmarksResponse)
         }
     }
 }

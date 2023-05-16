@@ -60,6 +60,10 @@ class SavedSitesSyncParser @Inject constructor(
         return SyncMergeResult.Success(true)
     }
 
+    override fun onFeatureRemoved() {
+        savedSitesSyncStore.modifiedSince = "0"
+    }
+
     override fun parseChanges(since: String): SyncChanges {
         val updates = if (since.isEmpty()) {
             allContent()
