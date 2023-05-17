@@ -329,7 +329,7 @@ class RealSavedSitesRepository(
         id: String,
         url: String,
         title: String,
-        lastModified: String?
+        lastModified: String?,
     ): Favorite {
         val idOrFallback = id.takeIf { it.isNotEmpty() } ?: UUID.randomUUID().toString()
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
@@ -389,7 +389,7 @@ class RealSavedSitesRepository(
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
-        if (savedSitesRelationsDao.countFavouritesByUrl(bookmark.url) > 0){
+        if (savedSitesRelationsDao.countFavouritesByUrl(bookmark.url) > 0) {
             savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         }
         savedSitesEntitiesDao.updateModified(bookmark.parentId)

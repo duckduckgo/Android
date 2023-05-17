@@ -108,12 +108,6 @@ class AppSyncApiClient @Inject constructor(
         return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
     }
 
-    private fun mapBookmarksResponse(response: BookmarksResponse): List<SyncChanges> {
-        val bookmarksJSON = Adapters.bookmarksResponseAdapter.toJson(response)
-        Timber.d("Sync: bookmarks responses mapped to $bookmarksJSON")
-        return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
-    }
-
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()

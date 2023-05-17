@@ -45,8 +45,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.whenever
-import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncParserTest {
@@ -74,6 +74,8 @@ class SavedSitesSyncParserTest {
     private val bookmark2 = aBookmark("bookmark2", "Bookmark 2", "https://bookmark2.com")
     private val bookmark3 = aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com")
     private val bookmark4 = aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com")
+
+    private val twoHoursAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(2)
 
     @Before
     fun before() {
@@ -159,8 +161,8 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenChangesAfterLastSyncInFavoritesThenChangesAreFormatted() {
-        val modificationTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now())
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+        val modificationTimestamp = DatabaseDateFormatter.iso8601()
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
 
         repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
         repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
@@ -193,8 +195,8 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenNoAfterLastSyncAreEmptyThenChangesAreEmpty() {
-        val modificationTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now())
+        val modificationTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601()
 
         repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
         repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
@@ -206,8 +208,8 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenBookmarkDeletedAfterLastSyncThenDataIsCorrect() {
-        val modificationTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now())
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+        val modificationTimestamp = DatabaseDateFormatter.iso8601()
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
 
         val modifiedBookmark3 = bookmark3.copy(lastModified = modificationTimestamp)
         val modifiedBookmark4 = bookmark4.copy(lastModified = modificationTimestamp)
@@ -229,8 +231,7 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenFolderDeletedAfterLastSyncThenDataIsCorrect() {
-        val modificationTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now())
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
 
         repository.insert(bookmark1)
         repository.insert(bookmark2)
@@ -255,7 +256,7 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenFavouriteDeletedAfterLastSyncThenDataIsCorrect() {
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
 
         repository.insert(favourite1)
         repository.insert(bookmark3)
@@ -270,7 +271,7 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenBookmarkAndFavouriteDeletedAfterLastSyncThenDataIsCorrect() {
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
 
         repository.insert(bookmark1)
         repository.insert(favourite1)

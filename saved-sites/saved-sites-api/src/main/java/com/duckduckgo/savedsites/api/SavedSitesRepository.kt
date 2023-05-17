@@ -16,7 +16,6 @@
 
 package com.duckduckgo.savedsites.api
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
@@ -204,7 +203,7 @@ interface SavedSitesRepository {
         id: String = "",
         url: String,
         title: String,
-        lastModified: String?
+        lastModified: String?,
     ): Favorite
 
     /**

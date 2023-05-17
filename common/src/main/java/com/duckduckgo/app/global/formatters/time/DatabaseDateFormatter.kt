@@ -40,14 +40,12 @@ class DatabaseDateFormatter {
             return FORMATTER_SECONDS.format(date)
         }
 
-        fun iso8601(date: LocalDateTime = LocalDateTime.now()): String {
-            val offsetDate = OffsetDateTime.of(date, ZoneOffset.UTC)
-            return offsetDate.format(DateTimeFormatter.ISO_INSTANT)
+        fun iso8601(date: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)): String {
+            return date.format(DateTimeFormatter.ISO_INSTANT)
         }
 
-        fun millisIso8601(date: LocalDateTime = LocalDateTime.now()): Long {
-            val offsetDate = OffsetDateTime.of(date, ZoneOffset.UTC)
-            return offsetDate.toInstant().toEpochMilli()
+        fun millisIso8601(date: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)): Long {
+            return date.toInstant().toEpochMilli()
         }
 
         fun parseMillisIso8601(offsetDateMillis: Long): String {

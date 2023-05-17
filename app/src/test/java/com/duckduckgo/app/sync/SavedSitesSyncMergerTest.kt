@@ -39,9 +39,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import junit.framework.Assert
-import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule

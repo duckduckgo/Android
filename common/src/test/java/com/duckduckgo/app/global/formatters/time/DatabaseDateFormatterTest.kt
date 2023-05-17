@@ -19,6 +19,8 @@ package com.duckduckgo.app.global.formatters.time
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 class DatabaseDateFormatterTest {
 
@@ -36,14 +38,13 @@ class DatabaseDateFormatterTest {
 
     @Test
     fun whenIso8601isUsedThenDateIsFormatted() {
-        val formatted = DatabaseDateFormatter.iso8601(fixedTime())
+        val formatted = DatabaseDateFormatter.iso8601(fixedUTCTime())
         assertEquals("2020-12-25T13:14:15.000000016Z", formatted)
     }
 
     @Test
     fun whenIso8601isParsedThenDateIsCorrect() {
-        val now = LocalDateTime.now()
-
+        val now = OffsetDateTime.now(ZoneOffset.UTC)
         val format = DatabaseDateFormatter.iso8601(now)
         val offsetDateMillis = DatabaseDateFormatter.millisIso8601(now)
         val formatted = DatabaseDateFormatter.parseMillisIso8601(offsetDateMillis)
@@ -53,5 +54,8 @@ class DatabaseDateFormatterTest {
 
     private fun fixedTime(): LocalDateTime {
         return LocalDateTime.of(2020, 12, 25, 13, 14, 15, 16)
+    }
+    private fun fixedUTCTime(): OffsetDateTime {
+        return OffsetDateTime.of(2020, 12, 25, 13, 14, 15, 16, ZoneOffset.UTC)
     }
 }

@@ -185,7 +185,7 @@ class SavedSitesSyncMerger @Inject constructor(
         remoteFolder.folder?.let {
             val folder = decryptFolder(remoteFolder, parentId, lastModified)
             processIds.add(folder.id)
-            if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT){
+            if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT) {
                 Timber.d("Sync: merging folder $folderId with parentId $parentId")
                 if (conflictResolution == DEDUPLICATION) {
                     // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
@@ -459,4 +459,4 @@ fun SavedSite.modifiedAfter(after: String?): Boolean {
     }
 }
 
-//eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6IkU0UkNPRkdtakZPRCtUT1RtRkMveTNPaEJwNStDaFRZcG9OTEdRSno0Rlk9IiwidXNlcl9pZCI6IjQwZTFjMzcwLTYxZWUtNDYxMy1iMTI1LWRjOGQ5MjljMmYxZSJ9fQ==
+// eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6IkU0UkNPRkdtakZPRCtUT1RtRkMveTNPaEJwNStDaFRZcG9OTEdRSno0Rlk9IiwidXNlcl9pZCI6IjQwZTFjMzcwLTYxZWUtNDYxMy1iMTI1LWRjOGQ5MjljMmYxZSJ9fQ==

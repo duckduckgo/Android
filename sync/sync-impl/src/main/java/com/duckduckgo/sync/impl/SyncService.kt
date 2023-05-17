@@ -161,7 +161,7 @@ data class BookmarkFolder(
 )
 
 data class BookmarksResponse(
-    @field:Json(name = "last_modified") val lastModified: String?,
+    @field:Json(name = "last_modified") val lastModified: String,
     val entries: List<SyncBookmarkEntry>,
 )
 
