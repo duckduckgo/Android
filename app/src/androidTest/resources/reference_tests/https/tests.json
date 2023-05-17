@@ -43,7 +43,8 @@
                 "expectURL": "http://negativetest.com/path/file.html?search=query&another=one#fragment",
                 "exceptPlatforms": [
                     "android-browser",
-                    "ios-browser"
+                    "ios-browser",
+                    "windows-browser"
                 ]
             },
             {
@@ -54,7 +55,8 @@
                 "expectURL": "https://s.secondnegative.com/path/file.html?search=query&another=one#fragment",
                 "exceptPlatforms": [
                     "android-browser",
-                    "ios-browser"
+                    "ios-browser",
+                    "windows-browser"
                 ]
             },
             {
@@ -147,7 +149,8 @@
                 "exceptPlatforms": [
                     "android-browser",
                     "ios-browser",
-                    "web-extension-mv3"
+                    "web-extension-mv3",
+                    "windows-browser"
                 ]
             },
             {
