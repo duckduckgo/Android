@@ -170,7 +170,7 @@ class RealSavedSitesParser : SavedSitesParser {
                                 name = folderName,
                                 parentId = folderParentId,
                                 lastModified = DatabaseDateFormatter.iso8601(),
-                                deleted = null
+                                deleted = null,
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)

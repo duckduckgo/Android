@@ -237,7 +237,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
     override fun getBookmarks(token: String, since: String): Result<SyncDataResponse> {
         val response = runCatching {
-            val patchCall = if (since.isNotEmpty()){
+            val patchCall = if (since.isNotEmpty()) {
                 syncService.bookmarksSince("Bearer $token", since)
             } else {
                 syncService.bookmarks("Bearer $token")

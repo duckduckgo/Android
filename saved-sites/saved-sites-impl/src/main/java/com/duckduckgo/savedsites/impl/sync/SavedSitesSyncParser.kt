@@ -39,7 +39,6 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
-import kotlin.math.sin
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncParser::class)
@@ -207,7 +206,7 @@ class SavedSitesSyncParser @Inject constructor(
 
     private fun deletedEntry(
         id: String,
-        deleted: String
+        deleted: String,
     ): SyncBookmarkEntry {
         return SyncBookmarkEntry(
             id = id,

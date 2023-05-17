@@ -77,7 +77,9 @@ class SavedSitesExporterTest {
         exporter = RealSavedSitesExporter(context.contentResolver, savedSitesRepository, RealSavedSitesParser())
 
         // initial db state
-        savedSitesRepository.insert(BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "Bookmarks", parentId = "", lastModified = "timestamp"))
+        savedSitesRepository.insert(
+            BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "Bookmarks", parentId = "", lastModified = "timestamp"),
+        )
         savedSitesRepository.insert(
             BookmarkFolder(id = SavedSitesNames.FAVORITES_ROOT, name = "Favorites", parentId = "", lastModified = "timestamp"),
         )

@@ -79,7 +79,7 @@ class AppSyncApiClient @Inject constructor(
 
         return when (val result = syncApi.getBookmarks(token, since)) {
             is Result.Error -> {
-                if (result.code == 304){
+                if (result.code == 304) {
                     // 304 - not modified means no changes to parse
                     Result.Success(emptyList())
                 } else {

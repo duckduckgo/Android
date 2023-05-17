@@ -126,9 +126,9 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
         fun instance(
-                savedSite: SavedSite,
-                parentFolderId: String = SavedSitesNames.BOOKMARKS_ROOT,
-                parentFolderName: String? = null,
+            savedSite: SavedSite,
+            parentFolderId: String = SavedSitesNames.BOOKMARKS_ROOT,
+            parentFolderName: String? = null,
         ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()

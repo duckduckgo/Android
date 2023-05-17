@@ -120,7 +120,7 @@ class SavedSitesSyncMerger @Inject constructor(
         val allChildren = mutableListOf<String>()
         allFolders.forEach { entry ->
             entry.folder?.children?.forEach {
-                if (!allChildren.contains(it)){
+                if (!allChildren.contains(it)) {
                     allChildren.add(it)
                 }
             }
@@ -180,7 +180,7 @@ class SavedSitesSyncMerger @Inject constructor(
         lastModified: String,
         processIds: MutableList<String>,
         conflictResolution: SyncConflictResolution,
-        folderId: String
+        folderId: String,
     ) {
         remoteFolder.folder?.let {
             val folder = decryptFolder(remoteFolder, parentId, lastModified)
@@ -261,7 +261,7 @@ class SavedSitesSyncMerger @Inject constructor(
         remoteUpdates: List<SyncBookmarkEntry>,
         folderId: String,
         lastModified: String,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ) {
         Timber.d("Sync: merging child $child")
         processIds.add(child)

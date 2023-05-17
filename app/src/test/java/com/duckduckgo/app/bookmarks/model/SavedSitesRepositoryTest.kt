@@ -440,7 +440,13 @@ class SavedSitesRepositoryTest {
             ),
         )
         val updatedBookmark =
-            Bookmark(id = bookmark.id, title = "new title", url = "example.com", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+            Bookmark(
+                id = bookmark.id,
+                title = "new title",
+                url = "example.com",
+                lastModified = "timestamp",
+                parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            )
 
         repository.updateBookmark(updatedBookmark, "folder1")
         val bookmarkUpdated = repository.getBookmark(updatedBookmark.url)!!

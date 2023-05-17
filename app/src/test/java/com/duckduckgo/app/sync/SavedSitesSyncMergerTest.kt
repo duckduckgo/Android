@@ -39,8 +39,6 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.duckduckgo.sync.crypto.SyncNativeLib
-import com.duckduckgo.sync.impl.RealSyncCrypto
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import junit.framework.Assert
 import kotlinx.coroutines.test.TestScope
@@ -72,8 +70,9 @@ class SavedSitesSyncMergerTest {
         TestSharedPrefsProvider(InstrumentationRegistry.getInstrumentation().context)
 
     private lateinit var syncMerger: SavedSitesSyncMerger
+
     @Before
-    fun setup(){
+    fun setup() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -93,7 +92,7 @@ class SavedSitesSyncMergerTest {
     }
 
     @Test
-    fun whenMergingCorruptedDataThenResultIsError(){
+    fun whenMergingCorruptedDataThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_invalid_data.json")
         val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
         val result = syncMerger.merge(corruptedChanges)
@@ -132,7 +131,7 @@ class SavedSitesSyncMergerTest {
     }
 }
 
-class FakeCrypto: SyncCrypto {
+class FakeCrypto : SyncCrypto {
     override fun encrypt(text: String): String {
         return text
     }

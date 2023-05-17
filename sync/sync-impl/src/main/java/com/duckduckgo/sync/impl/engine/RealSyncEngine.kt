@@ -186,7 +186,7 @@ class RealSyncEngine @Inject constructor(
 
     private fun persistChanges(
         remoteChanges: List<SyncChanges>,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ) {
         plugins.getPlugins().map {
             it.syncChanges(remoteChanges, conflictResolution)

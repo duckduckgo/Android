@@ -92,7 +92,7 @@ class RealSavedSitesImporter(
             }
 
             savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOKMARKS_ROOT, DatabaseDateFormatter.iso8601())
-            if (savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.isNotEmpty()){
+            if (savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.isNotEmpty()) {
                 savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, DatabaseDateFormatter.iso8601())
             }
 

@@ -32,7 +32,7 @@ sealed class SavedSite(
     open val title: String,
     open val url: String,
     open val lastModified: String?,
-    open val deleted: String? = null
+    open val deleted: String? = null,
 ) : Serializable {
     data class Favorite(
         override val id: String,
@@ -80,7 +80,7 @@ data class BookmarkFolder(
     val numBookmarks: Int = 0,
     val numFolders: Int = 0,
     val lastModified: String?,
-    val deleted: String? = null
+    val deleted: String? = null,
 ) : Serializable
 
 object SavedSitesNames {

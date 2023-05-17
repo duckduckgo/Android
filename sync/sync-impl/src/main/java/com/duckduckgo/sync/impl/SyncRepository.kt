@@ -35,7 +35,6 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlinx.coroutines.flow.Flow
-import timber.log.Timber
 
 interface SyncRepository {
 

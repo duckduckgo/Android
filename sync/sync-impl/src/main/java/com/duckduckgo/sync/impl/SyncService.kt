@@ -88,7 +88,6 @@ interface SyncService {
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
     fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<SyncDataResponse>
-
 }
 
 data class Login(
@@ -177,7 +176,7 @@ data class DeviceDataResponse(
 )
 
 data class SyncDataResponse(
-    val bookmarks: BookmarksResponse
+    val bookmarks: BookmarksResponse,
 ) {
     companion object {
         fun empty(): SyncDataResponse {
