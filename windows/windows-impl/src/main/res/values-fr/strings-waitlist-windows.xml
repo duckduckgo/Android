@@ -21,7 +21,7 @@
     <string name="windows_waitlist_title">Profitez d\'un accès anticipé afin d\'essayer DuckDuckGo pour Windows !</string>
     <string name="windows_title">Procurez-vous DuckDuckGo pour Windows !</string>
     <string name="windows_waitlist_description">DuckDuckGo pour Windows a tout ce dont vous avez besoin pour naviguer en toute confidentialité : recherche privée, blocage des traqueurs, cryptage forcé et blocage des fenêtres contextuelles (cookies), sans oublier d\'autres protections de choix à venir.</string>
-    <string name="windows_description">DuckDuckGo pour Windows répond à vos besoins de rapidité et de fonctionnalités de navigation, et dispose des meilleurs outils de leur catégorie pour protéger votre vie privée.\n\nSur votre ordinateur Windows, accédez à :</string>
+    <string name="windows_description">DuckDuckGo pour Windows a tout ce dont vous avez besoin pour naviguer en toute confidentialité : recherche privée, blocage des traqueurs, cryptage forcé et blocage des fenêtres contextuelles (cookies), sans oublier d\'autres protections de choix à venir.\n\nSur votre ordinateur Windows, accédez à :</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Partager le lien</string>
     <string name="windows_share_text">Prêt(e) à naviguer incognito sur Windows ?\n\nAccédez à cette URL sur votre ordinateur Windows pour télécharger l\'application : duckduckgo.com/windows</string>
