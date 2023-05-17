@@ -23,6 +23,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult.Duplicate
+import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult.NotDuplicate
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
@@ -113,17 +115,33 @@ class SavedSitesSyncMerger @Inject constructor(
 
         val processIds: MutableList<String> = mutableListOf()
         val allResponseIds = bookmarks.entries.map { it.id }
-
-        if (allResponseIds.contains(SavedSitesNames.BOOKMARKS_ROOT)) {
-            Timber.d("Sync: bookmarks root found, traversing from there")
-            processFolder(SavedSitesNames.BOOKMARKS_ROOT, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+        val allFolders = bookmarks.entries.filter { it.isFolder() }
+        val allFolderIds = allFolders.map { it.id }
+        val allChildren = mutableListOf<String>()
+        allFolders.forEach { entry ->
+            entry.folder?.children?.forEach {
+                if (!allChildren.contains(it)){
+                    allChildren.add(it)
+                }
+            }
         }
 
         // Iterate over received items and find:
         // 1. All folders without a parent in the payload
+        // check all children, the ones that are not in allFolders don't have a parent
+        val foldersWithoutParent = allFolderIds.filterNot { allChildren.contains(it) }
+        foldersWithoutParent.forEach { folderId ->
+            processFolder(folderId, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+        }
+
         // 2. All bookmarks without a parent in the payload
+        val allBookmarkIds = bookmarks.entries.filter { it.isBookmark() }.map { it.id }
+        val bookmarksWithoutParent = allBookmarkIds.filterNot { allChildren.contains(it) }
+        bookmarksWithoutParent.forEach { bookmarkId ->
+            processBookmark(bookmarkId, processIds, bookmarks.entries, SavedSitesNames.BOOKMARKS_ROOT, bookmarks.last_modified, conflictResolution)
+        }
 
-
+        // Favourites
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
             Timber.d("Sync: favourites root found, traversing from there")
             processFavourites(bookmarks.entries, bookmarks.last_modified, conflictResolution)
@@ -149,140 +167,161 @@ class SavedSitesSyncMerger @Inject constructor(
         if (remoteFolder == null) {
             Timber.d("Sync: can't find folder $folderId")
         } else {
-            remoteFolder.folder?.let {
-                val folder = decryptFolder(remoteFolder, parentId, lastModified)
-                processIds.add(folder.id)
-                if (conflictResolution == DEDUPLICATION) {
-                    // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
-                    when (val result = duplicateFinder.findFolderDuplicate(folder)) {
-                        is SavedSitesDuplicateResult.Duplicate -> {
-                            if (folder.deleted != null){
-                                Timber.d("Sync: folder $folderId has a local duplicate in {${result.id} and needs to be deleted")
-                                savedSitesRepository.delete(folder)
-                            } else {
-                                Timber.d("Sync: folder $folderId has a local duplicate in {${result.id}, replacing content")
-                                savedSitesRepository.replaceFolderContent(folder, result.id)
-                            }
-                        }
+            processRemoteFolder(remoteFolder, parentId, lastModified, processIds, conflictResolution, folderId)
+            remoteFolder.folder?.children?.forEachIndexed { position, child ->
+                processBookmark(child, processIds, remoteUpdates, folderId, lastModified, conflictResolution)
+            }
+        }
+    }
 
-                        is SavedSitesDuplicateResult.NotDuplicate -> {
-                            if (folder.deleted != null){
-                                Timber.d("Sync: folder $folderId not present locally but was deleted, nothing to do")
-                            } else {
-                                Timber.d("Sync: folder $folderId not present locally, inserting")
-                                savedSitesRepository.insert(folder)
-                            }
+    private fun processRemoteFolder(
+        remoteFolder: SyncBookmarkEntry,
+        parentId: String,
+        lastModified: String,
+        processIds: MutableList<String>,
+        conflictResolution: SyncConflictResolution,
+        folderId: String
+    ) {
+        remoteFolder.folder?.let {
+            val folder = decryptFolder(remoteFolder, parentId, lastModified)
+            processIds.add(folder.id)
+            if (conflictResolution == DEDUPLICATION) {
+                // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
+                when (val result = duplicateFinder.findFolderDuplicate(folder)) {
+                    is Duplicate -> {
+                        if (folder.deleted != null) {
+                            Timber.d("Sync: folder $folderId has a local duplicate in {${result.id} and needs to be deleted")
+                            savedSitesRepository.delete(folder)
+                        } else {
+                            Timber.d("Sync: folder $folderId has a local duplicate in {${result.id}, replacing content")
+                            savedSitesRepository.replaceFolderContent(folder, result.id)
                         }
                     }
-                } else {
-                    // if there's a folder with the same id locally we check the conflict resolution
-                    // if TIMESTAMP -> new timestamp wins
-                    // if REMOTE -> remote object wins and replaces local
-                    // if LOCAL -> local object wins and no changes are applied
-                    val localFolder = savedSitesRepository.getFolder(folder.id)
-                    if (localFolder != null) {
-                        when (conflictResolution) {
-                            REMOTE_WINS -> {
-                                if (folder.deleted != null){
-                                    Timber.d("Sync: folder $folderId exists locally but was deleted remotely, deleting locally too")
-                                    savedSitesRepository.delete(localFolder)
-                                } else {
-                                    Timber.d("Sync: folder $folderId exists locally, replacing content")
-                                    savedSitesRepository.replaceFolderContent(folder, folder.id)
-                                }
-                            }
 
-                            TIMESTAMP -> {
-                                if (folder.modifiedAfter(localFolder.lastModified)) {
-                                    if (folder.deleted != null){
-                                        Timber.d("Sync: folder $folderId deleted after local folder")
-                                        savedSitesRepository.delete(localFolder)
-                                    } else {
-                                        Timber.d("Sync: folder $folderId modified after local folder, replacing content")
-                                        savedSitesRepository.replaceFolderContent(folder, folder.id)
-                                    }
-                                } else {
-                                    Timber.d("Sync: folder $folderId modified before local folder, nothing to do")
-                                }
-                            }
-
-                            else -> {
-                                Timber.d("Sync: local folder wins over remote, nothing to do")
-                            }
-                        }
-                    } else {
-                        if (folder.deleted != null){
-                            Timber.d("Sync: folder $folderId not present locallybut was deleted, nothing to do")
+                    is NotDuplicate -> {
+                        if (folder.deleted != null) {
+                            Timber.d("Sync: folder $folderId not present locally but was deleted, nothing to do")
                         } else {
                             Timber.d("Sync: folder $folderId not present locally, inserting")
                             savedSitesRepository.insert(folder)
                         }
                     }
                 }
-            }
-
-            remoteFolder.folder?.children?.forEachIndexed { position, child ->
-                Timber.d("Sync: merging child $child")
-                processIds.add(child)
-                val childEntry = remoteUpdates.find { it.id == child }
-                if (childEntry == null) {
-                    Timber.d("Sync: can't find child $child")
-                } else {
-                    when {
-                        childEntry.isBookmark() -> {
-                            Timber.d("Sync: child $child is a Bookmark")
-                            val bookmark = decryptBookmark(childEntry, folderId, lastModified)
-                            if (conflictResolution == DEDUPLICATION) {
-                                // if there's a bookmark duplicate locally (url and name) then we replace it
-                                when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
-                                    is SavedSitesDuplicateResult.Duplicate -> {
-                                        Timber.d("Sync: child $child has a local duplicate in ${result.id}, replacing")
-                                        savedSitesRepository.replaceBookmark(bookmark, result.id)
-                                    }
-
-                                    is SavedSitesDuplicateResult.NotDuplicate -> {
-                                        Timber.d("Sync: child $child not present locally, inserting")
-                                        savedSitesRepository.insert(bookmark)
-                                    }
-                                }
+            } else {
+                // if there's a folder with the same id locally we check the conflict resolution
+                // if TIMESTAMP -> new timestamp wins
+                // if REMOTE -> remote object wins and replaces local
+                // if LOCAL -> local object wins and no changes are applied
+                val localFolder = savedSitesRepository.getFolder(folder.id)
+                if (localFolder != null) {
+                    when (conflictResolution) {
+                        REMOTE_WINS -> {
+                            if (folder.deleted != null) {
+                                Timber.d("Sync: folder $folderId exists locally but was deleted remotely, deleting locally too")
+                                savedSitesRepository.delete(localFolder)
                             } else {
-                                // if there's a bookmark with the same id locally we check the conflict resolution
-                                // if TIMESTAMP -> new timestamp wins
-                                // if REMOTE -> remote object wins and replaces local
-                                // if LOCAL -> local object wins and no changes are applied
-                                val storedBookmark = savedSitesRepository.getBookmarkById(child)
-                                if (storedBookmark != null) {
-                                    when (conflictResolution) {
-                                        REMOTE_WINS -> {
-                                            Timber.d("Sync: child $child exists locally, replacing")
-                                            savedSitesRepository.replaceBookmark(bookmark, child)
-                                        }
-
-                                        TIMESTAMP -> {
-                                            if (bookmark.modifiedAfter(storedBookmark.lastModified)) {
-                                                Timber.d("Sync: bookmark ${bookmark.id} modified after local bookmark, replacing content")
-                                                savedSitesRepository.replaceBookmark(bookmark, child)
-                                            } else {
-                                                Timber.d("Sync: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
-                                            }
-                                        }
-
-                                        else -> {
-                                            Timber.d("Sync: local bookmark wins over remote, nothing to do")
-                                        }
-                                    }
-                                } else {
-                                    Timber.d("Sync: child $child not present locally, inserting")
-                                    savedSitesRepository.insert(bookmark)
-                                }
+                                Timber.d("Sync: folder $folderId exists locally, replacing content")
+                                savedSitesRepository.replaceFolderContent(folder, folder.id)
                             }
                         }
 
-                        childEntry.isFolder() -> {
-                            Timber.d("Sync: child $child is a Folder")
-                            processFolder(childEntry.id, folderId, remoteUpdates, lastModified, processIds, conflictResolution)
+                        TIMESTAMP -> {
+                            if (folder.modifiedAfter(localFolder.lastModified)) {
+                                if (folder.deleted != null) {
+                                    Timber.d("Sync: folder $folderId deleted after local folder")
+                                    savedSitesRepository.delete(localFolder)
+                                } else {
+                                    Timber.d("Sync: folder $folderId modified after local folder, replacing content")
+                                    savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                }
+                            } else {
+                                Timber.d("Sync: folder $folderId modified before local folder, nothing to do")
+                            }
+                        }
+
+                        else -> {
+                            Timber.d("Sync: local folder wins over remote, nothing to do")
                         }
                     }
+                } else {
+                    if (folder.deleted != null) {
+                        Timber.d("Sync: folder $folderId not present locallybut was deleted, nothing to do")
+                    } else {
+                        Timber.d("Sync: folder $folderId not present locally, inserting")
+                        savedSitesRepository.insert(folder)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun processBookmark(
+        child: String,
+        processIds: MutableList<String>,
+        remoteUpdates: List<SyncBookmarkEntry>,
+        folderId: String,
+        lastModified: String,
+        conflictResolution: SyncConflictResolution
+    ) {
+        Timber.d("Sync: merging child $child")
+        processIds.add(child)
+        val childEntry = remoteUpdates.find { it.id == child }
+        if (childEntry == null) {
+            Timber.d("Sync: can't find child $child")
+        } else {
+            when {
+                childEntry.isBookmark() -> {
+                    Timber.d("Sync: child $child is a Bookmark")
+                    val bookmark = decryptBookmark(childEntry, folderId, lastModified)
+                    if (conflictResolution == DEDUPLICATION) {
+                        // if there's a bookmark duplicate locally (url and name) then we replace it
+                        when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
+                            is Duplicate -> {
+                                Timber.d("Sync: child $child has a local duplicate in ${result.id}, replacing")
+                                savedSitesRepository.replaceBookmark(bookmark, result.id)
+                            }
+
+                            is NotDuplicate -> {
+                                Timber.d("Sync: child $child not present locally, inserting")
+                                savedSitesRepository.insert(bookmark)
+                            }
+                        }
+                    } else {
+                        // if there's a bookmark with the same id locally we check the conflict resolution
+                        // if TIMESTAMP -> new timestamp wins
+                        // if REMOTE -> remote object wins and replaces local
+                        // if LOCAL -> local object wins and no changes are applied
+                        val storedBookmark = savedSitesRepository.getBookmarkById(child)
+                        if (storedBookmark != null) {
+                            when (conflictResolution) {
+                                REMOTE_WINS -> {
+                                    Timber.d("Sync: child $child exists locally, replacing")
+                                    savedSitesRepository.replaceBookmark(bookmark, child)
+                                }
+
+                                TIMESTAMP -> {
+                                    if (bookmark.modifiedAfter(storedBookmark.lastModified)) {
+                                        Timber.d("Sync: bookmark ${bookmark.id} modified after local bookmark, replacing content")
+                                        savedSitesRepository.replaceBookmark(bookmark, child)
+                                    } else {
+                                        Timber.d("Sync: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
+                                    }
+                                }
+
+                                else -> {
+                                    Timber.d("Sync: local bookmark wins over remote, nothing to do")
+                                }
+                            }
+                        } else {
+                            Timber.d("Sync: child $child not present locally, inserting")
+                            savedSitesRepository.insert(bookmark)
+                        }
+                    }
+                }
+
+                childEntry.isFolder() -> {
+                    Timber.d("Sync: child $child is a Folder")
+                    processFolder(childEntry.id, folderId, remoteUpdates, lastModified, processIds, conflictResolution)
                 }
             }
         }

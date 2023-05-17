@@ -17,9 +17,8 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.moshi.Json
 import retrofit2.Call
 import retrofit2.http.Body
@@ -191,3 +190,51 @@ data class SyncDataResponse(
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
 }
+
+data class SyncBookmarkPage(val url: String)
+data class SyncFolderChildren(val children: List<String>)
+
+data class SyncBookmarkEntry(
+    val id: String,
+    val title: String,
+    val page: SyncBookmarkPage?,
+    val folder: SyncFolderChildren?,
+    val deleted: String?,
+    val client_last_modified: String,
+) {
+    companion object {
+        fun asBookmark(
+            id: String,
+            title: String,
+            url: String,
+            deleted: String?,
+            clientLastModified: String,
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted, clientLastModified)
+        }
+
+        fun asFolder(
+            id: String,
+            title: String,
+            children: List<String>,
+            deleted: String?,
+            clientLastModified: String,
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted, clientLastModified)
+        }
+    }
+}
+
+fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
+fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
+
+class SyncDataRequest(
+    val client_timestamp: String = DatabaseDateFormatter.iso8601(),
+    val bookmarks: SyncBookmarksRequest,
+)
+
+class SyncRequest(val bookmarks: SyncBookmarksRequest)
+class SyncBookmarksRequest(
+    val updates: List<SyncBookmarkEntry>,
+    val modified_since: String = "0",
+)

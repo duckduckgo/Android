@@ -35,10 +35,7 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
-import com.duckduckgo.sync.impl.parser.RealSyncCrypter
-import com.duckduckgo.sync.impl.parser.SyncCrypter
 import com.duckduckgo.sync.store.SyncStore
-import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.jsoup.Jsoup
@@ -70,7 +67,6 @@ class SavedSitesParserTest {
     private lateinit var db: AppDatabase
     private lateinit var repository: SavedSitesRepository
 
-    lateinit var syncCrypter: SyncCrypter
     private val nativeLib: SyncLib = mock()
     private val store: SyncStore = mock()
 
@@ -84,7 +80,6 @@ class SavedSitesParserTest {
 
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
         parser = RealSavedSitesParser()
-        syncCrypter = RealSyncCrypter(repository, nativeLib, store)
 
         whenever(store.primaryKey).thenReturn("primaryKey")
 
@@ -348,18 +343,5 @@ class SavedSitesParserTest {
         Assert.assertEquals(12, savedSites.size)
         Assert.assertEquals(3, favoritesLists.size)
         Assert.assertEquals(9, bookmarks.size)
-    }
-
-    @Test
-    fun whenImportedFromFirefoxThenCanUploadToSync() = runTest {
-        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_firefox.html")
-        val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
-
-        val bookmarks = parser.parseHtml(document, repository)
-
-        Assert.assertEquals(17, bookmarks.size)
-
-        val allData = syncCrypter.generateAllData()
-        TestCase.assertTrue(allData.bookmarks.updates.isEmpty())
     }
 }

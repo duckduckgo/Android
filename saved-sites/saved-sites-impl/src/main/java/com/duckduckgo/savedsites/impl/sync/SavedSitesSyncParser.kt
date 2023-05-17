@@ -214,7 +214,7 @@ class SavedSitesSyncParser @Inject constructor(
             title = null,
             folder = null,
             page = null,
-            deleted = deleted,
+            deleted = "1",
             client_last_modified = null,
         )
     }
@@ -251,17 +251,15 @@ data class SyncBookmarkEntry(
     val client_last_modified: String?,
 )
 
-fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
-fun SyncBookmarkEntry.titleOrFallback(): String = this.title ?: "Bookmark"
-
-fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.BOOKMARKS_ROOT
-fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.FAVORITES_ROOT
-fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
-
 class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
 class SyncBookmarkUpdates(
     val updates: List<SyncBookmarkEntry>,
     val modified_since: String = "0",
 )
 
-// e8b0c8ea-5e75-484f-8764-1dd82e9fe5b2
+fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
+fun SyncBookmarkEntry.titleOrFallback(): String = this.title ?: "Bookmark"
+
+fun SyncBookmarkEntry.isBookmarksRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.BOOKMARKS_ROOT
+fun SyncBookmarkEntry.isFavouritesRoot(): Boolean = this.folder != null && this.id == SavedSitesNames.FAVORITES_ROOT
+fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
