@@ -695,7 +695,7 @@ class BrowserTabViewModelTest {
 
         testee.onFavoriteMenuClicked()
 
-        verify(mockSavedSitesRepository).insertFavorite(title = "A title", url = "www.example.com", lastModified = "timestamp")
+        verify(mockSavedSitesRepository).insertFavorite(title = "A title", url = "www.example.com")
         assertCommandIssued<Command.ShowSavedSiteAddedConfirmation>()
     }
 

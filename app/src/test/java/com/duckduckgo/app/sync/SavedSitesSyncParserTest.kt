@@ -33,12 +33,12 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncParser
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
+import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
+import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
+import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
-import com.duckduckgo.sync.impl.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.SyncBookmarkPage
-import com.duckduckgo.sync.impl.SyncFolderChildren
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

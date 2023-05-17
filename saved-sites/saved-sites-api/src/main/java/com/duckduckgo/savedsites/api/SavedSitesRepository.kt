@@ -203,7 +203,7 @@ interface SavedSitesRepository {
         id: String = "",
         url: String,
         title: String,
-        lastModified: String?,
+        lastModified: String? = null,
     ): Favorite
 
     /**

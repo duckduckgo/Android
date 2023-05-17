@@ -1867,7 +1867,7 @@ class BrowserTabViewModel @Inject constructor(
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
                     faviconManager.persistCachedFavicon(tabId, url)
-                    savedSitesRepository.insertFavorite(title = title, url = url, lastModified = DatabaseDateFormatter.iso8601())
+                    savedSitesRepository.insertFavorite(title = title, url = url)
                 } else {
                     null
                 }
