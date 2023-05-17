@@ -51,7 +51,7 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
 ) : VpnConnectivityLossListenerPlugin {
 
     override fun onVpnConnectivityLoss(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             coroutineScope.launch(dispatcherProvider.io()) {
                 handleConnectivityLoss(coroutineScope)
             }
@@ -59,7 +59,7 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
     }
 
     override fun onVpnConnected(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             coroutineScope.launch(dispatcherProvider.io()) {
                 logcat { "onVpnConnected called." }
                 if (repository.reconnectStatus == Reconnecting) {
