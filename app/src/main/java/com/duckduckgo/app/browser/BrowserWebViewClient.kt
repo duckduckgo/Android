@@ -27,6 +27,7 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
@@ -73,6 +74,7 @@ class BrowserWebViewClient @Inject constructor(
     private val autoconsent: Autoconsent,
     private val contentScopeScripts: ContentScopeScripts,
     private val pixel: Pixel,
+    private val crashLogger: CrashLogger,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -217,7 +219,7 @@ class BrowserWebViewClient @Inject constructor(
                 }
             }
         } catch (e: Throwable) {
-            Timber.e(e.localizedMessage)
+            crashLogger.logCrash(CrashLogger.Crash(shortName = "m_webview_should_override", t = e))
             return false
         }
     }
