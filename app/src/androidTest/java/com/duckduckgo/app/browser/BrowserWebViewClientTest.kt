@@ -280,7 +280,7 @@ class BrowserWebViewClientTest {
         val exception = RuntimeException()
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
         testee.shouldOverrideUrlLoading(webView, "")
-        verify(crashLogger).logCrash(Crash(shortName = "m_webview_shouldOverride", t = exception))
+        verify(crashLogger).logCrash(Crash(shortName = "m_webview_should_override", t = exception))
     }
 
     @Test
