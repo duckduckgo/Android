@@ -158,7 +158,7 @@ class SavedSitesRepositoryTest {
     fun whenFavoriteIsAddedThenBookmarkIsAlsoAdded() {
         givenEmptyDBState()
 
-        repository.insertFavorite("favourite1", "https://favorite.com", "favorite")
+        repository.insertFavorite("favourite1", "https://favorite.com", "favorite", "timestamp")
 
         assert(repository.getBookmark("https://favorite.com") != null)
         assert(repository.getFavorite("https://favorite.com") != null)
@@ -178,7 +178,7 @@ class SavedSitesRepositoryTest {
     fun whenFavoriteIsAddedAndThenRemovedThenBookmarkStillExists() {
         givenEmptyDBState()
 
-        val favorite = repository.insertFavorite("favourite1", "https://favorite.com", "favorite")
+        val favorite = repository.insertFavorite("favourite1", "https://favorite.com", "favorite", "timestamp")
 
         assert(repository.getFavorite("https://favorite.com") != null)
 
@@ -204,7 +204,7 @@ class SavedSitesRepositoryTest {
     fun whenInsertFavoriteThenReturnSavedSite() {
         givenNoFavoritesStored()
 
-        val savedSite = repository.insertFavorite(title = "title", url = "http://example.com")
+        val savedSite = repository.insertFavorite(title = "title", url = "http://example.com", lastModified = "timestamp")
 
         assertEquals("title", savedSite.title)
         assertEquals("http://example.com", savedSite.url)
@@ -215,7 +215,7 @@ class SavedSitesRepositoryTest {
     fun whenInsertFavoriteWithoutTitleThenSavedSiteUsesUrlAsTitle() {
         givenNoFavoritesStored()
 
-        val savedSite = repository.insertFavorite(title = "", url = "http://example.com")
+        val savedSite = repository.insertFavorite(title = "", url = "http://example.com", lastModified = "timestamp")
 
         assertEquals("http://example.com", savedSite.title)
         assertEquals("http://example.com", savedSite.url)
@@ -226,7 +226,7 @@ class SavedSitesRepositoryTest {
     fun whenUserHasFavoritesAndInsertFavoriteThenSavedSiteUsesNextPosition() {
         givenSomeFavoritesStored()
 
-        val savedSite = repository.insertFavorite(title = "Favorite", url = "http://favexample.com")
+        val savedSite = repository.insertFavorite(title = "Favorite", url = "http://favexample.com", lastModified = "timestamp")
 
         Assert.assertEquals("Favorite", savedSite.title)
         Assert.assertEquals("http://favexample.com", savedSite.url)
@@ -237,7 +237,7 @@ class SavedSitesRepositoryTest {
     fun whenDataSourceChangesThenNewListReceived() {
         givenNoFavoritesStored()
 
-        repository.insertFavorite(title = "Favorite", url = "http://favexample.com")
+        repository.insertFavorite(title = "Favorite", url = "http://favexample.com", lastModified = "timestamp")
 
         val testObserver = repository.getFavoritesObservable().test()
         val lastState = testObserver.assertNoErrors().values().last()

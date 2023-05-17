@@ -86,6 +86,7 @@ import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -1866,7 +1867,7 @@ class BrowserTabViewModel @Inject constructor(
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
                     faviconManager.persistCachedFavicon(tabId, url)
-                    savedSitesRepository.insertFavorite(title = title, url = url)
+                    savedSitesRepository.insertFavorite(title = title, url = url, lastModified = DatabaseDateFormatter.iso8601())
                 } else {
                     null
                 }

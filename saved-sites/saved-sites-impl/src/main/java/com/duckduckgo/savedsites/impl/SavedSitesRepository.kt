@@ -329,22 +329,24 @@ class RealSavedSitesRepository(
         id: String,
         url: String,
         title: String,
+        lastModified: String?
     ): Favorite {
         val idOrFallback = id.takeIf { it.isNotEmpty() } ?: UUID.randomUUID().toString()
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
         val existentBookmark = savedSitesEntitiesDao.entityByUrl(url)
+        val lastModifiedOrFallback = lastModified ?: DatabaseDateFormatter.iso8601()
         return if (existentBookmark == null) {
-            val entity = Entity(entityId = idOrFallback, title = titleOrFallback, url = url, type = BOOKMARK)
+            val entity = Entity(entityId = idOrFallback, title = titleOrFallback, url = url, type = BOOKMARK, lastModified = lastModifiedOrFallback)
             savedSitesEntitiesDao.insert(entity)
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = entity.entityId))
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
-            savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOKMARKS_ROOT)
-            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOKMARKS_ROOT, lastModifiedOrFallback)
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, lastModifiedOrFallback)
             getFavoriteById(entity.entityId)!!
         } else {
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existentBookmark.entityId))
-            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
-            savedSitesEntitiesDao.updateModified(id)
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, lastModifiedOrFallback)
+            savedSitesEntitiesDao.updateModified(id, lastModifiedOrFallback)
             getFavorite(url)!!
         }
     }
@@ -354,7 +356,7 @@ class RealSavedSitesRepository(
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {
-                return insertFavorite(savedSite.id, savedSite.url, savedSite.title)
+                return insertFavorite(savedSite.id, savedSite.url, savedSite.title, savedSite.lastModified ?: DatabaseDateFormatter.iso8601())
             }
 
             is Bookmark -> {
@@ -368,7 +370,7 @@ class RealSavedSitesRepository(
                 )
                 savedSitesEntitiesDao.insert(entity)
                 savedSitesRelationsDao.insert(Relation(folderId = savedSite.parentId, entityId = entity.entityId))
-                savedSitesEntitiesDao.updateModified(savedSite.parentId, entity.lastModified!!)
+                savedSitesEntitiesDao.updateModified(savedSite.parentId, savedSite.lastModified ?: DatabaseDateFormatter.iso8601())
                 entity.mapToBookmark(savedSite.parentId)
             }
         }
@@ -388,9 +390,9 @@ class RealSavedSitesRepository(
 
     private fun deleteBookmark(bookmark: Bookmark) {
         if (getFavorite(bookmark.url) != null) {
-            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
         }
-        savedSitesEntitiesDao.updateModified(bookmark.parentId)
+        savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
         savedSitesEntitiesDao.delete(bookmark.id)
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
     }
@@ -423,7 +425,15 @@ class RealSavedSitesRepository(
             savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
         }
 
-        savedSitesEntitiesDao.update(Entity(bookmark.id, bookmark.title, bookmark.url, BOOKMARK))
+        savedSitesEntitiesDao.update(
+            Entity(
+                bookmark.id,
+                bookmark.title,
+                bookmark.url,
+                BOOKMARK,
+                bookmark.lastModified ?: DatabaseDateFormatter.iso8601(),
+            ),
+        )
         savedSitesEntitiesDao.updateModified(fromFolderId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
         savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
     }
@@ -438,6 +448,7 @@ class RealSavedSitesRepository(
         )
         savedSitesEntitiesDao.insert(entity)
         savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
+        savedSitesEntitiesDao.updateModified(folder.parentId, folder.lastModified ?: DatabaseDateFormatter.iso8601())
         return folder
     }
 
@@ -511,6 +522,7 @@ class RealSavedSitesRepository(
             savedSitesEntitiesDao.delete(it.entityId)
         }
         savedSitesEntitiesDao.delete(folder.id)
+        savedSitesEntitiesDao.updateModified(folder.parentId)
     }
 
     override fun getFolder(folderId: String): BookmarkFolder? {

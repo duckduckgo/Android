@@ -168,7 +168,7 @@ class SavedSitesSyncMerger @Inject constructor(
             Timber.d("Sync: can't find folder $folderId")
         } else {
             processRemoteFolder(remoteFolder, parentId, lastModified, processIds, conflictResolution, folderId)
-            remoteFolder.folder?.children?.forEachIndexed { position, child ->
+            remoteFolder.folder?.children?.forEach { child ->
                 processBookmark(child, processIds, remoteUpdates, folderId, lastModified, conflictResolution)
             }
         }
@@ -185,70 +185,72 @@ class SavedSitesSyncMerger @Inject constructor(
         remoteFolder.folder?.let {
             val folder = decryptFolder(remoteFolder, parentId, lastModified)
             processIds.add(folder.id)
-            if (conflictResolution == DEDUPLICATION) {
-                // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
-                when (val result = duplicateFinder.findFolderDuplicate(folder)) {
-                    is Duplicate -> {
-                        if (folder.deleted != null) {
-                            Timber.d("Sync: folder $folderId has a local duplicate in {${result.id} and needs to be deleted")
-                            savedSitesRepository.delete(folder)
-                        } else {
-                            Timber.d("Sync: folder $folderId has a local duplicate in {${result.id}, replacing content")
-                            savedSitesRepository.replaceFolderContent(folder, result.id)
+            if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT){
+                if (conflictResolution == DEDUPLICATION) {
+                    // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
+                    when (val result = duplicateFinder.findFolderDuplicate(folder)) {
+                        is Duplicate -> {
+                            if (folder.deleted != null) {
+                                Timber.d("Sync: folder $folderId has a local duplicate in ${result.id} and needs to be deleted")
+                                savedSitesRepository.delete(folder)
+                            } else {
+                                Timber.d("Sync: folder $folderId has a local duplicate in ${result.id}, replacing content")
+                                savedSitesRepository.replaceFolderContent(folder, result.id)
+                            }
+                        }
+
+                        is NotDuplicate -> {
+                            if (folder.deleted != null) {
+                                Timber.d("Sync: folder $folderId not present locally but was deleted, nothing to do")
+                            } else {
+                                Timber.d("Sync: folder $folderId not present locally, inserting")
+                                savedSitesRepository.insert(folder)
+                            }
                         }
                     }
+                } else {
+                    // if there's a folder with the same id locally we check the conflict resolution
+                    // if TIMESTAMP -> new timestamp wins
+                    // if REMOTE -> remote object wins and replaces local
+                    // if LOCAL -> local object wins and no changes are applied
+                    val localFolder = savedSitesRepository.getFolder(folder.id)
+                    if (localFolder != null) {
+                        when (conflictResolution) {
+                            REMOTE_WINS -> {
+                                if (folder.deleted != null) {
+                                    Timber.d("Sync: folder $folderId exists locally but was deleted remotely, deleting locally too")
+                                    savedSitesRepository.delete(localFolder)
+                                } else {
+                                    Timber.d("Sync: folder $folderId exists locally, replacing content")
+                                    savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                }
+                            }
 
-                    is NotDuplicate -> {
+                            TIMESTAMP -> {
+                                if (folder.modifiedAfter(localFolder.lastModified)) {
+                                    if (folder.deleted != null) {
+                                        Timber.d("Sync: folder $folderId deleted after local folder")
+                                        savedSitesRepository.delete(localFolder)
+                                    } else {
+                                        Timber.d("Sync: folder $folderId modified after local folder, replacing content")
+                                        savedSitesRepository.replaceFolderContent(folder, folder.id)
+                                    }
+                                } else {
+                                    Timber.d("Sync: folder $folderId modified before local folder, nothing to do")
+                                }
+                            }
+
+                            else -> {
+                                Timber.d("Sync: local folder wins over remote, nothing to do")
+                            }
+                        }
+                    } else {
                         if (folder.deleted != null) {
-                            Timber.d("Sync: folder $folderId not present locally but was deleted, nothing to do")
+                            Timber.d("Sync: folder $folderId not present locallybut was deleted, nothing to do")
                         } else {
                             Timber.d("Sync: folder $folderId not present locally, inserting")
                             savedSitesRepository.insert(folder)
                         }
-                    }
-                }
-            } else {
-                // if there's a folder with the same id locally we check the conflict resolution
-                // if TIMESTAMP -> new timestamp wins
-                // if REMOTE -> remote object wins and replaces local
-                // if LOCAL -> local object wins and no changes are applied
-                val localFolder = savedSitesRepository.getFolder(folder.id)
-                if (localFolder != null) {
-                    when (conflictResolution) {
-                        REMOTE_WINS -> {
-                            if (folder.deleted != null) {
-                                Timber.d("Sync: folder $folderId exists locally but was deleted remotely, deleting locally too")
-                                savedSitesRepository.delete(localFolder)
-                            } else {
-                                Timber.d("Sync: folder $folderId exists locally, replacing content")
-                                savedSitesRepository.replaceFolderContent(folder, folder.id)
-                            }
-                        }
-
-                        TIMESTAMP -> {
-                            if (folder.modifiedAfter(localFolder.lastModified)) {
-                                if (folder.deleted != null) {
-                                    Timber.d("Sync: folder $folderId deleted after local folder")
-                                    savedSitesRepository.delete(localFolder)
-                                } else {
-                                    Timber.d("Sync: folder $folderId modified after local folder, replacing content")
-                                    savedSitesRepository.replaceFolderContent(folder, folder.id)
-                                }
-                            } else {
-                                Timber.d("Sync: folder $folderId modified before local folder, nothing to do")
-                            }
-                        }
-
-                        else -> {
-                            Timber.d("Sync: local folder wins over remote, nothing to do")
-                        }
-                    }
-                } else {
-                    if (folder.deleted != null) {
-                        Timber.d("Sync: folder $folderId not present locallybut was deleted, nothing to do")
-                    } else {
-                        Timber.d("Sync: folder $folderId not present locally, inserting")
-                        savedSitesRepository.insert(folder)
                     }
                 }
             }

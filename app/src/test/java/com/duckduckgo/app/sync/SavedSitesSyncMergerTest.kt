@@ -64,10 +64,6 @@ class SavedSitesSyncMergerTest {
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var duplicateFinder: SavedSitesDuplicateFinder
     private lateinit var store: FeatureSyncStore
-    private lateinit var crypto: SyncCrypto
-    private lateinit var syncStore: SyncSharedPrefsStore
-    private val sharedPrefsProvider =
-        TestSharedPrefsProvider(InstrumentationRegistry.getInstrumentation().context)
 
     private lateinit var syncMerger: SavedSitesSyncMerger
 
@@ -84,10 +80,6 @@ class SavedSitesSyncMergerTest {
         duplicateFinder = RealSavedSitesDuplicateFinder(repository)
 
         store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
-        syncStore = SyncSharedPrefsStore(sharedPrefsProvider, TestScope())
-        // syncStore.primaryKey = "UqffgOkjsRW2OAXSFMBF9YIQZr7XHPs3BUe0mYT381M="
-        // syncStore.secretKey = "ql3DT59/yE7qe7bxKk3/3BSHI8I0QmUuYLKBmGr/umI="
-        // crypto = RealSyncCrypto(SyncNativeLib(InstrumentationRegistry.getInstrumentation().targetContext), syncStore)
         syncMerger = SavedSitesSyncMerger(repository, store, duplicateFinder, FakeCrypto())
     }
 
@@ -126,8 +118,8 @@ class SavedSitesSyncMergerTest {
         assertTrue(subFolder.first[0].id == "45cc093d-e821-445c-bf25-b2f8aaa3d276")
         Assert.assertTrue(subFolder.second.isEmpty())
 
-        val favourites_root = repository.getFavoritesSync()
-        assertTrue(favourites_root[0].id == "4cde63c7-04ae-44ef-8d9c-ea699c0b679f")
+        val favouritesRoot = repository.getFavoritesSync()
+        assertTrue(favouritesRoot[0].id == "4cde63c7-04ae-44ef-8d9c-ea699c0b679f")
     }
 }
 
