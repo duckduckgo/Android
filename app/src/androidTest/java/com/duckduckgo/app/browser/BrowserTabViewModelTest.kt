@@ -689,7 +689,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavoriteAddedThenRepositoryUpdatedAndUserNotified() = runTest {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
+        val savedSite = Favorite(UUID.randomUUID().toString(), "A  title", "http://example.com", lastModified = "timestamp", 0)
         loadUrl("www.example.com", "A title")
         whenever(mockSavedSitesRepository.insertFavorite(any(), any(), any(), any())).thenReturn(savedSite)
 
