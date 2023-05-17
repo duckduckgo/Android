@@ -389,10 +389,10 @@ class RealSavedSitesRepository(
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
-        if (getFavorite(bookmark.url) != null) {
-            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
+        if (savedSitesRelationsDao.countFavouritesByUrl(bookmark.url) > 0){
+            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
         }
-        savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
+        savedSitesEntitiesDao.updateModified(bookmark.parentId)
         savedSitesEntitiesDao.delete(bookmark.id)
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
     }

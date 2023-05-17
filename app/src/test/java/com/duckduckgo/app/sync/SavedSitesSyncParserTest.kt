@@ -253,6 +253,41 @@ class SavedSitesSyncParserTest {
         assertTrue(changes[3].deleted == "1")
     }
 
+    @Test
+    fun whenFavouriteDeletedAfterLastSyncThenDataIsCorrect() {
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+
+        repository.insert(favourite1)
+        repository.insert(bookmark3)
+        repository.insert(bookmark4)
+        repository.delete(favourite1)
+
+        val changes = parser.changesSince(lastSyncTimestamp)
+        assertTrue(changes.isNotEmpty())
+        assertTrue(changes[0].id == SavedSitesNames.FAVORITES_ROOT)
+        assertTrue(changes[0].folder!!.children.isEmpty())
+    }
+
+    @Test
+    fun whenBookmarkAndFavouriteDeletedAfterLastSyncThenDataIsCorrect() {
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(LocalDateTime.now().minusHours(2))
+
+        repository.insert(bookmark1)
+        repository.insert(favourite1)
+        repository.insert(bookmark3)
+        repository.insert(bookmark4)
+        repository.delete(bookmark1)
+
+        val changes = parser.changesSince(lastSyncTimestamp)
+        assertTrue(changes.isNotEmpty())
+        assertTrue(changes[0].id == SavedSitesNames.FAVORITES_ROOT)
+        assertTrue(changes[0].folder!!.children.isEmpty())
+        assertTrue(changes[1].id == SavedSitesNames.BOOKMARKS_ROOT)
+        assertTrue(changes[1].folder!!.children == listOf(bookmark3.id, bookmark4.id))
+        assertTrue(changes[2].id == bookmark1.id)
+        assertTrue(changes[2].deleted == "1")
+    }
+
     private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
         return SyncBookmarkEntry(
             id = savedSite.id,
