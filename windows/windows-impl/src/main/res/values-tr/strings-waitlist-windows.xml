@@ -21,7 +21,7 @@
     <string name="windows_waitlist_title">Windows için DuckDuckGo\'yu denemek için erken erişim elde edin!</string>
     <string name="windows_title">Windows için DuckDuckGo\'yu edinin!</string>
     <string name="windows_waitlist_description">Windows için DuckDuckGo, daha fazla gizlilikle gezinmek için ihtiyacınız olan her şeye sahiptir: gizli arama, izleyici engelleme, zorunlu şifreleme ve çerez açılır penceresi engelleme. Ayrıca, sınıfının en iyisi daha fazla koruma da yolda.</string>
-    <string name="windows_description">Windows için DuckDuckGo, ihtiyacınız olan hız ve beklediğiniz tarama özelliklerinin yanı sıra sınıfındaki en iyi gizlilik özelliklerini (Privacy Essentials) sunuyor.\n\nWindows bilgisayarınızda şu adrese gidin:</string>
+    <string name="windows_description">Windows için DuckDuckGo, daha fazla gizlilikle gezinmek için ihtiyacınız olan her şeye sahiptir: gizli arama, izleyici engelleme, zorunlu şifreleme ve çerez açılır penceresi engelleme. Ayrıca, sınıfının en iyisi daha fazla koruma da yolda.\n\nWindows bilgisayarınızda şu adrese gidin:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Bağlantıyı paylaş</string>
     <string name="windows_share_text">Windows\'ta özel olarak gezinmeye hazır mısınız?\n\nİndirmek için Windows bilgisayarınızda bu URL\'yi ziyaret edin:\nduckduckgo.com/windows</string>
