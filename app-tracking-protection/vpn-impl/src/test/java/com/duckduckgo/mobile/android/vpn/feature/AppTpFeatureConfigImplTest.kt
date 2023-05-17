@@ -58,7 +58,6 @@ class AppTpFeatureConfigImplTest {
     fun whenDbTablesAreEmptyThenReturnToggleDefaultValue() {
         AppTpSetting.values().forEach { setting ->
             when (setting) {
-                AppTpSetting.Ipv6Support -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.InterceptDnsTraffic -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
@@ -131,14 +130,14 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.InterceptDnsTraffic, true, isManualOverride = true)
         config.setEnabled(AppTpSetting.InterceptDnsTraffic, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.Ipv6Support, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.Ipv6Support, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
+        config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
 
         config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
 
         assertFalse(config.isEnabled(AppTpSetting.InterceptDnsTraffic))
-        assertFalse(config.isEnabled(AppTpSetting.Ipv6Support))
+        assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
         assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 
@@ -149,14 +148,14 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.InterceptDnsTraffic, true, isManualOverride = true)
         config.setEnabled(AppTpSetting.InterceptDnsTraffic, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.Ipv6Support, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.Ipv6Support, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
+        config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
 
         config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
 
         assertFalse(config.isEnabled(AppTpSetting.InterceptDnsTraffic))
-        assertFalse(config.isEnabled(AppTpSetting.Ipv6Support))
+        assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
         assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 }
