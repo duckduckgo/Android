@@ -91,12 +91,12 @@ class AutofillSettingsViewModel @Inject constructor(
     private var combineJob: Job? = null
 
     fun onCopyUsername(username: String?) {
-        username?.let { clipboardInteractor.copyToClipboard(it) }
+        username?.let { clipboardInteractor.copyToClipboard(it, isSensitive = false) }
         addCommand(ShowUserUsernameCopied())
     }
 
     fun onCopyPassword(password: String?) {
-        password?.let { clipboardInteractor.copyToClipboard(it) }
+        password?.let { clipboardInteractor.copyToClipboard(it, isSensitive = true) }
         addCommand(ShowUserPasswordCopied())
     }
 

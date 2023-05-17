@@ -16,6 +16,7 @@
 
 package com.duckduckgo.deviceauth.api
 
+import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
@@ -29,6 +30,7 @@ interface DeviceAuthenticator {
      * Launches a device authentication flow for a specific [featureToAuth] from a [fragment]. [onResult] can be used to
      * communicate back to the feature the result of the flow.
      */
+    @UiThread
     fun authenticate(
         featureToAuth: Features,
         fragment: Fragment,
@@ -39,6 +41,7 @@ interface DeviceAuthenticator {
      * Launches a device authentication flow for a specific [featureToAuth] from a [fragmentActivity]. [onResult] can be used to
      * communicate back to the feature the result of the flow.
      */
+    @UiThread
     fun authenticate(
         featureToAuth: Features,
         fragmentActivity: FragmentActivity,

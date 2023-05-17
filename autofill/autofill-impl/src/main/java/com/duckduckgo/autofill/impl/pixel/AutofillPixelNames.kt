@@ -35,6 +35,10 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_SELECT_LOGIN_PROMPT_DISMISSED("m_autofill_logins_fill_login_inline_manual_dismissed"),
     AUTOFILL_SELECT_LOGIN_PROMPT_SELECTED("m_autofill_logins_fill_login_inline_manual_confirmed"),
 
+    AUTOFILL_PASSWORD_GENERATION_PROMPT_SHOWN("m_autofill_logins_password_generation_prompt_displayed"),
+    AUTOFILL_PASSWORD_GENERATION_PROMPT_DISMISSED("m_autofill_logins_password_generation_prompt_dismissed"),
+    AUTOFILL_PASSWORD_GENERATION_ACCEPTED("m_autofill_logins_password_generation_prompt_confirmed"),
+
     AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SHOWN("m_autofill_logins_fill_login_inline_autoprompt_displayed"),
     AUTOFILL_SELECT_LOGIN_AUTOPROMPT_DISMISSED("m_autofill_logins_autoprompt_dismissed"),
     AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SELECTED("m_autofill_logins_fill_login_inline_autoprompt_confirmed"),

@@ -125,6 +125,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
@@ -392,6 +393,8 @@ class BrowserTabViewModelTest {
 
     private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
+    private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -500,6 +503,7 @@ class BrowserTabViewModelTest {
             sitePermissionsManager = mockSitePermissionsManager,
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
+            automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
         )
 
         testee.loadData("abc", null, false, false)
@@ -4586,6 +4590,7 @@ class BrowserTabViewModelTest {
         override suspend fun isAutofillEnabledByConfiguration(url: String) = enabled
         override suspend fun canInjectCredentialsToWebView(url: String) = enabled
         override suspend fun canSaveCredentialsFromWebView(url: String) = enabled
+        override suspend fun canGeneratePasswordFromWebView(url: String) = enabled
         override suspend fun canAccessCredentialManagementScreen() = enabled
     }
 }
