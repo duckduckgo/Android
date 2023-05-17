@@ -19,13 +19,13 @@ package com.duckduckgo.cookies.impl
 import android.database.DatabaseErrorHandler
 import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
-import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.CookieRemover
+import com.duckduckgo.cookies.impl.CookiesPixelName.COOKIE_DELETE_ERROR
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -33,6 +33,7 @@ import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
+import logcat.asLog
 import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
@@ -54,7 +55,6 @@ class CookieManagerRemover @Inject constructor(private val cookieManagerProvider
 class SQLCookieRemover @Inject constructor(
     @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
     private val fireproofRepository: FireproofRepository,
-    private val crashLogger: CrashLogger,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
 ) : CookieRemover {
@@ -100,7 +100,11 @@ class SQLCookieRemover @Inject constructor(
                     deleteExecuted = true
                 }
             } catch (exception: Exception) {
-                crashLogger.logCrash(CrashLogger.Crash(shortName = "cookie_db_delete_error", t = exception))
+                val stacktrace = redactStacktraceInBase64(exception.asLog())
+                val params = mapOf(
+                    "ss" to stacktrace,
+                )
+                pixel.fire(COOKIE_DELETE_ERROR, params)
             } finally {
                 close()
             }
@@ -127,7 +131,7 @@ class SQLCookieRemover @Inject constructor(
         const val COOKIES_TABLE_NAME = "cookies"
     }
 
-    private class PixelSenderDatabaseErrorHandler() : DatabaseErrorHandler {
+    private class PixelSenderDatabaseErrorHandler : DatabaseErrorHandler {
 
         private val delegate = DefaultDatabaseErrorHandler()
 
