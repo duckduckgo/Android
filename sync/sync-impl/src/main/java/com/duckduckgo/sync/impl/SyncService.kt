@@ -129,9 +129,9 @@ data class DeviceEntries(
 )
 
 data class Device(
-    @field:Json(name = "device_id") val deviceId: String,
-    @field:Json(name = "device_name") val deviceName: String,
-    @field:Json(name = "device_type") val deviceType: String?,
+    @field:Json(name = "id") val deviceId: String,
+    @field:Json(name = "name") val deviceName: String,
+    @field:Json(name = "type") val deviceType: String?,
     @field:Json(name = "jw_iat") val jwIat: String,
 )
 
