@@ -26,6 +26,9 @@ interface NetPServersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(server: List<NetPEgressServer>)
 
+    @Query("delete from netp_egress_servers")
+    suspend fun clearAll()
+
     @Query("SELECT * from netp_egress_servers")
     suspend fun getServers(): List<NetPEgressServer>
 

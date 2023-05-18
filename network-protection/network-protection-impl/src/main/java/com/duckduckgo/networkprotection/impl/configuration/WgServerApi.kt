@@ -47,13 +47,12 @@ interface WgServerApi {
 @ContributesBinding(VpnScope::class)
 class RealWgServerApi @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
-    private val timezoneProvider: DeviceTimezoneProvider,
     private val appBuildConfig: AppBuildConfig,
     private val serverDebugProvider: PluginPoint<WgServerDebugProvider>,
 ) : WgServerApi {
 
     override suspend fun registerPublicKey(publicKey: String): WgServerData? {
-        return wgVpnControllerService.getServers()
+        return wgVpnControllerService.registerKey(RegisterKeyBody(publicKey = publicKey))
             .also {
                 if (appBuildConfig.isInternalBuild()) {
                     assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
@@ -74,16 +73,10 @@ class RealWgServerApi @Inject constructor(
                 }
             }
             .run {
-                val selectedServer = this.findClosestServer(timezoneProvider.getTimeZone())
-                logcat { "Closest server is: ${selectedServer.server.name}" }
-                wgVpnControllerService.registerKey(
-                    RegisterKeyBody(
-                        publicKey = publicKey,
-                        server = selectedServer.server.name,
-                    ),
-                ).firstOrNull()?.toWgServerData().also {
-                    logcat { "Registered public key to server: $it" }
-                }
+                logcat { "Eligible servers are: ${this.map { it.server.name }}" }
+                val server = this.firstOrNull()?.toWgServerData()
+                logcat { "Selected server is $server" }
+                server
             }
     }
 
@@ -141,15 +134,6 @@ class RealWgServerApi @Inject constructor(
         val country: String? by attributes
         val tzOffset: Long by attributes
     }
-}
-
-interface DeviceTimezoneProvider {
-    fun getTimeZone(): TimeZone
-}
-
-@ContributesBinding(VpnScope::class)
-class SystemDeviceTimezoneProvider @Inject constructor() : DeviceTimezoneProvider {
-    override fun getTimeZone(): TimeZone = TimeZone.getDefault()
 }
 
 @ContributesPluginPoint(VpnScope::class)
