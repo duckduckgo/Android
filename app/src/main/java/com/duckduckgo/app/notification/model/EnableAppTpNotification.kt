@@ -56,7 +56,7 @@ class EnableAppTpNotification(
             return false
         }
 
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
             return false
         }
 

@@ -30,7 +30,7 @@ class AppTPStateCollector @Inject constructor(
 ) : VpnStateCollectorPlugin {
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
-            put("enabled", vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN))
+            put("enabled", vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN))
         }
     }
 

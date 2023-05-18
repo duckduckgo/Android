@@ -48,7 +48,7 @@ class EnableAppTpNotificationTest {
     @Test
     fun whenAppTPEnabledThenCanShowIsFalse() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
-        whenever(mockVpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
 
         assertFalse(testee.canShow())
     }

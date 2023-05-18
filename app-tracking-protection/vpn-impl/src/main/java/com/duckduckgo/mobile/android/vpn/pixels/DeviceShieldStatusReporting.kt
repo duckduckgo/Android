@@ -83,7 +83,7 @@ class DeviceShieldStatusReportingWorker(
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     override suspend fun doWork(): Result {
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
             deviceShieldPixels.reportEnabled()
         } else {
             deviceShieldPixels.reportDisabled()

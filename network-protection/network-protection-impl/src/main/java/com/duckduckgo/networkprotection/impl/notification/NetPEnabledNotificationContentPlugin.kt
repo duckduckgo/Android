@@ -47,7 +47,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
     override fun getInitialContent(): VpnEnabledNotificationContent? {
-        return if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        return if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.netpEnabledNotificationTitle)),
                 message = SpannableStringBuilder(),
@@ -69,7 +69,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
     }
 
     override fun isActive(): Boolean {
-        return vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)
+        return vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
     }
 
     // This fun interface is provided just for testing purposes

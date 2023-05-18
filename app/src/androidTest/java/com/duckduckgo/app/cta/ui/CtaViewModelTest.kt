@@ -571,7 +571,7 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
-        whenever(mockVpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
+        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
         givenAtLeastOneDaxDialogCtaShown()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
@@ -584,7 +584,7 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
-        whenever(mockVpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)

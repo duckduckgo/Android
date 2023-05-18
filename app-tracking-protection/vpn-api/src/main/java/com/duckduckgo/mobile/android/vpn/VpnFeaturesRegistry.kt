@@ -37,9 +37,19 @@ interface VpnFeaturesRegistry {
     fun unregisterFeature(feature: VpnFeature)
 
     /**
+     * @return `true` if this feature is registered and the VPN is running, `false` otherwise.
+     */
+    fun isFeatureRunning(feature: VpnFeature): Boolean
+
+    /**
      * @return `true` if this feature is registered, `false` otherwise.
      */
     fun isFeatureRegistered(feature: VpnFeature): Boolean
+
+    /**
+     * @return returns `true` if there's any feature currently using the VPN and the VPN is running, `false` otherwise
+     */
+    fun isAnyFeatureRunning(): Boolean
 
     /**
      * @return returns `true` if there's any feature currently using the VPN, `false` otherwise

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.vpn.internal.feature
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -28,6 +27,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -39,6 +39,7 @@ import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
@@ -51,6 +52,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+@ContributeToActivityStarter(LaunchVpnInternalScreenWithEmptyParams::class)
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -290,10 +292,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         // listener
         binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)
     }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, VpnInternalSettingsActivity::class.java)
-        }
-    }
 }
+
+object LaunchVpnInternalScreenWithEmptyParams : ActivityParams

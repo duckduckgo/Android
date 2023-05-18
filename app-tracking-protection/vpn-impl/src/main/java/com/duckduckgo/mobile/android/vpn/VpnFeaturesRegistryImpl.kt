@@ -62,12 +62,20 @@ internal class VpnFeaturesRegistryImpl(
         }
     }
 
+    override fun isFeatureRunning(feature: VpnFeature): Boolean {
+        return isFeatureRegistered(feature) && vpnServiceWrapper.isServiceRunning()
+    }
+
     override fun isFeatureRegistered(feature: VpnFeature): Boolean {
-        return registeredFeatures().contains(feature.featureName) && vpnServiceWrapper.isServiceRunning()
+        return registeredFeatures().contains(feature.featureName)
+    }
+
+    override fun isAnyFeatureRunning(): Boolean {
+        return isAnyFeatureRegistered() && vpnServiceWrapper.isServiceRunning()
     }
 
     override fun isAnyFeatureRegistered(): Boolean {
-        return registeredFeatures().isNotEmpty() && vpnServiceWrapper.isServiceRunning()
+        return registeredFeatures().isNotEmpty()
     }
 
     override suspend fun refreshFeature(feature: VpnFeature) {

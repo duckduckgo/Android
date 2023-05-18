@@ -43,6 +43,7 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':feature-toggles-api')
+    implementation project(':navigation-api')
 
     implementation Kotlin.stdlib.jdk7
 

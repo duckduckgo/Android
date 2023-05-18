@@ -66,7 +66,7 @@ class DeviceShieldTileService : TileService() {
     }
 
     private fun respondToTile() {
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
             deviceShieldPixels.disableFromQuickSettingsTile()
             TrackerBlockingVpnService.stopService(this)
         } else {
@@ -100,7 +100,7 @@ class DeviceShieldTileService : TileService() {
                 while (isActive) {
                     val tile = qsTile
                     tile?.let {
-                        val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+                        val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
                         it.state = if (isDeviceShieldEnabled) STATE_ACTIVE else STATE_INACTIVE
                         it.updateTile()
                     }

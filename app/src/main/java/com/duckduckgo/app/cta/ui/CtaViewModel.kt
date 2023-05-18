@@ -217,7 +217,7 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
-                if (variantManager.isDaxDialogMessageEnabled() && !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+                if (variantManager.isDaxDialogMessageEnabled() && !vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
                     DaxBubbleCta.DaxEndEnableAppTpCta(onboardingStore, appInstallStore)
                 } else {
                     DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)

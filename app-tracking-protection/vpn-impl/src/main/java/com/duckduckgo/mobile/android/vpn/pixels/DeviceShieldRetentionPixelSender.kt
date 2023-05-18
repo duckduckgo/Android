@@ -30,7 +30,7 @@ class DeviceShieldRetentionPixelSender @Inject constructor(
 ) : RefreshRetentionAtbPlugin {
 
     override fun onSearchRetentionAtbRefreshed() {
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
             deviceShieldPixels.deviceShieldEnabledOnSearch()
         } else {
             deviceShieldPixels.deviceShieldDisabledOnSearch()
@@ -38,7 +38,7 @@ class DeviceShieldRetentionPixelSender @Inject constructor(
     }
 
     override fun onAppRetentionAtbRefreshed() {
-        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
             deviceShieldPixels.deviceShieldEnabledOnAppLaunch()
         } else {
             deviceShieldPixels.deviceShieldDisabledOnAppLaunch()
