@@ -235,20 +235,22 @@ class RealSecureStorageTest {
     }
 
     @Test
-    fun whenNoSecureStorageRepositoryGetWebsiteCredentialsForDomainThenFlowReturnsNothing() = runTest {
+    fun whenNoSecureStorageRepositoryGetWebsiteCredentialsForDomainThenFlowReturnsEmptyList() = runTest {
         setUpNoSecureStorageRepository()
 
         testee.websiteLoginDetailsWithCredentialsForDomain("test").test {
-            this.awaitComplete()
+            assertTrue(this.awaitItem().isEmpty())
+            this.cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenNoSecureStorageRepositoryGetWebsiteCredentialsThenFlowReturnsNothing() = runTest {
+    fun whenNoSecureStorageRepositoryGetWebsiteCredentialsThenFlowReturnsEmptyList() = runTest {
         setUpNoSecureStorageRepository()
 
         testee.websiteLoginDetailsWithCredentials().test {
-            this.awaitComplete()
+            assertTrue(this.awaitItem().isEmpty())
+            this.cancelAndIgnoreRemainingEvents()
         }
     }
 

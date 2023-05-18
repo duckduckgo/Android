@@ -40,6 +40,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
@@ -52,6 +53,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Locked
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementCredentialsMode
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementLockedMode
@@ -162,6 +164,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Password)
             is ShowListMode -> showListMode()
             is ShowDisabledMode -> showDisabledMode()
+            is ShowDeviceUnsupportedMode -> showDeviceUnsupportedMode()
             is ShowLockedMode -> showLockMode()
             is LaunchDeviceAuth -> launchDeviceAuth()
             is InitialiseViewAfterUnlock -> setupInitialState()
@@ -250,6 +253,15 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun showDeviceUnsupportedMode() {
+        resetToolbar()
+
+        supportFragmentManager.commit {
+            supportFragmentManager.findFragmentByTag(TAG_UNSUPPORTED)?.let { remove(it) }
+            replace(R.id.fragment_container_view, AutofillManagementDeviceUnsupportedMode.instance(), TAG_UNSUPPORTED)
+        }
+    }
+
     private fun resetToolbar() {
         setTitle(R.string.autofillManagementScreenTitle)
         binding.toolbar.menu.clear()
@@ -305,6 +317,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         private const val EXTRAS_SUGGESTIONS_FOR_URL = "extras_suggestions_for_url"
         private const val TAG_LOCKED = "tag_fragment_locked"
         private const val TAG_DISABLED = "tag_fragment_disabled"
+        private const val TAG_UNSUPPORTED = "tag_fragment_unsupported"
         private const val TAG_CREDENTIAL = "tag_fragment_credential"
         private const val TAG_ALL_CREDENTIALS = "tag_fragment_credentials_list"
 
