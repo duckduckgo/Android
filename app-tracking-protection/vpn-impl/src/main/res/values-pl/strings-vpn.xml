@@ -167,10 +167,10 @@
     <string name="atp_ReportBreakageAppNextCta">Dalej</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Opisz, co się dzieje, czego się spodziewasz i jakie kroki doprowadziły do powstania problemu.</string>
     <string name="atp_ReportBreakageFormInputHint">Opowiedz nam więcej o problemie, który występuje</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Klikając „Prześlij”, zgadzam się na wykorzystanie przez DuckDuckGo informacji zawartych w tym raporcie w celu poprawy ochrony przed śledzeniem przez aplikacje.
+    <string name="atp_ReportBreakageFormCheckboxText">Klikając „Prześlij”, zgadzam się na wykorzystanie przez DuckDuckGo informacji zawartych w tym raporcie w celu ulepszenia funkcji aplikacji.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Oprócz danych wprowadzonych w tym formularzu, Twój raport o problemie z aplikacją będzie zawierał informacje, takie jak:<br/>• Nazwa pakietu aplikacji<br/>• Lista modułów śledzących zablokowanych w aplikacji<br/>• Informacja o tym, czy ochrona przed śledzeniem przez aplikację jest włączona<br/>• Zbiorcza diagnostyka aplikacji DuckDuckGo<br/>]]>
+        <![CDATA[Oprócz danych wprowadzonych w tym formularzu, raport o problemie z aplikacją będzie zawierał następujące informacje:<br/>• Nazwa pakietu aplikacji<br/>• Lista modułów śledzących zablokowanych w aplikacji<br/>• Informacja o tym, czy włączono funkcje DuckDuckGo<br/>• Zbiorcza diagnostyka aplikacji DuckDuckGo<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Przesłano raport, dziękujemy! Twoje opinie pomogą nam ulepszyć ochronę przed śledzeniem przez aplikacje dla każdego użytkownika.</string>
     <string name="atp_ThanksForTheFeedback">Dzięki za opinię!</string>

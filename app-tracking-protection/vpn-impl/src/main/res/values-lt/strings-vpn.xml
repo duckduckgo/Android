@@ -167,10 +167,10 @@
     <string name="atp_ReportBreakageAppNextCta">Kitas</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Aprašykite, kas vyksta, ko tikėjotės, kad įvyks, ir veiksmus, dėl kurių iškilo problema.</string>
     <string name="atp_ReportBreakageFormInputHint">Papasakokite daugiau apie problemą, su kuria susiduriate</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Spausdamas „Pateikti“ sutinku, kad „DuckDuckGo“ gali naudoti šioje ataskaitoje pateiktą informaciją apsaugos nuo programėlių sekimo gerinimo tikslais.
+    <string name="atp_ReportBreakageFormCheckboxText">Spausdamas (-a) „Pateikti“ sutinku, kad „DuckDuckGo“ gali naudoti šioje ataskaitoje pateiktą informaciją programėlės funkcijų gerinimo tikslais.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Be šioje formoje įvestos informacijos, jūsų programėlės problemos ataskaitoje bus pateikta:<br/>• Programėlės pakuotės pavadinimas<br/>• Programėlėje blokuojamų sekimo įrenginių sąrašas<br/>• Ar įjungta apsauga nuo programėlių sekimo<br/>• Suvestinė „DuckDuckGo“ programėlės diagnostika.<br/>]]>
+        <![CDATA[Be šioje formoje įvestos informacijos, jūsų programėlės problemos ataskaitoje bus pateikta:<br/>• Programėlės paketo pavadinimas<br/>• Programėlėje blokuojamų sekiklių sąrašas<br/>• Ar įjungtos konkrečios „DuckDuckGo“ funkcijos<br/>• Suvestinė „DuckDuckGo“ programėlės diagnostika<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Ataskaita išsiųsta, ačiū! Jūsų atsiliepimai padeda mums tobulinti apsaugą nuo programėlių sekimo visiems.</string>
     <string name="atp_ThanksForTheFeedback">Dėkojame už atsiliepimą!</string>
