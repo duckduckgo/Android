@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Сохранить логин</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сейчас</string>
-    <string name="saveLoginDialogSubtitle">Логины надежно хранятся только на этом устройстве. Ими можно управлять в меню «Логины» в «Настройках».</string>
+    <string name="saveLoginDialogSubtitle">Логины защищены только на этом устройстве. Ими можно управлять в меню «Логины» в «Настройках».</string>
     <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
