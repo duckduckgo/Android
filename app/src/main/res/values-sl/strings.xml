@@ -434,8 +434,8 @@
         <item quantity="other"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
-        <item quantity="two"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
+        <item quantity="two" tools:ignore="ImpliedQuantity"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
         <item quantity="few"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
         <item quantity="other"><![CDATA[ vas je poskušal izslediti tukaj. <br/><br/>Blokiral sem ga!<br/><br/> ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.]]></item>
     </plurals>

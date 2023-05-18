@@ -433,8 +433,8 @@
         <item quantity="other"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="zero" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
         <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Tev pieskaroties un ritinot, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet! Turpini pārlūkot!]]></string>

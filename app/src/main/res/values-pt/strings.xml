@@ -432,7 +432,7 @@
         <item quantity="other"><![CDATA[ e<b>%1$doutros</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ estava a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ estava a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
         <item quantity="other"><![CDATA[ estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>

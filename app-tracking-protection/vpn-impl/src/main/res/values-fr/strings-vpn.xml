@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Protection contre le suivi des applications</string>
     <string name="refresh">Actualiser</string>
 
@@ -211,11 +211,11 @@
     <string name="atp_ActivityPastWeekAcross">Dans</string>
 
     <plurals name="atp_ActivityPastWeekTrackerCount">
-        <item quantity="one">Tentative de suivi</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity">Tentative de suivi</item>
         <item quantity="other">Tentatives de suivi</item>
     </plurals>
     <plurals name="atp_ActivityPastWeekAppCount">
-        <item quantity="one">Application</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity">Application</item>
         <item quantity="other">Applications</item>
     </plurals>
     <string name="atp_ActivityEnabledLabel">Cette fonctionnalité est disponible en version bêta. Vous rencontrez un problème lié à une application ? <annotation type="app_settings_link">Veuillez le signaler.</annotation></string>
