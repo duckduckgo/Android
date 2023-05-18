@@ -24,7 +24,7 @@
     <string name="windows_description">Aplikacja DuckDuckGo dla systemu Windows zapewnia szybkość, której potrzebujesz, i niezbędne funkcje przeglądania. Ponadto jest wyposażona w najlepsze w swojej klasie narzędzia do ochrony prywatności.\n\nNa komputerze z systemem Windows przejdź do:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Udostępnij link</string>
-    <string name="windows_share_text">Chcesz rozpocząć prywatne przeglądanie w systemie Windows?\n\nOdwiedź ten adres na komputerze z systemem Windows, aby pobrać:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Chcesz rozpocząć prywatne przeglądanie w systemie Windows?\n\nOdwiedź ten adres na komputerze z systemem Windows, aby pobrać:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Szukasz wersji na komputer Mac?</string>
     <string name="windows_join_waitlist">Dołącz do prywatnej listy oczekujących</string>
     <string name="windows_join_waitlist_error">Podczas dołączania do listy oczekujących wystąpił błąd, spróbuj ponownie później</string>
