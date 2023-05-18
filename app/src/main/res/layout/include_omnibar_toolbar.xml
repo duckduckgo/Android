@@ -94,7 +94,7 @@
                             android:gravity="center"
                             android:importantForAccessibility="no"
                             android:padding="4dp"
-                            android:src="@drawable/ic_ddg_logo"
+                            app:srcCompat="@drawable/ic_ddg_logo"
                             android:visibility="gone" />
 
                         <ImageView
