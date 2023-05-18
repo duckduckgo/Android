@@ -163,10 +163,10 @@
     <string name="atp_ReportBreakageAppNextCta">Următorul</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Te rugăm să descrii ce se întâmplă, ce te așteptai să se întâmple și pașii care au dus la apariția problemei.</string>
     <string name="atp_ReportBreakageFormInputHint">Spune-ne mai multe despre problema cu care te confrunți</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Făcând clic pe „Trimite”, sunt de acord că DuckDuckGo poate utiliza informațiile din acest raport în scopul îmbunătățirii Protecția împotriva urmăririi de către aplicație.
+    <string name="atp_ReportBreakageFormCheckboxText">Făcând clic pe „Trimitere”, sunt de acord ca DuckDuckGo să utilizeze informațiile din acest raport în scopul îmbunătățirii funcțiilor aplicației.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[În plus față de detaliile introduse în acest formular, raportul cu problemele aplicației tale va conține:<br/>• Numele pachetului aplicației<br/>• O listă a tehnologiilor de urmărire blocate în aplicație<br/>• Dacă Protecția împotriva urmăririi de către aplicații este activată<br/>• Diagnostice agregate ale aplicației DuckDuckGo<br/>]]>
+        <![CDATA[În plus față de detaliile introduse în acest formular, raportul privind problemele aplicației tale va conține:<br/>• denumirea pachetului aplicației<br/>• o listă a tehnologiilor de urmărire blocate în aplicație<br/>• dacă sunt activate funcții specifice DuckDuckGo<br/>• diagnosticele agregate ale aplicației DuckDuckGo<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Raport trimis, mulțumim! Feedbackul tău ne ajută să îmbunătățim Protecția împotriva urmăririi de către aplicație pentru toată lumea.</string>
     <string name="atp_ThanksForTheFeedback">Îți mulțumim pentru feedback!</string>

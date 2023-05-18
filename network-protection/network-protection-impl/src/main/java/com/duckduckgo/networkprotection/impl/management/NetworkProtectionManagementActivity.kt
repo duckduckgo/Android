@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -40,6 +39,7 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
@@ -63,6 +63,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
@@ -98,7 +101,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             REPORT_ISSUES_ANNOTATION,
             getText(R.string.netpManagementBetaDescription),
         ) {
-            startActivity(Intent(Intent.ACTION_VIEW, FEEDBACK_URL))
+            viewModel.onReportIssuesClicked()
         }
     }
 
@@ -201,6 +204,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is Command.ShowAlwaysOnPromotionDialog -> showAlwaysOnPromotionDialog()
             is Command.ShowAlwaysOnLockdownDialog -> showAlwaysOnLockdownDialog()
             is Command.OpenVPNSettings -> openVPNSettings()
+            is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
         }
     }
 
@@ -338,6 +342,5 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val TAG_ALWAYS_ON_DIALOG = "NETP_ALWAYS_ON_DIALOG"
-        val FEEDBACK_URL = "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945".toUri()
     }
 }

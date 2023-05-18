@@ -159,10 +159,10 @@
     <string name="atp_ReportBreakageAppNextCta">Järgmine</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Palun kirjelda, mis toimub, mida sa ootasid ja mis viis probleemi tekkimiseni.</string>
     <string name="atp_ReportBreakageFormInputHint">Räägi meile oma probleemist lähemalt</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Vajutades nuppu „Saada“, nõustun, et DuckDuckGo võib kasutada selles teavituses sisalduvat teavet rakenduse jälgimise kaitse täiustamiseks.
+    <string name="atp_ReportBreakageFormCheckboxText">Nuppu „Saada“ vajutades nõustun, et DuckDuckGo võib kasutada selles teavituses sisalduvat teavet rakenduse funktsioonide täiustamiseks.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Peale sellele vormile sisestatud üksikasjade sisaldab rakenduse probleemi teavitus järgmist.<br/>• Rakenduse paketi nimi<br/>• Rakenduses blokeeritud jälgurite loend<br/>• Kas rakenduse jälgimise kaitse on lubatud<br/>• DuckDuckGo\' rakenduse koondatud diagnostika<br/>]]>
+        <![CDATA[Peale selles vormis sisestatud andmete sisaldab sinu rakenduseprobleemi teavitus järgmist.<br/>• Rakendusepaketi nimi<br/>• Rakenduses blokeeritud jälgurite loetelu<br/>• Kas DuckDuckGo teatud funktsioonid on lubatud<br/>• DuckDuckGo rakenduse koondatud diagnostika<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Teavitus saadetud, aitäh. Sinu tagasiside aitab meil rakenduse jälgimise kaitset kõigi jaoks täiustada.</string>
     <string name="atp_ThanksForTheFeedback">Aitäh tagasiside eest!</string>

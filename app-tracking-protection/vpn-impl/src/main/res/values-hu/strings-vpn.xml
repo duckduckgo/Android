@@ -159,10 +159,10 @@
     <string name="atp_ReportBreakageAppNextCta">Következő</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Írd le, mi történik, mire számítottál, és milyen lépések vezettek a problémához.</string>
     <string name="atp_ReportBreakageFormInputHint">Mondj el többet a tapasztalt problémáról</string>
-    <string name="atp_ReportBreakageFormCheckboxText">A „Beküldés” gombra kattintva elfogadom, hogy a DuckDuckGo felhasználja a jelentésben szereplő információkat az alkalmazáskövetés elleni védelem javítása céljából.
+    <string name="atp_ReportBreakageFormCheckboxText">A „Beküldés” gombra kattintva elfogadom, hogy a DuckDuckGo az alkalmazás funkcióinak javítása céljából felhasználhatja a jelentésben szereplő adatokat.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Az ezen űrlapon megadott adatokon kívül az alkalmazással kapcsolatos problémajelentésed tartalmazza a következőket:<br/>• Az alkalmazáscsomag neve<br/>• Az alkalmazásban blokkolt nyomkövetők listája<br/>• Az alkalmazás nyomkövetés elleni védelem be van-e kapcsolva<br/>• A DuckDuckGo összesített alkalmazásdiagnosztikája<br/>]]>
+        <![CDATA[Az ezen űrlapon megadott adatokon kívül az alkalmazással kapcsolatos problémajelentésed tartalmazza a következőket:<br/>• Az alkalmazáscsomag neve<br/>• Az alkalmazásban blokkolt nyomkövetők listája<br/>• Bizonyos DuckDuckGo-funkciók be vannak-e kapcsolva<br/>• A DuckDuckGo összesített alkalmazásdiagnosztikája<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Jelentés elküldve, köszönjük! A visszajelzésed segítenek nekünk, hogy mindenki számára javítsuk az alkalmazáskövetés elleni védelmet.</string>
     <string name="atp_ThanksForTheFeedback">Köszönjük a visszajelzést!</string>

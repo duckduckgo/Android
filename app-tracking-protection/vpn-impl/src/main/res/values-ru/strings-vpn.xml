@@ -167,10 +167,10 @@
     <string name="atp_ReportBreakageAppNextCta">Далее</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Опишите, что происходит, что ожидалось и какие действия привели к неполадке.</string>
     <string name="atp_ReportBreakageFormInputHint">Расскажите о проблеме немного подробнее</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Нажимая кнопку «Отправить», я тем самым соглашаюсь, что DuckDuckGo может использовать полученную информацию в целях улучшения защиты от слежки.
+    <string name="atp_ReportBreakageFormCheckboxText">Нажимая кнопку «Отправить», я разрешаю DuckDuckGo использовать данные в этом отчете для улучшения работы приложения.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Помимо сведений, внесенных в форме, в отчет о сбоях приложения также войдет следующая информация:<br/>• имя пакета приложения<br/>• список заблокированных в приложении трекеров<br/>• была ли включена защита от слежки<br/>• сводная диагностика приложения DuckDuckGo<br/>]]>
+        <![CDATA[Помимо сведений, указанных в форме, в отчет о сбое приложения также войдет следующая информация:<br/>• имя пакета приложения<br/>• список заблокированных в приложении трекеров<br/>• данные о включении функций DuckDuckGo<br/>• сводная диагностика приложения DuckDuckGo<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Отчет отправлен. Спасибо! Ваши отзывы помогают нам улучшать защиту от слежки для всех.</string>
     <string name="atp_ThanksForTheFeedback">Спасибо за отзыв!</string>
