@@ -114,10 +114,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic)
     }
 
-    private val isIpv6SupportEnabled by lazy {
-        appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support)
-    }
-
     private val isPrivateDnsSupportEnabled by lazy {
         appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)
     }
@@ -416,19 +412,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             (systemDnsList + tunnelConfig.dns)
                 .filter { (it is Inet4Address) || (tunHasIpv6Address && it is Inet6Address) }
                 .forEach { addr ->
-                    if (isIpv6SupportEnabled || addr is Inet4Address) {
-                        logcat { "VPN log: Adding DNS $addr" }
-                        runCatching {
-                            addDnsServer(addr)
-                        }.onFailure { t ->
-                            logcat(ERROR) { "VPN log: Error setting DNS $addr: ${t.asLog()}" }
-                            if (addr.isLoopbackAddress) {
-                                deviceShieldPixels.reportLoopbackDnsError()
-                            } else if (addr.isAnyLocalAddress) {
-                                deviceShieldPixels.reportAnylocalDnsError()
-                            } else {
-                                deviceShieldPixels.reportGeneralDnsError()
-                            }
+                    logcat { "VPN log: Adding DNS $addr" }
+                    runCatching {
+                        addDnsServer(addr)
+                    }.onFailure { t ->
+                        logcat(ERROR) { "VPN log: Error setting DNS $addr: ${t.asLog()}" }
+                        if (addr.isLoopbackAddress) {
+                            deviceShieldPixels.reportLoopbackDnsError()
+                        } else if (addr.isAnyLocalAddress) {
+                            deviceShieldPixels.reportAnylocalDnsError()
+                        } else {
+                            deviceShieldPixels.reportGeneralDnsError()
                         }
                     }
                 }
@@ -491,10 +485,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                     logcat { "VPN log: Adding cloudflare DNS" }
                     dns.add(InetAddress.getByName("1.1.1.1"))
                     dns.add(InetAddress.getByName("1.0.0.1"))
-                    if (isIpv6SupportEnabled) {
-                        dns.add(InetAddress.getByName("2606:4700:4700::1111"))
-                        dns.add(InetAddress.getByName("2606:4700:4700::1001"))
-                    }
+                    dns.add(InetAddress.getByName("2606:4700:4700::1111"))
+                    dns.add(InetAddress.getByName("2606:4700:4700::1001"))
                 }.onFailure {
                     logcat(LogPriority.WARN) { "VPN log: Error adding fallback DNS: ${it.asLog()}" }
                 }

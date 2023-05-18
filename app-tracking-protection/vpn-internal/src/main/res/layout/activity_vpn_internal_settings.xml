@@ -53,13 +53,6 @@
                     app:primaryText="Config"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/ipv6SupportToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="IPv6 Support"
-                    app:showSwitch="true"/>
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/privateDnsToggle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

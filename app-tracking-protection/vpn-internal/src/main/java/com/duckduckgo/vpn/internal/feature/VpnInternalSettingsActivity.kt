@@ -178,7 +178,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->
-                binding.ipv6SupportToggle.isEnabled = isEnabled
                 binding.privateDnsToggle.isEnabled = isEnabled
                 binding.vpnInterceptDnsTrafficToggle.isEnabled = isEnabled
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
@@ -232,17 +231,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
-        with(AppTpSetting.Ipv6Support) {
-            binding.ipv6SupportToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-
         with(AppTpSetting.PrivateDnsSupport) {
             binding.privateDnsToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->

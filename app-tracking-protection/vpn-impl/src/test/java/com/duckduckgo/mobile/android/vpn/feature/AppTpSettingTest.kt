@@ -26,7 +26,6 @@ class AppTpSettingTest {
     fun whenAppTpSettingThenShouldHaveCorrectValues() {
         AppTpSetting.values().forEach { setting ->
             when (setting) {
-                AppTpSetting.Ipv6Support -> assertFalse(setting.defaultValue)
                 AppTpSetting.PrivateDnsSupport -> assertFalse(setting.defaultValue)
                 AppTpSetting.InterceptDnsTraffic -> assertFalse(setting.defaultValue)
                 AppTpSetting.AlwaysSetDNS -> assertFalse(setting.defaultValue)
