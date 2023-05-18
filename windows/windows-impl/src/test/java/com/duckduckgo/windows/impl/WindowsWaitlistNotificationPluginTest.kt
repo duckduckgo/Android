@@ -19,6 +19,8 @@ package com.duckduckgo.windows.impl
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_NOTIFICATION_CANCELLED
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_NOTIFICATION_SHOWN
 import com.duckduckgo.windows.impl.waitlist.WindowsWaitlistNotificationPlugin
@@ -33,11 +35,21 @@ class WindowsWaitlistNotificationPluginTest {
     private val mockNotification: SchedulableNotification = mock()
     private val mockTaskStackBuilderFactory: TaskStackBuilderFactory = mock()
     private val mockPixel: Pixel = mock()
+    private val mockWindowsDownloadLinkFeature: WindowsDownloadLinkFeature = mock()
+    private val mockGlobalActivityStarter: GlobalActivityStarter = mock()
+
     lateinit var testee: WindowsWaitlistNotificationPlugin
 
     @Before
     fun before() {
-        testee = WindowsWaitlistNotificationPlugin(mock(), mockNotification, mockTaskStackBuilderFactory, mockPixel)
+        testee = WindowsWaitlistNotificationPlugin(
+            mock(),
+            mockNotification,
+            mockTaskStackBuilderFactory,
+            mockPixel,
+            mockWindowsDownloadLinkFeature,
+            mockGlobalActivityStarter,
+        )
     }
 
     @Test

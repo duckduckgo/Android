@@ -28,6 +28,9 @@ import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
+import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import com.duckduckgo.windows.impl.R
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_NOTIFICATION_CANCELLED
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_NOTIFICATION_LAUNCHED
@@ -86,6 +89,8 @@ class WindowsWaitlistNotificationPlugin @Inject constructor(
     private val schedulableNotification: SchedulableNotification,
     private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val pixel: Pixel,
+    private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification {
@@ -105,8 +110,12 @@ class WindowsWaitlistNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = WindowsWaitlistActivity.intent(context).apply {
-            putExtra(WindowsWaitlistActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, WINDOWS_WAITLIST_NOTIFICATION_LAUNCHED.pixelName)
+        val intent = if (windowsDownloadLinkFeature.self().isEnabled()) {
+            globalActivityStarter.startIntent(context, WindowsScreenWithEmptyParams)
+        } else {
+            WindowsWaitlistActivity.intent(context).apply {
+                putExtra(WindowsWaitlistActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, WINDOWS_WAITLIST_NOTIFICATION_LAUNCHED.pixelName)
+            }
         }
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)
