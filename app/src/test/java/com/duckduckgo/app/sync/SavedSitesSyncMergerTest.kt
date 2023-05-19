@@ -45,7 +45,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncMergerTest {

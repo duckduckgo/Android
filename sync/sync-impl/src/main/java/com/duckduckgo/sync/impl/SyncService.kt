@@ -165,16 +165,6 @@ data class BookmarksResponse(
     val entries: List<SyncBookmarkEntry>,
 )
 
-data class SettingsResponse(
-    @field:Json(name = "last_modified") val lastModified: String?,
-    val entries: List<Setting>,
-)
-
-data class DeviceDataResponse(
-    @field:Json(name = "last_modified") val lastModified: String?,
-    val entries: List<Device>,
-)
-
 data class SyncDataResponse(
     val bookmarks: BookmarksResponse,
 ) {
