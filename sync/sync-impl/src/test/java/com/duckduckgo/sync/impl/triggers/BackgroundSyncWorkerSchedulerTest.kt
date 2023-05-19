@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.triggers
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
-import androidx.work.ExistingPeriodicWorkPolicy.REPLACE
 import androidx.work.WorkManager
 import com.duckduckgo.sync.api.DeviceSyncState
 import org.junit.Before
@@ -58,5 +57,4 @@ class BackgroundSyncWorkerSchedulerTest {
 
         verifyNoInteractions(mockWorkManager)
     }
-
 }

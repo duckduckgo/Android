@@ -29,20 +29,18 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
-import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesWorker(AppScope::class)
 class SyncBackgroundWorker(
     context: Context,
-    workerParameters: WorkerParameters
+    workerParameters: WorkerParameters,
 ) :
     CoroutineWorker(context, workerParameters) {
 
