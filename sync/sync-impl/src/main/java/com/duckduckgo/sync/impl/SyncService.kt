@@ -17,9 +17,9 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.Json
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -72,22 +72,16 @@ interface SyncService {
     @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
     fun patch(
         @Header("Authorization") token: String,
-        @Body request: SyncDataRequest,
-    ): Call<SyncDataResponse>
-
-    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
-    fun data(@Header("Authorization") token: String): Call<SyncDataResponse>
-
-    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
-    fun dataSince(@Header("Authorization") token: String, @Query("since") since: String): Call<SyncDataResponse>
+        @Body request: JSONObject,
+    ): Call<JSONObject>
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
     fun bookmarks(
         @Header("Authorization") token: String,
-    ): Call<SyncDataResponse>
+    ): Call<JSONObject>
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
-    fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<SyncDataResponse>
+    fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
 }
 
 data class Login(
@@ -165,19 +159,9 @@ data class BookmarksResponse(
     val entries: List<SyncBookmarkEntry>,
 )
 
-data class SyncDataResponse(
-    val bookmarks: BookmarksResponse,
-) {
-    companion object {
-        fun empty(): SyncDataResponse {
-            val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-            return SyncDataResponse(bookmarksResponse)
-        }
-    }
-}
-
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
+    NOT_MODIFIED(304),
 }
 
 data class SyncBookmarkPage(val url: String)
@@ -213,17 +197,3 @@ data class SyncBookmarkEntry(
         }
     }
 }
-
-fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
-fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
-
-class SyncDataRequest(
-    val client_timestamp: String = DatabaseDateFormatter.iso8601(),
-    val bookmarks: SyncBookmarksRequest,
-)
-
-class SyncRequest(val bookmarks: SyncBookmarksRequest)
-class SyncBookmarksRequest(
-    val updates: List<SyncBookmarkEntry>,
-    val modified_since: String = "0",
-)

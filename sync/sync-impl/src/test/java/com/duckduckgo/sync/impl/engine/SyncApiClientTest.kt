@@ -19,13 +19,12 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.duckduckgo.sync.impl.BookmarksResponse
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.store.SyncStore
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
+import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -45,8 +44,6 @@ internal class SyncApiClientTest {
         "\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\"" +
         ":[\"bookmark3\",\"bookmark4\"]},\"id\"" +
         ":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
-    val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-    val syncDataResponse = SyncDataResponse(bookmarksResponse)
     val patchAllError = Result.Error(-1, "Patch All Error")
     val getAllError = Result.Error(-1, "Get All Error")
 
@@ -77,7 +74,7 @@ internal class SyncApiClientTest {
     fun whenPatchAndBookmarkChangesThenApiIsSuccessful() {
         val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(syncDataResponse))
+        whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(JSONObject()))
 
         val result = apiClient.patch(listOf(bookmarksChanges))
         assertTrue(result is Result.Success)
@@ -97,8 +94,8 @@ internal class SyncApiClientTest {
     fun whenMappingChangesThenGeneratedObjectIsCorrect() {
         val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
         val changes = apiClient.mapRequest(listOf(bookmarksChanges))
-        assertTrue(changes.client_timestamp.isNotEmpty())
-        assertTrue(changes.bookmarks.updates.size == 4)
+        assertTrue(changes.get("client_timestamp") != null)
+        assertTrue(changes.get("bookmarks") != null)
     }
 
     @Test

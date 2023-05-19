@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.View
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import java.util.*
 

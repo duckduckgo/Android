@@ -34,6 +34,6 @@ data class SyncChanges(
     }
 }
 
-enum class SyncableType {
-    BOOKMARKS,
+enum class SyncableType(val field: String) {
+    BOOKMARKS("bookmarks"),
 }
