@@ -20,7 +20,7 @@ import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.CodeRedeemed
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.NotJoinedQueue
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -45,7 +45,7 @@ class NetPWaitlistViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockNetPWaitlistManager.getState()).thenReturn(NotJoinedQueue)
+        whenever(mockNetPWaitlistManager.getState()).thenReturn(NotUnlocked)
 
         testee = NetPWaitlistViewModel(mockNetPWaitlistManager)
     }
@@ -53,7 +53,7 @@ class NetPWaitlistViewModelTest {
     @Test
     fun whenViewModelCreatedThenEmitWaitlistState() = runTest {
         testee.viewState.test {
-            assert(awaitItem().waitlist is NotJoinedQueue)
+            assert(awaitItem().waitlist is NotUnlocked)
         }
     }
 
@@ -69,14 +69,14 @@ class NetPWaitlistViewModelTest {
     fun whenCodeRedeemFailedThenEmitNotJoinedState() = runTest {
         testee.viewState.test {
             testee.onCodeRedeemed(Activity.RESULT_CANCELED)
-            assert(awaitItem().waitlist is NotJoinedQueue)
+            assert(awaitItem().waitlist is NotUnlocked)
         }
     }
 
     @Test
     fun whenCodeRedeemSucceedsThenEmitRedeemedState() = runTest {
         testee.viewState.test {
-            assert(awaitItem().waitlist is NotJoinedQueue)
+            assert(awaitItem().waitlist is NotUnlocked)
             testee.onCodeRedeemed(Activity.RESULT_OK)
             assert(awaitItem().waitlist is CodeRedeemed)
         }

@@ -60,8 +60,8 @@
     <string name="netpBannerAlwaysOnLockDownEnabled"><b>Action required!</b> To avoid app issues, you need to change your Android settings. <annotation type="open_settings_link">Change settings</annotation></string>
 
     <!-- Waitlist -->
-    <string name="netpWaitlistActivityLabel">Network Protection</string>
-    <string name="netpWaitlistTitle">You\'re invited to try Network Protection!</string>
+    <string name="netpWaitlistActivityLabel">Beta Feature</string>
+    <string name="netpWaitlistTitle">You\'re invited to test a beta feature!</string>
     <string name="netpJoinWaitlist">Join the Private Waitlist</string>
     <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
     <string name="netpEnterCode">I Have an Invite Code</string>
@@ -85,5 +85,5 @@
     <string name="netpWaitlistRedeemedCodeStatus">Success! You\'re in.</string>
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
-    <string name="netpWaitlistInBetaDescription">Hide your location from websites and conceal your online activity from Internet providers and others on your network.</string>
+    <string name="netpWaitlistInBetaDescription">You\'ll need an invite code to fully unlock this feature.</string>
 </resources>
