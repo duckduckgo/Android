@@ -23,7 +23,7 @@
     <string name="macos_share_title">Link megosztása</string>
     <string name="macos_description_text">A DuckDuckGo Mac verziója gyors, böngészési funkciókban gazdag, és kategóriája legjobb adatvédelmi megoldásait kínálja.\n\nMacen lépj erre az oldalra:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Készen állsz a privát böngészésre a Macen?\n\nA letöltéshez látogass el erre az URL-címre a Macen:\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Készen állsz a privát böngészésre a Macen?\n\nA letöltéshez látogass el erre az URL-címre a Macen:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">A Windowsra készült verziót keresed?</string>
     <string name="macos_waitlist_footer">Nem kell megosztanod a személyes adataid a várólistához való csatlakozáshoz. A sorban elfoglalt helyedet egy olyan időbélyegző igazolja, amely kizárólag az eszközödön található meg, így értesíteni tudunk, amikor sorra kerülsz.</string>
