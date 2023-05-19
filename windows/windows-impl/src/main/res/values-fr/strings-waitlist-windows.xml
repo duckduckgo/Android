@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo pour Windows répond à vos besoins de rapidité et de fonctionnalités de navigation, et dispose des meilleurs outils de leur catégorie pour protéger votre vie privée.\n\nSur votre ordinateur Windows, accédez à :</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Partager le lien</string>
-    <string name="windows_share_text">Prêt(e) à naviguer incognito sur Windows ?\n\nAccédez à cette URL sur votre ordinateur Windows pour télécharger l\'application : duckduckgo.com/windows</string>
+    <string name="windows_share_text">Prêt(e) à naviguer incognito sur Windows ?\n\nAccédez à cette URL sur votre ordinateur Windows pour télécharger l\'application : https://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Vous recherchez la version Mac ?</string>
     <string name="windows_join_waitlist">Rejoindre la liste d\'attente privée</string>
     <string name="windows_join_waitlist_error">Une erreur s\'est produite lors de l\'inscription sur la liste d\'attente. Veuillez réessayer plus tard.</string>
