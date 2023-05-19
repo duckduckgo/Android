@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo für Windows hat die Geschwindigkeit, die du brauchst, die Browserfunktionen, die du erwartest, und ist vollgepackt mit unseren grundlegenden Funktionen für den Datenschutz.\n\nÖffne auf deinem Windows-Computer die folgende Website:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Link teilen</string>
-    <string name="windows_share_text">Bist du bereit, privat auf Windows zu browsen?\n\nRufe für den Download diese URL auf deinem Windows-Computer auf:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Bist du bereit, privat unter Windows zu browsen?\n\nBesuche für den Download diese URL auf deinem Windows-Computer:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Suchst du nach der Mac-Version?</string>
     <string name="windows_join_waitlist">Auf die private Warteliste setzen</string>
     <string name="windows_join_waitlist_error">Bei der Aktion „Auf die Warteliste setzen“ ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später noch einmal.</string>
