@@ -54,6 +54,10 @@ dependencies {
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
 
+    // WorkManager
+    implementation AndroidX.work.runtimeKtx
+    testImplementation AndroidX.work.testing
+
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
