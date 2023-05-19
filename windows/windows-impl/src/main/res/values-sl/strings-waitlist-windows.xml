@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo za računalnike Windows zagotavlja hitrost, ki jo potrebujete, in funkcije brskanja, ki jih pričakujete, ter je opremljen z našimi ključnimi funkcijami zasebnosti, ki so najboljše v tem razredu.\n\nV računalniku s sistemom Windows pojdite na:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Daj povezavo v skupno rabo</string>
-    <string name="windows_share_text">Ste pripravljeni začeti zasebno brskati v sistemu Windows?\n\nZa prenos v računalniku s sistemom Windows obiščite ta naslov URL:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Ste pripravljeni začeti zasebno brskati v sistemu Windows?\n\nZa prenos v računalniku s sistemom Windows obiščite ta naslov URL:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Iščete različico za računalnike Mac?</string>
     <string name="windows_join_waitlist">Pridruži se zasebnemu čakalnemu seznamu</string>
     <string name="windows_join_waitlist_error">Pri dodajanju na čakalni seznam je prišlo do napake. Poskusite znova pozneje.</string>
