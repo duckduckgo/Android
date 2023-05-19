@@ -77,7 +77,8 @@ class VpnServiceHeartbeat @Inject constructor(
             ERROR -> logcat { "HB monitor: sudden vpn stopped $vpnStopReason" }
             SELF_STOP, REVOKED, RESTART, UNKNOWN -> {
                 logcat { "HB monitor: self stopped or revoked or restart: $vpnStopReason" }
-                coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
+                // we absolutely want this to finish before VPN is stopped to avoid race conditions reading out the state
+                runBlocking { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
             }
         }
         job.cancel()
