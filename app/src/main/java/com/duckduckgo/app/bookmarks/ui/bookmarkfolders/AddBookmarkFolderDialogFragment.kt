@@ -46,7 +46,7 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         arguments?.getString(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text
             if (name.isNotBlank()) {
-                listener?.onBookmarkFolderAdded(BookmarkFolder(name = name, parentId = it, lastModified = DatabaseDateFormatter.iso8601()))
+                listener?.onBookmarkFolderAdded(BookmarkFolder(name = name, parentId = it))
             }
         }
     }
