@@ -61,7 +61,7 @@
                     android:contentDescription="@string/duckDuckGoLogoDescription"
                     android:maxWidth="180dp"
                     android:maxHeight="180dp"
-                    android:src="@drawable/logo_full"
+                    app:srcCompat="@drawable/logo_full"
                     android:visibility="gone" />
 
                 <com.duckduckgo.mobile.android.ui.view.MessageCta
