@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.waitlist.store
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 
 interface NetPWaitlistRepository {
-    fun unlock()
     fun getAuthenticationToken(): String?
     fun setAuthenticationToken(authToken: String)
     fun getState(isInternalBuild: Boolean): NetPWaitlistState
@@ -28,10 +27,6 @@ interface NetPWaitlistRepository {
 class RealNetPWaitlistRepository(
     private val dataStore: NetPWaitlistDataStore,
 ) : NetPWaitlistRepository {
-
-    override fun unlock() {
-        dataStore.settingUnlocked = true
-    }
 
     override fun getAuthenticationToken(): String? = dataStore.authToken
 
@@ -42,15 +37,14 @@ class RealNetPWaitlistRepository(
     override fun getState(isInternalBuild: Boolean): NetPWaitlistState {
         if (isInternalBuild) {
             // internal users bypass easter egg
-            unlock()
+            return NetPWaitlistState.InBeta
         }
-        if (!dataStore.settingUnlocked) {
-            return NetPWaitlistState.NotUnlocked
-        }
+
         if (didJoinBeta()) {
             return NetPWaitlistState.InBeta
         }
-        return NetPWaitlistState.NotJoinedQueue
+
+        return NetPWaitlistState.NotUnlocked
     }
 
     private fun didJoinBeta(): Boolean = dataStore.authToken != null
