@@ -13,7 +13,7 @@ dependencies {
     implementation JakeWharton.timber
     implementation Square.okio
     implementation project(':library-loader-api')
-    implementation "com.duckduckgo.synccrypto:sync-crypto-android:0.1.0-SNAPSHOT"
+    implementation "com.duckduckgo.synccrypto:sync-crypto-android:0.2.0"
 
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner
