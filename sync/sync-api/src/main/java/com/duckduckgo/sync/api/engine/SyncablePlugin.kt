@@ -31,6 +31,19 @@ interface SyncablePlugin {
      */
     fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String,
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean>
+
+    /**
+     * Sync Feature has been disabled / device has been removed
+     * This is an opportunity for Features to do some local cleanup if needed
+     */
+    fun onFeatureRemoved()
+
+    enum class SyncConflictResolution {
+        DEDUPLICATION,
+        REMOTE_WINS,
+        LOCAL_WINS,
+        TIMESTAMP,
+    }
 }

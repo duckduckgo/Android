@@ -31,6 +31,9 @@ interface SyncAttemptDao {
     @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
     fun lastAttempt(): SyncAttempt?
 
+    @Query("SELECT * FROM sync_attempts where state != 'IN_PROGRESS' ORDER BY id DESC LIMIT 1")
+    fun lastCompleted(): SyncAttempt?
+
     @Query("SELECT * FROM sync_attempts")
     fun attempts(): Flow<List<SyncAttempt>>
 

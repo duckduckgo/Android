@@ -46,13 +46,10 @@ import com.duckduckgo.sync.TestSyncFixtures.loginFailed
 import com.duckduckgo.sync.TestSyncFixtures.loginSuccess
 import com.duckduckgo.sync.TestSyncFixtures.logoutInvalid
 import com.duckduckgo.sync.TestSyncFixtures.logoutSuccess
-import com.duckduckgo.sync.TestSyncFixtures.patchAllError
-import com.duckduckgo.sync.TestSyncFixtures.patchAllSuccess
 import com.duckduckgo.sync.TestSyncFixtures.primaryKey
 import com.duckduckgo.sync.TestSyncFixtures.protectedEncryptionKey
 import com.duckduckgo.sync.TestSyncFixtures.secretKey
 import com.duckduckgo.sync.TestSyncFixtures.stretchedPrimaryKey
-import com.duckduckgo.sync.TestSyncFixtures.syncData
 import com.duckduckgo.sync.TestSyncFixtures.token
 import com.duckduckgo.sync.TestSyncFixtures.userId
 import com.duckduckgo.sync.TestSyncFixtures.validLoginKeys
@@ -61,9 +58,8 @@ import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.parser.SyncCrypter
+import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.SyncStore
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -86,14 +82,14 @@ class AppSyncRepositoryTest {
     private var syncDeviceIds: SyncDeviceIds = mock()
     private var syncApi: SyncApi = mock()
     private var syncStore: SyncStore = mock()
-    private var syncCrypter: SyncCrypter = mock()
     private var syncEngine: SyncEngine = mock()
+    private var syncStateRepository: SyncStateRepository = mock()
 
     private lateinit var syncRepo: SyncRepository
 
     @Before
     fun before() {
-        syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncCrypter, syncEngine)
+        syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncStateRepository, syncEngine)
     }
 
     @Test
@@ -331,28 +327,6 @@ class AppSyncRepositoryTest {
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
 
         val result = syncRepo.getConnectedDevices()
-
-        assertTrue(result is Result.Error)
-    }
-
-    @Test
-    fun whenInitialPatchSucceedsThenReturnSuccess() = runTest {
-        whenever(syncStore.token).thenReturn(token)
-        whenever(syncCrypter.generateAllData()).thenReturn(syncData)
-        whenever(syncApi.patch(token, syncData)).thenReturn(patchAllSuccess)
-
-        val result = syncRepo.sendAllData()
-
-        assertTrue(result is Result.Success)
-    }
-
-    @Test
-    fun whenInitialPatchFailsThenReturnError() = runTest {
-        whenever(syncStore.token).thenReturn(token)
-        whenever(syncCrypter.generateAllData()).thenReturn(syncData)
-        whenever(syncApi.patch(token, syncData)).thenReturn(patchAllError)
-
-        val result = syncRepo.sendAllData()
 
         assertTrue(result is Result.Error)
     }

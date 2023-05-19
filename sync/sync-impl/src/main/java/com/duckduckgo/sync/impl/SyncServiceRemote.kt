@@ -17,7 +17,6 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -68,7 +67,7 @@ interface SyncApi {
         bookmarks: SyncDataRequest,
     ): Result<SyncDataResponse?>
 
-    fun getAllData(token: String): Result<SyncDataResponse>
+    fun getBookmarks(token: String, since: String): Result<SyncDataResponse>
 }
 
 @ContributesBinding(AppScope::class)
@@ -236,9 +235,13 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-    override fun getAllData(token: String): Result<SyncDataResponse> {
+    override fun getBookmarks(token: String, since: String): Result<SyncDataResponse> {
         val response = runCatching {
-            val patchCall = syncService.data("Bearer $token")
+            val patchCall = if (since.isNotEmpty()) {
+                syncService.bookmarksSince("Bearer $token", since)
+            } else {
+                syncService.bookmarks("Bearer $token")
+            }
             patchCall.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())
@@ -258,6 +261,9 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
             val dataAdapter: JsonAdapter<SyncDataResponse> =
                 moshi.adapter(SyncDataResponse::class.java)
+
+            val bookmarksAdapter: JsonAdapter<BookmarksResponse> =
+                moshi.adapter(BookmarksResponse::class.java)
         }
     }
 
@@ -276,7 +282,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                 } ?: Result.Error(code = response.code(), reason = response.message().toString())
             }
         }.getOrElse {
-            return Result.Error(reason = response.message())
+            return Result.Error(response.code(), reason = response.message())
         }
     }
 

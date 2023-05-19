@@ -17,9 +17,8 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.moshi.Json
 import retrofit2.Call
 import retrofit2.http.Body
@@ -28,6 +27,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 @ContributesServiceApi(AppScope::class)
 interface SyncService {
@@ -78,10 +78,16 @@ interface SyncService {
     @GET("https://dev-sync-use.duckduckgo.com/sync/data")
     fun data(@Header("Authorization") token: String): Call<SyncDataResponse>
 
+    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
+    fun dataSince(@Header("Authorization") token: String, @Query("since") since: String): Call<SyncDataResponse>
+
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
     fun bookmarks(
         @Header("Authorization") token: String,
-    ): Call<BookmarksResponse>
+    ): Call<SyncDataResponse>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
+    fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<SyncDataResponse>
 }
 
 data class Login(
@@ -155,31 +161,17 @@ data class BookmarkFolder(
 )
 
 data class BookmarksResponse(
-    @field:Json(name = "last_modified") val lastModified: String?,
+    @field:Json(name = "last_modified") val lastModified: String,
     val entries: List<SyncBookmarkEntry>,
-)
-
-data class SettingsResponse(
-    @field:Json(name = "last_modified") val lastModified: String?,
-    val entries: List<Setting>,
-)
-
-data class DeviceDataResponse(
-    @field:Json(name = "last_modified") val lastModified: String?,
-    val entries: List<Device>,
 )
 
 data class SyncDataResponse(
     val bookmarks: BookmarksResponse,
-    val settings: SettingsResponse,
-    val devices: DeviceDataResponse,
 ) {
     companion object {
         fun empty(): SyncDataResponse {
             val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-            val settingsResponse = SettingsResponse("lastModified", emptyList())
-            val devicessResponse = DeviceDataResponse("lastModified", emptyList())
-            return SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
+            return SyncDataResponse(bookmarksResponse)
         }
     }
 }
@@ -187,3 +179,51 @@ data class SyncDataResponse(
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
 }
+
+data class SyncBookmarkPage(val url: String)
+data class SyncFolderChildren(val children: List<String>)
+
+data class SyncBookmarkEntry(
+    val id: String,
+    val title: String,
+    val page: SyncBookmarkPage?,
+    val folder: SyncFolderChildren?,
+    val deleted: String?,
+    val client_last_modified: String,
+) {
+    companion object {
+        fun asBookmark(
+            id: String,
+            title: String,
+            url: String,
+            deleted: String?,
+            clientLastModified: String,
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted, clientLastModified)
+        }
+
+        fun asFolder(
+            id: String,
+            title: String,
+            children: List<String>,
+            deleted: String?,
+            clientLastModified: String,
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted, clientLastModified)
+        }
+    }
+}
+
+fun SyncBookmarkEntry.isFolder(): Boolean = this.folder != null
+fun SyncBookmarkEntry.isBookmark(): Boolean = this.page != null
+
+class SyncDataRequest(
+    val client_timestamp: String = DatabaseDateFormatter.iso8601(),
+    val bookmarks: SyncBookmarksRequest,
+)
+
+class SyncRequest(val bookmarks: SyncBookmarksRequest)
+class SyncBookmarksRequest(
+    val updates: List<SyncBookmarkEntry>,
+    val modified_since: String = "0",
+)

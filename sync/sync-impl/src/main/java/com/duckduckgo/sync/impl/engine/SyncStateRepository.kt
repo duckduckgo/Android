@@ -30,6 +30,9 @@ interface SyncStateRepository {
     fun all(): Flow<List<SyncAttempt>>
 
     fun updateSyncState(state: SyncState)
+
+    fun lastCompleted(): SyncAttempt?
+    fun clearAll()
 }
 
 class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: SyncAttemptDao) : SyncStateRepository {
@@ -51,5 +54,13 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
             val updated = last.copy(state = state)
             syncAttemptDao.insert(updated)
         }
+    }
+
+    override fun lastCompleted(): SyncAttempt? {
+        return syncAttemptDao.lastCompleted()
+    }
+
+    override fun clearAll() {
+        syncAttemptDao.clear()
     }
 }

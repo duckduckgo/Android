@@ -52,7 +52,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         Timber.d("Saved sites: $currentFolder")
 
         viewModel.fetchBookmarkFolders(
-            intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: SavedSitesNames.BOOMARKS_ROOT,
+            intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: SavedSitesNames.BOOKMARKS_ROOT,
             currentFolder as BookmarkFolder?,
         )
     }
@@ -91,7 +91,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         when (item.itemId) {
             R.id.action_add_folder -> {
                 val dialog = AddBookmarkFolderDialogFragment.instance(
-                    SavedSitesNames.BOOMARKS_ROOT,
+                    SavedSitesNames.BOOKMARKS_ROOT,
                     getString(R.string.bookmarksActivityTitle),
                 )
                 dialog.show(supportFragmentManager, ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)
@@ -113,7 +113,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
     private fun setNewlyCreatedSelectedFolderResult() {
         viewModel.newFolderAdded(
-            selectedFolderId = intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: SavedSitesNames.BOOMARKS_ROOT,
+            selectedFolderId = intent.extras?.getString(KEY_BOOKMARK_FOLDER_ID) ?: SavedSitesNames.BOOKMARKS_ROOT,
             currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder?,
         )
     }

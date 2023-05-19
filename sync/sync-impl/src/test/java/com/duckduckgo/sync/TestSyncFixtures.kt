@@ -29,7 +29,6 @@ import com.duckduckgo.sync.impl.Connect
 import com.duckduckgo.sync.impl.ConnectKey
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Device
-import com.duckduckgo.sync.impl.DeviceDataResponse
 import com.duckduckgo.sync.impl.DeviceEntries
 import com.duckduckgo.sync.impl.DeviceResponse
 import com.duckduckgo.sync.impl.DeviceType
@@ -37,14 +36,13 @@ import com.duckduckgo.sync.impl.Login
 import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SettingsResponse
 import com.duckduckgo.sync.impl.Signup
+import com.duckduckgo.sync.impl.SyncBookmarkEntry
+import com.duckduckgo.sync.impl.SyncBookmarksRequest
+import com.duckduckgo.sync.impl.SyncDataRequest
 import com.duckduckgo.sync.impl.SyncDataResponse
+import com.duckduckgo.sync.impl.SyncRequest
 import com.duckduckgo.sync.impl.encodeB64
-import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncBookmarksRequest
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
-import com.duckduckgo.sync.impl.parser.SyncRequest
 import java.io.File
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -187,9 +185,7 @@ object TestSyncFixtures {
     val connectDeviceKeysNotFoundError = Result.Error(code = keysNotFoundCode, reason = keysNotFoundErr)
 
     val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-    val settingsResponse = SettingsResponse("lastModified", emptyList())
-    val devicessResponse = DeviceDataResponse("lastModified", emptyList())
-    val syncDataResponse = SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
+    val syncDataResponse = SyncDataResponse(bookmarksResponse)
 
     val patchAllSuccess = Result.Success(syncDataResponse)
     val patchAllError = Result.Error(-1, "Patch All Error")

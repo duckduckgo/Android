@@ -24,9 +24,9 @@ import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.BookmarksResponse
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.SyncDataRequest
 import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
-import com.duckduckgo.sync.impl.parser.SyncRequest
+import com.duckduckgo.sync.impl.SyncRequest
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -36,7 +36,7 @@ import timber.log.Timber
 
 interface SyncApiClient {
     fun patch(changes: List<SyncChanges>): Result<List<SyncChanges>>
-    fun get(): Result<List<SyncChanges>>
+    fun get(since: String): Result<List<SyncChanges>>
 }
 
 @ContributesBinding(AppScope::class)
@@ -72,14 +72,19 @@ class AppSyncApiClient @Inject constructor(
         }
     }
 
-    override fun get(): Result<List<SyncChanges>> {
+    override fun get(since: String): Result<List<SyncChanges>> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
-        return when (val result = syncApi.getAllData(token)) {
+        return when (val result = syncApi.getBookmarks(token, since)) {
             is Result.Error -> {
-                result
+                if (result.code == 304) {
+                    // 304 - not modified means no changes to parse
+                    Result.Success(emptyList())
+                } else {
+                    result
+                }
             }
 
             is Result.Success -> {

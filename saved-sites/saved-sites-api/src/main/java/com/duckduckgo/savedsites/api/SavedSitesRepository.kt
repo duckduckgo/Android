@@ -53,6 +53,8 @@ interface SavedSitesRepository {
      */
     fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
+    fun getAllFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
+
     /**
      * Returns complete list of [BookmarkFolderItem] inside a folder. This method traverses all folders.
      * @param selectedFolderId the id of the folder.
@@ -201,6 +203,7 @@ interface SavedSitesRepository {
         id: String = "",
         url: String,
         title: String,
+        lastModified: String? = null,
     ): Favorite
 
     /**
@@ -227,7 +230,10 @@ interface SavedSitesRepository {
      * @param savedSite to be updated
      * @param fromFolderId id of the previous bookmark folder
      */
-    fun updateBookmark(bookmark: Bookmark, fromFolderId: String)
+    fun updateBookmark(
+        bookmark: Bookmark,
+        fromFolderId: String,
+    )
 
     /**
      * Updates the position of [Favorite]
@@ -265,7 +271,19 @@ interface SavedSitesRepository {
      * @param remoteId the id of the remote folder
      * @param oldId the id of the local folder to be replaced
      */
-    fun replaceFolder(remoteId: String, localId: String)
+    fun replaceFolder(
+        remoteId: String,
+        localId: String,
+    )
+
+    /**
+     * Replaces an existing [BookmarkFolder]
+     * Used when syncing data from the backend
+     * There are scenarios when a duplicate remote folder has to be replace the local one
+     * @param folder the folder that will replace [localId]
+     * @param localId the id of the local folder to be replaced
+     */
+    fun replaceFolderContent(folder: BookmarkFolder, localId: String)
 
     /**
      * Replaces an existing [Bookmark]
@@ -273,7 +291,10 @@ interface SavedSitesRepository {
      * There are scenarios when a duplicate remote bookmark has to be replace the local one
      * @param bookmark the bookmark to replace locally
      */
-    fun replaceBookmark(bookmark: Bookmark, localId: String)
+    fun replaceBookmark(
+        bookmark: Bookmark,
+        localId: String,
+    )
 
     /**
      * Replaces an existing [Favorite]
@@ -323,4 +344,24 @@ interface SavedSitesRepository {
      * @return [Flow] of [SavedSite]
      */
     fun lastModified(): Flow<SavedSite>
+
+    /**
+     * Returns the list of [BookmarkFolder] modified after [since]
+     * @param since timestamp of modification for filtering
+     * @return [List] of [BookmarkFolder]
+     */
+    fun getFoldersModifiedSince(since: String): List<BookmarkFolder>
+
+    /**
+     * Returns the list of [Bookmark] modified after [since]
+     * @param since timestamp of modification for filtering
+     * @return [List] of [Bookmark]
+     */
+    fun getBookmarksModifiedSince(since: String): List<Bookmark>
+
+    /**
+     * Deletes all entities with deleted = 1
+     * This makes the deletion permanent
+     */
+    fun pruneDeleted()
 }

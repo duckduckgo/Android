@@ -42,66 +42,41 @@ sealed class SavedSitesDuplicateResult {
 @ContributesBinding(AppScope::class)
 class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSitesRepository) : SavedSitesDuplicateFinder {
     override fun findFolderDuplicate(bookmarkFolder: BookmarkFolder): SavedSitesDuplicateResult {
-        val present = repository.getFolder(bookmarkFolder.id)
-        return if (present != null) {
-            SavedSitesDuplicateResult.Duplicate(present.id)
-        } else {
-            val existingFolder = repository.getFolderByName(bookmarkFolder.name)
-            if (existingFolder != null) {
-                if (existingFolder.parentId == bookmarkFolder.parentId) {
-                    SavedSitesDuplicateResult.Duplicate(existingFolder.id)
-                } else {
-                    SavedSitesDuplicateResult.NotDuplicate
-                }
+        val existingFolder = repository.getFolderByName(bookmarkFolder.name)
+        return if (existingFolder != null) {
+            if (existingFolder.parentId == bookmarkFolder.parentId) {
+                SavedSitesDuplicateResult.Duplicate(existingFolder.id)
             } else {
                 SavedSitesDuplicateResult.NotDuplicate
             }
+        } else {
+            SavedSitesDuplicateResult.NotDuplicate
         }
     }
 
     override fun findFavouriteDuplicate(favorite: Favorite): SavedSitesDuplicateResult {
-        val present = repository.getFavoriteById(favorite.id)
-        return if (present != null) {
-            if (present.url == favorite.url && present.title == favorite.title) {
-                SavedSitesDuplicateResult.Duplicate(present.id)
+        val presentUrl = repository.getFavorite(favorite.url)
+        return if (presentUrl != null) {
+            if (presentUrl.title == favorite.title) {
+                SavedSitesDuplicateResult.Duplicate(presentUrl.id)
             } else {
                 SavedSitesDuplicateResult.NotDuplicate
             }
         } else {
-            // same favourite might have a different ID
-            val presentUrl = repository.getFavorite(favorite.url)
-            if (presentUrl != null) {
-                if (presentUrl.title == favorite.title) {
-                    SavedSitesDuplicateResult.Duplicate(presentUrl.id)
-                } else {
-                    SavedSitesDuplicateResult.NotDuplicate
-                }
-            } else {
-                SavedSitesDuplicateResult.NotDuplicate
-            }
+            SavedSitesDuplicateResult.NotDuplicate
         }
     }
 
     override fun findBookmarkDuplicate(bookmark: Bookmark): SavedSitesDuplicateResult {
-        val present = repository.getBookmarkById(bookmark.id)
-        return if (present != null) {
-            if (present.url == bookmark.url && present.title == bookmark.title && present.parentId == bookmark.parentId) {
-                SavedSitesDuplicateResult.Duplicate(present.id)
+        val presentUrl = repository.getBookmark(bookmark.url)
+        return if (presentUrl != null) {
+            if (presentUrl.title == bookmark.title && presentUrl.parentId == bookmark.parentId) {
+                SavedSitesDuplicateResult.Duplicate(presentUrl.id)
             } else {
                 SavedSitesDuplicateResult.NotDuplicate
             }
         } else {
-            // same bookmarks might have a different ID
-            val presentUrl = repository.getBookmark(bookmark.url)
-            if (presentUrl != null) {
-                if (presentUrl.title == bookmark.title && presentUrl.parentId == bookmark.parentId) {
-                    SavedSitesDuplicateResult.Duplicate(presentUrl.id)
-                } else {
-                    SavedSitesDuplicateResult.NotDuplicate
-                }
-            } else {
-                SavedSitesDuplicateResult.NotDuplicate
-            }
+            SavedSitesDuplicateResult.NotDuplicate
         }
     }
 }

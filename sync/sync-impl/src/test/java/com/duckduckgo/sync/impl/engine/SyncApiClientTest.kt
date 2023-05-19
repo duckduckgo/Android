@@ -20,9 +20,7 @@ import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.BookmarksResponse
-import com.duckduckgo.sync.impl.DeviceDataResponse
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SettingsResponse
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.store.SyncStore
@@ -48,9 +46,7 @@ internal class SyncApiClientTest {
         ":[\"bookmark3\",\"bookmark4\"]},\"id\"" +
         ":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
     val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-    val settingsResponse = SettingsResponse("lastModified", emptyList())
-    val devicessResponse = DeviceDataResponse("lastModified", emptyList())
-    val syncDataResponse = SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
+    val syncDataResponse = SyncDataResponse(bookmarksResponse)
     val patchAllError = Result.Error(-1, "Patch All Error")
     val getAllError = Result.Error(-1, "Get All Error")
 
@@ -109,7 +105,7 @@ internal class SyncApiClientTest {
     fun whenGetAndTokenEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn("")
 
-        val result = apiClient.get()
+        val result = apiClient.get("")
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
     }
@@ -117,9 +113,9 @@ internal class SyncApiClientTest {
     @Test
     fun whenGetAndApiFailsThenResultIsError() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.getAllData(any())).thenReturn(getAllError)
+        whenever(syncApi.getBookmarks(any(), any())).thenReturn(getAllError)
 
-        val result = apiClient.get()
+        val result = apiClient.get("")
         assertTrue(result is Result.Error)
     }
 }

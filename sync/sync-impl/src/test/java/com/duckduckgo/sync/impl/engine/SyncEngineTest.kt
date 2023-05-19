@@ -105,6 +105,6 @@ internal class SyncEngineTest {
 
         syncEngine.syncNow(APP_OPEN)
 
-        verify(syncApiClient).get()
+        verify(syncApiClient).get(any())
     }
 }

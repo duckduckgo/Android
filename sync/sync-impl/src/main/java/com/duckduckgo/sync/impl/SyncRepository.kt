@@ -26,8 +26,7 @@ import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.API_CODE.INVALID_LOGIN_CREDENTIALS
 import com.duckduckgo.sync.impl.Result.Error
-import com.duckduckgo.sync.impl.parser.SyncCrypter
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
+import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
@@ -36,7 +35,6 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlinx.coroutines.flow.Flow
-import timber.log.Timber
 
 interface SyncRepository {
 
@@ -55,8 +53,6 @@ interface SyncRepository {
     fun getConnectQR(): Result<String>
     fun connectDevice(contents: String): Result<Boolean>
     fun pollConnectionKeys(): Result<Boolean>
-    fun sendAllData(): Result<Boolean>
-    fun fetchAllData(): Result<Boolean>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
 }
 
@@ -68,7 +64,7 @@ class AppSyncRepository @Inject constructor(
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
-    private val syncCrypter: SyncCrypter,
+    private val syncStateRepository: SyncStateRepository,
     private val syncEngine: SyncEngine,
 ) : SyncRepository {
     override fun isSignedInFlow(): Flow<Boolean> = syncStore.isSignedInFlow()
@@ -224,6 +220,7 @@ class AppSyncRepository @Inject constructor(
             is Result.Success -> {
                 if (logoutThisDevice) {
                     syncStore.clearAll()
+                    syncStateRepository.clearAll()
                 }
                 Result.Success(true)
             }
@@ -329,46 +326,6 @@ class AppSyncRepository @Inject constructor(
         }
     }
 
-    @WorkerThread
-    override fun sendAllData(): Result<Boolean> {
-        val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Result.Error(reason = "Token Empty")
-
-        val allData = syncCrypter.generateAllData()
-        val allDataJSON = Adapters.patchAdapter.toJson(allData)
-        Timber.d("SYNC: initial patch data generated $allDataJSON")
-        return when (val result = syncApi.patch(token, allData)) {
-            is Result.Error -> {
-                result
-            }
-
-            is Result.Success -> {
-                Result.Success(true)
-            }
-        }
-    }
-
-    @WorkerThread
-    override fun fetchAllData(): Result<Boolean> {
-        val token =
-            syncStore.token.takeUnless { it.isNullOrEmpty() }
-                ?: return Result.Error(reason = "Token Empty")
-
-        return when (val result = syncApi.getAllData(token)) {
-            is Error -> {
-                result.removeKeysIfInvalid()
-                Error(reason = "SYNC get data failed $result")
-            }
-
-            is Result.Success -> {
-                // we only care about bookmarks for now
-                syncCrypter.store(result.data.bookmarks.entries)
-                Result.Success(true)
-            }
-        }
-    }
-
     private fun Error.removeKeysIfInvalid() {
         if (code == INVALID_LOGIN_CREDENTIALS.code) {
             syncStore.clearAll()
@@ -379,8 +336,6 @@ class AppSyncRepository @Inject constructor(
         companion object {
             private val moshi = Moshi.Builder().build()
             val recoveryCodeAdapter: JsonAdapter<LinkCode> = moshi.adapter(LinkCode::class.java)
-            val patchAdapter: JsonAdapter<SyncDataRequest> =
-                moshi.adapter(SyncDataRequest::class.java)
         }
     }
 }

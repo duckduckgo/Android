@@ -76,8 +76,8 @@ class RealSavedSitesExporter(
 
     @VisibleForTesting
     suspend fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
-        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
-        populateNode(node, SavedSitesNames.BOOMARKS_ROOT, 1)
+        val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOKMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null, 0))
+        populateNode(node, SavedSitesNames.BOOKMARKS_ROOT, 1)
         return node
     }
 

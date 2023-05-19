@@ -161,15 +161,16 @@ class RealSavedSitesParser : SavedSitesParser {
                         val folderName = folder.text()
 
                         if (isFavoritesFolder(folderName) || isBookmarksFolder(folderName)) {
-                            parseElement(element, SavedSitesNames.BOOMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
+                            parseElement(element, SavedSitesNames.BOOKMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
                         } else {
                             val folderParentId = parentId.ifEmpty {
-                                SavedSitesNames.BOOMARKS_ROOT
+                                SavedSitesNames.BOOKMARKS_ROOT
                             }
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
                                 parentId = folderParentId,
                                 lastModified = DatabaseDateFormatter.iso8601(),
+                                deleted = null,
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)

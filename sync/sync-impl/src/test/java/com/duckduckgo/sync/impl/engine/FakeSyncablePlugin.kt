@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
 
 class FakeSyncablePlugin(val changes: SyncChanges) : SyncablePlugin {
     override fun getChanges(since: String): SyncChanges {
@@ -27,8 +28,12 @@ class FakeSyncablePlugin(val changes: SyncChanges) : SyncablePlugin {
 
     override fun syncChanges(
         changes: List<SyncChanges>,
-        timestamp: String,
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         return SyncMergeResult.Success(false)
+    }
+
+    override fun onFeatureRemoved() {
+        // no-op
     }
 }

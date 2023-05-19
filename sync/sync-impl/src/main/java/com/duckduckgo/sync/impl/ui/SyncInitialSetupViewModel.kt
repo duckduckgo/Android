@@ -153,30 +153,6 @@ constructor(
         }
     }
 
-    fun onSendBookmarksClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.sendAllData()
-            if (result is Error) {
-                command.send(Command.ShowMessage("$result"))
-            } else {
-                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
-            }
-            updateViewState()
-        }
-    }
-
-    fun onReceiveBookmarksClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.fetchAllData()
-            if (result is Error) {
-                command.send(Command.ShowMessage("$result"))
-            } else {
-                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
-            }
-            updateViewState()
-        }
-    }
-
     private suspend fun updateViewState() {
         val accountInfo = syncRepository.getAccountInfo()
         viewState.emit(
