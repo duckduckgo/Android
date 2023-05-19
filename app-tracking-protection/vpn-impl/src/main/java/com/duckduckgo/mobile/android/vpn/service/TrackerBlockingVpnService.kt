@@ -36,6 +36,7 @@ import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
@@ -66,13 +67,14 @@ import java.net.Inet6Address
 import java.net.InetAddress
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.properties.Delegates
+import kotlin.system.exitProcess
 import kotlinx.coroutines.*
 import logcat.LogPriority
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-import kotlin.properties.Delegates
 
 @InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
@@ -85,8 +87,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }.getOrElse { e ->
             if (e is UnsatisfiedLinkError) {
                 logcat(ERROR) { "VPN log: ${e.asLog()}" }
-                Thread.sleep(100)
+                // A previous error unloaded the libraries, reload them
+                try {
+                    logcat { "VPN log: Loading native VPN networking library" }
+                    LibraryLoader.loadLibrary(this@TrackerBlockingVpnService, "netguard")
+                } catch (ignored: Throwable) {
+                    logcat(ERROR) { "VPN log: Error loading netguard library: ${ignored.asLog()}" }
+                    exitProcess(1)
+                }
             }
+            Thread.sleep(100)
             true
         }
     }
@@ -130,8 +140,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     @Inject lateinit var vpnNetworkStackProvider: VpnNetworkStackProvider
 
     @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
-
-    private val startVpnLock = Object()
 
     private val alwaysOnStateJob = ConflatedJob()
 
@@ -222,14 +230,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         when (val action = intent?.action) {
             ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
                 notifyVpnStart()
-                launch(serviceDispatcher) { startVpn() }
+                synchronized(this) {
+                    launch(serviceDispatcher) { startVpn() }
+                }
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                launch(serviceDispatcher) { stopVpn(VpnStopReason.SELF_STOP) }
+                synchronized(this) {
+                    launch(serviceDispatcher) { stopVpn(VpnStopReason.SELF_STOP) }
+                }
             }
             ACTION_RESTART_VPN -> {
-                launch(serviceDispatcher) { startVpn() }
+                synchronized(this) {
+                    launch(serviceDispatcher) { startVpn() }
+                }
             }
             else -> logcat(ERROR) { "Unknown intent action: $action" }
         }
@@ -250,29 +264,18 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
 
+        vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
+
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
 
-        synchronized(startVpnLock) {
-            val currStateStats = vpnServiceStateStatsDao.getLastStateStats()
-            // We don't check for ENABLED state here because it break when the app is updated
-            // (See: https://app.asana.com/0/488551667048375/1203621692416589/f)
-            if (!restarting && currStateStats?.state == ENABLING) {
-                // Sometimes onStartCommand gets called twice - this is a safety rail against that
-                logcat(LogPriority.WARN) { "VPN log: is already being started, abort" }
-                return@withContext
+        if (!restarting) {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
+                it.onVpnStarting(this)
             }
-
-            vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
-
-            if (!restarting) {
-                vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-                    logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
-                    it.onVpnStarting(this)
-                }
-            } else {
-                logcat { "VPN log: skipping service callbacks while restarting" }
-            }
+        } else {
+            logcat { "VPN log: skipping service callbacks while restarting" }
         }
 
         // Create a null route tunnel so that leaks can't scape
@@ -292,7 +295,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
                 activeTun = createTunnelInterface(it)
-                activeTun?.let {tun ->
+                activeTun?.let { tun ->
                     if (!tun.waitForTunellUpOrTimeout(it.addresses.keys.any { inetAddress -> inetAddress is Inet6Address })) {
                         activeTun = null
                     }
