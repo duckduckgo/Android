@@ -157,6 +157,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
+        binding.recreateTunnel.setOnClickListener { lifecycleScope.launch { vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN) } }
         binding.overrideMtuSelector.setOnClickListener { showMtuSelectorMenu() }
         binding.overrideServerBackendSelector.setOnClickListener {
             lifecycleScope.launch {

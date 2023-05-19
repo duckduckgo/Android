@@ -61,6 +61,14 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/netpDevSettingInternalIP" />
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                    android:id="@+id/recreateTunnel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Recreate tunnel"
+                    app:showSwitch="false"
+            />
+
             <!-- Section Config -->
             <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/sectionConfigTitle"
