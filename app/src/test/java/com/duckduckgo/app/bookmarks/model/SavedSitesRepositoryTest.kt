@@ -1161,18 +1161,18 @@ class SavedSitesRepositoryTest {
         val rootFolder = BookmarkFolder(
             id = SavedSitesNames.BOOKMARKS_ROOT,
             name = "root",
-            lastModified = DatabaseDateFormatter.iso8601(twoHoursAgo),
+            lastModified = DatabaseDateFormatter.iso8601(oneHourAgo),
             parentId = "",
         )
         repository.insert(rootFolder)
 
-        val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(twoHoursAgo))
+        val modifiedEarlierBookmarks = givenSomeBookmarks(5, DatabaseDateFormatter.iso8601(oneHourAgo))
         savedSitesEntitiesDao.insertList(modifiedEarlierBookmarks)
 
         val relation = givenFolderWithContent(SavedSitesNames.BOOKMARKS_ROOT, modifiedEarlierBookmarks)
         savedSitesRelationsDao.insertList(relation)
 
-        val modifiedSinceFolders = repository.getFoldersModifiedSince(DatabaseDateFormatter.iso8601(oneHourAgo))
+        val modifiedSinceFolders = repository.getFoldersModifiedSince(DatabaseDateFormatter.iso8601(twoHoursAgo))
         assertEquals(1, modifiedSinceFolders.size)
     }
 
@@ -1224,6 +1224,56 @@ class SavedSitesRepositoryTest {
             assertTrue(savedSites.favorites.isEmpty())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenPruningDeletedBookmarkFolderDataIsPermanentlyDeleted() {
+        givenEmptyDBState()
+
+        val bookmark = repository.insertBookmark("https://favorite.com", "Bookmark")
+        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+        repository.insert(parentFolder)
+        val updatedBookmark = bookmark.copy(parentId = parentFolder.id)
+        repository.updateBookmark(updatedBookmark, bookmark.parentId)
+
+        repository.delete(parentFolder)
+        assert(repository.getFolder(parentFolder.id) == null)
+        assert(repository.getBookmark(bookmark.url) == null)
+
+        repository.pruneDeleted()
+
+        assert(savedSitesEntitiesDao.deletedEntity(parentFolder.id) == null)
+        assert(savedSitesEntitiesDao.deletedEntity(bookmark.id) == null)
+    }
+
+    @Test
+    fun whenPruningDeletedBookmarkDataIsPermanentlyDeleted() {
+        givenEmptyDBState()
+
+        val bookmark = repository.insertBookmark("https://favorite.com", "Bookmark")
+        assert(repository.getBookmark(bookmark.url) != null)
+
+        repository.delete(bookmark)
+        assert(repository.getBookmark(bookmark.url) == null)
+
+        repository.pruneDeleted()
+
+        assert(savedSitesEntitiesDao.deletedEntity(bookmark.id) == null)
+    }
+
+    @Test
+    fun whenPruningDeletedFavouriteDataIsNotPermanentlyDeleted() {
+        givenEmptyDBState()
+
+        val favorite = repository.insertFavorite("favourite1", "https://favorite.com", "favorite", "timestamp")
+        assert(repository.getFavorite(favorite.url) != null)
+
+        repository.delete(favorite)
+        assert(repository.getFavorite(favorite.url) == null)
+
+        repository.pruneDeleted()
+
+        assert(savedSitesEntitiesDao.deletedEntity(favorite.id) != null)
     }
 
     private fun givenNoFavoritesStored() {

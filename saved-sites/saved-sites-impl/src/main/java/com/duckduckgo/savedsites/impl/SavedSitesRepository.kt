@@ -610,6 +610,13 @@ class RealSavedSitesRepository(
         return bookmarks.map { mapToBookmark(it)!! }
     }
 
+    override fun pruneDeleted() {
+        savedSitesEntitiesDao.allDeleted().forEach {
+            savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
+            savedSitesEntitiesDao.deletePermanently(it)
+        }
+    }
+
     private fun mapToBookmark(entity: Entity): Bookmark? {
         val relation = savedSitesRelationsDao.relationByEntityId(entity.entityId)
         return if (relation != null) {

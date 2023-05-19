@@ -358,4 +358,10 @@ interface SavedSitesRepository {
      * @return [List] of [Bookmark]
      */
     fun getBookmarksModifiedSince(since: String): List<Bookmark>
+
+    /**
+     * Deletes all entities with deleted = 1
+     * This makes the deletion permanent
+     */
+    fun pruneDeleted()
 }

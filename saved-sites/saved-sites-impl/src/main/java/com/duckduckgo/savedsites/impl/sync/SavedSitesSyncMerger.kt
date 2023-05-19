@@ -30,6 +30,7 @@ import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChanges
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult
+import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncMerger
 import com.duckduckgo.sync.api.engine.SyncablePlugin
 import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
@@ -80,11 +81,17 @@ class SavedSitesSyncMerger @Inject constructor(
         changes: SyncChanges,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-        return when (val validation = validateChanges(changes)) {
+        val result = when (val validation = validateChanges(changes)) {
             is SyncDataValidationResult.Error -> SyncMergeResult.Error(reason = validation.reason)
             is SyncDataValidationResult.Success -> processEntries(validation.data, conflictResolution)
             else -> SyncMergeResult.Error(reason = "Something went wrong")
         }
+
+        if (result is Success) {
+            pruneDeletedObjects()
+        }
+
+        return result
     }
 
     private fun validateChanges(changes: SyncChanges): SyncDataValidationResult<SyncBookmarkRemoteUpdates> {
@@ -382,6 +389,10 @@ class SavedSitesSyncMerger @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun pruneDeletedObjects() {
+        savedSitesRepository.pruneDeleted()
     }
 
     private fun decryptBookmark(
