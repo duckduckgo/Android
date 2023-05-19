@@ -253,8 +253,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             version.setClickListener {
                 if (viewModel.viewState().value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
                     netPEasterEggCounter++
-                    if (netPEasterEggCounter >= 7) {
-                        viewModel.unlockNetP()
+                    if (netPEasterEggCounter >= 12) {
                         Snackbar.make(
                             binding.root,
                             R.string.netpUnlockedSnackbar,
@@ -263,6 +262,8 @@ class SettingsActivity : DuckDuckGoActivity() {
                             launchNetpWaitlist()
                         }.setDuration(3500) // LENGTH_LONG is not long enough, increase to 3.5 sec
                             .show()
+                        // reset the counter
+                        netPEasterEggCounter = 0
                     }
                 }
             }
@@ -551,7 +552,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     }
                 }
                 NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
-                else -> {
+                NetPWaitlistState.CodeRedeemed -> {
                     netpPSetting.show()
                     netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
                 }

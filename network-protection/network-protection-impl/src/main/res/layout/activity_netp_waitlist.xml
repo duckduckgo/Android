@@ -104,21 +104,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/waitlistDescription" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                android:id="@+id/footerDescription"
-                app:typography="caption"
-                app:textType="secondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:textAlignment="center"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:text="@string/netpWaitlistFooter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>

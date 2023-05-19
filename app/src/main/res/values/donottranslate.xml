@@ -30,6 +30,6 @@
     <string name="netpSettingsConnecting">Connecting</string>
     <string name="netpSettingsConnected">Connected</string>
     <string name="netpSettingsDisconnected">Disconnected</string>
-    <string name="netpUnlockedSnackbar">You\'ve unlocked Network Protection beta!</string>
+    <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
 </resources>

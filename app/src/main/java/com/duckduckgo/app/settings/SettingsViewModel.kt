@@ -245,13 +245,6 @@ class SettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun unlockNetP() {
-        netpWaitlistRepository.unlock()
-        viewState.value = currentViewState().copy(
-            networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
-        )
-    }
-
     fun viewState(): StateFlow<ViewState> {
         return viewState
     }

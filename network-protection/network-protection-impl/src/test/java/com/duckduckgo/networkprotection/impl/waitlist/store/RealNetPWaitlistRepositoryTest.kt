@@ -41,7 +41,7 @@ class RealNetPWaitlistRepositoryTest {
 
     @Test
     fun whenStartingInternalStateIsUnlocked() {
-        assertEquals(NetPWaitlistState.NotJoinedQueue, testee.getState(true))
+        assertEquals(NetPWaitlistState.InBeta, testee.getState(true))
     }
 
     @Test

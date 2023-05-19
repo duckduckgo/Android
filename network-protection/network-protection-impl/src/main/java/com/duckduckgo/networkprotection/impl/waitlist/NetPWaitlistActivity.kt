@@ -37,7 +37,6 @@ import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpWaitlistBin
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeActivity.Launch.NetPWaitlistRedeemCodeScreenNoParams
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.CodeRedeemed
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.InBeta
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.NotJoinedQueue
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command.EnterInviteCode
@@ -84,7 +83,6 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
     private fun render(viewState: ViewState) {
         when (viewState.waitlist) {
             is NotUnlocked -> renderNotJoinedQueue() // Should not happen
-            is NotJoinedQueue -> renderNotJoinedQueue()
             is CodeRedeemed -> renderCodeRedeemed()
             is InBeta -> openNetP()
         }
@@ -93,7 +91,6 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
         binding.headerImage.setImageResource(R.drawable.ic_lock)
         binding.getStartedButton.gone()
         binding.enterCodeButton.show()
-        binding.footerDescription.show()
     }
 
     private fun renderCodeRedeemed() {
@@ -101,7 +98,6 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
         binding.headerImage.setImageResource(R.drawable.ic_dragon)
         binding.getStartedButton.show()
         binding.enterCodeButton.gone()
-        binding.footerDescription.gone()
     }
 
     private fun executeCommand(command: Command) {
