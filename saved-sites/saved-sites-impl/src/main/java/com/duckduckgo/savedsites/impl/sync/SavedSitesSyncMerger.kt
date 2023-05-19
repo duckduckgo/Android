@@ -102,7 +102,7 @@ class SavedSitesSyncMerger @Inject constructor(
         }
 
         if (bookmarks.entries == null) {
-            return SyncDataValidationResult.Success(SyncBookmarkRemoteUpdates(emptyList(), bookmarks.last_modified))
+            return SyncDataValidationResult.Error(reason = "Sync: merging failed, JSON format incorrect bookmarks null")
         }
 
         return SyncDataValidationResult.Success(bookmarks)

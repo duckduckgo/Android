@@ -56,7 +56,7 @@ class RealSyncEngine @Inject constructor(
         Timber.d("Sync: petition to sync now trigger: $trigger")
         when (trigger) {
             BACKGROUND_SYNC -> scheduleSync(trigger)
-            APP_OPEN -> performSync(trigger)
+            APP_OPEN -> scheduleSync(trigger)
             FEATURE_READ -> performSync(trigger)
             ACCOUNT_CREATION -> sendLocalData()
             ACCOUNT_LOGIN -> mergeRemoteData()
