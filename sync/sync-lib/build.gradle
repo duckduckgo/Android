@@ -7,22 +7,13 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.sync.crypto'
-
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-        }
-    }
-
-    buildFeatures {
-        prefab true
-    }
 }
 
 dependencies {
     implementation JakeWharton.timber
     implementation Square.okio
     implementation project(':library-loader-api')
+    implementation "com.duckduckgo.synccrypto:sync-crypto-android:0.1.0-SNAPSHOT"
 
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner

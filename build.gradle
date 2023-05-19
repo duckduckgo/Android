@@ -40,6 +40,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "https://s01.oss.sonatype.org/service/local/repositories/snapshots/content/"
+        }
     }
     configurations.all {
         resolutionStrategy.force 'org.objenesis:objenesis:2.6'
