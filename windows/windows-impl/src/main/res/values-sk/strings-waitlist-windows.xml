@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo pre Mac má rýchlosť, ktorú potrebujete, funkcie prehliadania, ktoré očakávate, a prichádza vybavený našimi prvotriednymi nástrojmi na ochranu súkromia.\n\nV počítači so systémom Windows prejdite na:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Zdieľať odkaz</string>
-    <string name="windows_share_text">Ste pripravení začať súkromne prehliadať v systéme Windows?\n\nNa stiahnutie navštívte túto URL adresu v počítači so systémom Windows:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Ste pripravení začať v systéme Windows prehliadať s ochranou súkromia?\n\nNa stiahnutie navštívte v počítači so systémom Windows túto URL adresu:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Hľadáte verziu pre Mac?</string>
     <string name="windows_join_waitlist">Pridajte sa do súkromného zoznamu čakateľov</string>
     <string name="windows_join_waitlist_error">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>
