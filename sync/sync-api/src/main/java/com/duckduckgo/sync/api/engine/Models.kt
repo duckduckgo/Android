@@ -37,7 +37,6 @@ data class SyncChangesResponse(val type: SyncableType, val jsonString: String) {
             return SyncChangesResponse(BOOKMARKS, "")
         }
     }
-
 }
 
 enum class SyncableType(val field: String) {
