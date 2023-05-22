@@ -24,7 +24,7 @@
     <string name="windows_description">Το DuckDuckGo για Windows έχει την ταχύτητα που χρειάζεστε, τις λειτουργίες περιήγησης που αναμένετε και περιλαμβάνει τις καλύτερες δυνατότητες απορρήτου στην κατηγορία μας.\n\nΣτον υπολογιστή σας με Windows, μεταβείτε στη διεύθυνση:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Κοινή χρήση συνδέσμου</string>
-    <string name="windows_share_text">Είστε έτοιμοι να αρχίσετε μια ιδιωτική περιήγηση σε Windows;Επισκεφθείτε αυτήν τη διεύθυνση URL στον υπολογιστή σας με Windows για να κάνετε λήψη:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Είστε έτοιμοι να αρχίσετε μια ιδιωτική περιήγηση σε Windows;\n\nΕπισκεφθείτε αυτήν τη διεύθυνση URL στον υπολογιστή σας με Windows για να κάνετε λήψη:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Αναζητάτε την έκδοση των Mac;</string>
     <string name="windows_join_waitlist">Εγγραφείτε στην Ιδιωτική λίστα αναμονής</string>
     <string name="windows_join_waitlist_error">Προέκυψε σφάλμα κατά την εγγραφή στη Λίστα αναμονής. Ξαναπροσπαθήστε αργότερα.</string>
