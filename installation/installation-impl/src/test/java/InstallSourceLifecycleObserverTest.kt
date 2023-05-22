@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.installer
+package com.duckduckgo.installation.impl.installer
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.installer.InstallSourceExtractor
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_PACKAGE_NAME
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -56,13 +57,13 @@ class InstallSourceLifecycleObserverTest {
     @Test
     fun whenNotPreviouslyProcessedThenPixelSent() = runTest {
         testee.onCreate(mockLifecycleOwner)
-        verify(mockPixel).fire(eq(AppPixelName.APP_INSTALLER_PACKAGE_NAME), any(), any())
+        verify(mockPixel).fire(eq(APP_INSTALLER_PACKAGE_NAME), any(), any())
     }
 
     @Test
     fun whenPreviouslyProcessedThenPixelNotSent() = runTest {
         testee.recordInstallSourceProcessed()
         testee.onCreate(mockLifecycleOwner)
-        verify(mockPixel, never()).fire(eq(AppPixelName.APP_INSTALLER_PACKAGE_NAME), any(), any())
+        verify(mockPixel, never()).fire(eq(APP_INSTALLER_PACKAGE_NAME), any(), any())
     }
 }

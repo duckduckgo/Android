@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.installer
+package com.duckduckgo.installation.impl.installer
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -23,10 +23,11 @@ import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.installer.InstallSourceExtractor
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.pixels.AppPixelName.APP_INSTALLER_PACKAGE_NAME
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INSTALLER_PACKAGE_NAME
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -55,7 +56,8 @@ class InstallSourceLifecycleObserver @Inject constructor(
                 val installationSource = installSourceExtractor.extract()
                 Timber.i("Installation source extracted: $installationSource")
 
-                val params = mapOf(PIXEL_PARAMETER_INSTALLER to installationSource.toString())
+                val isFromPlayStoreParam = if (installationSource == PLAY_STORE_PACKAGE_NAME) "1" else "0"
+                val params = mapOf(PIXEL_PARAMETER_INSTALLED_THROUGH_PLAY_STORE to isFromPlayStoreParam)
                 pixel.fire(APP_INSTALLER_PACKAGE_NAME, params)
 
                 recordInstallSourceProcessed()
@@ -81,8 +83,13 @@ class InstallSourceLifecycleObserver @Inject constructor(
     }
 
     companion object {
+        private const val PLAY_STORE_PACKAGE_NAME = "com.android.vending"
         private const val SHARED_PREFERENCES_FILENAME = "com.duckduckgo.app.installer.InstallSource"
         private const val SHARED_PREFERENCES_PROCESSED_KEY = "processed"
-        private const val PIXEL_PARAMETER_INSTALLER = "installer"
+        private const val PIXEL_PARAMETER_INSTALLED_THROUGH_PLAY_STORE = "installedThroughPlayStore"
     }
+}
+
+enum class InstallationPixelName(override val pixelName: String) : Pixel.PixelName {
+    APP_INSTALLER_PACKAGE_NAME("m_installation_source"),
 }
