@@ -552,7 +552,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     }
                 }
                 NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
-                NetPWaitlistState.CodeRedeemed -> {
+                NetPWaitlistState.CodeRedeemed, NetPWaitlistState.PendingInviteCode -> {
                     netpPSetting.show()
                     netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
                 }

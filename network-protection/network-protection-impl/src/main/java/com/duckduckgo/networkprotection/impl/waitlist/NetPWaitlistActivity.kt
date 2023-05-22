@@ -38,6 +38,7 @@ import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeActi
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.CodeRedeemed
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.NotUnlocked
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command.EnterInviteCode
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command.OpenNetP
@@ -82,7 +83,7 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         when (viewState.waitlist) {
-            is NotUnlocked -> renderNotJoinedQueue() // Should not happen
+            is NotUnlocked, PendingInviteCode -> renderNotJoinedQueue() // Should not happen
             is CodeRedeemed -> renderCodeRedeemed()
             is InBeta -> openNetP()
         }
