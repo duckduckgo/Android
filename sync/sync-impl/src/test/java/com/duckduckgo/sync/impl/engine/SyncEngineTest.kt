@@ -17,10 +17,12 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
-import com.duckduckgo.sync.api.engine.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncableDataPersister
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
@@ -39,7 +41,8 @@ internal class SyncEngineTest {
     private val syncApiClient: SyncApiClient = mock()
     private val syncScheduler: SyncScheduler = mock()
     private val syncStateRepository: SyncStateRepository = mock()
-    private val plugins: PluginPoint<SyncablePlugin> = mock()
+    private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
+    private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     private val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\"" +
@@ -53,7 +56,7 @@ internal class SyncEngineTest {
 
     @Before
     fun before() {
-        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, plugins)
+        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, providerPlugins, persisterPlugins)
     }
 
     @Test
@@ -65,12 +68,12 @@ internal class SyncEngineTest {
 
     @Test
     fun whenFirstSyncLocalChangesThenDataIsSentAndStateUpdatedWithSuccess() {
-        val localChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
-        val fakeSyncablePlugin = FakeSyncablePlugin(localChanges)
-        whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
+        val localChanges = SyncChangesRequest(BOOKMARKS, firstSyncWithBookmarksAndFavorites, "0")
+        val fakeSyncablePlugin = FakeSyncableDataPersister()
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
         whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
             Success(
-                listOf(SyncChanges.empty()),
+                listOf(SyncChangesResponse.empty()),
             ),
         )
 
@@ -83,9 +86,9 @@ internal class SyncEngineTest {
 
     @Test
     fun whenFirstSyncLocalChangesThenDataIsSentAndStateUpdatedWithError() {
-        val localChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
-        val fakeSyncablePlugin = FakeSyncablePlugin(localChanges)
-        whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
+        val localChanges = SyncChangesRequest(BOOKMARKS, firstSyncWithBookmarksAndFavorites, "0")
+        val fakeSyncablePlugin = FakeSyncableDataPersister()
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
         whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
             Result.Error(400, "patch failed"),
         )
@@ -99,9 +102,8 @@ internal class SyncEngineTest {
 
     @Test
     fun whenSyncAndNoLocalChangesThenGetRemoteChanges() {
-        val localChanges = SyncChanges.empty()
-        val fakeSyncablePlugin = FakeSyncablePlugin(localChanges)
-        whenever(plugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
+        val fakeSyncablePlugin = FakeSyncableDataPersister()
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
 
         syncEngine.syncNow(APP_OPEN)
 

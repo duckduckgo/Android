@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.sync.TestSyncFixtures
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
@@ -72,7 +72,7 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenPatchAndBookmarkChangesThenApiIsSuccessful() {
-        val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, firstSyncWithBookmarksAndFavorites, "")
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(JSONObject()))
 
@@ -82,7 +82,7 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenPatchAndBookmarkChangesThenApiFails() {
-        val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, firstSyncWithBookmarksAndFavorites, "0")
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(patchAllError)
 
@@ -92,7 +92,7 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenMappingChangesThenGeneratedObjectIsCorrect() {
-        val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, firstSyncWithBookmarksAndFavorites, "0")
         val changes = apiClient.mapRequest(listOf(bookmarksChanges))
         assertTrue(changes.get("client_timestamp") != null)
         assertTrue(changes.get("bookmarks") != null)

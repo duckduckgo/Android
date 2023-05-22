@@ -27,18 +27,16 @@ import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult.Duplicate
 import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult.NotDuplicate
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
-import com.duckduckgo.sync.api.engine.SyncMerger
-import com.duckduckgo.sync.api.engine.SyncablePlugin
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.DEDUPLICATION
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.REMOTE_WINS
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.TIMESTAMP
+import com.duckduckgo.sync.api.engine.SyncableDataPersister
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -46,25 +44,16 @@ import javax.inject.Inject
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = SyncMerger::class)
-class SavedSitesSyncMerger @Inject constructor(
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
+class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesSyncStore: FeatureSyncStore,
     private val duplicateFinder: SavedSitesDuplicateFinder,
     private val syncCrypto: SyncCrypto,
-) : SyncMerger, SyncablePlugin {
+) : SyncableDataPersister {
 
-    override fun getChanges(since: String): SyncChanges {
-        return SyncChanges.empty()
-    }
-
-    override fun getModifiedSince(): String {
-        return ""
-    }
-
-    override fun syncChanges(
-        changes: List<SyncChanges>,
+    override fun persist(
+        changes: List<SyncChangesResponse>,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
@@ -81,8 +70,8 @@ class SavedSitesSyncMerger @Inject constructor(
         savedSitesSyncStore.modifiedSince = "0"
     }
 
-    override fun merge(
-        changes: SyncChanges,
+    fun merge(
+        changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         val result = when (val validation = validateChanges(changes)) {
@@ -98,8 +87,8 @@ class SavedSitesSyncMerger @Inject constructor(
         return result
     }
 
-    private fun validateChanges(changes: SyncChanges): SyncDataValidationResult<SyncBookmarkEntries> {
-        val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.updatesJSON) }.getOrNull()
+    private fun validateChanges(changes: SyncChangesResponse): SyncDataValidationResult<SyncBookmarkEntries> {
+        val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString) }.getOrNull()
 
         if (response == null) {
             return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect bookmarks null")
@@ -442,7 +431,11 @@ class SavedSitesSyncMerger @Inject constructor(
     }
 }
 
-data class SyncBookmarkRemoteUpdates(val bookmarks: SyncBookmarkEntries)
+data class SyncBookmarkRemoteUpdates(
+    val bookmarks: SyncBookmarkEntries,
+    val client_timestamp: String,
+)
+
 data class SyncBookmarkEntries(
     val entries: List<SyncBookmarkEntry>,
     val last_modified: String,

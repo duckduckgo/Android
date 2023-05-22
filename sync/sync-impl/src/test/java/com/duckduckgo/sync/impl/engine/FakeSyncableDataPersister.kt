@@ -16,18 +16,15 @@
 
 package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
-import com.duckduckgo.sync.api.engine.SyncablePlugin
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncableDataPersister
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 
-class FakeSyncablePlugin(val changes: SyncChanges) : SyncablePlugin {
-    override fun getChanges(since: String): SyncChanges {
-        return changes
-    }
+class FakeSyncableDataPersister() : SyncableDataPersister {
 
-    override fun syncChanges(
-        changes: List<SyncChanges>,
+    override fun persist(
+        changes: List<SyncChangesResponse>,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         return SyncMergeResult.Success(false)

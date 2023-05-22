@@ -31,7 +31,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncParser
+import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
@@ -49,7 +49,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
-class SavedSitesSyncParserTest {
+class SavedSitesSyncDataProviderTest {
 
     @get:Rule
     @Suppress("unused")
@@ -64,7 +64,7 @@ class SavedSitesSyncParserTest {
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var store: FeatureSyncStore
 
-    private lateinit var parser: SavedSitesSyncParser
+    private lateinit var parser: SavedSitesSyncDataProvider
 
     private var favoritesFolder = aFolder(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "")
     private var bookmarksRootFolder = aFolder(SavedSitesNames.BOOKMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "")
@@ -89,7 +89,7 @@ class SavedSitesSyncParserTest {
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
         store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
-        parser = SavedSitesSyncParser(repository, store, FakeCrypto())
+        parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto())
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)

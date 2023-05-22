@@ -16,14 +16,14 @@
 
 package com.duckduckgo.sync.api.engine
 
-interface SyncablePlugin {
+interface SyncableDataProvider {
 
     /**
      * Used by the SyncClient to get all the updates from each syncable feature
      * since a specific time
      * This data that will be sent to the Sync API
      */
-    fun getChanges(since: String): SyncChanges
+    fun getChanges(): SyncChangesRequest
 
     /**
      * Used by the SyncClient to get the modifiedSince data per feature
@@ -33,24 +33,8 @@ interface SyncablePlugin {
     fun getModifiedSince(): String
 
     /**
-     * Changes from Sync Client have been received
-     * Each feature is responsible for merging and solving conflicts
-     */
-    fun syncChanges(
-        changes: List<SyncChanges>,
-        conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean>
-
-    /**
      * Sync Feature has been disabled / device has been removed
      * This is an opportunity for Features to do some local cleanup if needed
      */
     fun onSyncDisabled()
-
-    enum class SyncConflictResolution {
-        DEDUPLICATION,
-        REMOTE_WINS,
-        LOCAL_WINS,
-        TIMESTAMP,
-    }
 }

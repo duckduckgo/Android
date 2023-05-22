@@ -18,7 +18,8 @@ package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
@@ -26,12 +27,13 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.duckduckgo.sync.api.engine.SyncablePlugin
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.DEDUPLICATION
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.LOCAL_WINS
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.REMOTE_WINS
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.TIMESTAMP
+import com.duckduckgo.sync.api.engine.SyncableDataPersister
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
@@ -49,7 +51,8 @@ class RealSyncEngine @Inject constructor(
     private val syncApiClient: SyncApiClient,
     private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
-    private val plugins: PluginPoint<SyncablePlugin>,
+    private val providerPlugins: PluginPoint<SyncableDataProvider>,
+    private val persisterPlugins: PluginPoint<SyncableDataPersister>,
 ) : SyncEngine {
 
     override fun syncNow(trigger: SyncTrigger) {
@@ -91,8 +94,9 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun mergeRemoteData() {
-        Timber.d("Sync-Feature: merging remote data")
+        Timber.d("Sync-Feature: fetching remote data")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
+
         getRemoteChanges(DEDUPLICATION)
 
         val changes = getChanges()
@@ -106,7 +110,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun performSync(trigger: SyncTrigger) {
-        val changes = getListOfChanges()
+        val changes = getChanges()
 
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
@@ -121,7 +125,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun sendLocalChanges(
-        changes: List<SyncChanges>,
+        changes: List<SyncChangesRequest>,
         conflictResolution: SyncConflictResolution,
     ) {
         when (val result = syncApiClient.patch(changes)) {
@@ -156,27 +160,15 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun getListOfChanges(): List<SyncChanges> {
-        // TODO this should ude modifiedSince per feature
-        val lastAttempt = syncStateRepository.current()
-        return if (lastAttempt == null) {
-            Timber.d("Sync-Feature: gathering all data")
-            getChanges()
-        } else {
-            Timber.d("Sync-Feature: gathering changes since $lastAttempt")
-            getChanges(lastAttempt.timestamp)
-        }
-    }
-
     private fun getBookmarksModifiedSince(): String {
-        return plugins.getPlugins().map {
+        return providerPlugins.getPlugins().map {
             it.getModifiedSince()
         }.filterNot { it.isEmpty() }.first()
     }
 
-    private fun getChanges(timestamp: String = ""): List<SyncChanges> {
-        return plugins.getPlugins().map {
-            it.getChanges(timestamp)
+    private fun getChanges(): List<SyncChangesRequest> {
+        return providerPlugins.getPlugins().map {
+            it.getChanges()
         }.filterNot { it.isEmpty() }
     }
 
@@ -186,11 +178,11 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun persistChanges(
-        remoteChanges: List<SyncChanges>,
+        remoteChanges: List<SyncChangesResponse>,
         conflictResolution: SyncConflictResolution,
     ) {
-        plugins.getPlugins().map {
-            it.syncChanges(remoteChanges, conflictResolution)
+        persisterPlugins.getPlugins().map {
+            it.persist(remoteChanges, conflictResolution)
         }
     }
 }

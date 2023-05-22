@@ -17,9 +17,9 @@
 package com.duckduckgo.sync.impl.engine
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
@@ -32,8 +32,8 @@ import timber.log.Timber
 
 interface SyncApiClient {
 
-    fun patch(changes: List<SyncChanges>): Result<List<SyncChanges>>
-    fun get(since: String): Result<List<SyncChanges>>
+    fun patch(changes: List<SyncChangesRequest>): Result<List<SyncChangesResponse>>
+    fun get(since: String): Result<List<SyncChangesResponse>>
 }
 
 @ContributesBinding(AppScope::class)
@@ -42,7 +42,7 @@ class AppSyncApiClient @Inject constructor(
     private val syncApi: SyncApi,
 ) : SyncApiClient {
 
-    override fun patch(changes: List<SyncChanges>): Result<List<SyncChanges>> {
+    override fun patch(changes: List<SyncChangesRequest>): Result<List<SyncChangesResponse>> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -53,7 +53,7 @@ class AppSyncApiClient @Inject constructor(
 
         // this should be a Flow when more data types come in
         val bookmarkChanges = changes.first()
-        val updates = JSONObject(bookmarkChanges.updatesJSON)
+        val updates = JSONObject(bookmarkChanges.jsonString)
         Timber.d("Sync-Feature: patch data generated $updates")
         return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
@@ -71,7 +71,7 @@ class AppSyncApiClient @Inject constructor(
         }
     }
 
-    override fun get(since: String): Result<List<SyncChanges>> {
+    override fun get(since: String): Result<List<SyncChangesResponse>> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -93,20 +93,16 @@ class AppSyncApiClient @Inject constructor(
     }
 
     @VisibleForTesting
-    fun mapRequest(changes: List<SyncChanges>): JSONObject {
-        val request = JSONObject()
-        changes.forEach { feature ->
-            request.put(feature.type.field, feature.updatesJSON)
-        }
-        request.put("client_timestamp", DatabaseDateFormatter.iso8601())
-        return request
+    fun mapRequest(changes: List<SyncChangesRequest>): JSONObject {
+        val bookmarkChanges = changes.first()
+        return JSONObject(bookmarkChanges.jsonString)
     }
 
     // TODO: this will need to be refactored once we receive more than one type
     @VisibleForTesting
-    fun mapResponse(response: JSONObject): List<SyncChanges> {
+    fun mapResponse(response: JSONObject): List<SyncChangesResponse> {
         val bookmarksJSON = response.toString()
         Timber.d("Sync-Feature: responses mapped to $bookmarksJSON")
-        return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
+        return listOf(SyncChangesResponse(BOOKMARKS, bookmarksJSON))
     }
 }

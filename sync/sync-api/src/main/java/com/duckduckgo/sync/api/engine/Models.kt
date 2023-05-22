@@ -18,22 +18,59 @@ package com.duckduckgo.sync.api.engine
 
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 
-data class SyncChanges(
-    val type: SyncableType,
-    val updatesJSON: String,
-) {
+data class SyncChangesRequest(val type: SyncableType, val jsonString: String, val modifiedSince: String) {
 
     fun isEmpty(): Boolean {
-        return this.updatesJSON.isEmpty()
+        return this.jsonString.isEmpty()
     }
-
     companion object {
-        fun empty(): SyncChanges {
-            return SyncChanges(BOOKMARKS, "")
+        fun empty(): SyncChangesRequest {
+            return SyncChangesRequest(BOOKMARKS, "", "")
         }
     }
 }
 
+data class SyncChangesResponse(val type: SyncableType, val jsonString: String) {
+
+    companion object {
+        fun empty(): SyncChangesResponse {
+            return SyncChangesResponse(BOOKMARKS, "")
+        }
+    }
+
+}
+
 enum class SyncableType(val field: String) {
     BOOKMARKS("bookmarks"),
+}
+
+sealed class SyncMergeResult<out R> {
+
+    data class Success<out T>(val data: T) : SyncMergeResult<T>()
+    data class Error(
+        val code: Int = -1,
+        val reason: String,
+    ) : SyncMergeResult<Nothing>()
+
+    override fun toString(): String {
+        return when (this) {
+            is Success<*> -> "Success[data=$data]"
+            is Error -> "Error[exception=$code, $reason]"
+        }
+    }
+}
+
+sealed class SyncDataValidationResult<out R> {
+
+    data class Success<out T>(val data: T) : SyncDataValidationResult<T>()
+    data class Error(
+        val reason: String,
+    ) : SyncDataValidationResult<Nothing>()
+
+    override fun toString(): String {
+        return when (this) {
+            is Success<*> -> "Success[data=$data]"
+            is Error -> "Error[reason= $reason]"
+        }
+    }
 }
