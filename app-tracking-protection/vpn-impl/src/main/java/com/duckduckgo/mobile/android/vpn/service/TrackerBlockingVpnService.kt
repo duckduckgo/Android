@@ -79,11 +79,11 @@ import logcat.logcat
 @InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
 
-    private external fun jni_wait_for_tun_up(tunFd: Int, isIpv6Enabled: Boolean): Int
+    private external fun jni_wait_for_tun_up(tunFd: Int): Int
 
-    fun ParcelFileDescriptor.waitForTunellUpOrTimeout(isIpv6Enabled: Boolean): Boolean {
+    fun ParcelFileDescriptor.waitForTunellUpOrTimeout(): Boolean {
         return runCatching {
-            jni_wait_for_tun_up(this.fd, isIpv6Enabled) == 0
+            jni_wait_for_tun_up(this.fd) == 0
         }.getOrElse { e ->
             if (e is UnsatisfiedLinkError) {
                 logcat(ERROR) { "VPN log: ${e.asLog()}" }
@@ -280,7 +280,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         // Create a null route tunnel so that leaks can't scape
         val nullTun = createNullRouteTempTunnel()?.let {
-            if (!it.waitForTunellUpOrTimeout(false)) {
+            if (!it.waitForTunellUpOrTimeout()) {
                 logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
             }
             it
@@ -296,7 +296,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             if (it != null) {
                 activeTun = createTunnelInterface(it)
                 activeTun?.let { tun ->
-                    if (!tun.waitForTunellUpOrTimeout(it.addresses.keys.any { inetAddress -> inetAddress is Inet6Address })) {
+                    if (!tun.waitForTunellUpOrTimeout()) {
                         activeTun = null
                     }
                 }
