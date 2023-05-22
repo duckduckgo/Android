@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo for Windows on täpselt nii kiire kui vaja, ootuspäraste sirvimisfunktsioonidega ja täis meie tippklassi privaatsuselemente.\n\nAva oma Windowsi arvutis:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Jaga linki</string>
-    <string name="windows_share_text">Kas oled valmis Windowsis privaatseks sirvimiseks?\n\nAllalaadimiseks ava oma Windowsi arvutis see URL:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Kas oled valmis Windowsis privaatseks sirvimiseks?\n\nAllalaadimiseks ava oma Windowsi arvutis see URL:\n\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Kas otsid Maci versiooni?</string>
     <string name="windows_join_waitlist">Liitu privaatse ootenimekirjaga</string>
     <string name="windows_join_waitlist_error">Ootenimekirjaga liitumisel tekkis tõrge, proovi hiljem uuesti</string>
