@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 interface TrackingParametersRepository {
     fun updateAll(exceptions: List<TrackingParameterExceptionEntity>, parameters: List<TrackingParameterEntity>)
     val exceptions: List<TrackingParameterException>
-    val parameters: List<Regex>
+    val parameters: List<String>
 }
 
 class RealTrackingParametersRepository(
@@ -38,7 +38,7 @@ class RealTrackingParametersRepository(
     private val trackingParametersDao: TrackingParametersDao = database.trackingParametersDao()
 
     override val exceptions = CopyOnWriteArrayList<TrackingParameterException>()
-    override val parameters = CopyOnWriteArrayList<Regex>()
+    override val parameters = CopyOnWriteArrayList<String>()
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -62,7 +62,7 @@ class RealTrackingParametersRepository(
 
         parameters.clear()
         trackingParametersDao.getAllTrackingParameters().map {
-            parameters.add(it.parameter.toRegex())
+            parameters.add(it.parameter)
         }
     }
 }
