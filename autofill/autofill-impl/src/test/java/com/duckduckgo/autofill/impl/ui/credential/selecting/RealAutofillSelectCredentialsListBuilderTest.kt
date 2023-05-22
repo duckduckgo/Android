@@ -88,7 +88,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
     }
 
     @Test
-    fun whenNoPerfectMatchesAndOnePartialMatchThenPartialMatchAddedAsSecondaryButton() {
+    fun whenNoPerfectMatchesAndOnePartialMatchThenPartialMatchAddedAsPrimaryButton() {
         val sortedGroup = Groups(
             perfectMatches = emptyList(),
             partialMatches = mapOf(
@@ -96,7 +96,20 @@ class RealAutofillSelectCredentialsListBuilderTest {
             ),
         )
         val list = testee.buildFlatList(sortedGroup)
-        list[1].assertIsSecondaryButton()
+        list[1].assertIsPrimaryButton()
+    }
+
+    @Test
+    fun whenNoPerfectMatchesAndTwoPartialMatchesInSameDomainThenFirstPartialMatchAddedAsPrimaryButton() {
+        val sortedGroup = Groups(
+            perfectMatches = emptyList(),
+            partialMatches = mapOf(
+                Pair("foo.example.com", listOf(creds(), creds())),
+            ),
+        )
+        val list = testee.buildFlatList(sortedGroup)
+        list[1].assertIsPrimaryButton()
+        list[2].assertIsSecondaryButton()
     }
 
     @Test
@@ -125,6 +138,22 @@ class RealAutofillSelectCredentialsListBuilderTest {
     }
 
     @Test
+    fun whenNoPerfectMatchesAndMultiplePartialMatchesAcrossSitesThenFirstPartialMatchAddedAsPrimaryButton() {
+        val sortedGroup = Groups(
+            perfectMatches = emptyList(),
+            partialMatches = mapOf(
+                Pair("foo.example.com", listOf(creds(), creds())),
+                Pair("bar.example.com", listOf(creds(), creds())),
+            ),
+        )
+        val list = testee.buildFlatList(sortedGroup)
+        list[1].assertIsPrimaryButton()
+        list[2].assertIsSecondaryButton()
+        list[4].assertIsSecondaryButton()
+        list[5].assertIsSecondaryButton()
+    }
+
+    @Test
     fun whenPerfectMatchesAndMultiplePartialMatchesThenListOutputAsExpected() {
         val sortedGroup = Groups(
             perfectMatches = listOf(creds(), creds()),
@@ -145,15 +174,21 @@ class RealAutofillSelectCredentialsListBuilderTest {
         list[6].assertIsSecondaryButton()
     }
 
-    private fun ListItem.assertIsVerticalSpacing() = assertTrue(this is VerticalSpacing)
-    private fun ListItem.assertIsPrimaryButton() = assertTrue(this is ListItem.CredentialPrimaryType)
-    private fun ListItem.assertIsSecondaryButton() = assertTrue(this is ListItem.CredentialSecondaryType)
+    private fun ListItem.assertIsVerticalSpacing() = assertTrue("Not vertical spacing; is ${this.javaClass.simpleName}", this is VerticalSpacing)
+    private fun ListItem.assertIsPrimaryButton() = assertTrue(
+        "Not primary button; is ${this.javaClass.simpleName}",
+        this is ListItem.CredentialPrimaryType,
+    )
+    private fun ListItem.assertIsSecondaryButton() = assertTrue(
+        "Not secondary button; is ${this.javaClass.simpleName}",
+        this is ListItem.CredentialSecondaryType,
+    )
     private fun ListItem.assertIsDomainGroupHeading(name: String) {
-        assertTrue(this is GroupHeading)
+        assertTrue("Not a group heading; is ${this.javaClass.simpleName}", this is GroupHeading)
         assertEquals(String.format("From %s", name), (this as GroupHeading).label)
     }
     private fun ListItem.assertIsFromThisWebsiteGroupHeading() {
-        assertTrue(this is GroupHeading)
+        assertTrue("Not a group heading; is ${this.javaClass.simpleName}", this is GroupHeading)
         assertEquals("From This Website", (this as GroupHeading).label)
     }
 

@@ -45,8 +45,15 @@ class RealAutofillSelectCredentialsListBuilder @Inject constructor(
             processPerfectMatches(sortedGroups, flattenedList)
         }
 
+        // if we had any perfect matches we'll show the primary button there. So only show it for partial matches where there are no perfect matches.
+        var addPrimaryButtonToPartialMatches = sortedGroups.perfectMatches.isEmpty()
+
         sortedGroups.partialMatches.forEach { (key, value) ->
-            processPartialMatches(flattenedList, key, value)
+            val addedPrimaryButton = processPartialMatches(flattenedList, key, value, addPrimaryButtonToPartialMatches)
+            if (addedPrimaryButton) {
+                // only add the primary button once
+                addPrimaryButtonToPartialMatches = false
+            }
         }
 
         return flattenedList
@@ -72,15 +79,29 @@ class RealAutofillSelectCredentialsListBuilder @Inject constructor(
         }
     }
 
+    /**
+     * Process the partial matches for a given domain, adding them to the flattened list
+     * @param usePrimaryButtonType if true, the primary button will be used for the first item in the list
+     * @return true if the primary button was used, false otherwise
+     */
     private fun processPartialMatches(
         flattenedList: MutableList<ListItem>,
         key: String,
         value: List<LoginCredentials>,
-    ) {
+        usePrimaryButtonType: Boolean,
+    ): Boolean {
         flattenedList.add(GroupHeading(context.getString(R.string.useSavedLoginDialogFromDomainLabel, key)))
 
-        value.forEach {
-            flattenedList.add(CredentialSecondaryType(it))
+        var primaryButtonAdded = false
+        value.forEachIndexed { index, loginCredentials ->
+            if (index == 0 && usePrimaryButtonType) {
+                flattenedList.add(CredentialPrimaryType(loginCredentials))
+                primaryButtonAdded = true
+            } else {
+                flattenedList.add(CredentialSecondaryType(loginCredentials))
+            }
         }
+
+        return primaryButtonAdded
     }
 }
