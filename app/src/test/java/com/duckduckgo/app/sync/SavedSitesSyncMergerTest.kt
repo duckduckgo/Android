@@ -128,7 +128,6 @@ class SavedSitesSyncMergerTest {
 
         assertTrue(result is Error)
     }
-
 }
 
 class FakeCrypto : SyncCrypto {

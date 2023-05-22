@@ -26,10 +26,10 @@ import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -51,7 +51,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
             Timber.d("Sync-Feature: Listening to changes in Saved Sites")
             coroutineScope.launch(dispatcherProvider.io()) {
                 savedSitesRepository.lastModified().collect {
-                    if (initialised){
+                    if (initialised) {
                         Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
                         syncEngine.syncNow(FEATURE_READ)
                     } else {
