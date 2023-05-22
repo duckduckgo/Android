@@ -24,7 +24,7 @@
     <string name="windows_description">Windows için DuckDuckGo, ihtiyacınız olan hız ve beklediğiniz tarama özelliklerinin yanı sıra sınıfındaki en iyi gizlilik özelliklerini (Privacy Essentials) sunuyor.\n\nWindows bilgisayarınızda şu adrese gidin:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Bağlantıyı paylaş</string>
-    <string name="windows_share_text">Windows\'ta özel olarak gezinmeye hazır mısınız?\n\nİndirmek için Windows bilgisayarınızda bu URL\'yi ziyaret edin:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Windows\'ta özel olarak gezinmeye hazır mısınız?\n\nİndirmek için Windows bilgisayarınızda bu URL\'yi ziyaret edin:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Mac Sürümünü mü arıyorsunuz?</string>
     <string name="windows_join_waitlist">Özel Bekleme Listesine Katılın</string>
     <string name="windows_join_waitlist_error">Bekleme listesine katılırken bir hata oluştu, lütfen daha sonra tekrar deneyin</string>
