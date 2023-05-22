@@ -52,7 +52,7 @@ class AppSyncApiClient @Inject constructor(
         }
 
         val localChanges = mapRequest(changes)
-        Timber.d("Sync: patch data generated $localChanges")
+        Timber.d("Sync-Feature: patch data generated $localChanges")
         return when (val result = syncApi.patch(token, localChanges)) {
             is Result.Error -> {
                 result
@@ -103,7 +103,7 @@ class AppSyncApiClient @Inject constructor(
     @VisibleForTesting
     fun mapResponse(response: JSONObject): List<SyncChanges> {
         val bookmarksJSON = response.toString()
-        Timber.d("Sync: responses mapped to $bookmarksJSON")
+        Timber.d("Sync-Feature: responses mapped to $bookmarksJSON")
         return listOf(SyncChanges(BOOKMARKS, bookmarksJSON))
     }
 }

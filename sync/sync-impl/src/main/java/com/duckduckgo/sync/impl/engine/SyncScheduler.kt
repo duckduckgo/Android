@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncState.FAIL
@@ -25,6 +26,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 
 interface SyncScheduler {
 
@@ -43,10 +46,12 @@ class RealSyncScheduler @Inject constructor(private val syncStateRepository: Syn
                 IN_PROGRESS -> DISCARD
                 FAIL -> EXECUTE
                 else -> {
-                    val syncTime = Instant.parse(lastSync.timestamp)
-                    val now = Instant.now()
-                    val duration = Duration.between(syncTime, now)
-                    if (duration.toMinutes() > DEBOUNCE_PERIOD_IN_MINUTES) {
+                    val syncTime = OffsetDateTime.parse(lastSync.timestamp)
+                    val now = OffsetDateTime.now()
+
+                    val minutesAgo  = Duration.between(syncTime, now).toMinutes()
+                    Timber.d("Sync-Feature: Last sync was $minutesAgo minutes ago")
+                    if (minutesAgo > DEBOUNCE_PERIOD_IN_MINUTES) {
                         EXECUTE
                     } else {
                         DISCARD

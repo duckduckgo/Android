@@ -53,10 +53,10 @@ class RealSyncEngine @Inject constructor(
 ) : SyncEngine {
 
     override fun syncNow(trigger: SyncTrigger) {
-        Timber.d("Sync: petition to sync now trigger: $trigger")
+        Timber.d("Sync-Feature: petition to sync now trigger: $trigger")
         when (trigger) {
             BACKGROUND_SYNC -> scheduleSync(trigger)
-            APP_OPEN -> scheduleSync(trigger)
+            APP_OPEN -> performSync(trigger)
             FEATURE_READ -> performSync(trigger)
             ACCOUNT_CREATION -> sendLocalData()
             ACCOUNT_LOGIN -> mergeRemoteData()
@@ -66,42 +66,42 @@ class RealSyncEngine @Inject constructor(
     private fun scheduleSync(trigger: SyncTrigger) {
         when (syncScheduler.scheduleOperation()) {
             DISCARD -> {
-                Timber.d("Sync: petition to sync debounced")
+                Timber.d("Sync-Feature: petition to sync debounced")
             }
 
             EXECUTE -> {
-                Timber.d("Sync: petition to sync accepted, syncing now")
+                Timber.d("Sync-Feature: petition to sync accepted, syncing now")
                 performSync(trigger)
             }
         }
     }
 
     private fun sendLocalData() {
-        Timber.d("Sync: initiating first sync")
+        Timber.d("Sync-Feature: initiating first sync")
         val changes = getChanges()
 
         if (changes.isEmpty()) {
-            Timber.d("Sync: local data empty, nothing to send")
+            Timber.d("Sync-Feature: local data empty, nothing to send")
             return
         }
 
-        Timber.d("Sync: sending all local data $changes")
+        Timber.d("Sync-Feature: sending all local data $changes")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
         sendLocalChanges(changes, REMOTE_WINS)
     }
 
     private fun mergeRemoteData() {
-        Timber.d("Sync: merging remote data")
+        Timber.d("Sync-Feature: merging remote data")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
         getRemoteChange(DEDUPLICATION)
 
         val changes = getChanges()
         if (changes.isEmpty()) {
-            Timber.d("Sync: local data empty, nothing to send")
+            Timber.d("Sync-Feature: local data empty, nothing to send")
             return
         }
 
-        Timber.d("Sync: sending local data $changes")
+        Timber.d("Sync-Feature: sending local data $changes")
         sendLocalChanges(changes, LOCAL_WINS)
     }
 
@@ -111,11 +111,11 @@ class RealSyncEngine @Inject constructor(
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
         if (changes.isEmpty()) {
-            Timber.d("Sync: no changes to sync, asking for remote changes")
-            getRemoteChange(TIMESTAMP)
+            Timber.d("Sync-Feature: no changes to sync, asking for remote changes")
+            receiveRemoteChange(TIMESTAMP)
         } else {
-            Timber.d("Sync: changes to update $changes")
-            Timber.d("Sync: starting to sync")
+            Timber.d("Sync-Feature: changes to update $changes")
+            Timber.d("Sync-Feature: starting to sync")
             sendLocalChanges(changes, TIMESTAMP)
         }
     }
@@ -126,12 +126,12 @@ class RealSyncEngine @Inject constructor(
     ) {
         when (val result = syncApiClient.patch(changes)) {
             is Error -> {
-                Timber.d("Sync: patch failed ${result.reason}")
+                Timber.d("Sync-Feature: patch failed ${result.reason}")
                 syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
-                Timber.d("Sync: patch success")
+                Timber.d("Sync-Feature: patch success")
                 syncStateRepository.updateSyncState(SUCCESS)
                 persistChanges(result.data, conflictResolution)
             }
@@ -141,21 +141,21 @@ class RealSyncEngine @Inject constructor(
     private fun getRemoteChange(conflictResolution: SyncConflictResolution) {
         val lastCompleted = syncStateRepository.lastCompleted()
         val since = if (lastCompleted == null) {
-            Timber.d("Sync: get all remote changes")
+            Timber.d("Sync-Feature: get all remote changes")
             ""
         } else {
-            Timber.d("Sync: get remote changes since $lastCompleted")
+            Timber.d("Sync-Feature: get remote changes since $lastCompleted")
             lastCompleted.timestamp
         }
 
         when (val result = syncApiClient.get(since)) {
             is Error -> {
-                Timber.d("Sync: get failed ${result.reason}")
+                Timber.d("Sync-Feature: get failed ${result.reason}")
                 syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
-                Timber.d("Sync: get success")
+                Timber.d("Sync-Feature: get success")
                 syncStateRepository.updateSyncState(SUCCESS)
                 persistChanges(result.data, conflictResolution)
             }
@@ -165,10 +165,10 @@ class RealSyncEngine @Inject constructor(
     private fun getListOfChanges(): List<SyncChanges> {
         val lastAttempt = syncStateRepository.current()
         return if (lastAttempt == null) {
-            Timber.d("Sync: gathering all data")
+            Timber.d("Sync-Feature: gathering all data")
             getChanges()
         } else {
-            Timber.d("Sync: gathering changes since $lastAttempt")
+            Timber.d("Sync-Feature: gathering changes since $lastAttempt")
             getChanges(lastAttempt.timestamp)
         }
     }
@@ -180,7 +180,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     override fun notifyDataChanged() {
-        Timber.d("Sync: notifyDataChanged")
+        Timber.d("Sync-Feature: notifyDataChanged")
         performSync(FEATURE_READ)
     }
 

@@ -231,7 +231,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
 
         return onSuccess(response) {
-            val data = response.body() ?: throw IllegalStateException("Sync: get data not parsed")
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
             Result.Success(data)
         }
     }
@@ -249,7 +249,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
 
         return onSuccess(response) {
-            val data = response.body() ?: throw IllegalStateException("Sync: get data not parsed")
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
             Result.Success(data)
         }
     }

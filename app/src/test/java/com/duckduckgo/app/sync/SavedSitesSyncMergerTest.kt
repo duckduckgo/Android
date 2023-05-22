@@ -119,6 +119,16 @@ class SavedSitesSyncMergerTest {
         val favouritesRoot = repository.getFavoritesSync()
         assertTrue(favouritesRoot[0].id == "4cde63c7-04ae-44ef-8d9c-ea699c0b679f")
     }
+
+    @Test
+    fun whenMergingEmptyEntriesThenResultIsSuccess() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_empty_entries.json")
+        val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
+        val result = syncMerger.merge(corruptedChanges)
+
+        assertTrue(result is Error)
+    }
+
 }
 
 class FakeCrypto : SyncCrypto {

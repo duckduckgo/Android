@@ -43,14 +43,21 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
+    private var initialised: Boolean = false
+
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         if (deviceSyncState.isUserSignedInOnDevice()) {
-            Timber.d("Sync: Listening to changes in Saved Sites")
+            Timber.d("Sync-Feature: Listening to changes in Saved Sites")
             coroutineScope.launch(dispatcherProvider.io()) {
                 savedSitesRepository.lastModified().collect {
-                    Timber.d("Sync: Changes to Saved Sites detected, triggering sync")
-                    syncEngine.syncNow(FEATURE_READ)
+                    if (initialised){
+                        Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
+                        syncEngine.syncNow(FEATURE_READ)
+                    } else {
+                        Timber.d("Sync-Feature: Changes to Saved Sites initialised")
+                        initialised = true
+                    }
                 }
             }
         }

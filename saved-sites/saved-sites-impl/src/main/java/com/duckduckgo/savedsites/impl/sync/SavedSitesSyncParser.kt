@@ -74,7 +74,7 @@ class SavedSitesSyncParser @Inject constructor(
 
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
-        Timber.d("Sync: generating changes since $since")
+        Timber.d("Sync-Feature: generating changes since $since")
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         val folders = repository.getFoldersModifiedSince(since)
@@ -100,12 +100,12 @@ class SavedSitesSyncParser @Inject constructor(
 
     @VisibleForTesting
     fun allContent(): List<SyncBookmarkEntry> {
-        Timber.d("Sync: generating all content")
+        Timber.d("Sync-Feature: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
 
         if (!hasFavorites && !hasBookmarks) {
-            Timber.d("Sync: nothing to generate, favourites and bookmarks empty")
+            Timber.d("Sync-Feature: nothing to generate, favourites and bookmarks empty")
             return emptyList()
         }
 

@@ -352,7 +352,7 @@ class RealSavedSitesRepository(
     }
 
     override fun insert(savedSite: SavedSite): SavedSite {
-        Timber.d("Sync: inserting Saved Site $savedSite")
+        Timber.d("Sync-Feature: inserting Saved Site $savedSite")
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {
@@ -606,7 +606,7 @@ class RealSavedSitesRepository(
 
     override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
         val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedSince(since) }
-        Timber.d("Sync: bookmarks modified since $since are $bookmarks")
+        Timber.d("Sync-Feature: bookmarks modified since $since are $bookmarks")
         return bookmarks.map { mapToBookmark(it)!! }
     }
 
