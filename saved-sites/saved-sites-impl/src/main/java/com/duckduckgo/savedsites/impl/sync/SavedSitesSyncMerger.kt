@@ -59,6 +59,10 @@ class SavedSitesSyncMerger @Inject constructor(
         return SyncChanges.empty()
     }
 
+    override fun getModifiedSince(): String {
+        return ""
+    }
+
     override fun syncChanges(
         changes: List<SyncChanges>,
         conflictResolution: SyncConflictResolution,
@@ -94,22 +98,23 @@ class SavedSitesSyncMerger @Inject constructor(
         return result
     }
 
-    private fun validateChanges(changes: SyncChanges): SyncDataValidationResult<SyncBookmarkRemoteUpdates> {
-        val bookmarks = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.updatesJSON) }.getOrNull()
+    private fun validateChanges(changes: SyncChanges): SyncDataValidationResult<SyncBookmarkEntries> {
+        val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.updatesJSON) }.getOrNull()
 
-        if (bookmarks == null) {
+        if (response == null) {
             return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect bookmarks null")
         }
 
-        if (bookmarks.entries == null) {
-            return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect bookmarks null")
+        if (response.bookmarks.entries == null) {
+            Timber.d("Sync-Feature: JSON has null entries, replacing with empty list")
+            return SyncDataValidationResult.Success(SyncBookmarkEntries(emptyList(), response.bookmarks.last_modified))
         }
 
-        return SyncDataValidationResult.Success(bookmarks)
+        return SyncDataValidationResult.Success(response.bookmarks)
     }
 
     private fun processEntries(
-        bookmarks: SyncBookmarkRemoteUpdates,
+        bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         Timber.d("Sync-Feature: updating bookmarks last_modified to ${bookmarks.last_modified}")
@@ -437,7 +442,8 @@ class SavedSitesSyncMerger @Inject constructor(
     }
 }
 
-class SyncBookmarkRemoteUpdates(
+data class SyncBookmarkRemoteUpdates(val bookmarks: SyncBookmarkEntries)
+data class SyncBookmarkEntries(
     val entries: List<SyncBookmarkEntry>,
     val last_modified: String,
 )

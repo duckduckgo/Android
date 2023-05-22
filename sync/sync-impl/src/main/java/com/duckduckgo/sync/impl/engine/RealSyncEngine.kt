@@ -93,7 +93,7 @@ class RealSyncEngine @Inject constructor(
     private fun mergeRemoteData() {
         Timber.d("Sync-Feature: merging remote data")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
-        getRemoteChange(DEDUPLICATION)
+        getRemoteChanges(DEDUPLICATION)
 
         val changes = getChanges()
         if (changes.isEmpty()) {
@@ -112,7 +112,7 @@ class RealSyncEngine @Inject constructor(
 
         if (changes.isEmpty()) {
             Timber.d("Sync-Feature: no changes to sync, asking for remote changes")
-            receiveRemoteChange(TIMESTAMP)
+            getRemoteChanges(TIMESTAMP)
         } else {
             Timber.d("Sync-Feature: changes to update $changes")
             Timber.d("Sync-Feature: starting to sync")
@@ -138,16 +138,10 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun getRemoteChange(conflictResolution: SyncConflictResolution) {
-        val lastCompleted = syncStateRepository.lastCompleted()
-        val since = if (lastCompleted == null) {
-            Timber.d("Sync-Feature: get all remote changes")
-            ""
-        } else {
-            Timber.d("Sync-Feature: get remote changes since $lastCompleted")
-            lastCompleted.timestamp
-        }
-
+    private fun getRemoteChanges(conflictResolution: SyncConflictResolution) {
+        // TODO: refactor this to make one request per data type, now it's only bookmarks
+        val since = getBookmarksModifiedSince()
+        Timber.d("Sync-Feature: receive remote bookmarks change since $since")
         when (val result = syncApiClient.get(since)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
@@ -163,6 +157,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun getListOfChanges(): List<SyncChanges> {
+        // TODO this should ude modifiedSince per feature
         val lastAttempt = syncStateRepository.current()
         return if (lastAttempt == null) {
             Timber.d("Sync-Feature: gathering all data")
@@ -171,6 +166,12 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Feature: gathering changes since $lastAttempt")
             getChanges(lastAttempt.timestamp)
         }
+    }
+
+    private fun getBookmarksModifiedSince(): String {
+        return plugins.getPlugins().map {
+            it.getModifiedSince()
+        }.filterNot { it.isEmpty() }.first()
     }
 
     private fun getChanges(timestamp: String = ""): List<SyncChanges> {

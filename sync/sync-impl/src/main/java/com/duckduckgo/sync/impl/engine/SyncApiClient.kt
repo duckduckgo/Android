@@ -51,9 +51,11 @@ class AppSyncApiClient @Inject constructor(
             return Result.Error(reason = "Changes Empty")
         }
 
-        val localChanges = mapRequest(changes)
-        Timber.d("Sync-Feature: patch data generated $localChanges")
-        return when (val result = syncApi.patch(token, localChanges)) {
+        // this should be a Flow when more data types come in
+        val bookmarkChanges = changes.first()
+        val updates = JSONObject(bookmarkChanges.updatesJSON)
+        Timber.d("Sync-Feature: patch data generated $updates")
+        return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
                 result
             }
@@ -100,6 +102,7 @@ class AppSyncApiClient @Inject constructor(
         return request
     }
 
+    // TODO: this will need to be refactored once we receive more than one type
     @VisibleForTesting
     fun mapResponse(response: JSONObject): List<SyncChanges> {
         val bookmarksJSON = response.toString()

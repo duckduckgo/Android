@@ -26,6 +26,13 @@ interface SyncablePlugin {
     fun getChanges(since: String): SyncChanges
 
     /**
+     * Used by the SyncClient to get the modifiedSince data per feature
+     * When calling /GET to receive data we need to pass one since parameter per model we request
+     * This data that will be sent to the Sync API
+     */
+    fun getModifiedSince(): String
+
+    /**
      * Changes from Sync Client have been received
      * Each feature is responsible for merging and solving conflicts
      */

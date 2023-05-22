@@ -52,6 +52,10 @@ class SavedSitesSyncParser @Inject constructor(
         return parseChanges(since)
     }
 
+    override fun getModifiedSince(): String {
+        return savedSitesSyncStore.modifiedSince
+    }
+
     override fun syncChanges(
         changes: List<SyncChanges>,
         conflictResolution: SyncConflictResolution,
@@ -223,7 +227,7 @@ class SavedSitesSyncParser @Inject constructor(
             SyncChanges.empty()
         } else {
             val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
-            val patch = SyncDataRequest(bookmarkUpdates)
+            val patch = SyncBookmarksRequest(bookmarkUpdates, DatabaseDateFormatter.iso8601())
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
             SyncChanges(BOOKMARKS, allDataJSON)
         }
@@ -232,8 +236,8 @@ class SavedSitesSyncParser @Inject constructor(
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val patchAdapter: JsonAdapter<SyncDataRequest> =
-                moshi.adapter(SyncDataRequest::class.java)
+            val patchAdapter: JsonAdapter<SyncBookmarksRequest> =
+                moshi.adapter(SyncBookmarksRequest::class.java)
         }
     }
 }
@@ -250,7 +254,11 @@ data class SyncBookmarkEntry(
     val client_last_modified: String?,
 )
 
-class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
+class SyncBookmarksRequest(
+    val bookmarks: SyncBookmarkUpdates,
+    val client_timestamp: String,
+)
+
 class SyncBookmarkUpdates(
     val updates: List<SyncBookmarkEntry>,
     val modified_since: String = "0",
