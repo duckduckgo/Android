@@ -88,12 +88,12 @@ class RealTrackingParameters @Inject constructor(
 
     private fun getPreservedParameters(
         queryParameters: MutableSet<String>,
-        trackingParameters: List<Regex>,
+        trackingParameters: List<String>,
     ) =
         queryParameters.filter { parameter ->
             var match = false
             for (trackingParameter in trackingParameters) {
-                match = parameter.matches(trackingParameter)
+                match = parameter == trackingParameter
                 if (match) break
             }
             !match

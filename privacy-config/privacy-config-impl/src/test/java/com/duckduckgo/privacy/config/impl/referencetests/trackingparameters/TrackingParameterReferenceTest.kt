@@ -87,7 +87,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
     private fun mockTrackingParameters() {
         val jsonAdapter: JsonAdapter<TrackingParametersFeature> = moshi.adapter(TrackingParametersFeature::class.java)
         val exceptions = CopyOnWriteArrayList<TrackingParameterException>()
-        val trackingParameters = CopyOnWriteArrayList<Regex>()
+        val trackingParameters = CopyOnWriteArrayList<String>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             TrackingParameterReferenceTest::class.java.classLoader!!,
             "reference_tests/trackingparameters/config_reference.json",
@@ -98,7 +98,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
         features.keys().forEach { key ->
             val trackingParametersFeature: TrackingParametersFeature? = jsonAdapter.fromJson(features.get(key).toString())
             exceptions.addAll(trackingParametersFeature!!.exceptions)
-            trackingParameters.addAll(trackingParametersFeature.settings.parameters.map { it.toRegex() })
+            trackingParameters.addAll(trackingParametersFeature.settings.parameters.map { it })
         }
         whenever(mockRepository.exceptions).thenReturn(exceptions)
         whenever(mockRepository.parameters).thenReturn(trackingParameters)
