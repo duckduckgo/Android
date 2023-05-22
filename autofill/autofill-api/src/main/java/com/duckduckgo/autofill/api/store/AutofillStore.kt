@@ -94,8 +94,9 @@ interface AutofillStore {
 
     /**
      * Deletes the credential with the given ID
+     * @return the deleted LoginCredentials, or null if the deletion couldn't be performed
      */
-    suspend fun deleteCredentials(id: Long)
+    suspend fun deleteCredentials(id: Long): LoginCredentials?
 
     /**
      * Updates the given login credentials, replacing what was saved before for the credentials with the specified ID
@@ -103,6 +104,14 @@ interface AutofillStore {
      * @return The saved credential if it saved successfully, otherwise null
      */
     suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials?
+
+    /**
+     * Used to reinsert a credential that was previously deleted
+     * This supports the ability to give user a brief opportunity to 'undo' a deletion
+     *
+     * This is similar to a normal save, except it will preserve the original ID and last modified time
+     */
+    suspend fun reinsertCredentials(credentials: LoginCredentials)
 
     /**
      * Searches the saved login credentials for a match to the given URL, username and password

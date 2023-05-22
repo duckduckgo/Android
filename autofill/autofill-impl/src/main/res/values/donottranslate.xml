@@ -23,4 +23,7 @@
     <string name="deviceNotSupportedTitle">Device not supported</string>
     <string name="deviceNotSupportedSubtitle">To store Logins securely, we need to encrypt and store them on your device. Because your device does not support encrypted storage, Logins is unavailable.</string>
 
+    <string name="autofillManagementDeletedConfirmation">Login deleted</string>
+    <string name="autofillManagementUndoDeletion">Undo</string>
+
 </resources>
