@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.amplinks
+package com.duckduckgo.privacy.config.impl.referencetests.amplinks
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinkException
-import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import com.duckduckgo.privacy.config.impl.features.amplinks.AmpLinksFeature
+import com.duckduckgo.privacy.config.impl.features.amplinks.RealAmpLinks
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.CopyOnWriteArrayList
-import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.*
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +40,7 @@ import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-class AmpFormatReferenceTest(private val testCase: TestCase) {
+class AmpKeywordReferenceTest(private val testCase: TestCase) {
 
     lateinit var testee: AmpLinks
 
@@ -65,52 +66,53 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
         fun testData(): List<TestCase> {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
-                    AmpFormatReferenceTest::class.java.classLoader!!,
+                    AmpKeywordReferenceTest::class.java.classLoader!!,
                     "reference_tests/amplinks/tests.json",
                 ),
             )
-            return test?.ampFormats?.tests ?: emptyList()
+            return test?.ampKeywords?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
         }
     }
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() {
-        testCase.exceptPlatforms
         val extractedUrl = testee.extractCanonicalFromAmpLink(testCase.ampURL)
         if (extractedUrl != null) {
-            assertEquals(testCase.expectURL, (extractedUrl as AmpLinkType.ExtractedAmpLink).extractedUrl)
+            assertTrue(testCase.expectAmpDetected)
         } else {
-            assertEquals(testCase.expectURL, "")
+            assertFalse(testCase.expectAmpDetected)
         }
     }
 
     private fun mockAmpLinks() {
         val jsonAdapter: JsonAdapter<AmpLinksFeature> = moshi.adapter(AmpLinksFeature::class.java)
         val exceptions = CopyOnWriteArrayList<AmpLinkException>()
-        val ampLinkFormats = CopyOnWriteArrayList<Regex>()
+        val ampLinkKeywords = CopyOnWriteArrayList<String>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
-            AmpFormatReferenceTest::class.java.classLoader!!,
+            AmpKeywordReferenceTest::class.java.classLoader!!,
             "reference_tests/amplinks/config_reference.json",
         )
+
         val features: JSONObject = jsonObject.getJSONObject("features")
 
-        features.keys().forEach { key ->
-            val ampLinksFeature: AmpLinksFeature? = jsonAdapter.fromJson(features.get(key).toString())
+        features.keys().forEach {
+            val ampLinksFeature: AmpLinksFeature? = jsonAdapter.fromJson(features.get(it).toString())
             exceptions.addAll(ampLinksFeature!!.exceptions)
-            ampLinkFormats.addAll(ampLinksFeature.settings.linkFormats.map { it.toRegex(RegexOption.IGNORE_CASE) })
+            ampLinkKeywords.addAll(ampLinksFeature.settings.keywords)
         }
         whenever(mockRepository.exceptions).thenReturn(exceptions)
-        whenever(mockRepository.ampLinkFormats).thenReturn(ampLinkFormats)
+        whenever(mockRepository.ampLinkFormats).thenReturn(CopyOnWriteArrayList())
+        whenever(mockRepository.ampKeywords).thenReturn(ampLinkKeywords)
     }
 
     data class TestCase(
         val name: String,
         val ampURL: String,
-        val expectURL: String,
+        val expectAmpDetected: Boolean,
         val exceptPlatforms: List<String>,
     )
 
-    data class AmpFormatTest(
+    data class AmpKeywordTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
@@ -118,10 +120,6 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
     )
 
     data class ReferenceTest(
-        val ampFormats: AmpFormatTest,
-    )
-
-    data class Features(
-        val ampLink: JSONObject,
+        val ampKeywords: AmpKeywordTest,
     )
 }
