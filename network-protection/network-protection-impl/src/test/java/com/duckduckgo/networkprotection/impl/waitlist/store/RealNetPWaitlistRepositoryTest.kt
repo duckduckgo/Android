@@ -40,7 +40,13 @@ class RealNetPWaitlistRepositoryTest {
     }
 
     @Test
-    fun whenStartingInternalStateIsUnlocked() {
+    fun whenStartingInternalStateIsPendingInviteCode() {
+        assertEquals(NetPWaitlistState.PendingInviteCode, testee.getState(true))
+    }
+
+    @Test
+    fun whenStartingInternalAndAuthTokenStateIsInBeta() {
+        testee.setAuthenticationToken(fakeToken)
         assertEquals(NetPWaitlistState.InBeta, testee.getState(true))
     }
 
