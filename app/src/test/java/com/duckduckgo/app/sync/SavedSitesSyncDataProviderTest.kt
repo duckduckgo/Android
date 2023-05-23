@@ -128,8 +128,8 @@ class SavedSitesSyncDataProviderTest {
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 
-        val syncChanges = parser.getChanges("")
-        assertEquals(syncChanges.updatesJSON, updatesJSON)
+        val syncChanges = parser.getChanges()
+        assertEquals(syncChanges.jsonString, updatesJSON)
     }
 
     @Test
@@ -139,8 +139,8 @@ class SavedSitesSyncDataProviderTest {
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 
-        val syncChanges = parser.getChanges("")
-        assertEquals(syncChanges.updatesJSON, updatesJSON)
+        val syncChanges = parser.getChanges()
+        assertEquals(syncChanges.jsonString, updatesJSON)
     }
 
     @Test
@@ -155,8 +155,8 @@ class SavedSitesSyncDataProviderTest {
         repository.updateBookmark(bookmark1.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
         repository.updateBookmark(bookmark2.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
 
-        val syncChanges = parser.getChanges("")
-        assertEquals(syncChanges.updatesJSON, updatesJSON)
+        val syncChanges = parser.getChanges()
+        assertEquals(syncChanges.jsonString, updatesJSON)
     }
 
     @Test
@@ -194,15 +194,16 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenNoAfterLastSyncAreEmptyThenChangesAreEmpty() {
+    fun whenNoChangesAfterLastSyncAreEmptyThenChangesAreEmpty() {
         val modificationTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601()
+        store.modifiedSince = lastSyncTimestamp
 
         repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
         repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
         repository.insert(favourite1.copy(lastModified = modificationTimestamp))
 
-        val syncChanges = parser.getChanges(lastSyncTimestamp)
+        val syncChanges = parser.getChanges()
         assertTrue(syncChanges.isEmpty())
     }
 

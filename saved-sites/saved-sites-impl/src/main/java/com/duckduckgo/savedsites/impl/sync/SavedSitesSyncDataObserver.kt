@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -53,7 +53,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
                 savedSitesRepository.lastModified().collect {
                     if (initialised) {
                         Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
-                        syncEngine.syncNow(FEATURE_READ)
+                        syncEngine.syncNow(DATA_CHANGE)
                     } else {
                         Timber.d("Sync-Feature: Changes to Saved Sites initialised")
                         initialised = true

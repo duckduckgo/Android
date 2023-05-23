@@ -19,13 +19,13 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 
-class FakeSyncableDataProvider(val changes: SyncChangesRequest) : SyncableDataProvider {
+class FakeSyncableDataProvider(private val fakeChanges: SyncChangesRequest) : SyncableDataProvider {
     override fun getChanges(): SyncChangesRequest {
-        return changes
+        return fakeChanges
     }
 
     override fun getModifiedSince(): String {
-        return ""
+        return "0"
     }
 
     override fun onFeatureRemoved() {

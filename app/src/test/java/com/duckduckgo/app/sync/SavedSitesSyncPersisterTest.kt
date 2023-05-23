@@ -34,10 +34,11 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import junit.framework.Assert
 import org.junit.Assert.assertTrue
@@ -84,8 +85,8 @@ class SavedSitesSyncPersisterTest {
     @Test
     fun whenMergingCorruptedDataThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_invalid_data.json")
-        val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(corruptedChanges)
+        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
 
         Assert.assertTrue(result is Error)
     }
@@ -93,8 +94,8 @@ class SavedSitesSyncPersisterTest {
     @Test
     fun whenMergingNullEntriesThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_null_entries.json")
-        val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(corruptedChanges)
+        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Error)
     }
@@ -102,7 +103,7 @@ class SavedSitesSyncPersisterTest {
     @Test
     fun whenMergingDataInEmptyDBThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
-        val validChanges = SyncChanges(BOOKMARKS, updatesJSON)
+        val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
         val result = syncPersister.merge(validChanges, DEDUPLICATION)
 
         assertTrue(result is Success)
@@ -123,8 +124,8 @@ class SavedSitesSyncPersisterTest {
     @Test
     fun whenMergingEmptyEntriesThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_empty_entries.json")
-        val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(corruptedChanges)
+        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Error)
     }

@@ -16,16 +16,23 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
+import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncState.FAIL
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import org.junit.Before
@@ -45,37 +52,22 @@ internal class SyncEngineTest {
     private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
-    private val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\",\"folder\"" +
-        ":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\"" +
-        ":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\"" +
-        ":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"}," +
-        "\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestam" +
-        "p\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"},\"title\":\"Bookmark 4\"}," +
-        "{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\",\"bookmark4\"]}" +
-        ",\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
-
     @Before
     fun before() {
         syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, providerPlugins, persisterPlugins)
     }
 
     @Test
-    fun whenFirstSyncAndNoLocalChangesThenNothingIsSent() {
+    fun whenCreatingSyncAccountAndNoLocalChangesThenNothingIsSent() {
         syncEngine.syncNow(ACCOUNT_CREATION)
         verifyNoInteractions(syncStateRepository)
         verifyNoInteractions(syncApiClient)
     }
 
     @Test
-    fun whenFirstSyncLocalChangesThenDataIsSentAndStateUpdatedWithSuccess() {
-        val localChanges = SyncChangesRequest(BOOKMARKS, firstSyncWithBookmarksAndFavorites, "0")
-        val fakeSyncablePlugin = FakeSyncableDataPersister()
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
-        whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
-            Success(
-                listOf(SyncChangesResponse.empty()),
-            ),
-        )
+    fun whenCreatingSyncAccountThenDataIsSentAndStateUpdatedWithSuccess() {
+        givenLocalChanges()
+        givenPatchSuccess()
 
         syncEngine.syncNow(ACCOUNT_CREATION)
 
@@ -85,13 +77,9 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenFirstSyncLocalChangesThenDataIsSentAndStateUpdatedWithError() {
-        val localChanges = SyncChangesRequest(BOOKMARKS, firstSyncWithBookmarksAndFavorites, "0")
-        val fakeSyncablePlugin = FakeSyncableDataPersister()
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
-        whenever(syncApiClient.patch(listOf(localChanges))).thenReturn(
-            Result.Error(400, "patch failed"),
-        )
+    fun whenCreatingSyncAccountThenDataIsSentAndStateUpdatedWithError() {
+        givenLocalChanges()
+        givenPatchError()
 
         syncEngine.syncNow(ACCOUNT_CREATION)
 
@@ -101,12 +89,245 @@ internal class SyncEngineTest {
     }
 
     @Test
-    fun whenSyncAndNoLocalChangesThenGetRemoteChanges() {
-        val fakeSyncablePlugin = FakeSyncableDataPersister()
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakeSyncablePlugin))
+    fun whenAppOpenWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+        givenNoLocalChanges()
+        givenGetSuccess()
 
         syncEngine.syncNow(APP_OPEN)
 
         verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenAppOpenWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+        givenNoLocalChanges()
+        givenGetError()
+
+        syncEngine.syncNow(APP_OPEN)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenAppOpenWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+        givenLocalChanges()
+        givenPatchSuccess()
+
+        syncEngine.syncNow(APP_OPEN)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenAppOpenWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+        givenLocalChanges()
+        givenPatchError()
+
+        syncEngine.syncNow(APP_OPEN)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenFeatureReadWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.syncNow(FEATURE_READ)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenFeatureReadWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+        givenNoLocalChanges()
+        givenGetError()
+
+        syncEngine.syncNow(FEATURE_READ)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenFeatureReadWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+        givenLocalChanges()
+        givenPatchSuccess()
+
+        syncEngine.syncNow(FEATURE_READ)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenFeatureReadWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+        givenLocalChanges()
+        givenPatchError()
+
+        syncEngine.syncNow(FEATURE_READ)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenDataChangeWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.syncNow(DATA_CHANGE)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDataChangeWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+        givenNoLocalChanges()
+        givenGetError()
+
+        syncEngine.syncNow(DATA_CHANGE)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenDataChangeWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+        givenLocalChanges()
+        givenPatchSuccess()
+
+        syncEngine.syncNow(DATA_CHANGE)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenDataChangeWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+        givenLocalChanges()
+        givenPatchError()
+
+        syncEngine.syncNow(DATA_CHANGE)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenBackgroundSyncCantBeScheduledThenNothingHappens() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(DISCARD)
+
+        verifyNoInteractions(syncApiClient)
+        verifyNoInteractions(syncStateRepository)
+    }
+
+    @Test
+    fun whenBackgroundSyncWithoutChangesAndGetRemoteSucceedsThenStateIsUpdated() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
+        givenNoLocalChanges()
+        givenGetSuccess()
+
+        syncEngine.syncNow(BACKGROUND_SYNC)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenBackgroundSyncWithoutChangesAndGetRemoteFailsThenStateIsUpdated() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
+        givenNoLocalChanges()
+        givenGetError()
+
+        syncEngine.syncNow(BACKGROUND_SYNC)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenBackgroundSyncWithChangesAndPatchRemoteSucceedsThenStateIsUpdated() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
+        givenLocalChanges()
+        givenPatchSuccess()
+
+        syncEngine.syncNow(BACKGROUND_SYNC)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(SUCCESS)
+    }
+
+    @Test
+    fun whenBackgroundSyncWithChangesAndPatchRemoteFailsThenStateIsUpdated() {
+        whenever(syncScheduler.scheduleOperation()).thenReturn(EXECUTE)
+        givenLocalChanges()
+        givenPatchError()
+
+        syncEngine.syncNow(BACKGROUND_SYNC)
+
+        verify(syncApiClient).patch(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenAccountLoginGetRemoteFailsThenStateIsUpdated() {
+        givenLocalChanges()
+        givenGetError()
+
+        syncEngine.syncNow(ACCOUNT_LOGIN)
+
+        verify(syncApiClient).get(any())
+        verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    private fun givenNoLocalChanges() {
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        val fakeProviderPlugin = FakeSyncableDataProvider(SyncChangesRequest.empty())
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
+    }
+
+    private fun givenLocalChanges() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "0")
+        val fakePersisterPlugin = FakeSyncableDataPersister()
+        val fakeProviderPlugin = FakeSyncableDataProvider(localChanges)
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
+        whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
+    }
+
+    private fun givenGetError() {
+        whenever(syncApiClient.get(any())).thenReturn(
+            Result.Error(400, "get failed"),
+        )
+    }
+
+    private fun givenGetSuccess() {
+        whenever(syncApiClient.get(any())).thenReturn(
+            Success(
+                listOf(SyncChangesResponse.empty()),
+            ),
+        )
+    }
+
+    private fun givenPatchError() {
+        whenever(syncApiClient.patch(any())).thenReturn(
+            Result.Error(400, "patch failed"),
+        )
+    }
+
+    private fun givenPatchSuccess() {
+        whenever(syncApiClient.patch(any())).thenReturn(
+            Success(
+                listOf(SyncChangesResponse.empty()),
+            ),
+        )
     }
 }

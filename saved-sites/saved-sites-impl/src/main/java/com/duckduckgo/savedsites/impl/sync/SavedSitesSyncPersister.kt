@@ -91,7 +91,11 @@ class SavedSitesSyncPersister @Inject constructor(
         val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString) }.getOrNull()
 
         if (response == null) {
-            return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect bookmarks null")
+            return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect, response null")
+        }
+
+        if (response.bookmarks == null) {
+            return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect, bookmarks null")
         }
 
         if (response.bookmarks.entries == null) {
