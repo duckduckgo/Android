@@ -16,20 +16,17 @@
 
 package com.duckduckgo.app.sync
 
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.DeviceSyncState
-import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.*
 
-/**
- * We need to provide this fake implementation for non internal builds until we can add sync modules dependencies for all flavors.
- */
-@ContributesBinding(
-    scope = AppScope::class,
-    // mitigation for https://app.asana.com/0/414730916066338/1204248963638410/f
-    priority = ContributesBinding.Priority.HIGHEST,
-)
-class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
-    override fun isFeatureEnabled(): Boolean = false
-    override fun isUserSignedInOnDevice(): Boolean = false
-}
+// /**
+//  * We need to provide this fake implementation for non internal builds until we can add sync modules dependencies for all flavors.
+//  */
+// @ContributesBinding(
+//     scope = AppScope::class,
+//     // mitigation for https://app.asana.com/0/414730916066338/1204248963638410/f
+//     priority = ContributesBinding.Priority.HIGHEST,
+// )
+// class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
+//     override fun isFeatureEnabled(): Boolean = false
+//     override fun isUserSignedInOnDevice(): Boolean = false
+// }

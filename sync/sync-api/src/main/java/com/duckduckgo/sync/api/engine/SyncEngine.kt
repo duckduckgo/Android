@@ -28,15 +28,8 @@ interface SyncEngine {
         BACKGROUND_SYNC,
         APP_OPEN,
         FEATURE_READ,
+        DATA_CHANGE,
         ACCOUNT_CREATION,
         ACCOUNT_LOGIN,
     }
-
-    /**
-     * Entry point to the Sync Engine
-     * This will be triggered by Observers when data has changed
-     * Add / Update / Delete operations of [SyncableType]
-     *
-     */
-    fun notifyDataChanged()
 }

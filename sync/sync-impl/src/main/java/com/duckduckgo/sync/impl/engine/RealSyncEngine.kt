@@ -26,6 +26,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
@@ -61,6 +62,7 @@ class RealSyncEngine @Inject constructor(
             BACKGROUND_SYNC -> scheduleSync(trigger)
             APP_OPEN -> performSync(trigger)
             FEATURE_READ -> performSync(trigger)
+            DATA_CHANGE -> performSync(trigger)
             ACCOUNT_CREATION -> sendLocalData()
             ACCOUNT_LOGIN -> mergeRemoteData()
         }
@@ -170,11 +172,6 @@ class RealSyncEngine @Inject constructor(
         return providerPlugins.getPlugins().map {
             it.getChanges()
         }.filterNot { it.isEmpty() }
-    }
-
-    override fun notifyDataChanged() {
-        Timber.d("Sync-Feature: notifyDataChanged")
-        performSync(FEATURE_READ)
     }
 
     private fun persistChanges(
