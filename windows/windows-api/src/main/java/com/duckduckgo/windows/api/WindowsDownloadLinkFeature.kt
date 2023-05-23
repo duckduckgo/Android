@@ -19,6 +19,6 @@ package com.duckduckgo.windows.api
 import com.duckduckgo.feature.toggles.api.Toggle
 
 interface WindowsDownloadLinkFeature {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(true)
     fun self(): Toggle
 }
