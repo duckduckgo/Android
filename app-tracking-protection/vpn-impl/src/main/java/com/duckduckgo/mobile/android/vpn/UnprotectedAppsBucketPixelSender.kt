@@ -62,10 +62,7 @@ class UnprotectedAppsBucketPixelSender @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(
-        coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStateMonitor.VpnStopReason
-    ) {
+    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStateMonitor.VpnStopReason) {
         // no-op
     }
 

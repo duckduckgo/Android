@@ -55,9 +55,11 @@ data class AppBreakageCategory(val key: String, val description: String) : Seria
  * @param feature VpnFeature for which the App exclusion list is for
  */
 data class OpenAppExclusionParams(
+    val launchFrom: String,
     val feature: VpnFeature,
     val isFeatureEnabled: Boolean,
-    val defaultFilter: ExclusionListAppsFilter
+    val defaultFilter: ExclusionListAppsFilter,
+    val breakageCategories: List<AppBreakageCategory>,
 ) : GlobalActivityStarter.ActivityParams
 
 enum class ExclusionListAppsFilter {

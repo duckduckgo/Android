@@ -32,19 +32,18 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityManageRecentAppsProtectionBinding
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.ALL
-import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.PROTECTED_ONLY
 import com.duckduckgo.mobile.android.vpn.ui.OpenAppExclusionParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -73,6 +72,10 @@ class ManageRecentAppsProtectionActivity :
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    @AppTpBreakageCategories
+    lateinit var breakageCategories: List<AppBreakageCategory>
 
     private val binding: ActivityManageRecentAppsProtectionBinding by viewBinding()
 
@@ -140,6 +143,8 @@ class ManageRecentAppsProtectionActivity :
     }
 
     private fun observeViewModel() {
+        viewModel.prepareForFeature(AppTpVpnFeature.APPTP_VPN, breakageCategories, "apptp")
+
         lifecycleScope.launch {
             viewModel.getRecentApps()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -182,9 +187,11 @@ class ManageRecentAppsProtectionActivity :
             is Command.LaunchAllAppsProtection -> globalActivityStarter.start(
                 this,
                 OpenAppExclusionParams(
-                    feature = APPTP_VPN,
+                    launchFrom = "apptp",
+                    feature = AppTpVpnFeature.APPTP_VPN,
                     isFeatureEnabled = false,
                     defaultFilter = ALL,
+                    breakageCategories = breakageCategories,
                 ),
             )
         }

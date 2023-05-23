@@ -20,6 +20,8 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
 import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
@@ -27,14 +29,17 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
-@ContributesBinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = ExclusionList::class,
+)
 @SingleInstanceIn(AppScope::class)
 class AppTPExclusionList @Inject constructor(
     private val packageManager: PackageManager,
@@ -44,6 +49,8 @@ class AppTPExclusionList @Inject constructor(
 ) : ExclusionList {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
+
+    override val forFeature: VpnFeature = AppTpVpnFeature.APPTP_VPN
 
     override suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>> {
         return appTrackerRepository.getAppExclusionListFlow()
@@ -172,8 +179,8 @@ class AppTPExclusionList @Inject constructor(
         }
     }
 
-    override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
-        logcat { "TrackingProtectionAppsRepository: Checking $packageName protection status" }
+    override suspend fun isVpnFeatureEnabledForApp(packageName: String): Boolean {
+        logcat { "AppTPExclusionList: Checking $packageName protection status" }
         val appInfo = runCatching { packageManager.getApplicationInfo(packageName, 0) }.getOrElse { return true }
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()

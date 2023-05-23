@@ -20,13 +20,17 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
-import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.exclusion.getExclusionListForFeature
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -46,11 +50,10 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class ManageAppsProtectionViewModel @Inject constructor(
-    private val excludedApps: TrackingProtectionAppsRepository,
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
     private val pixel: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
-    @AppTpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
+    private val exclusionListPluginPoint: PluginPoint<ExclusionList>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -60,6 +63,9 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val entryProtectionSnapshot = mutableListOf<Pair<String, Boolean>>()
     private var latestSnapshot = 0L
     private val defaultTimeWindow = TimeWindow(5, DAYS)
+    private lateinit var exclusionList: ExclusionList
+    private lateinit var breakageCategories: List<AppBreakageCategory>
+    private lateinit var launchedFrom: String
 
     private fun MutableStateFlow<Long>.refresh() {
         viewModelScope.launch {
@@ -69,8 +75,15 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     private val filterState = MutableStateFlow(ExclusionListAppsFilter.ALL)
 
-    init {
-        excludedApps.manuallyExcludedApps()
+    fun prepareForFeature(
+        vpnFeature: VpnFeature,
+        breakageCategoriesForFeature: List<AppBreakageCategory>,
+        launchedFromForFeature: String,
+    ) {
+        exclusionList = exclusionListPluginPoint.getExclusionListForFeature(vpnFeature)
+        breakageCategories = breakageCategoriesForFeature
+        launchedFrom = launchedFromForFeature
+        exclusionList.manuallyExcludedApps()
             .combine(refreshSnapshot.asStateFlow()) { excludedApps, timestamp -> ManualProtectionSnapshot(timestamp, excludedApps) }
             .flowOn(dispatcherProvider.io())
             .onEach {
@@ -87,7 +100,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     internal suspend fun getProtectedApps(): Flow<ViewState> {
-        return excludedApps.getAppsAndProtectionInfo()
+        return exclusionList.getAppsAndProtectionInfo()
             .combine(filterState.asStateFlow()) { list, filter ->
                 val protectedApps = list.filter { !it.isExcluded }.map { AppInfoType(it) }
                 val unprotectedApps = list.filter { it.isExcluded }.map { AppInfoType(it) }
@@ -126,7 +139,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     internal suspend fun getRecentApps() =
         appTrackersRepository.getMostRecentVpnTrackers { defaultTimeWindow.asString() }.map { aggregateDataPerApp(it) }
-            .combine(excludedApps.getAppsAndProtectionInfo()) { recentAppsBlocked, protectedApps ->
+            .combine(exclusionList.getAppsAndProtectionInfo()) { recentAppsBlocked, protectedApps ->
                 recentAppsBlocked.map {
                     protectedApps.firstOrNull { protectedApp -> protectedApp.packageName == it.packageId }
                 }
@@ -164,12 +177,12 @@ class ManageAppsProtectionViewModel @Inject constructor(
     ) {
         pixel.didDisableAppProtectionFromApps()
         viewModelScope.launch {
-            excludedApps.manuallyExcludeApp(packageName)
+            exclusionList.manuallyExcludeApp(packageName)
             pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
                 command.send(
                     Command.LaunchFeedback(
-                        ReportBreakageScreen.IssueDescriptionForm("apptp", breakageCategories, appName, packageName),
+                        ReportBreakageScreen.IssueDescriptionForm(launchedFrom, breakageCategories, appName, packageName),
                     ),
                 )
             } else {
@@ -183,14 +196,14 @@ class ManageAppsProtectionViewModel @Inject constructor(
     ) {
         pixel.didEnableAppProtectionFromApps()
         viewModelScope.launch {
-            excludedApps.manuallyEnabledApp(packageName)
+            exclusionList.manuallyEnabledApp(packageName)
         }
     }
 
     fun restoreProtectedApps() {
         pixel.restoreDefaultProtectionList()
         viewModelScope.launch {
-            excludedApps.restoreDefaultProtectedList()
+            exclusionList.restoreDefaultProtectedList()
             // as product wanted to restart VPN as soon as we restored protections, we need to refresh the snapshot here
             refreshSnapshot.refresh()
             command.send(Command.RestartVpn)
@@ -272,7 +285,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         viewModelScope.launch {
             command.send(
                 Command.LaunchFeedback(
-                    ReportBreakageScreen.ListOfInstalledApps("apptp", breakageCategories),
+                    ReportBreakageScreen.ListOfInstalledApps(launchedFrom, breakageCategories),
                 ),
             )
         }

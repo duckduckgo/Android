@@ -38,12 +38,12 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.apps.ui.ExclusionListAdapter.ExclusionListListener
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter
 import com.duckduckgo.mobile.android.vpn.ui.OpenAppExclusionParams
@@ -96,9 +96,11 @@ class TrackingProtectionExclusionListActivity :
         super.onCreate(savedInstanceState)
 
         params = intent.getActivityParams(OpenAppExclusionParams::class.java) ?: OpenAppExclusionParams(
+            launchFrom = "unknown",
             feature = AppTpVpnFeature.APPTP_VPN,
             isFeatureEnabled = false,
             defaultFilter = ExclusionListAppsFilter.ALL,
+            breakageCategories = emptyList(),
         )
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
@@ -197,6 +199,8 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun observeViewModel() {
+        viewModel.prepareForFeature(params.feature, params.breakageCategories, params.launchFrom)
+
         lifecycleScope.launch {
             viewModel.getProtectedApps()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)

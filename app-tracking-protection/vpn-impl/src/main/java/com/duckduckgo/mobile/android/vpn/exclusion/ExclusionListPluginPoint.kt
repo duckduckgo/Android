@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.exclusion
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeature
 
 @ContributesPluginPoint(

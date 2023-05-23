@@ -18,8 +18,8 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R.string
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory.Undefined
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
@@ -27,6 +27,11 @@ import com.duckduckgo.mobile.android.vpn.apps.BannerContent.ALL_OR_PROTECTED_APP
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent.CUSTOMISED_PROTECTION
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent.UNPROTECTED_APPS
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory.Undefined
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.FakeExclusionListPlugin
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter
@@ -53,7 +58,8 @@ class ManageAppsProtectionViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val trackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
+    private val exclusionList = mock<ExclusionList>()
+    private val fakeExclusionListPlugin = FakeExclusionListPlugin(exclusionList)
     private val appTrackersRepository = mock<AppTrackerBlockingStatsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
     private val manuallyExcludedApps = Channel<List<Pair<String, Boolean>>>(1, BufferOverflow.DROP_OLDEST)
@@ -62,15 +68,16 @@ class ManageAppsProtectionViewModelTest {
 
     @Before
     fun setup() {
-        whenever(trackingProtectionAppsRepository.manuallyExcludedApps()).thenReturn(manuallyExcludedApps.consumeAsFlow())
+        whenever(exclusionList.forFeature).thenReturn(AppTpVpnFeature.APPTP_VPN)
+        whenever(exclusionList.manuallyExcludedApps()).thenReturn(manuallyExcludedApps.consumeAsFlow())
 
         viewModel = ManageAppsProtectionViewModel(
-            trackingProtectionAppsRepository,
             appTrackersRepository,
             deviceShieldPixels,
             coroutineRule.testDispatcherProvider,
-            emptyList(),
+            fakeExclusionListPlugin,
         )
+        viewModel.prepareForFeature(AppTpVpnFeature.APPTP_VPN, emptyList(), "apptp")
     }
 
     @Test
@@ -99,7 +106,7 @@ class ManageAppsProtectionViewModelTest {
 
         viewModel.onAppProtectionDisabled(appName, packageName, report)
 
-        verify(trackingProtectionAppsRepository).manuallyExcludeApp(packageName)
+        verify(exclusionList).manuallyExcludeApp(packageName)
     }
 
     @Test
@@ -144,7 +151,7 @@ class ManageAppsProtectionViewModelTest {
         viewModel.onAppProtectionEnabled(packageName)
 
         verify(deviceShieldPixels).didEnableAppProtectionFromApps()
-        verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
+        verify(exclusionList).manuallyEnabledApp(packageName)
     }
 
     @Test
@@ -152,7 +159,7 @@ class ManageAppsProtectionViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName)
 
-        verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
+        verify(exclusionList).manuallyEnabledApp(packageName)
     }
 
     @Test
@@ -160,7 +167,7 @@ class ManageAppsProtectionViewModelTest {
         viewModel.commands().test {
             viewModel.restoreProtectedApps()
             assertEquals(Command.RestartVpn, awaitItem())
-            verify(trackingProtectionAppsRepository).restoreDefaultProtectedList()
+            verify(exclusionList).restoreDefaultProtectedList()
             verify(deviceShieldPixels).restoreDefaultProtectionList()
             cancelAndConsumeRemainingEvents()
         }
@@ -289,7 +296,7 @@ class ManageAppsProtectionViewModelTest {
             ),
         )
 
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 allApps,
             ),
@@ -315,7 +322,7 @@ class ManageAppsProtectionViewModelTest {
             ),
         )
 
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 allApps,
             ),
@@ -339,7 +346,7 @@ class ManageAppsProtectionViewModelTest {
         val filterType = FilterType(string.atp_ExcludedAppsFilterProtectedLabel, 0)
         val appsList = listOf(panelType, filterType)
 
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 allApps,
             ),
@@ -360,7 +367,7 @@ class ManageAppsProtectionViewModelTest {
         val filterType = FilterType(string.atp_ExcludedAppsFilterUnprotectedLabel, unprotectedApps.size)
         val appsList = listOf(panelType, filterType)
 
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 allApps,
             ),
@@ -385,7 +392,7 @@ class ManageAppsProtectionViewModelTest {
             val filterType = FilterType(string.atp_ExcludedAppsFilterUnprotectedLabel, unprotectedApps.size)
             val appsList = listOf(panelType, filterType).plus(listOf(appInfoWithKnownIssues, appInfoLoadsWebsites, appInfoManuallyExcluded))
 
-            whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+            whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(
                 flowOf(
                     allApps,
                 ),
@@ -407,7 +414,7 @@ class ManageAppsProtectionViewModelTest {
         val filterType = FilterType(string.atp_ExcludedAppsFilterAllLabel, allApps.size)
         val appsList = listOf(panelType, filterType).plus(listOf(appInfoWithKnownIssues, appInfoManuallyExcluded))
 
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 allApps,
             ),
@@ -427,7 +434,7 @@ class ManageAppsProtectionViewModelTest {
         val filterType = FilterType(string.atp_ExcludedAppsFilterAllLabel, allApps.size)
         val appsList = listOf(panelType, filterType).plus(listOf(appInfoWithKnownIssues, appInfoProblematicNotExcluded))
 
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(
             flowOf(
                 allApps,
             ),

@@ -35,8 +35,10 @@ import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayou
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityFeedBinding
+import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.PROTECTED_ONLY
 import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.UNPROTECTED_ONLY
 import com.duckduckgo.mobile.android.vpn.ui.OpenAppExclusionParams
@@ -64,6 +66,10 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    @AppTpBreakageCategories
+    lateinit var breakageCategories: List<AppBreakageCategory>
 
     private val viewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
     private lateinit var binding: ViewDeviceShieldActivityFeedBinding
@@ -159,9 +165,11 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         globalActivityStarter.start(
             requireContext(),
             OpenAppExclusionParams(
+                launchFrom = "apptp",
                 feature = AppTpVpnFeature.APPTP_VPN,
                 isFeatureEnabled = command.vpnState.state == VpnRunningState.ENABLED,
                 defaultFilter = PROTECTED_ONLY,
+                breakageCategories = breakageCategories,
             ),
         )
     }
@@ -170,9 +178,11 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         globalActivityStarter.start(
             requireContext(),
             OpenAppExclusionParams(
+                launchFrom = "apptp",
                 feature = AppTpVpnFeature.APPTP_VPN,
                 isFeatureEnabled = command.vpnState.state == VpnRunningState.ENABLED,
                 defaultFilter = UNPROTECTED_ONLY,
+                breakageCategories = breakageCategories,
             ),
         )
     }

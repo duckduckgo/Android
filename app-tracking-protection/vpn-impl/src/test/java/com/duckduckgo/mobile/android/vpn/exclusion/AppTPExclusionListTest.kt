@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.apps
+package com.duckduckgo.mobile.android.vpn.exclusion
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -22,6 +22,7 @@ import android.content.pm.PackageManager.NameNotFoundException
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.mobile.android.vpn.apps.AppTPExclusionList
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.FakeAppTrackerRepository
@@ -38,7 +39,7 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class TrackingProtectionAppsRepositoryTest {
+class AppTPExclusionListTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -47,7 +48,7 @@ class TrackingProtectionAppsRepositoryTest {
     private val appTrackerRepository = FakeAppTrackerRepository()
     private val appTpFeatureConfig: AppTpFeatureConfig = mock()
 
-    private lateinit var trackingProtectionAppsRepository: TrackingProtectionAppsRepository
+    private lateinit var appTPExclusionList: AppTPExclusionList
 
     @Before
     fun setup() {
@@ -58,8 +59,8 @@ class TrackingProtectionAppsRepositoryTest {
         appTrackerRepository.manualExclusionList = MANUAL_EXCLUSION_LIST.toMutableMap()
         appTrackerRepository.systemAppOverrides = SYSTEM_OVERRIDE_LIST.toSet()
 
-        trackingProtectionAppsRepository =
-            RealTrackingProtectionAppsRepository(
+        appTPExclusionList =
+            AppTPExclusionList(
                 packageManager,
                 appTrackerRepository,
                 coroutineRule.testDispatcherProvider,
@@ -69,7 +70,7 @@ class TrackingProtectionAppsRepositoryTest {
 
     @Test
     fun whenGetExclusionAppListThenReturnExclusionList() = runTest {
-        val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
+        val exclusionList = appTPExclusionList.getExclusionAppsList()
 
         assertEquals(
             listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"),
@@ -82,7 +83,7 @@ class TrackingProtectionAppsRepositoryTest {
         whenever(packageManager.getApplicationInfo("com.example.app2", 0))
             .thenReturn(ApplicationInfo().apply { packageName = "com.example.app2" })
 
-        val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.app2")
+        val isEnabled = appTPExclusionList.isVpnFeatureEnabledForApp("com.example.app2")
 
         assertFalse(isEnabled)
     }
@@ -92,7 +93,7 @@ class TrackingProtectionAppsRepositoryTest {
         whenever(packageManager.getApplicationInfo("com.example.app1", 0))
             .thenReturn(ApplicationInfo().apply { packageName = "com.example.app1" })
 
-        val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.app1")
+        val isEnabled = appTPExclusionList.isVpnFeatureEnabledForApp("com.example.app1")
 
         assertTrue(isEnabled)
     }
@@ -107,7 +108,7 @@ class TrackingProtectionAppsRepositoryTest {
                 },
             )
 
-        val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.game")
+        val isEnabled = appTPExclusionList.isVpnFeatureEnabledForApp("com.example.game")
 
         assertFalse(isEnabled)
     }
@@ -117,7 +118,7 @@ class TrackingProtectionAppsRepositoryTest {
         whenever(packageManager.getApplicationInfo("com.duckduckgo.mobile", 0))
             .thenReturn(ApplicationInfo().apply { packageName = "com.duckduckgo.mobile" })
 
-        val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.duckduckgo.mobile")
+        val isEnabled = appTPExclusionList.isVpnFeatureEnabledForApp("com.duckduckgo.mobile")
 
         assertFalse(isEnabled)
     }
@@ -127,7 +128,7 @@ class TrackingProtectionAppsRepositoryTest {
         whenever(packageManager.getApplicationInfo("com.example.unknown", 0))
             .thenReturn(ApplicationInfo().apply { packageName = "com.example.unknown" })
 
-        val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.unknown")
+        val isEnabled = appTPExclusionList.isVpnFeatureEnabledForApp("com.example.unknown")
 
         assertTrue(isEnabled)
     }
@@ -137,23 +138,23 @@ class TrackingProtectionAppsRepositoryTest {
         whenever(packageManager.getApplicationInfo("com.example.unknown", 0))
             .thenThrow(NameNotFoundException())
 
-        val isEnabled = trackingProtectionAppsRepository.isAppProtectionEnabled("com.example.unknown")
+        val isEnabled = appTPExclusionList.isVpnFeatureEnabledForApp("com.example.unknown")
 
         assertTrue(isEnabled)
     }
 
     @Test
     fun whenManuallyEnabledAppThenRemoveFromExclusionList() = runTest {
-        trackingProtectionAppsRepository.manuallyEnabledApp("com.example.app2")
+        appTPExclusionList.manuallyEnabledApp("com.example.app2")
 
-        val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
+        val exclusionList = appTPExclusionList.getExclusionAppsList()
 
         assertEquals(listOf("com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"), exclusionList)
     }
 
     @Test
     fun whenManuallyExcludedAppsThenReturnExcludedApps() = runTest {
-        trackingProtectionAppsRepository.manuallyExcludedApps().test {
+        appTPExclusionList.manuallyExcludedApps().test {
             assertEquals(
                 listOf("com.example.app1" to true, "com.example.app2" to false, "com.example.app3" to false),
                 awaitItem(),
@@ -164,9 +165,9 @@ class TrackingProtectionAppsRepositoryTest {
 
     @Test
     fun whenManuallyExcludeAppThenAddToExclusionList() = runTest {
-        trackingProtectionAppsRepository.manuallyExcludeApp("com.example.app1")
+        appTPExclusionList.manuallyExcludeApp("com.example.app1")
 
-        val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
+        val exclusionList = appTPExclusionList.getExclusionAppsList()
 
         assertEquals(
             listOf(
@@ -184,9 +185,9 @@ class TrackingProtectionAppsRepositoryTest {
 
     @Test
     fun whenRestoreDefaultProtectedListThenClearManualExclusionList() = runTest {
-        trackingProtectionAppsRepository.restoreDefaultProtectedList()
+        appTPExclusionList.restoreDefaultProtectedList()
 
-        val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
+        val exclusionList = appTPExclusionList.getExclusionAppsList()
 
         assertEquals(
             listOf("com.example.app1", "com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"),
@@ -196,7 +197,7 @@ class TrackingProtectionAppsRepositoryTest {
 
     @Test
     fun whenGetAppsAndProtectionInfoThenReturnAppsWithProtectionInfo() = runTest {
-        trackingProtectionAppsRepository.getAppsAndProtectionInfo().test {
+        appTPExclusionList.getAppsAndProtectionInfo().test {
             assertEquals(
                 listOf(
                     "com.example.app1" to false,
@@ -218,7 +219,7 @@ class TrackingProtectionAppsRepositoryTest {
     fun whenProtectGamesFeatureEnabledThenRemoveGamesFromExclusionList() = runTest {
         whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
 
-        val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
+        val exclusionList = appTPExclusionList.getExclusionAppsList()
 
         assertEquals(listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"), exclusionList)
     }
@@ -227,7 +228,7 @@ class TrackingProtectionAppsRepositoryTest {
     fun whenProtectGamesFeatureEnabledThenShowGamesAsProtectedInProtectionInfo() = runTest {
         whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
 
-        trackingProtectionAppsRepository.getAppsAndProtectionInfo().test {
+        appTPExclusionList.getAppsAndProtectionInfo().test {
             assertEquals(
                 listOf(
                     "com.example.app1" to false,
