@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.ui
 
+import com.duckduckgo.mobile.android.vpn.VpnFeature
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import java.io.Serializable
 
@@ -47,3 +48,20 @@ data class OpenVpnBreakageCategoryWithBrokenApp(
  * @param description localized string with the category description that the user will see
  */
 data class AppBreakageCategory(val key: String, val description: String) : Serializable
+
+/**
+ * Model that represents the App Exclusion Screen
+ *
+ * @param feature VpnFeature for which the App exclusion list is for
+ */
+data class OpenAppExclusionParams(
+    val feature: VpnFeature,
+    val isFeatureEnabled: Boolean,
+    val defaultFilter: ExclusionListAppsFilter
+) : GlobalActivityStarter.ActivityParams
+
+enum class ExclusionListAppsFilter {
+    ALL,
+    PROTECTED_ONLY,
+    UNPROTECTED_ONLY,
+}

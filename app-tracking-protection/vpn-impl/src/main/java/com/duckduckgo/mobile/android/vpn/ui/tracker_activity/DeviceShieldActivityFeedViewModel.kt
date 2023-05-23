@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsData
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsProtectionData
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
@@ -138,9 +139,9 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     fun showAppsList(vpnState: VpnState, item: TrackerFeedItem.TrackerTrackerAppsProtection) {
         viewModelScope.launch {
-            if (item.selectedFilter == TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY) {
+            if (item.selectedFilter == ExclusionListAppsFilter.PROTECTED_ONLY) {
                 command.send(Command.ShowProtectedAppsList(vpnState))
-            } else if (item.selectedFilter == TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY) {
+            } else if (item.selectedFilter == ExclusionListAppsFilter.UNPROTECTED_ONLY) {
                 command.send(Command.ShowUnprotectedAppsList(vpnState))
             }
         }

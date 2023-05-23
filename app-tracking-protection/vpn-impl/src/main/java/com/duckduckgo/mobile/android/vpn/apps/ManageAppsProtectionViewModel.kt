@@ -25,7 +25,6 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -34,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -67,7 +67,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         }
     }
 
-    private val filterState = MutableStateFlow(AppsFilter.ALL)
+    private val filterState = MutableStateFlow(ExclusionListAppsFilter.ALL)
 
     init {
         excludedApps.manuallyExcludedApps()
@@ -95,7 +95,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
                 val customProtection = list.any { it.isProblematic() && !it.isExcluded }
 
                 when (filter) {
-                    AppsFilter.PROTECTED_ONLY -> {
+                    ExclusionListAppsFilter.PROTECTED_ONLY -> {
                         val panelType =
                             InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.ALL_OR_PROTECTED_APPS)
                         val filterType = FilterType(R.string.atp_ExcludedAppsFilterProtectedLabel, protectedApps.size)
@@ -104,7 +104,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
                         return@combine ViewState(protectedAppsList)
                     }
 
-                    AppsFilter.UNPROTECTED_ONLY -> {
+                    ExclusionListAppsFilter.UNPROTECTED_ONLY -> {
                         val panelType = InfoPanelType(if (customProtection) BannerContent.CUSTOMISED_PROTECTION else BannerContent.UNPROTECTED_APPS)
                         val filterType = FilterType(R.string.atp_ExcludedAppsFilterUnprotectedLabel, unprotectedApps.size)
                         val unProtectedAppsList = mutableListOf(panelType, filterType).plus(unprotectedApps)
@@ -212,7 +212,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     fun canRestoreDefaults() = currentManualProtections.isNotEmpty()
 
-    fun applyAppsFilter(value: AppsFilter) {
+    fun applyAppsFilter(value: ExclusionListAppsFilter) {
         viewModelScope.launch {
             filterState.emit(value)
         }

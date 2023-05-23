@@ -24,10 +24,10 @@ import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityAppsBinding
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.PROTECTED_ONLY
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.UNPROTECTED_ONLY
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.AppsData
 
 class AppsProtectionStateView @JvmOverloads constructor(
@@ -39,7 +39,7 @@ class AppsProtectionStateView @JvmOverloads constructor(
 
     fun bind(
         item: AppsData,
-        onAppsFilterClick: (AppsFilter) -> Unit,
+        onAppsFilterClick: (ExclusionListAppsFilter) -> Unit,
     ) {
         binding.activityApps.text = context.resources.getQuantityString(
             if (item.isProtected) R.plurals.atp_ActivityProtectedApps else R.plurals.atp_ActivityUnprotectedApps,

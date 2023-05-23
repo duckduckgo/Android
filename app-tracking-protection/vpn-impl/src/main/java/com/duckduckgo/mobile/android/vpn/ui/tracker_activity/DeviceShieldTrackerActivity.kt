@@ -49,6 +49,7 @@ import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity
@@ -59,10 +60,14 @@ import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivit
 import com.duckduckgo.mobile.android.vpn.di.AppTpBreakageCategories
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.ALL
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.PROTECTED_ONLY
+import com.duckduckgo.mobile.android.vpn.ui.OpenAppExclusionParams
 import com.duckduckgo.mobile.android.vpn.ui.alwayson.AlwaysOnAlertDialogFragment
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
@@ -70,6 +75,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTracker
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.DisableVpnDialogOptions
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -104,6 +110,9 @@ class DeviceShieldTrackerActivity :
     @Inject
     @AppTpBreakageCategories
     lateinit var breakageCategories: List<AppBreakageCategory>
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
@@ -478,7 +487,14 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchTrackingProtectionExclusionListActivity() {
-        startActivity(TrackingProtectionExclusionListActivity.intent(this, deviceShieldSwitch.isChecked))
+        globalActivityStarter.start(
+            this,
+            OpenAppExclusionParams(
+                feature = APPTP_VPN,
+                isFeatureEnabled = deviceShieldSwitch.isChecked,
+                defaultFilter = ALL,
+            ),
+        )
     }
 
     private fun startVPN() {

@@ -32,18 +32,21 @@ import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityFeedBinding
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.PROTECTED_ONLY
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter.UNPROTECTED_ONLY
+import com.duckduckgo.mobile.android.vpn.ui.OpenAppExclusionParams
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.ShowProtectedAppsList
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.ShowUnprotectedAppsList
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.TrackerListDisplayed
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -58,6 +61,9 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var trackerFeedAdapter: TrackerFeedAdapter
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
     private lateinit var binding: ViewDeviceShieldActivityFeedBinding
@@ -136,7 +142,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                 is TrackerFeedItem.TrackerTrackerAppsProtection -> {
                     viewModel.showAppsList(viewState.vpnState, trackerFeedItem)
                 }
-                else -> { } // no-op
+                else -> {} // no-op
             }
         }
     }
@@ -150,21 +156,23 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     }
 
     private fun showProtectedAppsList(command: ShowProtectedAppsList) {
-        startActivity(
-            TrackingProtectionExclusionListActivity.intent(
-                requireContext(),
-                command.vpnState.state == VpnRunningState.ENABLED,
-                AppsFilter.PROTECTED_ONLY,
+        globalActivityStarter.start(
+            requireContext(),
+            OpenAppExclusionParams(
+                feature = AppTpVpnFeature.APPTP_VPN,
+                isFeatureEnabled = command.vpnState.state == VpnRunningState.ENABLED,
+                defaultFilter = PROTECTED_ONLY,
             ),
         )
     }
 
     private fun showUnprotectedAppsList(command: ShowUnprotectedAppsList) {
-        startActivity(
-            TrackingProtectionExclusionListActivity.intent(
-                requireContext(),
-                command.vpnState.state == VpnRunningState.ENABLED,
-                AppsFilter.UNPROTECTED_ONLY,
+        globalActivityStarter.start(
+            requireContext(),
+            OpenAppExclusionParams(
+                feature = AppTpVpnFeature.APPTP_VPN,
+                isFeatureEnabled = command.vpnState.state == VpnRunningState.ENABLED,
+                defaultFilter = UNPROTECTED_ONLY,
             ),
         )
     }

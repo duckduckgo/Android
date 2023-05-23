@@ -26,10 +26,10 @@ import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent.ALL_OR_PROTECTED_APPS
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent.CUSTOMISED_PROTECTION
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent.UNPROTECTED_APPS
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -294,7 +294,7 @@ class ManageAppsProtectionViewModelTest {
                 allApps,
             ),
         )
-        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
+        viewModel.applyAppsFilter(ExclusionListAppsFilter.ALL)
 
         viewModel.getProtectedApps().test {
             assertEquals(ViewState(appsList), awaitItem())
@@ -320,7 +320,7 @@ class ManageAppsProtectionViewModelTest {
                 allApps,
             ),
         )
-        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY)
+        viewModel.applyAppsFilter(ExclusionListAppsFilter.PROTECTED_ONLY)
 
         viewModel.getProtectedApps().test {
             assertEquals(
@@ -344,7 +344,7 @@ class ManageAppsProtectionViewModelTest {
                 allApps,
             ),
         )
-        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY)
+        viewModel.applyAppsFilter(ExclusionListAppsFilter.PROTECTED_ONLY)
 
         viewModel.getProtectedApps().test {
             assertEquals(ViewState(appsList), awaitItem())
@@ -365,7 +365,7 @@ class ManageAppsProtectionViewModelTest {
                 allApps,
             ),
         )
-        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY)
+        viewModel.applyAppsFilter(ExclusionListAppsFilter.UNPROTECTED_ONLY)
 
         viewModel.getProtectedApps().test {
             assertEquals(
@@ -390,7 +390,7 @@ class ManageAppsProtectionViewModelTest {
                     allApps,
                 ),
             )
-            viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY)
+            viewModel.applyAppsFilter(ExclusionListAppsFilter.UNPROTECTED_ONLY)
 
             viewModel.getProtectedApps().test {
                 assertEquals(
@@ -412,7 +412,7 @@ class ManageAppsProtectionViewModelTest {
                 allApps,
             ),
         )
-        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
+        viewModel.applyAppsFilter(ExclusionListAppsFilter.ALL)
 
         viewModel.getProtectedApps().test {
             assertEquals(ViewState(appsList), awaitItem())
@@ -432,7 +432,7 @@ class ManageAppsProtectionViewModelTest {
                 allApps,
             ),
         )
-        viewModel.applyAppsFilter(TrackingProtectionExclusionListActivity.Companion.AppsFilter.ALL)
+        viewModel.applyAppsFilter(ExclusionListAppsFilter.ALL)
 
         viewModel.getProtectedApps().test {
             assertEquals(ViewState(appsList), awaitItem())

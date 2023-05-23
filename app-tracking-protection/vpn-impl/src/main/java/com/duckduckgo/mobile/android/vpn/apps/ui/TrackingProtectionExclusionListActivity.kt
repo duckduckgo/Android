@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.apps.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -26,8 +24,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
@@ -45,7 +45,10 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.ExclusionListAppsFilter
+import com.duckduckgo.mobile.android.vpn.ui.OpenAppExclusionParams
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
+import com.duckduckgo.navigation.api.getActivityParams
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -57,6 +60,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(OpenAppExclusionParams::class)
 class TrackingProtectionExclusionListActivity :
     DuckDuckGoActivity(),
     ManuallyEnableAppProtectionDialog.ManuallyEnableAppsProtectionDialogListener,
@@ -75,6 +79,8 @@ class TrackingProtectionExclusionListActivity :
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
 
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
+
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
     private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
@@ -84,9 +90,16 @@ class TrackingProtectionExclusionListActivity :
     private val shimmerLayout by lazy { findViewById<ShimmerFrameLayout>(R.id.deviceShieldExclusionAppListSkeleton) }
 
     private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
+    private lateinit var params: OpenAppExclusionParams
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        params = intent.getActivityParams(OpenAppExclusionParams::class.java) ?: OpenAppExclusionParams(
+            feature = AppTpVpnFeature.APPTP_VPN,
+            isFeatureEnabled = false,
+            defaultFilter = ExclusionListAppsFilter.ALL,
+        )
 
         reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
             if (!result.isEmpty()) {
@@ -173,9 +186,8 @@ class TrackingProtectionExclusionListActivity :
         )
 
         val recyclerView = binding.excludedAppsRecycler
-        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
 
-        if (isListEnabled) {
+        if (params.isFeatureEnabled) {
             recyclerView.alpha = 1.0f
         } else {
             recyclerView.alpha = 0.45f
@@ -198,8 +210,7 @@ class TrackingProtectionExclusionListActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
-        adapter.update(viewState, isListEnabled)
+        adapter.update(viewState, params.isFeatureEnabled)
         shimmerLayout.gone()
     }
 
@@ -223,8 +234,8 @@ class TrackingProtectionExclusionListActivity :
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
-            vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.refreshFeature(params.feature)
         }
     }
 
@@ -255,9 +266,9 @@ class TrackingProtectionExclusionListActivity :
         val unprotectedItemView = view.findViewById<View>(R.id.unprotectedApps)
 
         popupMenu.apply {
-            onMenuItemClicked(allItemView) { viewModel.applyAppsFilter(AppsFilter.ALL) }
-            onMenuItemClicked(protectedItemView) { viewModel.applyAppsFilter(AppsFilter.PROTECTED_ONLY) }
-            onMenuItemClicked(unprotectedItemView) { viewModel.applyAppsFilter(AppsFilter.UNPROTECTED_ONLY) }
+            onMenuItemClicked(allItemView) { viewModel.applyAppsFilter(ExclusionListAppsFilter.ALL) }
+            onMenuItemClicked(protectedItemView) { viewModel.applyAppsFilter(ExclusionListAppsFilter.PROTECTED_ONLY) }
+            onMenuItemClicked(unprotectedItemView) { viewModel.applyAppsFilter(ExclusionListAppsFilter.UNPROTECTED_ONLY) }
         }
         popupMenu.showAnchoredToView(binding.root, anchor)
     }
@@ -295,32 +306,13 @@ class TrackingProtectionExclusionListActivity :
         startActivity(DeviceShieldFAQActivity.intent(this))
     }
 
-    private fun getAppsFilterOrDefault(): AppsFilter {
-        return intent.getSerializableExtra(KEY_FILTER_LIST) as AppsFilter? ?: AppsFilter.ALL
+    private fun getAppsFilterOrDefault(): ExclusionListAppsFilter {
+        return params.defaultFilter
     }
 
     companion object {
         const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         const val LEARN_WHY_ANNOTATION = "learn_why_link"
-        private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
-        private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
-
-        enum class AppsFilter {
-            ALL,
-            PROTECTED_ONLY,
-            UNPROTECTED_ONLY,
-        }
-
-        internal fun intent(
-            context: Context,
-            isRunning: Boolean = true,
-            filter: AppsFilter = AppsFilter.ALL,
-        ): Intent {
-            val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
-            intent.putExtra(KEY_LIST_ENABLED, isRunning)
-            intent.putExtra(KEY_FILTER_LIST, filter)
-            return intent
-        }
     }
 
     override fun onDefaultProtectionRestored() {
