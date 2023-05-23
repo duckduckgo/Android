@@ -33,11 +33,11 @@ import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListAppBinding
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListFilterBinding
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListInfoPanelBinding
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 
 class ExclusionListAdapter(val listener: ExclusionListListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {

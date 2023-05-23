@@ -24,7 +24,7 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ManuallyDisableAppProtectionDialog : DialogFragment() {

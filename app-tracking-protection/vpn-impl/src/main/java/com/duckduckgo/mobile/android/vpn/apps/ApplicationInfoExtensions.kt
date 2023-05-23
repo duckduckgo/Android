@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.pm.ApplicationInfo
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 
 private fun parseAppCategory(category: Int): AppCategory {
     return when (category) {

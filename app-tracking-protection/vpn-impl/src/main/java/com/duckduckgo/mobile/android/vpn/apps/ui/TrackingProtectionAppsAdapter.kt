@@ -29,8 +29,8 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.databinding.RowExclusionListAppBinding
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 
 class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
     RecyclerView.Adapter<TrackingProtectionAppViewHolder>() {

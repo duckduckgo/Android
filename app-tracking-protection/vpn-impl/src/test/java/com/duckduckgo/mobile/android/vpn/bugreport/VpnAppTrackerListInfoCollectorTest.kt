@@ -17,9 +17,9 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.AppCategoryDetector
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase

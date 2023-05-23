@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
