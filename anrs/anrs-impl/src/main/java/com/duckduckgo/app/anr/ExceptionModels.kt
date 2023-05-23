@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.anr
 
+import android.webkit.URLUtil
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.AnrEntity
 import com.duckduckgo.app.anrs.store.ExceptionEntity
@@ -70,7 +71,7 @@ internal fun CrashLogger.Crash.asCrashEntity(
     webView: String,
 ): ExceptionEntity {
     val timestamp = FORMATTER_SECONDS.format(LocalDateTime.now())
-    val stacktrace = this.t.asLog()
+    val stacktrace = this.t.asLog().redactDomains()
     return ExceptionEntity(
         hash = (stacktrace + timestamp).encode().md5().hex(),
         shortName = this.shortName,
@@ -103,3 +104,13 @@ internal fun Array<StackTraceElement>.asStringArray(): ArrayList<String> {
 }
 
 private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+
+internal fun String.redactDomains(): String {
+    return this.split(" ").map {
+        if (URLUtil.isValidUrl(it)) {
+            "[REDACTED]"
+        } else {
+            it
+        }
+    }.joinToString(" ")
+}
