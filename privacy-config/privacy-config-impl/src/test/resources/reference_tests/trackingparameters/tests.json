@@ -129,7 +129,6 @@
                     "ios-browser",
                     "macos-browser",
                     "safari-extension",
-                    "android-browser",
                     "windows-browser"
                 ]
             }
