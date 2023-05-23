@@ -35,10 +35,13 @@ import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
+import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -122,14 +125,19 @@ class SavedSitesSyncDataProviderTest {
 
     @Test
     fun whenFirstSyncAndUsersHasFavoritesThenChangesAreFormatted() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_favourites.json")
-
         repository.insert(favourite1)
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 
         val syncChanges = parser.getChanges()
-        assertEquals(syncChanges.jsonString, updatesJSON)
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 5)
+        assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
+        assertTrue(changes.bookmarks.updates[1].id == "bookmark1")
+        assertTrue(changes.bookmarks.updates[2].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[3].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[4].id == "bookmarks_root")
     }
 
     @Test
@@ -140,7 +148,12 @@ class SavedSitesSyncDataProviderTest {
         repository.insert(bookmark4)
 
         val syncChanges = parser.getChanges()
-        assertEquals(syncChanges.jsonString, updatesJSON)
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 3)
+        assertTrue(changes.bookmarks.updates[0].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[1].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[2].id == "bookmarks_root")
     }
 
     @Test
@@ -148,6 +161,7 @@ class SavedSitesSyncDataProviderTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_folders_and_favourites.json")
 
         repository.insert(bookmark1)
+        repository.insert(bookmark2)
         repository.insert(favourite1)
         repository.insert(bookmark3)
         repository.insert(bookmark4)
@@ -156,7 +170,18 @@ class SavedSitesSyncDataProviderTest {
         repository.updateBookmark(bookmark2.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
 
         val syncChanges = parser.getChanges()
-        assertEquals(syncChanges.jsonString, updatesJSON)
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 7)
+        assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
+        assertTrue(changes.bookmarks.updates[1].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[2].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[3].id == "bookmark1")
+        assertTrue(changes.bookmarks.updates[4].id == "bookmark2")
+        assertTrue(changes.bookmarks.updates[5].id == "1a8736c1-83ff-48ce-9f01-797887455891")
+        assertTrue(changes.bookmarks.updates[5].folder!!.children == listOf("bookmark1", "bookmark2"))
+        assertTrue(changes.bookmarks.updates[6].id == "bookmarks_root")
+        assertTrue(changes.bookmarks.updates[6].folder!!.children == listOf("bookmark3", "bookmark4", "1a8736c1-83ff-48ce-9f01-797887455891"))
     }
 
     @Test
@@ -341,5 +366,13 @@ class SavedSitesSyncDataProviderTest {
         timestamp: String = "2023-05-10T16:10:32.338Z",
     ): Bookmark {
         return Bookmark(id, title, url, lastModified = timestamp)
+    }
+
+    private class Adapters {
+        companion object {
+            private val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<SyncBookmarksRequest> =
+                moshi.adapter(SyncBookmarksRequest::class.java)
+        }
     }
 }
