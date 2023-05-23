@@ -23,7 +23,7 @@
     <string name="macos_share_title">Bendrinti nuorodą</string>
     <string name="macos_description_text">„Mac“ skirta „DuckDuckGo“ pasižymi jums reikiama sparta, naršyklės funkcijomis ir aukščiausios klasės privatumo įrankiais.\n\n„Mac“ kompiuteryje eikite į:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Pasiruošę naršyti privačiai „Mac“?\n\nSpustelėkite šį URL „Mac“ kompiuteryje, kad atsisiųstumėte:\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Pasiruošę naršyti privačiai „Mac“?\n\nSpustelėkite šį URL „Mac“ kompiuteryje, kad atsisiųstumėte:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Ieškote „Windows“ versijos?</string>
     <string name="macos_waitlist_footer">Jums nereikia dalintis savo asmenine informacija, kad prisijungtumėte prie laukiančiųjų sąrašo. Užsitikrinsite vietą eilėje laiko žyma, kuri egzistuoja tik jūsų įrenginyje, kad galėtumėte jus įspėti, kai ateis jūsų eilė.</string>

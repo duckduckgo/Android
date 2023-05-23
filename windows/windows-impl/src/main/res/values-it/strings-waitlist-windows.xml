@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo per Windows ha ciò di cui hai bisogno per navigare con maggiore privacy: ricerca privata, blocco dei sistemi di tracciamento, crittografia forzata e blocco dei popup dei cookie, oltre a ulteriori protezioni di prima classe in arrivo.\n\nSul tuo computer Windows, apri il browser web e vai su:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Condividi link</string>
-    <string name="windows_share_text">Vuoi iniziare a navigare su Windows mantenendo la tua privacy?\n\nVisita questo URL dal tuo computer Windows per effettuare il download:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Vuoi iniziare a navigare su Windows mantenendo la tua privacy?\n\nVisita questo URL dal tuo computer Windows per effettuare il download:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Cerchi la versione per Mac?</string>
     <string name="windows_join_waitlist">Iscriviti alla lista d\'attesa privata</string>
     <string name="windows_join_waitlist_error">Si è verificato un errore durante l\'iscrizione alla lista d\'attesa, riprova più tardi</string>

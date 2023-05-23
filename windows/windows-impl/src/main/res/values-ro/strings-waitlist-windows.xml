@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo pentru Windows are tot ceea ce îți trebuie pentru a naviga într-un mod mai confidențial – căutare privată, blocarea tehnologiilor de urmărire, criptare forțată și blocarea ferestrelor pop-up cookie, plus alte elemente de protecție de cel mai înalt nivel, în curs de implementare.\n\nPe computerul tău Windows, accesează:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Partajează linkul</string>
-    <string name="windows_share_text">Ești gata să începi să navighezi în mod privat pe Windows?\n\nVizitează această adresă URL pe computerul tău Windows pentru a descărca:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Ești gata să începi să navighezi în mod privat folosind Windows?\n\nVizitează această adresă URL pe computerul tău Windows pentru a descărca:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Cauți versiunea pentru Mac?</string>
     <string name="windows_join_waitlist">Alătură-te listei de așteptare private</string>
     <string name="windows_join_waitlist_error">A apărut o eroare la aderarea la lista de așteptare, încearcă din nou mai târziu</string>

@@ -23,7 +23,7 @@
     <string name="macos_share_title">Κοινή χρήση συνδέσμου</string>
     <string name="macos_description_text">Το DuckDuckGo για Mac έχει την ταχύτητα που χρειάζεστε, τις λειτουργίες περιήγησης που αναμένετε και περιλαμβάνει τις καλύτερες δυνατότητες απορρήτου στην κατηγορία μας.\n\nΣτον Mac σας, μεταβείτε στη διεύθυνση:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Έτοιμοι να αρχίσετε μια ιδιωτική περιήγηση σε Mac; \n\nΕπισκεφτείτε αυτήν τη διεύθυνση URL στον Mac σας για να κάνετε λήψη:\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Έτοιμοι να αρχίσετε μια ιδιωτική περιήγηση σε Mac; \n\nΕπισκεφτείτε αυτήν τη διεύθυνση URL στον Mac σας για να κάνετε λήψη:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Αναζητάτε την έκδοση των Windows;</string>
     <string name="macos_waitlist_footer">Δεν θα χρειαστεί να κοινοποιήσετε προσωπικά στοιχεία για εγγραφή στη λίστα αναμονής. Θα εξασφαλίσετε τη θέση σας στην αναμονή βάσει χρονικής σήμανσης που υπάρχει αποκλειστικά στη συσκευή σας, ώστε να μπορούμε να σας ειδοποιήσουμε μόλις έρθει η σειρά σας.</string>

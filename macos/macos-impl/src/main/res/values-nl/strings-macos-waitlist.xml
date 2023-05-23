@@ -23,7 +23,7 @@
     <string name="macos_share_title">Link delen</string>
     <string name="macos_description_text">DuckDuckGo voor Mac heeft de snelheid die je nodig hebt en de browserfuncties die je verwacht, en zit boordevol met onze allerbeste essentiële facetten van privacy.\n\nGa op je Mac naar:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Klaar om privé te browsen op de Mac?\n\nBezoek deze URL op je Mac om DuckDuckGo te downloaden:\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Klaar om privé te browsen op de Mac?\n\nBezoek deze URL op je Mac om onze oplossing te downloaden:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Op zoek naar de versie voor Windows?</string>
     <string name="macos_waitlist_footer">Je hoeft geen persoonsgegevens te delen om op de wachtlijst te komen. Je beveiligt je plaats met een tijdstempel die alleen op jouw apparaat bestaat. Zo kunnen we je informeren wanneer je aan de beurt bent.</string>

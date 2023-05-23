@@ -23,7 +23,7 @@
     <string name="macos_share_title">Share Link</string>
     <string name="macos_description_text">DuckDuckGo for Mac has the speed you need, the browser features you expect, and comes packed with our best-in-class privacy essentials.\n\nOn your Mac, go to:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Ready to start browsing privately on Mac?\n\nVisit this URL on your Mac to download:\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Ready to start browsing privately on Mac?\n\nVisit this URL on your Mac to download:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Looking for the Windows Version?</string>
     <string name="macos_waitlist_footer">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>

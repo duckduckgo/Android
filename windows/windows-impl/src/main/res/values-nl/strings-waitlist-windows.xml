@@ -24,7 +24,7 @@
     <string name="windows_description">DuckDuckGo voor Windows heeft alles wat je nodig hebt om met meer privacy te browsen: privézoekopdrachten, blokkering van trackers, geforceerde versleuteling, blokkering van cookiepop-ups, plus nog meer uitstekende bescherming onderweg.\n\nGa op je Windows-computer naar:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Link delen</string>
-    <string name="windows_share_text">Klaar om privé te browsen in Windows?\n\nBezoek deze URL op je Windows-computer om onze oplossing te downloaden:\nduckduckgo.com/windows</string>
+    <string name="windows_share_text">Klaar om privé te browsen in Windows?\n\nBezoek deze URL op je Windows-computer om onze oplossing te downloaden:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Op zoek naar de versie voor Mac?</string>
     <string name="windows_join_waitlist">Schrijf je in voor de privéwachtlijst</string>
     <string name="windows_join_waitlist_error">Er is een fout opgetreden bij het inschrijven op de wachtlijst. Probeer het later opnieuw</string>
