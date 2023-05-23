@@ -36,6 +36,7 @@ import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
@@ -66,14 +67,39 @@ import java.net.Inet6Address
 import java.net.InetAddress
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.properties.Delegates
+import kotlin.system.exitProcess
 import kotlinx.coroutines.*
 import logcat.LogPriority
 import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
 @InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
+
+    private external fun jni_wait_for_tun_up(tunFd: Int): Int
+
+    fun ParcelFileDescriptor.waitForTunellUpOrTimeout(): Boolean {
+        return runCatching {
+            jni_wait_for_tun_up(this.fd) == 0
+        }.getOrElse { e ->
+            if (e is UnsatisfiedLinkError) {
+                logcat(ERROR) { "VPN log: ${e.asLog()}" }
+                // A previous error unloaded the libraries, reload them
+                try {
+                    logcat { "VPN log: Loading native VPN networking library" }
+                    LibraryLoader.loadLibrary(this@TrackerBlockingVpnService, "netguard")
+                } catch (ignored: Throwable) {
+                    logcat(ERROR) { "VPN log: Error loading netguard library: ${ignored.asLog()}" }
+                    exitProcess(1)
+                }
+            }
+            Thread.sleep(100)
+            true
+        }
+    }
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -90,7 +116,18 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     @Inject
     lateinit var vpnEnabledNotificationContentPluginPoint: PluginPoint<VpnEnabledNotificationContentPlugin>
 
-    private var tunInterface: ParcelFileDescriptor? = null
+    private var activeTun by Delegates.observable<ParcelFileDescriptor?>(null) { _, oldTun, newTun ->
+        fun ParcelFileDescriptor?.safeFd(): Int? {
+            return runCatching { this?.fd }.getOrNull()
+        }
+        runCatching {
+            logcat { "VPN log: New tun ${newTun?.safeFd()}" }
+            logcat { "VPN log: Closing old tun ${oldTun?.safeFd()}" }
+            oldTun?.close()
+        }.onFailure {
+            logcat(ERROR) { "VPN log: Error closing old tun ${oldTun?.safeFd()}" }
+        }
+    }
 
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
@@ -103,8 +140,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     @Inject lateinit var vpnNetworkStackProvider: VpnNetworkStackProvider
 
     @Inject lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
-
-    private val startVpnLock = Object()
 
     private val alwaysOnStateJob = ConflatedJob()
 
@@ -195,14 +230,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         when (val action = intent?.action) {
             ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
                 notifyVpnStart()
-                launch(serviceDispatcher) { startVpn(tunInterface) }
+                synchronized(this) {
+                    launch(serviceDispatcher) { startVpn() }
+                }
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                launch(serviceDispatcher) { stopVpn(VpnStopReason.SELF_STOP) }
+                synchronized(this) {
+                    launch(serviceDispatcher) { stopVpn(VpnStopReason.SELF_STOP) }
+                }
             }
             ACTION_RESTART_VPN -> {
-                launch(serviceDispatcher) { startVpn(tunInterface) }
+                synchronized(this) {
+                    launch(serviceDispatcher) { startVpn() }
+                }
             }
             else -> logcat(ERROR) { "Unknown intent action: $action" }
         }
@@ -210,7 +251,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         return returnCode
     }
 
-    private suspend fun startVpn(currentTunFd: ParcelFileDescriptor?) = withContext(serviceDispatcher) {
+    private suspend fun startVpn() = withContext(serviceDispatcher) {
         fun updateNetworkStackUponRestart() {
             logcat { "VPN log: updating the networking stack" }
             logcat { "VPN log: CURRENT network ${vpnNetworkStack.name}" }
@@ -223,44 +264,42 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
 
+        vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
+
         logcat { "VPN log: Starting VPN" }
-        val restarting = currentTunFd != null
+        val restarting = activeTun != null
 
-        synchronized(startVpnLock) {
-            val currStateStats = vpnServiceStateStatsDao.getLastStateStats()
-            // We don't check for ENABLED state here because it break when the app is updated
-            // (See: https://app.asana.com/0/488551667048375/1203621692416589/f)
-            if (!restarting && currStateStats?.state == ENABLING) {
-                // Sometimes onStartCommand gets called twice - this is a safety rail against that
-                logcat(LogPriority.WARN) { "VPN log: is already being started, abort" }
-                return@withContext
+        if (!restarting) {
+            vpnServiceCallbacksPluginPoint.getPlugins().forEach {
+                logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
+                it.onVpnStarting(this)
             }
-
-            vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
-
-            if (!restarting) {
-                vpnServiceCallbacksPluginPoint.getPlugins().forEach {
-                    logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
-                    it.onVpnStarting(this)
-                }
-            } else {
-                logcat { "VPN log: skipping service callbacks while restarting" }
-            }
+        } else {
+            logcat { "VPN log: skipping service callbacks while restarting" }
         }
 
         // Create a null route tunnel so that leaks can't scape
-        createNullRouteTempTunnel()
-        // let Android time to create the tunnel before we possibly update the networks that will close the old tunnel
-        delay(100)
-        currentTunFd?.let {
+        val nullTun = createNullRouteTempTunnel()?.let {
+            if (!it.waitForTunellUpOrTimeout()) {
+                logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
+            }
+            it
+        }
+        activeTun?.let {
             logcat { "VPN log: restarting the tunnel" }
             updateNetworkStackUponRestart()
             it
         }
+        activeTun = nullTun
 
         vpnNetworkStack.onPrepareVpn().getOrNull().also {
             if (it != null) {
-                createTunnelInterface(it)
+                activeTun = createTunnelInterface(it)
+                activeTun?.let { tun ->
+                    if (!tun.waitForTunellUpOrTimeout()) {
+                        activeTun = null
+                    }
+                }
             } else {
                 logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
                 stopVpn(VpnStopReason.ERROR, false)
@@ -268,7 +307,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
-        if (tunInterface == null) {
+        if (activeTun == null) {
             logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
             deviceShieldPixels.vpnEstablishTunInterfaceError()
             return@withContext
@@ -284,7 +323,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
 
         logcat { "VPN log: Enable new error handling for onStartVpn" }
-        vpnNetworkStack.onStartVpn(tunInterface!!).getOrElse {
+        vpnNetworkStack.onStartVpn(activeTun!!).getOrElse {
             logcat(ERROR) { "VPN log: Failed to start VPN" }
             stopVpn(VpnStopReason.ERROR, false)
             return@withContext
@@ -333,8 +372,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     private suspend fun createTunnelInterface(
         tunnelConfig: VpnTunnelConfig,
-    ) {
-        tunInterface = Builder().run {
+    ): ParcelFileDescriptor? {
+        val tunInterface = Builder().run {
             tunnelConfig.addresses.forEach { addAddress(it.key, it.value) }
             val tunHasIpv6Address = tunnelConfig.addresses.any { it.key is Inet6Address }
 
@@ -439,8 +478,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat(ERROR) { "VPN log: Failed to establish VPN tunnel" }
             stopVpn(VpnStopReason.ERROR, false)
         } else {
-            logcat { "VPN log: Final TUN interface created ${tunInterface?.fd}" }
+            logcat { "VPN log: Final TUN interface created ${tunInterface.fd}" }
         }
+
+        return tunInterface
     }
 
     /**
@@ -532,8 +573,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         vpnNetworkStack.onStopVpn(reason)
 
-        tunInterface?.close()
-        tunInterface = null
+        activeTun = null
 
         alwaysOnStateJob.cancel()
 
