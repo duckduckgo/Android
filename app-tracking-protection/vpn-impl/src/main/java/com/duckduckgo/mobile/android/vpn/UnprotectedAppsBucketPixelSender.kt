@@ -17,8 +17,10 @@
 package com.duckduckgo.mobile.android.vpn
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.getExclusionListForFeature
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -33,14 +35,16 @@ import kotlinx.coroutines.launch
     boundType = VpnServiceCallbacks::class,
 )
 class UnprotectedAppsBucketPixelSender @Inject constructor(
-    private val excludedApps: TrackingProtectionAppsRepository,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
+    exclusionListPluginPoint: PluginPoint<ExclusionList>,
 ) : VpnServiceCallbacks {
+
+    private val exclusionList by lazy { exclusionListPluginPoint.getExclusionListForFeature(AppTpVpnFeature.APPTP_VPN) }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            excludedApps.getAppsAndProtectionInfo().collectLatest { list ->
+            exclusionList.getAppsAndProtectionInfo().collectLatest { list ->
                 val totalCount = list.size
                 if (totalCount != 0) {
                     val unprotectedCount = list.count { it.isExcluded }
@@ -58,7 +62,10 @@ class UnprotectedAppsBucketPixelSender @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStateMonitor.VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStateMonitor.VpnStopReason
+    ) {
         // no-op
     }
 

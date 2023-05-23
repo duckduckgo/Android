@@ -21,8 +21,11 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.getExclusionListForFeature
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -40,13 +43,14 @@ class AppTPCompanyTrackersViewModel
 @Inject
 constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
-    private val excludedAppsRepository: TrackingProtectionAppsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatchers: DispatcherProvider,
+    exclusionListPluginPoint: PluginPoint<ExclusionList>,
 ) : ViewModel() {
 
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
+    private val exclusionList = exclusionListPluginPoint.getExclusionListForFeature(AppTpVpnFeature.APPTP_VPN)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -122,7 +126,7 @@ constructor(
             totalTrackingAttempts = sourceData.sumOf { it.trackingAttempts },
             lastTrackerBlockedAgo = lastTrackerBlockedAgo,
             trackingCompanies = sourceData,
-            protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName),
+            protectionEnabled = exclusionList.isVpnFeatureEnabledForApp(packageName),
         )
     }
 
@@ -140,10 +144,10 @@ constructor(
             withContext(dispatchers.io()) {
                 if (checked) {
                     deviceShieldPixels.didEnableAppProtectionFromDetail()
-                    excludedAppsRepository.manuallyEnabledApp(packageName)
+                    exclusionList.manuallyEnabledApp(packageName)
                 } else {
                     deviceShieldPixels.didDisableAppProtectionFromDetail()
-                    excludedAppsRepository.manuallyExcludeApp(packageName)
+                    exclusionList.manuallyExcludeApp(packageName)
                 }
             }
             command.send(Command.RestartVpn)

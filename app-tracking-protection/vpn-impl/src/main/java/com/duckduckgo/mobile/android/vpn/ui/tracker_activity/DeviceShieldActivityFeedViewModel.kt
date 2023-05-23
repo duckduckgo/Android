@@ -20,11 +20,12 @@ import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.exclusion.getExclusionListForFeature
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -56,8 +57,8 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val timeDiffFormatter: TimeDiffFormatter,
-    private val excludedApps: TrackingProtectionAppsRepository,
     private val vpnStateMonitor: VpnStateMonitor,
+    exclusionListPluginPoint: PluginPoint<ExclusionList>,
 ) : ViewModel() {
 
     private val MAX_BADGES_TO_DISPLAY = 5
@@ -66,6 +67,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var tickerJob: Job? = null
+    private val exclusionList = exclusionListPluginPoint.getExclusionListForFeature(AppTpVpnFeature.APPTP_VPN)
 
     sealed class Command {
         data class ShowProtectedAppsList(
@@ -161,7 +163,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     )
 
     private suspend fun getAppsData(): Flow<AppsProtectionData> = withContext(dispatcherProvider.io()) {
-        return@withContext excludedApps.getAppsAndProtectionInfo().map { list ->
+        return@withContext exclusionList.getAppsAndProtectionInfo().map { list ->
             val unprotected = list.filter { it.isExcluded }
             val protected = list.filter { !it.isExcluded }
             val unprotectedCount = unprotected.size

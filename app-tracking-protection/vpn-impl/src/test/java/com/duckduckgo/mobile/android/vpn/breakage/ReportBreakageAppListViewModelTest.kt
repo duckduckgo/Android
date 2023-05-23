@@ -18,9 +18,11 @@ package com.duckduckgo.mobile.android.vpn.breakage
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.FakeExclusionListPlugin
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -38,7 +40,8 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 class ReportBreakageAppListViewModelTest {
 
-    private val trackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
+    private val exclusionList = mock<ExclusionList>()
+    private val fakeExclusionListPlugin = FakeExclusionListPlugin(exclusionList)
     private val protectedAppsChannel = Channel<List<TrackingProtectionAppInfo>>(1, BufferOverflow.DROP_LATEST)
 
     @get:Rule
@@ -48,7 +51,8 @@ class ReportBreakageAppListViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = ReportBreakageAppListViewModel(trackingProtectionAppsRepository)
+        whenever(exclusionList.forFeature).thenReturn(AppTpVpnFeature.APPTP_VPN)
+        viewModel = ReportBreakageAppListViewModel(fakeExclusionListPlugin)
     }
 
     @Test
@@ -75,7 +79,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsAndNoInstalledAppsThenEmitNoItem() = runTest {
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             expectNoEvents()
         }
@@ -83,7 +87,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsThenEmitState() = runTest {
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             protectedAppsChannel.send(listOf(appWithoutIssues))
             assertEquals(
@@ -98,7 +102,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsAndSelectedAppThenEmitState() = runTest {
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             viewModel.onAppSelected(InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name))
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
@@ -115,7 +119,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsAndUnknownSelectedAppThenEmitState() = runTest {
-        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             viewModel.onAppSelected(InstalledApp(packageName = "unknown.package.name", name = appWithIssues.name))
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))

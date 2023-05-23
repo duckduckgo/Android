@@ -20,7 +20,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.FakeExclusionListPlugin
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
@@ -50,12 +52,14 @@ class NgVpnNetworkStackTest {
     private val vpnNetwork: VpnNetwork = mock()
     private val runtime: Runtime = mock()
     private val appTrackerDetector: AppTrackerDetector = mock()
-    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository = mock()
+    private val exclusionList = mock<ExclusionList>()
+    private val fakeExclusionListPlugin = FakeExclusionListPlugin(exclusionList)
 
     private lateinit var ngVpnNetworkStack: NgVpnNetworkStack
 
     @Before
     fun setup() {
+        whenever(exclusionList.forFeature).thenReturn(AppTpVpnFeature.APPTP_VPN)
         whenever(vpnNetwork.create()).thenReturn(111)
         whenever(vpnNetwork.mtu()).thenReturn(1500)
 
@@ -64,7 +68,7 @@ class NgVpnNetworkStackTest {
             { vpnNetwork },
             runtime,
             appTrackerDetector,
-            trackingProtectionAppsRepository,
+            fakeExclusionListPlugin,
         )
     }
 
@@ -99,7 +103,7 @@ class NgVpnNetworkStackTest {
 
     @Test
     fun whenOnPrepareVpnThenReturnCorrectVpnTunnelConfig() = runTest {
-        whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
+        whenever(exclusionList.getExclusionAppsList()).thenReturn(listOf())
 
         val configResult = ngVpnNetworkStack.onPrepareVpn()
         Assert.assertTrue(configResult.isSuccess)

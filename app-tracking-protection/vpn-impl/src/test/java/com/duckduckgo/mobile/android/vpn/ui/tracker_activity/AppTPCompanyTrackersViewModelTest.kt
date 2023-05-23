@@ -20,7 +20,9 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.FakeExclusionListPlugin
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
@@ -44,8 +46,9 @@ class AppTPCompanyTrackersViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
+    private val exclusionList = mock<ExclusionList>()
+    private val fakeExclusionListPlugin = FakeExclusionListPlugin(exclusionList)
     private val statsRepository = mock<AppTrackerBlockingStatsRepository>()
-    private val appsRepository = mock<TrackingProtectionAppsRepository>()
     private val timeDiffFormatter = mock<TimeDiffFormatter>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
 
@@ -53,12 +56,13 @@ class AppTPCompanyTrackersViewModelTest {
 
     @Before
     fun setup() {
+        whenever(exclusionList.forFeature).thenReturn(AppTpVpnFeature.APPTP_VPN)
         viewModel = AppTPCompanyTrackersViewModel(
             statsRepository,
-            appsRepository,
             timeDiffFormatter,
             deviceShieldPixels,
             CoroutineTestRule().testDispatcherProvider,
+            fakeExclusionListPlugin,
         )
     }
 

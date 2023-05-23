@@ -17,9 +17,10 @@
 package com.duckduckgo.mobile.android.vpn
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.FakeExclusionListPlugin
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -36,7 +37,8 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 class UnprotectedAppsBucketPixelSenderTest {
 
-    private val mockTrackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
+    private val exclusionList = mock<ExclusionList>()
+    private val fakeExclusionListPlugin = FakeExclusionListPlugin(exclusionList)
     private val mockDeviceShieldPixels = mock<DeviceShieldPixels>()
     private val protectedAppsChannel = Channel<List<TrackingProtectionAppInfo>>(1, BufferOverflow.DROP_LATEST)
 
@@ -47,16 +49,17 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Before
     fun setup() {
+        whenever(exclusionList.forFeature).thenReturn(AppTpVpnFeature.APPTP_VPN)
         testee = UnprotectedAppsBucketPixelSender(
-            mockTrackingProtectionAppsRepository,
             mockDeviceShieldPixels,
             coroutineRule.testDispatcherProvider,
+            fakeExclusionListPlugin,
         )
     }
 
     @Test
     fun whenVpnStartedWithNoUnprotectedAppsThenSentPixelWithBucketSize20() = runTest {
-        whenever(mockTrackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         protectedAppsChannel.send(listOf(app, app, app, app, app, app, app))
         val expectedBucketSize = 20
 
@@ -67,7 +70,7 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Test
     fun whenVpnStartedWith1UnprotectedAppsOutOf7ThenSentPixelWithBucketSize20() = runTest {
-        whenever(mockTrackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         protectedAppsChannel.send(listOf(app, app, app, app, app, excludedApp, app))
         val expectedBucketSize = 20
 
@@ -78,7 +81,7 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Test
     fun whenVpnStartedWith2UnprotectedAppsOutOf7ThenSentPixelWithBucketSize40() = runTest {
-        whenever(mockTrackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         protectedAppsChannel.send(listOf(app, app, app, app, app, excludedApp, excludedApp))
         val expectedBucketSize = 40
 
@@ -89,7 +92,7 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Test
     fun whenVpnStartedWith4UnprotectedAppsOutOf7ThenSentPixelWithBucketSize60() = runTest {
-        whenever(mockTrackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         protectedAppsChannel.send(listOf(app, app, excludedApp, app, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 60
 
@@ -100,7 +103,7 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Test
     fun whenVpnStartedWith5UnprotectedAppsOutOf7ThenSentPixelWithBucketSize80() = runTest {
-        whenever(mockTrackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         protectedAppsChannel.send(listOf(app, app, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 80
 
@@ -111,7 +114,7 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Test
     fun whenVpnStartedWith6UnprotectedAppsOutOf7ThenSentPixelWithBucketSize100() = runTest {
-        whenever(mockTrackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         protectedAppsChannel.send(listOf(app, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 100
 
@@ -122,7 +125,7 @@ class UnprotectedAppsBucketPixelSenderTest {
 
     @Test
     fun whenVpnStartedWithAllAppsUnprotectedThenSentPixelWithBucketSize100() = runTest {
-        whenever(mockTrackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         protectedAppsChannel.send(listOf(excludedApp, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp, excludedApp))
         val expectedBucketSize = 100
 

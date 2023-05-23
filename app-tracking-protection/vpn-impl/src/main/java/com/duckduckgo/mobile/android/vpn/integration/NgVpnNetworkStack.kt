@@ -18,12 +18,14 @@ package com.duckduckgo.mobile.android.vpn.integration
 
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.getExclusionListForFeature
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -56,13 +58,16 @@ class NgVpnNetworkStack @Inject constructor(
     private val vpnNetwork: Lazy<VpnNetwork>,
     private val runtime: Runtime,
     private val appTrackerDetector: AppTrackerDetector,
-    private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
+    exclusionListPluginPoint: PluginPoint<ExclusionList>,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
     private var jniContext = 0L
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
+    private val exclusionList: ExclusionList by lazy {
+        exclusionListPluginPoint.getExclusionListForFeature(AppTpVpnFeature.APPTP_VPN)
+    }
 
     override val name: String = AppTpVpnFeature.APPTP_VPN.featureName
 
@@ -92,7 +97,7 @@ class NgVpnNetworkStack @Inject constructor(
             ),
             dns = emptySet(),
             routes = emptyMap(),
-            appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
+            appExclusionList = exclusionList.getExclusionAppsList().toSet(),
         ),
     )
 

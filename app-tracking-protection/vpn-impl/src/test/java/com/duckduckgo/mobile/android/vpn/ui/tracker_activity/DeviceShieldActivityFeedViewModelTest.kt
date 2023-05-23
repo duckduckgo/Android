@@ -24,9 +24,10 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
-import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.FakeExclusionListPlugin
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -72,11 +73,13 @@ class DeviceShieldActivityFeedViewModelTest {
     private lateinit var viewModel: DeviceShieldActivityFeedViewModel
     private lateinit var repository: AppTrackerBlockingStatsRepository
 
-    private val mockExcludedApps: TrackingProtectionAppsRepository = mock()
+    private val exclusionList = mock<ExclusionList>()
+    private val fakeExclusionListPlugin = FakeExclusionListPlugin(exclusionList)
     private val mockVpnStateMonitor: VpnStateMonitor = mock()
 
     @Before
     fun setup() {
+        whenever(exclusionList.forFeature).thenReturn(AppTpVpnFeature.APPTP_VPN)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -86,8 +89,8 @@ class DeviceShieldActivityFeedViewModelTest {
             repository,
             CoroutineTestRule().testDispatcherProvider,
             RealTimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
-            mockExcludedApps,
             mockVpnStateMonitor,
+            fakeExclusionListPlugin,
         )
     }
 
@@ -149,7 +152,7 @@ class DeviceShieldActivityFeedViewModelTest {
     @Test
     fun whenGetMostRecentTrackersIsEmptyAndVpnEnabledAndBoundedConfigThenEmitDescriptionAndAppsProtectionState() = runBlocking {
         mockVpnEnabled()
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
         val boundedConfig = config.copy(maxRows = 5)
 
         viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
@@ -185,7 +188,7 @@ class DeviceShieldActivityFeedViewModelTest {
     @Test
     fun whenGetMostRecentTrackersIsEmptyAndVpnDisabledAndFiveRowsThenEmitDescription() = runBlocking {
         mockVpnDisabled()
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
         val boundedConfig = config.copy(maxRows = 5)
 
         viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
@@ -211,7 +214,7 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
 
         mockVpnEnabled()
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(flowOf(listOf(app, excludedApp)))
         val boundedConfig = config.copy(maxRows = 2)
 
         viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
@@ -232,7 +235,7 @@ class DeviceShieldActivityFeedViewModelTest {
     }
 
     private suspend fun getAppsAndProtectionInfoReturnsEmptyList() {
-        whenever(mockExcludedApps.getAppsAndProtectionInfo()).thenReturn(flowOf(emptyList()))
+        whenever(exclusionList.getAppsAndProtectionInfo()).thenReturn(flowOf(emptyList()))
     }
 
     private fun mockVpnEnabled() {
