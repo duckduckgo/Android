@@ -425,17 +425,18 @@ class RealSavedSitesRepository(
             savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
         }
 
+        val lastModified = DatabaseDateFormatter.iso8601()
         savedSitesEntitiesDao.update(
             Entity(
                 bookmark.id,
                 bookmark.title,
                 bookmark.url,
                 BOOKMARK,
-                bookmark.lastModified ?: DatabaseDateFormatter.iso8601(),
+                lastModified,
             ),
         )
-        savedSitesEntitiesDao.updateModified(fromFolderId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
-        savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
+        savedSitesEntitiesDao.updateModified(fromFolderId, lastModified)
+        savedSitesEntitiesDao.updateModified(bookmark.parentId, lastModified)
     }
 
     override fun insert(folder: BookmarkFolder): BookmarkFolder {
@@ -497,7 +498,16 @@ class RealSavedSitesRepository(
     ) {
         savedSitesEntitiesDao.updateId(localId, bookmark.id)
         savedSitesRelationsDao.updateEntityId(localId, bookmark.id)
-        updateBookmark(bookmark, bookmark.parentId)
+        savedSitesEntitiesDao.update(
+            Entity(
+                bookmark.id,
+                bookmark.title,
+                bookmark.url,
+                BOOKMARK,
+                bookmark.lastModified ?: DatabaseDateFormatter.iso8601(),
+            ),
+        )
+        savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
     }
 
     override fun replaceFavourite(
