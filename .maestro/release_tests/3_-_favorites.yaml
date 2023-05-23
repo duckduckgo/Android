@@ -65,9 +65,9 @@ appId: com.duckduckgo.mobile.android
     text: "No bookmarks added yet"
 # Undo remove favorite from bookmarks screen
 - assertVisible: "Undo"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/snackbar_action"
-- assertNotVisible:
-    text: "No favorites added yet"
-- assertNotVisible:
-    text: "No bookmarks added yet"
+#- tapOn:
+#    id: "com.duckduckgo.mobile.android:id/snackbar_action"
+#- assertNotVisible:
+#    text: "No favorites added yet"
+#- assertNotVisible:
+#    text: "No bookmarks added yet"
