@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.apps
+package com.duckduckgo.mobile.android.vpn.exclusion
 
 sealed class AppCategory {
     object Undefined : AppCategory() {

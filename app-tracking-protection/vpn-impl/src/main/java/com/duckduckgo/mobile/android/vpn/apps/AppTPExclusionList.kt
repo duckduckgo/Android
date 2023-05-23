@@ -20,6 +20,8 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.exclusion.ExclusionList
+import com.duckduckgo.mobile.android.vpn.exclusion.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
@@ -32,37 +34,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
-interface TrackingProtectionAppsRepository {
-
-    /** @return the list of installed apps and information about its excluded state */
-    suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>>
-
-    /** @return the list of installed apps currently excluded */
-    suspend fun getExclusionAppsList(): List<String>
-
-    fun manuallyExcludedApps(): Flow<List<Pair<String, Boolean>>>
-
-    /** Remove the app to the exclusion list so that its traffic does not go through the VPN */
-    suspend fun manuallyEnabledApp(packageName: String)
-
-    /** Add the app to the exclusion list so that its traffic goes through the VPN */
-    suspend fun manuallyExcludeApp(packageName: String)
-
-    /** Restore protection to the default list */
-    suspend fun restoreDefaultProtectedList()
-
-    /** Returns if an app tracking attempts are being blocked or not */
-    suspend fun isAppProtectionEnabled(packageName: String): Boolean
-}
-
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealTrackingProtectionAppsRepository @Inject constructor(
+class AppTPExclusionList @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-) : TrackingProtectionAppsRepository {
+) : ExclusionList {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
