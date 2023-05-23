@@ -78,7 +78,9 @@ class SavedSitesSyncDataProviderTest {
     private val bookmark3 = aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com")
     private val bookmark4 = aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com")
 
+    private val threeHoursAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(3)
     private val twoHoursAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(2)
+    private val oneHourAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(1)
 
     @Before
     fun before() {
@@ -313,6 +315,26 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes[1].folder!!.children == listOf(bookmark3.id, bookmark4.id))
         assertTrue(changes[2].id == bookmark1.id)
         assertTrue(changes[2].deleted == "1")
+    }
+
+    @Test
+    fun whenMovingABookmarkToAnotherFolderThenDataIsCorrect() {
+        val beforeLastSyncTimestamp = DatabaseDateFormatter.iso8601(threeHoursAgo)
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        val modificationTimestamp = DatabaseDateFormatter.iso8601(oneHourAgo)
+
+        val modifiedBookmark1 = bookmark1.copy(lastModified = modificationTimestamp)
+        val modifiedBookmark2 = bookmark2.copy(lastModified = beforeLastSyncTimestamp)
+
+        repository.insert(modifiedBookmark1)
+        repository.insert(modifiedBookmark2)
+        repository.insert(subFolder)
+        repository.updateBookmark(modifiedBookmark1.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
+
+        val changes = parser.changesSince(lastSyncTimestamp)
+        assertTrue(changes.filter { it.id == modifiedBookmark1.id } != null)
+        assertTrue(changes.filter { it.id == subFolder.id } != null)
+        assertTrue(changes.filter { it.id == SavedSitesNames.BOOKMARKS_ROOT } != null)
     }
 
     private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
