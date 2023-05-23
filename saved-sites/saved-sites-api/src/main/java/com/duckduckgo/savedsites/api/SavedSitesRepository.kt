@@ -334,10 +334,10 @@ interface SavedSitesRepository {
     fun favoritesCount(): Long
 
     /**
-     * Returns the last modified [SavedSite]
-     * @return [Flow] of [SavedSite]
+     * Returns the id the last modified [SavedSite]
+     * @return [Flow] of [String]
      */
-    fun lastModified(): Flow<SavedSite>
+    fun lastModified(): Flow<String>
 
     /**
      * Returns the list of [BookmarkFolder] modified after [since]

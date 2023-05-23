@@ -97,7 +97,7 @@ interface SavedSitesEntitiesDao {
         lastModified: String = DatabaseDateFormatter.iso8601(),
     )
 
-    @Query("select * from entities order by rowid desc limit 1")
+    @Query("select * from entities limit 1")
     fun lastModified(): Flow<Entity>
 
     @Query("select * from entities where url = :url and entities.deleted = 0 limit 1")

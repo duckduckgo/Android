@@ -589,12 +589,13 @@ class RealSavedSitesRepository(
         return savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT).size.toLong()
     }
 
-    override fun lastModified(): Flow<SavedSite> {
-        return savedSitesEntitiesDao.lastModified().map { it.mapToFavorite(0) }
+    override fun lastModified(): Flow<String> {
+        return savedSitesEntitiesDao.lastModified().map { it.entityId }
     }
 
     override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
         val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedSince(since) }
+        Timber.d("Sync-Feature: folders modified since $since are $folders")
         return folders.map { mapBookmarkFolder(it) }
     }
 

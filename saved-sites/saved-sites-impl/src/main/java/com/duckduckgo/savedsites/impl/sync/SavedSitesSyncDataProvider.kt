@@ -75,8 +75,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
             }
         }
 
-        // bookmarks that were deleted won't be part of the previous check
-        // we need to add them
+        // bookmarks that were deleted or edited won't be part of the previous check
         val bookmarks = repository.getBookmarksModifiedSince(since)
         bookmarks.forEach { bookmark ->
             if (bookmark.deleted != null) {
@@ -108,7 +107,8 @@ class SavedSitesSyncDataProvider @Inject constructor(
             }
         }
 
-        return addFolderContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
+        addFolderContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
+        return updates.distinct()
     }
 
     private fun addFolderContent(
