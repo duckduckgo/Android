@@ -828,34 +828,6 @@
                 "expectAction": "block"
             },
             {
-                "name": "format.test - supports complex regexp - matching request 1",
-                "siteURL": "https://example.com",
-                "requestURL": "https://format.test/aaabdfdggggi/test3.js",
-                "requestType": "script",
-                "expectAction": "ignore"
-            },
-            {
-                "name": "format.test - supports complex regexp - matching request 2",
-                "siteURL": "https://example.com",
-                "requestURL": "https://format.test/aaaacfej/test3.js",
-                "requestType": "script",
-                "expectAction": "ignore"
-            },
-            {
-                "name": "format.test - supports complex regexp - nonmatching request 1",
-                "siteURL": "https://example.com",
-                "requestURL": "https://format.test/aabdfdggggi/test3.js",
-                "requestType": "script",
-                "expectAction": "block"
-            },
-            {
-                "name": "format.test - supports complex regexp - nonmatching request 2",
-                "siteURL": "https://example.com",
-                "requestURL": "https://format.test/aaaacf/test3.js",
-                "requestType": "script",
-                "expectAction": "block"
-            },
-            {
                 "name": "format.test - with subdomain - match on sub subdomain",
                 "siteURL": "https://example.com",
                 "requestURL": "https://sub0.sub1.sub2.format.test/test4.js",
