@@ -113,6 +113,7 @@ class WindowsWaitlistActivity : DuckDuckGoActivity() {
             is NotJoinedQueue -> renderNotJoinedQueue()
             is JoinedWaitlist -> renderJoinedQueue()
             is InBeta -> renderInBeta(state.inviteCode)
+            else -> {} // no-op
         }
     }
 

@@ -22,8 +22,7 @@
             android:name=".MacOsActivity"
             android:exported="false"
             android:label="@string/macos_app"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:screenOrientation="portrait" />
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <receiver
             android:name=".MacOsLinkShareBroadcastReceiver"
             android:exported="false" />

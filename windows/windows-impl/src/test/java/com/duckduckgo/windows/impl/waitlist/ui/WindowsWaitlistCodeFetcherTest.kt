@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.windows.impl.ui
+package com.duckduckgo.windows.impl.waitlist.ui
 
 import android.content.Context
 import android.util.Log
@@ -39,8 +39,6 @@ import com.duckduckgo.windows.impl.waitlist.FetchCodeResult.Code
 import com.duckduckgo.windows.impl.waitlist.FetchCodeResult.CodeExisted
 import com.duckduckgo.windows.impl.waitlist.FetchCodeResult.NoCode
 import com.duckduckgo.windows.impl.waitlist.WindowsWaitlistManager
-import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistCodeFetcher
-import com.duckduckgo.windows.impl.waitlist.ui.WindowsWaitlistWorkRequestBuilder
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope

@@ -16,19 +16,9 @@
 
 package com.duckduckgo.windows.api
 
-/** Public interface for Windows waitlist */
-interface WindowsWaitlist {
-    /**
-     * This method returns the current state of the user in the Windows waitlist
-     * @return a [WindowsWaitlistState]
-     */
-    fun getWaitlistState(): WindowsWaitlistState
-}
+import com.duckduckgo.feature.toggles.api.Toggle
 
-/** Public data class for Windows waitlist */
-sealed class WindowsWaitlistState {
-    object NotJoinedQueue : WindowsWaitlistState()
-    object JoinedWaitlist : WindowsWaitlistState()
-    object FeatureEnabled : WindowsWaitlistState()
-    data class InBeta(val inviteCode: String) : WindowsWaitlistState()
+interface WindowsDownloadLinkFeature {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }

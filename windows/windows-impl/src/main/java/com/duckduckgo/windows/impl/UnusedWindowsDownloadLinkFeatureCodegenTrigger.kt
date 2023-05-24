@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.windows.api.ui
+package com.duckduckgo.windows.impl
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 
-/**
- * Use this class to launch the Windows Waitlist Activity Screen
- * ```kotlin
- * globalActivityStarter.start(context, WindowsWaitlistScreenWithEmptyParams)
- * ```
- */
-object WindowsWaitlistScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
-
-/**
- * Use this class to launch the Windows Activity Screen
- * ```kotlin
- * globalActivityStarter.start(context, WindowsScreenWithEmptyParams)
- * ```
- */
-object WindowsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    boundType = WindowsDownloadLinkFeature::class,
+    featureName = "windowsDownloadLink",
+)
+@Suppress("unused")
+private interface UnusedWindowsDownloadLinkFeatureCodegenTrigger
