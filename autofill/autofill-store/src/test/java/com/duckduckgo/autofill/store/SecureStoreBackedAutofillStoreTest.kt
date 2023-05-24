@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -413,6 +414,31 @@ class SecureStoreBackedAutofillStoreTest {
 
         val results = testee.getCredentials(visitedSite)
         assertEquals(1, results.size)
+    }
+
+    @Test
+    fun whenReinsertingLoginCredentialsThenAllFieldsPreserved() = runTest {
+        setupTesteeWithAutofillAvailable()
+        val originalCredentials = LoginCredentials(
+            id = 123,
+            domain = "example.com",
+            username = "user",
+            password = "abc123",
+            domainTitle = "title",
+            notes = "notes",
+            lastUpdatedMillis = 1000,
+        )
+        testee.reinsertCredentials(originalCredentials)
+
+        val reinsertedCredentials = secureStore.getWebsiteLoginDetailsWithCredentials(123)
+        assertNotNull("Failed to find credentials", reinsertedCredentials)
+        assertEquals(originalCredentials.id, reinsertedCredentials!!.details.id)
+        assertEquals(originalCredentials.username, reinsertedCredentials.details.username)
+        assertEquals(originalCredentials.domain, reinsertedCredentials.details.domain)
+        assertEquals(originalCredentials.domainTitle, reinsertedCredentials.details.domainTitle)
+        assertEquals(originalCredentials.lastUpdatedMillis, reinsertedCredentials.details.lastUpdatedMillis)
+        assertEquals(originalCredentials.notes, reinsertedCredentials.notes)
+        assertEquals(originalCredentials.password, reinsertedCredentials.password)
     }
 
     private fun List<LoginCredentials>.assertHasNoLoginCredentials(
