@@ -31,7 +31,7 @@ interface SyncableDataPersister {
      * Sync Feature has been disabled / device has been removed
      * This is an opportunity for Features to do some local cleanup if needed
      */
-    fun onFeatureRemoved()
+    fun onSyncDisabled()
 
     enum class SyncConflictResolution {
         DEDUPLICATION,
