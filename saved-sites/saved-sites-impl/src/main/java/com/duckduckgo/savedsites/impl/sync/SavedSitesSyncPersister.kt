@@ -23,8 +23,10 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult.Duplicate
-import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult.NotDuplicate
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
