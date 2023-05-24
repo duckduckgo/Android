@@ -129,6 +129,15 @@ class SavedSitesSyncPersisterTest {
 
         assertTrue(result is Error)
     }
+
+    @Test
+    fun whenMergingWithDeletedDataThenResultIsSuccess() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_deleted_entries.json")
+        val deletedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(deletedChanges, TIMESTAMP)
+
+        Assert.assertTrue(result is Success)
+    }
 }
 
 class FakeCrypto : SyncCrypto {

@@ -119,8 +119,8 @@ class SavedSitesSyncPersister @Inject constructor(
         }
 
         val processIds: MutableList<String> = mutableListOf()
-        val allResponseIds = bookmarks.entries.map { it.id }
-        val allFolders = bookmarks.entries.filter { it.isFolder() }
+        val allResponseIds = bookmarks.entries.filterNot { it.deleted != null }.map { it.id }
+        val allFolders = bookmarks.entries.filter { it.isFolder() }.filterNot { it.id == SavedSitesNames.FAVORITES_ROOT }
         val allFolderIds = allFolders.map { it.id }
         val allChildren = mutableListOf<String>()
         allFolders.forEach { entry ->
@@ -372,7 +372,7 @@ class SavedSitesSyncPersister @Inject constructor(
                     Timber.d("Sync-Feature: is $child duplicated locally?")
                     when (val result = duplicateFinder.findFavouriteDuplicate(favourite)) {
                         is SavedSitesDuplicateResult.Duplicate -> {
-                            Timber.d("Sync-Feature: child $child exists locally, replacing")
+                            Timber.d("Sync-Feature: child $child exists locally as ${result.id}, replacing")
                             savedSitesRepository.replaceFavourite(favourite, result.id)
                         }
 

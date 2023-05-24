@@ -356,7 +356,7 @@ class RealSavedSitesRepository(
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {
-                return insertFavorite(savedSite.id, savedSite.url, savedSite.title, savedSite.lastModified ?: DatabaseDateFormatter.iso8601())
+                return insertFavorite(savedSite.id, savedSite.url, savedSite.title, savedSite.lastModified)
             }
 
             is Bookmark -> {
