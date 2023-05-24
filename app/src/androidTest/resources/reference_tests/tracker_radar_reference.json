@@ -768,17 +768,12 @@
                     "action": "ignore"
                 },
                 {
-                    "rule": "format\\.test/a{3,5}(b|c)[d-f]+g*h?./test3\\.js",
-                    "comment": "Complex regexp",
-                    "action": "ignore"
-                },
-                {
                     "rule": "sub1\\.sub2\\.format\\.test/test4\\.js",
                     "comment": "With subdomain",
                     "action": "ignore"
                 },
                 {
-                    "rule": "sub1\\.sub2\\.format\\.test/(a|[bc])/test4a\\.js",
+                    "rule": "sub1\\.sub2\\.format\\.test/[abc]/test4a\\.js",
                     "comment": "With subdomain and regexp",
                     "action": "ignore"
                 },
