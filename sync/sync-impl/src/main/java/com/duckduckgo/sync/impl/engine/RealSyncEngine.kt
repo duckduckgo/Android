@@ -37,6 +37,7 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
@@ -182,6 +183,13 @@ class RealSyncEngine @Inject constructor(
     ) {
         persisterPlugins.getPlugins().map {
             it.persist(remoteChanges, conflictResolution)
+        }
+    }
+
+    override fun onSyncDisabled() {
+        syncStateRepository.clearAll()
+        persisterPlugins.getPlugins().map {
+            it.onSyncDisabled()
         }
     }
 }

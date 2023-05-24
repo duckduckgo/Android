@@ -24,6 +24,12 @@ interface SyncEngine {
      */
     fun syncNow(trigger: SyncTrigger)
 
+    /**
+     * Sync Feature has been disabled / device has been removed
+     * This is an opportunity for Features to do some local cleanup if needed
+     */
+    fun onSyncDisabled()
+
     enum class SyncTrigger {
         BACKGROUND_SYNC,
         APP_OPEN,
