@@ -53,17 +53,18 @@ class SavedSitesSyncPersister @Inject constructor(
 ) : SyncableDataPersister {
 
     override fun persist(
-        changes: List<SyncChangesResponse>,
+        changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-        changes.find { it.type == BOOKMARKS }?.let { bookmarkChanges ->
+        return if (changes.type == BOOKMARKS ){
             Timber.d("Sync-Feature: received remote changes, merging with resolution $conflictResolution")
-            val result = merge(bookmarkChanges, conflictResolution)
+            val result = merge(changes, conflictResolution)
             Timber.d("Sync-Feature: merging bookmarks finished with $result")
-            return SyncMergeResult.Success(true)
+            Success(true)
+        }else{
+            Timber.d("Sync-Feature: no bookmarks to merge")
+            Success(false)
         }
-        Timber.d("Sync-Feature: no bookmarks to merge")
-        return SyncMergeResult.Success(false)
     }
 
     override fun onSyncDisabled() {
