@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -53,6 +54,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
+import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -73,6 +75,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val credentialListFilter: CredentialListFilter,
     private val faviconManager: FaviconManager,
+    private val webUrlIdentifier: WebUrlIdentifier,
     private val featureSegmentsManager: FeatureSegmentsManager,
 ) : ViewModel() {
 
@@ -113,7 +116,9 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onViewCredentials(
         credentials: LoginCredentials,
     ) {
-        _viewState.value = viewState.value.copy(credentialMode = Viewing(credentialsViewed = credentials))
+        _viewState.value = viewState.value.copy(
+            credentialMode = Viewing(credentialsViewed = credentials, showLinkButton = credentials.shouldShowLinkButton()),
+        )
         addCommand(ShowCredentialMode)
     }
 
@@ -172,7 +177,13 @@ class AutofillSettingsViewModel @Inject constructor(
                 // if credential mode started with edit, it means that we need to exit credential mode right away instead of going
                 // back to view mode.
                 if (it is EditingExisting && !it.startedCredentialModeWithEdit) {
-                    _viewState.value = value.copy(credentialMode = Viewing(credentialsViewed = it.credentialsViewed))
+                    _viewState.value =
+                        value.copy(
+                            credentialMode = Viewing(
+                                credentialsViewed = it.credentialsViewed,
+                                showLinkButton = it.credentialsViewed.shouldShowLinkButton(),
+                            ),
+                        )
                 } else {
                     onExitCredentialMode()
                 }
@@ -348,6 +359,10 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    private fun LoginCredentials.shouldShowLinkButton(): Boolean {
+        return webUrlIdentifier.isLikelyAUrl(domain)
+    }
+
     private suspend fun updateExistingCredential(
         credentialMode: EditingExisting,
         updatedCredentials: LoginCredentials,
@@ -357,6 +372,7 @@ class AutofillSettingsViewModel @Inject constructor(
             _viewState.value = viewState.value.copy(
                 credentialMode = Viewing(
                     credentialsViewed = updated,
+                    showLinkButton = updated.shouldShowLinkButton(),
                 ),
             )
         }
@@ -371,6 +387,7 @@ class AutofillSettingsViewModel @Inject constructor(
             _viewState.value = viewState.value.copy(
                 credentialMode = Viewing(
                     credentialsViewed = savedCredentials,
+                    showLinkButton = savedCredentials.shouldShowLinkButton(),
                 ),
             )
         }
@@ -417,7 +434,10 @@ class AutofillSettingsViewModel @Inject constructor(
     sealed class CredentialMode {
         object ListMode : CredentialMode()
 
-        data class Viewing(val credentialsViewed: LoginCredentials) : CredentialMode()
+        data class Viewing(
+            val credentialsViewed: LoginCredentials,
+            val showLinkButton: Boolean,
+        ) : CredentialMode()
 
         abstract class Editing(
             open val saveable: Boolean = false,
@@ -460,5 +480,21 @@ class AutofillSettingsViewModel @Inject constructor(
     sealed class CredentialModeCommand(val id: String = UUID.randomUUID().toString()) {
         data class ShowEditCredentialMode(val credentials: LoginCredentials) : CredentialModeCommand()
         object ShowManualCredentialMode : CredentialModeCommand()
+    }
+}
+
+interface WebUrlIdentifier {
+    fun isLikelyAUrl(domain: String?): Boolean
+}
+
+@ContributesBinding(ActivityScope::class)
+class RegexBasedUrlIdentifier @Inject constructor() : WebUrlIdentifier {
+
+    override fun isLikelyAUrl(domain: String?): Boolean {
+        if (domain.isNullOrBlank()) {
+            return false
+        }
+
+        return Patterns.WEB_URL.matcher(domain).matches()
     }
 }
