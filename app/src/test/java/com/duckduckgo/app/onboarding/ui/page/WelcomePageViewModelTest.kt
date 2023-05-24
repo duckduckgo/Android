@@ -23,7 +23,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,9 +65,6 @@ class WelcomePageViewModelTest {
     @Mock
     private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 
-    @Mock
-    private lateinit var variantManager: VariantManager
-
     private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
 
     lateinit var viewModel: WelcomePageViewModel
@@ -83,7 +79,6 @@ class WelcomePageViewModelTest {
             context = mock(),
             pixel = pixel,
             defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-            variantManager = variantManager,
         )
 
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
@@ -160,26 +155,6 @@ class WelcomePageViewModelTest {
                     Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
                 ),
             )
-        }
-    }
-
-    @Test
-    fun givenExperimentVariantWhenLoadingWelcomeScreenThenReturnMultiselectCta() = runTest {
-        whenever(variantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mj" })
-        events.send(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowFeatureOptionsCta)
-        }
-    }
-
-    @Test
-    fun givenNonExperimentVariantWhenLoadingWelcomeScreenThenReturnControlCta() = runTest {
-        whenever(variantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mi" })
-        events.send(WelcomePageView.Event.ShowFirstDaxOnboardingDialog)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowControlDaxCta)
         }
     }
 }

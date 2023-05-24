@@ -22,16 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.FASTER_PAGE_LOADS
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.FEWER_ADS
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.ONE_CLICK_DATA_CLEARING
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.PRIVATE_SEARCH
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.SMALLER_DIGITAL_FOOTPRINT
-import com.duckduckgo.app.onboarding.ui.customisationexperiment.DDGFeatureOnboardingOption.TRACKER_BLOCKING
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isOnboardingCustomizationExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -42,50 +33,14 @@ class WelcomePageViewModel(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val variantManager: VariantManager,
 ) : ViewModel() {
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
         return when (event) {
-            WelcomePageView.Event.ShowFirstDaxOnboardingDialog -> showFirstDaxOnboardingDialog()
-            WelcomePageView.Event.OnSkipOptions -> onSkipOptionsClicked()
-            is WelcomePageView.Event.OnContinueOptions -> onContinueWithOptionsClicked(event.options)
             WelcomePageView.Event.OnPrimaryCtaClicked -> onPrimaryCtaClicked()
             WelcomePageView.Event.OnDefaultBrowserSet -> onDefaultBrowserSet()
             WelcomePageView.Event.OnDefaultBrowserNotSet -> onDefaultBrowserNotSet()
         }
-    }
-
-    private fun showFirstDaxOnboardingDialog() = flow {
-        when (variantManager.isOnboardingCustomizationExperimentEnabled()) {
-            true -> emit(WelcomePageView.State.ShowFeatureOptionsCta)
-            false -> emit(WelcomePageView.State.ShowControlDaxCta)
-        }
-    }
-
-    private fun onSkipOptionsClicked(): Flow<WelcomePageView.State> = flow {
-        pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
-        emit(WelcomePageView.State.ShowControlDaxCta)
-    }
-
-    private fun onContinueWithOptionsClicked(options: Map<DDGFeatureOnboardingOption, Boolean>): Flow<WelcomePageView.State> = flow {
-        val optionsSelected = options.filter { it.value }.map { it.key }.toList()
-        if (optionsSelected.isEmpty()) {
-            pixel.fire(AppPixelName.ONBOARDING_OPTION_SKIP)
-        } else {
-            optionsSelected.forEach { option ->
-                when (option) {
-                    PRIVATE_SEARCH -> pixel.fire(AppPixelName.ONBOARDING_OPTION_PRIVATE_SEARCH_SELECTED)
-                    TRACKER_BLOCKING -> pixel.fire(AppPixelName.ONBOARDING_OPTION_TRACKER_BLOCKING_SELECTED)
-                    SMALLER_DIGITAL_FOOTPRINT -> pixel.fire(AppPixelName.ONBOARDING_OPTION_SMALLER_DIGITAL_FOOTPRINT_SELECTED)
-                    FASTER_PAGE_LOADS -> pixel.fire(AppPixelName.ONBOARDING_OPTION_FASTER_PAGE_LOADS_SELECTED)
-                    FEWER_ADS -> pixel.fire(AppPixelName.ONBOARDING_OPTION_FEWER_ADS_SELECTED)
-                    ONE_CLICK_DATA_CLEARING -> pixel.fire(AppPixelName.ONBOARDING_OPTION_ONE_CLICK_DATA_CLEARING_SELECTED)
-                }
-            }
-            pixel.fire(AppPixelName.ONBOARDING_OPTIONS_SELECTED)
-        }
-        emit(WelcomePageView.State.ShowControlDaxCta)
     }
 
     private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {
@@ -139,7 +94,6 @@ class WelcomePageViewModelFactory(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val variantManager: VariantManager,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -150,7 +104,6 @@ class WelcomePageViewModelFactory(
                     context,
                     pixel,
                     defaultRoleBrowserDialog,
-                    variantManager,
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

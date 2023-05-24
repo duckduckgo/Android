@@ -40,15 +40,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
 
-    ONBOARDING_OPTION_PRIVATE_SEARCH_SELECTED("m_onboarding_option_private_search_selected"),
-    ONBOARDING_OPTION_TRACKER_BLOCKING_SELECTED("m_onboarding_option_tracker_blocking_selected"),
-    ONBOARDING_OPTION_SMALLER_DIGITAL_FOOTPRINT_SELECTED("m_onboarding_option_smaller_digital_footprint_selected"),
-    ONBOARDING_OPTION_FASTER_PAGE_LOADS_SELECTED("m_onboarding_option_faster_page_loads_selected"),
-    ONBOARDING_OPTION_FEWER_ADS_SELECTED("m_onboarding_option_fewer_ads_selected"),
-    ONBOARDING_OPTION_ONE_CLICK_DATA_CLEARING_SELECTED("m_onboarding_option_one_click_data_clearing_selected"),
-    ONBOARDING_OPTIONS_SELECTED("m_onboarding_option_selected"),
-    ONBOARDING_OPTION_SKIP("m_onboarding_option_skip"),
-
     BROWSER_MENU_WHITELIST_ADD("mb_wla"),
     BROWSER_MENU_WHITELIST_REMOVE("mb_wlr"),
 
