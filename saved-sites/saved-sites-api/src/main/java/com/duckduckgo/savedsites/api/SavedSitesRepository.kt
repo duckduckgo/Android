@@ -115,12 +115,6 @@ interface SavedSitesRepository {
     fun getBookmark(url: String): Bookmark?
 
     /**
-     * Returns [SavedSite] given an ID
-     * @param ID of the [SavedSite]
-     * @return [SavedSite] if found, or null if does not exist
-     */
-
-    /**
      * Returns [Bookmark] given an ID
      * @param ID of the [Bookmark]
      * @return [Bookmark] if found, or null if does not exist

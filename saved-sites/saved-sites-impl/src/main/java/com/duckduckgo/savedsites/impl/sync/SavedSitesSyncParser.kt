@@ -59,7 +59,7 @@ class SavedSitesSyncParser @Inject constructor(
         return SyncMergeResult.Success(true)
     }
 
-    override fun onFeatureRemoved() {
+    override fun onSyncDisabled() {
         savedSitesSyncStore.modifiedSince = "0"
     }
 

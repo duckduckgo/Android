@@ -93,7 +93,7 @@ class RealSyncEngine @Inject constructor(
     private fun mergeRemoteData() {
         Timber.d("Sync: merging remote data")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
-        receiveRemoteChange(DEDUPLICATION)
+        getRemoteChange(DEDUPLICATION)
 
         val changes = getChanges()
         if (changes.isEmpty()) {
@@ -112,7 +112,7 @@ class RealSyncEngine @Inject constructor(
 
         if (changes.isEmpty()) {
             Timber.d("Sync: no changes to sync, asking for remote changes")
-            receiveRemoteChange(TIMESTAMP)
+            getRemoteChange(TIMESTAMP)
         } else {
             Timber.d("Sync: changes to update $changes")
             Timber.d("Sync: starting to sync")
@@ -138,7 +138,7 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun receiveRemoteChange(conflictResolution: SyncConflictResolution) {
+    private fun getRemoteChange(conflictResolution: SyncConflictResolution) {
         val lastCompleted = syncStateRepository.lastCompleted()
         val since = if (lastCompleted == null) {
             Timber.d("Sync: get all remote changes")

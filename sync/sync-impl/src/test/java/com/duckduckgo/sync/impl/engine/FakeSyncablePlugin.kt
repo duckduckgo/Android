@@ -33,7 +33,7 @@ class FakeSyncablePlugin(val changes: SyncChanges) : SyncablePlugin {
         return SyncMergeResult.Success(false)
     }
 
-    override fun onFeatureRemoved() {
+    override fun onSyncDisabled() {
         // no-op
     }
 }
