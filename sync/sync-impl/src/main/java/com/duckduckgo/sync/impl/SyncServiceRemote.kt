@@ -67,7 +67,10 @@ interface SyncApi {
         updates: JSONObject,
     ): Result<JSONObject?>
 
-    fun getBookmarks(token: String, since: String): Result<JSONObject>
+    fun getBookmarks(
+        token: String,
+        since: String,
+    ): Result<JSONObject>
 }
 
 @ContributesBinding(AppScope::class)
@@ -236,8 +239,10 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
-// eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6Ik1UMjloYWZtUk9ycnAwTGFVZUI4Z211Vm84WllmK0hTZWZBRGVpOXJHS3M9IiwidXNlcl9pZCI6IjU1MTg3NjE2LWIxNGYtNDY4MS1iNzliLWM0NDA1ZmE1MTU1YiJ9fQ==
-    override fun getBookmarks(token: String, since: String): Result<JSONObject> {
+    override fun getBookmarks(
+        token: String,
+        since: String,
+    ): Result<JSONObject> {
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()) {
                 syncService.bookmarksSince("Bearer $token", since)
