@@ -163,10 +163,10 @@
     <string name="atp_ReportBreakageAppNextCta">Nākamais</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Lūdzu, apraksti, kas notiek, kādu rezultātu tu gaidīji, un darbības, kas noveda pie problēmas.</string>
     <string name="atp_ReportBreakageFormInputHint">Pastāsti mums vairāk par problēmu, ar kuru saskaries</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Nospiežot \"Iesniegt\", es piekrītu, ka DuckDuckGo drīkst izmantot šajā ziņojumā sniegto informāciju, lai uzlabotu Lietotņu pretizsekošanas aizsardzību.
+    <string name="atp_ReportBreakageFormCheckboxText">Noklikšķinot uz \"Iesniegt\", es piekrītu, ka DuckDuckGo drīkst izmantot šajā ziņojumā sniegto informāciju, lai uzlabotu lietotnes funkcijas.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Papildus šajā veidlapā ievadītajai informācijai tavs lietotnes problēmas ziņojums ietvers:<br/>• lietotnes paketes nosaukumu<br/>• lietotnē bloķēto izsekotāju sarakstu<br/>• vai ir iespējota Lietotņu pretizsekošanas aizsardzība<br/>• apkopotu DuckDuckGo lietotnes diagnostiku<br/>]]>
+        <![CDATA[Papildus šajā veidlapā ievadītajai informācijai tavs lietotnes problēmas ziņojums ietvers:<br/>• lietotnes paketes nosaukumu;<br/>• lietotnē bloķēto izsekotāju sarakstu;<br/>• vai ir iespējotas noteiktas DuckDuckGo funkcijas;<br/>• apkopotu DuckDuckGo lietotnes diagnostiku.<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Ziņojums nosūtīts, paldies! Tavas atsauksmes palīdz mums uzlabot Lietotņu pretizsekošanas aizsardzību visiem.</string>
     <string name="atp_ThanksForTheFeedback">Paldies tev par atsauksmēm!</string>

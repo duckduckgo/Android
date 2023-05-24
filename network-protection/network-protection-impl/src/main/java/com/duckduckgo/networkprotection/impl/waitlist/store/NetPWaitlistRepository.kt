@@ -36,8 +36,12 @@ class RealNetPWaitlistRepository(
 
     override fun getState(isInternalBuild: Boolean): NetPWaitlistState {
         if (isInternalBuild) {
-            // internal users bypass easter egg
-            return NetPWaitlistState.InBeta
+            return if (didJoinBeta()) {
+                // internal users bypass easter egg
+                NetPWaitlistState.InBeta
+            } else {
+                NetPWaitlistState.PendingInviteCode
+            }
         }
 
         if (didJoinBeta()) {

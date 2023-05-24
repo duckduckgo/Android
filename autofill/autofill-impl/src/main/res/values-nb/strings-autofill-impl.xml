@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Du trenger låsemønster, PIN-kode eller biometri på enheten for å beskytte påloggingene dine.</string>
     <string name="managementDisabledModeTitle">Sikre enheten din for å lagre pålogginger</string>
 
-    <string name="saveLoginDialogTitle">Vil du lagre påloggingen?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Vil du lagre passordet?</string>
     <string name="saveLoginDialogButtonSave">Lagre påloggingen</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke nå</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Pålogginger lagres bare på denne enheten og kan administreres i påloggingsmenyen i innstillinger.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
+    <string name="saveLoginDialogSubtitle">Pålogginger lagres bare på denne enheten og kan administreres i påloggingsmenyen i innstillinger.</string>
+    <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruke en lagret pålogging?</string>

@@ -54,6 +54,7 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistReposito
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
@@ -136,6 +137,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockNetPWaitlistRepository: NetPWaitlistRepository
 
+    @Mock
+    private lateinit var mockWindowsDownloadLinkToggle: Toggle
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -146,6 +150,11 @@ class SettingsViewModelTest {
         val windowsFeature: WindowsWaitlistFeature = mock()
         whenever(windowsFeatureToggle.isEnabled()).thenReturn(false)
         whenever(windowsFeature.self()).thenReturn(windowsFeatureToggle)
+
+        val mockWindowsDownloadLinkFeature: WindowsDownloadLinkFeature = mock()
+        whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(false)
+        whenever(mockWindowsDownloadLinkFeature.self()).thenReturn(mockWindowsDownloadLinkToggle)
+
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
@@ -178,6 +187,7 @@ class SettingsViewModelTest {
             deviceSyncState,
             mockVpnStateMonitor,
             mockNetPWaitlistRepository,
+            mockWindowsDownloadLinkFeature,
         )
 
         runTest {
@@ -773,11 +783,26 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenWindowsSettingClickedThenEmitCommandLaunchWindows() = runTest {
+    fun whenWindowsSettingClickedAndWindowsFeatureEnabledThenEmitCommandLaunchWindows() = runTest {
+        whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(true)
+
         testee.commands().test {
             testee.windowsSettingClicked()
 
             assertEquals(Command.LaunchWindows, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenWindowsSettingClickedAndWindowsFeatureDisabledThenEmitCommandLaunchWindowsWaitlist() = runTest {
+        whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(false)
+
+        testee.commands().test {
+            testee.windowsSettingClicked()
+
+            assertEquals(Command.LaunchWindowsWaitlist, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

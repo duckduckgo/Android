@@ -41,24 +41,6 @@
                 "exceptPlatforms": []
             },
             {
-                "name": "Tracking parameters that match a regular expression are removed",
-                "testURL": "http://www.example.com/test.html?utm_source=test&utm_medium=test&utm_campaign=test&utm_term=test&utm_content=test",
-                "expectURL": "http://www.example.com/test.html",
-                "exceptPlatforms": []
-            },
-            {
-                "name": "Tracking parameters that only case-insensitively match a regular expressions are not removed",
-                "testURL": "http://www.example.com/test.html?utm_NOPE=test",
-                "expectURL": "http://www.example.com/test.html?utm_NOPE=test",
-                "exceptPlatforms": []
-            },
-            {
-                "name": "Tracking parameters only literally matching regular expression are not removed",
-                "testURL": "http://www.example.com/test.html?reg*exp=test&regexp=test",
-                "expectURL": "http://www.example.com/test.html?reg*exp=test",
-                "exceptPlatforms": []
-            },
-            {
                 "name": "Duplicate plain-text tracking parameters are removed",
                 "testURL": "http://www.example.com/test.html?gclid=123&gclid=456&test=test&gclid=789",
                 "expectURL": "http://www.example.com/test.html?test=test",
@@ -117,7 +99,7 @@
             },
             {
                 "name": "Tracking parameters are removed correctly even when some parameters have no value",
-                "testURL": "http://www.example.com/test.html?a=123&fbclid&gclid&regexp&utm_tracker&b=456",
+                "testURL": "http://www.example.com/test.html?a=123&fbclid&gclid&b=456",
                 "expectURL": "http://www.example.com/test.html?a=123&b=456",
                 "exceptPlatforms": []
             },
@@ -132,6 +114,23 @@
                 "testURL": "http://www.example.com/test.html?c=%7B%7D&d=20220406%2Fus-east-1",
                 "expectURL": "http://www.example.com/test.html?c=%7B%7D&d=20220406%2Fus-east-1",
                 "exceptPlatforms": []
+            },
+            {
+                "name": "Ensure URLs aren't malformed by percent encoding",
+                "testURL": "https://example.com/trk/v1?prof=5555&camp=55559&kct=blah&kchid=123456&criteriaid=blah:blah&campaignid=55556666888&locphy=1234&adgroupid=5555555555&cid=6765676&kdv=g&kext=&kpg=&kpid=&queryStr=blah%20blah&url=https://www.example2.com/landing?show=all&CMP_ID=123456=6666&k_clickid=_1234567_666&utm_id=very-long_string:with-many_symbols&msclkid=1234237546jsdhgkjshf&utm_source=blah&utm_medium=test&utm_campaign=p%3AB%20%7C%20s%3ABC%20%7C%20ct%3ANBPS%20%7C%20ct2%3Axx%20%7C%20g%3Axx%20%7C%20c1%3ABike%20%7C%20c2%3ATrainers%2BAccessories%20%7C%20b%3AWahoo%20Fitness%20%7C%20mt%3Axx&utm_term=blah%20blah&utm_content=blah%20blah%20%E2%80%94%20General%20Terms",
+                "expectURL": "https://example.com/trk/v1?prof=5555&camp=55559&kct=blah&kchid=123456&criteriaid=blah:blah&campaignid=55556666888&locphy=1234&adgroupid=5555555555&cid=6765676&kdv=g&kext=&kpg=&kpid=&queryStr=blah%20blah&url=https://www.example2.com/landing?show=all&CMP_ID=123456=6666&k_clickid=_1234567_666&utm_id=very-long_string:with-many_symbols&msclkid=1234237546jsdhgkjshf",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Ensure parameters aren't treated as a regex if they have special characters",
+                "testURL": "https://example.com/test.html?badx=123",
+                "expectURL": "https://example.com/test.html?badx=123",
+                "exceptPlatforms": [
+                    "ios-browser",
+                    "macos-browser",
+                    "safari-extension",
+                    "windows-browser"
+                ]
             }
         ]
     }

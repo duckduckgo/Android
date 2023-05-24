@@ -167,10 +167,10 @@
     <string name="atp_ReportBreakageAppNextCta">Další</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Popiš, co se děje, co se mělo stát a jaké kroky k problému vedly.</string>
     <string name="atp_ReportBreakageFormInputHint">Řekni nám víc o svém problému</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Kliknutím na tlačítko \"Odeslat\" souhlasím s tím, že DuckDuckGo může použít informace v této zprávě pro zlepšení App Tracking Protection.
+    <string name="atp_ReportBreakageFormCheckboxText">Kliknutím na tlačítko Odeslat vyjadřuji souhlas s tím, aby DuckDuckGo mohl použít informace z této zprávy k vylepšování funkcí aplikace.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Kromě údajů zadaných do tohoto formuláře bude zpráva o problému s aplikací obsahovat:<br/>- Název balíčku aplikace<br/>- Seznam trackerů blokovaných v aplikaci<br/>- Informaci, zda je App Tracking Protection zapnutá<br/>- Souhrnnou diagnostiku aplikace DuckDuckGo<br/>]]>
+        <![CDATA[Kromě údajů zadaných do tohoto formuláře bude zpráva o problému s aplikací obsahovat:<br/>• Název balíčku aplikace<br/>• Seznam trackerů zablokovaných v aplikaci<br/>• Informaci, zda jsou zapnuté určité funkce DuckDuckGo<br/>• Souhrnnou diagnostiku aplikace DuckDuckGo<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Zpráva odeslána, díky! Zpětná vazba nám pomáhá zdokonalovat App Tracking Protection pro všechny.</string>
     <string name="atp_ThanksForTheFeedback">Děkujeme za zpětnou vazbu!</string>

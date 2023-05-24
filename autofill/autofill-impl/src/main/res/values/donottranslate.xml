@@ -15,5 +15,12 @@
   -->
 
 <resources>
+    <string name="autofill_password_generation_offer_title">Use generated password from DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Password will be saved in Logins.</string>
+    <string name="autofill_password_generation_offer_accept">Use Generated Password</string>
+    <string name="autofill_password_generation_offer_decline">Create My Own</string>
+
+    <string name="deviceNotSupportedTitle">Device not supported</string>
+    <string name="deviceNotSupportedSubtitle">To store Logins securely, we need to encrypt and store them on your device. Because your device does not support encrypted storage, Logins is unavailable.</string>
 
 </resources>

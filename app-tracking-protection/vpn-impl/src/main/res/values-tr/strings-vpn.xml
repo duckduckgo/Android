@@ -159,10 +159,10 @@
     <string name="atp_ReportBreakageAppNextCta">Sonraki</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Lütfen neler olduğunu, ne olmasını beklediğinizi ve soruna yol açan adımları açıklayın.</string>
     <string name="atp_ReportBreakageFormInputHint">Yaşadığınız sorun hakkında daha fazla bilgi verin</string>
-    <string name="atp_ReportBreakageFormCheckboxText">\"Gönder\"e tıklayarak, DuckDuckGo\'nun bu rapordaki bilgileri Uygulama İzlenme Koruması\'nı iyileştirmek amacıyla kullanabileceğini kabul ediyorum.
+    <string name="atp_ReportBreakageFormCheckboxText">\"Gönder\"e tıkladığımda, DuckDuckGo\'nun bu rapordaki bilgileri uygulamanın özelliklerini geliştirmek amacıyla kullanabileceğini kabul etmiş olacağımı anlıyorum.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Bu forma girilen ayrıntılara ek olarak, uygulama sorun raporunuz şunları içerecektir:<br/>• Uygulama paketi adı<br/>• Uygulamada engellenen izleyicilerin bir listesi<br/>• Uygulama İzleme Koruması\'nın etkin olup olmadığı<br/>• Toplu DuckDuckGo uygulama teşhisi<br/>]]>
+        <![CDATA[Bu forma girilen ayrıntılara ek olarak, uygulama sorun raporunuz şunları içerecektir:<br/>• Uygulama paketi adı<br/>• Uygulamada engellenen izleyicilerin bir listesi<br/>• Spesifik DuckDuckGo özelliklerinin etkin olup olmadığı<br/>• Toplu DuckDuckGo uygulama teşhisi<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Rapor gönderildi, teşekkürler! Geri bildiriminiz herkes için Uygulama İzleme Koruması\'nı geliştirmemize yardımcı oluyor.</string>
     <string name="atp_ThanksForTheFeedback">Geri dönüşünüz için teşekkür ederiz!</string>

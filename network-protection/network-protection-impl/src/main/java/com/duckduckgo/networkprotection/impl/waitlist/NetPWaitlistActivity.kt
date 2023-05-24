@@ -16,35 +16,42 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetPWaitlistScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpWaitlistBinding
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementActivity
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeActivity.Launch.NetPWaitlistRedeemCodeScreenNoParams
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.CodeRedeemed
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.NotUnlocked
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command.EnterInviteCode
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command.OpenNetP
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.ViewState
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(NetPWaitlistScreenNoParams::class)
 class NetPWaitlistActivity : DuckDuckGoActivity() {
+
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: NetPWaitlistViewModel by bindViewModel()
     private val binding: ActivityNetpWaitlistBinding by viewBinding()
@@ -76,7 +83,7 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         when (viewState.waitlist) {
-            is NotUnlocked -> renderNotJoinedQueue() // Should not happen
+            is NotUnlocked, PendingInviteCode -> renderNotJoinedQueue() // Should not happen
             is CodeRedeemed -> renderCodeRedeemed()
             is InBeta -> openNetP()
         }
@@ -102,17 +109,11 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun openRedeemCode() {
-        startForResult.launch(NetPWaitlistRedeemCodeActivity.intent(this))
+        startForResult.launch(globalActivityStarter.startIntent(this, NetPWaitlistRedeemCodeScreenNoParams))
     }
 
     private fun openNetP() {
-        startActivity(NetworkProtectionManagementActivity.intent(this))
+        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams)
         finish()
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, NetPWaitlistActivity::class.java)
-        }
     }
 }

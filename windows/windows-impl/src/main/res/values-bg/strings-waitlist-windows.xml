@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">Приложение DuckDuckGo за Windows</string>
     <string name="windows_waitlist_title">Възползвайте се от ранен достъп, за да изпробвате DuckDuckGo за Windows!</string>
+    <string name="windows_title">Вземете DuckDuckGo за Windows!</string>
     <string name="windows_waitlist_description">DuckDuckGo за Windows разполага с всичко необходимо за поверително сърфиране — поверително търсене, блокиране на тракери, принудително криптиране и блокиране на изскачащи прозорци с бисквитки, както и много от най-добрите в този клас елементи за защита.</string>
+    <string name="windows_description">DuckDuckGo за Windows разполага с всичко необходимо за поверително сърфиране — поверително търсене, блокиране на тракери, принудително криптиране и блокиране на изскачащи прозорци с бисквитки, както и много от най-добрите в този клас елементи за защита.\n\nНа Вашия компютър с Windows отидете на:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Споделяне на връзка</string>
+    <string name="windows_share_text">Готови ли сте да започнете поверително сърфиране с Windows?\n\nПосетете този URL адрес на компютър с Windows, за да изтеглите:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Търсите версията за Mac?</string>
     <string name="windows_join_waitlist">Включване в списък с чакащи за личен адрес</string>
     <string name="windows_join_waitlist_error">Възникна грешка при включване в списъка с чакащи, моля, опитайте отново по-късно</string>

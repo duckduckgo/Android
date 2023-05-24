@@ -30,6 +30,8 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -94,6 +96,7 @@ class BrowserWebViewClientTest {
     private val autoconsent: Autoconsent = mock()
     private val contentScopeScripts: ContentScopeScripts = mock()
     private val pixel: Pixel = mock()
+    private val crashLogger: CrashLogger = mock()
 
     @UiThreadTest
     @Before
@@ -120,6 +123,7 @@ class BrowserWebViewClientTest {
             autoconsent,
             contentScopeScripts,
             pixel,
+            crashLogger,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -269,6 +273,14 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenInjectEmailAutofillJsCalled() {
         testee.onPageStarted(webView, null, null)
         verify(browserAutofillConfigurator).configureAutofillForCurrentPage(webView, null)
+    }
+
+    @Test
+    fun whenShouldOverrideThrowsExceptionThenRecordException() = runTest {
+        val exception = RuntimeException()
+        whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
+        testee.shouldOverrideUrlLoading(webView, "")
+        verify(crashLogger).logCrash(Crash(shortName = "m_webview_should_override", t = exception))
     }
 
     @Test

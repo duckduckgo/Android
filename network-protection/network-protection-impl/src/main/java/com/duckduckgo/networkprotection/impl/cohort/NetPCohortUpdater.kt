@@ -35,7 +35,7 @@ class NetPCohortUpdater @Inject constructor(
     private val cohortStore: NetpCohortStore,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
             // skip if already stored
             cohortStore.cohortLocalDate?.let { return }
 

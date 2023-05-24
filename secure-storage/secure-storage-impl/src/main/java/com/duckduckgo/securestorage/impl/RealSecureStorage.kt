@@ -29,6 +29,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -97,7 +98,7 @@ class RealSecureStorage @Inject constructor(
                 }
             }
         } else {
-            emptyFlow()
+            flowOf(emptyList())
         }
 
     override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> =
@@ -110,7 +111,7 @@ class RealSecureStorage @Inject constructor(
                 }
             }
         } else {
-            emptyFlow()
+            flowOf(emptyList())
         }
 
     override suspend fun updateWebsiteLoginDetailsWithCredentials(

@@ -20,6 +20,7 @@ import android.webkit.WebView
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -28,17 +29,21 @@ import timber.log.Timber
 @ContributesBinding(FragmentScope::class)
 class InlineBrowserAutofill @Inject constructor(
     private val autofillInterface: AutofillJavascriptInterface,
+    private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
 ) : BrowserAutofill {
 
     override fun addJsInterface(
         webView: WebView,
         callback: Callback,
+        tabId: String,
     ) {
         Timber.v("Injecting BrowserAutofill interface")
         // Adding the interface regardless if the feature is available or not
         webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
         autofillInterface.webView = webView
         autofillInterface.callback = callback
+        autofillInterface.autoSavedLoginsMonitor = autoSavedLoginsMonitor
+        autofillInterface.tabId = tabId
     }
 
     override fun removeJsInterface() {
@@ -55,5 +60,13 @@ class InlineBrowserAutofill @Inject constructor(
 
     override fun cancelPendingAutofillRequestToChooseCredentials() {
         autofillInterface.cancelRetrievingStoredLogins()
+    }
+
+    override fun acceptGeneratedPassword() {
+        autofillInterface.acceptGeneratedPassword()
+    }
+
+    override fun rejectGeneratedPassword() {
+        autofillInterface.rejectGeneratedPassword()
     }
 }

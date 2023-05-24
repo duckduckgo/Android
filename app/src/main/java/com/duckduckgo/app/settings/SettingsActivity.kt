@@ -90,14 +90,16 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementActivity
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistActivity
+import com.duckduckgo.networkprotection.api.NetPWaitlistScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.WindowsWaitlistState
+import com.duckduckgo.windows.api.WindowsWaitlistState.FeatureEnabled
 import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
 import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
+import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -345,7 +347,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             when (waitlistState) {
                 is InBeta -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_ready))
                 is JoinedWaitlist -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_list))
-                is NotJoinedQueue -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description))
+                is NotJoinedQueue, FeatureEnabled -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description))
                 null -> {}
             }
         }
@@ -503,6 +505,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchMacOs -> launchMacOsScreen()
             is Command.LaunchAutoconsent -> launchAutoconsent()
             is Command.LaunchNotificationsSettings -> launchNotificationsSettings()
+            is Command.LaunchWindowsWaitlist -> launchWindowsWaitlistScreen()
             is Command.LaunchWindows -> launchWindowsScreen()
             is Command.LaunchSyncSettings -> launchSyncSettings()
             null -> TODO()
@@ -552,7 +555,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     }
                 }
                 NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
-                NetPWaitlistState.CodeRedeemed -> {
+                NetPWaitlistState.CodeRedeemed, NetPWaitlistState.PendingInviteCode -> {
                     netpPSetting.show()
                     netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
                 }
@@ -714,9 +717,14 @@ class SettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, MacOsScreenWithEmptyParams, options)
     }
 
-    private fun launchWindowsScreen() {
+    private fun launchWindowsWaitlistScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, WindowsWaitlistScreenWithEmptyParams, options)
+    }
+
+    private fun launchWindowsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, WindowsScreenWithEmptyParams, options)
     }
 
     private fun launchSyncSettings() {
@@ -748,11 +756,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchNetpManagementScreen() {
-        startActivity(NetworkProtectionManagementActivity.intent(this))
+        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams)
     }
 
     private fun launchNetpWaitlist() {
-        startActivity(NetPWaitlistActivity.intent(this))
+        globalActivityStarter.start(this, NetPWaitlistScreenNoParams)
     }
 
     private fun launchAppTPOnboardingScreen() {

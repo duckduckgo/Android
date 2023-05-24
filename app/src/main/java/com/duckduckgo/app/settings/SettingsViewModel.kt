@@ -59,9 +59,11 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistReposito
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
+import com.duckduckgo.windows.api.WindowsWaitlistState.FeatureEnabled
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -97,6 +99,7 @@ class SettingsViewModel @Inject constructor(
     private val deviceSyncState: DeviceSyncState,
     private val vpnStateMonitor: VpnStateMonitor,
     private val netpWaitlistRepository: NetPWaitlistRepository,
+    private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -163,6 +166,7 @@ class SettingsViewModel @Inject constructor(
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         object LaunchMacOs : Command()
         object LaunchNotificationsSettings : Command()
+        object LaunchWindowsWaitlist : Command()
         object LaunchWindows : Command()
         object LaunchSyncSettings : Command()
     }
@@ -198,7 +202,7 @@ class SettingsViewModel @Inject constructor(
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
-                    appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN),
+                    appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     autoconsentEnabled = autoconsent.isSettingEnabled(),
@@ -219,7 +223,7 @@ class SettingsViewModel @Inject constructor(
     fun startPollingAppTpEnableState() {
         viewModelScope.launch {
             while (isActive) {
-                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
                 if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
                     viewState.value = currentViewState().copy(
                         appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
@@ -334,7 +338,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun windowsSettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchWindows) }
+        viewModelScope.launch {
+            if (windowsDownloadLinkFeature.self().isEnabled()) {
+                command.send(Command.LaunchWindows)
+            } else {
+                command.send(Command.LaunchWindowsWaitlist)
+            }
+        }
     }
 
     fun onDefaultBrowserToggled(enabled: Boolean) {
@@ -466,6 +476,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun windowsSettingState(): WindowsWaitlistState? {
+        if (windowsDownloadLinkFeature.self().isEnabled()) {
+            return FeatureEnabled
+        }
         if (!windowsFeature.self().isEnabled()) return null
         return windowsWaitlist.getWaitlistState()
     }

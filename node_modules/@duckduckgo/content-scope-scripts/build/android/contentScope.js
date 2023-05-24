@@ -3,16 +3,22 @@
     'use strict';
 
     /* global cloneInto, exportFunction, false */
-
     // Only use globalThis for testing this breaks window.wrappedJSObject code in Firefox
     // eslint-disable-next-line no-global-assign
     let globalObj = typeof window === 'undefined' ? globalThis : window;
     let Error$1 = globalObj.Error;
+    let messageSecret;
     const CapturedSet = globalObj.Set;
     // Capture prototype to prevent overloading
     const createSet = () => new CapturedSet();
-    typeof window === 'undefined' ? null : window.dispatchEvent.bind(window);
+
+    const taintSymbol = Symbol('taint');
+
+    // save a reference to original CustomEvent amd dispatchEvent so they can't be overriden to forge messages
+    const OriginalCustomEvent = typeof CustomEvent === 'undefined' ? null : CustomEvent;
+    const originalWindowDispatchEvent = typeof window === 'undefined' ? null : window.dispatchEvent.bind(window);
     function registerMessageSecret (secret) {
+        messageSecret = secret;
     }
 
     /**
@@ -25,13 +31,14 @@
     /**
      * Creates a script element with the given code to avoid Firefox CSP restrictions.
      * @param {string} css
-     * @returns {HTMLLinkElement}
+     * @returns {HTMLLinkElement | HTMLStyleElement}
      */
     function createStyleElement (css) {
-        const style = document.createElement('link');
-        style.href = 'data:text/css,' + encodeURIComponent(css);
-        style.setAttribute('rel', 'stylesheet');
-        style.setAttribute('type', 'text/css');
+        let style;
+        {
+            style = document.createElement('style');
+            style.innerText = css;
+        }
         return style
     }
 
@@ -90,8 +97,12 @@
         if (!isBeingFramed()) {
             return false
         }
-        // @ts-expect-error - getTabHostname() is string|null here
-        return !matchHostname(globalThis.location.hostname, getTabHostname())
+        const tabHostname = getTabHostname();
+        // If we can't get the tab hostname, assume it's third party
+        if (!tabHostname) {
+            return true
+        }
+        return !matchHostname(globalThis.location.hostname, tabHostname)
     }
 
     /**
@@ -330,6 +341,28 @@
         return new Error$1().stack
     }
 
+    function getContextId (scope) {
+        if (document?.currentScript && 'contextID' in document.currentScript) {
+            return document.currentScript.contextID
+        }
+        if (scope.contextID) {
+            return scope.contextID
+        }
+        // @ts-expect-error - contextID is a global variable
+        if (typeof contextID !== 'undefined') {
+            // @ts-expect-error - contextID is a global variable
+            // eslint-disable-next-line no-undef
+            return contextID
+        }
+    }
+
+    function hasTaintedMethod (scope) {
+        if (document?.currentScript?.[taintSymbol]) return true
+        if ('__ddg_taint__' in window) return true
+        if (getContextId(scope)) return true
+        return false
+    }
+
     /**
      * @template {object} P
      * @typedef {object} ProxyObject<P>
@@ -346,13 +379,25 @@
          * @param {string} property
          * @param {ProxyObject<P>} proxyObject
          */
-        constructor (featureName, objectScope, property, proxyObject) {
+        constructor (featureName, objectScope, property, proxyObject, taintCheck = false) {
             this.objectScope = objectScope;
             this.property = property;
             this.featureName = featureName;
             this.camelFeatureName = camelcase(this.featureName);
             const outputHandler = (...args) => {
-                const isExempt = shouldExemptMethod(this.camelFeatureName);
+                let isExempt = shouldExemptMethod(this.camelFeatureName);
+                // If taint checking is enabled for this proxy then we should verify that the method is not tainted and exempt if it isn't
+                if (!isExempt && taintCheck) {
+                    // eslint-disable-next-line @typescript-eslint/no-this-alias
+                    let scope = this;
+                    try {
+                        // @ts-expect-error - Caller doesn't match this
+                        // eslint-disable-next-line no-caller
+                        scope = arguments.callee.caller;
+                    } catch {}
+                    const isTainted = hasTaintedMethod(scope);
+                    isExempt = !isTainted;
+                }
                 if (debug) {
                     postDebugMessage(this.camelFeatureName, {
                         isProxy: true,
@@ -417,8 +462,16 @@
         DDGReflect = globalObj.Reflect;
     }
 
+    /**
+     * @param {string | null} topLevelHostname
+     * @param {object[]} featureList
+     * @returns {boolean}
+     */
     function isUnprotectedDomain (topLevelHostname, featureList) {
         let unprotectedDomain = false;
+        if (!topLevelHostname) {
+            return false
+        }
         const domainParts = topLevelHostname.split('.');
 
         // walk up the domain to see if it's unprotected
@@ -551,7 +604,7 @@
 
         // Copy feature settings from remote config to preferences object
         output.featureSettings = parseFeatureSettings(data, enabledFeatures);
-        output.trackerLookup = {"org":{"cdn77":{"rsc":{"1666210260":1}},"adsrvr":1,"ampproject":1,"browser-update":1,"flowplayer":1,"privacy-center":1,"webvisor":1,"framasoft":1,"do-not-tracker":1,"trackersimulator":1},"io":{"1dmp":1,"1rx":1,"4dex":1,"adnami":1,"aidata":1,"arcspire":1,"bidr":1,"branch":1,"center":1,"concert":1,"connectad":1,"cordial":1,"dcmn":1,"extole":1,"getblue":1,"hbrd":1,"imbox":1,"instana":1,"karte":1,"lytics":1,"marchex":1,"mediago":1,"mrf":1,"myfidevs":1,"narrative":1,"ntv":1,"optad360":1,"oracleinfinity":1,"oribi":1,"p-n":1,"personalizer":1,"pghub":1,"piano":1,"powr":1,"pzz":1,"searchspring":1,"segment":1,"siteimproveanalytics":1,"sjv":1,"sspinc":1,"t13":1,"webgains":1,"wovn":1,"yellowblue":1,"zprk":1,"reviews":1,"appconsent":1,"leadsmonitor":1},"com":{"2020mustang":1,"33across":1,"360yield":1,"3lift":1,"4dsply":1,"4jnzhl0d0":1,"4strokemedia":1,"5d2d04464c":1,"a-mx":1,"a2z":1,"aamsitecertifier":1,"absorbingband":1,"abstractedauthority":1,"abtasty":1,"acexedge":1,"acidpigs":1,"acsbapp":1,"acuityplatform":1,"ad-score":1,"ad-stir":1,"adalyser":1,"adapf":1,"adara":1,"adblade":1,"addthis":1,"addtoany":1,"adelixir":1,"adentifi":1,"adextrem":1,"adgrx":1,"adhese":1,"adition":1,"adkernel":1,"adlightning":1,"adlooxtracking":1,"admanmedia":1,"admedo":1,"adnium":1,"adnxs":1,"adobedtm":1,"adotmob":1,"adpone":1,"adpushup":1,"adroll":1,"adrta":1,"ads-twitter":1,"ads3-adnow":1,"adsafeprotected":1,"adstanding":1,"adswizz":1,"adsymptotic":1,"adtdp":1,"adtechus":1,"adtelligent":1,"adthrive":1,"adtlgc":1,"adtng":1,"adultfriendfinder":1,"advangelists":1,"adventive":1,"advertising":1,"aegpresents":1,"affinity":1,"affirm":1,"agilone":1,"agkn":1,"aimbase":1,"albacross":1,"alcmpn":1,"alexametrics":1,"alicdn":1,"alikeaddition":1,"aliveachiever":1,"aliyuncs":1,"alluringbucket":1,"aloofvest":1,"amazon-adsystem":1,"amazon":1,"amplitude":1,"analytics-egain":1,"aniview":1,"anymind360":1,"amazonaws":{"ap-southeast-2":1,"elb":{"eu-west-2":{"collect-prd-alb-539115803":1},"us-east-1":{"data-allstate-com-715826933":1,"prod-lb-8-1772099769":1,"proxy-mycigna-prod-678433465":1,"www-u45-pnc-com-902993410":1,"www-u46-pnc-com-13593657":1},"eu-west-1":{"devservicesalb-471015105":1,"petfre-content-1201188928":1},"us-east-2":{"elbpiwik-public-1781721271":1},"eu-central-1":{"prod-lb-6-388533732":1,"prod-lb-7-718125029":1,"prod-pub-alb-654989386":1}},"us-east-2":{"s3":{"hb-gretsch-talk":1,"hb-jetpunk":1,"hb-obv2":1}},"eu-central-1":{"s3":{"headless-ssr-prod-bucket":1}}},"app-us1":1,"appboycdn":1,"appdynamics":1,"aralego":1,"arkoselabs":1,"aswpsdkus":1,"atemda":1,"att":1,"attentivemobile":1,"attractionbanana":1,"audioeye":1,"audrte":1,"automaticside":1,"avanser":1,"avmws":1,"aweber":1,"aweprt":1,"azure":1,"b0e8":1,"bagbeam":1,"bandborder":1,"batch":1,"bawdybalance":1,"bc0a":1,"bdstatic":1,"bedsberry":1,"beginnerpancake":1,"benchmarkemail":1,"betweendigital":1,"bfmio":1,"bidderstack":1,"bidtheatre":1,"bimbolive":1,"bing":1,"bizographics":1,"bizrate":1,"bkrtx":1,"blismedia":1,"blogherads":1,"bluecava":1,"bluekai":1,"boatwizard":1,"boilingcredit":1,"boldchat":1,"booking":1,"borderfree":1,"bounceexchange":1,"brainlyads":1,"brand-display":1,"brandmetrics":1,"brealtime":1,"breinify":1,"brightedge":1,"brightfunnel":1,"brightspotcdn":1,"btloader":1,"btstatic":1,"bttrack":1,"btttag":1,"butterbulb":1,"buzzoola":1,"byside":1,"cabnnr":1,"calculatorstatement":1,"callrail":1,"calltracks":1,"capablecup":1,"captcha-delivery":1,"carpentercomparison":1,"cartstack":1,"carvecakes":1,"casalemedia":1,"cdn-btsg":1,"cdnwidget":1,"channeladvisor":1,"chartbeat":1,"chatango":1,"chaturbate":1,"cheqzone":1,"cherriescare":1,"chickensstation":1,"childlikecrowd":1,"childlikeform":1,"cintnetworks":1,"circlelevel":1,"civiccomputing":1,"ck-ie":1,"clcktrax":1,"clearbit":1,"clearbitjs":1,"clickagy":1,"clickcease":1,"clickcertain":1,"clicktripz":1,"clientgear":1,"clksite":1,"cloudflare":1,"cloudflareinsights":1,"cloudflarestream":1,"cloudmaestro":1,"cobaltgroup":1,"cobrowser":1,"cognitivlabs":1,"colossusssp":1,"comm100":1,"googleapis":{"commondatastorage":1,"storage":1},"company-target":1,"condenastdigital":1,"confusedcart":1,"connatix":1,"consentframework":1,"contextweb":1,"conversionruler":1,"convertkit":1,"convertlanguage":1,"cookieinformation":1,"cookiepro":1,"coveo":1,"cpmstar":1,"cquotient":1,"crabbychin":1,"crazyegg":1,"creative-serving":1,"creativecdn":1,"criteo":1,"crowdedmass":1,"crowdriff":1,"crownpeak":1,"crsspxl":1,"ctnsnet":1,"cubchannel":1,"cudasvc":1,"cuddlethehyena":1,"cumbersomecarpenter":1,"curalate":1,"curvedhoney":1,"cutechin":1,"cxense":1,"dailymotion":1,"damdoor":1,"dampdock":1,"dapperfloor":1,"datadoghq-browser-agent":1,"decisivebase":1,"deepintent":1,"defybrick":1,"delivra":1,"demandbase":1,"detectdiscovery":1,"devilishdinner":1,"dimelochat":1,"discreetfield":1,"disqus":1,"dmpxs":1,"dockdigestion":1,"dollardelta":1,"dotomi":1,"doubleverify":1,"drainpaste":1,"dramaticdirection":1,"driftt":1,"dtscdn":1,"dtscout":1,"dwin1":1,"dynamics":1,"dynamicyield":1,"dynatrace":1,"dyntrk":1,"ebaystatic":1,"ecal":1,"eccmp":1,"elasticchange":1,"elfsight":1,"elitrack":1,"eloqua":1,"en25":1,"encouragingthread":1,"ensighten":1,"enviousshape":1,"eqads":1,"ero-advertising":1,"esputnik":1,"evergage":1,"evgnet":1,"exdynsrv":1,"exelator":1,"exoclick":1,"exosrv":1,"expansioneggnog":1,"expertrec":1,"exponea":1,"exponential":1,"extole":1,"ezodn":1,"ezoic":1,"ezoiccdn":1,"facebook":1,"fadewaves":1,"fallaciousfifth":1,"farmergoldfish":1,"fastly-insights":1,"fearlessfaucet":1,"fiftyt":1,"financefear":1,"fitanalytics":1,"five9":1,"fksnk":1,"flashtalking":1,"flipp":1,"floweryflavor":1,"flutteringfireman":1,"flux-cdn":1,"fomo":1,"foresee":1,"forter":1,"fortunatemark":1,"fouanalytics":1,"fox":1,"fqtag":1,"frailfruit":1,"freezingbuilding":1,"fronttoad":1,"fullstory":1,"functionalfeather":1,"fuzzybasketball":1,"gammamaximum":1,"gbqofs":1,"geetest":1,"geistm":1,"geniusmonkey":1,"geoip-js":1,"getbread":1,"getcandid":1,"getclicky":1,"getdrip":1,"getelevar":1,"getpublica":1,"getrockerbox":1,"getshogun":1,"getsitecontrol":1,"glassdoor":1,"gloriousbeef":1,"godpvqnszo":1,"gondolagnome":1,"google-analytics":1,"google":1,"googleadservices":1,"googlehosted":1,"googleoptimize":1,"googlesyndication":1,"googletagmanager":1,"googletagservices":1,"govx":1,"greylabeldelivery":1,"groovehq":1,"gstatic":1,"guarantee-cdn":1,"guiltlessbasketball":1,"gumgum":1,"haltingbadge":1,"hammerhearing":1,"handsomelyhealth":1,"hawksearch":1,"heapanalytics":1,"hellobar":1,"hiconversion":1,"highwebmedia":1,"histats":1,"hlserve":1,"hocgeese":1,"hollowafterthought":1,"honorableland":1,"hotjar":1,"hp":1,"hs-banner":1,"htlbid":1,"htplayground":1,"hubspot":1,"iadvize":1,"ib-ibi":1,"id5-sync":1,"iesnare":1,"igodigital":1,"iheart":1,"iljmp":1,"illiweb":1,"impactcdn":1,"impactradius-event":1,"impactradius-go":1,"impossibleexpansion":1,"impressionmonster":1,"improvedcontactform":1,"improvedigital":1,"imrworldwide":1,"indexww":1,"infolinks":1,"infusionsoft":1,"inmobi":1,"inmoment":1,"inq":1,"inside-graph":1,"instagram":1,"intentiq":1,"intergient":1,"investingchannel":1,"invocacdn":1,"iplsc":1,"ipredictive":1,"iteratehq":1,"ivitrack":1,"j93557g":1,"jaavnacsdw":1,"jimstatic":1,"journity":1,"js7k":1,"juicyads":1,"justanswer":1,"justpremium":1,"kakao":1,"kampyle":1,"kargo":1,"kissmetrics":1,"klarnaservices":1,"klaviyo":1,"knottyswing":1,"kount":1,"krushmedia":1,"ktkjmp":1,"kxcdn":1,"ladesk":1,"ladsp":1,"laughablelizards":1,"leadsrx":1,"lendingtree":1,"levexis":1,"liadm":1,"licdn":1,"lightboxcdn":1,"lijit":1,"linkedin":1,"linksynergy":1,"list-manage":1,"listrakbi":1,"livechatinc":1,"livejasmin":1,"localytics":1,"loggly":1,"loop11":1,"lovelydrum":1,"luckyorange":1,"lunchroomlock":1,"maddeningpowder":1,"mailchimp":1,"mailchimpapp":1,"mailerlite":1,"maillist-manage":1,"marinsm":1,"marketiq":1,"marketo":1,"marriedbelief":1,"matheranalytics":1,"mathtag":1,"maxmind":1,"mczbf":1,"measlymiddle":1,"medallia":1,"media6degrees":1,"mediacategory":1,"mediavine":1,"mediawallahscript":1,"medtargetsystem":1,"megpxs":1,"metricode":1,"metricswpsh":1,"mfadsrvr":1,"mgid":1,"micpn":1,"microadinc":1,"minutemedia-prebid":1,"minutemediaservices":1,"mixpo":1,"mktoresp":1,"mktoweb":1,"ml314":1,"moatads":1,"mobtrakk":1,"monsido":1,"mookie1":1,"mountain":1,"mouseflow":1,"mpeasylink":1,"mql5":1,"mrtnsvr":1,"murdoog":1,"mxpnl":1,"mybestpro":1,"myfinance":1,"myregistry":1,"nappyattack":1,"navistechnologies":1,"neodatagroup":1,"nervoussummer":1,"newrelic":1,"newscgp":1,"nextdoor":1,"ninthdecimal":1,"nitrocdn":1,"noibu":1,"nondescriptnote":1,"nosto":1,"npttech":1,"nuance":1,"nxsttv":1,"omappapi":1,"omnisnippet1":1,"omnisrc":1,"omnitagjs":1,"oneall":1,"onesignal":1,"onetag-sys":1,"oo-syringe":1,"ooyala":1,"opecloud":1,"opentext":1,"opera":1,"opmnstr":1,"optimicdn":1,"optinmonster":1,"optmnstr":1,"optmstr":1,"optnmnstr":1,"optnmstr":1,"oraclecloud":1,"osano":1,"otm-r":1,"outbrain":1,"overconfidentfood":1,"ownlocal":1,"pamelarandom":1,"panickypancake":1,"panoramicplane":1,"parastorage":1,"pardot":1,"parsely":1,"partplanes":1,"patreon":1,"paypal":1,"pbstck":1,"pcmag":1,"peerius":1,"perfdrive":1,"perfectmarket":1,"permutive":1,"picreel":1,"pinimg":1,"pippio":1,"piwikpro":1,"pixlee":1,"pleasantpump":1,"plotrabbit":1,"pluckypocket":1,"pocketfaucet":1,"possibleboats":1,"postaffiliatepro":1,"postrelease":1,"potatoinvention":1,"prepareplanes":1,"pricespider":1,"pricklydebt":1,"profusesupport":1,"proofpoint":1,"protoawe":1,"providesupport":1,"pswec":1,"psyma":1,"ptengine":1,"publir":1,"pubmatic":1,"pubmine":1,"pubnation":1,"puffypurpose":1,"qualaroo":1,"qualtrics":1,"quantcast":1,"quantserve":1,"quantummetric":1,"quietknowledge":1,"quizzicalzephyr":1,"quora":1,"r42tag":1,"railwayreason":1,"rakuten":1,"rambunctiousflock":1,"rangeplayground":1,"realsrv":1,"rebelswing":1,"reconditerake":1,"reconditerespect":1,"recruitics":1,"reddit":1,"redditstatic":1,"rehabilitatereason":1,"reson8":1,"resonantrock":1,"responsiveads":1,"restrainstorm":1,"retargetly":1,"revcontent":1,"rezync":1,"rfihub":1,"rhetoricalloss":1,"richaudience":1,"righteouscrayon":1,"rightfulfall":1,"riotgames":1,"rkdms":1,"rlcdn":1,"rmtag":1,"rncdn5":1,"rnengage":1,"rogersmedia":1,"rokt":1,"route":1,"rubiconproject":1,"s-onetag":1,"saambaa":1,"sablesong":1,"sail-horizon":1,"salesforceliveagent":1,"samestretch":1,"satisfycork":1,"savoryorange":1,"scarabresearch":1,"scaredsnakes":1,"scarfsmash":1,"scatteredstream":1,"scene7":1,"scholarlyiq":1,"scintillatingsilver":1,"scorecardresearch":1,"screechingstove":1,"screenpopper":1,"sddan":1,"sdiapi":1,"seatsmoke":1,"securedvisit":1,"seedtag":1,"sefsdvc":1,"segment":1,"sekindo":1,"selectivesummer":1,"selfishsnake":1,"servebom":1,"servedbyadbutler":1,"servenobid":1,"serverbid":1,"serving-sys":1,"shakegoldfish":1,"shappify":1,"shareaholic":1,"sharethis":1,"sharethrough":1,"shopifyapps":1,"shopperapproved":1,"shrillspoon":1,"sibautomation":1,"sicksmash":1,"sift":1,"siftscience":1,"signifyd":1,"siteimprove":1,"siteimproveanalytics":1,"sitescout":1,"skillfuldrop":1,"sli-spark":1,"slickstream":1,"slopesoap":1,"smadex":1,"smartadserver":1,"smashquartz":1,"smashsurprise":1,"smg":1,"smilewanted":1,"smoggysnakes":1,"snapchat":1,"snapkit":1,"snigelweb":1,"socdm":1,"sojern":1,"songsterritory":1,"sonobi":1,"speedcurve":1,"sphereup":1,"spiceworks":1,"spookyexchange":1,"spookyskate":1,"spookysleet":1,"sportradar":1,"sportradarserving":1,"sportslocalmedia":1,"spotxchange":1,"springserve":1,"srvmath":1,"stackadapt":1,"stakingsmile":1,"statcounter":1,"steadfastseat":1,"steadfastsound":1,"steadfastsystem":1,"steelhousemedia":1,"steepsquirrel":1,"stereoproxy":1,"stereotypedsugar":1,"stickyadstv":1,"stiffgame":1,"straightnest":1,"stripchat":1,"stupendoussleet":1,"stupendoussnow":1,"stupidscene":1,"sulkycook":1,"sumo":1,"sumologic":1,"sundaysky":1,"superficialeyes":1,"superficialsquare":1,"survicate":1,"svonm":1,"symantec":1,"taboola":1,"tagcommander":1,"tailtarget":1,"talkable":1,"taobao":1,"tapad":1,"taptapnetworks":1,"taskanalytics":1,"tealiumiq":1,"technoratimedia":1,"techtarget":1,"tediousticket":1,"teenytinyshirt":1,"tendertest":1,"the-ozone-project":1,"theadex":1,"themoneytizer":1,"theplatform":1,"thestar":1,"thomastorch":1,"threetruck":1,"thrtle":1,"tidaltv":1,"tidiochat":1,"tiktok":1,"tinypass":1,"tiqcdn":1,"tiresomethunder":1,"trackjs":1,"trafficjunky":1,"travelaudience":1,"treasuredata":1,"tremorhub":1,"trendemon":1,"tribalfusion":1,"trovit":1,"trueleadid":1,"truoptik":1,"truste":1,"trustedsite":1,"trustpilot":1,"tsyndicate":1,"tubemogul":1,"turn":1,"tvpixel":1,"tvsquared":1,"tweakwise":1,"twitter":1,"tynt":1,"typicalteeth":1,"u5e":1,"ubembed":1,"uidapi":1,"ultraoranges":1,"unbecominglamp":1,"unbxdapi":1,"undertone":1,"uninterestedquarter":1,"unpkg":1,"unrulymedia":1,"unwieldyhealth":1,"unwieldyplastic":1,"upsellit":1,"urbanairship":1,"usabilla":1,"usbrowserspeed":1,"usemessages":1,"userreport":1,"uservoice":1,"valuecommerce":1,"vengefulgrass":1,"vidazoo":1,"videoplayerhub":1,"vidoomy":1,"viglink":1,"visualwebsiteoptimizer":1,"vivaclix":1,"vk":1,"vlitag":1,"vocento":1,"voicefive":1,"volatilevessel":1,"voraciousgrip":1,"voxmedia":1,"vrtcal":1,"w3counter":1,"walkme":1,"warmafterthought":1,"warmquiver":1,"webcontentassessor":1,"webengage":1,"webeyez":1,"webflow":1,"webtraxs":1,"webtrends-optimize":1,"webtrends":1,"wgplayer":1,"wisepops":1,"worldoftulo":1,"wpadmngr":1,"wpshsdk":1,"wpushsdk":1,"wsod":1,"wt-safetag":1,"wysistat":1,"xg4ken":1,"xiti":1,"xlirdr":1,"xlivrdr":1,"xnxx-cdn":1,"y-track":1,"yahoo":1,"yandex":1,"yieldmo":1,"yieldoptimizer":1,"yimg":1,"yotpo":1,"yottaa":1,"youtube-nocookie":1,"youtube":1,"zatnoh":1,"zemanta":1,"zendesk":1,"zeotap":1,"zeronaught":1,"zestycrime":1,"zonos":1,"zoominfo":1,"zopim":1,"adnxs-simple":1,"createsend1":1,"adventori":1,"facil-iti":1,"provenexpert":1,"veoxa":1,"getflowbox":1,"parchedsofa":1,"adtraction":1,"bannerflow":1,"aboardamusement":1,"absorbingcorn":1,"abstractedamount":1,"actoramusement":1,"actuallysnake":1,"adorableanger":1,"agreeabletouch":1,"aheadday":1,"ancientact":1,"annoyedairport":1,"annoyingacoustics":1,"aquaticowl":1,"aspiringattempt":1,"audioarctic":1,"awarealley":1,"awesomeagreement":1,"awzbijw":1,"basketballbelieve":1,"begintrain":1,"bestboundary":1,"blushingbeast":1,"boredcrown":1,"breadbalance":1,"breakfastboat":1,"bulbbait":1,"burnbubble":1,"bustlingbath":1,"callousbrake":1,"calmcactus":1,"capriciouscorn":1,"caringcast":1,"catschickens":1,"causecherry":1,"chunkycactus":1,"cloisteredcord":1,"closedcows":1,"colossalclouds":1,"colossalcoat":1,"comfortablecheese":1,"conditioncrush":1,"consciouscheese":1,"consciousdirt":1,"coverapparatus":1,"cratecamera":1,"critictruck":1,"curvycry":1,"cushionpig":1,"damageddistance":1,"debonairdust":1,"decisivedrawer":1,"decisiveducks":1,"detailedkitten":1,"diplomahawaii":1,"dk4ywix":1,"dq95d35":1,"energeticladybug":1,"enormousearth":1,"evanescentedge":1,"fadedsnow":1,"fancyactivity":1,"farshake":1,"fastenfather":1,"fatcoil":1,"faultycanvas":1,"firstfrogs":1,"flimsycircle":1,"flimsythought":1,"friendwool":1,"fumblingform":1,"futuristicfifth":1,"giddycoat":1,"giraffepiano":1,"glisteningguide":1,"grayreceipt":1,"greasysquare":1,"grouchypush":1,"haltinggold":1,"handyfield":1,"handyfireman":1,"hearthorn":1,"historicalbeam":1,"horsenectar":1,"hystericalcloth":1,"impulsejewel":1,"incompetentjoke":1,"internalsink":1,"lameletters":1,"livelumber":1,"livelylaugh":1,"lorenzourban":1,"lumpylumber":1,"maliciousmusic":1,"meatydime":1,"memorizeneck":1,"mightyspiders":1,"mixedreading":1,"modularmental":1,"motionlessbag":1,"movemeal":1,"nondescriptcrowd":1,"nostalgicneed":1,"nuttyorganization":1,"optimallimit":1,"outstandingincome":1,"outstandingsnails":1,"panickycurtain":1,"petiteumbrella":1,"placidperson":1,"plantdigestion":1,"punyplant":1,"rabbitbreath":1,"rabbitrifle":1,"raintwig":1,"rainyhand":1,"rainyrule":1,"rangecake":1,"raresummer":1,"readymoon":1,"rebelsubway":1,"receptivereaction":1,"regularplants":1,"repeatsweater":1,"replaceroute":1,"resonantbrush":1,"respectrain":1,"richstring":1,"roofrelation":1,"rusticprice":1,"scaredcomfort":1,"scaredsnake":1,"scientificshirt":1,"scintillatingscissors":1,"screechingfurniture":1,"seashoresociety":1,"secretturtle":1,"shakysurprise":1,"shallowblade":1,"shesubscriptions":1,"shockingship":1,"sillyscrew":1,"sincerebuffalo":1,"sinceresubstance":1,"singroot":1,"sixscissors":1,"soggysponge":1,"somberscarecrow":1,"sordidsmile":1,"sortsail":1,"sortsummer":1,"spellsalsa":1,"spotlessstamp":1,"spottednoise":1,"stalesummer":1,"steadycopper":1,"stepplane":1,"strangesink":1,"stretchsister":1,"strivesidewalk":1,"superficialspring":1,"swellstocking":1,"synonymousrule":1,"tangyamount":1,"tastelesstrees":1,"teenytinycellar":1,"teenytinytongue":1,"terriblethumb":1,"terrifictooth":1,"thirdrespect":1,"ticketaunt":1,"tremendousplastic":1,"troubledtail":1,"typicalairplane":1,"ubiquitousyard":1,"unbecominghall":1,"uncoveredexpert":1,"unequalbrake":1,"unknowncrate":1,"untidyrice":1,"unusedstone":1,"venusgloria":1,"verdantanswer":1,"verseballs":1,"wearbasin":1,"cautiouscredit":1,"confesschairs":1,"chinsnakes":1,"wellgroomedhydrant":1,"heavyplayground":1,"bravecalculator":1,"workoperation":1,"secondhandfall":1,"unablehope":1,"tastelesstrucks":1,"losslace":1,"barbarousbase":1,"supportwaves":1,"protestcopy":1,"automaticturkey":1,"stretchsquirrel":1,"equablekettle":1,"discreetquarter":1,"peacefullimit":1,"gulliblegrip":1,"swelteringsleep":1,"muteknife":1,"aliasanvil":1,"operationchicken":1,"courageousbaby":1,"flowerstreatment":1,"scissorsstatement":1,"furryfork":1,"synonymoussticks":1,"deerbeginner":1,"rhetoricalveil":1,"farsnails":1,"kaputquill":1,"digestiondrawer":1,"meltmilk":1,"endurablebulb":1,"sugarfriction":1,"combcompetition":1,"stakingshock":1,"stretchsneeze":1,"sinkbooks":1,"brotherslocket":1,"cautiouscamera":1,"materialparcel":1,"inputicicle":1,"chargecracker":1,"fewjuice":1,"tumbleicicle":1,"serpentshampoo":1,"nutritiousbean":1,"scrapesleep":1,"bleachbubble":1,"longingtrees":1,"leftliquid":1,"handsomehose":1,"powerfulcopper":1,"painstakingpickle":1,"swankysquare":1,"soundstocking":1,"disagreeabledrop":1,"cushiondrum":1,"ruralrobin":1,"gorgeousedge":1,"strivesquirrel":1,"currentcollar":1,"combativecar":1,"ambiguousafternoon":1,"harborcaption":1,"blushingbread":1,"suggestionbridge":1,"spectacularstamp":1,"skisofa":1,"predictplate":1,"shakyseat":1,"priceypies":1,"livelyreward":1,"stealsteel":1,"shiveringspot":1,"memorizematch":1,"knitstamp":1,"bushesbag":1,"mundanenail":1,"coldbalance":1,"shapecomb":1,"shiverscissors":1,"broadborder":1,"quirkysugar":1,"stingyspoon":1,"billowybelief":1,"crookedcreature":1,"acceptableauthority":1,"sadloaf":1,"separatesort":1,"pailpatch":1,"scribblestring":1,"exhibitsneeze":1,"largebrass":1,"combcattle":1,"materialisticmoon":1,"fixedfold":1,"restructureinvention":1,"scaredstomach":1,"cautiouscherries":1,"tritebadge":1,"motionflowers":1,"ballsbanana":1,"meddleplant":1,"simulateswing":1,"marketspiders":1,"grumpydime":1,"neatshade":1,"samplesamba":1,"samesticks":1,"buttonladybug":1,"mentorsticks":1,"scaredsong":1,"annoyingclover":1,"grainmass":1,"tempertrick":1,"quizzicalpartner":1,"franticroof":1,"cattlecommittee":1,"tangycover":1,"looseloaf":1,"psychedelicarithmetic":1,"radiateprose":1,"shamerain":1,"cleanhaircut":1,"badgevolcano":1,"laboredlocket":1,"zipperxray":1,"stingycrush":1,"sixauthority":1,"thinkitten":1,"strokesystem":1,"hatefulrequest":1},"net":{"2mdn":1,"2o7":1,"incapdns":{"x":{"3exvfbh":1,"5t48cjc":1,"7xjpy4d":1,"dzm868l":1,"ttk8bbo":1}},"3gl":1,"a-mo":1,"acint":1,"adform":1,"adhigh":1,"admixer":1,"adobedc":1,"adspeed":1,"azureedge":{"adv-cloudfilse":1,"afw-static":1,"bayleys-pri-cdn-endpoint":1,"cdne-nxtevo-prd01-ms":1,"discountcodeexpress":1,"fp-cdn":1,"lefigaro":1,"ocpd-content":1,"sdtagging":1,"trenord-europe-trenord-endpoint-prd":1},"adverticum":1,"edgekey":{"akamai-111035":1,"com":{"alicdn":1,"ebay":1,"mtvnservices":1,"nbcuni":1,"nintendo":1,"oneindia":1,"scene7":1,"turner":1,"ziffdavis":1,"ziffdavisinternational":1},"ame":1,"au":1,"br":1,"ca":1,"com-v1":1,"com-v2":1,"gov":1,"in":1,"io":1,"it":1,"net":1,"org":1,"ppll":1,"rakuten":1,"uk":1},"apicit":1,"appier":1,"akamaized":{"assets-momentum":1,"com":{"media-rockstargames-":1,"ntd":1,"vocento":1}},"aticdn":1,"azure":1,"azurefd":1,"bannerflow":1,"bf-tools":1,"bidswitch":1,"bitsngo":1,"blueconic":1,"boldapps":1,"buysellads":1,"cedexis":1,"certona":1,"fastly":{"map":{"cidgroup":1,"condenast":1,"ihrinferno":1,"prisa-us-eu":1,"scribd":1,"target-opus":1,"thriftbooks":1,"ticketmaster4":1,"twitch":1,"vox":1,"appnexus":1},"global":{"shared":{"d2":1,"s2":1},"sni":{"j":1}},"ssl":{"global":{"igao-prod-herokuapp-com":1,"mslc-prod-herokuapp-com":1}}},"confiant-integrations":1,"consentmanager":1,"contentsquare":1,"criteo":1,"crwdcntrl":1,"cloudfront":{"d16jny3kjm2a1j":1,"d16kgn4efacaad":1,"d19l6uotjzm32g":1,"d1af033869koo7":1,"d1bxz6tua5hq87":1,"d1cr9zxt7u0sgu":1,"d1egjda7ggd2ew":1,"d1eh9yux7w8iql":1,"d1gwclp1pmzk26":1,"d1nhstnts0iwzs":1,"d1p5cqqchvbqmy":1,"d1pq45hly7zfel":1,"d1rhs7mhgydok3":1,"d1rw50yn65615p":1,"d1s87id6169zda":1,"d1snv67wdds0p2":1,"d1tprjo2w7krrh":1,"d1vg5xiq7qffdj":1,"d1vo8zfysxy97v":1,"d1y068gyog18cq":1,"d214hhm15p4t1d":1,"d21gpk1vhmjuf5":1,"d244lyzgucnepm":1,"d27cwqlgojh9yd":1,"d2aioe7l2jay46":1,"d2bj4wnxqmm2tk":1,"d2droglu4qf8st":1,"d2eanzqpmoo3ec":1,"d2f4zoo8hyailp":1,"d2hs2r19gv871k":1,"d2j6syf6c0cltf":1,"d2jpq2u2vrjftk":1,"d2qlgd5odkppg5":1,"d2qrdklrsxowl2":1,"d2s6j0ghajv79z":1,"d2tyltutevw8th":1,"d2wo2i8fdcw8of":1,"d2xbocf5uqnw0w":1,"d2y7rifa1cwopa":1,"d2zah9y47r7bi2":1,"d30jydkdo8eo9b":1,"d355prp56x5ntt":1,"d35mt2i8wrf9y1":1,"d38aqfmkl3ge26":1,"d38xvr37kwwhcm":1,"d3fv2pqyjay52z":1,"d3gxe0jmvtuxbc":1,"d3i4yxtzktqr9n":1,"d3jruqy3qmm3fd":1,"d3nn82uaxijpm6":1,"d3o8vwpyaorolj":1,"d3ochae1kou2ub":1,"d3odp2r1osuwn0":1,"d3owq2fdwtdp2j":1,"d3txh7prdum3s8":1,"d3v7mj6iyaqfac":1,"d4egga2bwam6h":1,"d5yoctgpv4cpx":1,"d6tizftlrpuof":1,"d9k0w0y3delq8":1,"dbukjj6eu5tsf":1,"de2pmm85odupd":1,"de7iszmjjjuya":1,"dfx0d9twj2ai":1,"dj28g4s0yd4ph":1,"dn0qt3r0xannq":1,"dokumfe7mps0i":1,"dowpznhhyvkm4":1,"dsh7ky7308k4b":1,"dsx863kqtdxrt":1,"dtpw88eywzb7u":1,"duube1y6ojsji":1,"dzlkq6toxiazj":1,"dzz1zjxa9ulpk":1,"d2638j3z8ek976":1},"akadns":{"com":{"dellcdn":1,"febsec-fidelity":1},"line-zero":1},"demdex":1,"dotmetrics":1,"doubleclick":1,"durationmedia":1,"e-planning":1,"edgecastcdn":1,"emsecure":1,"episerver":1,"esm1":1,"eulerian":1,"everestjs":1,"everesttech":1,"eyeota":1,"ezoic":1,"facebook":1,"fastclick":1,"fbcdn":1,"fonts":1,"edgesuite":{"com":{"fox":1,"iq":1,"tiktokcdn-us":1,"vidio":1,"sky":1},"linkedin":1,"stls":1},"fuseplatform":1,"fwmrm":1,"go-mpulse":1,"hadronid":1,"hs-analytics":1,"hsleadflows":1,"im-apps":1,"impervadns":1,"iocnt":1,"iprom":1,"jsdelivr":1,"kanade-ad":1,"azurewebsites":{"keha-matomo-te-palvelut-prod":1,"neuterbot-client":1,"app-ch-sgtm-prod":1,"app-fnsp-matomo-analytics-prod":1},"krxd":1,"line-scdn":1,"listhub":1,"livecom":1,"livedoor":1,"liveperson":1,"lkqd":1,"llnwd":1,"lpsnmedia":1,"magnetmail":1,"marketo":1,"maxymiser":1,"media":1,"microad":1,"monetate":1,"mxptint":1,"myfonts":1,"myvisualiq":1,"naver":1,"b-cdn":{"nnwwwlive":1,"speedy":1},"nr-data":1,"omtrdc":1,"onecount":1,"online-metrix":1,"openx":1,"opta":1,"owneriq":1,"pages02":1,"pages03":1,"pages04":1,"pages05":1,"pages06":1,"pages08":1,"perimeterx":1,"pingdom":1,"pmdstatic":1,"popads":1,"popcash":1,"primecaster":1,"pro-market":1,"px-cloud":1,"akamaihd":{"pxlclnmdecom-a":1},"r9cdn":1,"rfihub":1,"sancdn":1,"sc-static":1,"semasio":1,"sensic":1,"trafficmanager":{"serviceschipotlecom":1},"sexad":1,"smaato":1,"spreadshirts":1,"storygize":1,"tfaforms":1,"trackcmp":1,"trackedlink":1,"truste-svc":1,"uuidksinc":1,"viafoura":1,"visilabs":1,"visx":1,"w55c":1,"wdsvc":1,"witglobal":1,"yandex":1,"yastatic":1,"yieldlab":1,"ywxi":1,"zdbb":1,"zencdn":1,"zucks":1,"eviltracker":1},"co":{"6sc":1,"ayads":1,"datadome":1,"idio":1,"increasingly":1,"jads":1,"nanorep":1,"nc0":1,"pcdn":1,"prmutv":1,"resetdigital":1,"t":1,"tctm":1,"zip":1},"de":{"71i":1,"adscale":1,"auswaertiges-amt":1,"fiduciagad":1,"ioam":1,"itzbund":1,"werk21system":1},"gt":{"ad":1},"jp":{"adingo":1,"admatrix":1,"auone":1,"co":{"dmm":1,"google":1,"rakuten":1,"yahoo":1},"fout":1,"gmossp-sp":1,"gssprt":1,"ne":{"hatena":1},"impact-ad":1,"microad":1,"nakanohito":1,"ptengine":1,"r10s":1,"reemo-ad":1,"rtoaster":1,"shinobi":1,"team-rec":1,"uncn":1,"yimg":1,"yjtag":1},"pl":{"adocean":1,"dreamlab":1,"gemius":1,"nsaudience":1,"onet":1,"salesmanago":1,"wp":1},"pro":{"adpartner":1,"piwik":1,"usocial":1},"ru":{"adriver":1,"digitaltarget":1,"mail":1,"mindbox":1,"rambler":1,"sape":1,"smi2":1,"tns-counter":1,"top100":1,"ulogin":1,"yandex":1},"re":{"adsco":1},"info":{"adxbid":1,"bitrix":1,"navistechnologies":1,"usergram":1,"webantenna":1},"tv":{"affec":1,"attn":1,"iris":1,"ispot":1,"samba":1,"teads":1,"twitch":1},"dev":{"amazon":1},"us":{"amung":1,"samplicio":1,"slgnt":1,"trkn":1},"media":{"andbeyond":1,"nextday":1,"townsquare":1,"underdog":1},"link":{"app":1},"cloud":{"avct":1,"coremedia":1,"egain":1,"matomo":1},"delivery":{"ay":1,"monu":1},"br":{"com":{"btg360":1,"clearsale":1,"jsuol":1,"shopconvert":1,"shoptarget":1,"soclminer":1},"org":{"ivcbrasil":1}},"ch":{"ch":1,"da-services":1,"google":1},"ms":{"clarity":1},"my":{"cnt":1},"se":{"codigo":1},"me":{"contentexchange":1,"grow":1,"line":1,"loopme":1,"t":1,"channel":1},"to":{"cpx":1,"tawk":1},"chat":{"crisp":1,"gorgias":1},"fr":{"d-bi":1,"open-system":1,"weborama":1},"uk":{"co":{"dailymail":1,"hsbc":1}},"id":{"net":{"detik":1}},"ai":{"e-volution":1,"m2":1,"nrich":1,"wknd":1},"be":{"geoedge":1},"au":{"com":{"google":1,"news":1,"nine":1,"realestate":1,"zipmoney":1,"telstra":1}},"stream":{"ibclick":1},"cz":{"imedia":1,"seznam":1,"trackad":1},"app":{"infusionsoft":1,"permutive":1,"shop":1},"tech":{"ingage":1,"primis":1},"eu":{"kameleoon":1,"medallia":1,"media01":1,"ocdn":1,"rqtrk":1,"slgnt":1,"usercentrics":1},"fi":{"kesko":1,"simpli":1},"live":{"lura":1},"services":{"marketingautomation":1},"sg":{"mediacorp":1},"bi":{"newsroom":1},"fm":{"pdst":1},"ad":{"pixel":1},"xyz":{"playground":1},"it":{"plug":1,"repstatic":1,"stbm":1},"cc":{"popin":1},"network":{"pub":1},"nl":{"rijksoverheid":1,"google":1},"fyi":{"sda":1},"pe":{"shop":1},"es":{"socy":1},"im":{"spot":1},"market":{"spotim":1},"am":{"tru":1},"at":{"waust":1},"gov":{"weather":1},"in":{"zoho":1},"ca":{"bc":{"gov":1}},"no":{"acdn":1,"uio":1},"example":{"ad-company":1},"site":{"ad-company":1,"third-party":{"bad":1,"broken":1}},"pw":{"zlp6s":1}};
+        output.trackerLookup = {"org":{"cdn77":{"rsc":{"1558334541":1}},"adsrvr":1,"ampproject":1,"browser-update":1,"flowplayer":1,"ipify":1,"privacy-center":1,"webvisor":1,"framasoft":1,"do-not-tracker":1,"trackersimulator":1,"consensu":1,"cookielaw":1},"io":{"1dmp":1,"1rx":1,"4dex":1,"adnami":1,"aidata":1,"arcspire":1,"bidr":1,"branch":1,"center":1,"cloudimg":1,"concert":1,"connectad":1,"cordial":1,"dcmn":1,"extole":1,"getblue":1,"hbrd":1,"instana":1,"karte":1,"leadsmonitor":1,"litix":1,"lytics":1,"marchex":1,"mediago":1,"mrf":1,"narrative":1,"ntv":1,"optad360":1,"oracleinfinity":1,"oribi":1,"p-n":1,"personalizer":1,"pghub":1,"piano":1,"powr":1,"pzz":1,"searchspring":1,"segment":1,"siteimproveanalytics":1,"sspinc":1,"t13":1,"webgains":1,"wovn":1,"yellowblue":1,"zprk":1,"appconsent":1,"akstat":1,"clarium":1,"hotjar":1,"polyfill":1},"com":{"2020mustang":1,"33across":1,"360yield":1,"3lift":1,"4dsply":1,"4strokemedia":1,"8353e36c2a":1,"a-mx":1,"a2z":1,"aamsitecertifier":1,"absorbingband":1,"abstractedauthority":1,"abtasty":1,"acexedge":1,"acidpigs":1,"acsbapp":1,"acuityplatform":1,"ad-score":1,"ad-stir":1,"adalyser":1,"adapf":1,"adara":1,"adblade":1,"addthis":1,"addtoany":1,"adelixir":1,"adentifi":1,"adextrem":1,"adgrx":1,"adhese":1,"adition":1,"adkernel":1,"adlightning":1,"adlooxtracking":1,"admanmedia":1,"admedo":1,"adnium":1,"adnxs-simple":1,"adnxs":1,"adobedtm":1,"adotmob":1,"adpone":1,"adpushup":1,"adroll":1,"adrta":1,"ads-twitter":1,"ads3-adnow":1,"adsafeprotected":1,"adstanding":1,"adswizz":1,"adtdp":1,"adtechus":1,"adtelligent":1,"adthrive":1,"adtlgc":1,"adtng":1,"adultfriendfinder":1,"advangelists":1,"adventive":1,"adventori":1,"advertising":1,"aegpresents":1,"affinity":1,"affirm":1,"agilone":1,"agkn":1,"aimbase":1,"albacross":1,"alcmpn":1,"alexametrics":1,"alicdn":1,"alikeaddition":1,"aliveachiever":1,"aliyuncs":1,"alluringbucket":1,"aloofvest":1,"amazon-adsystem":1,"amazon":1,"ambiguousafternoon":1,"amplitude":1,"analytics-egain":1,"aniview":1,"annoyedairport":1,"annoyingclover":1,"anyclip":1,"anymind360":1,"app-us1":1,"appboycdn":1,"appdynamics":1,"appsflyer":1,"aralego":1,"arkoselabs":1,"aspiringattempt":1,"aswpsdkus":1,"atemda":1,"attentivemobile":1,"attractionbanana":1,"audioeye":1,"audrte":1,"automaticside":1,"avanser":1,"avmws":1,"aweber":1,"aweprt":1,"azure":1,"b0e8":1,"badgevolcano":1,"bagbeam":1,"ballsbanana":1,"bandborder":1,"batch":1,"bawdybalance":1,"bc0a":1,"bdstatic":1,"bedsberry":1,"beginnerpancake":1,"benchmarkemail":1,"betweendigital":1,"bfmio":1,"bidtheatre":1,"billowybelief":1,"bimbolive":1,"bing":1,"bizographics":1,"bizrate":1,"bkrtx":1,"blismedia":1,"blogherads":1,"bluecava":1,"bluekai":1,"blushingbread":1,"boatwizard":1,"boilingcredit":1,"boldchat":1,"booking":1,"borderfree":1,"bounceexchange":1,"brainlyads":1,"brand-display":1,"brandmetrics":1,"brealtime":1,"brightfunnel":1,"brightspotcdn":1,"btloader":1,"btstatic":1,"bttrack":1,"btttag":1,"bumlam":1,"butterbulb":1,"buttonladybug":1,"buzzfeed":1,"buzzoola":1,"byside":1,"c3tag":1,"cabnnr":1,"calculatorstatement":1,"callrail":1,"calltracks":1,"capablecup":1,"captcha-delivery":1,"carpentercomparison":1,"cartstack":1,"carvecakes":1,"casalemedia":1,"cattlecommittee":1,"cdninstagram":1,"cdnwidget":1,"channeladvisor":1,"chargecracker":1,"chartbeat":1,"chatango":1,"chaturbate":1,"cheqzone":1,"cherriescare":1,"chickensstation":1,"childlikecrowd":1,"childlikeform":1,"chocolateplatform":1,"cintnetworks":1,"circlelevel":1,"civiccomputing":1,"ck-ie":1,"clcktrax":1,"cleanhaircut":1,"clearbit":1,"clearbitjs":1,"clickagy":1,"clickcease":1,"clickcertain":1,"clicktripz":1,"clientgear":1,"cloudflare":1,"cloudflareinsights":1,"cloudflarestream":1,"cobaltgroup":1,"cobrowser":1,"cognitivlabs":1,"colossusssp":1,"combativecar":1,"comm100":1,"googleapis":{"commondatastorage":1,"imasdk":1,"storage":1,"fonts":1,"maps":1,"www":1},"company-target":1,"condenastdigital":1,"confusedcart":1,"connatix":1,"consentframework":1,"contextweb":1,"conversionruler":1,"convertkit":1,"convertlanguage":1,"cookiefirst":1,"cookieinformation":1,"cookiepro":1,"cootlogix":1,"coveo":1,"cpmstar":1,"cquotient":1,"crabbychin":1,"cratecamera":1,"crazyegg":1,"creative-serving":1,"creativecdn":1,"criteo":1,"crowdedmass":1,"crowdriff":1,"crownpeak":1,"crsspxl":1,"ctnsnet":1,"cudasvc":1,"cuddlethehyena":1,"cumbersomecarpenter":1,"curalate":1,"curvedhoney":1,"cushiondrum":1,"cutechin":1,"cxense":1,"d28dc30335":1,"dailymotion":1,"damdoor":1,"dampdock":1,"dapperfloor":1,"datadoghq-browser-agent":1,"decisivebase":1,"deepintent":1,"defybrick":1,"delivra":1,"demandbase":1,"detectdiscovery":1,"devilishdinner":1,"dimelochat":1,"disagreeabledrop":1,"discreetfield":1,"disqus":1,"dmpxs":1,"dockdigestion":1,"dotomi":1,"doubleverify":1,"drainpaste":1,"dramaticdirection":1,"driftt":1,"dtscdn":1,"dtscout":1,"dwin1":1,"dynamics":1,"dynamicyield":1,"dynatrace":1,"ebaystatic":1,"ecal":1,"eccmp":1,"elfsight":1,"elitrack":1,"eloqua":1,"en25":1,"encouragingthread":1,"enormousearth":1,"ensighten":1,"enviousshape":1,"eqads":1,"ero-advertising":1,"esputnik":1,"evergage":1,"evgnet":1,"exdynsrv":1,"exelator":1,"exoclick":1,"exosrv":1,"expansioneggnog":1,"expedia":1,"expertrec":1,"exponea":1,"exponential":1,"extole":1,"ezodn":1,"ezoic":1,"ezoiccdn":1,"facebook":1,"facil-iti":1,"fadewaves":1,"fallaciousfifth":1,"farmergoldfish":1,"fastly-insights":1,"fearlessfaucet":1,"fiftyt":1,"financefear":1,"fitanalytics":1,"five9":1,"fixedfold":1,"fksnk":1,"flashtalking":1,"flipp":1,"flowerstreatment":1,"floweryflavor":1,"flutteringfireman":1,"flux-cdn":1,"foresee":1,"forter":1,"fortunatemark":1,"fouanalytics":1,"fox":1,"fqtag":1,"frailfruit":1,"freezingbuilding":1,"fronttoad":1,"fullstory":1,"functionalfeather":1,"fuzzybasketball":1,"gammamaximum":1,"gbqofs":1,"geetest":1,"geistm":1,"geniusmonkey":1,"geoip-js":1,"getbread":1,"getcandid":1,"getclicky":1,"getdrip":1,"getelevar":1,"getrockerbox":1,"getshogun":1,"getsitecontrol":1,"giraffepiano":1,"glassdoor":1,"gloriousbeef":1,"godpvqnszo":1,"google-analytics":1,"google":1,"googleadservices":1,"googlehosted":1,"googleoptimize":1,"googlesyndication":1,"googletagmanager":1,"googletagservices":1,"gorgeousedge":1,"govx":1,"grainmass":1,"greasysquare":1,"greylabeldelivery":1,"groovehq":1,"growsumo":1,"gstatic":1,"guarantee-cdn":1,"guiltlessbasketball":1,"gumgum":1,"haltingbadge":1,"hammerhearing":1,"handsomelyhealth":1,"harborcaption":1,"hawksearch":1,"amazonaws":{"us-east-2":{"s3":{"hb-obv2":1}}},"heapanalytics":1,"hellobar":1,"hhbypdoecp":1,"hiconversion":1,"highwebmedia":1,"histats":1,"hlserve":1,"hocgeese":1,"hollowafterthought":1,"honorableland":1,"hotjar":1,"hp":1,"hs-banner":1,"htlbid":1,"htplayground":1,"hubspot":1,"ib-ibi":1,"id5-sync":1,"iesnare":1,"igodigital":1,"iheart":1,"iljmp":1,"illiweb":1,"impactcdn":1,"impactradius-event":1,"impressionmonster":1,"improvedcontactform":1,"improvedigital":1,"imrworldwide":1,"indexww":1,"infolinks":1,"infusionsoft":1,"inmobi":1,"inq":1,"inside-graph":1,"instagram":1,"intentiq":1,"intergient":1,"investingchannel":1,"invocacdn":1,"iperceptions":1,"iplsc":1,"ipredictive":1,"iteratehq":1,"ivitrack":1,"j93557g":1,"jaavnacsdw":1,"jimstatic":1,"journity":1,"js7k":1,"jscache":1,"juiceadv":1,"juicyads":1,"justanswer":1,"justpremium":1,"jwpcdn":1,"kakao":1,"kampyle":1,"kargo":1,"kissmetrics":1,"klarnaservices":1,"klaviyo":1,"knottyswing":1,"krushmedia":1,"ktkjmp":1,"kxcdn":1,"laboredlocket":1,"ladesk":1,"ladsp":1,"laughablelizards":1,"leadsrx":1,"lendingtree":1,"levexis":1,"liadm":1,"licdn":1,"lightboxcdn":1,"lijit":1,"linkedin":1,"linksynergy":1,"list-manage":1,"listrakbi":1,"livechatinc":1,"livejasmin":1,"localytics":1,"loggly":1,"loop11":1,"looseloaf":1,"lovelydrum":1,"lunchroomlock":1,"lwonclbench":1,"macromill":1,"maddeningpowder":1,"mailchimp":1,"mailchimpapp":1,"mailerlite":1,"maillist-manage":1,"marinsm":1,"marketiq":1,"marketo":1,"marphezis":1,"marriedbelief":1,"materialparcel":1,"matheranalytics":1,"mathtag":1,"maxmind":1,"mczbf":1,"measlymiddle":1,"medallia":1,"meddleplant":1,"media6degrees":1,"mediacategory":1,"mediavine":1,"mediawallahscript":1,"medtargetsystem":1,"megpxs":1,"memberful":1,"memorizematch":1,"mentorsticks":1,"metaffiliation":1,"metricode":1,"metricswpsh":1,"mfadsrvr":1,"mgid":1,"micpn":1,"microadinc":1,"minutemedia-prebid":1,"minutemediaservices":1,"mixpo":1,"mkt932":1,"mktoresp":1,"mktoweb":1,"ml314":1,"moatads":1,"mobtrakk":1,"monsido":1,"mookie1":1,"motionflowers":1,"mountain":1,"mouseflow":1,"mpeasylink":1,"mql5":1,"mrtnsvr":1,"murdoog":1,"mxpnl":1,"mybestpro":1,"myregistry":1,"nappyattack":1,"navistechnologies":1,"neodatagroup":1,"nervoussummer":1,"netmng":1,"newrelic":1,"newscgp":1,"nextdoor":1,"ninthdecimal":1,"nitropay":1,"noibu":1,"nondescriptnote":1,"nosto":1,"npttech":1,"ntvpwpush":1,"nuance":1,"nutritiousbean":1,"nxsttv":1,"omappapi":1,"omnisnippet1":1,"omnisrc":1,"omnitagjs":1,"ondemand":1,"oneall":1,"onesignal":1,"onetag-sys":1,"oo-syringe":1,"ooyala":1,"opecloud":1,"opentext":1,"opera":1,"opmnstr":1,"opti-digital":1,"optimicdn":1,"optimizely":1,"optinmonster":1,"optmnstr":1,"optmstr":1,"optnmnstr":1,"optnmstr":1,"osano":1,"otm-r":1,"outbrain":1,"overconfidentfood":1,"ownlocal":1,"pailpatch":1,"panickypancake":1,"panoramicplane":1,"parastorage":1,"pardot":1,"parsely":1,"partplanes":1,"patreon":1,"paypal":1,"pbstck":1,"pcmag":1,"peerius":1,"perfdrive":1,"perfectmarket":1,"permutive":1,"picreel":1,"pinterest":1,"pippio":1,"piwikpro":1,"pixlee":1,"placidperson":1,"pleasantpump":1,"plotrabbit":1,"pluckypocket":1,"pocketfaucet":1,"possibleboats":1,"postaffiliatepro":1,"postrelease":1,"potatoinvention":1,"powerfulcopper":1,"predictplate":1,"prepareplanes":1,"pricespider":1,"priceypies":1,"pricklydebt":1,"profusesupport":1,"proofpoint":1,"protoawe":1,"providesupport":1,"pswec":1,"psychedelicarithmetic":1,"psyma":1,"ptengine":1,"publir":1,"pubmatic":1,"pubmine":1,"pubnation":1,"qualaroo":1,"qualtrics":1,"quantcast":1,"quantserve":1,"quantummetric":1,"quietknowledge":1,"quizzicalpartner":1,"quizzicalzephyr":1,"quora":1,"r42tag":1,"radiateprose":1,"railwayreason":1,"rakuten":1,"rambunctiousflock":1,"rangeplayground":1,"rating-widget":1,"realsrv":1,"rebelswing":1,"reconditerake":1,"reconditerespect":1,"recruitics":1,"reddit":1,"redditstatic":1,"rehabilitatereason":1,"repeatsweater":1,"reson8":1,"resonantrock":1,"resonate":1,"responsiveads":1,"restrainstorm":1,"restructureinvention":1,"retargetly":1,"revcontent":1,"rezync":1,"rfihub":1,"rhetoricalloss":1,"richaudience":1,"righteouscrayon":1,"rightfulfall":1,"riotgames":1,"riskified":1,"rkdms":1,"rlcdn":1,"rmtag":1,"rogersmedia":1,"rokt":1,"route":1,"rtbsystem":1,"rubiconproject":1,"ruralrobin":1,"s-onetag":1,"saambaa":1,"sablesong":1,"sail-horizon":1,"salesforceliveagent":1,"samestretch":1,"sascdn":1,"satisfycork":1,"savoryorange":1,"scarabresearch":1,"scaredsnakes":1,"scaredsong":1,"scaredstomach":1,"scarfsmash":1,"scene7":1,"scholarlyiq":1,"scintillatingsilver":1,"scorecardresearch":1,"screechingstove":1,"screenpopper":1,"scribblestring":1,"sddan":1,"sdiapi":1,"seatsmoke":1,"securedvisit":1,"seedtag":1,"sefsdvc":1,"segment":1,"sekindo":1,"selectivesummer":1,"selfishsnake":1,"servebom":1,"servedbyadbutler":1,"servenobid":1,"serverbid":1,"serving-sys":1,"shakegoldfish":1,"shamerain":1,"shapecomb":1,"shappify":1,"shareaholic":1,"sharethis":1,"sharethrough":1,"shopifyapps":1,"shopperapproved":1,"shrillspoon":1,"sibautomation":1,"sicksmash":1,"sift":1,"siftscience":1,"signifyd":1,"singroot":1,"site":1,"siteimprove":1,"siteimproveanalytics":1,"sitescout":1,"sixauthority":1,"skillfuldrop":1,"skimresources":1,"skisofa":1,"sli-spark":1,"slickstream":1,"slopesoap":1,"smadex":1,"smartadserver":1,"smashquartz":1,"smashsurprise":1,"smg":1,"smilewanted":1,"smoggysnakes":1,"snapchat":1,"snapkit":1,"snigelweb":1,"socdm":1,"sojern":1,"songsterritory":1,"sonobi":1,"soundstocking":1,"spectacularstamp":1,"speedcurve":1,"sphereup":1,"spiceworks":1,"spookyexchange":1,"spookyskate":1,"spookysleet":1,"sportradarserving":1,"sportslocalmedia":1,"spotxchange":1,"springserve":1,"srvmath":1,"ssl-images-amazon":1,"stackadapt":1,"stakingsmile":1,"statcounter":1,"steadfastseat":1,"steadfastsound":1,"steadfastsystem":1,"steelhousemedia":1,"steepsquirrel":1,"stereotypedsugar":1,"stickyadstv":1,"stiffgame":1,"stingycrush":1,"straightnest":1,"stripchat":1,"strivesquirrel":1,"strokesystem":1,"stupendoussleet":1,"stupendoussnow":1,"stupidscene":1,"sulkycook":1,"sumo":1,"sumologic":1,"sundaysky":1,"superficialeyes":1,"superficialsquare":1,"surveymonkey":1,"survicate":1,"svonm":1,"swankysquare":1,"symantec":1,"taboola":1,"tailtarget":1,"talkable":1,"tamgrt":1,"tangycover":1,"taobao":1,"tapad":1,"tapioni":1,"taptapnetworks":1,"taskanalytics":1,"tealiumiq":1,"techlab-cdn":1,"technoratimedia":1,"techtarget":1,"tediousticket":1,"teenytinyshirt":1,"tendertest":1,"the-ozone-project":1,"theadex":1,"themoneytizer":1,"theplatform":1,"thestar":1,"thinkitten":1,"threetruck":1,"thrtle":1,"tidaltv":1,"tidiochat":1,"tiktok":1,"tinypass":1,"tiqcdn":1,"tiresomethunder":1,"trackjs":1,"traffichaus":1,"trafficjunky":1,"trafmag":1,"travelaudience":1,"treasuredata":1,"tremorhub":1,"trendemon":1,"tribalfusion":1,"trovit":1,"trueleadid":1,"truoptik":1,"truste":1,"trustpilot":1,"trvdp":1,"tsyndicate":1,"tubemogul":1,"turn":1,"tvpixel":1,"tvsquared":1,"tweakwise":1,"twitter":1,"tynt":1,"typicalteeth":1,"u5e":1,"ubembed":1,"uidapi":1,"ultraoranges":1,"unbecominglamp":1,"unbxdapi":1,"undertone":1,"uninterestedquarter":1,"unpkg":1,"unrulymedia":1,"unwieldyhealth":1,"unwieldyplastic":1,"upsellit":1,"urbanairship":1,"usabilla":1,"usbrowserspeed":1,"usemessages":1,"userreport":1,"uservoice":1,"valuecommerce":1,"vengefulgrass":1,"vidazoo":1,"videoplayerhub":1,"vidoomy":1,"viglink":1,"visualwebsiteoptimizer":1,"vivaclix":1,"vk":1,"vlitag":1,"voicefive":1,"volatilevessel":1,"voraciousgrip":1,"voxmedia":1,"vrtcal":1,"w3counter":1,"walkme":1,"warmafterthought":1,"warmquiver":1,"webcontentassessor":1,"webengage":1,"webeyez":1,"webtraxs":1,"webtrends-optimize":1,"webtrends":1,"wgplayer":1,"woosmap":1,"worldoftulo":1,"wpadmngr":1,"wpshsdk":1,"wpushsdk":1,"wsod":1,"wt-safetag":1,"wysistat":1,"xg4ken":1,"xiti":1,"xlirdr":1,"xlivrdr":1,"xnxx-cdn":1,"y-track":1,"yahoo":1,"yandex":1,"yieldmo":1,"yieldoptimizer":1,"yimg":1,"yotpo":1,"yottaa":1,"youtube-nocookie":1,"youtube":1,"zemanta":1,"zendesk":1,"zeotap":1,"zeronaught":1,"zestycrime":1,"zonos":1,"zoominfo":1,"zopim":1,"createsend1":1,"veoxa":1,"parchedsofa":1,"sooqr":1,"adtraction":1,"4jnzhl0d0":1,"aboardamusement":1,"absorbingcorn":1,"abstractedamount":1,"actoramusement":1,"actuallysnake":1,"adorableanger":1,"agreeabletouch":1,"aheadday":1,"ancientact":1,"annoyingacoustics":1,"aquaticowl":1,"audioarctic":1,"awarealley":1,"awesomeagreement":1,"awzbijw":1,"basketballbelieve":1,"begintrain":1,"bestboundary":1,"blushingbeast":1,"boredcrown":1,"breadbalance":1,"breakfastboat":1,"bulbbait":1,"burnbubble":1,"bustlingbath":1,"callousbrake":1,"calmcactus":1,"capriciouscorn":1,"caringcast":1,"catschickens":1,"causecherry":1,"chunkycactus":1,"cloisteredcord":1,"closedcows":1,"colossalclouds":1,"colossalcoat":1,"comfortablecheese":1,"conditioncrush":1,"consciouscheese":1,"consciousdirt":1,"coverapparatus":1,"critictruck":1,"cubchannel":1,"curvycry":1,"cushionpig":1,"damageddistance":1,"debonairdust":1,"decisivedrawer":1,"decisiveducks":1,"detailedkitten":1,"diplomahawaii":1,"dk4ywix":1,"dollardelta":1,"dq95d35":1,"elasticchange":1,"energeticladybug":1,"evanescentedge":1,"fadedsnow":1,"fancyactivity":1,"farshake":1,"fastenfather":1,"fatcoil":1,"faultycanvas":1,"firstfrogs":1,"flimsycircle":1,"flimsythought":1,"friendwool":1,"fumblingform":1,"futuristicfifth":1,"giddycoat":1,"glisteningguide":1,"gondolagnome":1,"grayreceipt":1,"grouchypush":1,"haltinggold":1,"handyfield":1,"handyfireman":1,"hearthorn":1,"historicalbeam":1,"horsenectar":1,"hystericalcloth":1,"impossibleexpansion":1,"impulsejewel":1,"incompetentjoke":1,"internalsink":1,"lameletters":1,"livelumber":1,"livelylaugh":1,"lorenzourban":1,"lumpylumber":1,"maliciousmusic":1,"meatydime":1,"memorizeneck":1,"mightyspiders":1,"mixedreading":1,"modularmental":1,"motionlessbag":1,"movemeal":1,"nondescriptcrowd":1,"nostalgicneed":1,"nuttyorganization":1,"optimallimit":1,"outstandingincome":1,"outstandingsnails":1,"pamelarandom":1,"panickycurtain":1,"petiteumbrella":1,"plantdigestion":1,"puffypurpose":1,"punyplant":1,"rabbitbreath":1,"rabbitrifle":1,"raintwig":1,"rainyhand":1,"rainyrule":1,"rangecake":1,"raresummer":1,"readymoon":1,"rebelsubway":1,"receptivereaction":1,"regularplants":1,"replaceroute":1,"resonantbrush":1,"respectrain":1,"richstring":1,"roofrelation":1,"rusticprice":1,"scaredcomfort":1,"scaredsnake":1,"scatteredstream":1,"scientificshirt":1,"scintillatingscissors":1,"screechingfurniture":1,"seashoresociety":1,"secretturtle":1,"shakysurprise":1,"shallowblade":1,"shesubscriptions":1,"shockingship":1,"sillyscrew":1,"sincerebuffalo":1,"sinceresubstance":1,"sixscissors":1,"soggysponge":1,"somberscarecrow":1,"sordidsmile":1,"sortsail":1,"sortsummer":1,"spellsalsa":1,"spotlessstamp":1,"spottednoise":1,"stalesummer":1,"steadycopper":1,"stepplane":1,"stereoproxy":1,"strangesink":1,"stretchsister":1,"strivesidewalk":1,"superficialspring":1,"swellstocking":1,"synonymousrule":1,"tangyamount":1,"tastelesstrees":1,"teenytinycellar":1,"teenytinytongue":1,"terriblethumb":1,"terrifictooth":1,"thirdrespect":1,"thomastorch":1,"ticketaunt":1,"tremendousplastic":1,"troubledtail":1,"typicalairplane":1,"ubiquitousyard":1,"unbecominghall":1,"uncoveredexpert":1,"unequalbrake":1,"unknowncrate":1,"untidyrice":1,"unusedstone":1,"venusgloria":1,"verdantanswer":1,"verseballs":1,"wearbasin":1,"cautiouscredit":1,"confesschairs":1,"chinsnakes":1,"wellgroomedhydrant":1,"heavyplayground":1,"bravecalculator":1,"workoperation":1,"secondhandfall":1,"unablehope":1,"tastelesstrucks":1,"losslace":1,"barbarousbase":1,"supportwaves":1,"protestcopy":1,"automaticturkey":1,"stretchsquirrel":1,"equablekettle":1,"discreetquarter":1,"peacefullimit":1,"gulliblegrip":1,"swelteringsleep":1,"muteknife":1,"aliasanvil":1,"operationchicken":1,"courageousbaby":1,"scissorsstatement":1,"furryfork":1,"synonymoussticks":1,"deerbeginner":1,"rhetoricalveil":1,"farsnails":1,"kaputquill":1,"digestiondrawer":1,"meltmilk":1,"endurablebulb":1,"sugarfriction":1,"combcompetition":1,"stakingshock":1,"stretchsneeze":1,"sinkbooks":1,"brotherslocket":1,"cautiouscamera":1,"inputicicle":1,"fewjuice":1,"tumbleicicle":1,"serpentshampoo":1,"scrapesleep":1,"bleachbubble":1,"longingtrees":1,"leftliquid":1,"handsomehose":1,"painstakingpickle":1,"currentcollar":1,"suggestionbridge":1,"shakyseat":1,"livelyreward":1,"stealsteel":1,"shiveringspot":1,"knitstamp":1,"bushesbag":1,"mundanenail":1,"coldbalance":1,"shiverscissors":1,"broadborder":1,"quirkysugar":1,"stingyspoon":1,"crookedcreature":1,"acceptableauthority":1,"sadloaf":1,"separatesort":1,"exhibitsneeze":1,"largebrass":1,"combcattle":1,"materialisticmoon":1,"cautiouscherries":1,"tritebadge":1,"simulateswing":1,"marketspiders":1,"grumpydime":1,"neatshade":1,"samplesamba":1,"samesticks":1,"tempertrick":1,"franticroof":1,"zipperxray":1,"hatefulrequest":1,"planebasin":1,"daughterstone":1,"motionlessmeeting":1,"guidecent":1,"whispermeeting":1,"adventurousamount":1,"swingslip":1,"charmingplate":1,"haplessland":1,"hospitablehat":1,"recessrain":1,"entertainskin":1,"brainynut":1,"dazzlingbook":1,"oafishchance":1,"damagedadvice":1,"sombersticks":1,"grayoranges":1,"nightwound":1,"stingyshoe":1,"inquisitiveice":1,"passivepolo":1,"baitbaseball":1,"wantingwindow":1,"strangeclocks":1,"fewkittens":1,"givevacation":1,"gleamingcow":1,"uselesslumber":1,"quillkick":1,"bustlingbook":1,"ambiguousdinosaurs":1,"childlikeexample":1,"smoggysongs":1,"condemnedcomb":1,"fuzzyerror":1,"stimulatingsneeze":1,"tiredthroat":1,"exuberantedge":1,"concernedchickens":1,"addthisedge":1,"adsymptotic":1,"bootstrapcdn":1,"bugsnag":1,"dmxleo":1,"dtssrv":1,"fontawesome":1,"hs-scripts":1,"iubenda":1,"jwpltx":1,"nereserv":1,"onaudience":1,"onetrust":1,"outbrainimg":1,"quantcount":1,"rtactivate":1,"shopifysvc":1,"stripe":1,"twimg":1,"vimeo":1,"vimeocdn":1,"wp":1},"net":{"2mdn":1,"2o7":1,"3gl":1,"a-mo":1,"acint":1,"adform":1,"adhigh":1,"admixer":1,"adobedc":1,"adspeed":1,"adverticum":1,"apicit":1,"appier":1,"akamaized":{"assets-momentum":1},"aticdn":1,"edgekey":{"au":1,"ca":1,"com-v1":1,"es":1,"ihg":1,"in":1,"it":1,"jp":1,"net":1,"org":1,"com":{"scene7":1},"uk-v1":1,"uk":1},"azure":1,"azurefd":1,"bannerflow":1,"bf-tools":1,"bidswitch":1,"bitsngo":1,"blueconic":1,"boldapps":1,"buysellads":1,"cachefly":1,"cedexis":1,"certona":1,"confiant-integrations":1,"consentmanager":1,"contentsquare":1,"criteo":1,"crwdcntrl":1,"cloudfront":{"d1af033869koo7":1,"d1s87id6169zda":1,"d1vg5xiq7qffdj":1,"d1y068gyog18cq":1,"d21gpk1vhmjuf5":1,"d2zah9y47r7bi2":1,"d38b8me95wjkbc":1,"d38xvr37kwwhcm":1,"d3odp2r1osuwn0":1,"d5yoctgpv4cpx":1,"d6tizftlrpuof":1,"dbukjj6eu5tsf":1,"dn0qt3r0xannq":1,"dsh7ky7308k4b":1,"d2g3ekl4mwm40k":1},"demdex":1,"dotmetrics":1,"doubleclick":1,"durationmedia":1,"e-planning":1,"edgecastcdn":1,"emsecure":1,"episerver":1,"esm1":1,"eulerian":1,"everestjs":1,"everesttech":1,"eyeota":1,"ezoic":1,"facebook":1,"fastclick":1,"fonts":1,"azureedge":{"fp-cdn":1,"sdtagging":1},"fuseplatform":1,"fwmrm":1,"go-mpulse":1,"hadronid":1,"hs-analytics":1,"hsleadflows":1,"im-apps":1,"impervadns":1,"iocnt":1,"iprom":1,"fastly":{"global":{"sni":{"j":1}},"map":{"prisa-us-eu":1},"ssl":{"global":{"qognvtzku-x":1}}},"jsdelivr":1,"kanade-ad":1,"krxd":1,"line-scdn":1,"listhub":1,"livecom":1,"livedoor":1,"liveperson":1,"lkqd":1,"llnwd":1,"lpsnmedia":1,"magnetmail":1,"marketo":1,"maxymiser":1,"media":1,"microad":1,"mobon":1,"monetate":1,"mxptint":1,"myfonts":1,"myvisualiq":1,"naver":1,"nr-data":1,"ojrq":1,"omtrdc":1,"onecount":1,"online-metrix":1,"openx":1,"openxcdn":1,"opta":1,"owneriq":1,"pages02":1,"pages03":1,"pages04":1,"pages05":1,"pages06":1,"pages08":1,"perimeterx":1,"pingdom":1,"pmdstatic":1,"popads":1,"popcash":1,"primecaster":1,"pro-market":1,"px-cdn":1,"px-cloud":1,"akamaihd":{"pxlclnmdecom-a":1},"rfihub":1,"sancdn":1,"sc-static":1,"semasio":1,"sensic":1,"sexad":1,"smaato":1,"spreadshirts":1,"storygize":1,"tfaforms":1,"trackcmp":1,"trackedlink":1,"tradetracker":1,"truste-svc":1,"uuidksinc":1,"viafoura":1,"visilabs":1,"visx":1,"w55c":1,"wdsvc":1,"witglobal":1,"yandex":1,"yastatic":1,"yieldlab":1,"zencdn":1,"zucks":1,"azurewebsites":{"app-fnsp-matomo-analytics-prod":1},"eviltracker":1,"ad-delivery":1,"chartbeat":1,"msecnd":1,"cloudfunctions":{"us-central1-adaptive-growth":1}},"co":{"6sc":1,"ayads":1,"datadome":1,"getlasso":1,"idio":1,"increasingly":1,"jads":1,"nanorep":1,"nc0":1,"pcdn":1,"prmutv":1,"resetdigital":1,"t":1,"tctm":1,"zip":1},"gt":{"ad":1},"ru":{"adfox":1,"adriver":1,"digitaltarget":1,"mail":1,"mindbox":1,"rambler":1,"rutarget":1,"sape":1,"smi2":1,"tns-counter":1,"top100":1,"ulogin":1,"yandex":1,"yadro":1},"jp":{"adingo":1,"admatrix":1,"auone":1,"co":{"dmm":1,"i-mobile":1,"rakuten":1,"yahoo":1},"fout":1,"genieesspv":1,"gmossp-sp":1,"gsspat":1,"gssprt":1,"ne":{"hatena":1},"i2i":1,"impact-ad":1,"microad":1,"nakanohito":1,"r10s":1,"reemo-ad":1,"rtoaster":1,"shinobi":1,"team-rec":1,"uncn":1,"yimg":1,"yjtag":1},"pl":{"adocean":1,"dreamlab":1,"gemius":1,"nsaudience":1,"onet":1,"salesmanago":1,"wp":1},"pro":{"adpartner":1,"piwik":1,"usocial":1},"de":{"adscale":1,"auswaertiges-amt":1,"fiduciagad":1,"ioam":1,"itzbund":1,"vgwort":1,"werk21system":1},"re":{"adsco":1},"info":{"adxbid":1,"bitrix":1,"navistechnologies":1,"usergram":1,"webantenna":1},"tv":{"affec":1,"attn":1,"iris":1,"ispot":1,"samba":1,"teads":1,"twitch":1,"videohub":1},"dev":{"amazon":1},"us":{"amung":1,"samplicio":1,"slgnt":1,"trkn":1},"media":{"andbeyond":1,"nextday":1,"townsquare":1,"underdog":1},"link":{"app":1},"cloud":{"avct":1,"egain":1,"matomo":1},"delivery":{"ay":1,"monu":1},"ly":{"bit":1},"br":{"com":{"btg360":1,"clearsale":1,"jsuol":1,"shopconvert":1,"shoptarget":1,"soclminer":1},"org":{"ivcbrasil":1}},"ch":{"ch":1,"da-services":1,"google":1},"me":{"channel":1,"contentexchange":1,"grow":1,"line":1,"loopme":1,"t":1},"ms":{"clarity":1},"my":{"cnt":1},"se":{"codigo":1},"to":{"cpx":1,"tawk":1},"chat":{"crisp":1,"gorgias":1},"fr":{"d-bi":1,"open-system":1,"weborama":1},"uk":{"co":{"dailymail":1,"hsbc":1}},"gov":{"dhs":1},"ai":{"e-volution":1,"hybrid":1,"m2":1,"nrich":1,"wknd":1},"be":{"geoedge":1},"au":{"com":{"google":1,"news":1,"nine":1,"zipmoney":1,"telstra":1}},"stream":{"ibclick":1},"cz":{"imedia":1,"seznam":1,"trackad":1},"app":{"infusionsoft":1,"permutive":1,"shop":1},"tech":{"ingage":1,"primis":1},"eu":{"kameleoon":1,"medallia":1,"media01":1,"ocdn":1,"rqtrk":1,"slgnt":1,"usercentrics":1},"fi":{"kesko":1,"simpli":1},"live":{"lura":1},"services":{"marketingautomation":1},"sg":{"mediacorp":1},"bi":{"newsroom":1},"fm":{"pdst":1},"ad":{"pixel":1},"xyz":{"playground":1},"it":{"plug":1,"repstatic":1},"cc":{"popin":1},"network":{"pub":1},"nl":{"rijksoverheid":1},"fyi":{"sda":1},"es":{"socy":1},"im":{"spot":1},"market":{"spotim":1},"am":{"tru":1},"no":{"uio":1},"at":{"waust":1},"pe":{"shop":1},"ca":{"bc":{"gov":1}},"example":{"ad-company":1},"site":{"ad-company":1,"third-party":{"bad":1,"broken":1}},"pw":{"zlp6s":1},"gg":{"clean":1}};
 
         return output
     }
@@ -610,6 +663,18 @@
         return windowsSpecificFeatures.includes(featureName)
     }
 
+    function createCustomEvent (eventName, eventDetail) {
+
+        // @ts-expect-error - possibly null
+        return new OriginalCustomEvent(eventName, eventDetail)
+    }
+
+    function sendMessage (messageType, options) {
+        // FF & Chrome
+        return originalWindowDispatchEvent(createCustomEvent('sendMessageProxy' + messageSecret, { detail: { messageType, options } }))
+        // TBD other platforms
+    }
+
     const baseFeatures = /** @type {const} */([
         'runtimeChecks',
         'fingerprintingAudio',
@@ -642,7 +707,8 @@
             'webCompat'
         ],
         android: [
-            ...baseFeatures
+            ...baseFeatures,
+            'clickToLoad'
         ],
         windows: [
             ...baseFeatures,
@@ -1187,10 +1253,10 @@
 
     /**
      * @typedef {object} Site
-     * @property {string} domain
-     * @property {boolean} isBroken
-     * @property {boolean} allowlisted
-     * @property {string[]} enabledFeatures
+     * @property {string | null} domain
+     * @property {boolean} [isBroken]
+     * @property {boolean} [allowlisted]
+     * @property {string[]} [enabledFeatures]
      */
 
     class ContentFeature {
@@ -1203,7 +1269,7 @@
         /** @type {Record<string, unknown> | undefined} */
         #bundledfeatureSettings
 
-        /** @type {{ debug: boolean, featureSettings: Record<string, unknown>, assets: AssetConfig | undefined, site: Site  } | null} */
+        /** @type {{ debug?: boolean, featureSettings?: Record<string, unknown>, assets?: AssetConfig | undefined, site: Site  } | null} */
         #args
 
         constructor (featureName) {
@@ -1324,6 +1390,11 @@
             if (!domain) return []
             const domains = this._getFeatureSetting()?.[featureKeyName] || [];
             return domains.filter((rule) => {
+                if (Array.isArray(rule.domain)) {
+                    return rule.domain.some((domainRule) => {
+                        return matchHostname(domain, domainRule)
+                    })
+                }
                 return matchHostname(domain, rule.domain)
             })
         }
@@ -1345,6 +1416,9 @@
         load (args) {
         }
 
+        /**
+         * @param {import('./content-scope-features.js').LoadArgs} args
+         */
         callLoad (args) {
             const mark = this.monitor.mark(this.name + 'CallLoad');
             this.#args = args;
@@ -1353,7 +1427,7 @@
             // If we have a bundled config, treat it as a regular config
             // This will be overriden by the remote config if it is available
             if (this.#bundledConfig && this.#args) {
-                const enabledFeatures = computeEnabledFeatures(args.bundledConfig, getTabHostname(), this.platform.version);
+                const enabledFeatures = computeEnabledFeatures(args.bundledConfig, args.site.domain, this.platform.version);
                 this.#args.featureSettings = parseFeatureSettings(args.bundledConfig, enabledFeatures);
             }
             this.#trackerLookup = args.trackerLookup;
@@ -1370,6 +1444,63 @@
 
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         update () {
+        }
+    }
+
+    new Set();
+
+    function generateUniqueID () {
+        return Symbol(undefined)
+    }
+
+    function addTaint () {
+        const contextID = generateUniqueID();
+        if ('duckduckgo' in navigator &&
+            navigator.duckduckgo &&
+            typeof navigator.duckduckgo === 'object' &&
+            'taints' in navigator.duckduckgo &&
+            navigator.duckduckgo.taints instanceof Set) {
+            if (document.currentScript) {
+                // @ts-expect-error - contextID is undefined on currentScript
+                document.currentScript.contextID = contextID;
+            }
+            navigator?.duckduckgo?.taints.add(contextID);
+        }
+        return contextID
+    }
+
+    function createContextAwareFunction (fn) {
+        return function (...args) {
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
+            let scope = this;
+            // Save the previous contextID and set the new one
+            const prevContextID = this?.contextID;
+            // @ts-expect-error - contextID is undefined on window
+            // eslint-disable-next-line no-undef
+            const changeToContextID = getContextId(this) || contextID;
+            if (typeof args[0] === 'function') {
+                args[0].contextID = changeToContextID;
+            }
+            // @ts-expect-error - scope doesn't match window
+            if (scope && scope !== globalThis) {
+                scope.contextID = changeToContextID;
+            } else if (!scope) {
+                scope = new Proxy(scope, {
+                    get (target, prop) {
+                        if (prop === 'contextID') {
+                            return changeToContextID
+                        }
+                        return Reflect.get(target, prop)
+                    }
+                });
+            }
+            // Run the original function with the new contextID
+            const result = Reflect.apply(fn, scope, args);
+
+            // Restore the previous contextID
+            scope.contextID = prevContextID;
+
+            return result
         }
     }
 
@@ -1426,6 +1557,7 @@
      * @returns {Proxy}
      */
     function constructProxy (scope, outputs) {
+        const taintString = '__ddg_taint__';
         // @ts-expect-error - Expected 2 arguments, but got 1
         if (Object.is(scope)) {
             // Should not happen, but just in case fail safely
@@ -1445,8 +1577,14 @@
                         return Reflect.apply(targetOut[property], target, args)
                     }
                 } else {
-                    return Reflect.get(targetOut, property, receiver)
+                    return Reflect.get(targetOut, property, scope)
                 }
+            },
+            getOwnPropertyDescriptor (target, property) {
+                if (typeof property === 'string' && property === taintString) {
+                    return { configurable: true, enumerable: false, value: true }
+                }
+                return Reflect.getOwnPropertyDescriptor(target, property)
             }
         })
     }
@@ -1533,9 +1671,8 @@
     const window = constructProxy(parentScope, {
         ${keysOut}
     });
-    const globalThis = constructProxy(parentScope, {
-        ${keysOut}
-    });
+    // Ensure globalThis === window
+    const globalThis = window
     `;
         return removeIndent(`(function (parentScope) {
         /**
@@ -1545,12 +1682,35 @@
          */
         ${constructProxy.toString()}
         ${prepend}
+
+        ${getContextId.toString()}
+        ${generateUniqueID.toString()}
+        ${createContextAwareFunction.toString()}
+        ${addTaint.toString()}
+        const contextID = addTaint()
+        
+        const originalSetTimeout = setTimeout
+        setTimeout = createContextAwareFunction(originalSetTimeout)
+        
+        const originalSetInterval = setInterval
+        setInterval = createContextAwareFunction(originalSetInterval)
+        
+        const originalPromiseThen = Promise.prototype.then
+        Promise.prototype.then = createContextAwareFunction(originalPromiseThen)
+        
+        const originalPromiseCatch = Promise.prototype.catch
+        Promise.prototype.catch = createContextAwareFunction(originalPromiseCatch)
+        
+        const originalPromiseFinally = Promise.prototype.finally
+        Promise.prototype.finally = createContextAwareFunction(originalPromiseFinally)
+
         ${code}
     })(globalThis)
     `)
     }
 
     /* global TrustedScriptURL, TrustedScript */
+
 
     let stackDomains = [];
     let matchAllStackDomains = false;
@@ -1559,6 +1719,8 @@
     let tagModifiers = {};
     let shadowDomEnabled = false;
     let scriptOverload = {};
+    let replaceElement = false;
+    let monitorProperties = true;
     // Ignore monitoring properties that are only relevant once and already handled
     const defaultIgnoreMonitorList = ['onerror', 'onload'];
     let ignoreMonitorList = defaultIgnoreMonitorList;
@@ -1578,7 +1740,6 @@
 
     let elementRemovalTimeout;
     const featureName = 'runtimeChecks';
-    const taintSymbol = Symbol(featureName);
     const supportedSinks = ['src'];
     // Store the original methods so we can call them without any side effects
     const defaultElementMethods = {
@@ -1591,6 +1752,25 @@
         removeChild: HTMLElement.prototype.removeChild
     };
     const supportedTrustedTypes = 'TrustedScriptURL' in window;
+
+    const jsMimeTypes = [
+        'text/javascript',
+        'text/ecmascript',
+        'application/javascript',
+        'application/ecmascript',
+        'application/x-javascript',
+        'application/x-ecmascript',
+        'text/javascript1.0',
+        'text/javascript1.1',
+        'text/javascript1.2',
+        'text/javascript1.3',
+        'text/javascript1.4',
+        'text/javascript1.5',
+        'text/jscript',
+        'text/livescript',
+        'text/x-ecmascript',
+        'text/x-javascript'
+    ];
 
     class DDGRuntimeChecks extends HTMLElement {
         #tagName
@@ -1676,6 +1856,12 @@
             // @ts-expect-error TrustedScript is not defined in the TS lib
             if (supportedTrustedTypes && el.textContent instanceof TrustedScript) return
 
+            // Short circuit if not a script type
+            const scriptType = el.type.toLowerCase();
+            if (!jsMimeTypes.includes(scriptType) &&
+                scriptType !== 'module' &&
+                scriptType !== '') return
+
             el.textContent = wrapScriptCodeOverload(el.textContent, scriptOverload);
         }
 
@@ -1684,9 +1870,8 @@
          * This is to allow us to interrogate the real element before it is moved to the DOM.
          */
         _transplantElement () {
-            // Creeate the real element
+            // Create the real element
             const el = initialCreateElement.call(document, this.#tagName);
-
             if (taintCheck) {
                 // Add a symbol to the element so we can identify it as a runtime checked element
                 Object.defineProperty(el, taintSymbol, { value: true, configurable: false, enumerable: false, writable: false });
@@ -1742,14 +1927,34 @@
                 this.computeScriptOverload(el);
             }
 
+            // TODO pollyfill WeakRef
+            this.#el = new WeakRef(el);
+
+            if (replaceElement) {
+                this.replaceElement(el);
+            } else {
+                this.insertAfterAndRemove(el);
+            }
+        }
+
+        replaceElement (el) {
+            // @ts-expect-error - this is wrong node type
+            super.parentElement?.replaceChild(el, this);
+
+            if (monitorProperties) {
+                this._monitorProperties(el);
+            }
+        }
+
+        insertAfterAndRemove (el) {
             // Move the new element to the DOM
             try {
                 this.insertAdjacentElement('afterend', el);
             } catch (e) { console.warn(e); }
 
-            this._monitorProperties(el);
-            // TODO pollyfill WeakRef
-            this.#el = new WeakRef(el);
+            if (monitorProperties) {
+                this._monitorProperties(el);
+            }
 
             // Delay removal of the custom element so if the script calls removeChild it will still be in the DOM and not throw.
             setTimeout(() => {
@@ -1996,6 +2201,9 @@
             shadowDomEnabled = this.getFeatureSettingEnabled('shadowDom') || false;
             scriptOverload = this.getFeatureSetting('scriptOverload') || {};
             ignoreMonitorList = this.getFeatureSetting('ignoreMonitorList') || defaultIgnoreMonitorList;
+            replaceElement = this.getFeatureSettingEnabled('replaceElement') || false;
+            monitorProperties = this.getFeatureSettingEnabled('monitorProperties') || true;
+            this.getFeatureSettingEnabled('injectGenericOverloads') || true;
 
             overrideCreateElement();
 
@@ -4793,7 +5001,8 @@
                     platform: args.platform.name,
                     isDuckDuckGo () {
                         return DDGPromise.resolve(true)
-                    }
+                    },
+                    taints: new Set()
                 },
                 enumerable: true,
                 configurable: false,
@@ -5165,6 +5374,2813 @@
         }
     }
 
+    const logoImg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFQAAABUCAYAAAAcaxDBAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAABNTSURBVHgBzV0LcFPXmf6PJFt+gkEY8wrYMSEbgst7m02ywZnOZiEJCQlJC+QB25lNs7OzlEJ2ptmZLGayfUy3EEhmW5rM7gCZBtjJgzxmSTvTRSST9IF5pCE0TUosmmBjHIKNZFmWLN2e78hHPvfqXuleSdfONyNLV7q6uve7//uc85vRlwAda25oTFK8lZGn0UPaLI2okUhrTH/KGnU7M+olTevlL0KaeM3e01LaKa/PE2p64dgpGmMwGgN0rGqtS1Ve2cB/fhk/gVbSqI5KAU4wvxlBTdNe9VJ5sOnAb0I0yhg1QiWJTGN3E0gcHQRTpO0dTXJdJ7RjzZJWflHrGaNVdiTRN2kalTfOIU9VLfnqp5ruM9TTxR+dlIqGKX7uI7IDLrl7PFS2zW1iXSMURGqkbaUc0uiprqWqxa1UOXcxVcxdxAmcRoUApMZDH9HAmeMU+8NxQbYV3Ca25ITCwaRY4immcYk0AUgcv3wtJ3CxeLgBEBw++jpF249akusWsSUltGPNoq0aY5vMVLviusU04b5HbJMoVLo/ItRaBUyBp7rGtjTHuNSGj75BkbdeN/2ckdbWdODENioRSkIopFLThl4hpi0wflZzy0pO5D9aEiDsIFfXQagtf4CAXCqronzWHHFc3CQ/f53rZuGYl198zorYEKOyW0shrUUT2rFu8bc1jdqMUplLIkFi9NhRCvOLA4mp/jCVAjAn+N2qJa1UvXSZkGYjQOylfTu4OQjqPxAhl7atef+JnVQEiiK0Y+2ipzSNq7gCXFT9o1vFRRkB6evnFxJ5642SkWgF4fD4OUxYba4dEW4GLr/0bJY2FGsCCiIUMaVWEX6FDB4cF1D/T1uzJANE4uTxPBaoWbbSlNgcZiDIYsl7mg6d6iWHcEyolb0MPLyFxq1Yq9sXqg31ihx9nb4MsCK298VnxQ3XQaNTjJXd49SuOiJUkEmJIyRy7TSgWg2bf5xlK/sO76defpJuq7ZTgMy61Y9Q7bI7de/Dlndvf8xoAhw7K9uECjX3R46okomTm/rEbt0dh1TixIzqDeI9lSPZD/ZDWDT0uT2PXmqYSSvI7HryUT2pkNTB5K121d82oZ+sWQzJbJXbZmRa3GWBces2UuXX7qOKigryeDy6z0A+wqbosaDIdEYLZtdgSiq3qVcfOH6rnWPaIlQE7MTacp1ImHvuL/Ztz63iE+qpZtN2qp8z13IX6Siix4OjYi7gQCdy+6+aADNSecKys3l/+3fyHc+bb4d0nMl+KLfNyIS9vPTfPyAtEbc8jvjevz5F45r/inIBpqF6aSvV/M1twiTYLX4UCpwzYlIRw17TMnIOS5aJ8E5eE5e8Gza2TO17+nTXb3IdLyehaSeUOsBfVsj3pv77z6hsWmNmH5AJycwFQeb3nqfBqvHU399P4XBYPMfjcWK8DOXz+bK+I4mFCo2GGRh479dZpFbMbhGkSvBzvWHTvFkHd53+zNKe5lR5bjc7SPHoE7h3rOPZjwTU/POftlE+4ORS5ZVEly+OvDm1UTw0bldRsmtoaCC/32/6/SvQgDw3rVSY9GibTv2zfps7qasPHl9o9X1LCYXd5HxnKkbIyQPrt2Q+h325uOOxnGqeOQfsE+vXvxnhN7krROzd/6PUlJkU9nOJrK4mrzf7lPxcaiCt0IxE57msgkkpAQdZNf9G8tYFMr8Ns5PoDKV3YDRl47zp7OnTnUGz75tK6HC82SG3jXbTwhM6Q0U1sZvvFERVz77e1PtbwSptLBVwndN/+PNMxocb+OnGu0acJM/7mVa20Cw+Nb2CFCW2qtsIhFUndPml5wq/mAmTiT2yjep2HKKZ/7CF6r+ylKqqqmyTCdRwlcQNRmXfDeDaEP5JgFjUJzLghSDUfM2+m3UVkE4uthvkNvJz1aZAOgpNJbWv3U/jnnyeZi5bQRMmTHBEohFprfmZa6RC9eFwJcCDmg2igI5RCeP3sq7IKJ2BhzdnXosY0Zjz2gHUm0vltAe/TYFAoCgiVUByQGqhQyf5gBxftddwyiqGh3j056RuGKUTjqhoVR8mc8bf/r2wk6VGmtTdIpIoNWRxRwISCk4UtBqlVEeoUTpRaZcAkYWoOtQ8MG+xaaxZKuCmj1u+ltwArlmtS6icABjRVbczhNqRTqfQFvGM57avU21t6aXnvTOd9PKb79O+l9rpnfYOGn/7WlekFFDNnBxykcDweMeqBZnRigyhmAqjHsSY2xbkiLh0Tpw4MbMZiQ5yAo7T1h2/oG89/iL9aHeQLvQ4jynfaQ8JEqsry6lhUi2dPXeJdr/4vmtSCgnVSalqS+HxK30b5GZGD73E1mvyTcNdKEg6m3hsOeWqjKqDuMf+43VOQA09vHoJNTcGqKbKL0h2ipuWNIqHEaloC115c78rRRUM3UhO8Cyyv+HfYZqG2TBiLEpIaDqQHynNVfHCwMhJhrMHtOzguqUi85GAet52y7W0/Ym7aP7caYJMQD6XAnBQmDjhBhAuqh7foA2tUu0FoVnqrngyjE4WdMeb5upy83uXt3DJdGdigwpjJb5UAJn9nAuJSsMIhVR7QejwBC4BqLsaLPcXIp0Az7vLy8szm1Pq3XEYRoh5US45J3UwT6q9BFf7VjynCfWMqDvGtVUUVDrjhWRx8BIF8FaQTk46OGxD7TEBwg1gQoaq9jrzwkjYSU/H/UsXqJMUVGcEz1aIumt1k/OSibDnP3cfoZ/se7cgTw/8ZN+vRdjUzb+/ekUL/fJouhjtFqFylouETu05h/BFnqQv1ah+ya+czKBL1XKQsIV7/F+89VFGygrx9t09V8RzJBrnEnpEhFOAf9a15BZUTjBjUEWSkq0ebj914+uq/SxmYkIqlbL87J3joczrmqp0Ovpue4icAtGCBGJRue1WwQRQJdRYQ2CkNfpI0+bLqqhRVYod4gWpZqof6R8pSr/85u/F880mcWU+IJ6Fs4NkNs8KZKIIT1UNuQWjTwGpsr6B9QE+D6M6GdAbp9Cod8MJWO9FzL+0JHT1innC/kmAlBsLIBRAbIuHCjte3sMVo2o2FyLuP+N8ZCbyAdmCsTgEIZTv8ZHhRp8mVlukRdQ4Pl0wBqLiCYNwZkWRe5d/RQT0cEwNnMx7V7RQKWE26068P0xi7fXc/l2l/8wuoQC4kVzpfwsqz1gdDYuoOqc9FY1QwcD4USxKiUTCchczySoVZGjjG8clqIGTN4M7qsnZJErEPiVHwPA2pSPDrHUAPquFBEXnw5zUoaEhKhpJfh69PEMZ5BoT78q/L394+H6z/oVLj42sNsWDi543yRFyDBI2ulek5KOEA5OnU8EY4Pb7Uz58Gy4s0rBLZtdBrsJ9VDK4R+jlnsIl9NIbRKE2chNQc0hmKckE3CP0Qkh4eTgmNafPi3ina2RCIsOnecHnT87tpl1wQrVQ1npKoqILDKzjA+HrBgYGnBHamb/2CmLiF7Pf940f/jyW3gfSl+DJ1BB/xP6cfi4FrKIIjNfrJBQr1Ea+VGRwzFUenn5w0OFxon/M+XHPYWchjhvAsh4JlTMuQb08rmchua16r5IMzXZ1UCwWc/adpHW4BiLHmkxAF6/rskkW8nC1PCc3jVMHiya185xwTI6cU611ETrp8N64AWN6rg+htD5O6IiEGrMjY23UMTrOiCfYUdsIWFfcx/PTKZ9MYwqjkKnpOefyFCc0FVJ3UEkttmoDxyR+NJ5/hl4GkNDASsuPpz/Mk5QVY0esWi82ajQv3Z3yeSkV1JRZjQNnTvBxmfRd8BdbqEUKygP8ft9sMQXHNq7azE+EO6eoeXGm5vr0A148zn3f4MW0V0+ZlFSRfiLILxufjgJkwA+v7zRDAlROsopHzBPyNR04Ffpk7eJemYKiBioHuuT4TFFpKFf7IT6+ZFV5MoWXhyXXvcBvxrPcsVnPpfINk4SCh2MUsOQN4ZIqoQNqKY+HTGjRIa5QS1FQvq8OGZdkfIYH+ACmgDvGtEeIWl7LaQIKQR/n4dIRcgzjWixdAV4jMSSaFhkPy4yPwmupO9beUtzFsDPHxLMjO6qinJufxq1pYhvbKOUp7AbDHIBI5O5fHEkH/06hrl+F/VT9Da/WH8KzCOw9/qE9WsybmUCKzgjyblRhVe/zRag97GhvD7ejPmd21AhO7BAfVTn/X9sxeCMKw3BM/vqRDEkFCEOWBBuLrMoss3ICaCtWOEuEs6YmpYL4Kwht2nOqt2PN4qCcPYKJ+hOGFyfgQDW33CneKxgfHKOhm253ZkdNgAmw8sYiF3crHzcDpFNNOdEtYgQsCF+EV5mrSzH2aua1Qe2rTZZqO0IxdlSBKOyOEdRpjMYmCYxSe+XrDKFQe9FkahjqFL5i+4MUbUfHGMapnWFl7VIaaXUHMoRC7bmnykip8S4Yp0M7grSjRUqom8PDuZBr4jGPvvZIdQd0Bo0XSvao2+o0RpPp0M4AO+o0rzfAqo+TEVE/o8MLy+hHd1fQQHlxXUDyTzxO6ro/6AhtOtAe5D8flNvG6dCB9ZsLr5MO5/XFSGmlDbMTvN5H2+73c0J99FmAie1CASKdSCdg4nKZjnHVlsLLFar6Mq93XM5TYMxUVFyqZfTMCj+9/NUynVT+9pq864MtYVyfpS5gSCOZ1Zsk69d2ne4MbWqZhuk5YtkwCqh+brvkglks1Ut378ozAmnEUEJMwk1yUurq9AOtF/o76YVP/ofe7v5/ev/ySUqk+LCJ10/Vvuzi9Nnuk/Re8iy9P8tLA34PNfSlhBTubS2n7rps+QC5X/04RZVxjZwg3R5pRHgw4bbvtT2Z7bR0ntxr/J7F0sQFjRrznpT5PSTjqmde0y3VO//dBxxPhtBu30DE49GpU6dSZWVl5v21h2+niC87cbi69hq6a+b91DJxIb392a/of//8PEWTepMBovq9Gnm81vHtA28nOKn2bbedpZiMkk1GdQdMzwI7ahrbJbdBYM9PR6QbxDZs+bFzezpsR41qf2HA/MZ8Ev6Ydn7wfXrglytp95mdWWQCkMBYbIA0zVoCv6ix75hwTcZ+AMb1Wbzuuc2MTPF9skDzgfY2fhsyDU5RNFGX6qFoEnhoMzmBtKNqwRnqXiwY81Aibj1LxQmhgYe2GMh81rgCJiS4sUDOPJBpyXvUYB+NBlSvj0YoaC9kG4hHOamQUDndcUr1NF7tym/ftBzTI7EkPJkjHBuwOeiKa6lR5uijAILliRlgFTIlc/YeyUmoUP2UpvNkxiYt6NXkiNTO9BCWGj5VeXOPjKLrg1bE53ZiUWPfKeOKZCCXqkvkrVQ0HzyxU2Oks6dGA40TwfJnOzaV/SGdhqpqP6V6ak4bCAlM8LTVah9I+1AiwR/mUjoxYn3sdGu5tiwys5q4cDKb97fn7Ytnq/TTvP/4JjXgN/tBqP/0H/w8/0hpV0iM10ej0cxbC+qXWpIhfo+rM8iMRvqFrcQjPhinAX6MSDhMc88O0sLzTLy+0ttHUS79g7FBcUyQXTFobi7kEvGaPB1xUE3KZTdV2I56Ny1peJWSnuX85RRspxeEHRXdY6Rkym4yObvZIB6dM5+0unqxOrmsrIy+iH1O73QeobLyMt2uIDHGJXmiN0Dfv/lp6rzyKSUScQqU1dOc2rnU0j+RVh3ppjs/9tEN5710z4c+uraH0cRwWmL7tDhFEjF6sJ1R3aBe7TGii4Y0+RthsVNscGjFrg8v2MpIHLZq4/EpeXWt2nBCaNVmLFzkamOh3XgH0R3rafz48aLoHEmE6Y5DN9G4upFKMSQQZK6evY6+Oe+fqaYs25zgpp3/7jpyAtx0ZHvGPn1wtt07HjMW0kNwQvnspgpHedmu0xd6N83jkso8raRIavhXL4lbo+baINhKWhk88l//HSWTSUEqsqKTF39H3dEu7q2TQpUDvkn0vZt20arZ3xCfm558XcBR1obsZ8rjT5v26et55t/0DWkgmSy5wgmZ4tqoAHRsWFBHMe8rmqHdpZO2ktoTe7jeVdGMGTPEZLKPL39IG498U5zQfXMepK9f+5CpVBoByep68ls597FqDisTluy1rCzIYkOj0+5Sxdk1S9qYoU2EVfdDQG3Dlly2WqSh6D2CBwDVt0OiEecfX5c1Rg7VxtBNtaFXiARI7Nm9LWusjJvtXc0Hj2+iAlF0y+Cz31i0iXnYVuPUcozBoF+JmdcXDu2zEEXG1YsYEk2wioHsbgYSy2fO4TdzZXpw0WTaoWVzWNEy2F5olAslamqd7awkrMxAKSGXDMp/KGCGdAOa58wbKQh7yVXcob00Q0kIlTAzARIgtparoFu9662Qs10xpJIXgezGmHZQUkKBYWlt4y/Xm30OSUWDA0ygcLPnEqbJXDls3d2BW5pDpCW/Uwqp1B2XXEI+YgHZigNeGJOwCiUY6hw7c0KQCGeTe1IGwzDPNgz3kAtwjVAJO8SqQFkQzgVk+yZZ/HOVz7sEacbpMJYQveq4RBLb6xaRIz81SgCxSfK0esmzXqN09wP3waWRpV6lgdSeQmLKgn6RxgAZcpnnbkFuCf9BFR8KD3K/f3Q0SdSfwpcAHevQVSLVmNLYAg+j+SBYLOrlNQ0TskP4k15swUIp0s5hFvZY/YcvI/4CeAZjCToTSnsAAAAASUVORK5CYII=';
+    const loadingImages = {
+        darkMode: 'data:image/svg+xml;utf8,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%20%20%20%20%3Cstyle%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%40keyframes%20rotate%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20from%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20to%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate%28359deg%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%3C%2Fstyle%3E%0A%20%20%20%20%20%20%20%20%3Cg%20style%3D%22transform-origin%3A%2050%25%2050%25%3B%20animation%3A%20rotate%201s%20infinite%20reverse%20linear%3B%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2218.0968%22%20y%3D%2216.0861%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%28136.161%2018.0968%2016.0861%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.1%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%228.49878%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.4%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2219.9976%22%20y%3D%228.37451%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2890%2019.9976%208.37451%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.2%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2216.1727%22%20y%3D%221.9917%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2846.1607%2016.1727%201.9917%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.3%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%228.91309%22%20y%3D%226.88501%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%28136.161%208.91309%206.88501%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.6%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%226.79602%22%20y%3D%2210.996%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2846.1607%206.79602%2010.996%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.7%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%227%22%20y%3D%228.62549%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2890%207%208.62549%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.8%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%228.49878%22%20y%3D%2213%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.9%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fsvg%3E',
+        lightMode: 'data:image/svg+xml;utf8,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%20%20%20%20%3Cstyle%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%40keyframes%20rotate%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20from%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate%280deg%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20to%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20transform%3A%20rotate%28359deg%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%3C%2Fstyle%3E%0A%20%20%20%20%20%20%20%20%3Cg%20style%3D%22transform-origin%3A%2050%25%2050%25%3B%20animation%3A%20rotate%201s%20infinite%20reverse%20linear%3B%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2218.0968%22%20y%3D%2216.0861%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%28136.161%2018.0968%2016.0861%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.1%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%228.49878%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.4%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2219.9976%22%20y%3D%228.37451%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2890%2019.9976%208.37451%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.2%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2216.1727%22%20y%3D%221.9917%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2846.1607%2016.1727%201.9917%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.3%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%228.91309%22%20y%3D%226.88501%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%28136.161%208.91309%206.88501%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.6%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%226.79602%22%20y%3D%2210.996%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2846.1607%206.79602%2010.996%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.7%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%227%22%20y%3D%228.62549%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20transform%3D%22rotate%2890%207%208.62549%29%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.8%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%228.49878%22%20y%3D%2213%22%20width%3D%223%22%20height%3D%227%22%20rx%3D%221.5%22%20fill%3D%22%23111111%22%20fill-opacity%3D%220.9%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fsvg%3E' // 'data:application/octet-stream;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxzdHlsZT4KCQlAa2V5ZnJhbWVzIHJvdGF0ZSB7CgkJCWZyb20gewoJCQkJdHJhbnNmb3JtOiByb3RhdGUoMGRlZyk7CgkJCX0KCQkJdG8gewoJCQkJdHJhbnNmb3JtOiByb3RhdGUoMzU5ZGVnKTsKCQkJfQoJCX0KCTwvc3R5bGU+Cgk8ZyBzdHlsZT0idHJhbnNmb3JtLW9yaWdpbjogNTAlIDUwJTsgYW5pbWF0aW9uOiByb3RhdGUgMXMgaW5maW5pdGUgcmV2ZXJzZSBsaW5lYXI7Ij4KCQk8cmVjdCB4PSIxOC4wOTY4IiB5PSIxNi4wODYxIiB3aWR0aD0iMyIgaGVpZ2h0PSI3IiByeD0iMS41IiB0cmFuc2Zvcm09InJvdGF0ZSgxMzYuMTYxIDE4LjA5NjggMTYuMDg2MSkiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CQoJCTxyZWN0IHg9IjguNDk4NzgiIHdpZHRoPSIzIiBoZWlnaHQ9IjciIHJ4PSIxLjUiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC40Ii8+CgkJPHJlY3QgeD0iMTkuOTk3NiIgeT0iOC4zNzQ1MSIgd2lkdGg9IjMiIGhlaWdodD0iNyIgcng9IjEuNSIgdHJhbnNmb3JtPSJyb3RhdGUoOTAgMTkuOTk3NiA4LjM3NDUxKSIgZmlsbD0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwLjIiLz4KCQk8cmVjdCB4PSIxNi4xNzI3IiB5PSIxLjk5MTciIHdpZHRoPSIzIiBoZWlnaHQ9IjciIHJ4PSIxLjUiIHRyYW5zZm9ybT0icm90YXRlKDQ2LjE2MDcgMTYuMTcyNyAxLjk5MTcpIiBmaWxsPSIjZmZmZmZmIiBmaWxsLW9wYWNpdHk9IjAuMyIvPgoJCTxyZWN0IHg9IjguOTEzMDkiIHk9IjYuODg1MDEiIHdpZHRoPSIzIiBoZWlnaHQ9IjciIHJ4PSIxLjUiIHRyYW5zZm9ybT0icm90YXRlKDEzNi4xNjEgOC45MTMwOSA2Ljg4NTAxKSIgZmlsbD0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwLjYiLz4KCQk8cmVjdCB4PSI2Ljc5NjAyIiB5PSIxMC45OTYiIHdpZHRoPSIzIiBoZWlnaHQ9IjciIHJ4PSIxLjUiIHRyYW5zZm9ybT0icm90YXRlKDQ2LjE2MDcgNi43OTYwMiAxMC45OTYpIiBmaWxsPSIjZmZmZmZmIiBmaWxsLW9wYWNpdHk9IjAuNyIvPgoJCTxyZWN0IHg9IjciIHk9IjguNjI1NDkiIHdpZHRoPSIzIiBoZWlnaHQ9IjciIHJ4PSIxLjUiIHRyYW5zZm9ybT0icm90YXRlKDkwIDcgOC42MjU0OSkiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC44Ii8+CQkKCQk8cmVjdCB4PSI4LjQ5ODc4IiB5PSIxMyIgd2lkdGg9IjMiIGhlaWdodD0iNyIgcng9IjEuNSIgZmlsbD0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwLjkiLz4KCTwvZz4KPC9zdmc+Cg=='
+    };
+    const closeIcon = 'data:image/svg+xml;utf8,%3Csvg%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M5.99998%204.58578L10.2426%200.34314C10.6331%20-0.0473839%2011.2663%20-0.0473839%2011.6568%200.34314C12.0474%200.733665%2012.0474%201.36683%2011.6568%201.75735L7.41419%205.99999L11.6568%2010.2426C12.0474%2010.6332%2012.0474%2011.2663%2011.6568%2011.6568C11.2663%2012.0474%2010.6331%2012.0474%2010.2426%2011.6568L5.99998%207.41421L1.75734%2011.6568C1.36681%2012.0474%200.733649%2012.0474%200.343125%2011.6568C-0.0473991%2011.2663%20-0.0473991%2010.6332%200.343125%2010.2426L4.58577%205.99999L0.343125%201.75735C-0.0473991%201.36683%20-0.0473991%200.733665%200.343125%200.34314C0.733649%20-0.0473839%201.36681%20-0.0473839%201.75734%200.34314L5.99998%204.58578Z%22%20fill%3D%22%23222222%22%2F%3E%0A%3C%2Fsvg%3E';
+
+    const blockedFBLogo = 'data:image/svg+xml;utf8,%3Csvg%20width%3D%2280%22%20height%3D%2280%22%20viewBox%3D%220%200%2080%2080%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Ccircle%20cx%3D%2240%22%20cy%3D%2240%22%20r%3D%2240%22%20fill%3D%22white%22%2F%3E%0A%3Cg%20clip-path%3D%22url%28%23clip0%29%22%3E%0A%3Cpath%20d%3D%22M73.8457%2039.974C73.8457%2021.284%2058.7158%206.15405%2040.0258%206.15405C21.3358%206.15405%206.15344%2021.284%206.15344%2039.974C6.15344%2056.884%2018.5611%2070.8622%2034.7381%2073.4275V49.764H26.0999V39.974H34.7381V32.5399C34.7381%2024.0587%2039.764%2019.347%2047.5122%2019.347C51.2293%2019.347%2055.0511%2020.0799%2055.0511%2020.0799V28.3517H50.8105C46.6222%2028.3517%2045.2611%2030.9693%2045.2611%2033.6393V39.974H54.6846L53.1664%2049.764H45.2611V73.4275C61.4381%2070.9146%2073.8457%2056.884%2073.8457%2039.974Z%22%20fill%3D%22%231877F2%22%2F%3E%0A%3C%2Fg%3E%0A%3Crect%20x%3D%223.01295%22%20y%3D%2211.7158%22%20width%3D%2212.3077%22%20height%3D%2292.3077%22%20rx%3D%226.15385%22%20transform%3D%22rotate%28-45%203.01295%2011.7158%29%22%20fill%3D%22%23666666%22%20stroke%3D%22white%22%20stroke-width%3D%226.15385%22%2F%3E%0A%3Cdefs%3E%0A%3CclipPath%20id%3D%22clip0%22%3E%0A%3Crect%20width%3D%2267.6923%22%20height%3D%2267.6923%22%20fill%3D%22white%22%20transform%3D%22translate%286.15344%206.15405%29%22%2F%3E%0A%3C%2FclipPath%3E%0A%3C%2Fdefs%3E%0A%3C%2Fsvg%3E';
+
+    const blockedYTVideo = 'data:image/svg+xml;utf8,%3Csvg%20width%3D%2275%22%20height%3D%2275%22%20viewBox%3D%220%200%2075%2075%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Crect%20x%3D%226.75%22%20y%3D%2215.75%22%20width%3D%2256.25%22%20height%3D%2239%22%20rx%3D%2213.5%22%20fill%3D%22%23DE5833%22%2F%3E%0A%20%20%3Cmask%20id%3D%22path-2-outside-1_885_11045%22%20maskUnits%3D%22userSpaceOnUse%22%20x%3D%2223.75%22%20y%3D%2222.5%22%20width%3D%2224%22%20height%3D%2226%22%20fill%3D%22black%22%3E%0A%20%20%3Crect%20fill%3D%22white%22%20x%3D%2223.75%22%20y%3D%2222.5%22%20width%3D%2224%22%20height%3D%2226%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M41.9425%2037.5279C43.6677%2036.492%2043.6677%2033.9914%2041.9425%2032.9555L31.0394%2026.4088C29.262%2025.3416%2027%2026.6218%2027%2028.695L27%2041.7884C27%2043.8615%2029.262%2045.1418%2031.0394%2044.0746L41.9425%2037.5279Z%22%2F%3E%0A%20%20%3C%2Fmask%3E%0A%20%20%3Cpath%20d%3D%22M41.9425%2037.5279C43.6677%2036.492%2043.6677%2033.9914%2041.9425%2032.9555L31.0394%2026.4088C29.262%2025.3416%2027%2026.6218%2027%2028.695L27%2041.7884C27%2043.8615%2029.262%2045.1418%2031.0394%2044.0746L41.9425%2037.5279Z%22%20fill%3D%22white%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M30.0296%2044.6809L31.5739%2047.2529L30.0296%2044.6809ZM30.0296%2025.8024L31.5739%2023.2304L30.0296%2025.8024ZM42.8944%2036.9563L44.4387%2039.5283L42.8944%2036.9563ZM41.35%2036.099L28.4852%2028.3744L31.5739%2023.2304L44.4387%2030.955L41.35%2036.099ZM30%2027.5171L30%2042.9663L24%2042.9663L24%2027.5171L30%2027.5171ZM28.4852%2042.1089L41.35%2034.3843L44.4387%2039.5283L31.5739%2047.2529L28.4852%2042.1089ZM30%2042.9663C30%2042.1888%2029.1517%2041.7087%2028.4852%2042.1089L31.5739%2047.2529C28.2413%2049.2539%2024%2046.8535%2024%2042.9663L30%2042.9663ZM28.4852%2028.3744C29.1517%2028.7746%2030%2028.2945%2030%2027.5171L24%2027.5171C24%2023.6299%2028.2413%2021.2294%2031.5739%2023.2304L28.4852%2028.3744ZM44.4387%2030.955C47.6735%2032.8974%2047.6735%2037.586%2044.4387%2039.5283L41.35%2034.3843C40.7031%2034.7728%2040.7031%2035.7105%2041.35%2036.099L44.4387%2030.955Z%22%20fill%3D%22%23BC4726%22%20mask%3D%22url(%23path-2-outside-1_885_11045)%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2257.75%22%20cy%3D%2252.5%22%20r%3D%2213.5%22%20fill%3D%22%23E0E0E0%22%2F%3E%0A%20%20%3Crect%20x%3D%2248.75%22%20y%3D%2250.25%22%20width%3D%2218%22%20height%3D%224.5%22%20rx%3D%221.5%22%20fill%3D%22%23666666%22%2F%3E%0A%20%20%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M57.9853%2015.8781C58.2046%2016.1015%2058.5052%2016.2262%2058.8181%2016.2238C59.1311%2016.2262%2059.4316%2016.1015%2059.6509%2015.8781L62.9821%2012.5469C63.2974%2012.2532%2063.4272%2011.8107%2063.3206%2011.3931C63.2139%2010.9756%2062.8879%2010.6495%2062.4703%2010.5429C62.0528%2010.4363%2061.6103%2010.5661%2061.3165%2010.8813L57.9853%2014.2125C57.7627%2014.4325%2057.6374%2014.7324%2057.6374%2015.0453C57.6374%2015.3583%2057.7627%2015.6582%2057.9853%2015.8781ZM61.3598%2018.8363C61.388%2019.4872%2061.9385%2019.9919%2062.5893%2019.9637L62.6915%2019.9559L66.7769%2019.6023C67.4278%2019.5459%2067.9097%2018.9726%2067.8533%2018.3217C67.7968%2017.6708%2067.2235%2017.1889%2066.5726%2017.2453L62.4872%2017.6067C61.8363%2017.6349%2061.3316%2018.1854%2061.3598%2018.8363Z%22%20fill%3D%22%23AAAAAA%22%20fill-opacity%3D%220.6%22%2F%3E%0A%20%20%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M10.6535%2015.8781C10.4342%2016.1015%2010.1336%2016.2262%209.82067%2016.2238C9.5077%2016.2262%209.20717%2016.1015%208.98787%2015.8781L5.65667%2012.5469C5.34138%2012.2532%205.2116%2011.8107%205.31823%2011.3931C5.42487%2010.9756%205.75092%2010.6495%206.16847%2010.5429C6.58602%2010.4363%207.02848%2010.5661%207.32227%2010.8813L10.6535%2014.2125C10.8761%2014.4325%2011.0014%2014.7324%2011.0014%2015.0453C11.0014%2015.3583%2010.8761%2015.6582%2010.6535%2015.8781ZM7.2791%2018.8362C7.25089%2019.4871%206.7004%2019.9919%206.04954%2019.9637L5.9474%2019.9558L1.86197%2019.6023C1.44093%2019.5658%201.07135%2019.3074%200.892432%2018.9246C0.713515%2018.5417%200.752449%2018.0924%200.994567%2017.7461C1.23669%2017.3997%201.6452%2017.2088%202.06624%2017.2453L6.15167%2017.6067C6.80254%2017.6349%207.3073%2018.1854%207.2791%2018.8362Z%22%20fill%3D%22%23AAAAAA%22%20fill-opacity%3D%220.6%22%2F%3E%0A%3C%2Fsvg%3E%0A';
+    const videoPlayDark = 'data:image/svg+xml;utf8,%3Csvg%20width%3D%2222%22%20height%3D%2226%22%20viewBox%3D%220%200%2022%2026%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Cpath%20d%3D%22M21%2011.2679C22.3333%2012.0377%2022.3333%2013.9622%2021%2014.732L3%2025.1244C1.66667%2025.8942%202.59376e-06%2024.9319%202.66105e-06%2023.3923L3.56958e-06%202.60769C3.63688e-06%201.06809%201.66667%200.105844%203%200.875644L21%2011.2679Z%22%20fill%3D%22%23222222%22%2F%3E%0A%3C%2Fsvg%3E%0A';
+    const videoPlayLight = 'data:image/svg+xml;utf8,%3Csvg%20width%3D%2222%22%20height%3D%2226%22%20viewBox%3D%220%200%2022%2026%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%3Cpath%20d%3D%22M21%2011.2679C22.3333%2012.0377%2022.3333%2013.9622%2021%2014.732L3%2025.1244C1.66667%2025.8942%202.59376e-06%2024.9319%202.66105e-06%2023.3923L3.56958e-06%202.60769C3.63688e-06%201.06809%201.66667%200.105844%203%200.875644L21%2011.2679Z%22%20fill%3D%22%23FFFFFF%22%2F%3E%0A%3C%2Fsvg%3E';
+
+    var localesJSON = `{"bg":{"facebook.json":{"informationalModalMessageTitle":"При влизане разрешавате на Facebook да Ви проследява","informationalModalMessageBody":"След като влезете, DuckDuckGo не може да блокира проследяването от Facebook в съдържанието на този сайт.","informationalModalConfirmButtonText":"Вход","informationalModalRejectButtonText":"Назад","loginButtonText":"Вход във Facebook","loginBodyText":"Facebook проследява Вашата активност в съответния сайт, когато го използвате за вход.","buttonTextUnblockContent":"Разблокиране на съдържанието","buttonTextUnblockComment":"Разблокиране на коментара","buttonTextUnblockComments":"Разблокиране на коментарите","buttonTextUnblockPost":"Разблокиране на публикацията","buttonTextUnblockVideo":"Разблокиране на видеото","infoTitleUnblockContent":"DuckDuckGo блокира това съдържание, за да предотврати проследяване от Facebook","infoTitleUnblockComment":"DuckDuckGo блокира този коментар, за да предотврати проследяване от Facebook","infoTitleUnblockComments":"DuckDuckGo блокира тези коментари, за да предотврати проследяване от Facebook","infoTitleUnblockPost":"DuckDuckGo блокира тази публикация, за да предотврати проследяване от Facebook","infoTitleUnblockVideo":"DuckDuckGo блокира това видео, за да предотврати проследяване от Facebook","infoTextUnblockContent":"Блокирахме проследяването от Facebook при зареждане на страницата. Ако разблокирате това съдържание, Facebook ще следи Вашата активност."},"shared.json":{"learnMore":"Научете повече","readAbout":"Прочетете за тази защита на поверителността"},"youtube.json":{"informationalModalMessageTitle":"Активиране на всички прегледи в YouTube?","informationalModalMessageBody":"Показването на преглед позволява на Google (собственик на YouTube) да види част от информацията за Вашето устройство, но все пак осигурява повече поверителност отколкото при възпроизвеждане на видеоклипа.","informationalModalConfirmButtonText":"Активиране на всички прегледи","informationalModalRejectButtonText":"Не, благодаря","buttonTextUnblockVideo":"Разблокиране на видеото","infoTitleUnblockVideo":"DuckDuckGo блокира този видеоклип в YouTube, за да предотврати проследяване от Google","infoTextUnblockVideo":"Блокирахме проследяването от Google (собственик на YouTube) при зареждане на страницата. Ако разблокирате този видеоклип, Google ще следи Вашата активност.","infoPreviewToggleText":"Прегледите са деактивирани за осигуряване на допълнителна поверителност","infoPreviewToggleEnabledText":"Прегледите са активирани","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Научете повече</a> за вградената защита от социални медии на DuckDuckGo"}},"cs":{"facebook.json":{"informationalModalMessageTitle":"Když se přihlásíš přes Facebook, bude tě moct sledovat","informationalModalMessageBody":"Po přihlášení už DuckDuckGo nemůže bránit Facebooku, aby tě na téhle stránce sledoval.","informationalModalConfirmButtonText":"Přihlásit se","informationalModalRejectButtonText":"Zpět","loginButtonText":"Přihlásit se pomocí Facebooku","loginBodyText":"Facebook sleduje tvou aktivitu na webu, když se přihlásíš jeho prostřednictvím.","buttonTextUnblockContent":"Odblokovat obsah","buttonTextUnblockComment":"Odblokovat komentář","buttonTextUnblockComments":"Odblokovat komentáře","buttonTextUnblockPost":"Odblokovat příspěvek","buttonTextUnblockVideo":"Odblokovat video","infoTitleUnblockContent":"DuckDuckGo zablokoval tenhle obsah, aby Facebooku zabránil tě sledovat","infoTitleUnblockComment":"Služba DuckDuckGo zablokovala tento komentář, aby Facebooku zabránila ve tvém sledování","infoTitleUnblockComments":"Služba DuckDuckGo zablokovala tyto komentáře, aby Facebooku zabránila ve tvém sledování","infoTitleUnblockPost":"DuckDuckGo zablokoval tenhle příspěvek, aby Facebooku zabránil tě sledovat","infoTitleUnblockVideo":"DuckDuckGo zablokoval tohle video, aby Facebooku zabránil tě sledovat","infoTextUnblockContent":"Při načítání stránky jsme Facebooku zabránili, aby tě sledoval. Když tenhle obsah odblokuješ, Facebook bude mít přístup ke tvé aktivitě."},"shared.json":{"learnMore":"Více informací","readAbout":"Přečti si o téhle ochraně soukromí"},"youtube.json":{"informationalModalMessageTitle":"Zapnout všechny náhledy YouTube?","informationalModalMessageBody":"Zobrazování náhledů umožní společnosti Google (která vlastní YouTube) zobrazit některé informace o tvém zařízení, ale pořád jde o diskrétnější volbu, než je přehrávání videa.","informationalModalConfirmButtonText":"Zapnout všechny náhledy","informationalModalRejectButtonText":"Ne, děkuji","buttonTextUnblockVideo":"Odblokovat video","infoTitleUnblockVideo":"DuckDuckGo zablokoval tohle video z YouTube, aby Googlu zabránil tě sledovat","infoTextUnblockVideo":"Zabránili jsme společnosti Google (která vlastní YouTube), aby tě při načítání stránky sledovala. Pokud toto video odblokuješ, Google získá přístup ke tvé aktivitě.","infoPreviewToggleText":"Náhledy jsou pro větší soukromí vypnuté","infoPreviewToggleEnabledText":"Náhledy jsou zapnuté","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Další informace</a> o ochraně DuckDuckGo před sledováním prostřednictvím vloženého obsahu ze sociálních médií"}},"da":{"facebook.json":{"informationalModalMessageTitle":"Når du logger ind med Facebook, kan de spore dig","informationalModalMessageBody":"Når du er logget ind, kan DuckDuckGo ikke blokere for, at indhold fra Facebook sporer dig på dette websted.","informationalModalConfirmButtonText":"Log på","informationalModalRejectButtonText":"Gå tilbage","loginButtonText":"Log ind med Facebook","loginBodyText":"Facebook sporer din aktivitet på et websted, når du bruger dem til at logge ind.","buttonTextUnblockContent":"Fjern blokering af indhold","buttonTextUnblockComment":"Fjern blokering af kommentar","buttonTextUnblockComments":"Fjern blokering af kommentarer","buttonTextUnblockPost":"Fjern blokering af indlæg","buttonTextUnblockVideo":"Fjern blokering af video","infoTitleUnblockContent":"DuckDuckGo har blokeret dette indhold for at forhindre Facebook i at spore dig","infoTitleUnblockComment":"DuckDuckGo har blokeret denne kommentar for at forhindre Facebook i at spore dig","infoTitleUnblockComments":"DuckDuckGo har blokeret disse kommentarer for at forhindre Facebook i at spore dig","infoTitleUnblockPost":"DuckDuckGo blokerede dette indlæg for at forhindre Facebook i at spore dig","infoTitleUnblockVideo":"DuckDuckGo har blokeret denne video for at forhindre Facebook i at spore dig","infoTextUnblockContent":"Vi blokerede for, at Facebook sporede dig, da siden blev indlæst. Hvis du ophæver blokeringen af dette indhold, vil Facebook kende din aktivitet."},"shared.json":{"learnMore":"Mere info","readAbout":"Læs om denne beskyttelse af privatlivet"},"youtube.json":{"informationalModalMessageTitle":"Vil du aktivere alle YouTube-forhåndsvisninger?","informationalModalMessageBody":"Med forhåndsvisninger kan Google (som ejer YouTube) se nogle af enhedens oplysninger, men det er stadig mere privat end at afspille videoen.","informationalModalConfirmButtonText":"Aktivér alle forhåndsvisninger","informationalModalRejectButtonText":"Nej tak.","buttonTextUnblockVideo":"Fjern blokering af video","infoTitleUnblockVideo":"DuckDuckGo har blokeret denne YouTube-video for at forhindre Google i at spore dig","infoTextUnblockVideo":"Vi blokerede Google (som ejer YouTube) fra at spore dig, da siden blev indlæst. Hvis du fjerner blokeringen af denne video, vil Google få kendskab til din aktivitet.","infoPreviewToggleText":"Forhåndsvisninger er deaktiveret for at give yderligere privatliv","infoPreviewToggleEnabledText":"Forhåndsvisninger er deaktiveret","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Få mere at vide på</a> om DuckDuckGos indbyggede beskyttelse på sociale medier"}},"de":{"facebook.json":{"informationalModalMessageTitle":"Wenn du dich bei Facebook anmeldest, kann Facebook dich tracken","informationalModalMessageBody":"Sobald du angemeldet bist, kann DuckDuckGo nicht mehr verhindern, dass Facebook-Inhalte dich auf dieser Website tracken.","informationalModalConfirmButtonText":"Anmelden","informationalModalRejectButtonText":"Zurück","loginButtonText":"Mit Facebook anmelden","loginBodyText":"Facebook trackt deine Aktivität auf einer Website, wenn du dich über Facebook dort anmeldest.","buttonTextUnblockContent":"Blockierung aufheben","buttonTextUnblockComment":"Blockierung aufheben","buttonTextUnblockComments":"Blockierung aufheben","buttonTextUnblockPost":"Blockierung aufheben","buttonTextUnblockVideo":"Blockierung aufheben","infoTitleUnblockContent":"DuckDuckGo hat diesen Inhalt blockiert, um zu verhindern, dass Facebook dich trackt","infoTitleUnblockComment":"DuckDuckGo hat diesen Kommentar blockiert, um zu verhindern, dass Facebook dich trackt","infoTitleUnblockComments":"DuckDuckGo hat diese Kommentare blockiert, um zu verhindern, dass Facebook dich trackt","infoTitleUnblockPost":"DuckDuckGo hat diesen Beitrag blockiert, um zu verhindern, dass Facebook dich trackt","infoTitleUnblockVideo":"DuckDuckGo hat dieses Video blockiert, um zu verhindern, dass Facebook dich trackt","infoTextUnblockContent":"Wir haben Facebook daran gehindert, dich zu tracken, als die Seite geladen wurde. Wenn du die Blockierung für diesen Inhalt aufhebst, kennt Facebook deine Aktivitäten."},"shared.json":{"learnMore":"Mehr erfahren","readAbout":"Weitere Informationen über diesen Datenschutz"},"youtube.json":{"informationalModalMessageTitle":"Alle YouTube-Vorschauen aktivieren?","informationalModalMessageBody":"Durch das Anzeigen von Vorschauen kann Google (dem YouTube gehört) einige Informationen zu deinem Gerät sehen. Dies ist aber immer noch privater als das Abspielen des Videos.","informationalModalConfirmButtonText":"Alle Vorschauen aktivieren","informationalModalRejectButtonText":"Nein, danke","buttonTextUnblockVideo":"Blockierung aufheben","infoTitleUnblockVideo":"DuckDuckGo hat dieses YouTube-Video blockiert, um zu verhindern, dass Google dich trackt.","infoTextUnblockVideo":"Wir haben Google (dem YouTube gehört) daran gehindert, dich beim Laden der Seite zu tracken. Wenn du die Blockierung für dieses Video aufhebst, kennt Google deine Aktivitäten.","infoPreviewToggleText":"Vorschau für mehr Privatsphäre deaktiviert","infoPreviewToggleEnabledText":"Vorschau aktiviert","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Erfahre mehr</a> über den DuckDuckGo-Schutz vor eingebetteten Social Media-Inhalten"}},"el":{"facebook.json":{"informationalModalMessageTitle":"Η σύνδεση μέσω Facebook τους επιτρέπει να σας παρακολουθούν","informationalModalMessageBody":"Μόλις συνδεθείτε, το DuckDuckGo δεν μπορεί να εμποδίσει το περιεχόμενο του Facebook από το να σας παρακολουθεί σε αυτόν τον ιστότοπο.","informationalModalConfirmButtonText":"Σύνδεση","informationalModalRejectButtonText":"Επιστροφή","loginButtonText":"Σύνδεση μέσω Facebook","loginBodyText":"Το Facebook παρακολουθεί τη δραστηριότητά σας σε έναν ιστότοπο όταν τον χρησιμοποιείτε για να συνδεθείτε.","buttonTextUnblockContent":"Άρση αποκλεισμού περιεχομένου","buttonTextUnblockComment":"Άρση αποκλεισμού σχολίου","buttonTextUnblockComments":"Άρση αποκλεισμού σχολίων","buttonTextUnblockPost":"Άρση αποκλεισμού ανάρτησης","buttonTextUnblockVideo":"Άρση αποκλεισμού βίντεο","infoTitleUnblockContent":"Το DuckDuckGo απέκλεισε το περιεχόμενο αυτό για να εμποδίσει το Facebook από το να σας παρακολουθεί","infoTitleUnblockComment":"Το DuckDuckGo απέκλεισε το σχόλιο αυτό για να εμποδίσει το Facebook από το να σας παρακολουθεί","infoTitleUnblockComments":"Το DuckDuckGo απέκλεισε τα σχόλια αυτά για να εμποδίσει το Facebook από το να σας παρακολουθεί","infoTitleUnblockPost":"Το DuckDuckGo απέκλεισε την ανάρτηση αυτή για να εμποδίσει το Facebook από το να σας παρακολουθεί","infoTitleUnblockVideo":"Το DuckDuckGo απέκλεισε το βίντεο αυτό για να εμποδίσει το Facebook από το να σας παρακολουθεί","infoTextUnblockContent":"Αποκλείσαμε το Facebook από το να σας παρακολουθεί όταν φορτώθηκε η σελίδα. Εάν κάνετε άρση αποκλεισμού γι' αυτό το περιεχόμενο, το Facebook θα γνωρίζει τη δραστηριότητά σας."},"shared.json":{"learnMore":"Μάθετε περισσότερα","readAbout":"Διαβάστε σχετικά με την παρούσα προστασίας προσωπικών δεδομένων"},"youtube.json":{"informationalModalMessageTitle":"Ενεργοποίηση όλων των προεπισκοπήσεων του YouTube;","informationalModalMessageBody":"Η προβολή των προεπισκοπήσεων θα επιτρέψει στην Google (στην οποία ανήκει το YouTube) να βλέπει ορισμένες από τις πληροφορίες της συσκευής σας, ωστόσο εξακολουθεί να είναι πιο ιδιωτική από την αναπαραγωγή του βίντεο.","informationalModalConfirmButtonText":"Ενεργοποίηση όλων των προεπισκοπήσεων","informationalModalRejectButtonText":"Όχι, ευχαριστώ","buttonTextUnblockVideo":"Άρση αποκλεισμού βίντεο","infoTitleUnblockVideo":"Το DuckDuckGo απέκλεισε το βίντεο αυτό στο YouTube για να εμποδίσει την Google από το να σας παρακολουθεί","infoTextUnblockVideo":"Αποκλείσαμε την Google (στην οποία ανήκει το YouTube) από το να σας παρακολουθεί όταν φορτώθηκε η σελίδα. Εάν κάνετε άρση αποκλεισμού γι' αυτό το βίντεο, η Google θα γνωρίζει τη δραστηριότητά σας.","infoPreviewToggleText":"Οι προεπισκοπήσεις απενεργοποιήθηκαν για πρόσθετη προστασία των προσωπικών δεδομένων","infoPreviewToggleEnabledText":"Οι προεπισκοπήσεις ενεργοποιήθηκαν","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Μάθετε περισσότερα</a> για την ενσωματωμένη προστασία κοινωνικών μέσων DuckDuckGo"}},"en":{"facebook.json":{"informationalModalMessageTitle":"Logging in with Facebook lets them track you","informationalModalMessageBody":"Once you're logged in, DuckDuckGo can't block Facebook content from tracking you on this site.","informationalModalConfirmButtonText":"Log In","informationalModalRejectButtonText":"Go back","loginButtonText":"Log in with Facebook","loginBodyText":"Facebook tracks your activity on a site when you use them to login.","buttonTextUnblockContent":"Unblock Content","buttonTextUnblockComment":"Unblock Comment","buttonTextUnblockComments":"Unblock Comments","buttonTextUnblockPost":"Unblock Post","buttonTextUnblockVideo":"Unblock Video","infoTitleUnblockContent":"DuckDuckGo blocked this content to prevent Facebook from tracking you","infoTitleUnblockComment":"DuckDuckGo blocked this comment to prevent Facebook from tracking you","infoTitleUnblockComments":"DuckDuckGo blocked these comments to prevent Facebook from tracking you","infoTitleUnblockPost":"DuckDuckGo blocked this post to prevent Facebook from tracking you","infoTitleUnblockVideo":"DuckDuckGo blocked this video to prevent Facebook from tracking you","infoTextUnblockContent":"We blocked Facebook from tracking you when the page loaded. If you unblock this content, Facebook will know your activity."},"shared.json":{"learnMore":"Learn More","readAbout":"Read about this privacy protection"},"youtube.json":{"informationalModalMessageTitle":"Enable all YouTube previews?","informationalModalMessageBody":"Showing previews will allow Google (which owns YouTube) to see some of your device’s information, but is still more private than playing the video.","informationalModalConfirmButtonText":"Enable All Previews","informationalModalRejectButtonText":"No Thanks","buttonTextUnblockVideo":"Unblock Video","infoTitleUnblockVideo":"DuckDuckGo blocked this YouTube video to prevent Google from tracking you","infoTextUnblockVideo":"We blocked Google (which owns YouTube) from tracking you when the page loaded. If you unblock this video, Google will know your activity.","infoPreviewToggleText":"Previews disabled for additional privacy","infoPreviewToggleEnabledText":"Previews enabled","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Learn more</a> about DuckDuckGo Embedded Social Media Protection"}},"es":{"facebook.json":{"informationalModalMessageTitle":"Al iniciar sesión en Facebook, les permites que te rastreen","informationalModalMessageBody":"Una vez que hayas iniciado sesión, DuckDuckGo no puede bloquear el contenido de Facebook para que no te rastree en este sitio.","informationalModalConfirmButtonText":"Iniciar sesión","informationalModalRejectButtonText":"Volver atrás","loginButtonText":"Iniciar sesión con Facebook","loginBodyText":"Facebook rastrea tu actividad en un sitio web cuando lo usas para iniciar sesión.","buttonTextUnblockContent":"Desbloquear contenido","buttonTextUnblockComment":"Desbloquear comentario","buttonTextUnblockComments":"Desbloquear comentarios","buttonTextUnblockPost":"Desbloquear publicación","buttonTextUnblockVideo":"Desbloquear vídeo","infoTitleUnblockContent":"DuckDuckGo ha bloqueado este contenido para evitar que Facebook te rastree","infoTitleUnblockComment":"DuckDuckGo ha bloqueado este comentario para evitar que Facebook te rastree","infoTitleUnblockComments":"DuckDuckGo ha bloqueado estos comentarios para evitar que Facebook te rastree","infoTitleUnblockPost":"DuckDuckGo ha bloqueado esta publicación para evitar que Facebook te rastree","infoTitleUnblockVideo":"DuckDuckGo ha bloqueado este vídeo para evitar que Facebook te rastree","infoTextUnblockContent":"Hemos bloqueado el rastreo de Facebook cuando se ha cargado la página. Si desbloqueas este contenido, Facebook tendrá conocimiento de tu actividad."},"shared.json":{"learnMore":"Más información","readAbout":"Lee acerca de esta protección de privacidad"},"youtube.json":{"informationalModalMessageTitle":"¿Habilitar todas las vistas previas de YouTube?","informationalModalMessageBody":"Mostrar vistas previas permitirá a Google (que es el propietario de YouTube) ver parte de la información de tu dispositivo, pero sigue siendo más privado que reproducir el vídeo.","informationalModalConfirmButtonText":"Habilitar todas las vistas previas","informationalModalRejectButtonText":"No, gracias","buttonTextUnblockVideo":"Desbloquear vídeo","infoTitleUnblockVideo":"DuckDuckGo ha bloqueado este vídeo de YouTube para evitar que Google te rastree","infoTextUnblockVideo":"Hemos bloqueado el rastreo de Google (que es el propietario de YouTube) al cargarse la página. Si desbloqueas este vídeo, Goggle tendrá conocimiento de tu actividad.","infoPreviewToggleText":"Vistas previas desactivadas para mayor privacidad","infoPreviewToggleEnabledText":"Vistas previas activadas","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Más información</a> sobre la protección integrada de redes sociales DuckDuckGo"}},"et":{"facebook.json":{"informationalModalMessageTitle":"Kui logid Facebookiga sisse, saab Facebook sind jälgida","informationalModalMessageBody":"Kui oled sisse logitud, ei saa DuckDuckGo blokeerida Facebooki sisu sind jälgimast.","informationalModalConfirmButtonText":"Logi sisse","informationalModalRejectButtonText":"Mine tagasi","loginButtonText":"Logi sisse Facebookiga","loginBodyText":"Kui logid sisse Facebookiga, saab Facebook sinu tegevust saidil jälgida.","buttonTextUnblockContent":"Deblokeeri sisu","buttonTextUnblockComment":"Deblokeeri kommentaar","buttonTextUnblockComments":"Deblokeeri kommentaarid","buttonTextUnblockPost":"Deblokeeri postitus","buttonTextUnblockVideo":"Deblokeeri video","infoTitleUnblockContent":"DuckDuckGo blokeeris selle sisu, et Facebook ei saaks sind jälgida","infoTitleUnblockComment":"DuckDuckGo blokeeris selle kommentaari, et Facebook ei saaks sind jälgida","infoTitleUnblockComments":"DuckDuckGo blokeeris need kommentaarid, et Facebook ei saaks sind jälgida","infoTitleUnblockPost":"DuckDuckGo blokeeris selle postituse, et Facebook ei saaks sind jälgida","infoTitleUnblockVideo":"DuckDuckGo blokeeris selle video, et Facebook ei saaks sind jälgida","infoTextUnblockContent":"Blokeerisime lehe laadimise ajal Facebooki jaoks sinu jälgimise. Kui sa selle sisu deblokeerid, saab Facebook sinu tegevust jälgida."},"shared.json":{"learnMore":"Loe edasi","readAbout":"Loe selle privaatsuskaitse kohta"},"youtube.json":{"informationalModalMessageTitle":"Kas lubada kõik YouTube’i eelvaated?","informationalModalMessageBody":"Eelvaate näitamine võimaldab Google’il (kellele YouTube kuulub) näha osa sinu seadme teabest, kuid see on siiski privaatsem kui video esitamine.","informationalModalConfirmButtonText":"Luba kõik eelvaated","informationalModalRejectButtonText":"Ei aitäh","buttonTextUnblockVideo":"Deblokeeri video","infoTitleUnblockVideo":"DuckDuckGo blokeeris selle YouTube’i video, et takistada Google’it sind jälgimast","infoTextUnblockVideo":"Me blokeerisime lehe laadimise ajal Google’i (kellele YouTube kuulub) jälgimise. Kui sa selle video deblokeerid, saab Google sinu tegevusest teada.","infoPreviewToggleText":"Eelvaated on täiendava privaatsuse tagamiseks keelatud","infoPreviewToggleEnabledText":"Eelvaated on lubatud","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Lisateave</a> DuckDuckGo sisseehitatud sotsiaalmeediakaitse kohta"}},"fi":{"facebook.json":{"informationalModalMessageTitle":"Kun kirjaudut sisään Facebook-tunnuksilla, Facebook voi seurata sinua","informationalModalMessageBody":"Kun olet kirjautunut sisään, DuckDuckGo ei voi estää Facebook-sisältöä seuraamasta sinua tällä sivustolla.","informationalModalConfirmButtonText":"Kirjaudu sisään","informationalModalRejectButtonText":"Edellinen","loginButtonText":"Kirjaudu sisään Facebook-tunnuksilla","loginBodyText":"Facebook seuraa toimintaasi sivustolla, kun kirjaudut sisään sen kautta.","buttonTextUnblockContent":"Poista sisällön esto","buttonTextUnblockComment":"Poista kommentin esto","buttonTextUnblockComments":"Poista kommenttien esto","buttonTextUnblockPost":"Poista julkaisun esto","buttonTextUnblockVideo":"Poista videon esto","infoTitleUnblockContent":"DuckDuckGo esti tämän sisällön estääkseen Facebookia seuraamasta sinua","infoTitleUnblockComment":"DuckDuckGo esti tämän kommentin estääkseen Facebookia seuraamasta sinua","infoTitleUnblockComments":"DuckDuckGo esti nämä kommentit estääkseen Facebookia seuraamasta sinua","infoTitleUnblockPost":"DuckDuckGo esti tämän julkaisun estääkseen Facebookia seuraamasta sinua","infoTitleUnblockVideo":"DuckDuckGo esti tämän videon estääkseen Facebookia seuraamasta sinua","infoTextUnblockContent":"Estimme Facebookia seuraamasta sinua, kun sivua ladattiin. Jos poistat tämän sisällön eston, Facebook saa tietää toimintasi."},"shared.json":{"learnMore":"Lue lisää","readAbout":"Lue tästä yksityisyydensuojasta"},"youtube.json":{"informationalModalMessageTitle":"Otetaanko käyttöön kaikki YouTube-esikatselut?","informationalModalMessageBody":"Kun sallit esikatselun, Google (joka omistaa YouTuben) voi nähdä joitakin laitteesi tietoja, mutta se on silti yksityisempää kuin videon toistaminen.","informationalModalConfirmButtonText":"Ota käyttöön kaikki esikatselut","informationalModalRejectButtonText":"Ei kiitos","buttonTextUnblockVideo":"Poista videon esto","infoTitleUnblockVideo":"DuckDuckGo esti tämän YouTube-videon, jotta Google ei voi seurata sinua","infoTextUnblockVideo":"Estimme Googlea (joka omistaa YouTuben) seuraamasta sinua, kun sivua ladattiin. Jos poistat tämän videon eston, Google tietää toimintasi.","infoPreviewToggleText":"Esikatselut on poistettu käytöstä yksityisyyden lisäämiseksi","infoPreviewToggleEnabledText":"Esikatselut käytössä","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Lue lisää</a> DuckDuckGon upotetusta sosiaalisen median suojauksesta"}},"fr":{"facebook.json":{"informationalModalMessageTitle":"L'identification via Facebook leur permet de vous pister","informationalModalMessageBody":"Une fois que vous êtes connecté(e), DuckDuckGo ne peut pas empêcher le contenu Facebook de vous pister sur ce site.","informationalModalConfirmButtonText":"Connexion","informationalModalRejectButtonText":"Revenir en arrière","loginButtonText":"S'identifier avec Facebook","loginBodyText":"Facebook piste votre activité sur un site lorsque vous l'utilisez pour vous identifier.","buttonTextUnblockContent":"Débloquer le contenu","buttonTextUnblockComment":"Débloquer le commentaire","buttonTextUnblockComments":"Débloquer les commentaires","buttonTextUnblockPost":"Débloquer la publication","buttonTextUnblockVideo":"Débloquer la vidéo","infoTitleUnblockContent":"DuckDuckGo a bloqué ce contenu pour empêcher Facebook de vous suivre","infoTitleUnblockComment":"DuckDuckGo a bloqué ce commentaire pour empêcher Facebook de vous suivre","infoTitleUnblockComments":"DuckDuckGo a bloqué ces commentaires pour empêcher Facebook de vous suivre","infoTitleUnblockPost":"DuckDuckGo a bloqué cette publication pour empêcher Facebook de vous pister","infoTitleUnblockVideo":"DuckDuckGo a bloqué cette vidéo pour empêcher Facebook de vous pister","infoTextUnblockContent":"Nous avons empêché Facebook de vous pister lors du chargement de la page. Si vous débloquez ce contenu, Facebook connaîtra votre activité."},"shared.json":{"learnMore":"En savoir plus","readAbout":"En savoir plus sur cette protection de la confidentialité"},"youtube.json":{"informationalModalMessageTitle":"Activer tous les aperçus YouTube ?","informationalModalMessageBody":"L'affichage des aperçus permettra à Google (propriétaire de YouTube) de voir certaines informations de votre appareil, mais cela reste davantage confidentiel qu'en lisant la vidéo.","informationalModalConfirmButtonText":"Activer tous les aperçus","informationalModalRejectButtonText":"Non merci","buttonTextUnblockVideo":"Débloquer la vidéo","infoTitleUnblockVideo":"DuckDuckGo a bloqué cette vidéo YouTube pour empêcher Google de vous pister","infoTextUnblockVideo":"Nous avons empêché Google (propriétaire de YouTube) de vous pister lors du chargement de la page. Si vous débloquez cette vidéo, Google connaîtra votre activité.","infoPreviewToggleText":"Aperçus désactivés pour plus de confidentialité","infoPreviewToggleEnabledText":"Aperçus activés","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">En savoir plus</a> sur la protection intégrée DuckDuckGo des réseaux sociaux"}},"hr":{"facebook.json":{"informationalModalMessageTitle":"Prijava putem Facebooka omogućuje im da te prate","informationalModalMessageBody":"Nakon što se prijaviš, DuckDuckGo ne može blokirati Facebookov sadržaj da te prati na Facebooku.","informationalModalConfirmButtonText":"Prijavljivanje","informationalModalRejectButtonText":"Vrati se","loginButtonText":"Prijavi se putem Facebooka","loginBodyText":"Facebook prati tvoju aktivnost na toj web lokaciji kad je koristiš za prijavu.","buttonTextUnblockContent":"Deblokiranje sadržaja","buttonTextUnblockComment":"Deblokiranje komentara","buttonTextUnblockComments":"Deblokiranje komentara","buttonTextUnblockPost":"Deblokiranje objave","buttonTextUnblockVideo":"Deblokiranje videozapisa","infoTitleUnblockContent":"DuckDuckGo je blokirao ovaj sadržaj kako bi spriječio Facebook da te prati","infoTitleUnblockComment":"DuckDuckGo je blokirao ovaj komentar kako bi spriječio Facebook da te prati","infoTitleUnblockComments":"DuckDuckGo je blokirao ove komentare kako bi spriječio Facebook da te prati","infoTitleUnblockPost":"DuckDuckGo je blokirao ovu objavu kako bi spriječio Facebook da te prati","infoTitleUnblockVideo":"DuckDuckGo je blokirao ovaj video kako bi spriječio Facebook da te prati","infoTextUnblockContent":"Blokirali smo Facebook da te prati kad se stranica učita. Ako deblokiraš ovaj sadržaj, Facebook će znati tvoju aktivnost."},"shared.json":{"learnMore":"Saznajte više","readAbout":"Pročitaj više o ovoj zaštiti privatnosti"},"youtube.json":{"informationalModalMessageTitle":"Omogućiti sve YouTube pretpreglede?","informationalModalMessageBody":"Prikazivanje pretpregleda omogućit će Googleu (u čijem je vlasništvu YouTube) da vidi neke podatke o tvom uređaju, ali je i dalje privatnija opcija od reprodukcije videozapisa.","informationalModalConfirmButtonText":"Omogući sve pretpreglede","informationalModalRejectButtonText":"Ne, hvala","buttonTextUnblockVideo":"Deblokiranje videozapisa","infoTitleUnblockVideo":"DuckDuckGo je blokirao ovaj YouTube videozapis kako bi spriječio Google da te prati","infoTextUnblockVideo":"Blokirali smo Google (u čijem je vlasništvu YouTube) da te prati kad se stranica učita. Ako deblokiraš ovaj videozapis, Google će znati tvoju aktivnost.","infoPreviewToggleText":"Pretpregledi su onemogućeni radi dodatne privatnosti","infoPreviewToggleEnabledText":"Pretpregledi su omogućeni","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Saznaj više</a> o uključenoj DuckDuckGo zaštiti od društvenih medija"}},"hu":{"facebook.json":{"informationalModalMessageTitle":"A Facebookkal való bejelentkezéskor a Facebook nyomon követhet","informationalModalMessageBody":"Miután bejelentkezel, a DuckDuckGo nem fogja tudni blokkolni a Facebook-tartalmat, amely nyomon követ ezen az oldalon.","informationalModalConfirmButtonText":"Bejelentkezés","informationalModalRejectButtonText":"Visszalépés","loginButtonText":"Bejelentkezés Facebookkal","loginBodyText":"Ha a Facebookkal jelentkezel be, nyomon követik a webhelyen végzett tevékenységedet.","buttonTextUnblockContent":"Tartalom feloldása","buttonTextUnblockComment":"Hozzászólás feloldása","buttonTextUnblockComments":"Hozzászólások feloldása","buttonTextUnblockPost":"Bejegyzés feloldása","buttonTextUnblockVideo":"Videó feloldása","infoTitleUnblockContent":"A DuckDuckGo blokkolta ezt a tartalmat, hogy megakadályozza a Facebookot a nyomon követésedben","infoTitleUnblockComment":"A DuckDuckGo blokkolta ezt a hozzászólást, hogy megakadályozza a Facebookot a nyomon követésedben","infoTitleUnblockComments":"A DuckDuckGo blokkolta ezeket a hozzászólásokat, hogy megakadályozza a Facebookot a nyomon követésedben","infoTitleUnblockPost":"A DuckDuckGo blokkolta ezt a bejegyzést, hogy megakadályozza a Facebookot a nyomon követésedben","infoTitleUnblockVideo":"A DuckDuckGo blokkolta ezt a videót, hogy megakadályozza a Facebookot a nyomon követésedben","infoTextUnblockContent":"Az oldal betöltésekor blokkoltuk a Facebookot a nyomon követésedben. Ha feloldod ezt a tartalmat, a Facebook tudni fogja, hogy milyen tevékenységet végzel."},"shared.json":{"learnMore":"További részletek","readAbout":"Tudj meg többet erről az adatvédelemről"},"youtube.json":{"informationalModalMessageTitle":"Engedélyezed minden YouTube-videó előnézetét?","informationalModalMessageBody":"Az előnézetek megjelenítésével a Google (a YouTube tulajdonosa) láthatja a készülék néhány adatát, de ez adatvédelmi szempontból még mindig előnyösebb, mint a videó lejátszása.","informationalModalConfirmButtonText":"Minden előnézet engedélyezése","informationalModalRejectButtonText":"Nem, köszönöm","buttonTextUnblockVideo":"Videó feloldása","infoTitleUnblockVideo":"A DuckDuckGo blokkolta a YouTube-videót, hogy a Google ne követhessen nyomon","infoTextUnblockVideo":"Blokkoltuk, hogy a Google (a YouTube tulajdonosa) nyomon követhessen az oldal betöltésekor. Ha feloldod a videó blokkolását, a Google tudni fogja, hogy milyen tevékenységet végzel.","infoPreviewToggleText":"Az előnézetek a fokozott adatvédelem érdekében letiltva","infoPreviewToggleEnabledText":"Az előnézetek engedélyezve","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">További tudnivalók</a> a DuckDuckGo beágyazott közösségi média elleni védelméről"}},"it":{"facebook.json":{"informationalModalMessageTitle":"L'accesso con Facebook consente di tracciarti","informationalModalMessageBody":"Dopo aver effettuato l'accesso, DuckDuckGo non può bloccare il tracciamento dei contenuti di Facebook su questo sito.","informationalModalConfirmButtonText":"Accedi","informationalModalRejectButtonText":"Torna indietro","loginButtonText":"Accedi con Facebook","loginBodyText":"Facebook tiene traccia della tua attività su un sito quando lo usi per accedere.","buttonTextUnblockContent":"Sblocca contenuti","buttonTextUnblockComment":"Sblocca commento","buttonTextUnblockComments":"Sblocca commenti","buttonTextUnblockPost":"Sblocca post","buttonTextUnblockVideo":"Sblocca video","infoTitleUnblockContent":"DuckDuckGo ha bloccato questo contenuto per impedire a Facebook di tracciarti","infoTitleUnblockComment":"DuckDuckGo ha bloccato questo commento per impedire a Facebook di tracciarti","infoTitleUnblockComments":"DuckDuckGo ha bloccato questi commenti per impedire a Facebook di tracciarti","infoTitleUnblockPost":"DuckDuckGo ha bloccato questo post per impedire a Facebook di tracciarti","infoTitleUnblockVideo":"DuckDuckGo ha bloccato questo video per impedire a Facebook di tracciarti","infoTextUnblockContent":"Abbiamo impedito a Facebook di tracciarti al caricamento della pagina. Se sblocchi questo contenuto, Facebook conoscerà la tua attività."},"shared.json":{"learnMore":"Ulteriori informazioni","readAbout":"Leggi di più su questa protezione della privacy"},"youtube.json":{"informationalModalMessageTitle":"Abilitare tutte le anteprime di YouTube?","informationalModalMessageBody":"La visualizzazione delle anteprime consentirà a Google (che possiede YouTube) di vedere alcune delle informazioni del tuo dispositivo, ma è comunque più privato rispetto alla riproduzione del video.","informationalModalConfirmButtonText":"Abilita tutte le anteprime","informationalModalRejectButtonText":"No, grazie","buttonTextUnblockVideo":"Sblocca video","infoTitleUnblockVideo":"DuckDuckGo ha bloccato questo video di YouTube per impedire a Google di tracciarti","infoTextUnblockVideo":"Abbiamo impedito a Google (che possiede YouTube) di tracciarti quando la pagina è stata caricata. Se sblocchi questo video, Google conoscerà la tua attività.","infoPreviewToggleText":"Anteprime disabilitate per una maggiore privacy","infoPreviewToggleEnabledText":"Anteprime abilitate","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Scopri di più</a> sulla protezione dai social media integrata di DuckDuckGo"}},"lt":{"facebook.json":{"informationalModalMessageTitle":"Prisijungę prie „Facebook“ galite būti sekami","informationalModalMessageBody":"Kai esate prisijungę, „DuckDuckGo“ negali užblokuoti „Facebook“ turinio, todėl esate sekami šioje svetainėje.","informationalModalConfirmButtonText":"Prisijungti","informationalModalRejectButtonText":"Grįžti atgal","loginButtonText":"Prisijunkite su „Facebook“","loginBodyText":"„Facebook“ seka jūsų veiklą svetainėje, kai prisijungiate su šia svetaine.","buttonTextUnblockContent":"Atblokuoti turinį","buttonTextUnblockComment":"Atblokuoti komentarą","buttonTextUnblockComments":"Atblokuoti komentarus","buttonTextUnblockPost":"Atblokuoti įrašą","buttonTextUnblockVideo":"Atblokuoti vaizdo įrašą","infoTitleUnblockContent":"„DuckDuckGo“ užblokavo šį turinį, kad „Facebook“ negalėtų jūsų sekti","infoTitleUnblockComment":"„DuckDuckGo“ užblokavo šį komentarą, kad „Facebook“ negalėtų jūsų sekti","infoTitleUnblockComments":"„DuckDuckGo“ užblokavo šiuos komentarus, kad „Facebook“ negalėtų jūsų sekti","infoTitleUnblockPost":"„DuckDuckGo“ užblokavo šį įrašą, kad „Facebook“ negalėtų jūsų sekti","infoTitleUnblockVideo":"„DuckDuckGo“ užblokavo šį vaizdo įrašą, kad „Facebook“ negalėtų jūsų sekti","infoTextUnblockContent":"Užblokavome „Facebook“, kad negalėtų jūsų sekti, kai puslapis buvo įkeltas. Jei atblokuosite šį turinį, „Facebook“ žinos apie jūsų veiklą."},"shared.json":{"learnMore":"Sužinoti daugiau","readAbout":"Skaitykite apie šią privatumo apsaugą"},"youtube.json":{"informationalModalMessageTitle":"Įjungti visas „YouTube“ peržiūras?","informationalModalMessageBody":"Peržiūrų rodymas leis „Google“ (kuriai priklauso „YouTube“) matyti tam tikrą jūsų įrenginio informaciją, tačiau ji vis tiek bus privatesnė nei leidžiant vaizdo įrašą.","informationalModalConfirmButtonText":"Įjungti visas peržiūras","informationalModalRejectButtonText":"Ne, dėkoju","buttonTextUnblockVideo":"Atblokuoti vaizdo įrašą","infoTitleUnblockVideo":"„DuckDuckGo“ užblokavo šį „YouTube“ vaizdo įrašą, kad „Google“ negalėtų jūsų sekti","infoTextUnblockVideo":"Užblokavome „Google“ (kuriai priklauso „YouTube“) galimybę sekti jus, kai puslapis buvo įkeltas. Jei atblokuosite šį vaizdo įrašą, „Google“ sužinos apie jūsų veiklą.","infoPreviewToggleText":"Peržiūros išjungtos dėl papildomo privatumo","infoPreviewToggleEnabledText":"Peržiūros įjungtos","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Sužinokite daugiau</a> apie „DuckDuckGo“ įdėtąją socialinės žiniasklaidos apsaugą"}},"lv":{"facebook.json":{"informationalModalMessageTitle":"Ja pieteiksies ar Facebook, viņi varēs tevi izsekot","informationalModalMessageBody":"Kad tu piesakies, DuckDuckGo nevar novērst, ka Facebook saturs tevi izseko šajā vietnē.","informationalModalConfirmButtonText":"Pieteikties","informationalModalRejectButtonText":"Atgriezties","loginButtonText":"Pieteikties ar Facebook","loginBodyText":"Facebook izseko tavas aktivitātes vietnē, kad esi pieteicies ar Facebook.","buttonTextUnblockContent":"Atbloķēt saturu","buttonTextUnblockComment":"Atbloķēt komentāru","buttonTextUnblockComments":"Atbloķēt komentārus","buttonTextUnblockPost":"Atbloķēt ziņu","buttonTextUnblockVideo":"Atbloķēt video","infoTitleUnblockContent":"DuckDuckGo bloķēja šo saturu, lai neļautu Facebook tevi izsekot","infoTitleUnblockComment":"DuckDuckGo bloķēja šo komentāru, lai neļautu Facebook tevi izsekot","infoTitleUnblockComments":"DuckDuckGo bloķēja šos komentārus, lai neļautu Facebook tevi izsekot","infoTitleUnblockPost":"DuckDuckGo bloķēja šo ziņu, lai neļautu Facebook tevi izsekot","infoTitleUnblockVideo":"DuckDuckGo bloķēja šo videoklipu, lai neļautu Facebook tevi izsekot","infoTextUnblockContent":"Mēs bloķējām Facebook iespēju tevi izsekot, ielādējot lapu. Ja atbloķēsi šo saturu, Facebook redzēs, ko tu dari."},"shared.json":{"learnMore":"Uzzināt vairāk","readAbout":"Lasi par šo privātuma aizsardzību"},"youtube.json":{"informationalModalMessageTitle":"Vai iespējot visus YouTube priekšskatījumus?","informationalModalMessageBody":"Priekšskatījumu rādīšana ļaus Google (kam pieder YouTube) redzēt daļu tavas ierīces informācijas, taču tas tāpat ir privātāk par videoklipa atskaņošanu.","informationalModalConfirmButtonText":"Iespējot visus priekšskatījumus","informationalModalRejectButtonText":"Nē, paldies","buttonTextUnblockVideo":"Atbloķēt video","infoTitleUnblockVideo":"DuckDuckGo bloķēja šo YouTube videoklipu, lai neļautu Google tevi izsekot","infoTextUnblockVideo":"Mēs neļāvām Google (kam pieder YouTube) tevi izsekot, kad lapa tika ielādēta. Ja atbloķēsi šo videoklipu, Google zinās, ko tu dari.","infoPreviewToggleText":"Priekšskatījumi ir atspējoti, lai nodrošinātu papildu konfidencialitāti","infoPreviewToggleEnabledText":"Priekšskatījumi ir iespējoti","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Uzzini vairāk</a> par DuckDuckGo iegulto sociālo mediju aizsardzību"}},"nb":{"facebook.json":{"informationalModalMessageTitle":"Når du logger på med Facebook, kan de spore deg","informationalModalMessageBody":"Når du er logget på, kan ikke DuckDuckGo hindre Facebook-innhold i å spore deg på dette nettstedet.","informationalModalConfirmButtonText":"Logg inn","informationalModalRejectButtonText":"Gå tilbake","loginButtonText":"Logg på med Facebook","loginBodyText":"Når du logger på med Facebook, sporer de aktiviteten din på nettstedet.","buttonTextUnblockContent":"Opphev blokkering av innhold","buttonTextUnblockComment":"Opphev blokkering av kommentar","buttonTextUnblockComments":"Opphev blokkering av kommentarer","buttonTextUnblockPost":"Opphev blokkering av innlegg","buttonTextUnblockVideo":"Opphev blokkering av video","infoTitleUnblockContent":"DuckDuckGo blokkerte dette innholdet for å hindre Facebook i å spore deg","infoTitleUnblockComment":"DuckDuckGo blokkerte denne kommentaren for å hindre Facebook i å spore deg","infoTitleUnblockComments":"DuckDuckGo blokkerte disse kommentarene for å hindre Facebook i å spore deg","infoTitleUnblockPost":"DuckDuckGo blokkerte dette innlegget for å hindre Facebook i å spore deg","infoTitleUnblockVideo":"DuckDuckGo blokkerte denne videoen for å hindre Facebook i å spore deg","infoTextUnblockContent":"Vi hindret Facebook i å spore deg da siden ble lastet. Hvis du opphever blokkeringen av dette innholdet, får Facebook vite om aktiviteten din."},"shared.json":{"learnMore":"Finn ut mer","readAbout":"Les om denne personvernfunksjonen"},"youtube.json":{"informationalModalMessageTitle":"Vil du aktivere alle YouTube-forhåndsvisninger?","informationalModalMessageBody":"Forhåndsvisninger gjør det mulig for Google (som eier YouTube) å se enkelte opplysninger om enheten din, men det er likevel mer privat enn å spille av videoen.","informationalModalConfirmButtonText":"Aktiver alle forhåndsvisninger","informationalModalRejectButtonText":"Nei takk","buttonTextUnblockVideo":"Opphev blokkering av video","infoTitleUnblockVideo":"DuckDuckGo blokkerte denne YouTube-videoen for å hindre Google i å spore deg","infoTextUnblockVideo":"Vi blokkerte Google (som eier YouTube) mot å spore deg da siden ble lastet. Hvis du opphever blokkeringen av denne videoen, får Google vite om aktiviteten din.","infoPreviewToggleText":"Forhåndsvisninger er deaktivert for å gi deg ekstra personvern","infoPreviewToggleEnabledText":"Forhåndsvisninger er aktivert","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Finn ut mer</a> om DuckDuckGos innebygde beskyttelse for sosiale medier"}},"nl":{"facebook.json":{"informationalModalMessageTitle":"Als je inlogt met Facebook, kunnen zij je volgen","informationalModalMessageBody":"Als je eenmaal bent ingelogd, kan DuckDuckGo niet voorkomen dat Facebook je op deze site volgt.","informationalModalConfirmButtonText":"Inloggen","informationalModalRejectButtonText":"Terug","loginButtonText":"Inloggen met Facebook","loginBodyText":"Facebook volgt je activiteit op een site als je Facebook gebruikt om in te loggen.","buttonTextUnblockContent":"Inhoud deblokkeren","buttonTextUnblockComment":"Opmerking deblokkeren","buttonTextUnblockComments":"Opmerkingen deblokkeren","buttonTextUnblockPost":"Bericht deblokkeren","buttonTextUnblockVideo":"Video deblokkeren","infoTitleUnblockContent":"DuckDuckGo heeft deze inhoud geblokkeerd om te voorkomen dat Facebook je kan volgen","infoTitleUnblockComment":"DuckDuckGo heeft deze opmerking geblokkeerd om te voorkomen dat Facebook je kan volgen","infoTitleUnblockComments":"DuckDuckGo heeft deze opmerkingen geblokkeerd om te voorkomen dat Facebook je kan volgen","infoTitleUnblockPost":"DuckDuckGo heeft dit bericht geblokkeerd om te voorkomen dat Facebook je kan volgen","infoTitleUnblockVideo":"DuckDuckGo heeft deze video geblokkeerd om te voorkomen dat Facebook je kan volgen","infoTextUnblockContent":"We hebben voorkomen dat Facebook je volgde toen de pagina werd geladen. Als je deze inhoud deblokkeert, kan Facebook je activiteit zien."},"shared.json":{"learnMore":"Meer informatie","readAbout":"Lees meer over deze privacybescherming"},"youtube.json":{"informationalModalMessageTitle":"Alle YouTube-voorbeelden inschakelen?","informationalModalMessageBody":"Bij het tonen van voorbeelden kan Google (eigenaar van YouTube) een deel van de informatie over je apparaat zien, maar blijft je privacy beter beschermd dan als je de video zou afspelen.","informationalModalConfirmButtonText":"Alle voorbeelden inschakelen","informationalModalRejectButtonText":"Nee, bedankt","buttonTextUnblockVideo":"Video deblokkeren","infoTitleUnblockVideo":"DuckDuckGo heeft deze YouTube-video geblokkeerd om te voorkomen dat Google je kan volgen","infoTextUnblockVideo":"We hebben voorkomen dat Google (eigenaar van YouTube) je volgde toen de pagina werd geladen. Als je deze video deblokkeert, kan Google je activiteit zien.","infoPreviewToggleText":"Voorbeelden uitgeschakeld voor extra privacy","infoPreviewToggleEnabledText":"Voorbeelden ingeschakeld","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Meer informatie</a> over DuckDuckGo's bescherming tegen ingesloten social media"}},"pl":{"facebook.json":{"informationalModalMessageTitle":"Jeśli zalogujesz się za pośrednictwem Facebooka, będzie on mógł śledzić Twoją aktywność","informationalModalMessageBody":"Po zalogowaniu się DuckDuckGo nie może zablokować możliwości śledzenia Cię przez Facebooka na tej stronie.","informationalModalConfirmButtonText":"Zaloguj się","informationalModalRejectButtonText":"Wróć","loginButtonText":"Zaloguj się za pośrednictwem Facebooka","loginBodyText":"Facebook śledzi Twoją aktywność na stronie, gdy logujesz się za jego pośrednictwem.","buttonTextUnblockContent":"Odblokuj treść","buttonTextUnblockComment":"Odblokuj komentarz","buttonTextUnblockComments":"Odblokuj komentarze","buttonTextUnblockPost":"Odblokuj post","buttonTextUnblockVideo":"Odblokuj wideo","infoTitleUnblockContent":"DuckDuckGo zablokował tę treść, aby Facebook nie mógł Cię śledzić","infoTitleUnblockComment":"DuckDuckGo zablokował ten komentarz, aby Facebook nie mógł Cię śledzić","infoTitleUnblockComments":"DuckDuckGo zablokował te komentarze, aby Facebook nie mógł Cię śledzić","infoTitleUnblockPost":"DuckDuckGo zablokował ten post, aby Facebook nie mógł Cię śledzić","infoTitleUnblockVideo":"DuckDuckGo zablokował tę treść wideo, aby Facebook nie mógł Cię śledzić.","infoTextUnblockContent":"Zablokowaliśmy Facebookowi możliwość śledzenia Cię podczas ładowania strony. Jeśli odblokujesz tę treść, Facebook uzyska informacje o Twojej aktywności."},"shared.json":{"learnMore":"Dowiedz się więcej","readAbout":"Dowiedz się więcej o tej ochronie prywatności"},"youtube.json":{"informationalModalMessageTitle":"Włączyć wszystkie podglądy w YouTube?","informationalModalMessageBody":"Wyświetlanie podglądu pozwala Google (który jest właścicielem YouTube) zobaczyć niektóre informacje o Twoim urządzeniu, ale nadal jest to bardziej prywatne niż odtwarzanie filmu.","informationalModalConfirmButtonText":"Włącz wszystkie podglądy","informationalModalRejectButtonText":"Nie, dziękuję","buttonTextUnblockVideo":"Odblokuj wideo","infoTitleUnblockVideo":"DuckDuckGo zablokował ten film w YouTube, aby uniemożliwić Google śledzenie Twojej aktywności","infoTextUnblockVideo":"Zablokowaliśmy możliwość śledzenia Cię przez Google (właściciela YouTube) podczas ładowania strony. Jeśli odblokujesz ten film, Google zobaczy Twoją aktywność.","infoPreviewToggleText":"Podglądy zostały wyłączone, aby zapewnić większą ptywatność","infoPreviewToggleEnabledText":"Podglądy włączone","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Dowiedz się więcej</a> o zabezpieczeniu osadzonych treści społecznościowych DuckDuckGo"}},"pt":{"facebook.json":{"informationalModalMessageTitle":"Iniciar sessão no Facebook permite que este te rastreie","informationalModalMessageBody":"Depois de iniciares sessão, o DuckDuckGo não poderá bloquear o rastreio por parte do conteúdo do Facebook neste site.","informationalModalConfirmButtonText":"Iniciar sessão","informationalModalRejectButtonText":"Retroceder","loginButtonText":"Iniciar sessão com o Facebook","loginBodyText":"O Facebook rastreia a tua atividade num site quando o usas para iniciares sessão.","buttonTextUnblockContent":"Desbloquear Conteúdo","buttonTextUnblockComment":"Desbloquear Comentário","buttonTextUnblockComments":"Desbloquear Comentários","buttonTextUnblockPost":"Desbloquear Publicação","buttonTextUnblockVideo":"Desbloquear Vídeo","infoTitleUnblockContent":"O DuckDuckGo bloqueou este conteúdo para evitar que o Facebook te rastreie","infoTitleUnblockComment":"O DuckDuckGo bloqueou este comentário para evitar que o Facebook te rastreie","infoTitleUnblockComments":"O DuckDuckGo bloqueou estes comentários para evitar que o Facebook te rastreie","infoTitleUnblockPost":"O DuckDuckGo bloqueou esta publicação para evitar que o Facebook te rastreie","infoTitleUnblockVideo":"O DuckDuckGo bloqueou este vídeo para evitar que o Facebook te rastreie","infoTextUnblockContent":"Bloqueámos o rastreio por parte do Facebook quando a página foi carregada. Se desbloqueares este conteúdo, o Facebook fica a saber a tua atividade."},"shared.json":{"learnMore":"Saiba mais","readAbout":"Ler mais sobre esta proteção de privacidade"},"youtube.json":{"informationalModalMessageTitle":"Ativar todas as pré-visualizações do YouTube?","informationalModalMessageBody":"Mostrar visualizações permite à Google (que detém o YouTube) ver algumas das informações do teu dispositivo, mas ainda é mais privado do que reproduzir o vídeo.","informationalModalConfirmButtonText":"Ativar todas as pré-visualizações","informationalModalRejectButtonText":"Não, obrigado","buttonTextUnblockVideo":"Desbloquear Vídeo","infoTitleUnblockVideo":"O DuckDuckGo bloqueou este vídeo do YouTube para impedir que a Google te rastreie","infoTextUnblockVideo":"Bloqueámos o rastreio por parte da Google (que detém o YouTube) quando a página foi carregada. Se desbloqueares este vídeo, a Google fica a saber a tua atividade.","infoPreviewToggleText":"Pré-visualizações desativadas para privacidade adicional","infoPreviewToggleEnabledText":"Pré-visualizações ativadas","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Saiba mais</a> sobre a Proteção contra conteúdos de redes sociais incorporados do DuckDuckGo"}},"ro":{"facebook.json":{"informationalModalMessageTitle":"Conectarea cu Facebook îi permite să te urmărească","informationalModalMessageBody":"Odată ce te-ai conectat, DuckDuckGo nu poate împiedica conținutul Facebook să te urmărească pe acest site.","informationalModalConfirmButtonText":"Autentificare","informationalModalRejectButtonText":"Înapoi","loginButtonText":"Conectează-te cu Facebook","loginBodyText":"Facebook urmărește activitatea ta pe un site atunci când îl utilizezi pentru a te conecta.","buttonTextUnblockContent":"Deblochează conținutul","buttonTextUnblockComment":"Deblochează comentariul","buttonTextUnblockComments":"Deblochează comentariile","buttonTextUnblockPost":"Deblochează postarea","buttonTextUnblockVideo":"Deblochează videoclipul","infoTitleUnblockContent":"DuckDuckGo a blocat acest conținut pentru a împiedica Facebook să te urmărească","infoTitleUnblockComment":"DuckDuckGo a blocat acest comentariu pentru a împiedica Facebook să te urmărească","infoTitleUnblockComments":"DuckDuckGo a blocat aceste comentarii pentru a împiedica Facebook să te urmărească","infoTitleUnblockPost":"DuckDuckGo a blocat această postare pentru a împiedica Facebook să te urmărească","infoTitleUnblockVideo":"DuckDuckGo a blocat acest videoclip pentru a împiedica Facebook să te urmărească","infoTextUnblockContent":"Am împiedicat Facebook să te urmărească atunci când pagina a fost încărcată. Dacă deblochezi acest conținut, Facebook îți va cunoaște activitatea."},"shared.json":{"learnMore":"Află mai multe","readAbout":"Citește despre această protecție a confidențialității"},"youtube.json":{"informationalModalMessageTitle":"Activezi toate previzualizările YouTube?","informationalModalMessageBody":"Afișarea previzualizărilor va permite ca Google (care deține YouTube) să vadă unele dintre informațiile despre dispozitivul tău, dar este totuși mai privată decât redarea videoclipului.","informationalModalConfirmButtonText":"Activează toate previzualizările","informationalModalRejectButtonText":"Nu, mulțumesc","buttonTextUnblockVideo":"Deblochează videoclipul","infoTitleUnblockVideo":"DuckDuckGo a blocat acest videoclip de pe YouTube pentru a împiedica Google să te urmărească","infoTextUnblockVideo":"Am împiedicat Google (care deține YouTube) să te urmărească atunci când s-a încărcat pagina. Dacă deblochezi acest videoclip, Google va cunoaște activitatea ta.","infoPreviewToggleText":"Previzualizările au fost dezactivate pentru o confidențialitate suplimentară","infoPreviewToggleEnabledText":"Previzualizări activate","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Află mai multe</a> despre Protecția integrată DuckDuckGo pentru rețelele sociale"}},"ru":{"facebook.json":{"informationalModalMessageTitle":"Вход через Facebook позволяет этой социальной сети отслеживать вас","informationalModalMessageBody":"После входа DuckDuckGo не сможет блокировать отслеживание ваших действий с контентом на Facebook.","informationalModalConfirmButtonText":"Войти","informationalModalRejectButtonText":"Вернуться","loginButtonText":"Войти через Facebook","loginBodyText":"При использовании учетной записи Facebook для входа на сайты эта социальная сеть сможет отслеживать на них ваши действия.","buttonTextUnblockContent":"Разблокировать","buttonTextUnblockComment":"Разблокировать","buttonTextUnblockComments":"Разблокировать","buttonTextUnblockPost":"Разблокировать","buttonTextUnblockVideo":"Разблокировать","infoTitleUnblockContent":"DuckDuckGo заблокировал этот контент, чтобы вас не отслеживал Facebook","infoTitleUnblockComment":"DuckDuckGo заблокировал этот комментарий, чтобы вас не отслеживал Facebook","infoTitleUnblockComments":"DuckDuckGo заблокировал эти комментарии, чтобы вас не отслеживал Facebook","infoTitleUnblockPost":"DuckDuckGo заблокировал эту публикацию, чтобы вас не отслеживал Facebook","infoTitleUnblockVideo":"DuckDuckGo заблокировал это видео, чтобы вас не отслеживал Facebook","infoTextUnblockContent":"Во время загрузки страницы мы помешали Facebook отследить ваши действия. Если разблокировать этот контент, Facebook сможет фиксировать вашу активность."},"shared.json":{"learnMore":"Узнать больше","readAbout":"Подробнее об этом виде защиты конфиденциальности"},"youtube.json":{"informationalModalMessageTitle":"Включить предпросмотр видео из YouTube?","informationalModalMessageBody":"Активация предварительного просмотра позволит Google (владельцу YouTube) получить некоторые сведения о вашем устройстве, однако это более безопасный вариант, чем воспроизведение видео целиком.","informationalModalConfirmButtonText":"Включить предпросмотр","informationalModalRejectButtonText":"Нет, спасибо","buttonTextUnblockVideo":"Разблокировать","infoTitleUnblockVideo":"DuckDuckGo заблокировал это видео из YouTube, чтобы вас не отслеживал Google","infoTextUnblockVideo":"Во время загрузки страницы мы помешали Google (владельцу YouTube) отследить ваши действия. Если разблокировать видео, Google сможет фиксировать вашу активность.","infoPreviewToggleText":"Предварительный просмотр отключен для дополнительной защиты конфиденциальности","infoPreviewToggleEnabledText":"Предварительный просмотр включен","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Подробнее</a> о защите DuckDuckGo от внедренного контента соцсетей"}},"sk":{"facebook.json":{"informationalModalMessageTitle":"Prihlásenie cez Facebook mu umožní sledovať vás","informationalModalMessageBody":"DuckDuckGo po prihlásení nemôže na tejto lokalite zablokovať sledovanie vašej osoby obsahom Facebooku.","informationalModalConfirmButtonText":"Prihlásiť sa","informationalModalRejectButtonText":"Prejsť späť","loginButtonText":"Prihláste sa pomocou služby Facebook","loginBodyText":"Keď použijete prihlasovanie cez Facebook, Facebook bude na lokalite sledovať vašu aktivitu.","buttonTextUnblockContent":"Odblokovať obsah","buttonTextUnblockComment":"Odblokovať komentár","buttonTextUnblockComments":"Odblokovať komentáre","buttonTextUnblockPost":"Odblokovať príspevok","buttonTextUnblockVideo":"Odblokovať video","infoTitleUnblockContent":"DuckDuckGo zablokoval tento obsah, aby vás Facebook nesledoval","infoTitleUnblockComment":"DuckDuckGo zablokoval tento komentár, aby zabránil sledovaniu zo strany Facebooku","infoTitleUnblockComments":"DuckDuckGo zablokoval tieto komentáre, aby vás Facebook nesledoval","infoTitleUnblockPost":"DuckDuckGo zablokoval tento príspevok, aby vás Facebook nesledoval","infoTitleUnblockVideo":"DuckDuckGo zablokoval toto video, aby vás Facebook nesledoval","infoTextUnblockContent":"Pri načítaní stránky sme zablokovali Facebook, aby vás nesledoval. Ak tento obsah odblokujete, Facebook bude vedieť o vašej aktivite."},"shared.json":{"learnMore":"Zistite viac","readAbout":"Prečítajte si o tejto ochrane súkromia"},"youtube.json":{"informationalModalMessageTitle":"Chcete povoliť všetky ukážky zo služby YouTube?","informationalModalMessageBody":"Zobrazenie ukážok umožní spoločnosti Google (ktorá vlastní YouTube) vidieť niektoré informácie o vašom zariadení, ale stále je to súkromnejšie ako prehrávanie videa.","informationalModalConfirmButtonText":"Povoliť všetky ukážky","informationalModalRejectButtonText":"Nie, ďakujem","buttonTextUnblockVideo":"Odblokovať video","infoTitleUnblockVideo":"DuckDuckGo toto video v službe YouTube zablokoval s cieľom predísť tomu, aby vás spoločnosť Google mohla sledovať","infoTextUnblockVideo":"Zablokovali sme pre spoločnosť Google (ktorá vlastní YouTube), aby vás nemohla sledovať, keď sa stránka načíta. Ak toto video odblokujete, Google bude poznať vašu aktivitu.","infoPreviewToggleText":"Ukážky sú zakázané s cieľom zvýšiť ochranu súkromia","infoPreviewToggleEnabledText":"Ukážky sú povolené","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Získajte viac informácií</a> o DuckDuckGo, vloženej ochrane sociálnych médií"}},"sl":{"facebook.json":{"informationalModalMessageTitle":"Če se prijavite s Facebookom, vam Facebook lahko sledi","informationalModalMessageBody":"Ko ste enkrat prijavljeni, DuckDuckGo ne more blokirati Facebookove vsebine, da bi vam sledila na tem spletnem mestu.","informationalModalConfirmButtonText":"Prijava","informationalModalRejectButtonText":"Pojdi nazaj","loginButtonText":"Prijavite se s Facebookom","loginBodyText":"Če se prijavite s Facebookom, bo nato spremljal vaša dejanja na spletnem mestu.","buttonTextUnblockContent":"Odblokiraj vsebino","buttonTextUnblockComment":"Odblokiraj komentar","buttonTextUnblockComments":"Odblokiraj komentarje","buttonTextUnblockPost":"Odblokiraj objavo","buttonTextUnblockVideo":"Odblokiraj videoposnetek","infoTitleUnblockContent":"DuckDuckGo je blokiral to vsebino, da bi Facebooku preprečil sledenje","infoTitleUnblockComment":"DuckDuckGo je blokiral ta komentar, da bi Facebooku preprečil sledenje","infoTitleUnblockComments":"DuckDuckGo je blokiral te komentarje, da bi Facebooku preprečil sledenje","infoTitleUnblockPost":"DuckDuckGo je blokiral to objavo, da bi Facebooku preprečil sledenje","infoTitleUnblockVideo":"DuckDuckGo je blokiral ta videoposnetek, da bi Facebooku preprečil sledenje","infoTextUnblockContent":"Ko se je stran naložila, smo Facebooku preprečili, da bi vam sledil. Če to vsebino odblokirate, bo Facebook izvedel za vaša dejanja."},"shared.json":{"learnMore":"Več","readAbout":"Preberite več o tej zaščiti zasebnosti"},"youtube.json":{"informationalModalMessageTitle":"Želite omogočiti vse YouTubove predoglede?","informationalModalMessageBody":"Prikaz predogledov omogoča Googlu (ki je lastnik YouTuba) vpogled v nekatere podatke o napravi, vendar je še vedno bolj zasebno kot predvajanje videoposnetka.","informationalModalConfirmButtonText":"Omogoči vse predoglede","informationalModalRejectButtonText":"Ne, hvala","buttonTextUnblockVideo":"Odblokiraj videoposnetek","infoTitleUnblockVideo":"DuckDuckGo je blokiral ta videoposnetek v YouTubu, da bi Googlu preprečil sledenje","infoTextUnblockVideo":"Googlu (ki je lastnik YouTuba) smo preprečili, da bi vam sledil, ko se je stran naložila. Če odblokirate ta videoposnetek, bo Google izvedel za vašo dejavnost.","infoPreviewToggleText":"Predogledi so zaradi dodatne zasebnosti onemogočeni","infoPreviewToggleEnabledText":"Predogledi so omogočeni","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Več</a> o vgrajeni zaščiti družbenih medijev DuckDuckGo"}},"sv":{"facebook.json":{"informationalModalMessageTitle":"Om du loggar in med Facebook kan de spåra dig","informationalModalMessageBody":"När du väl är inloggad kan DuckDuckGo inte hindra Facebooks innehåll från att spåra dig på den här webbplatsen.","informationalModalConfirmButtonText":"Logga in","informationalModalRejectButtonText":"Gå tillbaka","loginButtonText":"Logga in med Facebook","loginBodyText":"Facebook spårar din aktivitet på en webbplats om du använder det för att logga in.","buttonTextUnblockContent":"Avblockera innehåll","buttonTextUnblockComment":"Avblockera kommentar","buttonTextUnblockComments":"Avblockera kommentarer","buttonTextUnblockPost":"Avblockera inlägg","buttonTextUnblockVideo":"Avblockera video","infoTitleUnblockContent":"DuckDuckGo blockerade det här innehållet för att förhindra att Facebook spårar dig","infoTitleUnblockComment":"DuckDuckGo blockerade den här kommentaren för att förhindra att Facebook spårar dig","infoTitleUnblockComments":"DuckDuckGo blockerade de här kommentarerna för att förhindra att Facebook spårar dig","infoTitleUnblockPost":"DuckDuckGo blockerade det här inlägget för att förhindra att Facebook spårar dig","infoTitleUnblockVideo":"DuckDuckGo blockerade den här videon för att förhindra att Facebook spårar dig","infoTextUnblockContent":"Vi hindrade Facebook från att spåra dig när sidan lästes in. Om du avblockerar det här innehållet kommer Facebook att känna till din aktivitet."},"shared.json":{"learnMore":"Läs mer","readAbout":"Läs mer om detta integritetsskydd"},"youtube.json":{"informationalModalMessageTitle":"Aktivera alla förhandsvisningar för YouTube?","informationalModalMessageBody":"Genom att visa förhandsvisningar kan Google (som äger YouTube) se en del av enhetens information, men det är ändå mer privat än att spela upp videon.","informationalModalConfirmButtonText":"Aktivera alla förhandsvisningar","informationalModalRejectButtonText":"Nej tack","buttonTextUnblockVideo":"Avblockera video","infoTitleUnblockVideo":"DuckDuckGo blockerade den här YouTube-videon för att förhindra att Google spårar dig","infoTextUnblockVideo":"Vi hindrade Google (som äger YouTube) från att spåra dig när sidan laddades. Om du tar bort blockeringen av videon kommer Google att känna till din aktivitet.","infoPreviewToggleText":"Förhandsvisningar har inaktiverats för ytterligare integritet","infoPreviewToggleEnabledText":"Förhandsvisningar aktiverade","infoPreviewInfoText":"<a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">Läs mer</a> om DuckDuckGos skydd mot inbäddade sociala medier"}},"tr":{"facebook.json":{"informationalModalMessageTitle":"Facebook ile giriş yapmak, sizi takip etmelerini sağlar","informationalModalMessageBody":"Giriş yaptıktan sonra, DuckDuckGo Facebook içeriğinin sizi bu sitede izlemesini engelleyemez.","informationalModalConfirmButtonText":"Oturum Aç","informationalModalRejectButtonText":"Geri dön","loginButtonText":"Facebook ile giriş yapın","loginBodyText":"Facebook, giriş yapmak için kullandığınızda bir sitedeki etkinliğinizi izler.","buttonTextUnblockContent":"İçeriğin Engelini Kaldır","buttonTextUnblockComment":"Yorumun Engelini Kaldır","buttonTextUnblockComments":"Yorumların Engelini Kaldır","buttonTextUnblockPost":"Gönderinin Engelini Kaldır","buttonTextUnblockVideo":"Videonun Engelini Kaldır","infoTitleUnblockContent":"DuckDuckGo, Facebook'un sizi izlemesini önlemek için bu içeriği engelledi","infoTitleUnblockComment":"DuckDuckGo, Facebook'un sizi izlemesini önlemek için bu yorumu engelledi","infoTitleUnblockComments":"DuckDuckGo, Facebook'un sizi izlemesini önlemek için bu yorumları engelledi","infoTitleUnblockPost":"DuckDuckGo, Facebook'un sizi izlemesini önlemek için bu gönderiyi engelledi","infoTitleUnblockVideo":"DuckDuckGo, Facebook'un sizi izlemesini önlemek için bu videoyu engelledi","infoTextUnblockContent":"Sayfa yüklendiğinde Facebook'un sizi izlemesini engelledik. Bu içeriğin engelini kaldırırsanız Facebook etkinliğinizi öğrenecektir."},"shared.json":{"learnMore":"Daha Fazla Bilgi","readAbout":"Bu gizlilik koruması hakkında bilgi edinin"},"youtube.json":{"informationalModalMessageTitle":"Tüm YouTube önizlemeleri etkinleştirilsin mi?","informationalModalMessageBody":"Önizlemelerin gösterilmesi Google'ın (YouTube'un sahibi) cihazınızın bazı bilgilerini görmesine izin verir, ancak yine de videoyu oynatmaktan daha özeldir.","informationalModalConfirmButtonText":"Tüm Önizlemeleri Etkinleştir","informationalModalRejectButtonText":"Hayır Teşekkürler","buttonTextUnblockVideo":"Videonun Engelini Kaldır","infoTitleUnblockVideo":"DuckDuckGo, Google'ın sizi izlemesini önlemek için bu YouTube videosunu engelledi","infoTextUnblockVideo":"Sayfa yüklendiğinde Google'ın (YouTube'un sahibi) sizi izlemesini engelledik. Bu videonun engelini kaldırırsanız, Google etkinliğinizi öğrenecektir.","infoPreviewToggleText":"Ek gizlilik için önizlemeler devre dışı bırakıldı","infoPreviewToggleEnabledText":"Önizlemeler etkinleştirildi","infoPreviewInfoText":"DuckDuckGo Yerleşik Sosyal Medya Koruması hakkında <a href=\\\"https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/\\\">daha fazla bilgi edinin</a>"}}}`;
+
+    /*********************************************************
+     *  Style Definitions
+     *********************************************************/
+    /**
+     * Get CSS style defintions for CTL, using the provided AssetConfig for any non-embedded assets
+     * (e.g. fonts.)
+     * @param {import('../../content-feature.js').AssetConfig} [assets]
+     */
+    function getStyles (assets) {
+        let fontStyle = '';
+        let regularFontFamily = "system, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'";
+        let boldFontFamily = regularFontFamily;
+        if (assets?.regularFontUrl && assets?.boldFontUrl) {
+            fontStyle = `
+        @font-face{
+            font-family: DuckDuckGoPrivacyEssentials;
+            src: url(${assets.regularFontUrl});
+        }
+        @font-face{
+            font-family: DuckDuckGoPrivacyEssentialsBold;
+            font-weight: bold;
+            src: url(${assets.boldFontUrl});
+        }
+    `;
+            regularFontFamily = 'DuckDuckGoPrivacyEssentials';
+            boldFontFamily = 'DuckDuckGoPrivacyEssentialsBold';
+        }
+        return {
+            fontStyle,
+            darkMode: {
+                background: `
+            background: #111111;
+        `,
+                textFont: `
+            color: rgba(255, 255, 255, 0.9);
+        `,
+                buttonFont: `
+            color: #111111;
+        `,
+                linkFont: `
+            color: #7295F6;
+        `,
+                buttonBackground: `
+            background: #5784FF;
+        `,
+                buttonBackgroundHover: `
+            background: #557FF3;
+        `,
+                buttonBackgroundPress: `
+            background: #3969EF;
+        `,
+                toggleButtonText: `
+            color: #EEEEEE;
+        `,
+                toggleButtonBgState: {
+                    active: `
+                background: #5784FF;
+            `,
+                    inactive: `
+                background-color: #666666;
+            `
+                }
+            },
+            lightMode: {
+                background: `
+            background: #FFFFFF;
+        `,
+                textFont: `
+            color: #222222;
+        `,
+                buttonFont: `
+            color: #FFFFFF;
+        `,
+                linkFont: `
+            color: #3969EF;
+        `,
+                buttonBackground: `
+            background: #3969EF;
+        `,
+                buttonBackgroundHover: `
+            background: #2B55CA;
+        `,
+                buttonBackgroundPress: `
+            background: #1E42A4;
+        `,
+                toggleButtonText: `
+            color: #666666;
+        `,
+                toggleButtonBgState: {
+                    active: `
+                background: #3969EF;
+            `,
+                    inactive: `
+                background-color: #666666;
+            `
+                }
+            },
+            loginMode: {
+                buttonBackground: `
+            background: #666666;
+        `,
+                buttonFont: `
+            color: #FFFFFF;
+        `
+            },
+            cancelMode: {
+                buttonBackground: `
+            background: rgba(34, 34, 34, 0.1);
+        `,
+                buttonFont: `
+            color: #222222;
+        `,
+                buttonBackgroundHover: `
+            background: rgba(0, 0, 0, 0.12);
+        `,
+                buttonBackgroundPress: `
+            background: rgba(0, 0, 0, 0.18);
+        `
+            },
+            button: `
+        border-radius: 8px;
+
+        padding: 11px 22px;
+        font-weight: bold;
+        margin: 0px auto;
+        border-color: #3969EF;
+        border: none;
+
+        font-family: ${boldFontFamily};
+        font-size: 14px;
+
+        position: relative;
+        cursor: pointer;
+        box-shadow: none;
+        z-index: 2147483646;
+    `,
+            circle: `
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        background: #E0E0E0;
+        border: 1px solid #E0E0E0;
+        position: absolute;
+        top: -8px;
+        right: -8px;
+    `,
+            loginIcon: `
+        position: absolute;
+        top: -13px;
+        right: -10px;
+        height: 28px;
+        width: 28px;
+    `,
+            rectangle: `
+        width: 12px;
+        height: 3px;
+        background: #666666;
+        position: relative;
+        top: 42.5%;
+        margin: auto;
+    `,
+            textBubble: `
+        background: #FFFFFF;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12), 0px 8px 16px rgba(0, 0, 0, 0.08);
+        width: 360px;
+        margin-top: 10px;
+        z-index: 2147483647;
+        position: absolute;
+        line-height: normal;
+    `,
+            textBubbleWidth: 360, // Should match the width rule in textBubble
+            textBubbleLeftShift: 100, // Should match the CSS left: rule in textBubble
+            textArrow: `
+        display: inline-block;
+        background: #FFFFFF;
+        border: solid rgba(0, 0, 0, 0.1);
+        border-width: 0 1px 1px 0;
+        padding: 5px;
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+        position: relative;
+        top: -9px;
+    `,
+            arrowDefaultLocationPercent: 50,
+            hoverTextTitle: `
+        padding: 0px 12px 12px;
+        margin-top: -5px;
+    `,
+            hoverTextBody: `
+        font-family: ${regularFontFamily};
+        font-size: 14px;
+        line-height: 21px;
+        margin: auto;
+        padding: 17px;
+        text-align: left;
+    `,
+            hoverContainer: `
+        padding-bottom: 10px;
+    `,
+            buttonTextContainer: `
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border: none;
+        padding: 0;
+        margin: 0;
+    `,
+            headerRow: `
+
+    `,
+            block: `
+        box-sizing: border-box;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 12px;
+        max-width: 600px;
+        min-height: 300px;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+
+        font-family: ${regularFontFamily};
+        line-height: 1;
+    `,
+            youTubeDialogBlock: `
+        height: calc(100% - 30px);
+        max-width: initial;
+        min-height: initial;
+    `,
+            imgRow: `
+        display: flex;
+        flex-direction: column;
+        margin: 20px 0px;
+    `,
+            content: `
+        display: flex;
+        flex-direction: column;
+        padding: 16px 0;
+        flex: 1 1 1px;
+    `,
+            feedbackLink: `
+        font-family: ${regularFontFamily};
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 12px;
+        color: #ABABAB;
+        text-decoration: none;
+    `,
+            feedbackRow: `
+        height: 30px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    `,
+            titleBox: `
+        display: flex;
+        padding: 12px;
+        max-height: 44px;
+        border-bottom: 1px solid;
+        border-color: rgba(196, 196, 196, 0.3);
+        margin: 0;
+        margin-bottom: 4px;
+    `,
+            title: `
+        font-family: ${regularFontFamily};
+        line-height: 1.4;
+        font-size: 14px;
+        margin: auto 10px;
+        flex-basis: 100%;
+        height: 1.4em;
+        flex-wrap: wrap;
+        overflow: hidden;
+        text-align: left;
+        border: none;
+        padding: 0;
+    `,
+            buttonRow: `
+        display: flex;
+        height: 100%
+        flex-direction: row;
+        margin: 20px auto 0px;
+        height: 100%;
+        align-items: flex-start;
+    `,
+            modalContentTitle: `
+        font-family: ${boldFontFamily};
+        font-size: 17px;
+        font-weight: bold;
+        line-height: 21px;
+        margin: 10px auto;
+        text-align: center;
+        border: none;
+        padding: 0px 32px;
+    `,
+            modalContentText: `
+        font-family: ${regularFontFamily};
+        font-size: 14px;
+        line-height: 21px;
+        margin: 0px auto 14px;
+        text-align: center;
+        border: none;
+        padding: 0;
+    `,
+            modalButtonRow: `
+        border: none;
+        padding: 0;
+        margin: auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    `,
+            modalButton: `
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `,
+            modalIcon: `
+        display: block;
+    `,
+            contentTitle: `
+        font-family: ${boldFontFamily};
+        font-size: 17px;
+        font-weight: bold;
+        margin: 20px auto 10px;
+        padding: 0px 30px;
+        text-align: center;
+        margin-top: auto;
+    `,
+            contentText: `
+        font-family: ${regularFontFamily};
+        font-size: 14px;
+        line-height: 21px;
+        padding: 0px 40px;
+        text-align: center;
+        margin: 0 auto auto;
+    `,
+            icon: `
+        height: 80px;
+        width: 80px;
+        margin: auto;
+    `,
+            closeIcon: `
+        height: 12px;
+        width: 12px;
+        margin: auto;
+    `,
+            closeButton: `
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 20px;
+        height: 21px;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+    `,
+            logo: `
+        flex-basis: 0%;
+        min-width: 20px;
+        height: 21px;
+        border: none;
+        padding: 0;
+        margin: 0;
+    `,
+            logoImg: `
+        height: 21px;
+        width: 21px;
+    `,
+            loadingImg: `
+        display: block;
+        margin: 0px 8px 0px 0px;
+        height: 14px;
+        width: 14px;
+    `,
+            modal: `
+        width: 340px;
+        padding: 0;
+        margin: auto;
+        background-color: #FFFFFF;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: block;
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.08), 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        border: none;
+    `,
+            modalContent: `
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        border: none;
+        margin: 0;
+    `,
+            overlay: `
+        height: 100%;
+        width: 100%;
+        background-color: #666666;
+        opacity: .5;
+        display: block;
+        position: fixed;
+        top: 0;
+        right: 0;
+        border: none;
+        padding: 0;
+        margin: 0;
+    `,
+            modalContainer: `
+        height: 100vh;
+        width: 100vw;
+        box-sizing: border-box;
+        z-index: 2147483647;
+        display: block;
+        position: fixed;
+        border: 0;
+        margin: 0;
+        padding: 0;
+    `,
+            headerLinkContainer: `
+        flex-basis: 100%;
+        display: grid;
+        justify-content: flex-end;
+    `,
+            headerLink: `
+        line-height: 1.4;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: ${boldFontFamily};
+        text-decoration: none;
+        cursor: pointer;
+        min-width: 100px;
+        text-align: end;
+        float: right;
+        display: none;
+    `,
+            generalLink: `
+        line-height: 1.4;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: ${boldFontFamily};
+        cursor: pointer;
+        text-decoration: none;
+    `,
+            wrapperDiv: `
+        display: inline-block;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        max-width: 600px;
+        min-height: 300px;
+    `,
+            toggleButtonWrapper: `
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    `,
+            toggleButton: `
+        cursor: pointer;
+        position: relative;
+        width: 30px;
+        height: 16px;
+        margin-top: -3px;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: transparent;
+        text-align: left;
+    `,
+            toggleButtonBg: `
+        right: 0;
+        width: 30px;
+        height: 16px;
+        overflow: visible;
+        border-radius: 10px;
+    `,
+            toggleButtonText: `
+        display: inline-block;
+        margin: 0 0 0 7px;
+        padding: 0;
+    `,
+            toggleButtonKnob: `
+        position: absolute;
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 10px;
+        background-color: #ffffff;
+        margin-top: 1px;
+        top: calc(50% - 14px/2 - 1px);
+        box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 1px 1px rgba(0, 0, 0, 0.1);
+    `,
+            toggleButtonKnobState: {
+                active: `
+            right: 1px;
+        `,
+                inactive: `
+            left: 1px;
+        `
+            },
+            placeholderWrapperDiv: `
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-sizing: border-box;
+        max-width: initial;
+        min-width: 380px;
+        min-height: 300px;
+        margin: auto;
+    `,
+            youTubeWrapperDiv: `
+        position: relative;
+        overflow: hidden;
+        max-width: initial;
+        min-width: 380px;
+        min-height: 300px;
+        height: 100%;
+    `,
+            youTubeDialogDiv: `
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        max-width: initial;
+        min-height: initial;
+        height: calc(100% - 30px);
+    `,
+            youTubeDialogBottomRow: `
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: auto;
+    `,
+            youTubePlaceholder: `
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: rgba(45, 45, 45, 0.8);
+    `,
+            youTubePreviewWrapperImg: `
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    `,
+            youTubePreviewImg: `
+        min-width: 100%;
+        min-height: 100%;
+        height: auto;
+    `,
+            youTubeTopSection: `
+        font-family: ${boldFontFamily};
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        padding: 18px 12px 0;
+    `,
+            youTubeTitle: `
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 14px;
+        color: #FFFFFF;
+        margin: 0;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-sizing: border-box;
+    `,
+            youTubePlayButtonRow: `
+        flex: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `,
+            youTubePlayButton: `
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 48px;
+        width: 80px;
+        padding: 0px 24px;
+        border-radius: 8px;
+    `,
+            youTubePreviewToggleRow: `
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 0 12px 18px;
+    `,
+            youTubePreviewToggleText: `
+        color: #EEEEEE;
+        font-weight: 400;
+    `,
+            youTubePreviewInfoText: `
+        color: #ABABAB;
+    `
+        }
+    }
+
+    /**
+     * @param {string} locale UI locale
+     */
+    function getConfig (locale) {
+        const locales = JSON.parse(localesJSON);
+        const fbStrings = locales[locale]['facebook.json'];
+        const ytStrings = locales[locale]['youtube.json'];
+
+        const sharedStrings = locales[locale]['shared.json'];
+        const config = {
+            'Facebook, Inc.': {
+                informationalModal: {
+                    icon: blockedFBLogo,
+                    messageTitle: fbStrings.informationalModalMessageTitle,
+                    messageBody: fbStrings.informationalModalMessageBody,
+                    confirmButtonText: fbStrings.informationalModalConfirmButtonText,
+                    rejectButtonText: fbStrings.informationalModalRejectButtonText
+                },
+                elementData: {
+                    'FB Like Button': {
+                        selectors: [
+                            '.fb-like'
+                        ],
+                        replaceSettings: {
+                            type: 'blank'
+                        }
+                    },
+                    'FB Button iFrames': {
+                        selectors: [
+                            "iframe[src*='//www.facebook.com/plugins/like.php']",
+                            "iframe[src*='//www.facebook.com/v2.0/plugins/like.php']",
+                            "iframe[src*='//www.facebook.com/plugins/share_button.php']",
+                            "iframe[src*='//www.facebook.com/v2.0/plugins/share_button.php']"
+                        ],
+                        replaceSettings: {
+                            type: 'blank'
+                        }
+                    },
+                    'FB Save Button': {
+                        selectors: [
+                            '.fb-save'
+                        ],
+                        replaceSettings: {
+                            type: 'blank'
+                        }
+                    },
+                    'FB Share Button': {
+                        selectors: [
+                            '.fb-share-button'
+                        ],
+                        replaceSettings: {
+                            type: 'blank'
+                        }
+                    },
+                    'FB Page iFrames': {
+                        selectors: [
+                            "iframe[src*='//www.facebook.com/plugins/page.php']",
+                            "iframe[src*='//www.facebook.com/v2.0/plugins/page.php']"
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockContent,
+                            infoTitle: fbStrings.infoTitleUnblockContent,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'originalElement'
+                        }
+                    },
+                    'FB Page Div': {
+                        selectors: [
+                            '.fb-page'
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockContent,
+                            infoTitle: fbStrings.infoTitleUnblockContent,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'iFrame',
+                            targetURL: 'https://www.facebook.com/plugins/page.php?href=data-href&tabs=data-tabs&width=data-width&height=data-height',
+                            urlDataAttributesToPreserve: {
+                                'data-href': {
+                                    default: '',
+                                    required: true
+                                },
+                                'data-tabs': {
+                                    default: 'timeline'
+                                },
+                                'data-height': {
+                                    default: '500'
+                                },
+                                'data-width': {
+                                    default: '500'
+                                }
+                            },
+                            styleDataAttributes: {
+                                width: {
+                                    name: 'data-width',
+                                    unit: 'px'
+                                },
+                                height: {
+                                    name: 'data-height',
+                                    unit: 'px'
+                                }
+                            }
+                        }
+                    },
+                    'FB Comment iFrames': {
+                        selectors: [
+                            "iframe[src*='//www.facebook.com/plugins/comment_embed.php']",
+                            "iframe[src*='//www.facebook.com/v2.0/plugins/comment_embed.php']"
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockComment,
+                            infoTitle: fbStrings.infoTitleUnblockComment,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'originalElement'
+                        }
+                    },
+                    'FB Comments': {
+                        selectors: [
+                            '.fb-comments',
+                            'fb\\:comments'
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockComments,
+                            infoTitle: fbStrings.infoTitleUnblockComments,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'allowFull',
+                            targetURL: 'https://www.facebook.com/v9.0/plugins/comments.php?href=data-href&numposts=data-numposts&sdk=joey&version=v9.0&width=data-width',
+                            urlDataAttributesToPreserve: {
+                                'data-href': {
+                                    default: '',
+                                    required: true
+                                },
+                                'data-numposts': {
+                                    default: 10
+                                },
+                                'data-width': {
+                                    default: '500'
+                                }
+                            }
+                        }
+                    },
+                    'FB Embedded Comment Div': {
+                        selectors: [
+                            '.fb-comment-embed'
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockComment,
+                            infoTitle: fbStrings.infoTitleUnblockComment,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'iFrame',
+                            targetURL: 'https://www.facebook.com/v9.0/plugins/comment_embed.php?href=data-href&sdk=joey&width=data-width&include_parent=data-include-parent',
+                            urlDataAttributesToPreserve: {
+                                'data-href': {
+                                    default: '',
+                                    required: true
+                                },
+                                'data-width': {
+                                    default: '500'
+                                },
+                                'data-include-parent': {
+                                    default: 'false'
+                                }
+                            },
+                            styleDataAttributes: {
+                                width: {
+                                    name: 'data-width',
+                                    unit: 'px'
+                                }
+                            }
+                        }
+                    },
+                    'FB Post iFrames': {
+                        selectors: [
+                            "iframe[src*='//www.facebook.com/plugins/post.php']",
+                            "iframe[src*='//www.facebook.com/v2.0/plugins/post.php']"
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockPost,
+                            infoTitle: fbStrings.infoTitleUnblockPost,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'originalElement'
+                        }
+                    },
+                    'FB Posts Div': {
+                        selectors: [
+                            '.fb-post'
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockPost,
+                            infoTitle: fbStrings.infoTitleUnblockPost,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'allowFull',
+                            targetURL: 'https://www.facebook.com/v9.0/plugins/post.php?href=data-href&sdk=joey&show_text=true&width=data-width',
+                            urlDataAttributesToPreserve: {
+                                'data-href': {
+                                    default: '',
+                                    required: true
+                                },
+                                'data-width': {
+                                    default: '500'
+                                }
+                            },
+                            styleDataAttributes: {
+                                width: {
+                                    name: 'data-width',
+                                    unit: 'px'
+                                },
+                                height: {
+                                    name: 'data-height',
+                                    unit: 'px',
+                                    fallbackAttribute: 'data-width'
+                                }
+                            }
+                        }
+                    },
+                    'FB Video iFrames': {
+                        selectors: [
+                            "iframe[src*='//www.facebook.com/plugins/video.php']",
+                            "iframe[src*='//www.facebook.com/v2.0/plugins/video.php']"
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockVideo,
+                            infoTitle: fbStrings.infoTitleUnblockVideo,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'originalElement'
+                        }
+                    },
+                    'FB Video': {
+                        selectors: [
+                            '.fb-video'
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockVideo,
+                            infoTitle: fbStrings.infoTitleUnblockVideo,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'iFrame',
+                            targetURL: 'https://www.facebook.com/plugins/video.php?href=data-href&show_text=true&width=data-width',
+                            urlDataAttributesToPreserve: {
+                                'data-href': {
+                                    default: '',
+                                    required: true
+                                },
+                                'data-width': {
+                                    default: '500'
+                                }
+                            },
+                            styleDataAttributes: {
+                                width: {
+                                    name: 'data-width',
+                                    unit: 'px'
+                                },
+                                height: {
+                                    name: 'data-height',
+                                    unit: 'px',
+                                    fallbackAttribute: 'data-width'
+                                }
+                            }
+                        }
+                    },
+                    'FB Group iFrames': {
+                        selectors: [
+                            "iframe[src*='//www.facebook.com/plugins/group.php']",
+                            "iframe[src*='//www.facebook.com/v2.0/plugins/group.php']"
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockContent,
+                            infoTitle: fbStrings.infoTitleUnblockContent,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'originalElement'
+                        }
+                    },
+                    'FB Group': {
+                        selectors: [
+                            '.fb-group'
+                        ],
+                        replaceSettings: {
+                            type: 'dialog',
+                            buttonText: fbStrings.buttonTextUnblockContent,
+                            infoTitle: fbStrings.infoTitleUnblockContent,
+                            infoText: fbStrings.infoTextUnblockContent
+                        },
+                        clickAction: {
+                            type: 'iFrame',
+                            targetURL: 'https://www.facebook.com/plugins/group.php?href=data-href&width=data-width',
+                            urlDataAttributesToPreserve: {
+                                'data-href': {
+                                    default: '',
+                                    required: true
+                                },
+                                'data-width': {
+                                    default: '500'
+                                }
+                            },
+                            styleDataAttributes: {
+                                width: {
+                                    name: 'data-width',
+                                    unit: 'px'
+                                }
+                            }
+                        }
+                    },
+                    'FB Login Button': {
+                        selectors: [
+                            '.fb-login-button'
+                        ],
+                        replaceSettings: {
+                            type: 'loginButton',
+                            icon: blockedFBLogo,
+                            buttonText: fbStrings.loginButtonText,
+                            popupBodyText: fbStrings.loginBodyText
+                        },
+                        clickAction: {
+                            type: 'allowFull',
+                            targetURL: 'https://www.facebook.com/v9.0/plugins/login_button.php?app_id=app_id_replace&auto_logout_link=false&button_type=continue_with&sdk=joey&size=large&use_continue_as=false&width=',
+                            urlDataAttributesToPreserve: {
+                                'data-href': {
+                                    default: '',
+                                    required: true
+                                },
+                                'data-width': {
+                                    default: '500'
+                                },
+                                app_id_replace: {
+                                    default: 'null'
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            Youtube: {
+                informationalModal: {
+                    icon: blockedYTVideo,
+                    messageTitle: ytStrings.informationalModalMessageTitle,
+                    messageBody: ytStrings.informationalModalMessageBody,
+                    confirmButtonText: ytStrings.informationalModalConfirmButtonText,
+                    rejectButtonText: ytStrings.informationalModalRejectButtonText
+                },
+                elementData: {
+                    'YouTube embedded video': {
+                        selectors: [
+                            "iframe[src*='//youtube.com/embed']",
+                            "iframe[src*='//youtube-nocookie.com/embed']",
+                            "iframe[src*='//www.youtube.com/embed']",
+                            "iframe[src*='//www.youtube-nocookie.com/embed']",
+                            "iframe[data-src*='//youtube.com/embed']",
+                            "iframe[data-src*='//youtube-nocookie.com/embed']",
+                            "iframe[data-src*='//www.youtube.com/embed']",
+                            "iframe[data-src*='//www.youtube-nocookie.com/embed']"
+                        ],
+                        replaceSettings: {
+                            type: 'youtube-video',
+                            buttonText: ytStrings.buttonTextUnblockVideo,
+                            infoTitle: ytStrings.infoTitleUnblockVideo,
+                            infoText: ytStrings.infoTextUnblockVideo,
+                            previewToggleText: ytStrings.infoPreviewToggleText,
+                            placeholder: {
+                                previewToggleEnabledText: ytStrings.infoPreviewToggleEnabledText,
+                                previewInfoText: ytStrings.infoPreviewInfoText,
+                                videoPlayIcon: {
+                                    lightMode: videoPlayLight,
+                                    darkMode: videoPlayDark
+                                }
+                            }
+                        },
+                        clickAction: {
+                            type: 'youtube-video'
+                        }
+                    },
+                    'YouTube embedded subscription button': {
+                        selectors: [
+                            "iframe[src*='//youtube.com/subscribe_embed']",
+                            "iframe[src*='//youtube-nocookie.com/subscribe_embed']",
+                            "iframe[src*='//www.youtube.com/subscribe_embed']",
+                            "iframe[src*='//www.youtube-nocookie.com/subscribe_embed']",
+                            "iframe[data-src*='//youtube.com/subscribe_embed']",
+                            "iframe[data-src*='//youtube-nocookie.com/subscribe_embed']",
+                            "iframe[data-src*='//www.youtube.com/subscribe_embed']",
+                            "iframe[data-src*='//www.youtube-nocookie.com/subscribe_embed']"
+                        ],
+                        replaceSettings: {
+                            type: 'blank'
+                        }
+                    }
+                }
+            }
+        };
+
+        return { config, sharedStrings }
+    }
+
+    /**
+     * @typedef {'darkMode' | 'lightMode' | 'loginMode' | 'cancelMode'} displayMode
+     *   Key for theme value to determine the styling of buttons/placeholders.
+     *   Matches `styles[mode]` keys:
+     *     - `'lightMode'`: Primary colors styling for light theme
+     *     - `'darkMode'`: Primary colors styling for dark theme
+     *     - `'cancelMode'`: Secondary colors styling for all themes
+     */
+
+    let devMode = false;
+    let isYoutubePreviewsEnabled = false;
+    let appID;
+
+    const titleID = 'DuckDuckGoPrivacyEssentialsCTLElementTitle';
+
+    // Configuration for how the placeholder elements should look and behave.
+    // @see {getConfig}
+    let config = null;
+    let sharedStrings = null;
+    let styles = null;
+
+    // TODO: Remove these redundant data structures and refactor the related code.
+    //       There should be no need to have the entity configuration stored in two
+    //       places.
+    const entities = [];
+    const entityData = {};
+
+    // Used to avoid displaying placeholders for the same tracking element twice.
+    const knownTrackingElements = new WeakSet();
+
+    // Promise that is resolved when the Click to Load feature init() function has
+    // finished its work, enough that it's now safe to replace elements with
+    // placeholders.
+    let readyToDisplayPlaceholdersResolver;
+    const readyToDisplayPlaceholders = new Promise(resolve => {
+        readyToDisplayPlaceholdersResolver = resolve;
+    });
+
+    // Promise that is resolved when the page has finished loading (and
+    // readyToDisplayPlaceholders has resolved). Wait for this before sending
+    // essential messages to surrogate scripts.
+    let afterPageLoadResolver;
+    const afterPageLoad = new Promise(resolve => { afterPageLoadResolver = resolve; });
+
+    /*********************************************************
+     *  Widget Replacement logic
+     *********************************************************/
+    class DuckWidget {
+        /**
+         * @param {Object} widgetData
+         *   The configuration for this "widget" as determined in ctl-config.js.
+         * @param {HTMLElement} originalElement
+         *   The original tracking element to replace with a placeholder.
+         * @param {string} entity
+         *   The entity behind the tracking element (e.g. "Facebook, Inc.").
+         */
+        constructor (widgetData, originalElement, entity) {
+            this.clickAction = { ...widgetData.clickAction }; // shallow copy
+            this.replaceSettings = widgetData.replaceSettings;
+            this.originalElement = originalElement;
+            this.placeholderElement = null;
+            this.dataElements = {};
+            this.gatherDataElements();
+            this.entity = entity;
+            this.widgetID = Math.random();
+            this.autoplay = false;
+            // Boolean if widget is unblocked and content should not be blocked
+            this.isUnblocked = false;
+        }
+
+        /**
+         * Dispatch an event on the target element, including the widget's ID and
+         * other details.
+         * @param {EventTarget} eventTarget
+         * @param {string} eventName
+         */
+        dispatchEvent (eventTarget, eventName) {
+            eventTarget.dispatchEvent(
+                createCustomEvent(
+                    eventName, {
+                        detail: {
+                            entity: this.entity,
+                            replaceSettings: this.replaceSettings,
+                            widgetID: this.widgetID
+                        }
+                    }
+                )
+            );
+        }
+
+        /**
+         * Take note of some of the tracking element's attributes (as determined by
+         * clickAction.urlDataAttributesToPreserve) and store those in
+         * this.dataElement.
+         */
+        gatherDataElements () {
+            if (!this.clickAction.urlDataAttributesToPreserve) {
+                return
+            }
+            for (const [attrName, attrSettings] of Object.entries(this.clickAction.urlDataAttributesToPreserve)) {
+                let value = this.originalElement.getAttribute(attrName);
+                if (!value) {
+                    if (attrSettings.required) {
+                        // Missing a required attribute means we won't be able to replace it
+                        // with a light version, replace with full version.
+                        this.clickAction.type = 'allowFull';
+                    }
+                    value = attrSettings.default;
+                }
+                this.dataElements[attrName] = value;
+            }
+        }
+
+        /**
+         * Return the URL of the Facebook content, for use when a Facebook Click to
+         * Load placeholder has been clicked by the user.
+         * @returns {string}
+         */
+        getTargetURL () {
+            // Copying over data fields should be done lazily, since some required data may not be
+            // captured until after page scripts run.
+            this.copySocialDataFields();
+            return this.clickAction.targetURL
+        }
+
+        /**
+         * Determines which display mode the placeholder element should render in.
+         * @returns {displayMode}
+         */
+        getMode () {
+            // Login buttons are always the login style types
+            if (this.replaceSettings.type === 'loginButton') {
+                return 'loginMode'
+            }
+            if (window?.matchMedia('(prefers-color-scheme: dark)')?.matches) {
+                return 'darkMode'
+            }
+            return 'lightMode'
+        }
+
+        /**
+         * Take note of some of the tracking element's style attributes (as
+         * determined by clickAction.styleDataAttributes) as a CSS string.
+         *
+         * @returns {string}
+         */
+        getStyle () {
+            let styleString = 'border: none;';
+
+            if (this.clickAction.styleDataAttributes) {
+                // Copy elements from the original div into style attributes as directed by config
+                for (const [attr, valAttr] of Object.entries(this.clickAction.styleDataAttributes)) {
+                    let valueFound = this.dataElements[valAttr.name];
+                    if (!valueFound) {
+                        valueFound = this.dataElements[valAttr.fallbackAttribute];
+                    }
+                    let partialStyleString = '';
+                    if (valueFound) {
+                        partialStyleString += `${attr}: ${valueFound}`;
+                    }
+                    if (!partialStyleString.includes(valAttr.unit)) {
+                        partialStyleString += valAttr.unit;
+                    }
+                    partialStyleString += ';';
+                    styleString += partialStyleString;
+                }
+            }
+
+            return styleString
+        }
+
+        /**
+         * Store some attributes from the original tracking element, used for both
+         * placeholder element styling, and when restoring the original tracking
+         * element.
+         */
+        copySocialDataFields () {
+            if (!this.clickAction.urlDataAttributesToPreserve) {
+                return
+            }
+
+            // App ID may be set by client scripts, and is required for some elements.
+            if (this.dataElements.app_id_replace && appID != null) {
+                this.clickAction.targetURL = this.clickAction.targetURL.replace('app_id_replace', appID);
+            }
+
+            for (const key of Object.keys(this.dataElements)) {
+                let attrValue = this.dataElements[key];
+
+                if (!attrValue) {
+                    continue
+                }
+
+                // The URL for Facebook videos are specified as the data-href
+                // attribute on a div, that is then used to create the iframe.
+                // Some websites omit the protocol part of the URL when doing
+                // that, which then prevents the iframe from loading correctly.
+                if (key === 'data-href' && attrValue.startsWith('//')) {
+                    attrValue = window.location.protocol + attrValue;
+                }
+
+                this.clickAction.targetURL =
+                    this.clickAction.targetURL.replace(
+                        key, encodeURIComponent(attrValue)
+                    );
+            }
+        }
+
+        /**
+         * Creates an iFrame for this facebook content.
+         *
+         * @returns {HTMLIFrameElement}
+         */
+        createFBIFrame () {
+            const frame = document.createElement('iframe');
+
+            frame.setAttribute('src', this.getTargetURL());
+            frame.setAttribute('style', this.getStyle());
+
+            return frame
+        }
+
+        /**
+         * Tweaks an embedded YouTube video element ready for when it's
+         * reloaded.
+         *
+         * @param {HTMLIFrameElement} videoElement
+         * @returns {EventListener?} onError
+         *   Function to be called if the video fails to load.
+         */
+        adjustYouTubeVideoElement (videoElement) {
+            let onError = null;
+
+            if (!videoElement.src) {
+                return onError
+            }
+            const url = new URL(videoElement.src);
+            const { hostname: originalHostname } = url;
+
+            // Upgrade video to YouTube's "privacy enhanced" mode, but fall back
+            // to standard mode if the video fails to load.
+            // Note:
+            //  1. Changing the iframe's host like this won't cause a CSP
+            //     violation on Chrome, see https://crbug.com/1271196.
+            //  2. The onError event doesn't fire for blocked iframes on Chrome.
+            if (originalHostname !== 'www.youtube-nocookie.com') {
+                url.hostname = 'www.youtube-nocookie.com';
+                onError = (event) => {
+                    url.hostname = originalHostname;
+                    videoElement.src = url.href;
+                    event.stopImmediatePropagation();
+                };
+            }
+
+            // Configure auto-play correctly depending on if the video's preview
+            // loaded, otherwise it doesn't allow autoplay.
+            let allowString = videoElement.getAttribute('allow') || '';
+            const allowed = new Set(allowString.split(';').map(s => s.trim()));
+            if (this.autoplay) {
+                allowed.add('autoplay');
+                url.searchParams.set('autoplay', '1');
+            } else {
+                allowed.delete('autoplay');
+                url.searchParams.delete('autoplay');
+            }
+            allowString = Array.from(allowed).join('; ');
+            videoElement.setAttribute('allow', allowString);
+
+            videoElement.src = url.href;
+            return onError
+        }
+
+        /**
+         * Fades the given element in/out.
+         * @param {HTMLElement} element
+         *   The element to fade in or out.
+         * @param {number} interval
+         *   Frequency of opacity updates (ms).
+         * @param {boolean} fadeIn
+         *   True if the element should fade in instead of out.
+         * @returns {Promise<void>}
+         *    Promise that resolves when the fade in/out is complete.
+         */
+        fadeElement (element, interval, fadeIn) {
+            return new Promise(resolve => {
+                let opacity = fadeIn ? 0 : 1;
+                const originStyle = element.style.cssText;
+                const fadeOut = setInterval(function () {
+                    opacity += fadeIn ? 0.03 : -0.03;
+                    element.style.cssText = originStyle + `opacity: ${opacity};`;
+                    if (opacity <= 0 || opacity >= 1) {
+                        clearInterval(fadeOut);
+                        resolve();
+                    }
+                }, interval);
+            })
+        }
+
+        /**
+         * Fades the given element out.
+         * @param {HTMLElement} element
+         *   The element to fade out.
+         * @returns {Promise<void>}
+         *    Promise that resolves when the fade out is complete.
+         */
+        fadeOutElement (element) {
+            return this.fadeElement(element, 10, false)
+        }
+
+        /**
+         * Fades the given element in.
+         * @param {HTMLElement} element
+         *   The element to fade in.
+         * @returns {Promise<void>}
+         *    Promise that resolves when the fade in is complete.
+         */
+        fadeInElement (element) {
+            return this.fadeElement(element, 10, true)
+        }
+
+        /**
+         * The function that's called when the user clicks to load some content.
+         * Unblocks the content, puts it back in the page, and removes the
+         * placeholder.
+         * @param {HTMLIFrameElement} originalElement
+         *   The original tracking element.
+         * @param {HTMLElement} replacementElement
+         *   The placeholder element.
+         */
+        clickFunction (originalElement, replacementElement) {
+            let clicked = false;
+            const handleClick = e => {
+                // Ensure that the click is created by a user event & prevent double clicks from adding more animations
+                if (e.isTrusted && !clicked) {
+                    this.isUnblocked = true;
+                    clicked = true;
+                    let isLogin = false;
+                    const clickElement = e.srcElement; // Object.assign({}, e)
+                    if (this.replaceSettings.type === 'loginButton') {
+                        isLogin = true;
+                    }
+                    window.addEventListener('ddg-ctp-unblockClickToLoadContent-complete', () => {
+                        const parent = replacementElement.parentNode;
+
+                        // The placeholder was removed from the DOM while we loaded
+                        // the original content, give up.
+                        if (!parent) return
+
+                        // If we allow everything when this element is clicked,
+                        // notify surrogate to enable SDK and replace original element.
+                        if (this.clickAction.type === 'allowFull') {
+                            parent.replaceChild(originalElement, replacementElement);
+                            this.dispatchEvent(window, 'ddg-ctp-load-sdk');
+                            return
+                        }
+                        // Create a container for the new FB element
+                        const fbContainer = document.createElement('div');
+                        fbContainer.style.cssText = styles.wrapperDiv;
+                        const fadeIn = document.createElement('div');
+                        fadeIn.style.cssText = 'display: none; opacity: 0;';
+
+                        // Loading animation (FB can take some time to load)
+                        const loadingImg = document.createElement('img');
+                        loadingImg.setAttribute('src', loadingImages[this.getMode()]);
+                        loadingImg.setAttribute('height', '14px');
+                        loadingImg.style.cssText = styles.loadingImg;
+
+                        // Always add the animation to the button, regardless of click source
+                        if (clickElement.nodeName === 'BUTTON') {
+                            clickElement.firstElementChild.insertBefore(loadingImg, clickElement.firstElementChild.firstChild);
+                        } else {
+                            // try to find the button
+                            let el = clickElement;
+                            let button = null;
+                            while (button === null && el !== null) {
+                                button = el.querySelector('button');
+                                el = el.parentElement;
+                            }
+                            if (button) {
+                                button.firstElementChild.insertBefore(loadingImg, button.firstElementChild.firstChild);
+                            }
+                        }
+
+                        fbContainer.appendChild(fadeIn);
+
+                        let fbElement;
+                        let onError = null;
+                        switch (this.clickAction.type) {
+                        case 'iFrame':
+                            fbElement = this.createFBIFrame();
+                            break
+                        case 'youtube-video':
+                            onError = this.adjustYouTubeVideoElement(originalElement);
+                            fbElement = originalElement;
+                            break
+                        default:
+                            fbElement = originalElement;
+                            break
+                        }
+
+                        // Modify the overlay to include a Facebook iFrame, which
+                        // starts invisible. Once loaded, fade out and remove the
+                        // overlay then fade in the Facebook content.
+                        parent.replaceChild(fbContainer, replacementElement);
+                        fbContainer.appendChild(replacementElement);
+                        fadeIn.appendChild(fbElement);
+                        fbElement.addEventListener('load', async () => {
+                            await this.fadeOutElement(replacementElement);
+                            fbContainer.replaceWith(fbElement);
+                            this.dispatchEvent(fbElement, 'ddg-ctp-placeholder-clicked');
+                            await this.fadeInElement(fadeIn);
+                            // Focus on new element for screen readers.
+                            fbElement.focus();
+                        }, { once: true });
+                        // Note: This event only fires on Firefox, on Chrome the frame's
+                        //       load event will always fire.
+                        if (onError) {
+                            fbElement.addEventListener('error', onError, { once: true });
+                        }
+                    }, { once: true });
+                    const action = this.entity === 'Youtube' ? 'block-ctl-yt' : 'block-ctl-fb';
+                    unblockClickToLoadContent({ entity: this.entity, action, isLogin });
+                }
+            };
+            // If this is a login button, show modal if needed
+            if (this.replaceSettings.type === 'loginButton' && entityData[this.entity].shouldShowLoginModal) {
+                return e => {
+                    makeModal(this.entity, handleClick, e);
+                }
+            }
+            return handleClick
+        }
+    }
+
+    /**
+     * Replace the given tracking element with the given placeholder.
+     * Notes:
+     *  1. This function also dispatches events targetting the original and
+     *     placeholder elements. That way, the surrogate scripts can use the event
+     *     targets to keep track of which placeholder corresponds to which tracking
+     *     element.
+     *  2. To achieve that, the original and placeholder elements must be in the DOM
+     *     at the time the events are dispatched. Otherwise, the events will not
+     *     bubble up and the surrogate script will miss them.
+     *  3. Placeholder must be shown immediately (to avoid a flicker for the user),
+     *     but the events must only be sent once the document (and therefore
+     *     surrogate scripts) have loaded.
+     *  4. Therefore, we hide the element until the page has loaded, then dispatch
+     *     the events after page load, and then remove the element from the DOM.
+     *  5. The "ddg-ctp-ready" event needs to be dispatched _after_ the element
+     *     replacement events have fired. That is why a setTimeout is required
+     *     before dispatching "ddg-ctp-ready".
+     *
+     *  Also note, this all assumes that the surrogate script that needs these
+     *  events will not be loaded asynchronously after the page has finished
+     *  loading.
+     *
+     * @param {DuckWidget} widget
+     *   The DuckWidget associated with the tracking element.
+     * @param {HTMLElement} trackingElement
+     *   The tracking element on the page to replace.
+     * @param {HTMLElement} placeholderElement
+     *   The placeholder element that should be shown instead.
+     */
+    function replaceTrackingElement (widget, trackingElement, placeholderElement) {
+        // In some situations (e.g. YouTube Click to Load previews are
+        // enabled/disabled), a second placeholder will be shown for a tracking
+        // element.
+        const elementToReplace = widget.placeholderElement || trackingElement;
+
+        // Note the placeholder element, so that it can also be replaced later if
+        // necessary.
+        widget.placeholderElement = placeholderElement;
+
+        // First hide the element, since we need to keep it in the DOM until the
+        // events have been dispatched.
+        const originalDisplay = [
+            elementToReplace.style.getPropertyValue('display'),
+            elementToReplace.style.getPropertyPriority('display')
+        ];
+        elementToReplace.style.setProperty('display', 'none', 'important');
+
+        // When iframes are blocked by the declarativeNetRequest API, they are
+        // collapsed (hidden) automatically. Unfortunately however, there's a bug
+        // that stops them from being uncollapsed (shown again) if they are removed
+        // from the DOM after they are collapsed. As a workaround, have the iframe
+        // load a benign data URI, so that it's uncollapsed, before removing it from
+        // the DOM. See https://crbug.com/1428971
+        const originalSrc = elementToReplace.src;
+        elementToReplace.src =
+            'data:text/plain;charset=utf-8;base64,' + btoa('https://crbug.com/1428971');
+
+        // Add the placeholder element to the page.
+        elementToReplace.parentElement.insertBefore(
+            placeholderElement, elementToReplace
+        );
+
+        // While the placeholder is shown (and original element hidden)
+        // synchronously, the events are dispatched (and original element removed
+        // from the DOM) asynchronously after the page has finished loading.
+        // eslint-disable-next-line promise/prefer-await-to-then
+        afterPageLoad.then(() => {
+            // With page load complete, and both elements in the DOM, the events can
+            // be dispatched.
+            widget.dispatchEvent(trackingElement, 'ddg-ctp-tracking-element');
+            widget.dispatchEvent(placeholderElement, 'ddg-ctp-placeholder-element');
+
+            // Once the events are sent, the tracking element (or previous
+            // placeholder) can finally be removed from the DOM.
+            elementToReplace.remove();
+            elementToReplace.style.setProperty('display', ...originalDisplay);
+            elementToReplace.src = originalSrc;
+        });
+    }
+
+    /**
+     * Creates a placeholder element for the given tracking element and replaces
+     * it on the page.
+     * @param {DuckWidget} widget
+     *   The CTL 'widget' associated with the tracking element.
+     * @param {HTMLIFrameElement} trackingElement
+     *   The tracking element on the page that should be replaced with a placeholder.
+     */
+    function createPlaceholderElementAndReplace (widget, trackingElement) {
+        if (widget.replaceSettings.type === 'blank') {
+            replaceTrackingElement(widget, trackingElement, document.createElement('div'));
+        }
+
+        if (widget.replaceSettings.type === 'loginButton') {
+            const icon = widget.replaceSettings.icon;
+            // Create a button to replace old element
+            const { button, container } = makeLoginButton(
+                widget.replaceSettings.buttonText, widget.getMode(),
+                widget.replaceSettings.popupBodyText, icon, trackingElement
+            );
+            button.addEventListener('click', widget.clickFunction(trackingElement, container));
+            replaceTrackingElement(widget, trackingElement, container);
+        }
+
+        // Facebook
+        if (widget.replaceSettings.type === 'dialog') {
+            const icon = widget.replaceSettings.icon;
+            const button = makeButton(widget.replaceSettings.buttonText, widget.getMode());
+            const textButton = makeTextButton(widget.replaceSettings.buttonText, widget.getMode());
+            const { contentBlock, shadowRoot } = createContentBlock(
+                widget, button, textButton, icon
+            );
+            button.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
+            textButton.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
+
+            replaceTrackingElement(widget, trackingElement, contentBlock);
+            showExtraUnblockIfShortPlaceholder(shadowRoot, contentBlock);
+        }
+
+        // YouTube
+        if (widget.replaceSettings.type === 'youtube-video') {
+            sendMessage('updateYouTubeCTLAddedFlag', true);
+            replaceYouTubeCTL(trackingElement, widget);
+
+            // Subscribe to changes to youtubePreviewsEnabled setting
+            // and update the CTL state
+            window.addEventListener(
+                'ddg-settings-youtubePreviewsEnabled',
+                (/** @type CustomEvent */ { detail: value }) => {
+                    isYoutubePreviewsEnabled = value;
+                    replaceYouTubeCTL(trackingElement, widget);
+                }
+            );
+        }
+    }
+
+    /**
+     * @param {HTMLIFrameElement} trackingElement
+     *   The original tracking element (YouTube video iframe)
+     * @param {DuckWidget} widget
+     *   The CTL 'widget' associated with the tracking element.
+     */
+    function replaceYouTubeCTL (trackingElement, widget) {
+        // Skip replacing tracking element if it has already been unblocked
+        if (widget.isUnblocked) {
+            return
+        }
+
+        if (isYoutubePreviewsEnabled === true) {
+            // Show YouTube Preview for embedded video
+            const oldPlaceholder = widget.placeholderElement;
+            const { youTubePreview, shadowRoot } = createYouTubePreview(trackingElement, widget);
+            resizeElementToMatch(oldPlaceholder || trackingElement, youTubePreview);
+            replaceTrackingElement(widget, trackingElement, youTubePreview);
+            showExtraUnblockIfShortPlaceholder(shadowRoot, youTubePreview);
+        } else {
+            // Block YouTube embedded video and display blocking dialog
+            widget.autoplay = false;
+            const oldPlaceholder = widget.placeholderElement;
+            const { blockingDialog, shadowRoot } = createYouTubeBlockingDialog(trackingElement, widget);
+            resizeElementToMatch(oldPlaceholder || trackingElement, blockingDialog);
+            replaceTrackingElement(widget, trackingElement, blockingDialog);
+            showExtraUnblockIfShortPlaceholder(shadowRoot, blockingDialog);
+            hideInfoTextIfNarrowPlaceholder(shadowRoot, blockingDialog, 460);
+        }
+    }
+
+    /**
+     * Show the extra unblock link in the header if the placeholder or
+     * its parent is too short for the normal unblock button to be visible.
+     * Note: This does not take into account the placeholder's vertical
+     *       position in the parent element.
+     * @param {ShadowRoot} shadowRoot
+     * @param {HTMLElement} placeholder Placeholder for tracking element
+     */
+    function showExtraUnblockIfShortPlaceholder (shadowRoot, placeholder) {
+        if (!placeholder.parentElement) {
+            return
+        }
+        const parentStyles = window.getComputedStyle(placeholder.parentElement);
+        // Inline elements, like span or p, don't have a height value that we can use because they're
+        // not a "block" like element with defined sizes. Because we skip this check on "inline"
+        // parents, it might be necessary to traverse up the DOM tree until we find the nearest non
+        // "inline" parent to get a reliable height for this check.
+        if (parentStyles.display === 'inline') {
+            return
+        }
+        const { height: placeholderHeight } = placeholder.getBoundingClientRect();
+        const { height: parentHeight } = placeholder.parentElement.getBoundingClientRect();
+
+        if ((placeholderHeight > 0 && placeholderHeight <= 200) ||
+            (parentHeight > 0 && parentHeight <= 230)) {
+            /** @type {HTMLElement?} */
+            const titleRowTextButton = shadowRoot.querySelector(`#${titleID + 'TextButton'}`);
+            if (titleRowTextButton) {
+                titleRowTextButton.style.display = 'block';
+            }
+
+            // Avoid the placeholder being taller than the containing element
+            // and overflowing.
+            /** @type {HTMLElement?} */
+            const innerDiv = shadowRoot.querySelector('.DuckDuckGoSocialContainer');
+            if (innerDiv) {
+                innerDiv.style.minHeight = 'initial';
+                innerDiv.style.maxHeight = parentHeight + 'px';
+                innerDiv.style.overflow = 'hidden';
+            }
+        }
+    }
+
+    /**
+     * Hide the info text (and move the "Learn More" link) if the placeholder is too
+     * narrow.
+     * @param {ShadowRoot} shadowRoot
+     * @param {HTMLElement} placeholder Placeholder for tracking element
+     * @param {number} narrowWidth
+     *    Maximum placeholder width (in pixels) for the placeholder to be considered
+     *    narrow.
+     */
+    function hideInfoTextIfNarrowPlaceholder (shadowRoot, placeholder, narrowWidth) {
+        const { width: placeholderWidth } = placeholder.getBoundingClientRect();
+        if (placeholderWidth > 0 && placeholderWidth <= narrowWidth) {
+            const buttonContainer =
+                  shadowRoot.querySelector('.DuckDuckGoButton.primary')?.parentElement;
+            const contentTitle = shadowRoot.getElementById('contentTitle');
+            const infoText = shadowRoot.getElementById('infoText');
+            /** @type {HTMLElement?} */
+            const learnMoreLink = shadowRoot.getElementById('learnMoreLink');
+
+            // These elements will exist, but this check keeps TypeScript happy.
+            if (!buttonContainer || !contentTitle || !infoText || !learnMoreLink) {
+                return
+            }
+
+            // Remove the information text.
+            infoText.remove();
+            learnMoreLink.remove();
+
+            // Append the "Learn More" link to the title.
+            contentTitle.innerText += '. ';
+            learnMoreLink.style.removeProperty('font-size');
+            contentTitle.appendChild(learnMoreLink);
+
+            // Improve margin/padding, to ensure as much is displayed as possible.
+            buttonContainer.style.removeProperty('margin');
+        }
+    }
+
+    /**
+     * Replace the blocked CTL elements on the page with placeholders.
+     * @param {HTMLElement} [targetElement]
+     *   If specified, only this element will be replaced (assuming it matches
+     *   one of the expected CSS selectors). If omitted, all matching elements
+     *   in the document will be replaced instead.
+     */
+    async function replaceClickToLoadElements (targetElement) {
+        await readyToDisplayPlaceholders;
+
+        for (const entity of Object.keys(config)) {
+            for (const widgetData of Object.values(config[entity].elementData)) {
+                const selector = widgetData.selectors.join();
+
+                let trackingElements = [];
+                if (targetElement) {
+                    if (targetElement.matches(selector)) {
+                        trackingElements.push(targetElement);
+                    }
+                } else {
+                    trackingElements = Array.from(document.querySelectorAll(selector));
+                }
+
+                await Promise.all(trackingElements.map(trackingElement => {
+                    if (knownTrackingElements.has(trackingElement)) {
+                        return Promise.resolve()
+                    }
+
+                    knownTrackingElements.add(trackingElement);
+
+                    const widget = new DuckWidget(widgetData, trackingElement, entity);
+                    return createPlaceholderElementAndReplace(widget, trackingElement)
+                }));
+            }
+        }
+    }
+
+    /*********************************************************
+     *  Messaging to surrogates & extension
+     *********************************************************/
+
+    /**
+     * @typedef unblockClickToLoadContentRequest
+     * @property {string} entity
+     *   The entity to unblock requests for (e.g. "Facebook, Inc.").
+     * @property {boolean} [isLogin=false]
+     *   True if we should "allow social login", defaults to false.
+     * @property {string} action
+     *   The Click to Load blocklist rule action (e.g. "block-ctl-fb") that should
+     *   be allowed. Important since in the future there might be multiple types of
+     *   embedded content from the same entity that the user can allow
+     *   independently.
+     */
+
+    /**
+     * Send a message to the background to unblock requests for the given entity for
+     * the page.
+     * @param {unblockClickToLoadContentRequest} message
+     * @see {@link ddg-ctp-unblockClickToLoadContent-complete} for the response handler.
+     */
+    function unblockClickToLoadContent (message) {
+        sendMessage('unblockClickToLoadContent', message);
+    }
+
+    /**
+     * Unblock the entity, close the login dialog and continue the Facebook login
+     * flow. Called after the user clicks to proceed after the warning dialog is
+     * shown.
+     * @param {string} entity
+     */
+    function runLogin (entity) {
+        const action = entity === 'Youtube' ? 'block-ctl-yt' : 'block-ctl-fb';
+        unblockClickToLoadContent({ entity, action, isLogin: true });
+        originalWindowDispatchEvent(
+            createCustomEvent('ddg-ctp-run-login', {
+                detail: {
+                    entity
+                }
+            })
+        );
+    }
+
+    /**
+     * Close the login dialog and abort. Called after the user clicks to cancel
+     * after the warning dialog is shown.
+     * @param {string} entity
+     */
+    function cancelModal (entity) {
+        originalWindowDispatchEvent(
+            createCustomEvent('ddg-ctp-cancel-modal', {
+                detail: {
+                    entity
+                }
+            })
+        );
+    }
+
+    function openShareFeedbackPage () {
+        sendMessage('openShareFeedbackPage', '');
+    }
+
+    function getYouTubeVideoDetails (videoURL) {
+        sendMessage('getYouTubeVideoDetails', videoURL);
+    }
+
+    /*********************************************************
+     *  Widget building blocks
+     *********************************************************/
+
+    /**
+     * Creates a "Learn more" link element.
+     * @param {displayMode} [mode='lightMode']
+     * @returns {HTMLAnchorElement}
+     */
+    function getLearnMoreLink (mode = 'lightMode') {
+        const linkElement = document.createElement('a');
+        linkElement.style.cssText = styles.generalLink + styles[mode].linkFont;
+        linkElement.ariaLabel = sharedStrings.readAbout;
+        linkElement.href = 'https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/';
+        linkElement.target = '_blank';
+        linkElement.textContent = sharedStrings.learnMore;
+        linkElement.id = 'learnMoreLink';
+        return linkElement
+    }
+
+    /**
+     * Resizes and positions the target element to match the source element.
+     * @param {HTMLElement} sourceElement
+     * @param {HTMLElement} targetElement
+     */
+    function resizeElementToMatch (sourceElement, targetElement) {
+        const computedStyle = window.getComputedStyle(sourceElement);
+        const stylesToCopy = ['position', 'top', 'bottom', 'left', 'right',
+            'transform', 'margin'];
+
+        // It's apparently preferable to use the source element's size relative to
+        // the current viewport, when resizing the target element. However, the
+        // declarativeNetRequest API "collapses" (hides) blocked elements. When
+        // that happens, getBoundingClientRect will return all zeros.
+        // TODO: Remove this entirely, and always use the computed height/width of
+        //       the source element instead?
+        const { height, width } = sourceElement.getBoundingClientRect();
+        if (height > 0 && width > 0) {
+            targetElement.style.height = height + 'px';
+            targetElement.style.width = width + 'px';
+        } else {
+            stylesToCopy.push('height', 'width');
+        }
+
+        for (const key of stylesToCopy) {
+            targetElement.style[key] = computedStyle[key];
+        }
+
+        // If the parent element is very small (and its dimensions can be trusted) set a max height/width
+        // to avoid the placeholder overflowing.
+        if (computedStyle.display !== 'inline') {
+            if (targetElement.style.maxHeight < computedStyle.height) {
+                targetElement.style.maxHeight = 'initial';
+            }
+            if (targetElement.style.maxWidth < computedStyle.width) {
+                targetElement.style.maxWidth = 'initial';
+            }
+        }
+    }
+
+    /**
+     * Create a `<style/>` element with DDG font-face styles/CSS
+     * to be attached to DDG wrapper elements
+     * @returns HTMLStyleElement
+     */
+    function makeFontFaceStyleElement () {
+        // Put our custom font-faces inside the wrapper element, since
+        // @font-face does not work inside a shadowRoot.
+        // See https://github.com/mdn/interactive-examples/issues/887.
+        const fontFaceStyleElement = document.createElement('style');
+        fontFaceStyleElement.textContent = styles.fontStyle;
+        return fontFaceStyleElement
+    }
+
+    /**
+     * Create a `<style/>` element with base styles for DDG social container and
+     * button to be attached to DDG wrapper elements/shadowRoot, also returns a wrapper
+     * class name for Social Container link styles
+     * @param {displayMode} [mode='lightMode']
+     * @returns {{wrapperClass: string, styleElement: HTMLStyleElement; }}
+     */
+    function makeBaseStyleElement (mode = 'lightMode') {
+        // Style element includes our font & overwrites page styles
+        const styleElement = document.createElement('style');
+        const wrapperClass = 'DuckDuckGoSocialContainer';
+        styleElement.textContent = `
+        .${wrapperClass} a {
+            ${styles[mode].linkFont}
+            font-weight: bold;
+        }
+        .${wrapperClass} a:hover {
+            ${styles[mode].linkFont}
+            font-weight: bold;
+        }
+        .DuckDuckGoButton {
+            ${styles.button}
+        }
+        .DuckDuckGoButton > div {
+            ${styles.buttonTextContainer}
+        }
+        .DuckDuckGoButton.primary {
+           ${styles[mode].buttonBackground}
+        }
+        .DuckDuckGoButton.primary > div {
+           ${styles[mode].buttonFont}
+        }
+        .DuckDuckGoButton.primary:hover {
+           ${styles[mode].buttonBackgroundHover}
+        }
+        .DuckDuckGoButton.primary:active {
+           ${styles[mode].buttonBackgroundPress}
+        }
+        .DuckDuckGoButton.secondary {
+           ${styles.cancelMode.buttonBackground}
+        }
+        .DuckDuckGoButton.secondary > div {
+            ${styles.cancelMode.buttonFont}
+         }
+        .DuckDuckGoButton.secondary:hover {
+           ${styles.cancelMode.buttonBackgroundHover}
+        }
+        .DuckDuckGoButton.secondary:active {
+           ${styles.cancelMode.buttonBackgroundPress}
+        }
+    `;
+        return { wrapperClass, styleElement }
+    }
+
+    /**
+     * Creates an anchor element with no destination. It is expected that a click
+     * handler is added to the element later.
+     * @param {string} linkText
+     * @param {displayMode} mode
+     * @returns {HTMLAnchorElement}
+     */
+    function makeTextButton (linkText, mode = 'lightMode') {
+        const linkElement = document.createElement('a');
+        linkElement.style.cssText = styles.headerLink + styles[mode].linkFont;
+        linkElement.textContent = linkText;
+        return linkElement
+    }
+
+    /**
+     * Create a button element.
+     * @param {string} buttonText
+     *   Text to be displayed inside the button.
+     * @param {displayMode} [mode='lightMode']
+     *   The button is usually styled as the primary call to action, but if
+     *   'cancelMode' is specified the button is styled as a secondary call to
+     *   action.
+     * @returns {HTMLButtonElement} Button element
+     */
+    function makeButton (buttonText, mode = 'lightMode') {
+        const button = document.createElement('button');
+        button.classList.add('DuckDuckGoButton');
+        button.classList.add(mode === 'cancelMode' ? 'secondary' : 'primary');
+        if (buttonText) {
+            const textContainer = document.createElement('div');
+            textContainer.textContent = buttonText;
+            button.appendChild(textContainer);
+        }
+        return button
+    }
+
+    /**
+     * Create a toggle button.
+     * @param {displayMode} mode
+     * @param {boolean} [isActive=false]
+     *   True if the button should be toggled by default.
+     * @param {string} [classNames='']
+     *   Class names to assign to the button (space delimited).
+     * @param {string} [dataKey='']
+     *   Value to assign to the button's 'data-key' attribute.
+     * @returns {HTMLButtonElement}
+     */
+    function makeToggleButton (mode, isActive = false, classNames = '', dataKey = '') {
+        const toggleButton = document.createElement('button');
+        toggleButton.className = classNames;
+        toggleButton.style.cssText = styles.toggleButton;
+        toggleButton.type = 'button';
+        toggleButton.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        toggleButton.setAttribute('data-key', dataKey);
+
+        const activeKey = isActive ? 'active' : 'inactive';
+
+        const toggleBg = document.createElement('div');
+        toggleBg.style.cssText =
+            styles.toggleButtonBg + styles[mode].toggleButtonBgState[activeKey];
+
+        const toggleKnob = document.createElement('div');
+        toggleKnob.style.cssText =
+            styles.toggleButtonKnob + styles.toggleButtonKnobState[activeKey];
+
+        toggleButton.appendChild(toggleBg);
+        toggleButton.appendChild(toggleKnob);
+
+        return toggleButton
+    }
+
+    /**
+     * Create a toggle button that's wrapped in a div with some text.
+     * @param {string} text
+     *   Text to display by the button.
+     * @param {displayMode} mode
+     * @param {boolean} [isActive=false]
+     *   True if the button should be toggled by default.
+     * @param {string} [toggleClassNames='']
+     *   Class names to assign to the toggle button.
+     * @param {string} [textCssStyles='']
+     *   Styles to apply to the wrapping div (on top of ones determined by the
+     *   display mode.)
+     * @param {string} [dataKey='']
+     *   Value to assign to the button's 'data-key' attribute.
+     * @returns {HTMLDivElement}
+     */
+    function makeToggleButtonWithText (text, mode, isActive = false, toggleClassNames = '', textCssStyles = '', dataKey = '') {
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = styles.toggleButtonWrapper;
+
+        const toggleButton = makeToggleButton(mode, isActive, toggleClassNames, dataKey);
+
+        const textDiv = document.createElement('div');
+        textDiv.style.cssText = styles.contentText + styles.toggleButtonText + styles[mode].toggleButtonText + textCssStyles;
+        textDiv.textContent = text;
+
+        wrapper.appendChild(toggleButton);
+        wrapper.appendChild(textDiv);
+        return wrapper
+    }
+
+    /**
+     * Create the default block symbol, for when the image isn't available.
+     * @returns {HTMLDivElement}
+     */
+    function makeDefaultBlockIcon () {
+        const blockedIcon = document.createElement('div');
+        const dash = document.createElement('div');
+        blockedIcon.appendChild(dash);
+        blockedIcon.style.cssText = styles.circle;
+        dash.style.cssText = styles.rectangle;
+        return blockedIcon
+    }
+
+    /**
+     * Creates a share feedback link element.
+     * @returns {HTMLAnchorElement}
+     */
+    function makeShareFeedbackLink () {
+        const feedbackLink = document.createElement('a');
+        feedbackLink.style.cssText = styles.feedbackLink;
+        feedbackLink.target = '_blank';
+        feedbackLink.href = '#';
+        feedbackLink.text = 'Share Feedback';
+        // Open Feedback Form page through background event to avoid browser blocking extension link
+        feedbackLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            openShareFeedbackPage();
+        });
+
+        return feedbackLink
+    }
+
+    /**
+     * Creates a share feedback link element, wrapped in a styled div.
+     * @returns {HTMLDivElement}
+     */
+    function makeShareFeedbackRow () {
+        const feedbackRow = document.createElement('div');
+        feedbackRow.style.cssText = styles.feedbackRow;
+
+        const feedbackLink = makeShareFeedbackLink();
+        feedbackRow.appendChild(feedbackLink);
+
+        return feedbackRow
+    }
+
+    /**
+     * Creates a placeholder Facebook login button. When clicked, a warning dialog
+     * is displayed to the user. The login flow only continues if the user clicks to
+     * proceed.
+     * @param {string} buttonText
+     * @param {displayMode} mode
+     * @param {string} hoverTextBody
+     *   The hover text to display for the button.
+     * @param {string?} icon
+     *   The source of the icon to display in the button, if null the default block
+     *   icon is used instead.
+     * @param {HTMLElement} originalElement
+     *   The original Facebook login button that this placeholder is replacing.
+     *   Note: This function does not actually replace the button, the caller is
+     *         expected to do that.
+     * @returns {{ container: HTMLDivElement, button: HTMLButtonElement }}
+     */
+    function makeLoginButton (buttonText, mode, hoverTextBody, icon, originalElement) {
+        const container = document.createElement('div');
+        container.style.cssText = 'position: relative;';
+        container.appendChild(makeFontFaceStyleElement());
+
+        const shadowRoot = container.attachShadow({ mode: devMode ? 'open' : 'closed' });
+        // inherit any class styles on the button
+        container.className = 'fb-login-button FacebookLogin__button';
+        const { styleElement } = makeBaseStyleElement(mode);
+        styleElement.textContent += `
+        #DuckDuckGoPrivacyEssentialsHoverableText {
+            display: none;
+        }
+        #DuckDuckGoPrivacyEssentialsHoverable:hover #DuckDuckGoPrivacyEssentialsHoverableText {
+            display: block;
+        }
+    `;
+        shadowRoot.appendChild(styleElement);
+
+        const hoverContainer = document.createElement('div');
+        hoverContainer.id = 'DuckDuckGoPrivacyEssentialsHoverable';
+        hoverContainer.style.cssText = styles.hoverContainer;
+        shadowRoot.appendChild(hoverContainer);
+
+        // Make the button
+        const button = makeButton(buttonText, mode);
+        // Add blocked icon
+        if (!icon) {
+            button.appendChild(makeDefaultBlockIcon());
+        } else {
+            const imgElement = document.createElement('img');
+            imgElement.style.cssText = styles.loginIcon;
+            imgElement.setAttribute('src', icon);
+            imgElement.setAttribute('height', '28px');
+            button.appendChild(imgElement);
+        }
+        hoverContainer.appendChild(button);
+
+        // hover action
+        const hoverBox = document.createElement('div');
+        hoverBox.id = 'DuckDuckGoPrivacyEssentialsHoverableText';
+        hoverBox.style.cssText = styles.textBubble;
+        const arrow = document.createElement('div');
+        arrow.style.cssText = styles.textArrow;
+        hoverBox.appendChild(arrow);
+        const branding = createTitleRow('DuckDuckGo');
+        branding.style.cssText += styles.hoverTextTitle;
+        hoverBox.appendChild(branding);
+        const hoverText = document.createElement('div');
+        hoverText.style.cssText = styles.hoverTextBody;
+        hoverText.textContent = hoverTextBody + ' ';
+        hoverText.appendChild(getLearnMoreLink(mode));
+        hoverBox.appendChild(hoverText);
+
+        hoverContainer.appendChild(hoverBox);
+        const rect = originalElement.getBoundingClientRect();
+
+        // The left side of the hover popup may go offscreen if the
+        // login button is all the way on the left side of the page. This
+        // If that is the case, dynamically shift the box right so it shows
+        // properly.
+        if (rect.left < styles.textBubbleLeftShift) {
+            const leftShift = -rect.left + 10; // 10px away from edge of the screen
+            hoverBox.style.cssText += `left: ${leftShift}px;`;
+            const change = (1 - (rect.left / styles.textBubbleLeftShift)) * (100 - styles.arrowDefaultLocationPercent);
+            arrow.style.cssText += `left: ${Math.max(10, styles.arrowDefaultLocationPercent - change)}%;`;
+        } else if (rect.left + styles.textBubbleWidth - styles.textBubbleLeftShift > window.innerWidth) {
+            const rightShift = rect.left + styles.textBubbleWidth - styles.textBubbleLeftShift;
+            const diff = Math.min(rightShift - window.innerWidth, styles.textBubbleLeftShift);
+            const rightMargin = 20; // Add some margin to the page, so scrollbar doesn't overlap.
+            hoverBox.style.cssText += `left: -${styles.textBubbleLeftShift + diff + rightMargin}px;`;
+            const change = ((diff / styles.textBubbleLeftShift)) * (100 - styles.arrowDefaultLocationPercent);
+            arrow.style.cssText += `left: ${Math.max(10, styles.arrowDefaultLocationPercent + change)}%;`;
+        } else {
+            hoverBox.style.cssText += `left: -${styles.textBubbleLeftShift}px;`;
+            arrow.style.cssText += `left: ${styles.arrowDefaultLocationPercent}%;`;
+        }
+
+        return {
+            button,
+            container
+        }
+    }
+
+    /**
+     * Creates a privacy warning dialog for the user, so that the user can choose to
+     * proceed/abort.
+     * @param {string} entity
+     *   The entity to unblock requests for (e.g. "Facebook, Inc.") if the user
+     *   clicks to proceed.
+     * @param {function} acceptFunction
+     *   The function to call if the user has clicked to proceed.
+     * @param {...any} acceptFunctionParams
+     *   The parameters passed to acceptFunction when it is called.
+     *   TODO: Have the caller bind these arguments to the function instead.
+     */
+    function makeModal (entity, acceptFunction, ...acceptFunctionParams) {
+        const icon = entityData[entity].modalIcon;
+
+        const modalContainer = document.createElement('div');
+        modalContainer.setAttribute('data-key', 'modal');
+        modalContainer.style.cssText = styles.modalContainer;
+
+        modalContainer.appendChild(makeFontFaceStyleElement());
+
+        const closeModal = () => {
+            document.body.removeChild(modalContainer);
+            cancelModal(entity);
+        };
+
+        // Protect the contents of our modal inside a shadowRoot, to avoid
+        // it being styled by the website's stylesheets.
+        const shadowRoot = modalContainer.attachShadow({ mode: devMode ? 'open' : 'closed' });
+        const { styleElement } = makeBaseStyleElement('lightMode');
+        shadowRoot.appendChild(styleElement);
+
+        const pageOverlay = document.createElement('div');
+        pageOverlay.style.cssText = styles.overlay;
+
+        const modal = document.createElement('div');
+        modal.style.cssText = styles.modal;
+
+        // Title
+        const modalTitle = createTitleRow('DuckDuckGo', null, closeModal);
+        modal.appendChild(modalTitle);
+
+        const iconElement = document.createElement('img');
+        iconElement.style.cssText = styles.icon + styles.modalIcon;
+        iconElement.setAttribute('src', icon);
+        iconElement.setAttribute('height', '70px');
+
+        const title = document.createElement('div');
+        title.style.cssText = styles.modalContentTitle;
+        title.textContent = entityData[entity].modalTitle;
+
+        // Content
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = styles.modalContent;
+
+        const message = document.createElement('div');
+        message.style.cssText = styles.modalContentText;
+        message.textContent = entityData[entity].modalText + ' ';
+        message.appendChild(getLearnMoreLink());
+
+        modalContent.appendChild(iconElement);
+        modalContent.appendChild(title);
+        modalContent.appendChild(message);
+
+        // Buttons
+        const buttonRow = document.createElement('div');
+        buttonRow.style.cssText = styles.modalButtonRow;
+        const allowButton = makeButton(entityData[entity].modalAcceptText, 'lightMode');
+        allowButton.style.cssText += styles.modalButton + 'margin-bottom: 8px;';
+        allowButton.setAttribute('data-key', 'allow');
+        allowButton.addEventListener('click', function doLogin () {
+            acceptFunction(...acceptFunctionParams);
+            document.body.removeChild(modalContainer);
+        });
+        const rejectButton = makeButton(entityData[entity].modalRejectText, 'cancelMode');
+        rejectButton.setAttribute('data-key', 'reject');
+        rejectButton.style.cssText += styles.modalButton;
+        rejectButton.addEventListener('click', closeModal);
+
+        buttonRow.appendChild(allowButton);
+        buttonRow.appendChild(rejectButton);
+        modalContent.appendChild(buttonRow);
+
+        modal.appendChild(modalContent);
+
+        shadowRoot.appendChild(pageOverlay);
+        shadowRoot.appendChild(modal);
+
+        document.body.insertBefore(modalContainer, document.body.childNodes[0]);
+    }
+
+    /**
+     * Create the "title row" div that contains a placeholder's heading.
+     * @param {string} message
+     *   The title text to display.
+     * @param {HTMLAnchorElement?} [textButton]
+     *   The link to display with the title, if any.
+     * @param {EventListener} [closeBtnFn]
+     *   If provided, a close button is added that calls this function when clicked.
+     * @returns {HTMLDivElement}
+     */
+    function createTitleRow (message, textButton, closeBtnFn) {
+        // Create row container
+        const row = document.createElement('div');
+        row.style.cssText = styles.titleBox;
+
+        // Logo
+        const logoContainer = document.createElement('div');
+        logoContainer.style.cssText = styles.logo;
+        const logoElement = document.createElement('img');
+        logoElement.setAttribute('src', logoImg);
+        logoElement.setAttribute('height', '21px');
+        logoElement.style.cssText = styles.logoImg;
+        logoContainer.appendChild(logoElement);
+        row.appendChild(logoContainer);
+
+        // Content box title
+        const msgElement = document.createElement('div');
+        msgElement.id = titleID; // Ensure we can find this to potentially hide it later.
+        msgElement.textContent = message;
+        msgElement.style.cssText = styles.title;
+        row.appendChild(msgElement);
+
+        // Close Button
+        if (typeof closeBtnFn === 'function') {
+            const closeButton = document.createElement('button');
+            closeButton.style.cssText = styles.closeButton;
+            const closeIconImg = document.createElement('img');
+            closeIconImg.setAttribute('src', closeIcon);
+            closeIconImg.setAttribute('height', '12px');
+            closeIconImg.style.cssText = styles.closeIcon;
+            closeButton.appendChild(closeIconImg);
+            closeButton.addEventListener('click', closeBtnFn);
+            row.appendChild(closeButton);
+        }
+
+        // Text button for very small boxes
+        if (textButton) {
+            textButton.id = titleID + 'TextButton';
+            row.appendChild(textButton);
+        }
+
+        return row
+    }
+
+    /**
+     * Create a placeholder element (wrapped in a div and shadowRoot), to replace a
+     * tracking element with.
+     * @param {DuckWidget} widget
+     *   Widget corresponding to the tracking element.
+     * @param {HTMLButtonElement} button
+     *   Primary button that loads the original tracking element (and removed this
+     *   placeholder) when clicked.
+     * @param {HTMLAnchorElement?} textButton
+     *   Link to display next to the title, if any.
+     * @param {string?} img
+     *   Source of image to display in the placeholder (if any).
+     * @param {HTMLDivElement} [bottomRow]
+     *   Bottom row to append to the placeholder, if any.
+     * @returns {{ contentBlock: HTMLDivElement, shadowRoot: ShadowRoot }}
+     */
+    function createContentBlock (widget, button, textButton, img, bottomRow) {
+        const contentBlock = document.createElement('div');
+        contentBlock.style.cssText = styles.wrapperDiv;
+
+        contentBlock.appendChild(makeFontFaceStyleElement());
+
+        // Put everything else inside the shadowRoot of the wrapper element to
+        // reduce the chances of the website's stylesheets messing up the
+        // placeholder's appearance.
+        const shadowRootMode = devMode ? 'open' : 'closed';
+        const shadowRoot = contentBlock.attachShadow({ mode: shadowRootMode });
+
+        // Style element includes our font & overwrites page styles
+        const { wrapperClass, styleElement } = makeBaseStyleElement(widget.getMode());
+        shadowRoot.appendChild(styleElement);
+
+        // Create overall grid structure
+        const element = document.createElement('div');
+        element.style.cssText = styles.block + styles[widget.getMode()].background + styles[widget.getMode()].textFont;
+        if (widget.replaceSettings.type === 'youtube-video') {
+            element.style.cssText += styles.youTubeDialogBlock;
+        }
+        element.className = wrapperClass;
+        shadowRoot.appendChild(element);
+
+        // grid of three rows
+        const titleRow = document.createElement('div');
+        titleRow.style.cssText = styles.headerRow;
+        element.appendChild(titleRow);
+        titleRow.appendChild(createTitleRow('DuckDuckGo', textButton));
+
+        const contentRow = document.createElement('div');
+        contentRow.style.cssText = styles.content;
+
+        if (img) {
+            const imageRow = document.createElement('div');
+            imageRow.style.cssText = styles.imgRow;
+            const imgElement = document.createElement('img');
+            imgElement.style.cssText = styles.icon;
+            imgElement.setAttribute('src', img);
+            imgElement.setAttribute('height', '70px');
+            imageRow.appendChild(imgElement);
+            element.appendChild(imageRow);
+        }
+
+        const contentTitle = document.createElement('div');
+        contentTitle.style.cssText = styles.contentTitle;
+        contentTitle.textContent = widget.replaceSettings.infoTitle;
+        contentTitle.id = 'contentTitle';
+        contentRow.appendChild(contentTitle);
+        const contentText = document.createElement('div');
+        contentText.style.cssText = styles.contentText;
+        const contentTextSpan = document.createElement('span');
+        contentTextSpan.id = 'infoText';
+        contentTextSpan.textContent = widget.replaceSettings.infoText + ' ';
+        contentText.appendChild(contentTextSpan);
+        contentText.appendChild(getLearnMoreLink());
+        contentRow.appendChild(contentText);
+        element.appendChild(contentRow);
+
+        const buttonRow = document.createElement('div');
+        buttonRow.style.cssText = styles.buttonRow;
+        buttonRow.appendChild(button);
+        contentText.appendChild(buttonRow);
+
+        if (bottomRow) {
+            contentRow.appendChild(bottomRow);
+        }
+
+        /** Share Feedback Link */
+        if (widget.replaceSettings.type === 'youtube-video') {
+            const feedbackRow = makeShareFeedbackRow();
+            shadowRoot.appendChild(feedbackRow);
+        }
+
+        return { contentBlock, shadowRoot }
+    }
+
+    /**
+     * Create the content block to replace embedded YouTube videos/iframes with.
+     * @param {HTMLIFrameElement} trackingElement
+     * @param {DuckWidget} widget
+     * @returns {{ blockingDialog: HTMLElement, shadowRoot: ShadowRoot }}
+     */
+    function createYouTubeBlockingDialog (trackingElement, widget) {
+        const button = makeButton(widget.replaceSettings.buttonText, widget.getMode());
+        const textButton = makeTextButton(widget.replaceSettings.buttonText, widget.getMode());
+
+        const bottomRow = document.createElement('div');
+        bottomRow.style.cssText = styles.youTubeDialogBottomRow;
+        const previewToggle = makeToggleButtonWithText(
+            widget.replaceSettings.previewToggleText,
+            widget.getMode(),
+            false,
+            '',
+            '',
+            'yt-preview-toggle'
+        );
+        previewToggle.addEventListener(
+            'click',
+            () => makeModal(widget.entity, () => sendMessage('setYoutubePreviewsEnabled', true), widget.entity)
+        );
+        bottomRow.appendChild(previewToggle);
+
+        const { contentBlock, shadowRoot } = createContentBlock(
+            widget, button, textButton, null, bottomRow
+        );
+        contentBlock.id = trackingElement.id;
+        contentBlock.style.cssText += styles.wrapperDiv + styles.youTubeWrapperDiv;
+
+        button.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
+        textButton.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
+
+        return {
+            blockingDialog: contentBlock,
+            shadowRoot
+        }
+    }
+
+    /**
+     * Creates the placeholder element to replace a YouTube video iframe element
+     * with a preview image. Mutates widget Object to set the autoplay property
+     * as the preview details load.
+     * @param {HTMLIFrameElement} originalElement
+     *   The YouTube video iframe element.
+     * @param {DuckWidget} widget
+     *   The widget Object. We mutate this to set the autoplay property.
+     * @returns {{ youTubePreview: HTMLElement, shadowRoot: ShadowRoot }}
+     *   Object containing the YouTube Preview element and its shadowRoot.
+     */
+    function createYouTubePreview (originalElement, widget) {
+        const youTubePreview = document.createElement('div');
+        youTubePreview.id = originalElement.id;
+        youTubePreview.style.cssText = styles.wrapperDiv + styles.placeholderWrapperDiv;
+
+        youTubePreview.appendChild(makeFontFaceStyleElement());
+
+        // Protect the contents of our placeholder inside a shadowRoot, to avoid
+        // it being styled by the website's stylesheets.
+        const shadowRoot = youTubePreview.attachShadow({ mode: devMode ? 'open' : 'closed' });
+        const { wrapperClass, styleElement } = makeBaseStyleElement(widget.getMode());
+        shadowRoot.appendChild(styleElement);
+
+        const youTubePreviewDiv = document.createElement('div');
+        youTubePreviewDiv.style.cssText = styles.youTubeDialogDiv;
+        youTubePreviewDiv.classList.add(wrapperClass);
+        shadowRoot.appendChild(youTubePreviewDiv);
+
+        /** Preview Image */
+        const previewImageWrapper = document.createElement('div');
+        previewImageWrapper.style.cssText = styles.youTubePreviewWrapperImg;
+        youTubePreviewDiv.appendChild(previewImageWrapper);
+        // We use an image element for the preview image so that we can ensure
+        // the referrer isn't passed.
+        const previewImageElement = document.createElement('img');
+        previewImageElement.setAttribute('referrerPolicy', 'no-referrer');
+        previewImageElement.style.cssText = styles.youTubePreviewImg;
+        previewImageWrapper.appendChild(previewImageElement);
+
+        const innerDiv = document.createElement('div');
+        innerDiv.style.cssText = styles.youTubePlaceholder;
+
+        /** Top section */
+        const topSection = document.createElement('div');
+        topSection.style.cssText = styles.youTubeTopSection;
+        innerDiv.appendChild(topSection);
+
+        /** Video Title */
+        const titleElement = document.createElement('p');
+        titleElement.style.cssText = styles.youTubeTitle;
+        topSection.appendChild(titleElement);
+
+        /** Text Button on top section */
+        // Use darkMode styles because the preview background is dark and causes poor contrast
+        // with lightMode button, making it hard to read.
+        const textButton = makeTextButton(widget.replaceSettings.buttonText, 'darkMode');
+        textButton.id = titleID + 'TextButton';
+
+        textButton.addEventListener(
+            'click',
+            widget.clickFunction(originalElement, youTubePreview)
+        );
+        topSection.appendChild(textButton);
+
+        /** Play Button */
+        const playButtonRow = document.createElement('div');
+        playButtonRow.style.cssText = styles.youTubePlayButtonRow;
+
+        const playButton = makeButton('', widget.getMode());
+        playButton.style.cssText += styles.youTubePlayButton;
+
+        const videoPlayImg = document.createElement('img');
+        const videoPlayIcon = widget.replaceSettings.placeholder.videoPlayIcon[widget.getMode()];
+        videoPlayImg.setAttribute('src', videoPlayIcon);
+        playButton.appendChild(videoPlayImg);
+
+        playButton.addEventListener(
+            'click',
+            widget.clickFunction(originalElement, youTubePreview)
+        );
+        playButtonRow.appendChild(playButton);
+        innerDiv.appendChild(playButtonRow);
+
+        /** Preview Toggle */
+        const previewToggleRow = document.createElement('div');
+        previewToggleRow.style.cssText = styles.youTubePreviewToggleRow;
+
+        const previewToggle = makeToggleButtonWithText(
+            widget.replaceSettings.placeholder.previewToggleEnabledText,
+            widget.getMode(),
+            true,
+            '',
+            styles.youTubePreviewToggleText,
+            'yt-preview-toggle'
+        );
+        previewToggle.addEventListener(
+            'click',
+            () => sendMessage('setYoutubePreviewsEnabled', false)
+        );
+
+        /** Preview Info Text */
+        const previewText = document.createElement('div');
+        previewText.style.cssText = styles.contentText + styles.toggleButtonText + styles.youTubePreviewInfoText;
+        // Since this string contains an anchor element, setting innerText won't
+        // work.
+        // Warning: This is not ideal! The translated (and original) strings must be
+        //          checked very carefully! Any HTML they contain will be inserted.
+        //          Ideally, the translation system would allow only certain element
+        //          types to be included, and would avoid the URLs for links being
+        //          included in the translations.
+        previewText.insertAdjacentHTML(
+            'beforeend', widget.replaceSettings.placeholder.previewInfoText
+        );
+        const previewTextLink = previewText.querySelector('a');
+        if (previewTextLink) {
+            const newPreviewTextLink = getLearnMoreLink(widget.getMode());
+            newPreviewTextLink.innerText = previewTextLink.innerText;
+            previewTextLink.replaceWith(newPreviewTextLink);
+        }
+
+        previewToggleRow.appendChild(previewToggle);
+        previewToggleRow.appendChild(previewText);
+        innerDiv.appendChild(previewToggleRow);
+
+        youTubePreviewDiv.appendChild(innerDiv);
+
+        // We use .then() instead of await here to show the placeholder right away
+        // while the YouTube endpoint takes it time to respond.
+        const videoURL = originalElement.src || originalElement.getAttribute('data-src');
+        getYouTubeVideoDetails(videoURL);
+        window.addEventListener('ddg-ctp-youTubeVideoDetails',
+            (/** @type {CustomEvent} */ {
+                detail: { videoURL: videoURLResp, status, title, previewImage }
+            }) => {
+                if (videoURLResp !== videoURL) { return }
+                if (status === 'success') {
+                    titleElement.innerText = title;
+                    titleElement.title = title;
+                    if (previewImage) {
+                        previewImageElement.setAttribute('src', previewImage);
+                    }
+                    widget.autoplay = true;
+                }
+            }
+        );
+
+        /** Share Feedback Link */
+        const feedbackRow = makeShareFeedbackRow();
+        shadowRoot.appendChild(feedbackRow);
+
+        return { youTubePreview, shadowRoot }
+    }
+
+    // Convention is that each function should be named the same as the sendMessage
+    // method we are calling into eg. calling `sendMessage('getClickToLoadState')`
+    // will result in a response routed to `updateHandlers.getClickToLoadState()`.
+    const messageResponseHandlers = {
+        getClickToLoadState (response) {
+            devMode = response.devMode;
+            isYoutubePreviewsEnabled = response.youtubePreviewsEnabled;
+
+            // Mark the feature as ready, to allow placeholder replacements to
+            // start.
+            readyToDisplayPlaceholdersResolver();
+        },
+        setYoutubePreviewsEnabled (response) {
+            if (response?.messageType && typeof response?.value === 'boolean') {
+                originalWindowDispatchEvent(
+                    createCustomEvent(
+                        response.messageType, { detail: response.value }
+                    )
+                );
+            }
+        },
+        getYouTubeVideoDetails (response) {
+            if (response?.status && typeof response.videoURL === 'string') {
+                originalWindowDispatchEvent(
+                    createCustomEvent(
+                        'ddg-ctp-youTubeVideoDetails',
+                        { detail: response }
+                    )
+                );
+            }
+        },
+        unblockClickToLoadContent () {
+            originalWindowDispatchEvent(
+                createCustomEvent('ddg-ctp-unblockClickToLoadContent-complete')
+            );
+        }
+    };
+
+    const knownMessageResponseType = Object.prototype.hasOwnProperty.bind(messageResponseHandlers);
+
+    class ClickToLoad extends ContentFeature {
+        async init (args) {
+            const websiteOwner = args?.site?.parentEntity;
+            const settings = args?.featureSettings?.clickToLoad || {};
+            const locale = args?.locale || 'en';
+            const localizedConfig = getConfig(locale);
+            config = localizedConfig.config;
+            sharedStrings = localizedConfig.sharedStrings;
+            // update styles if asset config was sent
+            styles = getStyles(this.assetConfig);
+
+            for (const entity of Object.keys(config)) {
+                // Strip config entities that are first-party, or aren't enabled in the
+                // extension's clickToLoad settings.
+                if ((websiteOwner && entity === websiteOwner) ||
+                    !settings[entity] ||
+                    settings[entity].state !== 'enabled') {
+                    delete config[entity];
+                    continue
+                }
+
+                // Populate the entities and entityData data structures.
+                // TODO: Remove them and this logic, they seem unnecessary.
+
+                entities.push(entity);
+
+                const shouldShowLoginModal = !!config[entity].informationalModal;
+                const currentEntityData = { shouldShowLoginModal };
+
+                if (shouldShowLoginModal) {
+                    const { informationalModal } = config[entity];
+                    currentEntityData.modalIcon = informationalModal.icon;
+                    currentEntityData.modalTitle = informationalModal.messageTitle;
+                    currentEntityData.modalText = informationalModal.messageBody;
+                    currentEntityData.modalAcceptText = informationalModal.confirmButtonText;
+                    currentEntityData.modalRejectText = informationalModal.rejectButtonText;
+                }
+
+                entityData[entity] = currentEntityData;
+            }
+
+            // Listen for events from "surrogate" scripts.
+            addEventListener('ddg-ctp', (/** @type {CustomEvent} */ event) => {
+                if (!('detail' in event)) return
+
+                const entity = event.detail?.entity;
+                if (!entities.includes(entity)) {
+                    // Unknown entity, reject
+                    return
+                }
+                if (event.detail?.appID) {
+                    appID = JSON.stringify(event.detail.appID).replace(/"/g, '');
+                }
+                // Handle login call
+                if (event.detail?.action === 'login') {
+                    if (entityData[entity].shouldShowLoginModal) {
+                        makeModal(entity, runLogin, entity);
+                    } else {
+                        runLogin(entity);
+                    }
+                }
+            });
+
+            // Request the current state of Click to Load from the platform.
+            // Note: When the response is received, the response handler resolves
+            //       the readyToDisplayPlaceholders Promise.
+            sendMessage('getClickToLoadState');
+            await readyToDisplayPlaceholders;
+
+            // Then wait for the page to finish loading, and resolve the
+            // afterPageLoad Promise.
+            if (document.readyState === 'complete') {
+                afterPageLoadResolver();
+            } else {
+                window.addEventListener('load', afterPageLoadResolver, { once: true });
+            }
+            await afterPageLoad;
+
+            // On some websites, the "ddg-ctp-ready" event is occasionally
+            // dispatched too early, before the listener is ready to receive it.
+            // To counter that, catch "ddg-ctp-surrogate-load" events dispatched
+            // _after_ page, so the "ddg-ctp-ready" event can be dispatched again.
+            window.addEventListener(
+                'ddg-ctp-surrogate-load', () => {
+                    originalWindowDispatchEvent(createCustomEvent('ddg-ctp-ready'));
+                }
+            );
+
+            // Then wait for any in-progress element replacements, before letting
+            // the surrogate scripts know to start.
+            window.setTimeout(() => {
+                originalWindowDispatchEvent(createCustomEvent('ddg-ctp-ready'));
+            }, 0);
+        }
+
+        update (message) {
+            // TODO: Once all Click to Load messages include the feature property, drop
+            //       messages that don't include the feature property too.
+            if (message?.feature && message?.feature !== 'clickToLoad') return
+
+            const messageType = message?.messageType;
+            if (!messageType) return
+
+            // Message responses.
+            if (messageType === 'response') {
+                const messageResponseType = message?.responseMessageType;
+                if (messageResponseType && knownMessageResponseType(messageResponseType)) {
+                    return messageResponseHandlers[messageResponseType](message.response)
+                }
+            }
+
+            // Other known update messages.
+            if (messageType === 'displayClickToLoadPlaceholders') {
+                // TODO: Pass `message.options.ruleAction` through, that way only
+                //       content corresponding to the entity for that ruleAction need to
+                //       be replaced with a placeholder.
+                return replaceClickToLoadElements()
+            }
+        }
+    }
+
     var platformFeatures = {
         ddg_feature_runtimeChecks: RuntimeChecks,
         ddg_feature_fingerprintingAudio: FingerprintingAudio,
@@ -5179,7 +8195,8 @@
         ddg_feature_fingerprintingTemporaryStorage: FingerprintingTemporaryStorage,
         ddg_feature_navigatorInterface: NavigatorInterface,
         ddg_feature_elementHiding: ElementHiding,
-        ddg_feature_exceptionHandler: ExceptionHandler
+        ddg_feature_exceptionHandler: ExceptionHandler,
+        ddg_feature_clickToLoad: ClickToLoad
     };
 
     /* global false */
@@ -5187,7 +8204,8 @@
     function shouldRun () {
         // don't inject into non-HTML documents (such as XML documents)
         // but do inject into XHTML documents
-        if (document instanceof Document === false && (
+        // Should check HTMLDocument as Document is an alias for XMLDocument also.
+        if (document instanceof HTMLDocument === false && (
             document instanceof XMLDocument === false ||
             document.createElement('div') instanceof HTMLDivElement === false
         )) {
@@ -5204,10 +8222,8 @@
 
     /**
      * @typedef {object} LoadArgs
-     * @property {object} site
-     * @property {object} platform
-     * @property {string} platform.name
-     * @property {string} [platform.version]
+     * @property {import('./content-feature').Site} site
+     * @property {import('./utils.js').Platform} platform
      * @property {boolean} documentOriginIsTracker
      * @property {object} [bundledConfig]
      * @property {string} [injectName]

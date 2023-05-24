@@ -33,6 +33,12 @@ data class CookieExceptionEntity(
     val reason: String,
 )
 
+@Entity(tableName = "cookie")
+data class CookieEntity(
+    @PrimaryKey val id: Int = 1,
+    val json: String,
+)
+
 fun CookieExceptionEntity.toCookieException(): CookieException {
     return CookieException(domain = this.domain, reason = this.reason)
 }

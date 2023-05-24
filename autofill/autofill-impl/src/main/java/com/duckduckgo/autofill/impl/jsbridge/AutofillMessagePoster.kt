@@ -30,7 +30,10 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface AutofillMessagePoster {
-    suspend fun postMessage(webView: WebView?, message: String)
+    suspend fun postMessage(
+        webView: WebView?,
+        message: String,
+    )
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -39,7 +42,10 @@ class AutofillWebViewMessagePoster @Inject constructor(
 ) : AutofillMessagePoster {
 
     @SuppressLint("RequiresFeature")
-    override suspend fun postMessage(webView: WebView?, message: String) {
+    override suspend fun postMessage(
+        webView: WebView?,
+        message: String,
+    ) {
         webView?.let { wv ->
             withContext(dispatchers.main()) {
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {

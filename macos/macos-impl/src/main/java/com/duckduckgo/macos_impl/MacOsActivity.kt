@@ -32,11 +32,13 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.macos_impl.MacOsViewModel.Command
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
+import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsWaitlistClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
 import com.duckduckgo.macos_impl.MacOsViewModel.ViewState
 import com.duckduckgo.macos_impl.databinding.ActivityMacosBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -85,12 +87,18 @@ class MacOsActivity : DuckDuckGoActivity() {
     private fun executeCommand(command: Command) {
         when (command) {
             is ShareLink -> launchSharePageChooser()
+            is GoToWindowsWaitlistClientSettings -> launchWindowsWaitlistClientSettings()
             is GoToWindowsClientSettings -> launchWindowsClientSettings()
         }
     }
 
-    private fun launchWindowsClientSettings() {
+    private fun launchWindowsWaitlistClientSettings() {
         globalActivityStarter.start(this, WindowsWaitlistScreenWithEmptyParams)
+        finish()
+    }
+
+    private fun launchWindowsClientSettings() {
+        globalActivityStarter.start(this, WindowsScreenWithEmptyParams)
         finish()
     }
 

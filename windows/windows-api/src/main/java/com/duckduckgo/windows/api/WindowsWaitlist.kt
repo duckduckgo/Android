@@ -29,5 +29,6 @@ interface WindowsWaitlist {
 sealed class WindowsWaitlistState {
     object NotJoinedQueue : WindowsWaitlistState()
     object JoinedWaitlist : WindowsWaitlistState()
+    object FeatureEnabled : WindowsWaitlistState()
     data class InBeta(val inviteCode: String) : WindowsWaitlistState()
 }

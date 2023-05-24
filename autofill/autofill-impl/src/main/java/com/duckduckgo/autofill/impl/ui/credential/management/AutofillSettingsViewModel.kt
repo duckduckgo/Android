@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
@@ -91,12 +92,12 @@ class AutofillSettingsViewModel @Inject constructor(
     private var combineJob: Job? = null
 
     fun onCopyUsername(username: String?) {
-        username?.let { clipboardInteractor.copyToClipboard(it) }
+        username?.let { clipboardInteractor.copyToClipboard(it, isSensitive = false) }
         addCommand(ShowUserUsernameCopied())
     }
 
     fun onCopyPassword(password: String?) {
-        password?.let { clipboardInteractor.copyToClipboard(it) }
+        password?.let { clipboardInteractor.copyToClipboard(it, isSensitive = true) }
         addCommand(ShowUserPasswordCopied())
     }
 
@@ -192,6 +193,12 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     suspend fun launchDeviceAuth() {
+        if (!autofillStore.autofillAvailable) {
+            Timber.d("Can't access secure storage so can't offer autofill functionality")
+            deviceUnsupported()
+            return
+        }
+
         if (!deviceAuthenticator.hasValidDeviceAuthentication()) {
             Timber.d("Can't show device auth as there is no valid device authentication")
             disabled()
@@ -244,6 +251,14 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ExitLockedMode)
         addCommand(ShowDisabledMode)
         _viewState.value = _viewState.value.copy(credentialMode = Disabled)
+    }
+
+    private fun deviceUnsupported() {
+        // Remove backstack modes if they are present
+        addCommand(ExitListMode)
+        addCommand(ExitCredentialMode)
+        addCommand(ExitLockedMode)
+        addCommand(ShowDeviceUnsupportedMode)
     }
 
     private fun addCommand(command: Command) {
@@ -420,6 +435,7 @@ class AutofillSettingsViewModel @Inject constructor(
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
         object ShowDisabledMode : Command()
+        object ShowDeviceUnsupportedMode : Command()
         object ShowLockedMode : Command()
         object LaunchDeviceAuth : Command()
         object ExitCredentialMode : Command()

@@ -34,8 +34,7 @@
             app:type="single_line"
             android:layout_marginBottom="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditLoginTitleHint"
-            app:editable="true"
-        />
+            app:editable="true" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/usernameEditText"
@@ -65,6 +64,7 @@
             android:layout_marginTop="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditWebsiteHint"
             app:type="single_line"
+            android:inputType="textUri|textNoSuggestions"
             app:editable="false" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput

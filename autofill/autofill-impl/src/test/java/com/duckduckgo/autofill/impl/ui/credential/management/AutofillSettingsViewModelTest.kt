@@ -87,7 +87,7 @@ class AutofillSettingsViewModelTest {
     fun whenUserCopiesPasswordThenCommandIssuedToShowChange() = runTest {
         testee.onCopyPassword("hello")
 
-        verify(clipboardInteractor).copyToClipboard("hello")
+        verify(clipboardInteractor).copyToClipboard("hello", isSensitive = true)
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserPasswordCopied::class)
             cancelAndIgnoreRemainingEvents()
@@ -98,7 +98,7 @@ class AutofillSettingsViewModelTest {
     fun whenUserCopiesUsernameThenCommandIssuedToShowChange() = runTest {
         testee.onCopyUsername("username")
 
-        verify(clipboardInteractor).copyToClipboard("username")
+        verify(clipboardInteractor).copyToClipboard("username", isSensitive = false)
         testee.commands.test {
             awaitItem().first().assertCommandType(ShowUserUsernameCopied::class)
             cancelAndIgnoreRemainingEvents()
@@ -383,7 +383,27 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
+    fun whenLaunchDeviceAuthWithDeviceUnsupportedThenEmitUnsupportedModeCommand() = runTest {
+        configureDeviceToBeUnsupported()
+        testee.launchDeviceAuth()
+
+        testee.commands.test {
+            assertEquals(
+                listOf(
+                    ExitListMode,
+                    ExitCredentialMode,
+                    ExitLockedMode,
+                    ShowDeviceUnsupportedMode,
+                ),
+                this.expectMostRecentItem().toList(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenLaunchDeviceAuthThenUpdateStateToIsAuthenticatingAndEmitLaunchDeviceCommand() = runTest {
+        configureDeviceToBeSupported()
         configureDeviceToHaveValidAuthentication(true)
         configureStoreToHaveThisManyCredentialsStored(1)
         testee.launchDeviceAuth()
@@ -423,6 +443,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenLaunchedDeviceAuthHasEndedAndLaunchedAgainThenEmitLaunchDeviceCommandTwice() = runTest {
+        configureDeviceToBeSupported()
         configureDeviceToHaveValidAuthentication(true)
         configureStoreToHaveThisManyCredentialsStored(1)
         testee.launchDeviceAuth()
@@ -439,6 +460,7 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenLaunchDeviceAuthWithNoValidAuthenticationThenShowDisabledViewAndAuthNotLaunched() = runTest {
+        configureDeviceToBeSupported()
         configureDeviceToHaveValidAuthentication(false)
         testee.launchDeviceAuth()
         testee.commands.test {
@@ -501,6 +523,14 @@ class AutofillSettingsViewModelTest {
 
     private fun configureDeviceToHaveValidAuthentication(hasValidAuth: Boolean) {
         whenever(deviceAuthenticator.hasValidDeviceAuthentication()).thenReturn(hasValidAuth)
+    }
+
+    private fun configureDeviceToBeUnsupported() {
+        whenever(mockStore.autofillAvailable).thenReturn(false)
+    }
+
+    private fun configureDeviceToBeSupported() {
+        whenever(mockStore.autofillAvailable).thenReturn(true)
     }
 
     private fun someCredentials(): LoginCredentials {

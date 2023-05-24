@@ -23,7 +23,7 @@
     <string name="macos_share_title">Partager le lien</string>
     <string name="macos_description_text">DuckDuckGo pour Mac répond à vos besoins de rapidité et de fonctionnalités de navigation, et dispose des meilleurs outils de leur catégorie pour protéger votre vie privée.\n\nSur votre Mac, accédez à :</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Prêt(e) à naviguer incognito sur Mac ?\n\nAccédez à cette URL sur votre Mac pour télécharger l\'application :\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Prêt(e) à naviguer incognito sur Mac ?\n\nAccédez à cette URL sur votre Mac pour télécharger l\'application :\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Vous cherchez la version Windows ?</string>
     <string name="macos_waitlist_footer">Vous n\'aurez pas à fournir d\'informations personnelles pour vous inscrire sur la liste d\'attente. Votre place sera assurée par un horodatage associé uniquement à votre appareil, qui nous permettra de vous informer quand viendra votre tour.</string>

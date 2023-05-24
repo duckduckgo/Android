@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.waitlist
 /** Public data class for Network Protection waitlist */
 sealed class NetPWaitlistState {
     object NotUnlocked : NetPWaitlistState()
+    object PendingInviteCode : NetPWaitlistState()
     object InBeta : NetPWaitlistState()
     object CodeRedeemed : NetPWaitlistState()
 }

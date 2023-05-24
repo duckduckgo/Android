@@ -23,7 +23,7 @@
     <string name="macos_share_title">Dela länk</string>
     <string name="macos_description_text">DuckDuckGo för Mac har hastigheten du behöver, webbläsarfunktionerna du förväntar dig och våra många förstklassiga integritetsfunktioner.\n\nPå din Mac går du till:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Är du redo att börja surfa privat på din Mac?\n\nLadda ner genom att gå till den här webbadressen på din Mac:\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Är du redo att börja surfa privat på din Mac?\n\nLadda ner genom att gå till den här webbadressen på din Mac:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Letar du efter Windows-versionen?</string>
     <string name="macos_waitlist_footer">Du behöver inte dela någon personlig information för att komma med på väntelistan. Du reserverar din plats i väntelistan med en tidsstämpel som bara finns på din enhet så att vi kan meddela dig när det är din tur.</string>

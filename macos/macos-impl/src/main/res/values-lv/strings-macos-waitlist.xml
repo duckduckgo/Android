@@ -23,7 +23,7 @@
     <string name="macos_share_title">Kopīgot saiti</string>
     <string name="macos_description_text">DuckDuckGo Mac datoram sniedz nepieciešamo ātrumu, ierastās pārlūkošanas funkcijas un savā klasē labākās privātuma pamatfunkcijas.\n\nSavā Mac datorā dodies uz:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Vai esi gatavs sākt privātu pārlūkošanu savā Mac?\n\n Apmeklē šo URL savā Mac datorā, lai lejupielādētu:\nhttps://duckduckgo.com/mac</string>
+    <string name="macos_share_text">Vai esi gatavs sākt privātu pārlūkošanu savā Mac? \n\n Apmeklē šo URL savā Mac datorā, lai lejupielādētu:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Vai meklē Windows versiju?</string>
     <string name="macos_waitlist_footer">Lai pievienotos gaidīšanas sarakstam, tev nav jādalās ar personisku informāciju. Tu ieņemsi vietu rindā, izmantojot laikspiedolu, kas pastāv tikai tavā ierīcē, lai mēs varētu tevi informēt, kad pienāks tava kārta.</string>

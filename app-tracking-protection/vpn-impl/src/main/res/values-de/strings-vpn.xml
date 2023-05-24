@@ -159,10 +159,10 @@
     <string name="atp_ReportBreakageAppNextCta">Weiter</string>
     <string name="atp_ReportBreakageFormWhatHappenedText">Bitte beschreibe, was passiert, was du erwartet hast und welche Schritte zu dem Problem geführt haben.</string>
     <string name="atp_ReportBreakageFormInputHint">Erzähl uns mehr über dein Problem</string>
-    <string name="atp_ReportBreakageFormCheckboxText">Indem ich auf „Absenden“ klicke, stimme ich zu, dass DuckDuckGo die Informationen in diesem Bericht zur Verbesserung von App Tracking Protection verwenden darf.
+    <string name="atp_ReportBreakageFormCheckboxText">Indem ich auf „Absenden“ klicke, stimme ich zu, dass DuckDuckGo die Informationen in diesem Bericht zur Verbesserung der App-Funktionen verwenden darf.
     </string>
     <string name="atp_ReportBreakageFormDisclaimerText">
-        <![CDATA[Zusätzlich zu den in dieses Formular eingegebenen Details enthält dein App-Problembericht:<br/>• Den Namen des App-Pakets<br/>• Eine Liste der in der App blockierten Tracker<br/>• Ob App Tracking Protection aktiviert ist<br/>• Aggregierte DuckDuckGo-App-Diagnosen<br/>]]>
+        <![CDATA[Zusätzlich zu den in dieses Formular eingegebenen Details enthält dein App-Problembericht:<br/>• Den Namen des App-Pakets<br/>• Eine Liste der in der App blockierten Tracker<br/>• Ob bestimmte DuckDuckGo-Funktionen aktiviert sind<br/>• Aggregierte DuckDuckGo-App-Diagnosen<br/>]]>
     </string>
     <string name="atp_ReportBreakageSent">Bericht gesendet, danke! Dein Feedback hilft uns, App Tracking Protection für alle zu verbessern.</string>
     <string name="atp_ThanksForTheFeedback">Vielen Dank für dein Feedback!</string>

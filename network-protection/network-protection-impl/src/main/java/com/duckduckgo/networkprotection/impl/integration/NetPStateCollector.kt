@@ -30,7 +30,7 @@ class NetPStateCollector @Inject constructor(
 ) : VpnStateCollectorPlugin {
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
-            put("enabled", vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN))
+            put("enabled", vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN))
         }
     }
 

@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import app.cash.turbine.test
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,8 +62,8 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
 
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.BAR))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.BAR))
         assertTrue(vpnServiceWrapper.isServiceRunning())
     }
 
@@ -74,8 +73,8 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
         vpnServiceWrapper.startService()
 
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
-        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.BAR))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
+        assertTrue(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.BAR))
     }
 
     @Test
@@ -87,7 +86,7 @@ class VpnFeaturesRegistryImplTest {
     fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredThenReturnTrue() {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
 
-        assertTrue(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertTrue(vpnFeaturesRegistry.isAnyFeatureRunning())
         assertTrue(vpnServiceWrapper.isServiceRunning())
     }
 
@@ -96,7 +95,7 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnServiceWrapper.stopService()
 
-        assertFalse(vpnFeaturesRegistry.isAnyFeatureRegistered())
+        assertFalse(vpnFeaturesRegistry.isAnyFeatureRunning())
         assertFalse(vpnServiceWrapper.isServiceRunning())
     }
 
@@ -105,7 +104,7 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
 
-        assertFalse(vpnFeaturesRegistry.isFeatureRegistered(TestVpnFeatures.FOO))
+        assertFalse(vpnFeaturesRegistry.isFeatureRunning(TestVpnFeatures.FOO))
     }
 
     @Test
@@ -149,36 +148,6 @@ class VpnFeaturesRegistryImplTest {
 
         assertTrue(vpnServiceWrapper.isServiceRunning())
         assertEquals(0, vpnServiceWrapper.restartCount)
-    }
-
-    @Test
-    fun whenRegisterFeatureThenEmitChange() = runTest {
-        vpnFeaturesRegistry.registryChanges().test {
-            vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
-            vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
-            assertEquals(TestVpnFeatures.FOO.featureName to true, awaitItem())
-            assertEquals(TestVpnFeatures.BAR.featureName to true, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUnregisterNotRegisterFeatureThenNoEmission() = runTest {
-        vpnFeaturesRegistry.registryChanges().test {
-            vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun whenUnregisterRegisteredFeatureThenEmitChange() = runTest {
-        vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
-        vpnFeaturesRegistry.registryChanges().test {
-            vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
-            assertEquals(TestVpnFeatures.FOO.featureName to true, awaitItem())
-            assertEquals(TestVpnFeatures.FOO.featureName to false, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     private enum class TestVpnFeatures(override val featureName: String) : VpnFeature {

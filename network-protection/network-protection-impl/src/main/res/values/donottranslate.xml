@@ -86,4 +86,14 @@
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
     <string name="netpWaitlistInBetaDescription">You\'ll need an invite code to fully unlock this feature.</string>
+
+    <!--Breakage reporting -->
+    <string name="netpReportBreakageCategoryCrashes">App freezes or crashes</string>
+    <string name="netpReportBreakageCategoryMessages">Message delivery fails</string>
+    <string name="netpReportBreakageCategoryCalls">Voice calls don\'t work</string>
+    <string name="netpReportBreakageCategoryContent">Content loads slowly</string>
+    <string name="netpReportBreakageCategoryConnection">App has no connection</string>
+    <string name="netpReportBreakageCategoryIot">Can\'t connect local device</string>
+    <string name="netpReportBreakageCategoryFeatureRequest">Feature request</string>
+    <string name="netpReportBreakageCategoryOther">Something else</string>
 </resources>

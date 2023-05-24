@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
@@ -39,7 +38,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -52,13 +50,7 @@ class SQLCookieRemoverTest {
     private val cookieManager = CookieManager.getInstance()
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val mockPixel: Pixel = mock()
-    private lateinit var crashLogger: FakeCraskLogger
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
-
-    @Before
-    fun setup() {
-        crashLogger = FakeCraskLogger()
-    }
 
     @After
     fun after() = runBlocking {
@@ -119,24 +111,14 @@ class SQLCookieRemoverTest {
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
         repository: FireproofRepository = FireproofWebsiteRepositoryImpl(fireproofWebsiteDao, DefaultDispatcherProvider(), mock()),
-        exceptionPixel: CrashLogger = crashLogger,
         pixel: Pixel = mockPixel,
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
             repository,
-            exceptionPixel,
             pixel,
             dispatcherProvider,
         )
-    }
-}
-
-internal class FakeCraskLogger : CrashLogger {
-    var crash: CrashLogger.Crash? = null
-
-    override fun logCrash(crash: CrashLogger.Crash) {
-        this.crash = crash
     }
 }

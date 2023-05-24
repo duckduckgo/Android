@@ -538,9 +538,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .addParameter("name", String::class)
             .addCode(
                 """
-                return kotlin.runCatching { this.javaClass.getDeclaredMethod(name) }.getOrNull()?.let { m ->
-                    m.invoke(this)
-                } as Toggle
+                val toggle = kotlin.runCatching {
+                    this.javaClass.getDeclaredMethod(name)
+                }.getOrNull()?.invoke(this) as Toggle
+                return toggle
                 """.trimIndent(),
             )
             .returns(Toggle::class)

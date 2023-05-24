@@ -53,6 +53,16 @@ class AutofillCapabilityCheckerImpl @Inject constructor(
         return@withContext autofillFeature.canSaveCredentials().isEnabled()
     }
 
+    override suspend fun canGeneratePasswordFromWebView(url: String): Boolean = withContext(dispatcherProvider.io()) {
+        if (!isSecureAutofillAvailable()) return@withContext false
+        if (!isAutofillEnabledByConfiguration(url)) return@withContext false
+        if (!isAutofillEnabledByUser()) return@withContext false
+
+        if (isInternalTester()) return@withContext true
+
+        return@withContext autofillFeature.canGeneratePasswords().isEnabled()
+    }
+
     /**
      * Because the credential management screen handles the states where the user has toggled autofill off, or the device can't support it,
      * this feature is not dependent those checks.

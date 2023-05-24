@@ -47,7 +47,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -72,25 +71,21 @@ class SecureStoreBackedAutofillStoreTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         whenever(autofillPrefsStore.isEnabled).thenReturn(true)
-        whenever(autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(true)
     }
 
     @Test
-    fun whenAutofillUnavailableAndPrefsAreAllTrueThenReturnTrueForAutofillEnabledAndShowOnboardingWhenOfferingToSaveLogin() {
+    fun whenAutofillUnavailableAndPrefsAreAllTrueThenReturnTrueForAutofillEnabled() {
         setupTestee(canAccessSecureStorage = false)
 
         assertTrue(testee.autofillEnabled)
-        assertTrue(testee.showOnboardingWhenOfferingToSaveLogin)
     }
 
     @Test
-    fun whenAutofillAvailableAndPrefsAreAllFalseThenReturnFalseForAutofillEnabledAndShowOnboardingWhenOfferingToSaveLogin() = runTest {
+    fun whenAutofillAvailableAndPrefsAreAllFalseThenReturnFalseForAutofillEnabled() = runTest {
         setupTesteeWithAutofillAvailable()
         whenever(autofillPrefsStore.isEnabled).thenReturn(false)
-        whenever(autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin).thenReturn(false)
 
         assertFalse(testee.autofillEnabled)
-        assertFalse(testee.showOnboardingWhenOfferingToSaveLogin)
     }
 
     @Test
@@ -307,19 +302,6 @@ class SecureStoreBackedAutofillStoreTest {
         testee.saveCredentials(url, credentials)
 
         assertEquals(credentials.copy(domain = "example.com", lastUpdatedMillis = UPDATED_INITIAL_LAST_UPDATED), testee.getCredentials(url)[0])
-    }
-
-    @Test
-    fun whenSaveCredentialsForFirstTimeThenDisableShowOnboardingFlag() = runTest {
-        setupTesteeWithAutofillAvailable()
-        val url = "example.com"
-        val credentials = LoginCredentials(
-            domain = url,
-            username = "username1",
-            password = "password",
-        )
-        testee.saveCredentials(url, credentials)
-        verify(autofillPrefsStore).showOnboardingWhenOfferingToSaveLogin = false
     }
 
     @Test

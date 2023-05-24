@@ -36,7 +36,7 @@ class FakeWgVpnControllerService : WgVpnControllerService {
     }
 
     override suspend fun registerKey(registerKeyBody: RegisterKeyBody): List<EligibleServerInfo> {
-        return servers.filter { it.server.name == registerKeyBody.server }.map { it.toEligibleServerInfo() }
+        return servers.filter { it.server.name == registerKeyBody.server || registerKeyBody.server == "*" }.map { it.toEligibleServerInfo() }
     }
 
     private fun RegisteredServerInfo.toEligibleServerInfo(): EligibleServerInfo {

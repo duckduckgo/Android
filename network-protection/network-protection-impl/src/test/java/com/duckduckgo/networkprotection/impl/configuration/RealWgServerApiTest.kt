@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
-import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -33,9 +32,6 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealWgServerApiTest() {
     private val wgVpnControllerService = FakeWgVpnControllerService()
-
-    @Mock
-    private lateinit var deviceTimezoneProvider: DeviceTimezoneProvider
 
     @Mock
     private lateinit var appBuildConfig: AppBuildConfig
@@ -52,7 +48,6 @@ class RealWgServerApiTest() {
 
         testee = RealWgServerApi(
             wgVpnControllerService,
-            deviceTimezoneProvider,
             appBuildConfig,
             object : PluginPoint<WgServerDebugProvider> {
                 override fun getPlugins(): Collection<WgServerDebugProvider> {
@@ -63,45 +58,7 @@ class RealWgServerApiTest() {
     }
 
     @Test
-    fun whenGetWgServerDataAndUTCEuropeThenReturnCorrectServerData() = runTest {
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-0:00"))
-
-        assertEquals(
-            WgServerData(
-                serverName = "egress.euw",
-                publicKey = "CLQMP4SFzpyvAzMj3rXwShm+3n6Yt68hGHBF67At+x0=",
-                publicEndpoint = "euw.egress.np.duck.com:443",
-                address = "",
-                location = null,
-                gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
-            ),
-            testee.registerPublicKey("testpublickey"),
-        )
-    }
-
-    @Test
-    fun whenGetWgServerDataAndUTCEastCoastThenReturnCorrectServerData() = runTest {
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-4:00"))
-
-        assertEquals(
-            WgServerData(
-                serverName = "egress.use.2",
-                publicKey = "q3YJJUwMNP31J8qSvMdVsxASKNcjrm8ep8cLcI0qViY=",
-                publicEndpoint = "109.200.208.198:443",
-                address = "",
-                location = "Newark, United states",
-                gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
-            ),
-            testee.registerPublicKey("testpublickey"),
-        )
-    }
-
-    @Test
-    fun whenGetWgServerDataAndUTCCenterUSAThenReturnCorrectServerData() = runTest {
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-7:00"))
-
+    fun whenGetWgServerDataPlayBuildThenReturnFirstServer() = runTest {
         assertEquals(
             WgServerData(
                 serverName = "egress.usw.1",
@@ -114,52 +71,11 @@ class RealWgServerApiTest() {
             ),
             testee.registerPublicKey("testpublickey"),
         )
-    }
-
-    @Test
-    fun whenGetWgServerDataAndUTCWestUSAThenReturnCorrectServerData() = runTest {
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-10:00"))
-
-        assertEquals(
-            WgServerData(
-                serverName = "egress.usw.1",
-                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
-                publicEndpoint = "162.245.204.100:443",
-                address = "",
-                location = null,
-                gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
-            ),
-            testee.registerPublicKey("testpublickey"),
-        )
-    }
-
-    @Test
-    fun whenInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-1:00"))
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-
-        testee.registerPublicKey("testpublickey")
-
-        assertEquals(
-            wgVpnControllerService.getServers().map { it.server },
-            fakeWgServerDebugProvider.cachedServers,
-        )
-    }
-
-    @Test
-    fun whenNotInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-1:00"))
-
-        testee.registerPublicKey("testpublickey")
-
-        assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
     }
 
     @Test
     fun whenInternalFlavorAndUserSelectedServerThenReturnUserSelectedServer() = runTest {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-10:00"))
         fakeWgServerDebugProvider.selectedServer = "egress.euw"
 
         assertEquals(
@@ -177,33 +93,30 @@ class RealWgServerApiTest() {
     }
 
     @Test
-    fun whenInternalFlavorAndUserSelectedServerIsAutomaticThenReturnClosestServer() = runTest {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        whenever(deviceTimezoneProvider.getTimeZone()).thenReturn(TimeZone.getTimeZone("GMT-10:00"))
-        fakeWgServerDebugProvider.selectedServer = null
+    fun whenNotInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
+        testee.registerPublicKey("testpublickey")
 
-        assertEquals(
-            WgServerData(
-                serverName = "egress.usw.1",
-                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
-                publicEndpoint = "162.245.204.100:443",
-                address = "",
-                location = null,
-                gateway = "1.2.3.4",
-                allowedIPs = "0.0.0.0/0,::0/0",
-            ),
-            testee.registerPublicKey("testpublickey"),
-        )
+        assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
+    }
+
+    @Test
+    fun whenInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        testee.registerPublicKey("testpublickey")
+
+        assertTrue(fakeWgServerDebugProvider.cachedServers.isNotEmpty())
     }
 }
 
 private class FakeWgServerDebugProvider : WgServerDebugProvider {
     val cachedServers = mutableListOf<Server>()
-    var selectedServer: String? = "egress.usc"
+    var selectedServer: String? = null
 
     override suspend fun getSelectedServerName(): String? = selectedServer
 
     override suspend fun storeEligibleServers(servers: List<Server>) {
+        cachedServers.clear()
         cachedServers.addAll(servers)
     }
 }

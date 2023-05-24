@@ -71,7 +71,7 @@ class RealVpnStateMonitorTest {
     fun whenVpnLastDisabledByAndroidAndVpnKilledBySystemThenReturnTrue() = runTest {
         whenever(vpnServiceStateDao.getLastStateStats()).thenReturn(null)
         whenever(vpnHeartBeatDao.hearBeats()).thenReturn(listOf(HeartBeatEntity(type = VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)))
-        whenever(vpnFeaturesRegistry.isAnyFeatureRegistered()).thenReturn(false)
+        whenever(vpnFeaturesRegistry.isAnyFeatureRunning()).thenReturn(false)
 
         Assert.assertTrue(testee.vpnLastDisabledByAndroid())
     }

@@ -25,6 +25,8 @@ import javax.inject.Inject
 interface AutofillResponseWriter {
     fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String
     fun generateEmptyResponseGetAutofillData(): String
+    fun generateResponseForAcceptingGeneratedPassword(): String
+    fun generateResponseForRejectingGeneratedPassword(): String
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -32,6 +34,8 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
 
     private val autofillDataAdapterCredentialsAvailable = moshi.adapter(ContainingCredentials::class.java).indent("  ")
     private val autofillDataAdapterCredentialsUnavailable = moshi.adapter(EmptyResponse::class.java).indent("  ")
+    private val autofillDataAdapterAcceptGeneratedPassword = moshi.adapter(AcceptGeneratedPasswordResponse::class.java).indent("  ")
+    private val autofillDataAdapterRejectGeneratedPassword = moshi.adapter(RejectGeneratedPasswordResponse::class.java).indent("  ")
 
     override fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String {
         val credentialsResponse = ContainingCredentials.CredentialSuccessResponse(credentials)
@@ -43,5 +47,17 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
         val credentialsResponse = EmptyResponse.EmptyCredentialResponse()
         val topLevelResponse = EmptyResponse(success = credentialsResponse)
         return autofillDataAdapterCredentialsUnavailable.toJson(topLevelResponse)
+    }
+
+    override fun generateResponseForAcceptingGeneratedPassword(): String {
+        val response = AcceptGeneratedPasswordResponse.AcceptGeneratedPassword()
+        val topLevelResponse = AcceptGeneratedPasswordResponse(success = response)
+        return autofillDataAdapterAcceptGeneratedPassword.toJson(topLevelResponse)
+    }
+
+    override fun generateResponseForRejectingGeneratedPassword(): String {
+        val response = RejectGeneratedPasswordResponse.RejectGeneratedPassword()
+        val topLevelResponse = RejectGeneratedPasswordResponse(success = response)
+        return autofillDataAdapterRejectGeneratedPassword.toJson(topLevelResponse)
     }
 }

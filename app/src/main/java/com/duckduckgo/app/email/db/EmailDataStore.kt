@@ -54,10 +54,12 @@ class EmailEncryptedSharedPreferences(
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
             )
-        } catch (e: IOException) {
-            pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
-        } catch (e: GeneralSecurityException) {
-            pixel.enqueueFire(AppPixelName.ENCRYPTED_GENERAL_EXCEPTION)
+        } catch (t: Throwable) {
+            when (t) {
+                is IOException -> pixel.enqueueFire(AppPixelName.ENCRYPTED_IO_EXCEPTION)
+                is GeneralSecurityException -> pixel.enqueueFire(AppPixelName.ENCRYPTED_GENERAL_EXCEPTION)
+                else -> { /* noop */ }
+            }
         }
         return null
     }

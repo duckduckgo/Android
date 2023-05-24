@@ -19,7 +19,12 @@
 <resources>
     <string name="windows_app">DuckDuckGo-app for Windows</string>
     <string name="windows_waitlist_title">Få tidlig tilgang til å prøve DuckDuckGo for Windows!</string>
+    <string name="windows_title">Skaff deg DuckDuckGo for Windows!</string>
     <string name="windows_waitlist_description">DuckDuckGo for Windows har det du trenger for å surfe med mer personvern – privat søk, sporingsblokkering, tvungen kryptering, blokkering av popup-vinduer om informasjonskapsler og enda flere førsteklasses beskyttelser som er på vei.</string>
+    <string name="windows_description">DuckDuckGo for Windows har det du trenger for å surfe med mer personvern – privat søk, sporingsblokkering, tvungen kryptering, blokkering av popup-vinduer om informasjonskapsler og enda flere førsteklasses beskyttelser som er på vei.\n\nPå en Windows-datamaskin går du til:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Del lenke</string>
+    <string name="windows_share_text">Er du klar til å begynne å surfe privat på Windows?\n\nGå til denne URL-adressen på Windows-datamaskinen din for å laste ned:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Ser du etter Mac-versjonen?</string>
     <string name="windows_join_waitlist">Skriv deg opp på den private ventelisten</string>
     <string name="windows_join_waitlist_error">Det oppstod en feil under registrering for ventelisten. Prøv igjen senere.</string>

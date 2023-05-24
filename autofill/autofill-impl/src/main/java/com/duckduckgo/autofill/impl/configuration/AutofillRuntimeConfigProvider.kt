@@ -50,6 +50,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val userPreferences = runtimeConfigurationWriter.generateUserPreferences(
             autofillCredentials = canInjectCredentials(url),
             credentialSaving = canSaveCredentials(url),
+            passwordGeneration = canGeneratePasswords(url),
             showInlineKeyIcon = true,
         )
         val availableInputTypes = generateAvailableInputTypes(url)
@@ -92,6 +93,11 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private suspend fun canSaveCredentials(url: String?): Boolean {
         if (url == null) return false
         return autofillCapabilityChecker.canSaveCredentialsFromWebView(url)
+    }
+
+    private suspend fun canGeneratePasswords(url: String?): Boolean {
+        if (url == null) return false
+        return autofillCapabilityChecker.canGeneratePasswordFromWebView(url)
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()

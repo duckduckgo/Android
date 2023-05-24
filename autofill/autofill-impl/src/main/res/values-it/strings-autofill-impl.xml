@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Per proteggere i tuoi accessi sono necessari una sequenza di blocco del dispositivo, un PIN o dati biometrici.</string>
     <string name="managementDisabledModeTitle">Proteggi il tuo dispositivo per salvare gli accessi</string>
 
-    <string name="saveLoginDialogTitle">Salvare dati di accesso?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Salvare password?</string>
     <string name="saveLoginDialogButtonSave">Salva dati di accesso</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
     <string name="saveLoginDialogNotNow">Non adesso</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">I dati di accesso sono archiviati in modo sicuro solo su questo dispositivo e possono essere gestiti dal menu Accessi, all\'interno di Impostazioni.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
+    <string name="saveLoginDialogSubtitle">I dati di accesso sono archiviati in modo sicuro solo su questo dispositivo e possono essere gestiti dal menu Accessi, all\'interno di Impostazioni.</string>
+    <string name="saveLoginDialogTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
 
     <string name="useSavedLoginDialogTitle">Usare i dati di accesso salvati?</string>

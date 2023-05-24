@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Na ochranu přihlašovacích údajů se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
     <string name="managementDisabledModeTitle">Zabezpeč si zařízení, ať si můžeš ukládat přihlašovací údaje</string>
 
-    <string name="saveLoginDialogTitle">Uložit přihlašovací údaje?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Uložit heslo?</string>
     <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Teď ne</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Přihlašovací údaje jsou bezpečně uložené jen na tomhle zařízení a dají se spravovat v nabídce Přihlášení v Nastavení.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
+    <string name="saveLoginDialogSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení a dají se spravovat v nabídce Přihlášení v Nastaveních.</string>
+    <string name="saveLoginDialogTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použít uložené přihlášení?</string>

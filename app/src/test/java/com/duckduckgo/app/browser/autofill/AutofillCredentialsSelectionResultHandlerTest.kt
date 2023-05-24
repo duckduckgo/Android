@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler.CredentialInjector
@@ -31,7 +32,9 @@ import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -42,6 +45,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
@@ -49,6 +53,9 @@ import org.mockito.kotlin.*
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class AutofillCredentialsSelectionResultHandlerTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val credentialsSaver: AutofillCredentialSaver = mock()
     private val credentialsInjector: CredentialInjector = mock()
@@ -59,6 +66,8 @@ class AutofillCredentialsSelectionResultHandlerTest {
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: AutofillCredentialsSelectionResultHandler
+    private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
+    private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
 
     @Test
     fun whenSaveBundleMissingUrlThenNoAttemptToSaveMade() = runTest {
@@ -323,6 +332,9 @@ class AutofillCredentialsSelectionResultHandlerTest {
             appCoroutineScope = this,
             pixel = pixel,
             autofillDialogSuppressor = autofillDialogSuppressor,
+            autoSavedLoginsMonitor = autoSavedLoginsMonitor,
+            existingCredentialMatchDetector = existingCredentialMatchDetector,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
         )
     }
 

@@ -52,12 +52,6 @@ class SecureStoreBackedAutofillStore(
             autofillPrefsStore.isEnabled = value
         }
 
-    override var showOnboardingWhenOfferingToSaveLogin: Boolean
-        get() = autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin
-        set(value) {
-            autofillPrefsStore.showOnboardingWhenOfferingToSaveLogin = value
-        }
-
     override var hasEverBeenPromptedToSaveLogin: Boolean
         get() = autofillPrefsStore.hasEverBeenPromptedToSaveLogin
         set(value) {
@@ -124,9 +118,7 @@ class SecureStoreBackedAutofillStore(
         )
 
         return withContext(dispatcherProvider.io()) {
-            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
-                showOnboardingWhenOfferingToSaveLogin = false
-            }
+            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials()
         }
     }
 

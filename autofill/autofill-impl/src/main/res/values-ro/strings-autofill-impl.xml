@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja conectările.</string>
     <string name="managementDisabledModeTitle">Securizează-ți dispozitivul pentru a salva conectările</string>
 
-    <string name="saveLoginDialogTitle">Salvezi autentificarea?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Salvezi parola?</string>
     <string name="saveLoginDialogButtonSave">Salvează autentificarea</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu acum</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">Datele de conectare sunt stocate în siguranță doar pe acest dispozitiv și pot fi gestionate din meniul Date de conectare din Setări.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">Dorești ca DuckDuckGo să îți salveze datele de autentificare?</string>
+    <string name="saveLoginDialogSubtitle">Datele de conectare sunt stocate în siguranță doar pe acest dispozitiv și pot fi gestionate din meniul Date de conectare din Setări.</string>
+    <string name="saveLoginDialogTitle">Vrei ca DuckDuckGo să îți salveze datele de conectare?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
     <string name="useSavedLoginDialogTitle">Folosești datele de conectare salvate?</string>

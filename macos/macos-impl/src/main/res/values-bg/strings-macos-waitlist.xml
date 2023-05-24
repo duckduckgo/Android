@@ -23,7 +23,7 @@
     <string name="macos_share_title">Споделяне на връзка</string>
     <string name="macos_description_text">DuckDuckGo за Mac притежава необходимата скорост, както и очакваните от Вас функции на браузъра, и предлага най-добрите в този клас елементи за защита.\n\nНа Вашия Mac отидете на:</string>
     <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Готови ли сте да започнете поверително сърфиране на Mac?\n\nПосетете този URL адрес на устройство с Mac, за да изтеглите приложението:\nduckduckgo.com/mac</string>
+    <string name="macos_share_text">Готови ли сте да започнете поверително сърфиране на Mac?\n\nПосетете този URL адрес на Mac, за да изтеглите:\nhttps://duckduckgo.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Търсите версията за Windows?</string>
     <string name="macos_waitlist_footer">Не е необходимо да споделяте лична информация, за да се включите в списъка с чакащи. Ще си осигурите място на опашката с клеймо за време, което съществува само на вашето устройство, така можем да ви уведомим, когато дойде вашия ред.</string>

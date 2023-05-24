@@ -36,13 +36,6 @@ interface AutofillStore {
     val autofillAvailable: Boolean
 
     /**
-     * Used to determine whether we show additional onboarding info when offering to save a login credential
-     *
-     * This will default to true, and remain true until after the first credential has been saved
-     */
-    var showOnboardingWhenOfferingToSaveLogin: Boolean
-
-    /**
      * Used to determine if a user has ever been prompted to save a login (note: prompted to save, not necessarily saved)
      * Defaults to false, and will be set to true after the user has been shown a prompt to save a login
      */

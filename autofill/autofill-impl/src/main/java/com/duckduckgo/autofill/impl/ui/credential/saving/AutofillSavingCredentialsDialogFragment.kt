@@ -57,7 +57,6 @@ import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentia
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -128,7 +127,6 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     ) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureSiteDetails(binding, credentials)
-        configureTitles(binding, credentials)
         configureCloseButtons(binding)
         configureSaveButton(binding)
     }
@@ -187,21 +185,10 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         (dialog as BottomSheetDialog).animateClosed()
     }
 
-    private fun configureTitles(
+    private fun configureSiteDetails(
         binding: ContentAutofillSaveNewCredentialsBinding,
         credentials: LoginCredentials,
     ) {
-        val resources = viewModel.determineTextResources(credentials)
-
-        binding.dialogTitle.text = getString(resources.title)
-        binding.saveLoginButton.text = getString(resources.ctaButton)
-
-        if (!showOnboarding) {
-            binding.onboardingSubtitle.gone()
-        }
-    }
-
-    private fun configureSiteDetails(binding: ContentAutofillSaveNewCredentialsBinding, credentials: LoginCredentials) {
         val originalUrl = getOriginalUrl()
         val url = originalUrl.extractDomain() ?: originalUrl
 
@@ -238,8 +225,6 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS)!!
     private fun getTabId() = arguments?.getString(CredentialSavePickerDialog.KEY_TAB_ID)!!
     private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
-
-    private val showOnboarding: Boolean by lazy { viewModel.showOnboarding() }
 
     companion object {
 

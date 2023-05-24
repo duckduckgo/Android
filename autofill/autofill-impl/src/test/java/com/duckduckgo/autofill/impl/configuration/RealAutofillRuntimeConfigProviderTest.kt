@@ -68,6 +68,7 @@ class RealAutofillRuntimeConfigProviderTest {
             runtimeConfigurationWriter.generateUserPreferences(
                 autofillCredentials = any(),
                 credentialSaving = any(),
+                passwordGeneration = any(),
                 showInlineKeyIcon = any(),
             ),
         ).thenReturn("")
@@ -315,12 +316,14 @@ class RealAutofillRuntimeConfigProviderTest {
         whenever(autofillCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(enabled)
         whenever(autofillCapabilityChecker.canInjectCredentialsToWebView(any())).thenReturn(enabled)
         whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(any())).thenReturn(enabled)
+        whenever(autofillCapabilityChecker.canGeneratePasswordFromWebView(any())).thenReturn(enabled)
     }
 
     private fun verifyAutofillCredentialsReturnedAs(expectedValue: Boolean) {
         verify(runtimeConfigurationWriter).generateUserPreferences(
             autofillCredentials = eq(expectedValue),
             credentialSaving = any(),
+            passwordGeneration = any(),
             showInlineKeyIcon = any(),
         )
     }
@@ -329,6 +332,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateUserPreferences(
             autofillCredentials = any(),
             credentialSaving = any(),
+            passwordGeneration = any(),
             showInlineKeyIcon = eq(true),
         )
     }

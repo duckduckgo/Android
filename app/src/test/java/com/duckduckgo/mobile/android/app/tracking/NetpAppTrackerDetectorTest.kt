@@ -143,7 +143,7 @@ class NetpAppTrackerDetectorTest {
     }
 
     @Test
-    fun whenEvaluateThirdPartyTrackerAndoverriddenSystemAppAndInExclusionListAndReturnNull() {
+    fun whenEvaluateThirdPartyTrackerAndOverriddenSystemAppAndInExclusionListAndReturnNull() {
         whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
             .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
         whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)
@@ -164,7 +164,7 @@ class NetpAppTrackerDetectorTest {
     }
 
     @Test
-    fun whenEvaluateThirdPartyTrackerAndoverriddenSystemAppThenReturnTracker() {
+    fun whenEvaluateThirdPartyTrackerAndOverriddenSystemAppThenReturnTracker() {
         whenever(appTrackerRepository.findTracker(TEST_APP_TRACKER.hostname, APP_PACKAGE_ID))
             .thenReturn(AppTrackerType.ThirdParty(TEST_APP_TRACKER))
         whenever(appNameResolver.getPackageIdForUid(APP_UID)).thenReturn(APP_ORIGINATING_APP.packageId)

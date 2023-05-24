@@ -23,13 +23,11 @@
     <string name="managementDisabledModeSubtitle">A bejelentkezések védelméhez az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
     <string name="managementDisabledModeTitle">Tedd biztonságossá a készülékedet a bejelentkezések mentéséhez</string>
 
-    <string name="saveLoginDialogTitle">Mented a bejelentkezést?</string>
-    <string name="saveLoginMissingUsernameDialogTitle">Mented a jelszót?</string>
     <string name="saveLoginDialogButtonSave">Bejelentkezés mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginDialogNotNow">Most nem</string>
-    <string name="saveLoginDialogOnboardingExplanationSubtitle">A bejelentkezési adatok csak ezen az eszközön lesznek biztonságosan tárolva, és a Beállítások &gt; Bejelentkezések menüpontban kezelhetők.</string>
-    <string name="saveLoginDialogFirstTimeOnboardingExplanationTitle">A DuckDuckGo mentse a bejelentkezést?</string>
+    <string name="saveLoginDialogSubtitle">A bejelentkezési adatok csak ezen az eszközön lesznek biztonságosan tárolva, és a Beállítások &gt; Bejelentkezések menüpontban kezelhetők.</string>
+    <string name="saveLoginDialogTitle">A DuckDuckGo mentse a bejelentkezést?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
     <string name="useSavedLoginDialogTitle">Mentett bejelentkezés használata?</string>

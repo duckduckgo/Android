@@ -111,6 +111,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
@@ -187,6 +188,7 @@ class BrowserTabViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val sitePermissionsManager: SitePermissionsManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
+    private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     UrlExtractionListener,
@@ -449,6 +451,8 @@ class BrowserTabViewModel @Inject constructor(
             val includeShortcutToViewCredential: Boolean,
             val messageResourceId: Int,
         ) : Command()
+        class AcceptGeneratedPassword(val url: String) : Command()
+        class RejectGeneratedPassword(val url: String) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -1249,6 +1253,8 @@ class BrowserTabViewModel @Inject constructor(
 
         isProcessingTrackingLink = false
         isLinkOpenedInNewTab = false
+
+        automaticSavedLoginsMonitor.clearAutoSavedLoginId(tabId)
     }
 
     private fun setAdClickActiveTabData(url: String?) {
@@ -2810,6 +2816,14 @@ class BrowserTabViewModel @Inject constructor(
                 messageResourceId = R.string.autofillLoginUpdatedSnackbarMessage,
             )
         }
+    }
+
+    fun acceptGeneratedPassword(originalUrl: String) {
+        command.postValue(AcceptGeneratedPassword(originalUrl))
+    }
+
+    fun rejectGeneratedPassword(originalUrl: String) {
+        command.postValue(RejectGeneratedPassword(originalUrl))
     }
 
     companion object {

@@ -28,7 +28,6 @@ dependencies {
 
     implementation project(':di')
     implementation project(':common')
-    implementation project(':anrs-api')
     implementation project(':app-build-config-api')
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
@@ -36,6 +35,7 @@ dependencies {
     implementation project(':cookies-store')
     implementation project(':browser-api')
     implementation project(':statistics')
+    implementation project(':content-scope-scripts-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation JakeWharton.timber
@@ -49,6 +49,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
+    implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx

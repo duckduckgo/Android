@@ -17,7 +17,6 @@
 package com.duckduckgo.networkprotection.impl.management
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Build
@@ -25,11 +24,11 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -40,6 +39,8 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
@@ -48,7 +49,6 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnectingFailed
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowRevoked
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command
-import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.Command.ShowAlwaysOnLockdownDialog
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionDetails
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
@@ -58,10 +58,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class)
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
@@ -97,7 +101,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             REPORT_ISSUES_ANNOTATION,
             getText(R.string.netpManagementBetaDescription),
         ) {
-            startActivity(Intent(Intent.ACTION_VIEW, FEEDBACK_URL))
+            viewModel.onReportIssuesClicked()
         }
     }
 
@@ -200,6 +204,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             is Command.ShowAlwaysOnPromotionDialog -> showAlwaysOnPromotionDialog()
             is Command.ShowAlwaysOnLockdownDialog -> showAlwaysOnLockdownDialog()
             is Command.OpenVPNSettings -> openVPNSettings()
+            is Command.ShowIssueReportingPage -> globalActivityStarter.start(this, command.params)
         }
     }
 
@@ -337,9 +342,5 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val TAG_ALWAYS_ON_DIALOG = "NETP_ALWAYS_ON_DIALOG"
-        val FEEDBACK_URL = "https://form.asana.com/?k=_wNLt6YcT5ILpQjDuW0Mxw&d=137249556945".toUri()
-        fun intent(context: Context): Intent {
-            return Intent(context, NetworkProtectionManagementActivity::class.java)
-        }
     }
 }

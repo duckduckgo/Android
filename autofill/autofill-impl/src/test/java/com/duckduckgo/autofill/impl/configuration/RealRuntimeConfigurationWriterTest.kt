@@ -89,7 +89,7 @@ class RealRuntimeConfigurationWriterTest {
                       "inputType_identities": false,
                       "inputType_creditCards": false,
                       "emailProtection": true,
-                      "password_generation": false,
+                      "password_generation": true,
                       "credentials_saving": true,
                       "inlineIcon_credentials": true
                     }
@@ -103,6 +103,7 @@ class RealRuntimeConfigurationWriterTest {
             testee.generateUserPreferences(
                 autofillCredentials = true,
                 credentialSaving = true,
+                passwordGeneration = true,
                 showInlineKeyIcon = true,
             ),
         )
