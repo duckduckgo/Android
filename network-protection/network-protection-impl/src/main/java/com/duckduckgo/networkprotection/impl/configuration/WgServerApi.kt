@@ -16,18 +16,13 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.math.abs
 import logcat.logcat
 
 interface WgServerApi {
@@ -47,31 +42,24 @@ interface WgServerApi {
 @ContributesBinding(VpnScope::class)
 class RealWgServerApi @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
-    private val appBuildConfig: AppBuildConfig,
-    private val serverDebugProvider: PluginPoint<WgServerDebugProvider>,
+    private val serverDebugProvider: WgServerDebugProvider,
 ) : WgServerApi {
 
     override suspend fun registerPublicKey(publicKey: String): WgServerData? {
-        return wgVpnControllerService.registerKey(RegisterKeyBody(publicKey = publicKey))
-            .also {
-                if (appBuildConfig.isInternalBuild()) {
-                    assert(serverDebugProvider.getPlugins().size <= 1) { "Only one debug server provider can be registered" }
-                    serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
-                        provider.storeEligibleServers(it.map { it.server })
-                    }
-                }
+        // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
+        // returns the closest one or "*" if list is empty
+        val selectedServer = serverDebugProvider.fetchServers()
+            .also { fetchedServers ->
+                serverDebugProvider.cacheServers(fetchedServers)
             }
-            .filter {
-                if (appBuildConfig.isInternalBuild()) {
-                    serverDebugProvider.getPlugins().firstOrNull()?.let { provider ->
-                        provider.getSelectedServerName()?.let { selectedServer ->
-                            it.server.name == selectedServer
-                        } ?: true
-                    } ?: true
-                } else {
-                    true
-                }
-            }
+            .map { it.name }
+            .firstOrNull { serverName ->
+                serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
+                    serverName == userSelectedServer
+                } ?: true
+            } ?: "*"
+
+        return wgVpnControllerService.registerKey(RegisterKeyBody(publicKey = publicKey, server = selectedServer))
             .run {
                 logcat { "Eligible servers are: ${this.map { it.server.name }}" }
                 val server = this.firstOrNull()?.toWgServerData()
@@ -109,36 +97,23 @@ class RealWgServerApi @Inject constructor(
 
     private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
 
-    private fun Collection<RegisteredServerInfo>.findClosestServer(timeZone: TimeZone): RegisteredServerInfo {
-        val serverAttributes = this.map { ServerAttributes(it.server.attributes) }.sortedBy { it.tzOffset }
-        var min = Int.MAX_VALUE.toLong()
-        val offset = TimeUnit.MILLISECONDS.toSeconds(timeZone.rawOffset.toLong())
-        var closest = offset
-
-        serverAttributes.forEach { attrs ->
-            val diff = abs(attrs.tzOffset - offset)
-            if (diff < min) {
-                min = diff
-                closest = attrs.tzOffset
-            }
-        }
-
-        return this.firstOrNull { ServerAttributes(it.server.attributes).tzOffset == closest } ?: this.first()
-    }
-
     private data class ServerAttributes(val map: Map<String, Any?>) {
         // withDefault wraps the map to return null for missing keys
         private val attributes = map.withDefault { null }
 
         val city: String? by attributes
         val country: String? by attributes
-        val tzOffset: Long by attributes
     }
 }
 
-@ContributesPluginPoint(VpnScope::class)
 interface WgServerDebugProvider {
-    suspend fun getSelectedServerName(): String?
+    suspend fun getSelectedServerName(): String? = null
 
-    suspend fun storeEligibleServers(servers: List<Server>)
+    suspend fun cacheServers(servers: List<Server>) { /* noop */ }
+
+    suspend fun fetchServers(): List<Server> = emptyList()
 }
+
+// Contribute just the default dummy implementation
+@ContributesBinding(AppScope::class)
+class WgServerDebugProviderImpl @Inject constructor() : WgServerDebugProvider

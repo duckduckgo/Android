@@ -16,49 +16,42 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealWgServerApiTest() {
+class RealWgServerApiTest {
     private val wgVpnControllerService = FakeWgVpnControllerService()
 
-    @Mock
-    private lateinit var appBuildConfig: AppBuildConfig
-
-    private lateinit var fakeWgServerDebugProvider: FakeWgServerDebugProvider
-    private lateinit var testee: RealWgServerApi
+    private lateinit var productionWgServerDebugProvider: DefaultWgServerDebugProvider
+    private lateinit var internalWgServerDebugProvider: FakeWgServerDebugProvider
+    private lateinit var productionApi: RealWgServerApi
+    private lateinit var internalApi: RealWgServerApi
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
-        fakeWgServerDebugProvider = FakeWgServerDebugProvider()
+        productionWgServerDebugProvider = DefaultWgServerDebugProvider()
+        internalWgServerDebugProvider = FakeWgServerDebugProvider(wgVpnControllerService)
 
-        testee = RealWgServerApi(
+        internalApi = RealWgServerApi(
             wgVpnControllerService,
-            appBuildConfig,
-            object : PluginPoint<WgServerDebugProvider> {
-                override fun getPlugins(): Collection<WgServerDebugProvider> {
-                    return setOf(fakeWgServerDebugProvider)
-                }
-            },
+            internalWgServerDebugProvider,
+        )
+        productionApi = RealWgServerApi(
+            wgVpnControllerService,
+            productionWgServerDebugProvider,
         )
     }
 
     @Test
-    fun whenGetWgServerDataPlayBuildThenReturnFirstServer() = runTest {
+    fun whenRegisterInProductionThenReturnTheFirstServer() = runTest {
         assertEquals(
             WgServerData(
                 serverName = "egress.usw.1",
@@ -69,14 +62,13 @@ class RealWgServerApiTest() {
                 gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.registerPublicKey("testpublickey"),
+            productionApi.registerPublicKey("testpublickey"),
         )
     }
 
     @Test
-    fun whenInternalFlavorAndUserSelectedServerThenReturnUserSelectedServer() = runTest {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        fakeWgServerDebugProvider.selectedServer = "egress.euw"
+    fun whenRegisterInInternalAndServerSelectedThenReturnSelectedServer() = runTest {
+        internalWgServerDebugProvider.selectedServer = "egress.euw"
 
         assertEquals(
             WgServerData(
@@ -88,35 +80,57 @@ class RealWgServerApiTest() {
                 gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
-            testee.registerPublicKey("testpublickey"),
+            internalApi.registerPublicKey("testpublickey"),
         )
     }
 
     @Test
-    fun whenNotInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
-        testee.registerPublicKey("testpublickey")
+    fun whenRegisterInInternalAndWrongServerSelectedThenReturnFirstServer() = runTest {
+        internalWgServerDebugProvider.selectedServer = "egress.wrong"
 
-        assertTrue(fakeWgServerDebugProvider.cachedServers.isEmpty())
+        assertEquals(
+            WgServerData(
+                serverName = "egress.usw.1",
+                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
+                publicEndpoint = "162.245.204.100:443",
+                address = "",
+                location = null,
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            internalApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenRegisterInProductionThenDoNotCacheServers() = runTest {
+        productionApi.registerPublicKey("testpublickey")
+
+        assertTrue(internalWgServerDebugProvider.cachedServers.isEmpty())
     }
 
     @Test
     fun whenInternalFlavorGetWgServerDataThenStoreReturnedServers() = runTest {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        internalApi.registerPublicKey("testpublickey")
 
-        testee.registerPublicKey("testpublickey")
-
-        assertTrue(fakeWgServerDebugProvider.cachedServers.isNotEmpty())
+        assertEquals(8, internalWgServerDebugProvider.cachedServers.size)
     }
 }
 
-private class FakeWgServerDebugProvider : WgServerDebugProvider {
+private class FakeWgServerDebugProvider(private val controllerService: WgVpnControllerService) : WgServerDebugProvider {
     val cachedServers = mutableListOf<Server>()
     var selectedServer: String? = null
 
     override suspend fun getSelectedServerName(): String? = selectedServer
 
-    override suspend fun storeEligibleServers(servers: List<Server>) {
+    override suspend fun cacheServers(servers: List<Server>) {
         cachedServers.clear()
         cachedServers.addAll(servers)
     }
+
+    override suspend fun fetchServers(): List<Server> {
+        return controllerService.getServers().map { it.server }
+    }
 }
+
+private class DefaultWgServerDebugProvider : WgServerDebugProvider
