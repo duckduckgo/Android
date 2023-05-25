@@ -64,7 +64,6 @@ class AppSyncRepository @Inject constructor(
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
-    private val syncStateRepository: SyncStateRepository,
     private val syncEngine: SyncEngine,
 ) : SyncRepository {
     override fun isSignedInFlow(): Flow<Boolean> = syncStore.isSignedInFlow()
@@ -98,7 +97,7 @@ class AppSyncRepository @Inject constructor(
 
             is Result.Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
-                syncEngine.syncNow(ACCOUNT_CREATION)
+                syncEngine.triggerSync(ACCOUNT_CREATION)
                 Result.Success(true)
             }
         }
@@ -195,7 +194,7 @@ class AppSyncRepository @Inject constructor(
     }
 
     override fun removeAccount() {
-        syncStore.clearAll()
+        onSyncDisabled()
     }
 
     override fun logout(deviceId: String): Result<Boolean> {
@@ -219,8 +218,7 @@ class AppSyncRepository @Inject constructor(
 
             is Result.Success -> {
                 if (logoutThisDevice) {
-                    syncStore.clearAll()
-                    syncStateRepository.clearAll()
+                    onSyncDisabled()
                 }
                 Result.Success(true)
             }
@@ -237,7 +235,7 @@ class AppSyncRepository @Inject constructor(
             }
 
             is Result.Success -> {
-                syncStore.clearAll()
+                onSyncDisabled()
                 Result.Success(true)
             }
         }
@@ -320,7 +318,7 @@ class AppSyncRepository @Inject constructor(
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
                 if (decryptResult.result != 0L) return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
-                syncEngine.syncNow(ACCOUNT_LOGIN)
+                syncEngine.triggerSync(ACCOUNT_LOGIN)
 
                 Result.Success(true)
             }
@@ -329,8 +327,13 @@ class AppSyncRepository @Inject constructor(
 
     private fun Error.removeKeysIfInvalid() {
         if (code == INVALID_LOGIN_CREDENTIALS.code) {
-            syncStore.clearAll()
+            onSyncDisabled()
         }
+    }
+
+    private fun onSyncDisabled(){
+        syncStore.clearAll()
+        syncEngine.onSyncDisabled()
     }
 
     private class Adapters {

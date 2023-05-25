@@ -26,8 +26,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.sync.RealSavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncPersister
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao

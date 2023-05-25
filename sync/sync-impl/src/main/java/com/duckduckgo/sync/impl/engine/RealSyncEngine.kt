@@ -57,7 +57,7 @@ class RealSyncEngine @Inject constructor(
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
 ) : SyncEngine {
 
-    override fun syncNow(trigger: SyncTrigger) {
+    override fun triggerSync(trigger: SyncTrigger) {
         Timber.d("Sync-Feature: petition to sync now trigger: $trigger")
         when (trigger) {
             BACKGROUND_SYNC -> scheduleSync(trigger)
@@ -182,6 +182,13 @@ class RealSyncEngine @Inject constructor(
     ) {
         persisterPlugins.getPlugins().map {
             it.persist(remoteChanges, conflictResolution)
+        }
+    }
+
+    override fun onSyncDisabled() {
+        syncStateRepository.clearAll()
+        persisterPlugins.getPlugins().map {
+            it.onSyncDisabled()
         }
     }
 }
