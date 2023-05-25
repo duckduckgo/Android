@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Agora não</string>
-    <string name="saveLoginDialogSubtitle">Os inícios de sessão são armazenados com segurança apenas neste dispositivo, e podes efetuar a gestão dos mesmos a partir do menu de Inícios de sessão nas Definições.</string>
     <string name="saveLoginDialogTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
     <string name="useSavedLoginDialogTitle">Utilizar um início de sessão guardado?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Dados de início de sessão para %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Dados de início de sessão para o site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">De %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nenhum início de sessão guardado</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados em segurança apenas neste dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
     <string name="autofillManagementSearchLogins">Pesquisar inícios de sessão</string>

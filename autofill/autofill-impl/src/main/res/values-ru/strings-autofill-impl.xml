@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Сохранить логин</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сейчас</string>
-    <string name="saveLoginDialogSubtitle">Логины защищены только на этом устройстве. Ими можно управлять в меню «Логины» в «Настройках».</string>
     <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
     <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Логин для %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Логин для сайта</string>
     <string name="useSavedLoginDialogGroupThisWebsite">С этого сайта</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">С %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных логинов пока нет</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Логины надежно хранятся только на этом устройстве.</string>
 
     <string name="autofillManagementAddLogin">Добавить логин</string>
     <string name="autofillManagementSearchLogins">Поиск логинов</string>

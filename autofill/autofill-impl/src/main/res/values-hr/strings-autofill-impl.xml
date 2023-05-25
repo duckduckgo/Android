@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Spremi prijavu</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Ne sada</string>
-    <string name="saveLoginDialogSubtitle">Prijave se sigurno spremaju samo na ovom uređaju i njima se može upravljati iz izbornika Automatsko popunjavanje u Postavkama.</string>
     <string name="saveLoginDialogTitle">Želiš li da DuckDuckGo spremi tvoju prijavu?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 
     <string name="useSavedLoginDialogTitle">Koristiti spremljene podatke za prijavu?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prijava za %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prijava za web lokaciju</string>
     <string name="useSavedLoginDialogGroupThisWebsite">S ove web lokacije</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">S %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Predloženo</string>
     <string name="credentialManagementNoLoginsSavedTitle">Još nema spremljenih prijava</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prijave su sigurno spremljene samo na ovom uređaju.</string>
 
     <string name="autofillManagementAddLogin">Dodaj prijavu</string>
     <string name="autofillManagementSearchLogins">Pretraživanje prijava</string>

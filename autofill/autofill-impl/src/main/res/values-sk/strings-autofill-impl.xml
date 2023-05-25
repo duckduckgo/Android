@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Uložiť prihlasovacie údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložiť heslo</string>
     <string name="saveLoginDialogNotNow">Teraz nie</string>
-    <string name="saveLoginDialogSubtitle">Prihlasovacie údaje sú zabezpečene uložené len v tomto zariadení a môžete ich spravovať v ponuke Prihlasovacie údaje v Nastaveniach.</string>
     <string name="saveLoginDialogTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použiť uložené prihlasovacie údaje?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prihlásenie pre %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prihlásenie na stránky</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z tejto webovej lokality</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Z adresy %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatiaľ nie sú uložené žiadne prihlásenia</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prihlásenia sú zabezpečene uložené iba v tomto zariadení.</string>
 
     <string name="autofillManagementAddLogin">Pridať prihlásenie</string>
     <string name="autofillManagementSearchLogins">Vyhľadávanie prihlásení</string>

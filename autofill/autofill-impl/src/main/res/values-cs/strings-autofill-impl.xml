@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Teď ne</string>
-    <string name="saveLoginDialogSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení a dají se spravovat v nabídce Přihlášení v Nastaveních.</string>
     <string name="saveLoginDialogTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použít uložené přihlášení?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Přihlášení pro %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Přihlášení k webu</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z této webové stránky</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Ze stránky %1$ss</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložené žádné přihlašovací údaje</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení.</string>
 
     <string name="autofillManagementAddLogin">Přidat přihlášení</string>
     <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>

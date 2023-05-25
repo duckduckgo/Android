@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Gem login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Ikke nu</string>
-    <string name="saveLoginDialogSubtitle">Logins gemmes kun sikkert på denne enhed og kan administreres fra menuen Automatisk udfyldning i Indstillinger.</string>
     <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme dit login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruge et gemt login?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Login til %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Login til websted</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette websted</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen logins gemt endnu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Login gemmes kun sikkert på denne enhed.</string>
 
     <string name="autofillManagementAddLogin">Tilføj login</string>
     <string name="autofillManagementSearchLogins">Søg logins</string>

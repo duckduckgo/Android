@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Bejelentkezés mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginDialogNotNow">Most nem</string>
-    <string name="saveLoginDialogSubtitle">A bejelentkezési adatok csak ezen az eszközön lesznek biztonságosan tárolva, és a Beállítások &gt; Bejelentkezések menüpontban kezelhetők.</string>
     <string name="saveLoginDialogTitle">A DuckDuckGo mentse a bejelentkezést?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
     <string name="useSavedLoginDialogTitle">Mentett bejelentkezés használata?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Bejelentkezés - %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Bejelentkezés webhelyre</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Erről a webhelyről</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Innen: %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Javasolt</string>
     <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett bejelentkezési adatok</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Csak ezen az eszközön és biztonságosan tároljuk a bejelentkezési adatokat.</string>
 
     <string name="autofillManagementAddLogin">Bejelentkezési adatok hozzáadása</string>
     <string name="autofillManagementSearchLogins">Bejelentkezési adatok keresése</string>

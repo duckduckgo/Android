@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Spara inloggning</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginDialogNotNow">Inte nu</string>
-    <string name="saveLoginDialogSubtitle">Inloggningar lagras säkert, enbart på den här enheten, och kan hanteras genom menyn Inloggningar i inställningarna.</string>
     <string name="saveLoginDialogTitle">Vill du att DuckDuckGo ska spara din inloggning?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
     <string name="useSavedLoginDialogTitle">Använd sparad inloggning?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Inloggning för %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Inloggning för webbplatsen</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Från den här webbplatsen</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Från %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
     <string name="credentialManagementNoLoginsSavedTitle">Inga inloggningar sparade ännu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Inloggningar lagras säkert endast på den här enheten.</string>
 
     <string name="autofillManagementAddLogin">Lägg till inloggning</string>
     <string name="autofillManagementSearchLogins">Sök inloggningar</string>

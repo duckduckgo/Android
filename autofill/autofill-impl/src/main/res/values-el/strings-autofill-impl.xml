@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Όχι τώρα</string>
-    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια μόνο σε αυτή τη συσκευή και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
     <string name="saveLoginDialogTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένων στοιχείων σύνδεσης;</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Σύνδεση για %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Σύνδεση για τον ιστότοπο</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Από αυτόν τον ιστότοπο</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Από %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα στοιχεία σύνδεσης</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια μόνο σε αυτήν τη συσκευή.</string>
 
     <string name="autofillManagementAddLogin">Προσθήκη στοιχείων σύνδεσης</string>
     <string name="autofillManagementSearchLogins">Αναζήτηση στοιχείων σύνδεσης</string>

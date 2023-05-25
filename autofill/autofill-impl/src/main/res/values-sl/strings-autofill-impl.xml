@@ -26,13 +26,10 @@
     <string name="saveLoginDialogButtonSave">Shrani prijavo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne zdaj</string>
-    <string name="saveLoginDialogSubtitle">Prijave so varno shranjene samo v tej napravi in jih lahko upravljate v meniju Prijave v Nastavitvah.</string>
     <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Želite uporabiti shranjene podatke za prijavo?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prijava za %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prijava za spletno mesto</string>
     <string name="useSavedLoginDialogGroupThisWebsite">S tega spletnega mesta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">S spletnega mesta %1$s</string>
 
@@ -65,7 +62,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Predlagano</string>
     <string name="credentialManagementNoLoginsSavedTitle">Podatki za prijavo še niso shranjeni</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Podatki za prijavo so varno shranjeni samo v tej napravi.</string>
 
     <string name="autofillManagementAddLogin">Dodajanje podatkov za prijavo</string>
     <string name="autofillManagementSearchLogins">Iskanje podatkov za prijavo</string>
