@@ -953,11 +953,7 @@
       },
       {
         "tableName": "entities",
-<<<<<<< HEAD
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entityId` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT, `type` TEXT NOT NULL, PRIMARY KEY(`entityId`))",
-=======
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`entityId` TEXT NOT NULL, `title` TEXT NOT NULL, `url` TEXT, `type` TEXT NOT NULL, `lastModified` TEXT, `deleted` INTEGER NOT NULL, PRIMARY KEY(`entityId`))",
->>>>>>> c8914a879 (add timestamp to local bookmarks)
         "fields": [
           {
             "fieldPath": "entityId",
@@ -981,18 +977,6 @@
             "fieldPath": "type",
             "columnName": "type",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "lastModified",
-            "columnName": "lastModified",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "deleted",
-            "columnName": "deleted",
-            "affinity": "INTEGER",
             "notNull": true
           }
         ],
