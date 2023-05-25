@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.service
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -160,14 +161,16 @@ class RealSavedSitesParser : SavedSitesParser {
                         val folderName = folder.text()
 
                         if (isFavoritesFolder(folderName) || isBookmarksFolder(folderName)) {
-                            parseElement(element, SavedSitesNames.BOOMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
+                            parseElement(element, SavedSitesNames.BOOKMARKS_ROOT, savedSitesRepository, savedSites, folderName == FAVORITES_FOLDER)
                         } else {
                             val folderParentId = parentId.ifEmpty {
-                                SavedSitesNames.BOOMARKS_ROOT
+                                SavedSitesNames.BOOKMARKS_ROOT
                             }
                             val bookmarkFolder = BookmarkFolder(
                                 name = folderName,
                                 parentId = folderParentId,
+                                lastModified = DatabaseDateFormatter.iso8601(),
+                                deleted = null,
                             )
                             // if folder exists we use that one instead
                             val existingFolder = savedSitesRepository.getFolderByName(folderName)
@@ -184,10 +187,24 @@ class RealSavedSitesParser : SavedSitesParser {
                             val link = linkItem.attr("href")
                             val title = linkItem.text()
                             if (inFavorite) {
-                                savedSites.add(SavedSite.Favorite(UUID.randomUUID().toString(), title = title, url = link, favorites))
+                                savedSites.add(
+                                    SavedSite.Favorite(
+                                        UUID.randomUUID().toString(),
+                                        title = title,
+                                        url = link,
+                                        lastModified = DatabaseDateFormatter.iso8601(),
+                                        favorites,
+                                    ),
+                                )
                                 favorites++
                             } else {
-                                val bookmark = SavedSite.Bookmark(UUID.randomUUID().toString(), title = title, url = link, parentId = parentId)
+                                val bookmark = SavedSite.Bookmark(
+                                    UUID.randomUUID().toString(),
+                                    title = title,
+                                    url = link,
+                                    parentId = parentId,
+                                    lastModified = DatabaseDateFormatter.iso8601(),
+                                )
                                 savedSites.add(bookmark)
                             }
                         }

@@ -79,6 +79,7 @@ constructor(
                 command.send(Command.ShowMessage("$result"))
             }
             getConnectedDevices()
+            startInitialSync()
         }
     }
 
@@ -136,25 +137,17 @@ constructor(
         }
     }
 
-    fun onSendBookmarksClicked() {
+    private fun startInitialSync() {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.sendAllData()
-            if (result is Error) {
-                command.send(Command.ShowMessage("$result"))
-            } else {
-                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
-            }
-            updateViewState()
-        }
-    }
-
-    fun onReceiveBookmarksClicked() {
-        viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.fetchAllData()
-            if (result is Error) {
-                command.send(Command.ShowMessage("$result"))
-            } else {
-                command.send(Command.ShowMessage("Bookmarks Sent Successfully"))
+            when (val connectedDevices = syncRepository.getConnectedDevices()) {
+                is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
+                is Success -> {
+                    viewState.emit(
+                        viewState.value.copy(
+                            connectedDevices = connectedDevices.data,
+                        ),
+                    )
+                }
             }
             updateViewState()
         }

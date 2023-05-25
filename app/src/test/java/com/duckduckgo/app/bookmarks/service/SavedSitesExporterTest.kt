@@ -77,8 +77,12 @@ class SavedSitesExporterTest {
         exporter = RealSavedSitesExporter(context.contentResolver, savedSitesRepository, RealSavedSitesParser())
 
         // initial db state
-        savedSitesRepository.insert(BookmarkFolder(id = SavedSitesNames.BOOMARKS_ROOT, name = "Bookmarks", parentId = ""))
-        savedSitesRepository.insert(BookmarkFolder(id = SavedSitesNames.FAVORITES_ROOT, name = "Favorites", parentId = ""))
+        savedSitesRepository.insert(
+            BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "Bookmarks", parentId = "", lastModified = "timestamp"),
+        )
+        savedSitesRepository.insert(
+            BookmarkFolder(id = SavedSitesNames.FAVORITES_ROOT, name = "Favorites", parentId = "", lastModified = "timestamp"),
+        )
     }
 
     @After
@@ -88,15 +92,15 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeBookmarksExistThenExportingSucceeds() = runTest {
-        val root = BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
-        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val root = BookmarkFolder(SavedSitesNames.BOOKMARKS_ROOT, "DuckDuckGo Bookmarks", "", 0, 0, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder))
 
         savedSitesRepository.insertFolderBranch(folderBranch)
 
-        savedSitesRepository.insertFavorite("www.favorite.com", "Favorite")
+        savedSitesRepository.insertFavorite("favourite1", "www.favorite.com", "Favorite", "timestamp")
 
         val testFile = File(filesDir, "test_bookmarks.html")
         val localUri = Uri.fromFile(testFile)
@@ -127,7 +131,7 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenSomeFavoritesExistThenExportingSucceeds() = runTest {
-        val favorite = SavedSite.Favorite(id = "favorite1", title = "example", url = "www.example.com", position = 0)
+        val favorite = SavedSite.Favorite(id = "favorite1", title = "example", url = "www.example.com", position = 0, lastModified = "timestamp")
         savedSitesRepository.insert(favorite)
 
         val testFile = File(filesDir, "test_favorites.html")
@@ -141,10 +145,10 @@ class SavedSitesExporterTest {
 
     @Test
     fun whenGetTreeStructureThenReturnTraversableTree() = runTest {
-        val root = BookmarkFolder(SavedSitesNames.BOOMARKS_ROOT, "DuckDuckGo Bookmarks", "")
-        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val root = BookmarkFolder(SavedSitesNames.BOOKMARKS_ROOT, "DuckDuckGo Bookmarks", "", 0, 0, "timestamp")
+        val parentFolder = BookmarkFolder("folder1", "Folder One", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Folder Two", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(root, parentFolder, childFolder))
 
         savedSitesRepository.insertFolderBranch(folderBranch)
@@ -193,7 +197,7 @@ class SavedSitesExporterTest {
                 "" -> {
                     Assert.assertEquals(0, node.value.depth)
                 }
-                SavedSitesNames.BOOMARKS_ROOT -> {
+                SavedSitesNames.BOOKMARKS_ROOT -> {
                     Assert.assertEquals(1, node.value.depth)
                 }
                 else -> {

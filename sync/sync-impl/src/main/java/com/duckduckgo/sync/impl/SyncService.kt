@@ -18,9 +18,8 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.moshi.Json
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,6 +27,7 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 @ContributesServiceApi(AppScope::class)
 interface SyncService {
@@ -72,11 +72,16 @@ interface SyncService {
     @PATCH("https://dev-sync-use.duckduckgo.com/sync/data")
     fun patch(
         @Header("Authorization") token: String,
-        @Body request: SyncDataRequest,
-    ): Call<DataResponse>
+        @Body request: JSONObject,
+    ): Call<JSONObject>
 
-    @GET("https://dev-sync-use.duckduckgo.com/sync/data")
-    fun data(@Header("Authorization") token: String): Call<DataResponse>
+    @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
+    fun bookmarks(
+        @Header("Authorization") token: String,
+    ): Call<JSONObject>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
+    fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
 }
 
 data class Login(
@@ -154,22 +159,41 @@ data class BookmarksResponse(
     val entries: List<SyncBookmarkEntry>,
 )
 
-data class SettingsResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
-    val entries: List<Setting>,
-)
-
-data class DeviceDataResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
-    val entries: List<Device>,
-)
-
-data class DataResponse(
-    val bookmarks: BookmarksResponse,
-    val settings: SettingsResponse,
-    val devices: DeviceDataResponse,
-)
-
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
+    NOT_MODIFIED(304),
+}
+
+data class SyncBookmarkPage(val url: String)
+data class SyncFolderChildren(val children: List<String>)
+
+data class SyncBookmarkEntry(
+    val id: String,
+    val title: String,
+    val page: SyncBookmarkPage?,
+    val folder: SyncFolderChildren?,
+    val deleted: String?,
+    val client_last_modified: String,
+) {
+    companion object {
+        fun asBookmark(
+            id: String,
+            title: String,
+            url: String,
+            deleted: String?,
+            clientLastModified: String,
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted, clientLastModified)
+        }
+
+        fun asFolder(
+            id: String,
+            title: String,
+            children: List<String>,
+            deleted: String?,
+            clientLastModified: String,
+        ): SyncBookmarkEntry {
+            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted, clientLastModified)
+        }
+    }
 }

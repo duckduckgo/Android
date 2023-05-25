@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
@@ -25,11 +26,12 @@ object BookmarkTestUtils {
 
     fun givenSomeBookmarks(
         total: Int,
+        lastModified: String = DatabaseDateFormatter.iso8601(),
     ): List<Entity> {
         val entities = mutableListOf<Entity>()
         for (index in 1..total) {
             entities.add(
-                Entity(title = "entity$index", url = "https://testUrl$index", type = BOOKMARK),
+                Entity(title = "entity$index", url = "https://testUrl$index", type = BOOKMARK, lastModified = lastModified),
             )
         }
         return entities

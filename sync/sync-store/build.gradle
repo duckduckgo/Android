@@ -44,7 +44,12 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 
+    implementation project(path: ':common')
+
     kapt AndroidX.room.compiler
+
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
 
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
