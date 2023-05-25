@@ -26,10 +26,13 @@
     <string name="saveLoginDialogButtonSave">Tallenna kirjautumistiedot</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginDialogNotNow">Ei nyt</string>
+    <string name="saveLoginDialogSubtitle">Kirjautumistiedot tallennetaan turvallisesti laitteellesi. Niitä voi hallita asetusten kirjautumistiedot-valikosta.</string>
     <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
     <string name="useSavedLoginDialogTitle">Käytä tallennettuja kirjautumistietoja?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Sivuston %1$s salasana</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Sivuston salasana</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Tältä sivustolta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Sivustolta %1$s</string>
 
@@ -62,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
     <string name="credentialManagementNoLoginsSavedTitle">Kirjautumistietoja ei ole vielä tallennettu</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Kirjautumiset tallennetaan laitteellesi turvallisesti.</string>
 
     <string name="autofillManagementAddLogin">Lisää kirjautumistiedot</string>
     <string name="autofillManagementSearchLogins">Hae kirjautumistietoja</string>
@@ -74,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Käyttäjätunnus kopioitu</string>
     <string name="autofillManagementPasswordCopied">Salasana kopioitu</string>
+
+    <string name="autofill_password_generation_offer_title">Haluatko käyttää DuckDuckGon luomaa salasanaa?</string>
+    <string name="autofill_password_generation_offer_message">Salasana tallennetaan Kirjautumiset-osioon.</string>
+    <string name="autofill_password_generation_offer_accept">Käytä luotua salasanaa</string>
+    <string name="autofill_password_generation_offer_decline">Luo oma</string>
+
+    <string name="deviceNotSupportedTitle">Laitetta ei tueta</string>
+    <string name="deviceNotSupportedSubtitle">Jotta kirjautumiset voidaan tallentaa turvallisesti, meidän on salattava ja tallennettava ne laitteellesi. Koska laitteesi ei tue salattua tallennusta, kirjautumiset eivät ole käytettävissä.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Kirjautumistieto poistettu</string>
+    <string name="autofillManagementUndoDeletion">Kumoa</string>
 
 </resources>
