@@ -81,6 +81,7 @@ class SyncActivityViewModel @Inject constructor(
                         viewState.emit(initViewStateThisDeviceState())
                     }
                 }
+
                 false -> viewState.emit(signedOutState())
             }
         }.flowOn(dispatchers.io()).launchIn(viewModelScope)
@@ -256,7 +257,6 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.toggle(true).showAccount())
         }
     }
-
     private fun signedOutState(): ViewState = ViewState()
     private fun ViewState.isSignedInState() = this.loginQRCode != null && this.showAccount
     private fun ViewState.toggle(isChecked: Boolean) = copy(syncToggleState = isChecked)

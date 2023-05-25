@@ -55,7 +55,7 @@ class BookmarkFoldersAdapter(
 
     private fun generateNewList(value: List<BookmarkFoldersItemTypes>): List<BookmarkFoldersItemTypes> {
         Timber.d("Bookmarks: generateNewList")
-        return if (parentId == SavedSitesNames.BOOMARKS_ROOT) {
+        return if (parentId == SavedSitesNames.BOOKMARKS_ROOT) {
             listOf(Header) + value
         } else {
             value

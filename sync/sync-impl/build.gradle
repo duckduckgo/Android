@@ -54,6 +54,17 @@ dependencies {
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"
 
+    // WorkManager
+    implementation AndroidX.work.runtimeKtx
+    testImplementation AndroidX.work.testing
+
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.ktx
+
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
+
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
@@ -64,6 +75,7 @@ dependencies {
     testImplementation CashApp.turbine
     testImplementation AndroidX.archCore.testing
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+    testImplementation 'org.json:json:_'
 
     testImplementation project(path: ':common-test')
 
