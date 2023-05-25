@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl.di
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
 
 /**
  * This is here to trigger the code generations
@@ -28,7 +28,7 @@ import com.duckduckgo.sync.api.engine.SyncablePlugin
  */
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = SyncablePlugin::class,
+    boundType = SyncableDataProvider::class,
 )
 @Suppress("unused")
-private interface UnusedSyncablePluginCodegenTrigger
+private interface UnusedSyncableDataProviderPluginCodegenTrigger

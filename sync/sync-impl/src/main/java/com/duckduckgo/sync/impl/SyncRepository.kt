@@ -321,6 +321,7 @@ class AppSyncRepository @Inject constructor(
                 if (decryptResult.result != 0L) return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
                 syncEngine.syncNow(ACCOUNT_LOGIN)
+
                 Result.Success(true)
             }
         }

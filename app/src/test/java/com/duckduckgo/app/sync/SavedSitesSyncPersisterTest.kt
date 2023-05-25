@@ -28,16 +28,17 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncMerger
+import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncPersister
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution.DEDUPLICATION
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import junit.framework.Assert
 import org.junit.Assert.assertTrue
@@ -47,7 +48,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class SavedSitesSyncMergerTest {
+class SavedSitesSyncPersisterTest {
 
     @get:Rule
     @Suppress("unused")
@@ -63,7 +64,7 @@ class SavedSitesSyncMergerTest {
     private lateinit var duplicateFinder: SavedSitesDuplicateFinder
     private lateinit var store: FeatureSyncStore
 
-    private lateinit var syncMerger: SavedSitesSyncMerger
+    private lateinit var syncPersister: SavedSitesSyncPersister
 
     @Before
     fun setup() {
@@ -78,14 +79,14 @@ class SavedSitesSyncMergerTest {
         duplicateFinder = RealSavedSitesDuplicateFinder(repository)
 
         store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
-        syncMerger = SavedSitesSyncMerger(repository, store, duplicateFinder, FakeCrypto())
+        syncPersister = SavedSitesSyncPersister(repository, store, duplicateFinder, FakeCrypto())
     }
 
     @Test
     fun whenMergingCorruptedDataThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_invalid_data.json")
-        val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
-        val result = syncMerger.merge(corruptedChanges)
+        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
 
         Assert.assertTrue(result is Error)
     }
@@ -93,8 +94,8 @@ class SavedSitesSyncMergerTest {
     @Test
     fun whenMergingNullEntriesThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_null_entries.json")
-        val corruptedChanges = SyncChanges(BOOKMARKS, updatesJSON)
-        val result = syncMerger.merge(corruptedChanges)
+        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Error)
     }
@@ -102,8 +103,8 @@ class SavedSitesSyncMergerTest {
     @Test
     fun whenMergingDataInEmptyDBThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
-        val validChanges = SyncChanges(BOOKMARKS, updatesJSON)
-        val result = syncMerger.merge(validChanges, DEDUPLICATION)
+        val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(validChanges, DEDUPLICATION)
 
         assertTrue(result is Success)
 
@@ -118,6 +119,24 @@ class SavedSitesSyncMergerTest {
 
         val favouritesRoot = repository.getFavoritesSync()
         assertTrue(favouritesRoot[0].id == "4cde63c7-04ae-44ef-8d9c-ea699c0b679f")
+    }
+
+    @Test
+    fun whenMergingEmptyEntriesThenResultIsSuccess() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_empty_entries.json")
+        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
+
+        assertTrue(result is Error)
+    }
+
+    @Test
+    fun whenMergingWithDeletedDataThenResultIsSuccess() {
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_deleted_entries.json")
+        val deletedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
+        val result = syncPersister.merge(deletedChanges, TIMESTAMP)
+
+        Assert.assertTrue(result is Success)
     }
 }
 

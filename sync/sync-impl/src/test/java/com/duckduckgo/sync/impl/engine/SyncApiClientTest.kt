@@ -16,16 +16,16 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.sync.TestSyncFixtures
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.duckduckgo.sync.impl.BookmarksResponse
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.store.SyncStore
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
+import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -38,15 +38,6 @@ internal class SyncApiClientTest {
     private val syncApi: SyncApi = mock()
     private lateinit var apiClient: AppSyncApiClient
 
-    private val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":" +
-        "\"timestamp\",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\"" +
-        ":\"Favorites\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"}" +
-        ",\"title\":\"Bookmark 3\"},{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"}," +
-        "\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\"" +
-        ":[\"bookmark3\",\"bookmark4\"]},\"id\"" +
-        ":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
-    val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-    val syncDataResponse = SyncDataResponse(bookmarksResponse)
     val patchAllError = Result.Error(-1, "Patch All Error")
     val getAllError = Result.Error(-1, "Get All Error")
 
@@ -75,9 +66,10 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenPatchAndBookmarkChangesThenApiIsSuccessful() {
-        val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "")
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
-        whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(syncDataResponse))
+        whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(JSONObject()))
 
         val result = apiClient.patch(listOf(bookmarksChanges))
         assertTrue(result is Result.Success)
@@ -85,7 +77,8 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenPatchAndBookmarkChangesThenApiFails() {
-        val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "0")
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(patchAllError)
 
@@ -95,10 +88,11 @@ internal class SyncApiClientTest {
 
     @Test
     fun whenMappingChangesThenGeneratedObjectIsCorrect() {
-        val bookmarksChanges = SyncChanges(BOOKMARKS, firstSyncWithBookmarksAndFavorites)
+        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "0")
         val changes = apiClient.mapRequest(listOf(bookmarksChanges))
-        assertTrue(changes.client_timestamp.isNotEmpty())
-        assertTrue(changes.bookmarks.updates.size == 4)
+        assertTrue(changes.get("client_timestamp") != null)
+        assertTrue(changes.get("bookmarks") != null)
     }
 
     @Test

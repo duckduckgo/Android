@@ -26,13 +26,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
-import com.duckduckgo.sync.api.engine.SyncChanges
-import com.duckduckgo.sync.api.engine.SyncMergeResult
-import com.duckduckgo.sync.api.engine.SyncParser
-import com.duckduckgo.sync.api.engine.SyncablePlugin
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -40,31 +36,16 @@ import javax.inject.Inject
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncablePlugin::class)
-@ContributesBinding(scope = AppScope::class, boundType = SyncParser::class)
-class SavedSitesSyncParser @Inject constructor(
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
+class SavedSitesSyncDataProvider @Inject constructor(
     private val repository: SavedSitesRepository,
     private val savedSitesSyncStore: FeatureSyncStore,
     private val syncCrypto: SyncCrypto,
-) : SyncParser, SyncablePlugin {
+) : SyncableDataProvider {
 
-    override fun getChanges(since: String): SyncChanges {
-        return parseChanges(since)
-    }
-
-    override fun syncChanges(
-        changes: List<SyncChanges>,
-        conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
-        return SyncMergeResult.Success(true)
-    }
-
-    override fun onSyncDisabled() {
-        savedSitesSyncStore.modifiedSince = "0"
-    }
-
-    override fun parseChanges(since: String): SyncChanges {
-        val updates = if (since.isEmpty()) {
+    override fun getChanges(): SyncChangesRequest {
+        val since = savedSitesSyncStore.modifiedSince
+        val updates = if (since == "0") {
             allContent()
         } else {
             changesSince(since)
@@ -72,9 +53,17 @@ class SavedSitesSyncParser @Inject constructor(
         return formatUpdates(updates)
     }
 
+    override fun getModifiedSince(): String {
+        return savedSitesSyncStore.modifiedSince
+    }
+
+    override fun onSyncDisabled() {
+        savedSitesSyncStore.modifiedSince = "0"
+    }
+
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
-        Timber.d("Sync: generating changes since $since")
+        Timber.d("Sync-Feature: generating changes since $since")
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         val folders = repository.getFoldersModifiedSince(since)
@@ -86,8 +75,7 @@ class SavedSitesSyncParser @Inject constructor(
             }
         }
 
-        // bookmarks that were deleted won't be part of the previous check
-        // we need to add them
+        // bookmarks that were deleted or edited won't be part of the previous check
         val bookmarks = repository.getBookmarksModifiedSince(since)
         bookmarks.forEach { bookmark ->
             if (bookmark.deleted != null) {
@@ -100,12 +88,12 @@ class SavedSitesSyncParser @Inject constructor(
 
     @VisibleForTesting
     fun allContent(): List<SyncBookmarkEntry> {
-        Timber.d("Sync: generating all content")
+        Timber.d("Sync-Feature: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
 
         if (!hasFavorites && !hasBookmarks) {
-            Timber.d("Sync: nothing to generate, favourites and bookmarks empty")
+            Timber.d("Sync-Feature: nothing to generate, favourites and bookmarks empty")
             return emptyList()
         }
 
@@ -119,7 +107,8 @@ class SavedSitesSyncParser @Inject constructor(
             }
         }
 
-        return addFolderContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
+        addFolderContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
+        return updates.distinct()
     }
 
     private fun addFolderContent(
@@ -218,22 +207,22 @@ class SavedSitesSyncParser @Inject constructor(
         )
     }
 
-    private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChanges {
+    private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChangesRequest {
         return if (updates.isEmpty()) {
-            SyncChanges.empty()
+            SyncChangesRequest(BOOKMARKS, "", savedSitesSyncStore.modifiedSince)
         } else {
             val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
-            val patch = SyncDataRequest(bookmarkUpdates)
+            val patch = SyncBookmarksRequest(bookmarkUpdates, DatabaseDateFormatter.iso8601())
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
-            SyncChanges(BOOKMARKS, allDataJSON)
+            SyncChangesRequest(BOOKMARKS, allDataJSON, savedSitesSyncStore.modifiedSince)
         }
     }
 
     private class Adapters {
         companion object {
             private val moshi = Moshi.Builder().build()
-            val patchAdapter: JsonAdapter<SyncDataRequest> =
-                moshi.adapter(SyncDataRequest::class.java)
+            val patchAdapter: JsonAdapter<SyncBookmarksRequest> =
+                moshi.adapter(SyncBookmarksRequest::class.java)
         }
     }
 }
@@ -250,7 +239,11 @@ data class SyncBookmarkEntry(
     val client_last_modified: String?,
 )
 
-class SyncDataRequest(val bookmarks: SyncBookmarkUpdates)
+class SyncBookmarksRequest(
+    val bookmarks: SyncBookmarkUpdates,
+    val client_timestamp: String,
+)
+
 class SyncBookmarkUpdates(
     val updates: List<SyncBookmarkEntry>,
     val modified_since: String = "0",

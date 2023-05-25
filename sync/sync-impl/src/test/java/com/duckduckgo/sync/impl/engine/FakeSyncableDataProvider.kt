@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.engine
+package com.duckduckgo.sync.impl.engine
 
-interface SyncParser {
-    fun parseChanges(since: String): SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
+
+class FakeSyncableDataProvider(private val fakeChanges: SyncChangesRequest) : SyncableDataProvider {
+    override fun getChanges(): SyncChangesRequest {
+        return fakeChanges
+    }
+
+    override fun getModifiedSince(): String {
+        return "0"
+    }
+
+    override fun onFeatureRemoved() {
+        // no-op
+    }
 }

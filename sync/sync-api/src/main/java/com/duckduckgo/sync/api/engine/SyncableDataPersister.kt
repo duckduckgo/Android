@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.engine
+package com.duckduckgo.sync.api.engine
 
-import com.duckduckgo.sync.api.engine.SyncChanges
-import com.duckduckgo.sync.api.engine.SyncMergeResult
-import com.duckduckgo.sync.api.engine.SyncablePlugin
-import com.duckduckgo.sync.api.engine.SyncablePlugin.SyncConflictResolution
+interface SyncableDataPersister {
 
-class FakeSyncablePlugin(val changes: SyncChanges) : SyncablePlugin {
-    override fun getChanges(since: String): SyncChanges {
-        return changes
-    }
-
-    override fun syncChanges(
-        changes: List<SyncChanges>,
+    /**
+     * Changes from Sync Client have been received
+     * Each feature is responsible for merging and solving conflicts
+     */
+    fun persist(
+        changes: List<SyncChangesResponse>,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
-        return SyncMergeResult.Success(false)
-    }
+    ): SyncMergeResult<Boolean>
 
-    override fun onSyncDisabled() {
-        // no-op
+    /**
+     * Sync Feature has been disabled / device has been removed
+     * This is an opportunity for Features to do some local cleanup if needed
+     */
+    fun onSyncDisabled()
+
+    enum class SyncConflictResolution {
+        DEDUPLICATION,
+        REMOTE_WINS,
+        LOCAL_WINS,
+        TIMESTAMP,
     }
 }

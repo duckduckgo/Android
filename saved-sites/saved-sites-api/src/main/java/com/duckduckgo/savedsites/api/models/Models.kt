@@ -79,7 +79,7 @@ data class BookmarkFolder(
     val parentId: String,
     val numBookmarks: Int = 0,
     val numFolders: Int = 0,
-    val lastModified: String?,
+    val lastModified: String? = null,
     val deleted: String? = null,
 ) : Serializable
 

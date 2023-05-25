@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.engine
+package com.duckduckgo.sync.impl.di
 
-interface SyncEngine {
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.SyncableDataPersister
 
-    /**
-     * Entry point to the Sync Engine
-     * This will be used by Background Sync and App Triggered workers
-     */
-    fun syncNow(trigger: SyncTrigger)
-
-    enum class SyncTrigger {
-        BACKGROUND_SYNC,
-        APP_OPEN,
-        FEATURE_READ,
-        DATA_CHANGE,
-        ACCOUNT_CREATION,
-        ACCOUNT_LOGIN,
-    }
-}
+/**
+ * This is here to trigger the code generations
+ * [SyncablePlugin] lives in the api module but we don't want to add
+ * anvil dependencies
+ * CodeGen should not be generated in public api modules.
+ */
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = SyncableDataPersister::class,
+)
+@Suppress("unused")
+private interface UnusedSyncableDataPersisterPluginCodegenTrigger

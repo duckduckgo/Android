@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.triggers
+package com.duckduckgo.savedsites.impl.sync
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -34,19 +35,30 @@ import timber.log.Timber
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
-class AppLifecycleSyncObserver @Inject constructor(
-    @AppCoroutineScope val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
-    private val deviceSyncState: DeviceSyncState,
+class SavedSitesSyncDataObserver @Inject constructor(
+    private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
+    private val deviceSyncState: DeviceSyncState,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
-    override fun onStart(owner: LifecycleOwner) {
-        super.onStart(owner)
+    private var initialised: Boolean = false
+
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
         if (deviceSyncState.isUserSignedInOnDevice()) {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                Timber.d("Sync-Feature: App started, triggering sync")
-                syncEngine.syncNow(APP_OPEN)
+            Timber.d("Sync-Feature: Listening to changes in Saved Sites")
+            coroutineScope.launch(dispatcherProvider.io()) {
+                savedSitesRepository.lastModified().collect {
+                    if (initialised) {
+                        Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
+                        syncEngine.syncNow(DATA_CHANGE)
+                    } else {
+                        Timber.d("Sync-Feature: Changes to Saved Sites initialised")
+                        initialised = true
+                    }
+                }
             }
         }
     }

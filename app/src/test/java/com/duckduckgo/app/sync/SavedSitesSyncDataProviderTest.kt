@@ -31,14 +31,17 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncParser
+import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
+import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -49,7 +52,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
-class SavedSitesSyncParserTest {
+class SavedSitesSyncDataProviderTest {
 
     @get:Rule
     @Suppress("unused")
@@ -64,7 +67,7 @@ class SavedSitesSyncParserTest {
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var store: FeatureSyncStore
 
-    private lateinit var parser: SavedSitesSyncParser
+    private lateinit var parser: SavedSitesSyncDataProvider
 
     private var favoritesFolder = aFolder(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "")
     private var bookmarksRootFolder = aFolder(SavedSitesNames.BOOKMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "")
@@ -75,7 +78,9 @@ class SavedSitesSyncParserTest {
     private val bookmark3 = aBookmark("bookmark3", "Bookmark 3", "https://bookmark3.com")
     private val bookmark4 = aBookmark("bookmark4", "Bookmark 4", "https://bookmark4.com")
 
+    private val threeHoursAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(3)
     private val twoHoursAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(2)
+    private val oneHourAgo = OffsetDateTime.now(ZoneOffset.UTC).minusHours(1)
 
     @Before
     fun before() {
@@ -89,7 +94,7 @@ class SavedSitesSyncParserTest {
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
         store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
-        parser = SavedSitesSyncParser(repository, store, FakeCrypto())
+        parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto())
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)
@@ -122,14 +127,19 @@ class SavedSitesSyncParserTest {
 
     @Test
     fun whenFirstSyncAndUsersHasFavoritesThenChangesAreFormatted() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_favourites.json")
-
         repository.insert(favourite1)
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 
-        val syncChanges = parser.getChanges("")
-        assertEquals(syncChanges.updatesJSON, updatesJSON)
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 5)
+        assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
+        assertTrue(changes.bookmarks.updates[1].id == "bookmark1")
+        assertTrue(changes.bookmarks.updates[2].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[3].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[4].id == "bookmarks_root")
     }
 
     @Test
@@ -139,8 +149,13 @@ class SavedSitesSyncParserTest {
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 
-        val syncChanges = parser.getChanges("")
-        assertEquals(syncChanges.updatesJSON, updatesJSON)
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 3)
+        assertTrue(changes.bookmarks.updates[0].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[1].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[2].id == "bookmarks_root")
     }
 
     @Test
@@ -148,6 +163,7 @@ class SavedSitesSyncParserTest {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_folders_and_favourites.json")
 
         repository.insert(bookmark1)
+        repository.insert(bookmark2)
         repository.insert(favourite1)
         repository.insert(bookmark3)
         repository.insert(bookmark4)
@@ -155,8 +171,19 @@ class SavedSitesSyncParserTest {
         repository.updateBookmark(bookmark1.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
         repository.updateBookmark(bookmark2.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
 
-        val syncChanges = parser.getChanges("")
-        assertEquals(syncChanges.updatesJSON, updatesJSON)
+        val syncChanges = parser.getChanges()
+
+        val changes = Adapters.adapter.fromJson(syncChanges.jsonString)!!
+        assertTrue(changes.bookmarks.updates.size == 7)
+        assertTrue(changes.bookmarks.updates[0].id == "favorites_root")
+        assertTrue(changes.bookmarks.updates[1].id == "bookmark3")
+        assertTrue(changes.bookmarks.updates[2].id == "bookmark4")
+        assertTrue(changes.bookmarks.updates[3].id == "bookmark1")
+        assertTrue(changes.bookmarks.updates[4].id == "bookmark2")
+        assertTrue(changes.bookmarks.updates[5].id == "1a8736c1-83ff-48ce-9f01-797887455891")
+        assertTrue(changes.bookmarks.updates[5].folder!!.children == listOf("bookmark1", "bookmark2"))
+        assertTrue(changes.bookmarks.updates[6].id == "bookmarks_root")
+        assertTrue(changes.bookmarks.updates[6].folder!!.children == listOf("bookmark3", "bookmark4", "1a8736c1-83ff-48ce-9f01-797887455891"))
     }
 
     @Test
@@ -194,15 +221,16 @@ class SavedSitesSyncParserTest {
     }
 
     @Test
-    fun whenNoAfterLastSyncAreEmptyThenChangesAreEmpty() {
+    fun whenNoChangesAfterLastSyncAreEmptyThenChangesAreEmpty() {
         val modificationTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601()
+        store.modifiedSince = lastSyncTimestamp
 
         repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
         repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
         repository.insert(favourite1.copy(lastModified = modificationTimestamp))
 
-        val syncChanges = parser.getChanges(lastSyncTimestamp)
+        val syncChanges = parser.getChanges()
         assertTrue(syncChanges.isEmpty())
     }
 
@@ -289,6 +317,26 @@ class SavedSitesSyncParserTest {
         assertTrue(changes[2].deleted == "1")
     }
 
+    @Test
+    fun whenMovingABookmarkToAnotherFolderThenDataIsCorrect() {
+        val beforeLastSyncTimestamp = DatabaseDateFormatter.iso8601(threeHoursAgo)
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        val modificationTimestamp = DatabaseDateFormatter.iso8601(oneHourAgo)
+
+        val modifiedBookmark1 = bookmark1.copy(lastModified = modificationTimestamp)
+        val modifiedBookmark2 = bookmark2.copy(lastModified = beforeLastSyncTimestamp)
+
+        repository.insert(modifiedBookmark1)
+        repository.insert(modifiedBookmark2)
+        repository.insert(subFolder)
+        repository.updateBookmark(modifiedBookmark1.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
+
+        val changes = parser.changesSince(lastSyncTimestamp)
+        assertTrue(changes.filter { it.id == modifiedBookmark1.id } != null)
+        assertTrue(changes.filter { it.id == subFolder.id } != null)
+        assertTrue(changes.filter { it.id == SavedSitesNames.BOOKMARKS_ROOT } != null)
+    }
+
     private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
         return SyncBookmarkEntry(
             id = savedSite.id,
@@ -340,5 +388,13 @@ class SavedSitesSyncParserTest {
         timestamp: String = "2023-05-10T16:10:32.338Z",
     ): Bookmark {
         return Bookmark(id, title, url, lastModified = timestamp)
+    }
+
+    private class Adapters {
+        companion object {
+            private val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<SyncBookmarksRequest> =
+                moshi.adapter(SyncBookmarksRequest::class.java)
+        }
     }
 }

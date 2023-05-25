@@ -33,7 +33,10 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
         fun onFavouriteEdited(favorite: Favorite)
-        fun onBookmarkEdited(bookmark: Bookmark, oldFolderId: String)
+        fun onBookmarkEdited(
+            bookmark: Bookmark,
+            oldFolderId: String,
+        )
     }
 
     var listener: EditSavedSiteListener? = null
@@ -84,6 +87,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
                 val updatedBookmark = savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
                 listener?.onBookmarkEdited(updatedBookmark, savedSite.parentId)
             }
+
             is Favorite -> {
                 listener?.onFavouriteEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl),
@@ -98,9 +102,11 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
                 editable.toString().isBlank() -> {
                     setConfirmationVisibility(ValidationState.INVALID)
                 }
+
                 editable.toString() != getSavedSite().url -> {
                     setConfirmationVisibility(ValidationState.CHANGED)
                 }
+
                 else -> {
                     setConfirmationVisibility(ValidationState.UNCHANGED)
                 }

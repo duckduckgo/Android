@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.view.View
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import java.util.*
 
@@ -46,7 +45,7 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         arguments?.getString(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text
             if (name.isNotBlank()) {
-                listener?.onBookmarkFolderAdded(BookmarkFolder(name = name, parentId = it, lastModified = DatabaseDateFormatter.iso8601()))
+                listener?.onBookmarkFolderAdded(BookmarkFolder(name = name, parentId = it))
             }
         }
     }
