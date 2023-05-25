@@ -28,7 +28,7 @@ class FakeSyncableDataProvider(private val fakeChanges: SyncChangesRequest) : Sy
         return "0"
     }
 
-    override fun onFeatureRemoved() {
-        // no-op
+    override fun onSyncDisabled() {
+        TODO("Not yet implemented")
     }
 }
