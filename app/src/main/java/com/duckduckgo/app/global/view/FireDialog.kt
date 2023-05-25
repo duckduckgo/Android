@@ -33,6 +33,8 @@ import com.duckduckgo.app.browser.databinding.IncludeDaxDialogCtaBinding
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
+import com.duckduckgo.app.featureusage.FeatureSegmentType
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
@@ -63,6 +65,7 @@ class FireDialog(
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
     private val appCoroutineScope: CoroutineScope,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -199,6 +202,7 @@ class FireDialog(
             canRestart = true
             if (event is ClearAllDataFinished) {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+                featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.FIRE_BUTTON_USED)
             }
         } else {
             clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)

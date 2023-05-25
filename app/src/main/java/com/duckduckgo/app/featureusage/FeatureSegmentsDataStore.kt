@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.dev.settings.db.DevSettingsSharedPreferences
+import javax.inject.Inject
 
 interface FeatureSegmentsDataStore {
     var bookmarksImported: Boolean
@@ -34,7 +35,7 @@ interface FeatureSegmentsDataStore {
     var tenSearchesMade: Boolean
 }
 
-class FeatureSegmentsDataStoreSharedPreferences(
+class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
     private val context: Context,
 ) : FeatureSegmentsDataStore {
 

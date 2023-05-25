@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
@@ -144,8 +145,9 @@ class BrowserModule {
         defaultBrowserDetector: DefaultBrowserDetector,
         appInstallStore: AppInstallStore,
         pixel: Pixel,
+        featureSegmentsManager: FeatureSegmentsManager,
     ): MainProcessLifecycleObserver {
-        return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
+        return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel, featureSegmentsManager)
     }
 
     @SingleInstanceIn(AppScope::class)

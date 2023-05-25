@@ -78,6 +78,8 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.featureusage.FeatureSegmentType
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
@@ -189,6 +191,7 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     UrlExtractionListener,
@@ -1897,6 +1900,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
+                    featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.FAVOURITE_SET)
                     faviconManager.persistCachedFavicon(tabId, url)
                     savedSitesRepository.insertFavorite(title = title, url = url)
                 } else {

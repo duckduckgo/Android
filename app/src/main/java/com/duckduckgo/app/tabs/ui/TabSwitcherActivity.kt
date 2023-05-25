@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -86,6 +87,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var userEventsStore: UserEventsStore
+
+    @Inject
+    lateinit var featureSegmentsManager: FeatureSegmentsManager
 
     @Inject
     @AppCoroutineScope
@@ -207,6 +211,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
+            featureSegmentsManager = featureSegmentsManager,
         )
         dialog.show()
     }

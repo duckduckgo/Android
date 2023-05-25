@@ -26,6 +26,7 @@ import com.duckduckgo.app.featureusage.FeatureSegmentType.LOGIN_SAVED
 import com.duckduckgo.app.featureusage.FeatureSegmentType.SET_AS_DEFAULT
 import com.duckduckgo.app.featureusage.FeatureSegmentType.TEN_SEARCHES_MADE
 import com.duckduckgo.app.featureusage.FeatureSegmentType.TWO_SEARCHES_MADE
+import javax.inject.Inject
 
 interface FeatureSegmentsManager {
     fun getUserFeatureSegments(): Map<String, Boolean>
@@ -33,7 +34,7 @@ interface FeatureSegmentsManager {
     fun isFeatureSegmentsAllowed(): Boolean
 }
 
-class FeatureSegmentManagerImpl(
+class FeatureSegmentManagerImpl @Inject constructor(
     private val featureSegmentsDataStore: FeatureSegmentsDataStore,
 ) : FeatureSegmentsManager {
 

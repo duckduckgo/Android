@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.di
 
 import android.content.Context
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.RealDefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -35,7 +36,8 @@ class WelcomePageModule {
         context: Context,
         pixel: Pixel,
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialog)
+        featureSegmentsManager: FeatureSegmentsManager,
+    ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialog, featureSegmentsManager)
 
     @Provides
     fun defaultRoleBrowserDialog(

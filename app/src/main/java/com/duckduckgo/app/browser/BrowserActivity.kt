@@ -42,6 +42,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -114,6 +115,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var featureSegmentsManager: FeatureSegmentsManager
 
     @Inject
     @AppCoroutineScope
@@ -423,6 +427,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
+            featureSegmentsManager = featureSegmentsManager,
         )
         dialog.clearStarted = {
             removeObservers()
