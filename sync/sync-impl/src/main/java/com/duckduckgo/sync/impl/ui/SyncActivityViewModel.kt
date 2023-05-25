@@ -24,8 +24,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ConnectedDevice
-import com.duckduckgo.sync.api.SyncEngine
-import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
@@ -60,7 +58,6 @@ class SyncActivityViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncRepository: SyncRepository,
-    private val syncEngine: SyncEngine,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -84,6 +81,7 @@ class SyncActivityViewModel @Inject constructor(
                         viewState.emit(initViewStateThisDeviceState())
                     }
                 }
+
                 false -> viewState.emit(signedOutState())
             }
         }.flowOn(dispatchers.io()).launchIn(viewModelScope)
@@ -259,11 +257,6 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.toggle(true).showAccount())
         }
     }
-
-    fun syncNow() {
-        syncEngine.syncNow()
-    }
-
     private fun signedOutState(): ViewState = ViewState()
     private fun ViewState.isSignedInState() = this.loginQRCode != null && this.showAccount
     private fun ViewState.toggle(isChecked: Boolean) = copy(syncToggleState = isChecked)
@@ -284,5 +277,4 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun ViewState.showAccount() = copy(showAccount = true)
     private fun ViewState.hideAccount() = copy(showAccount = false)
-
 }

@@ -16,26 +16,6 @@
 
 package com.duckduckgo.sync.api.engine
 
-interface SyncMerger {
-    /**
-     * Output of the [SyncEngine]
-     * This is called for each feature with the changes that come from the server
-     */
-    fun merge(changes: SyncChanges): SyncMergeResult<Boolean>
-}
-
-sealed class SyncMergeResult<out R> {
-
-    data class Success<out T>(val data: T) : SyncMergeResult<T>()
-    data class Error(
-        val code: Int = -1,
-        val reason: String,
-    ) : SyncMergeResult<Nothing>()
-
-    override fun toString(): String {
-        return when (this) {
-            is Success<*> -> "Success[data=$data]"
-            is Error -> "Error[exception=$code, $reason]"
-        }
-    }
+interface FeatureSyncStore {
+    var modifiedSince: String
 }

@@ -1,0 +1,1 @@
+{"bookmarks":{"modified_since":"0","updates":[{"client_last_modified":"2023-05-16T11:22:56.988Z","id":"bookmark3","page":{"url":"https://bookmark3.com"},"title":"Bookmark 3"},{"deleted":"2023-05-16T11:22:56.988Z","id":"bookmark4"},{"client_last_modified":"2023-05-16T11:22:56.988Z","folder":{"children":["bookmark3","bookmark4"]},"id":"bookmarks_root","title":"Bookmarks"}]}}

@@ -17,14 +17,13 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
+import org.json.JSONObject
 import retrofit2.Response
-import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -65,10 +64,13 @@ interface SyncApi {
 
     fun patch(
         token: String,
-        bookmarks: SyncDataRequest,
-    ): Result<SyncDataResponse>
+        updates: JSONObject,
+    ): Result<JSONObject?>
 
-    fun getAllData(token: String): Result<SyncDataResponse>
+    fun getBookmarks(
+        token: String,
+        since: String,
+    ): Result<JSONObject>
 }
 
 @ContributesBinding(AppScope::class)
@@ -222,42 +224,39 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
     override fun patch(
         token: String,
-        bookmarks: SyncDataRequest,
-    ): Result<SyncDataResponse> {
+        updates: JSONObject,
+    ): Result<JSONObject> {
         val response = runCatching {
-            val patchCall = syncService.patch("Bearer $token", bookmarks)
+            val patchCall = syncService.patch("Bearer $token", updates)
             patchCall.execute()
         }.getOrElse { throwable ->
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
-            Result.Success(response.body()!!)
-        }
-    }
-
-    override fun getAllData(token: String): Result<SyncDataResponse> {
-        val response = runCatching {
-            val patchCall = syncService.data("Bearer $token")
-            patchCall.execute()
-        }.getOrElse { throwable ->
-            return Result.Error(reason = throwable.message.toString())
-        }
-
-        return onSuccess(response) {
-            val data = response.body() ?: throw IllegalStateException("SYNC get data not parsed")
-            val allDataJSON = ResponseAdapters.dataAdapter.toJson(data.bookmarks)
-            Timber.i("SYNC get data $allDataJSON")
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
             Result.Success(data)
         }
     }
 
-    private class ResponseAdapters {
-        companion object {
-            private val moshi = Moshi.Builder().build()
+    override fun getBookmarks(
+        token: String,
+        since: String,
+    ): Result<JSONObject> {
+        val response = runCatching {
+            val patchCall = if (since.isNotEmpty()) {
+                syncService.bookmarksSince("Bearer $token", since)
+            } else {
+                syncService.bookmarks("Bearer $token")
+            }
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
 
-            val dataAdapter: JsonAdapter<BookmarksResponse> =
-                moshi.adapter(BookmarksResponse::class.java)
+        return onSuccess(response) {
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            Result.Success(data)
         }
     }
 
@@ -276,7 +275,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                 } ?: Result.Error(code = response.code(), reason = response.message().toString())
             }
         }.getOrElse {
-            return Result.Error(reason = response.message())
+            return Result.Error(response.code(), reason = response.message())
         }
     }
 

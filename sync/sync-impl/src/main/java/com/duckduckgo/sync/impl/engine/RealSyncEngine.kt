@@ -18,13 +18,25 @@ package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncEngine
-import com.duckduckgo.sync.api.engine.SyncablePlugin
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.duckduckgo.sync.api.engine.SyncableDataPersister
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.impl.SyncRepository
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
@@ -37,98 +49,137 @@ import timber.log.Timber
 
 @ContributesBinding(scope = AppScope::class)
 class RealSyncEngine @Inject constructor(
-    private val syncRepository: SyncRepository,
-    private val syncApi: SyncApiClient,
+    private val syncApiClient: SyncApiClient,
     private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
-    private val plugins: PluginPoint<SyncablePlugin>,
+    private val providerPlugins: PluginPoint<SyncableDataProvider>,
+    private val persisterPlugins: PluginPoint<SyncableDataPersister>,
 ) : SyncEngine {
 
-    override fun syncNow() {
-        Timber.d("Sync: petition to sync now")
+    override fun syncNow(trigger: SyncTrigger) {
+        Timber.d("Sync-Feature: petition to sync now trigger: $trigger")
+        when (trigger) {
+            BACKGROUND_SYNC -> scheduleSync(trigger)
+            APP_OPEN -> performSync(trigger)
+            FEATURE_READ -> performSync(trigger)
+            DATA_CHANGE -> performSync(trigger)
+            ACCOUNT_CREATION -> sendLocalData()
+            ACCOUNT_LOGIN -> mergeRemoteData()
+        }
+    }
+
+    private fun scheduleSync(trigger: SyncTrigger) {
         when (syncScheduler.scheduleOperation()) {
             DISCARD -> {
-                Timber.d("Sync: petition to sync denied, debouncing")
+                Timber.d("Sync-Feature: petition to sync debounced")
             }
+
             EXECUTE -> {
-                Timber.d("Sync: petition to sync accepted, syncing now")
-                performSync()
+                Timber.d("Sync-Feature: petition to sync accepted, syncing now")
+                performSync(trigger)
             }
         }
     }
 
-    private fun performSync() {
-        // get all changes from last sync
-        // send changes to api
-        // receive api changes
-        // store state
-        // send changes to observers
-        val changes = getListOfChanges()
-
-        val syncAttempt = SyncAttempt(state = IN_PROGRESS, meta = "Manual launch")
-        syncStateRepository.store(syncAttempt)
+    private fun sendLocalData() {
+        Timber.d("Sync-Feature: initiating first sync")
+        val changes = getChanges()
 
         if (changes.isEmpty()) {
-            Timber.d("Sync: no changes to sync, asking for remote changes")
-            receiveRemoteChange()
+            Timber.d("Sync-Feature: local data empty, nothing to send")
+            return
+        }
+
+        Timber.d("Sync-Feature: sending all local data $changes")
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
+        sendLocalChanges(changes, REMOTE_WINS)
+    }
+
+    private fun mergeRemoteData() {
+        Timber.d("Sync-Feature: fetching remote data")
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
+
+        getRemoteChanges(DEDUPLICATION)
+
+        val changes = getChanges()
+        if (changes.isEmpty()) {
+            Timber.d("Sync-Feature: local data empty, nothing to send")
+            return
+        }
+
+        Timber.d("Sync-Feature: sending local data $changes")
+        sendLocalChanges(changes, LOCAL_WINS)
+    }
+
+    private fun performSync(trigger: SyncTrigger) {
+        val changes = getChanges()
+
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
+
+        if (changes.isEmpty()) {
+            Timber.d("Sync-Feature: no changes to sync, asking for remote changes")
+            getRemoteChanges(TIMESTAMP)
         } else {
-            Timber.d("Sync: changes to update $changes")
-            Timber.d("Sync: starting to sync")
-            sendLocalChanges(changes)
+            Timber.d("Sync-Feature: changes to update $changes")
+            Timber.d("Sync-Feature: starting to sync")
+            sendLocalChanges(changes, TIMESTAMP)
         }
     }
 
-    private fun sendLocalChanges(changes: List<SyncChanges>) {
-        when (val result = syncApi.patch(changes)) {
+    private fun sendLocalChanges(
+        changes: List<SyncChangesRequest>,
+        conflictResolution: SyncConflictResolution,
+    ) {
+        when (val result = syncApiClient.patch(changes)) {
             is Error -> {
-                Timber.d("Sync: patch failed ${result.reason}")
+                Timber.d("Sync-Feature: patch failed ${result.reason}")
                 syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
-                Timber.d("Sync: patch success")
+                Timber.d("Sync-Feature: patch success")
                 syncStateRepository.updateSyncState(SUCCESS)
-                sendChanges(result.data)
+                persistChanges(result.data, conflictResolution)
             }
         }
     }
 
-    private fun receiveRemoteChange() {
-        // calls to GET
-    }
+    private fun getRemoteChanges(conflictResolution: SyncConflictResolution) {
+        // TODO: refactor this to make one request per data type, now it's only bookmarks
+        val since = getBookmarksModifiedSince()
+        Timber.d("Sync-Feature: receive remote bookmarks change since $since")
+        when (val result = syncApiClient.get(since)) {
+            is Error -> {
+                Timber.d("Sync-Feature: get failed ${result.reason}")
+                syncStateRepository.updateSyncState(FAIL)
+            }
 
-    private fun getListOfChanges(): List<SyncChanges> {
-        val lastAttempt = syncStateRepository.current()
-        return if (lastAttempt == null) {
-            initialSync()
-        } else {
-            getChanges(lastAttempt.timestamp)
+            is Success -> {
+                Timber.d("Sync-Feature: get success")
+                syncStateRepository.updateSyncState(SUCCESS)
+                persistChanges(result.data, conflictResolution)
+            }
         }
     }
 
-    private fun initialSync(): List<SyncChanges> {
-        Timber.d("Sync: initialSync")
-        return plugins.getPlugins().map {
-            it.getChanges("")
+    private fun getBookmarksModifiedSince(): String {
+        return providerPlugins.getPlugins().map {
+            it.getModifiedSince()
+        }.filterNot { it.isEmpty() }.first()
+    }
+
+    private fun getChanges(): List<SyncChangesRequest> {
+        return providerPlugins.getPlugins().map {
+            it.getChanges()
         }.filterNot { it.isEmpty() }
     }
 
-    private fun getChanges(timestamp: String): List<SyncChanges> {
-        Timber.d("Sync: gathering changes from $timestamp")
-        return plugins.getPlugins().map {
-            it.getChanges(timestamp)
-        }.filterNot { it.isEmpty() }
-    }
-
-    override fun notifyDataChanged() {
-        // should sync happen?
-        // if so then call syncNow
-        // otherwise do nothing
-        Timber.d("Sync: notifyDataChanged")
-        performSync()
-    }
-
-    private fun sendChanges(data: SyncDataResponse) {
-        Timber.d("Sync: sendChanges")
+    private fun persistChanges(
+        remoteChanges: List<SyncChangesResponse>,
+        conflictResolution: SyncConflictResolution,
+    ) {
+        persisterPlugins.getPlugins().map {
+            it.persist(remoteChanges, conflictResolution)
+        }
     }
 }

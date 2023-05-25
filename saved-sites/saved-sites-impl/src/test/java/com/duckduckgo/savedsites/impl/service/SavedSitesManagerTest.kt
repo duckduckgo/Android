@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
@@ -119,10 +120,16 @@ class SavedSitesManagerTest {
     }
 
     private fun aBookmark(): SavedSite.Bookmark {
-        return SavedSite.Bookmark(UUID.randomUUID().toString(), "title", "url", UUID.randomUUID().toString())
+        return SavedSite.Bookmark(
+            UUID.randomUUID().toString(),
+            "title",
+            "url",
+            UUID.randomUUID().toString(),
+            lastModified = DatabaseDateFormatter.iso8601(),
+        )
     }
 
     private fun aFavorite(): SavedSite.Favorite {
-        return SavedSite.Favorite(UUID.randomUUID().toString(), "title", "url", 0)
+        return SavedSite.Favorite(UUID.randomUUID().toString(), "title", "url", lastModified = DatabaseDateFormatter.iso8601(), 0)
     }
 }

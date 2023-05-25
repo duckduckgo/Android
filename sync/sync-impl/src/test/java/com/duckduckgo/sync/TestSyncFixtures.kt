@@ -22,12 +22,10 @@ import com.duckduckgo.sync.crypto.ConnectKeys
 import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.impl.AccountCreatedResponse
-import com.duckduckgo.sync.impl.BookmarksResponse
 import com.duckduckgo.sync.impl.Connect
 import com.duckduckgo.sync.impl.ConnectKey
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Device
-import com.duckduckgo.sync.impl.DeviceDataResponse
 import com.duckduckgo.sync.impl.DeviceEntries
 import com.duckduckgo.sync.impl.DeviceResponse
 import com.duckduckgo.sync.impl.DeviceType
@@ -35,13 +33,8 @@ import com.duckduckgo.sync.impl.Login
 import com.duckduckgo.sync.impl.LoginResponse
 import com.duckduckgo.sync.impl.Logout
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SettingsResponse
 import com.duckduckgo.sync.impl.Signup
-import com.duckduckgo.sync.impl.SyncDataResponse
 import com.duckduckgo.sync.impl.encodeB64
-import com.duckduckgo.sync.impl.parser.SyncBookmarkEntry
-import com.duckduckgo.sync.impl.parser.SyncBookmarkUpdates
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import java.io.File
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -183,37 +176,12 @@ object TestSyncFixtures {
     val connectDeviceSuccess = Result.Success(encryptedRecoveryCode)
     val connectDeviceKeysNotFoundError = Result.Error(code = keysNotFoundCode, reason = keysNotFoundErr)
 
-    val bookmarksResponse = BookmarksResponse("lastModified", emptyList())
-    val settingsResponse = SettingsResponse("lastModified", emptyList())
-    val devicessResponse = DeviceDataResponse("lastModified", emptyList())
-    val syncDataResponse = SyncDataResponse(bookmarksResponse, settingsResponse, devicessResponse)
-
-    val patchAllSuccess = Result.Success(syncDataResponse)
-    val patchAllError = Result.Error(-1, "Patch All Error")
-
-    private fun aBookmarkEntry(index: Int): SyncBookmarkEntry {
-        return SyncBookmarkEntry.asBookmark("bookmark$index", "title$index", "https://bookmark$index.com", null)
-    }
-
-    private fun aBookmarkFolderEntry(
-        index: Int,
-        children: List<Int>,
-    ): SyncBookmarkEntry {
-        return SyncBookmarkEntry.asFolder("folder$index", "title$index", children.map { "bookmark$index" }, null)
-    }
-
-    private fun someBookmarkEntries(): SyncBookmarkUpdates {
-        return SyncBookmarkUpdates(
-            listOf(
-                aBookmarkEntry(1),
-                aBookmarkEntry(2),
-                aBookmarkEntry(3),
-                aBookmarkFolderEntry(1, listOf(1, 2, 3)),
-            ),
-        )
-    }
-
-    val syncData = SyncDataRequest(someBookmarkEntries())
+    val firstSyncWithBookmarksAndFavorites = "{\"bookmarks\":{\"updates\":[{\"client_last_modified\":\"timestamp\"" +
+        ",\"folder\":{\"children\":[\"bookmark1\"]},\"id\":\"favorites_root\",\"title\":\"Favorites\"},{\"client_last_modified\"" +
+        ":\"timestamp\",\"id\":\"bookmark3\",\"page\":{\"url\":\"https://bookmark3.com\"},\"title\":\"Bookmark 3\"}" +
+        ",{\"client_last_modified\":\"timestamp\",\"id\":\"bookmark4\",\"page\":{\"url\":\"https://bookmark4.com\"}" +
+        ",\"title\":\"Bookmark 4\"},{\"client_last_modified\":\"timestamp\",\"folder\":{\"children\":[\"bookmark3\"," +
+        "\"bookmark4\"]},\"id\":\"bookmarks_root\",\"title\":\"Bookmarks\"}]}}"
 
     fun qrBitmap(): Bitmap {
         return Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)

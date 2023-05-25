@@ -16,23 +16,24 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChanges
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.SyncDataResponse
-import com.duckduckgo.sync.impl.parser.SyncDataRequest
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import org.json.JSONObject
 import timber.log.Timber
 
 interface SyncApiClient {
 
-    fun patch(changes: List<SyncChanges>): Result<SyncDataResponse>
+    fun patch(changes: List<SyncChangesRequest>): Result<List<SyncChangesResponse>>
+    fun get(since: String): Result<List<SyncChangesResponse>>
 }
 
 @ContributesBinding(AppScope::class)
@@ -40,7 +41,8 @@ class AppSyncApiClient @Inject constructor(
     private val syncStore: SyncStore,
     private val syncApi: SyncApi,
 ) : SyncApiClient {
-    override fun patch(changes: List<SyncChanges>): Result<SyncDataResponse> {
+
+    override fun patch(changes: List<SyncChangesRequest>): Result<List<SyncChangesResponse>> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
@@ -49,29 +51,58 @@ class AppSyncApiClient @Inject constructor(
             return Result.Error(reason = "Changes Empty")
         }
 
-        val localChangesJSON = mapChanges(changes)
-        Timber.d("Sync: patch data generated $localChangesJSON")
-        val localChanges = Adapters.patchAdapter.fromJson(localChangesJSON)!!
-        return when (val result = syncApi.patch(token, localChanges)) {
+        // this should be a Flow when more data types come in
+        val bookmarkChanges = changes.first()
+        val updates = JSONObject(bookmarkChanges.jsonString)
+        Timber.d("Sync-Feature: patch data generated $updates")
+        return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
                 result
             }
 
             is Result.Success -> {
-                Result.Success(result.data)
+                if (result.data == null) {
+                    Result.Success(emptyList())
+                } else {
+                    val remoteChanges = mapResponse(result.data)
+                    Result.Success(remoteChanges)
+                }
             }
         }
     }
 
-    private fun mapChanges(changes: List<SyncChanges>): String {
-        return changes.first { it.type == BOOKMARKS }.updatesJSON
+    override fun get(since: String): Result<List<SyncChangesResponse>> {
+        val token =
+            syncStore.token.takeUnless { it.isNullOrEmpty() }
+                ?: return Result.Error(reason = "Token Empty")
+
+        return when (val result = syncApi.getBookmarks(token, since)) {
+            is Result.Error -> {
+                if (result.code == API_CODE.NOT_MODIFIED.code) {
+                    Result.Success(emptyList())
+                } else {
+                    result
+                }
+            }
+
+            is Result.Success -> {
+                val remoteChanges = mapResponse(result.data)
+                Result.Success(remoteChanges)
+            }
+        }
     }
 
-    private class Adapters {
-        companion object {
-            private val moshi = Moshi.Builder().build()
-            val patchAdapter: JsonAdapter<SyncDataRequest> =
-                moshi.adapter(SyncDataRequest::class.java)
-        }
+    @VisibleForTesting
+    fun mapRequest(changes: List<SyncChangesRequest>): JSONObject {
+        val bookmarkChanges = changes.first()
+        return JSONObject(bookmarkChanges.jsonString)
+    }
+
+    // TODO: this will need to be refactored once we receive more than one type
+    @VisibleForTesting
+    fun mapResponse(response: JSONObject): List<SyncChangesResponse> {
+        val bookmarksJSON = response.toString()
+        Timber.d("Sync-Feature: responses mapped to $bookmarksJSON")
+        return listOf(SyncChangesResponse(BOOKMARKS, bookmarksJSON))
     }
 }

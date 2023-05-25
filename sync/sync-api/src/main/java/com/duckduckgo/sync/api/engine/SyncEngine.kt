@@ -22,13 +22,14 @@ interface SyncEngine {
      * Entry point to the Sync Engine
      * This will be used by Background Sync and App Triggered workers
      */
-    fun syncNow()
+    fun syncNow(trigger: SyncTrigger)
 
-    /**
-     * Entry point to the Sync Engine
-     * This will be triggered by Observers when data has changed
-     * Add / Update / Delete operations of [SyncableType]
-     *
-     */
-    fun notifyDataChanged()
+    enum class SyncTrigger {
+        BACKGROUND_SYNC,
+        APP_OPEN,
+        FEATURE_READ,
+        DATA_CHANGE,
+        ACCOUNT_CREATION,
+        ACCOUNT_LOGIN,
+    }
 }

@@ -60,14 +60,23 @@ interface SavedSitesEntitiesDao {
     )
     fun entitiesInFolderSync(folderId: String): List<Entity>
 
+    @Query(
+        "select * from entities inner join relations on entities.entityId = relations.entityId " +
+            "where relations.folderId = :folderId",
+    )
+    fun allEntitiesInFolderSync(folderId: String): List<Entity>
+
     @Query("update entities set deleted = 1, lastModified = :lastModified where entityId = :id")
-    fun delete(id: String, lastModified: String = DatabaseDateFormatter.timestamp())
+    fun delete(
+        id: String,
+        lastModified: String = DatabaseDateFormatter.iso8601(),
+    )
 
     @Query("update entities set deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
     fun deleteAll(
-        bookmarksRoot: String = SavedSitesNames.BOOMARKS_ROOT,
+        bookmarksRoot: String = SavedSitesNames.BOOKMARKS_ROOT,
         favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
-        lastModified: String = DatabaseDateFormatter.timestamp(),
+        lastModified: String = DatabaseDateFormatter.iso8601(),
     )
 
     @Delete
@@ -76,10 +85,19 @@ interface SavedSitesEntitiesDao {
     @Update(onConflict = OnConflictStrategy.IGNORE)
     fun update(entity: Entity)
 
-    @Query("update entities set lastModified = :lastModified where entityId = :entityId")
-    fun updateModified(entityId: String, lastModified: String = DatabaseDateFormatter.timestamp())
+    @Query("update entities set entityId = :newId where entityId = :oldId")
+    fun updateId(
+        oldId: String,
+        newId: String,
+    )
 
-    @Query("select * from entities order by rowid desc limit 1")
+    @Query("update entities set lastModified = :lastModified where entityId = :entityId")
+    fun updateModified(
+        entityId: String,
+        lastModified: String = DatabaseDateFormatter.iso8601(),
+    )
+
+    @Query("select * from entities limit 1")
     fun lastModified(): Flow<Entity>
 
     @Query("select * from entities where url = :url and entities.deleted = 0 limit 1")
@@ -109,4 +127,13 @@ interface SavedSitesEntitiesDao {
 
     @Query("select * from entities where type = :type and entities.deleted = 0")
     fun entitiesByTypeSync(type: EntityType): List<Entity>
+
+    @Query("select * from entities where type = :type")
+    fun allEntitiesByTypeSync(type: EntityType): List<Entity>
+
+    @Query("select * from entities where entityId = :id")
+    fun deletedEntity(id: String): Entity?
+
+    @Query("select * from entities where deleted = 1")
+    fun allDeleted(): List<Entity>
 }

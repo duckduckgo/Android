@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.engine
+package com.duckduckgo.app.sync
 
-interface SyncParser {
-    fun parseChanges(since: String): SyncChanges
-}
+import javax.inject.*
+
+// /**
+//  * We need to provide this fake implementation for non internal builds until we can add sync modules dependencies for all flavors.
+//  */
+// @ContributesBinding(
+//     scope = AppScope::class,
+//     // mitigation for https://app.asana.com/0/414730916066338/1204248963638410/f
+//     priority = ContributesBinding.Priority.HIGHEST,
+// )
+// class FakeDeviceSyncState @Inject constructor() : DeviceSyncState {
+//     override fun isFeatureEnabled(): Boolean = false
+//     override fun isUserSignedInOnDevice(): Boolean = false
+// }

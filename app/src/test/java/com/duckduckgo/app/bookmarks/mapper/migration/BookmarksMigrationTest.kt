@@ -160,7 +160,7 @@ class BookmarksMigrationTest {
         // two relations migrated, one for bookmarks and another for favorites
         assertTrue(savedSitesRelationsDao.relations().size == 2)
 
-        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOMARKS_ROOT)
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
@@ -180,7 +180,7 @@ class BookmarksMigrationTest {
         assertTrue(savedSitesEntitiesDao.entities().size == 2 + ROOT_FOLDERS)
         assertTrue(savedSitesRelationsDao.relations().size == 2)
 
-        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOMARKS_ROOT)
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)

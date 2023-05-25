@@ -291,7 +291,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemClickedThenLaunchBrowser() {
-        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", "timestamp", 0))
 
         testee.onQuickAccessItemClicked(quickAccessItem)
 
@@ -301,7 +301,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemClickedThenPixelSent() {
-        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", "timestamp", 0))
 
         testee.onQuickAccessItemClicked(quickAccessItem)
 
@@ -310,7 +310,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemEditRequestedThenLaunchEditDialog() {
-        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", "timestamp", 0))
 
         testee.onEditQuickAccessItemRequested(quickAccessItem)
 
@@ -320,7 +320,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessItemDeleteRequestedThenShowDeleteConfirmation() {
-        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", 0))
+        val quickAccessItem = QuickAccessFavorite(Favorite("favorite1", "title", "http://example.com", "timestamp", 0))
 
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
@@ -330,7 +330,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessEditedThenRepositoryUpdated() {
-        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
+        val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
         testee.onFavouriteEdited(savedSite)
 
@@ -339,7 +339,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = runTest {
-        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
+        val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
         testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
 
@@ -348,7 +348,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessInsertedThenRepositoryUpdated() {
-        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
+        val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
         testee.insertQuickAccessItem(savedSite)
 
@@ -357,7 +357,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenQuickAccessListChangedThenRepositoryUpdated() {
-        val savedSite = Favorite("favorute1", "title", "http://example.com", 0)
+        val savedSite = Favorite("favorute1", "title", "http://example.com", "timestamp", 0)
         val savedSites = listOf(QuickAccessFavorite(savedSite))
 
         testee.onQuickAccessListChanged(savedSites)
@@ -367,7 +367,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenUserHasFavoritesThenInitialStateShowsFavorites() {
-        val savedSite = Favorite("favorite1", "title", "http://example.com", 0)
+        val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
         testee = SystemSearchViewModel(
             mockUserStageStore,
