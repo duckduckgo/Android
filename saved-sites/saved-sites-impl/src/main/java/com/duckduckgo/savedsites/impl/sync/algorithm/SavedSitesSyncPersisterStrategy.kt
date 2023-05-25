@@ -16,30 +16,29 @@
 
 package com.duckduckgo.savedsites.impl.sync.algorithm
 
+import com.duckduckgo.savedsites.api.models.BookmarkFolder
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 
-class SavedSitesLocalWinsAlgorithm() : SavedSitesSyncAlgorithm {
-    override fun processBookmarkFolder(
-        remoteFolder: SyncBookmarkEntry,
+interface SavedSitesSyncPersisterStrategy {
+
+    fun processBookmarkFolder(
+        folder: BookmarkFolder,
         parentId: String,
-        lastModified: String
-    ) {
-        TODO("Not yet implemented")
-    }
+        lastModified: String,
+    )
 
-    override fun processFavouritesFolder(
-        entries: List<SyncBookmarkEntry>,
-        lastModified: String
-    ) {
-        TODO("Not yet implemented")
-    }
+    fun processFavourite(
+        favourite: Favorite,
+        lastModified: String,
+    )
 
-    override fun processBookmark(
+    fun processBookmark(
+        bookmark: Bookmark,
         child: String,
         entries: List<SyncBookmarkEntry>,
         folderId: String,
         lastModified: String
-    ) {
-        TODO("Not yet implemented")
-    }
+    )
 }
