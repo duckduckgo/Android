@@ -167,10 +167,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                     Timber.d("Sync-Feature: child $child is a Bookmark")
                     val bookmark = decryptBookmark(childEntry, folderId, lastModified)
                     when (conflictResolution) {
-                        DEDUPLICATION -> deduplicationStrategy.processBookmark(bookmark, child, entries, folderId, lastModified)
-                        REMOTE_WINS -> remoteWinsStrategy.processBookmark(bookmark, child, entries, folderId, lastModified)
-                        LOCAL_WINS -> localWinsStrategy.processBookmark(bookmark, child, entries, folderId, lastModified)
-                        TIMESTAMP -> timestampStrategy.processBookmark(bookmark, child, entries, folderId, lastModified)
+                        DEDUPLICATION -> deduplicationStrategy.processBookmark(bookmark, child, folderId, lastModified)
+                        REMOTE_WINS -> remoteWinsStrategy.processBookmark(bookmark, child, folderId, lastModified)
+                        LOCAL_WINS -> localWinsStrategy.processBookmark(bookmark, child, folderId, lastModified)
+                        TIMESTAMP -> timestampStrategy.processBookmark(bookmark, child, folderId, lastModified)
                     }
                 }
                 childEntry.isFolder() -> {

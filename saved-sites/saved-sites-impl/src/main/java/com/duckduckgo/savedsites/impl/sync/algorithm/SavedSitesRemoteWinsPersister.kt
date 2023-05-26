@@ -22,7 +22,6 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
-import com.duckduckgo.sync.api.SyncCrypto
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
@@ -61,19 +60,18 @@ class SavedSitesRemoteWinsPersister @Inject constructor(
 
     override fun processBookmark(
         bookmark: Bookmark,
-        child: String,
-        entries: List<SyncBookmarkEntry>,
+        bookmarkId: String,
         folderId: String,
         lastModified: String
     ) {
         // if there's a bookmark with the same id locally we check the conflict resolution
         // if REMOTE -> remote object wins and replaces local
-        val storedBookmark = savedSitesRepository.getBookmarkById(child)
+        val storedBookmark = savedSitesRepository.getBookmarkById(bookmarkId)
         if (storedBookmark != null) {
-            Timber.d("Sync-Feature: child $child exists locally, replacing")
-            savedSitesRepository.replaceBookmark(bookmark, child)
+            Timber.d("Sync-Feature: child $bookmarkId exists locally, replacing")
+            savedSitesRepository.replaceBookmark(bookmark, bookmarkId)
         } else {
-            Timber.d("Sync-Feature: child $child not present locally, inserting")
+            Timber.d("Sync-Feature: child $bookmarkId not present locally, inserting")
             savedSitesRepository.insert(bookmark)
         }
 

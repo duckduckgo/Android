@@ -65,20 +65,19 @@ class SavedSitesDeduplicationPersister @Inject constructor(
 
     override fun processBookmark(
         bookmark: Bookmark,
-        child: String,
-        entries: List<SyncBookmarkEntry>,
+        bookmarkId: String,
         folderId: String,
         lastModified: String
     ) {
         // if there's a bookmark duplicate locally (url and name) then we replace it
         when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
             is Duplicate -> {
-                Timber.d("Sync-Feature: child $child has a local duplicate in ${result.id}, replacing")
+                Timber.d("Sync-Feature: child $bookmarkId has a local duplicate in ${result.id}, replacing")
                 savedSitesRepository.replaceBookmark(bookmark, result.id)
             }
 
             is NotDuplicate -> {
-                Timber.d("Sync-Feature: child $child not present locally, inserting")
+                Timber.d("Sync-Feature: child $bookmarkId not present locally, inserting")
                 savedSitesRepository.insert(bookmark)
             }
         }

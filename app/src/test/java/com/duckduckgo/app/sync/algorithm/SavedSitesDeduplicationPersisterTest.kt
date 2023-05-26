@@ -27,14 +27,12 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDeduplicationPersister
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncPersister
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
@@ -53,7 +51,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class SavedSitesSyncPersisterAlgorithmTest {
+class SavedSitesDeduplicationPersisterTest {
 
     //move this to unit test
     @get:Rule
@@ -68,10 +66,9 @@ class SavedSitesSyncPersisterAlgorithmTest {
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var duplicateFinder: SavedSitesDuplicateFinder
-    private lateinit var store: FeatureSyncStore
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
 
-    private lateinit var syncPersister: SavedSitesSyncPersister
+    private lateinit var persister: SavedSitesDeduplicationPersister
 
     @Before
     fun setup() {
@@ -85,75 +82,11 @@ class SavedSitesSyncPersisterAlgorithmTest {
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
         duplicateFinder = RealSavedSitesDuplicateFinder(repository)
 
-        store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
-        syncPersister = SavedSitesSyncPersister(repository, store, persisterAlgorithm)
+        persister = SavedSitesDeduplicationPersister(repository, duplicateFinder)
     }
 
     @Test
-    fun whenMergingCorruptedDataThenResultIsError() {
-        whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(SyncMergeResult.Error( reason = "error"))
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_invalid_data.json")
-        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.process(corruptedChanges, TIMESTAMP)
+    fun whenProcessingBookmarkNotPresentLocallyThenBookmarkIsInserted() {
 
-        Assert.assertTrue(result is Error)
-    }
-
-    @Test
-    fun whenMergingNullEntriesThenResultIsError() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_null_entries.json")
-        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.process(corruptedChanges, TIMESTAMP)
-
-        assertTrue(result is Error)
-    }
-
-    @Test
-    fun whenMergingDataInEmptyDBThenResultIsSuccess() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
-        val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.process(validChanges, DEDUPLICATION)
-
-        assertTrue(result is Success)
-
-        val bookmarksRoot = repository.getFolderContentSync(SavedSitesNames.BOOKMARKS_ROOT)
-        assertTrue(bookmarksRoot.first[0].id == "2e41e447-40e8-4f93-8e36-18267fa91210")
-        assertTrue(bookmarksRoot.first[1].id == "4cde63c7-04ae-44ef-8d9c-ea699c0b679f")
-        Assert.assertTrue(bookmarksRoot.second[0].id == "fefb0876-ac2d-41ee-ad5e-56604927d021")
-
-        val subFolder = repository.getFolderContentSync("fefb0876-ac2d-41ee-ad5e-56604927d021")
-        assertTrue(subFolder.first[0].id == "45cc093d-e821-445c-bf25-b2f8aaa3d276")
-        Assert.assertTrue(subFolder.second.isEmpty())
-
-        val favouritesRoot = repository.getFavoritesSync()
-        assertTrue(favouritesRoot[0].id == "4cde63c7-04ae-44ef-8d9c-ea699c0b679f")
-    }
-
-    @Test
-    fun whenMergingEmptyEntriesThenResultIsSuccess() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_empty_entries.json")
-        val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.process(corruptedChanges, TIMESTAMP)
-
-        assertTrue(result is Error)
-    }
-
-    @Test
-    fun whenMergingWithDeletedDataThenResultIsSuccess() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_deleted_entries.json")
-        val deletedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.process(deletedChanges, TIMESTAMP)
-
-        Assert.assertTrue(result is Success)
-    }
-}
-
-class FakeCrypto : SyncCrypto {
-    override fun encrypt(text: String): String {
-        return text
-    }
-
-    override fun decrypt(data: String): String {
-        return data
     }
 }

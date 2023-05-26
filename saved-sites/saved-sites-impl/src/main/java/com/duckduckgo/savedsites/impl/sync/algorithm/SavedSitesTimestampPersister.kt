@@ -23,7 +23,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
-import com.duckduckgo.sync.api.SyncCrypto
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
@@ -67,23 +66,22 @@ class SavedSitesTimestampPersister @Inject constructor(
 
     override fun processBookmark(
         bookmark: Bookmark,
-        child: String,
-        entries: List<SyncBookmarkEntry>,
+        bookmarkId: String,
         folderId: String,
         lastModified: String
     ) {
         // if there's a bookmark with the same id locally we check the conflict resolution
         // if TIMESTAMP -> new timestamp wins
-        val storedBookmark = savedSitesRepository.getBookmarkById(child)
+        val storedBookmark = savedSitesRepository.getBookmarkById(bookmarkId)
         if (storedBookmark != null) {
             if (bookmark.modifiedAfter(storedBookmark.lastModified)) {
                 Timber.d("Sync-Feature: bookmark ${bookmark.id} modified after local bookmark, replacing content")
-                savedSitesRepository.replaceBookmark(bookmark, child)
+                savedSitesRepository.replaceBookmark(bookmark, bookmarkId)
             } else {
                 Timber.d("Sync-Feature: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
             }
         } else {
-            Timber.d("Sync-Feature: child $child not present locally, inserting")
+            Timber.d("Sync-Feature: child $bookmarkId not present locally, inserting")
             savedSitesRepository.insert(bookmark)
         }
 

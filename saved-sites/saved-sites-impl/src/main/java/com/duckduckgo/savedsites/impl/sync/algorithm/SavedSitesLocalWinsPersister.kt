@@ -54,18 +54,17 @@ class SavedSitesLocalWinsPersister @Inject constructor(
 
     override fun processBookmark(
         bookmark: Bookmark,
-        child: String,
-        entries: List<SyncBookmarkEntry>,
+        bookmarkId: String,
         folderId: String,
         lastModified: String
     ) {
         // if there's a bookmark with the same id locally we check the conflict resolution
         // if LOCAL -> local object wins and no changes are applied
-        val storedBookmark = savedSitesRepository.getBookmarkById(child)
+        val storedBookmark = savedSitesRepository.getBookmarkById(bookmarkId)
         if (storedBookmark != null) {
             Timber.d("Sync-Feature: local bookmark wins over remote, nothing to do")
         } else {
-            Timber.d("Sync-Feature: child $child not present locally, inserting")
+            Timber.d("Sync-Feature: child $bookmarkId not present locally, inserting")
             savedSitesRepository.insert(bookmark)
         }
     }
