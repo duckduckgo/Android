@@ -25,6 +25,12 @@ interface SyncEngine {
     fun triggerSync(trigger: SyncTrigger)
 
     /**
+     * Sync Feature has been disabled / device has been removed
+     * This is an opportunity for Features to do some local cleanup if needed
+     */
+    fun onSyncDisabled()
+
+    /**
      * Represent each possible trigger fo
      * See Tech Design: Sync Engine https://app.asana.com/0/481882893211075/1204303361994831/f
      * [BACKGROUND_SYNC] -> Sync triggered by a Background Worker

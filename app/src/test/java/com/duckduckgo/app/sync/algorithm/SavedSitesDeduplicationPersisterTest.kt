@@ -23,6 +23,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDeduplicationPersister
@@ -30,11 +32,13 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesDeduplicationPersisterTest {
@@ -73,5 +77,9 @@ class SavedSitesDeduplicationPersisterTest {
 
     @Test
     fun whenProcessingBookmarkNotPresentLocallyThenBookmarkIsInserted() {
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
+        persister.processBookmark(bookmark, bookmark.id, SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+
+        assertTrue(repository.getBookmarkById(bookmark.id) != null)
     }
 }
