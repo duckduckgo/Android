@@ -41,15 +41,14 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
     private val context: Context,
 ) : NetPDefaultConfigProvider {
-    private val defaultConfig = object : NetPDefaultConfigProvider {}
 
     override fun mtu(): Int {
         return mtuInternalProvider.getMtu()
     }
 
-    override fun exclusionList(): Set<String> {
+    override suspend fun exclusionList(): Set<String> {
         return mutableSetOf<String>().apply {
-            addAll(defaultConfig.exclusionList())
+            addAll(realNetPConfigProvider.exclusionList())
             addAll(exclusionListProvider.getExclusionList())
         }.toSet()
     }

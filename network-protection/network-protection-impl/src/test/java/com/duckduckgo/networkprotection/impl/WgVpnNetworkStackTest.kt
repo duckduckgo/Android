@@ -66,6 +66,10 @@ class WgVpnNetworkStackTest {
         override fun routes(): Map<String, Int> {
             return mapOf("10.11.12.1" to 32)
         }
+
+        override suspend fun exclusionList(): Set<String> {
+            return setOf("com.example.app")
+        }
     }
 
     private lateinit var testee: WgVpnNetworkStack
@@ -103,7 +107,7 @@ class WgVpnNetworkStackTest {
         assertNotNull(actual)
         assertEquals(1280, actual!!.mtu)
         assertEquals(emptyMap<InetAddress, Int>(), actual.addresses)
-        assertEquals(emptySet<String>(), actual.appExclusionList)
+        assertEquals(setOf("com.example.app"), actual.appExclusionList)
         assertEquals(mapOf("10.11.12.1" to 32), actual.routes)
         assertEquals(expectedDns.size, actual.dns.size)
         assertTrue(actual.dns.any { it.hostAddress == "1.2.3.4" })

@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.config
 
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.exclusion.ExclusionList
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress
@@ -25,7 +26,7 @@ import javax.inject.Inject
 interface NetPDefaultConfigProvider {
     fun mtu(): Int = 1280
 
-    fun exclusionList(): Set<String> = emptySet()
+    suspend fun exclusionList(): Set<String> = emptySet()
 
     fun fallbackDns(): Set<InetAddress> = emptySet()
 
@@ -45,4 +46,8 @@ interface NetPDefaultConfigProvider {
 data class PcapConfig(val filename: String, val snapLen: Int, val fileSize: Int)
 
 @ContributesBinding(VpnScope::class)
-class RealNetPDefaultConfigProvider @Inject constructor() : NetPDefaultConfigProvider
+class RealNetPDefaultConfigProvider @Inject constructor(private val exclusionList: ExclusionList) : NetPDefaultConfigProvider {
+    override suspend fun exclusionList(): Set<String> {
+        return exclusionList.getExclusionAppsList().toSet()
+    }
+}
