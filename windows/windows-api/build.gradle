@@ -26,6 +26,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 android {
     namespace 'com.duckduckgo.windows.api'
 }

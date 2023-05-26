@@ -32,6 +32,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 tasks.register('jvm_checks') {
     dependsOn 'test'
 }

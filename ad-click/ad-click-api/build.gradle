@@ -26,6 +26,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     implementation Kotlin.stdlib.jdk7
     implementation Google.dagger
