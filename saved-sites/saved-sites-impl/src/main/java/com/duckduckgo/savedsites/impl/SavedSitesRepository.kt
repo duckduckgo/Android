@@ -266,11 +266,21 @@ class RealSavedSitesRepository(
     }
 
     override fun getBookmarks(): Flow<List<Bookmark>> {
-        return savedSitesEntitiesDao.entitiesByType(BOOKMARK).map { entities -> entities.mapToBookmarks() }
+        return savedSitesEntitiesDao.entitiesByType(BOOKMARK).map { entities ->
+            entities.map { entity ->
+                val relationId = savedSitesRelationsDao.relationByEntityId(entity.entityId)?.folderId ?: SavedSitesNames.BOOKMARKS_ROOT
+                entity.mapToBookmark(relationId)
+            }
+        }
     }
 
     override fun getBookmarksObservable(): Single<List<Bookmark>> {
-        return savedSitesEntitiesDao.entitiesByTypeObservable(BOOKMARK).map { entities -> entities.mapToBookmarks() }
+        return savedSitesEntitiesDao.entitiesByTypeObservable(BOOKMARK).map { entities ->
+            entities.map { entity ->
+                val relationId = savedSitesRelationsDao.relationByEntityId(entity.entityId)?.folderId ?: SavedSitesNames.BOOKMARKS_ROOT
+                entity.mapToBookmark(relationId)
+            }
+        }
     }
 
     override fun getBookmark(url: String): Bookmark? {
@@ -671,9 +681,6 @@ class RealSavedSitesRepository(
             null
         }
     }
-
-    private fun List<Entity>.mapToBookmarks(folderId: String = SavedSitesNames.BOOKMARKS_ROOT): List<Bookmark> =
-        this.map { it.mapToBookmark(folderId) }
 
     private fun List<Entity>.mapToFavorites(): List<Favorite> = this.mapIndexed { index, relation -> relation.mapToFavorite(index) }
 

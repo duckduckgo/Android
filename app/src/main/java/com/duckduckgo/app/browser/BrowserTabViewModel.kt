@@ -431,7 +431,12 @@ class BrowserTabViewModel @Inject constructor(
             object FinishPartialTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
-        class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
+
+        class InjectCredentials(
+            val url: String,
+            val credentials: LoginCredentials
+        ) : Command()
+
         class CancelIncomingAutofillRequest(val url: String) : Command()
         object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
@@ -442,15 +447,18 @@ class BrowserTabViewModel @Inject constructor(
             val permissionsToRequest: Array<String>,
             val request: PermissionRequest,
         ) : Command()
+
         class GrantSitePermissionRequest(
             val sitePermissionsToGrant: Array<String>,
             val request: PermissionRequest,
         ) : Command()
+
         class ShowUserCredentialSavedOrUpdatedConfirmation(
             val credentials: LoginCredentials,
             val includeShortcutToViewCredential: Boolean,
             val messageResourceId: Int,
         ) : Command()
+
         class AcceptGeneratedPassword(val url: String) : Command()
         class RejectGeneratedPassword(val url: String) : Command()
     }
@@ -595,8 +603,10 @@ class BrowserTabViewModel @Inject constructor(
                                 command.value = AskToAutomateFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
                             }
                         }
+
                         settingsDataStore.automaticFireproofSetting == ALWAYS ->
                             fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
+
                         else -> {
                             if (canPromptAboutFireproofing) {
                                 command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
@@ -639,10 +649,14 @@ class BrowserTabViewModel @Inject constructor(
             browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
         }.launchIn(viewModelScope)
 
-        savedSitesRepository.getBookmarks().map { bookmarks ->
-            val bookmark = bookmarks.firstOrNull { it.url == url }
-            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
-        }.launchIn(viewModelScope)
+        savedSitesRepository.getBookmarks()
+            .flowOn(dispatchers.io())
+            .map { bookmarks ->
+                val bookmark = bookmarks.firstOrNull { it.url == url }
+                    browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+                }
+            .flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
 
         remoteMessagingModel.activeMessages
             .combine(ctaChangedTicker.asStateFlow(), ::Pair)
@@ -874,9 +888,11 @@ class BrowserTabViewModel @Inject constructor(
             is NonHttpAppLink -> {
                 nonHttpAppLinkClicked(type)
             }
+
             is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
                 handleCloakedAmpLink(type.ampUrl)
             }
+
             else -> {
                 if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
                     Timber.d("AMP link detection: Using extracted URL: ${type.extractedUrl}")
@@ -1433,7 +1449,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>) {
+    override fun onSitePermissionRequested(
+        request: PermissionRequest,
+        sitePermissionsAllowedToAsk: Array<String>
+    ) {
         viewModelScope.launch(dispatchers.io()) {
             val url = request.origin.toString()
             val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
@@ -1505,11 +1524,13 @@ class BrowserTabViewModel @Inject constructor(
                         faviconManager.persistCachedFavicon(tabId, domain)
                     }
                 }
+
                 LocationPermissionType.ALLOW_ONCE -> {
                     pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
                     locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, true, false)
                 }
+
                 LocationPermissionType.DENY_ALWAYS -> {
                     pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                     onSiteLocationPermissionAlwaysDenied()
@@ -1518,6 +1539,7 @@ class BrowserTabViewModel @Inject constructor(
                         faviconManager.persistCachedFavicon(tabId, domain)
                     }
                 }
+
                 LocationPermissionType.DENY_ONCE -> {
                     pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                     locationPermissionSession[domain] = permission
@@ -1551,12 +1573,15 @@ class BrowserTabViewModel @Inject constructor(
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
                 }
+
                 LocationPermissionType.ALLOW_ONCE -> {
                     command.postValue(AskDomainPermission(locationPermission.origin))
                 }
+
                 LocationPermissionType.DENY_ALWAYS -> {
                     onSiteLocationPermissionAlwaysDenied()
                 }
+
                 LocationPermissionType.DENY_ONCE -> {
                     command.postValue(AskDomainPermission(locationPermission.origin))
                 }
@@ -1692,7 +1717,12 @@ class BrowserTabViewModel @Inject constructor(
         onSiteChanged()
     }
 
-    fun onAutoconsentResultReceived(consentManaged: Boolean, optOutFailed: Boolean, selfTestFailed: Boolean, isCosmetic: Boolean?) {
+    fun onAutoconsentResultReceived(
+        consentManaged: Boolean,
+        optOutFailed: Boolean,
+        selfTestFailed: Boolean,
+        isCosmetic: Boolean?
+    ) {
         site?.consentManaged = consentManaged
         site?.consentOptOutFailed = optOutFailed
         site?.consentSelfTestFailed = selfTestFailed
@@ -2087,23 +2117,28 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
             }
+
             is RequiredAction.OpenInNewBackgroundTab -> {
                 command.value = GenerateWebViewPreviewImage
                 viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }
+
             is RequiredAction.DownloadFile -> {
                 command.value = DownloadImage(requiredAction.url, false)
                 true
             }
+
             is RequiredAction.ShareLink -> {
                 command.value = ShareLink(requiredAction.url)
                 true
             }
+
             is RequiredAction.CopyLink -> {
                 command.value = CopyLink(requiredAction.url)
                 true
             }
+
             RequiredAction.None -> {
                 false
             }
@@ -2741,7 +2776,10 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 
-    override fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials) {
+    override fun shareCredentialsWithPage(
+        originalUrl: String,
+        credentials: LoginCredentials
+    ) {
         command.postValue(InjectCredentials(originalUrl, credentials))
     }
 
@@ -2749,7 +2787,10 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(CancelIncomingAutofillRequest(originalUrl))
     }
 
-    override suspend fun saveCredentials(url: String, credentials: LoginCredentials): LoginCredentials? {
+    override suspend fun saveCredentials(
+        url: String,
+        credentials: LoginCredentials
+    ): LoginCredentials? {
         return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.saveCredentials(url, credentials)
         }
