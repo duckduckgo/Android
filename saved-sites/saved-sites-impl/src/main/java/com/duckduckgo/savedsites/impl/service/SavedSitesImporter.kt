@@ -91,6 +91,18 @@ class RealSavedSitesImporter(
                 }
             }
 
+            savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { favorite ->
+                Pair(
+                    Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = favorite.id),
+                    Entity(favorite.id, title = favorite.title, url = favorite.url, type = BOOKMARK),
+                )
+            }.also { pairs ->
+                pairs.asSequence().chunked(IMPORT_BATCH_SIZE).forEach { chunk ->
+                    savedSitesRelationsDao.insertList(chunk.map { it.first })
+                    savedSitesEntitiesDao.insertList(chunk.map { it.second })
+                }
+            }
+
             savedSitesEntitiesDao.updateModified(SavedSitesNames.BOOKMARKS_ROOT, DatabaseDateFormatter.iso8601())
             if (savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.isNotEmpty()) {
                 savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT, DatabaseDateFormatter.iso8601())
