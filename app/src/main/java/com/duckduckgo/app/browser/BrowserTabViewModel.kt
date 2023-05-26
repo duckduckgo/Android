@@ -434,7 +434,7 @@ class BrowserTabViewModel @Inject constructor(
 
         class InjectCredentials(
             val url: String,
-            val credentials: LoginCredentials
+            val credentials: LoginCredentials,
         ) : Command()
 
         class CancelIncomingAutofillRequest(val url: String) : Command()
@@ -653,8 +653,8 @@ class BrowserTabViewModel @Inject constructor(
             .flowOn(dispatchers.io())
             .map { bookmarks ->
                 val bookmark = bookmarks.firstOrNull { it.url == url }
-                    browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
-                }
+                browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+            }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
@@ -1451,7 +1451,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onSitePermissionRequested(
         request: PermissionRequest,
-        sitePermissionsAllowedToAsk: Array<String>
+        sitePermissionsAllowedToAsk: Array<String>,
     ) {
         viewModelScope.launch(dispatchers.io()) {
             val url = request.origin.toString()
@@ -1721,7 +1721,7 @@ class BrowserTabViewModel @Inject constructor(
         consentManaged: Boolean,
         optOutFailed: Boolean,
         selfTestFailed: Boolean,
-        isCosmetic: Boolean?
+        isCosmetic: Boolean?,
     ) {
         site?.consentManaged = consentManaged
         site?.consentOptOutFailed = optOutFailed
@@ -2778,7 +2778,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun shareCredentialsWithPage(
         originalUrl: String,
-        credentials: LoginCredentials
+        credentials: LoginCredentials,
     ) {
         command.postValue(InjectCredentials(originalUrl, credentials))
     }
@@ -2789,7 +2789,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override suspend fun saveCredentials(
         url: String,
-        credentials: LoginCredentials
+        credentials: LoginCredentials,
     ): LoginCredentials? {
         return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.saveCredentials(url, credentials)
