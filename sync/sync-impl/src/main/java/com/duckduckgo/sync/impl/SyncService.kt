@@ -145,55 +145,7 @@ data class ErrorResponse(
     val error: String,
 )
 
-data class Setting(
-    val key: String,
-    val value: String,
-)
-
-data class BookmarkFolder(
-    val children: List<String>,
-)
-
-data class BookmarksResponse(
-    @field:Json(name = "last_modified") val lastModified: String,
-    val entries: List<SyncBookmarkEntry>,
-)
-
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
     NOT_MODIFIED(304),
-}
-
-data class SyncBookmarkPage(val url: String)
-data class SyncFolderChildren(val children: List<String>)
-
-data class SyncBookmarkEntry(
-    val id: String,
-    val title: String,
-    val page: SyncBookmarkPage?,
-    val folder: SyncFolderChildren?,
-    val deleted: String?,
-    val client_last_modified: String,
-) {
-    companion object {
-        fun asBookmark(
-            id: String,
-            title: String,
-            url: String,
-            deleted: String?,
-            clientLastModified: String,
-        ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, SyncBookmarkPage(url), null, deleted, clientLastModified)
-        }
-
-        fun asFolder(
-            id: String,
-            title: String,
-            children: List<String>,
-            deleted: String?,
-            clientLastModified: String,
-        ): SyncBookmarkEntry {
-            return SyncBookmarkEntry(id, title, null, SyncFolderChildren(children), deleted, clientLastModified)
-        }
-    }
 }

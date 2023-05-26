@@ -50,9 +50,14 @@ class SyncBackgroundWorker(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var deviceSyncState: DeviceSyncState
+
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
-            syncEngine.syncNow(BACKGROUND_SYNC)
+            if (deviceSyncState.isUserSignedInOnDevice()) {
+                syncEngine.syncNow(BACKGROUND_SYNC)
+            }
             return@withContext Result.success()
         }
     }
@@ -71,6 +76,8 @@ class SyncBackgroundWorkerScheduler @Inject constructor(
         super.onCreate(owner)
         if (deviceSyncState.isUserSignedInOnDevice()) {
             scheduleBackgroundSync()
+        } else {
+            workManager.cancelAllWorkByTag(BACKGROUND_SYNC_WORKER_TAG)
         }
     }
 

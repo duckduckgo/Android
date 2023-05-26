@@ -16,6 +16,10 @@
 
 package com.duckduckgo.sync.api.engine
 
+/**
+ * As per API requirement, each feature needs to store the date it was lastly modified
+ * Implement this interface to do exactly that
+ */
 interface FeatureSyncStore {
     var modifiedSince: String
 }

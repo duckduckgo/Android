@@ -26,7 +26,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class BackgroundSyncWorkerSchedulerTest {
@@ -55,6 +54,6 @@ class BackgroundSyncWorkerSchedulerTest {
         whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(false)
         syncBackgroundWorkerScheduler.onCreate(mockOwner)
 
-        verifyNoInteractions(mockWorkManager)
+        verify(mockWorkManager).cancelAllWorkByTag(any())
     }
 }

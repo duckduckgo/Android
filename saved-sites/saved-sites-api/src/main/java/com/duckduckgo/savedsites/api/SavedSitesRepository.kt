@@ -53,6 +53,11 @@ interface SavedSitesRepository {
      */
     fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
+    /**
+     * Returns all [Bookmark] and [BookmarkFolder] inside a folder, also deleted objects
+     * @param folderId the id of the folder.
+     * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
+     */
     fun getAllFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
     /**
@@ -121,6 +126,11 @@ interface SavedSitesRepository {
      */
     fun getBookmarkById(id: String): Bookmark?
 
+    /**
+     * Returns [SavedSite] given an ID
+     * @param ID of the [SavedSite]
+     * @return [SavedSite] if found, or null if does not exist
+     */
     fun getSavedSite(id: String): SavedSite?
 
     /**

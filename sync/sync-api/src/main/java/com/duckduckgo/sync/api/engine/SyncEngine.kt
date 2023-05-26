@@ -20,10 +20,20 @@ interface SyncEngine {
 
     /**
      * Entry point to the Sync Engine
-     * This will be used by Background Sync and App Triggered workers
+     * See Tech Design: Sync Updating/Polling Strategy https://app.asana.com/0/481882893211075/1204040479708519/f
      */
     fun syncNow(trigger: SyncTrigger)
 
+    /**
+     * Represent each possible trigger fo
+     * See Tech Design: Sync Engine https://app.asana.com/0/481882893211075/1204303361994831/f
+     * [BACKGROUND_SYNC] -> Sync triggered by a Background Worker
+     * [APP_OPEN] -> Sync triggered after App is opened
+     * [FEATURE_READ] -> Sync triggered when a feature screen is opened (Bookmarks screen, etc...)
+     * [DATA_CHANGE] -> Sync triggered because data associated to a Syncable object has changed (new bookmark added)
+     * [ACCOUNT_CREATION] -> Sync triggered after creating a new Sync account
+     * [ACCOUNT_LOGIN] -> Sync triggered after login into an already existing sync account
+     */
     enum class SyncTrigger {
         BACKGROUND_SYNC,
         APP_OPEN,

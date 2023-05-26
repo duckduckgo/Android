@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,6 +31,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 internal class BackgroundSyncWorkerTest {
@@ -38,6 +41,7 @@ internal class BackgroundSyncWorkerTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSyncEngine: SyncEngine = mock()
+    private val mockSyncState: DeviceSyncState = mock()
 
     private lateinit var context: Context
 
@@ -47,15 +51,34 @@ internal class BackgroundSyncWorkerTest {
     }
 
     @Test
-    fun whenDoWorkThenTriggerBackgroundSyncAndReturnSuccess() =
+    fun whenDoWorkTriggeredAndSyncEnabledThenSyncTriggeredReturnSuccess() =
         runTest {
             val worker = TestListenableWorkerBuilder<SyncBackgroundWorker>(context = context).build()
             worker.syncEngine = mockSyncEngine
             worker.dispatchers = coroutineRule.testDispatcherProvider
+            worker.deviceSyncState = mockSyncState
+
+            whenever(mockSyncState.isUserSignedInOnDevice()).thenReturn(true)
 
             val result = worker.doWork()
 
             verify(mockSyncEngine).syncNow(BACKGROUND_SYNC)
+            Assert.assertEquals(result, ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun whenDoWorkTriggeredAndSyncDisabledThenSyncNotTriggeredReturnSuccess() =
+        runTest {
+            val worker = TestListenableWorkerBuilder<SyncBackgroundWorker>(context = context).build()
+            worker.syncEngine = mockSyncEngine
+            worker.dispatchers = coroutineRule.testDispatcherProvider
+            worker.deviceSyncState = mockSyncState
+
+            whenever(mockSyncState.isUserSignedInOnDevice()).thenReturn(false)
+
+            val result = worker.doWork()
+
+            verifyNoInteractions(mockSyncEngine)
             Assert.assertEquals(result, ListenableWorker.Result.success())
         }
 }
