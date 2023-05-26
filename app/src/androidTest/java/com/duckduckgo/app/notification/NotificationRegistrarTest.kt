@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.notification
 
-import android.app.NotificationManager
-import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.plugins.PluginPoint
@@ -40,7 +38,6 @@ class NotificationRegistrarTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
-    private val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
@@ -58,7 +55,6 @@ class NotificationRegistrarTest {
         testee = NotificationRegistrar(
             TestScope(),
             context,
-            notificationManager,
             notificationManagerCompat,
             mockSettingsDataStore,
             mockPixel,
