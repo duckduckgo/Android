@@ -783,11 +783,6 @@
                     "action": "ignore"
                 },
                 {
-                    "rule": "^https?:\/\/([^./]+\\.)*sub1\\.sub2\\.format\\.test/test4c\\.js$",
-                    "comment": "With subdomain and explicit anchoring",
-                    "action": "ignore"
-                },
-                {
                     "rule": "format.test/test5\\.js",
                     "comment": "No escape on the domain.",
                     "action": "ignore"
