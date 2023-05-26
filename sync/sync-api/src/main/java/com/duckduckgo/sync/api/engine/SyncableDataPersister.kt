@@ -33,6 +33,14 @@ interface SyncableDataPersister {
      */
     fun onSyncDisabled()
 
+    /**
+     * Represent each possible conflict resolution strategy that Sync supports
+     * See Tech Design: Sync Engine https://app.asana.com/0/481882893211075/1204303361994831/f
+     * [DEDUPLICATION] -> Remote and Local data will be deduplicated and merged (Account Flows)
+     * [REMOTE_WINS] -> Objects present in Remote will override objets in Local
+     * [LOCAL_WINS] -> Object present in Local wins, Remote object is discarded
+     * [TIMESTAMP] -> The last modified object wins, either from Remote or Local
+     */
     enum class SyncConflictResolution {
         DEDUPLICATION,
         REMOTE_WINS,

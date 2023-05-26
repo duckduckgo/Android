@@ -20,18 +20,14 @@ import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
 
 interface SyncStateRepository {
     fun store(syncAttempt: SyncAttempt)
 
     fun current(): SyncAttempt?
 
-    fun all(): Flow<List<SyncAttempt>>
-
     fun updateSyncState(state: SyncState)
 
-    fun lastCompleted(): SyncAttempt?
     fun clearAll()
 }
 
@@ -44,20 +40,12 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
         return syncAttemptDao.lastAttempt()
     }
 
-    override fun all(): Flow<List<SyncAttempt>> {
-        return syncAttemptDao.attempts()
-    }
-
     override fun updateSyncState(state: SyncState) {
         val last = syncAttemptDao.lastAttempt()
         if (last != null) {
             val updated = last.copy(state = state)
             syncAttemptDao.insert(updated)
         }
-    }
-
-    override fun lastCompleted(): SyncAttempt? {
-        return syncAttemptDao.lastCompleted()
     }
 
     override fun clearAll() {
