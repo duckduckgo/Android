@@ -53,7 +53,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class SavedSitesSyncPersisterTest {
+class SavedSitesSyncPersisterAlgorithmTest {
 
     //move this to unit test
     @get:Rule

@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -94,7 +95,7 @@ class SavedSitesSyncDataProviderTest {
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
         store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
-        parser = SavedSitesSyncDataProvider(repository, store, com.duckduckgo.sync.impl.sync.FakeCrypto())
+        parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto())
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)
@@ -396,5 +397,15 @@ class SavedSitesSyncDataProviderTest {
             val adapter: JsonAdapter<SyncBookmarksRequest> =
                 moshi.adapter(SyncBookmarksRequest::class.java)
         }
+    }
+}
+
+class FakeCrypto : SyncCrypto {
+    override fun encrypt(text: String): String {
+        return text
+    }
+
+    override fun decrypt(data: String): String {
+        return data
     }
 }
