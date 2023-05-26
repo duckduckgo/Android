@@ -346,6 +346,7 @@ dependencies {
     implementation "androidx.work:work-multiprocess:_"
     androidTestImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
+    testImplementation AndroidX.work.testing
 
     // Dagger
     kapt Google.dagger.compiler

@@ -2,9 +2,10 @@ package com.duckduckgo.app.featureusage.di
 
 import android.content.Context
 import com.duckduckgo.app.featureusage.FeatureSegmentManagerImpl
-import com.duckduckgo.app.featureusage.FeatureSegmentsDataStore
-import com.duckduckgo.app.featureusage.FeatureSegmentsDataStoreSharedPreferences
 import com.duckduckgo.app.featureusage.FeatureSegmentsManager
+import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStore
+import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStoreSharedPreferences
+import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
 
@@ -21,7 +22,8 @@ class FeatureSegmentsModule {
     @Provides
     fun providesFeatureSegmentsManager(
         featureSegmentsDataStore: FeatureSegmentsDataStore,
+        pixel: Pixel,
     ): FeatureSegmentsManager {
-        return FeatureSegmentManagerImpl(featureSegmentsDataStore)
+        return FeatureSegmentManagerImpl(featureSegmentsDataStore, pixel)
     }
 }

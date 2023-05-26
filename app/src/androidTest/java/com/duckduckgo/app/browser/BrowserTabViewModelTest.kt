@@ -80,6 +80,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -333,6 +334,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
+    @Mock
+    private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -504,6 +508,7 @@ class BrowserTabViewModelTest {
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
+            featureSegmentsManager = mockFeatureSegmentsManager,
         )
 
         testee.loadData("abc", null, false, false)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.featureusage
+package com.duckduckgo.app.featureusage.db
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -33,6 +33,7 @@ interface FeatureSegmentsDataStore {
     var twoSearchesMade: Boolean
     var fiveSearchesMade: Boolean
     var tenSearchesMade: Boolean
+    var searchesCount: Int
 }
 
 class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
@@ -72,6 +73,9 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
     override var tenSearchesMade: Boolean
         get() = preferences.getBoolean(KEY_TEN_SEARCHES_MADE, false)
         set(enabled) = preferences.edit { putBoolean(KEY_TEN_SEARCHES_MADE, enabled) }
+    override var searchesCount: Int
+        get() = preferences.getInt(KEY_SEARCHES_COUNT, -1)
+        set(count) = preferences.edit { putInt(KEY_SEARCHES_COUNT, count) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.feature_segments.settings"
@@ -85,5 +89,6 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
         const val KEY_TWO_SEARCHES_MADE = "TWO_SEARCHES_MADE"
         const val KEY_FIVE_SEARCHES_MADE = "FIVE_SEARCHES_MADE"
         const val KEY_TEN_SEARCHES_MADE = "TEN_SEARCHES_MADE"
+        const val KEY_SEARCHES_COUNT = "SEARCHES_COUNT"
     }
 }

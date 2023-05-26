@@ -26,20 +26,56 @@ import com.duckduckgo.app.featureusage.FeatureSegmentType.LOGIN_SAVED
 import com.duckduckgo.app.featureusage.FeatureSegmentType.SET_AS_DEFAULT
 import com.duckduckgo.app.featureusage.FeatureSegmentType.TEN_SEARCHES_MADE
 import com.duckduckgo.app.featureusage.FeatureSegmentType.TWO_SEARCHES_MADE
+import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStore
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import javax.inject.Inject
 
 interface FeatureSegmentsManager {
-    fun getUserFeatureSegments(): Map<String, Boolean>
     fun addUserToFeatureSegment(segment: FeatureSegmentType)
     fun isFeatureSegmentsAllowed(): Boolean
+    fun shouldFireSegmentsPixel(): Boolean
+    fun fireFeatureSegmentsPixel()
 }
 
 class FeatureSegmentManagerImpl @Inject constructor(
     private val featureSegmentsDataStore: FeatureSegmentsDataStore,
+    private val pixel: Pixel,
 ) : FeatureSegmentsManager {
 
-    override fun getUserFeatureSegments(): Map<String, Boolean> {
-        // TODO check new user?
+    override fun addUserToFeatureSegment(segment: FeatureSegmentType) {
+        if (isFeatureSegmentsAllowed()) {
+            when (segment) {
+                BOOKMARKS_IMPORTED -> featureSegmentsDataStore.bookmarksImported = true
+                FAVOURITE_SET -> featureSegmentsDataStore.favouriteSet = true
+                SET_AS_DEFAULT -> featureSegmentsDataStore.setAsDefault = true
+                LOGIN_SAVED -> featureSegmentsDataStore.loginSaved = true
+                FIRE_BUTTON_USED -> featureSegmentsDataStore.fireButtonUsed = true
+                APP_TP_ENABLED -> featureSegmentsDataStore.appTpEnabled = true
+                EMAIL_PROTECTION_SET -> featureSegmentsDataStore.emailProtectionSet = true
+                TWO_SEARCHES_MADE -> featureSegmentsDataStore.twoSearchesMade = true
+                FIVE_SEARCHES_MADE -> featureSegmentsDataStore.fiveSearchesMade = true
+                TEN_SEARCHES_MADE -> featureSegmentsDataStore.tenSearchesMade = true
+            }
+        }
+    }
+
+    override fun isFeatureSegmentsAllowed(): Boolean {
+        // TODO check install date
+        return true
+    }
+
+    override fun shouldFireSegmentsPixel(): Boolean {
+        val listOfSegments = getUserFeatureSegments()
+        return listOfSegments.any { it.value } || isFeatureSegmentsAllowed()
+    }
+
+    override fun fireFeatureSegmentsPixel() {
+        val params = getUserFeatureSegments().map { it.key to it.value.toString() }.toMap()
+        pixel.fire(AppPixelName.DAILY_USER_EVENT_SEGMENT, params)
+    }
+
+    private fun getUserFeatureSegments(): Map<String, Boolean> {
         return mapOf(
             BOOKMARKS_IMPORTED.name.lowercase() to featureSegmentsDataStore.bookmarksImported,
             FAVOURITE_SET.name.lowercase() to featureSegmentsDataStore.favouriteSet,
@@ -52,26 +88,5 @@ class FeatureSegmentManagerImpl @Inject constructor(
             FIVE_SEARCHES_MADE.name.lowercase() to featureSegmentsDataStore.fiveSearchesMade,
             TEN_SEARCHES_MADE.name.lowercase() to featureSegmentsDataStore.tenSearchesMade,
         )
-    }
-
-    override fun addUserToFeatureSegment(segment: FeatureSegmentType) {
-        // TODO check new user
-        when (segment) {
-            BOOKMARKS_IMPORTED -> featureSegmentsDataStore.bookmarksImported = true
-            FAVOURITE_SET -> featureSegmentsDataStore.favouriteSet = true
-            SET_AS_DEFAULT -> featureSegmentsDataStore.setAsDefault = true
-            LOGIN_SAVED -> featureSegmentsDataStore.loginSaved = true
-            FIRE_BUTTON_USED -> featureSegmentsDataStore.fireButtonUsed = true
-            APP_TP_ENABLED -> featureSegmentsDataStore.appTpEnabled = true
-            EMAIL_PROTECTION_SET -> featureSegmentsDataStore.emailProtectionSet = true
-            TWO_SEARCHES_MADE -> featureSegmentsDataStore.twoSearchesMade = true
-            FIVE_SEARCHES_MADE -> featureSegmentsDataStore.fiveSearchesMade = true
-            TEN_SEARCHES_MADE -> featureSegmentsDataStore.tenSearchesMade = true
-        }
-    }
-
-    override fun isFeatureSegmentsAllowed(): Boolean {
-        // TODO check install date
-        return true
     }
 }

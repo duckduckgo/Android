@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Companion.MAX_DIALOG_ATTEMPTS
@@ -57,6 +58,9 @@ class DefaultBrowserPageViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
+    @Mock
+    private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -65,7 +69,7 @@ class DefaultBrowserPageViewModelTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockFeatureSegmentsManager)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -91,7 +95,7 @@ class DefaultBrowserPageViewModelTest {
     fun whenInitializingIfThereIsADefaultBrowserThenShowSettingsUI() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
 
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockFeatureSegmentsManager)
 
         assertTrue(viewState() is DefaultBrowserSettingsUI)
     }
@@ -100,7 +104,7 @@ class DefaultBrowserPageViewModelTest {
     fun whenInitializingIfThereIsNotADefaultBrowserThenShowDialogUI() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
 
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockFeatureSegmentsManager)
 
         assertTrue(viewState() is DefaultBrowserDialogUI)
     }
