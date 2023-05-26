@@ -36,7 +36,7 @@ interface SyncApiClient {
     fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse>
     fun get(
         type: SyncableType,
-        since: String
+        since: String,
     ): Result<SyncChangesResponse>
 }
 
@@ -75,7 +75,7 @@ class AppSyncApiClient @Inject constructor(
 
     override fun get(
         type: SyncableType,
-        since: String
+        since: String,
     ): Result<SyncChangesResponse> {
         val token =
             syncStore.token.takeUnless { it.isNullOrEmpty() }
@@ -89,7 +89,7 @@ class AppSyncApiClient @Inject constructor(
     private fun getBookmarks(
         type: SyncableType,
         token: String,
-        since: String
+        since: String,
     ): Result<SyncChangesResponse> {
         return when (val result = syncApi.getBookmarks(token, since)) {
             is Result.Error -> {
@@ -116,7 +116,7 @@ class AppSyncApiClient @Inject constructor(
     @VisibleForTesting
     fun mapResponse(
         type: SyncableType,
-        response: JSONObject
+        response: JSONObject,
     ): SyncChangesResponse {
         val jsonString = response.toString()
         Timber.d("Sync-Feature: $type response mapped to $jsonString")

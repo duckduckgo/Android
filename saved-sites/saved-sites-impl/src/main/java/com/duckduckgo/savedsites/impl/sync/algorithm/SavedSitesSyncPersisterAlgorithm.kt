@@ -28,22 +28,20 @@ import com.duckduckgo.savedsites.impl.sync.isFolder
 import com.duckduckgo.savedsites.impl.sync.titleOrFallback
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncMergeResult
-import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
+import timber.log.Timber
 
 interface SavedSitesSyncPersisterAlgorithm {
     fun processEntries(
         bookmarks: SyncBookmarkEntries,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean>
 }
 
@@ -57,9 +55,8 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
 ) : SavedSitesSyncPersisterAlgorithm {
     override fun processEntries(
         bookmarks: SyncBookmarkEntries,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-
         val processIds: MutableList<String> = mutableListOf()
         val allResponseIds = bookmarks.entries.filterNot { it.deleted != null }.map { it.id }
         val allFolders = bookmarks.entries.filter { it.isFolder() }.filterNot { it.id == SavedSitesNames.FAVORITES_ROOT }
@@ -133,7 +130,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         remoteFolder: SyncBookmarkEntry,
         parentId: String,
         lastModified: String,
-        processIds: MutableList<String>
+        processIds: MutableList<String>,
     ) {
         val folder = decryptFolder(remoteFolder, parentId, lastModified)
         if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT) {
@@ -154,7 +151,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         processIds: MutableList<String>,
         entries: List<SyncBookmarkEntry>,
         folderId: String,
-        lastModified: String
+        lastModified: String,
     ) {
         Timber.d("Sync-Feature: processing child $child")
         processIds.add(child)
@@ -184,7 +181,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     private fun processFavouritesFolder(
         conflictResolution: SyncConflictResolution,
         entries: List<SyncBookmarkEntry>,
-        lastModified: String
+        lastModified: String,
     ) {
         val favourites = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT }!!
         favourites.folder?.children?.forEachIndexed { position, child ->

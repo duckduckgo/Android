@@ -18,17 +18,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
-import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
@@ -36,15 +26,11 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
-import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
-import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
-import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
@@ -113,7 +99,6 @@ class SavedSitesSyncPersister @Inject constructor(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-
         Timber.d("Sync-Feature: updating bookmarks last_modified to ${bookmarks.last_modified}")
         savedSitesSyncStore.modifiedSince = bookmarks.last_modified
 

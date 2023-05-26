@@ -19,7 +19,6 @@ package com.duckduckgo.savedsites.impl.sync.algorithm
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 
 interface SavedSitesSyncPersisterStrategy {
 
@@ -38,6 +37,6 @@ interface SavedSitesSyncPersisterStrategy {
         bookmark: Bookmark,
         bookmarkId: String,
         folderId: String,
-        lastModified: String
+        lastModified: String,
     )
 }

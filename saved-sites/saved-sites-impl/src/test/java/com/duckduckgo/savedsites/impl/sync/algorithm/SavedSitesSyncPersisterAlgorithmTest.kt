@@ -17,48 +17,19 @@
 package com.duckduckgo.savedsites.impl.sync.algorithm
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncPersister
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
-import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesSyncPersisterAlgorithm
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterStrategy
-import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
-import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
-import com.duckduckgo.sync.api.engine.SyncChangesResponse
-import com.duckduckgo.sync.api.engine.SyncMergeResult
-import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
-import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
-import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
-import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
-import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import junit.framework.Assert
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncPersisterAlgorithmTest {
 
-    //move this to unit test
+    // move this to unit test
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()

@@ -21,11 +21,10 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @Named("localWinsStrategy")
@@ -56,7 +55,7 @@ class SavedSitesLocalWinsPersister @Inject constructor(
         bookmark: Bookmark,
         bookmarkId: String,
         folderId: String,
-        lastModified: String
+        lastModified: String,
     ) {
         // if there's a bookmark with the same id locally we check the conflict resolution
         // if LOCAL -> local object wins and no changes are applied
@@ -71,7 +70,7 @@ class SavedSitesLocalWinsPersister @Inject constructor(
 
     override fun processFavourite(
         favourite: Favorite,
-        lastModified: String
+        lastModified: String,
     ) {
         Timber.d("Sync-Feature: adding ${favourite.id} to Favourites")
         savedSitesRepository.insert(favourite)

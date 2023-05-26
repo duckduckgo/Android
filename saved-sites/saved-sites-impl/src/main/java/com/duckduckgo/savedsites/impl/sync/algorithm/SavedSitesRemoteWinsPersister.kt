@@ -21,11 +21,10 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @Named("remoteWinsStrategy")
@@ -62,7 +61,7 @@ class SavedSitesRemoteWinsPersister @Inject constructor(
         bookmark: Bookmark,
         bookmarkId: String,
         folderId: String,
-        lastModified: String
+        lastModified: String,
     ) {
         // if there's a bookmark with the same id locally we check the conflict resolution
         // if REMOTE -> remote object wins and replaces local
@@ -74,12 +73,11 @@ class SavedSitesRemoteWinsPersister @Inject constructor(
             Timber.d("Sync-Feature: child $bookmarkId not present locally, inserting")
             savedSitesRepository.insert(bookmark)
         }
-
     }
 
     override fun processFavourite(
         favourite: Favorite,
-        lastModified: String
+        lastModified: String,
     ) {
         Timber.d("Sync-Feature: adding ${favourite.id} to Favourites")
         savedSitesRepository.insert(favourite)

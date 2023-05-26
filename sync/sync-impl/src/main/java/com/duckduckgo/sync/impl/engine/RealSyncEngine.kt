@@ -40,7 +40,6 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState
 import com.duckduckgo.sync.store.model.SyncState.FAIL
 import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
@@ -121,7 +120,7 @@ class RealSyncEngine @Inject constructor(
         Timber.d("Sync-Feature: starting to sync")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
-        //TODO: Is this good enough? Should we make the calls in parallel?
+        // TODO: Is this good enough? Should we make the calls in parallel?
         getChanges().forEach {
             if (it.isEmpty()) {
                 Timber.d("Sync-Feature: no changes to sync for $it, asking for remote changes")
@@ -153,7 +152,7 @@ class RealSyncEngine @Inject constructor(
 
     private fun getRemoteChanges(
         changes: SyncChangesRequest,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ) {
         Timber.d("Sync-Feature: receive remote change $changes")
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince)) {

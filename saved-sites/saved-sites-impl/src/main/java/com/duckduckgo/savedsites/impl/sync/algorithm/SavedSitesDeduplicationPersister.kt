@@ -21,13 +21,12 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @Named("deduplicationStrategy")
@@ -67,7 +66,7 @@ class SavedSitesDeduplicationPersister @Inject constructor(
         bookmark: Bookmark,
         bookmarkId: String,
         folderId: String,
-        lastModified: String
+        lastModified: String,
     ) {
         // if there's a bookmark duplicate locally (url and name) then we replace it
         when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
@@ -85,7 +84,7 @@ class SavedSitesDeduplicationPersister @Inject constructor(
 
     override fun processFavourite(
         favourite: Favorite,
-        lastModified: String
+        lastModified: String,
     ) {
         Timber.d("Sync-Feature: is ${favourite.id} duplicated locally?")
         when (val result = duplicateFinder.findFavouriteDuplicate(favourite)) {
@@ -100,5 +99,4 @@ class SavedSitesDeduplicationPersister @Inject constructor(
             }
         }
     }
-
 }
