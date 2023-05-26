@@ -161,7 +161,7 @@
                         android:background="@null"
                         android:fontFamily="sans-serif"
                         android:hint="@string/omnibarInputHint"
-                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                        android:imeOptions="flagNoExtractUi|actionSearch|actionGo|flagNoPersonalizedLearning"
                         android:inputType="textUri|textNoSuggestions"
                         android:maxLines="1"
                         android:paddingStart="5dp"
