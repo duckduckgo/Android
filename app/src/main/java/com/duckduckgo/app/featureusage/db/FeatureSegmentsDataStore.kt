@@ -33,7 +33,9 @@ interface FeatureSegmentsDataStore {
     var twoSearchesMade: Boolean
     var fiveSearchesMade: Boolean
     var tenSearchesMade: Boolean
-    var searchesCount: Int
+
+    var dailySearchesCount: Int
+    var userAddedToSegmentsEvents: Boolean
 }
 
 class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
@@ -73,9 +75,12 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
     override var tenSearchesMade: Boolean
         get() = preferences.getBoolean(KEY_TEN_SEARCHES_MADE, false)
         set(enabled) = preferences.edit { putBoolean(KEY_TEN_SEARCHES_MADE, enabled) }
-    override var searchesCount: Int
-        get() = preferences.getInt(KEY_SEARCHES_COUNT, -1)
+    override var dailySearchesCount: Int
+        get() = preferences.getInt(KEY_SEARCHES_COUNT, 0)
         set(count) = preferences.edit { putInt(KEY_SEARCHES_COUNT, count) }
+    override var userAddedToSegmentsEvents: Boolean
+        get() = preferences.getBoolean(KEY_USER_ADDED_TO_SEGMENTS_EVENTS, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_USER_ADDED_TO_SEGMENTS_EVENTS, enabled) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.feature_segments.settings"
@@ -90,5 +95,6 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
         const val KEY_FIVE_SEARCHES_MADE = "FIVE_SEARCHES_MADE"
         const val KEY_TEN_SEARCHES_MADE = "TEN_SEARCHES_MADE"
         const val KEY_SEARCHES_COUNT = "SEARCHES_COUNT"
+        const val KEY_USER_ADDED_TO_SEGMENTS_EVENTS = "USER_ADDED_TO_SEGMENTS_EVENTS"
     }
 }

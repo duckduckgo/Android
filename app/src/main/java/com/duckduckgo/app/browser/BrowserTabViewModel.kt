@@ -883,6 +883,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             searchCountDao.incrementSearchCount()
         }
+        featureSegmentsManager.searchMade()
 
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)

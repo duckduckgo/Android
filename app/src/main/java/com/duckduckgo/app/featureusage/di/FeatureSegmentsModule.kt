@@ -6,6 +6,7 @@ import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStore
 import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStoreSharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.UserBrowserProperties
 import dagger.Module
 import dagger.Provides
 
@@ -23,7 +24,8 @@ class FeatureSegmentsModule {
     fun providesFeatureSegmentsManager(
         featureSegmentsDataStore: FeatureSegmentsDataStore,
         pixel: Pixel,
+        userBrowserProperties: UserBrowserProperties,
     ): FeatureSegmentsManager {
-        return FeatureSegmentManagerImpl(featureSegmentsDataStore, pixel)
+        return FeatureSegmentManagerImpl(featureSegmentsDataStore, pixel, userBrowserProperties)
     }
 }

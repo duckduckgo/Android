@@ -29,18 +29,21 @@ import com.duckduckgo.app.featureusage.FeatureSegmentType.TWO_SEARCHES_MADE
 import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.UserBrowserProperties
 import javax.inject.Inject
 
 interface FeatureSegmentsManager {
     fun addUserToFeatureSegment(segment: FeatureSegmentType)
-    fun isFeatureSegmentsAllowed(): Boolean
+    fun searchMade()
     fun shouldFireSegmentsPixel(): Boolean
     fun fireFeatureSegmentsPixel()
+    fun restartDailySearchCount()
 }
 
 class FeatureSegmentManagerImpl @Inject constructor(
     private val featureSegmentsDataStore: FeatureSegmentsDataStore,
     private val pixel: Pixel,
+    private val userBrowserProperties: UserBrowserProperties,
 ) : FeatureSegmentsManager {
 
     override fun addUserToFeatureSegment(segment: FeatureSegmentType) {
@@ -57,22 +60,38 @@ class FeatureSegmentManagerImpl @Inject constructor(
                 FIVE_SEARCHES_MADE -> featureSegmentsDataStore.fiveSearchesMade = true
                 TEN_SEARCHES_MADE -> featureSegmentsDataStore.tenSearchesMade = true
             }
+            featureSegmentsDataStore.userAddedToSegmentsEvents = true
         }
     }
 
-    override fun isFeatureSegmentsAllowed(): Boolean {
-        // TODO check install date
-        return true
+    override fun searchMade() {
+        if (isFeatureSegmentsAllowed()) {
+            val updatedSearchesMade = featureSegmentsDataStore.dailySearchesCount++
+            when (updatedSearchesMade) {
+                2 -> addUserToFeatureSegment(TWO_SEARCHES_MADE)
+                5 -> addUserToFeatureSegment(FIVE_SEARCHES_MADE)
+                10 -> addUserToFeatureSegment(TEN_SEARCHES_MADE)
+            }
+            featureSegmentsDataStore.dailySearchesCount = updatedSearchesMade
+        }
     }
 
     override fun shouldFireSegmentsPixel(): Boolean {
         val listOfSegments = getUserFeatureSegments()
-        return listOfSegments.any { it.value } || isFeatureSegmentsAllowed()
+        return listOfSegments.any { it.value } && isFeatureSegmentsAllowed()
     }
 
     override fun fireFeatureSegmentsPixel() {
         val params = getUserFeatureSegments().map { it.key to it.value.toString() }.toMap()
         pixel.fire(AppPixelName.DAILY_USER_EVENT_SEGMENT, params)
+    }
+
+    override fun restartDailySearchCount() {
+        featureSegmentsDataStore.dailySearchesCount = 0
+    }
+
+    private fun isFeatureSegmentsAllowed(): Boolean {
+        return userBrowserProperties.daysSinceInstalled() < 8 || featureSegmentsDataStore.userAddedToSegmentsEvents
     }
 
     private fun getUserFeatureSegments(): Map<String, Boolean> {

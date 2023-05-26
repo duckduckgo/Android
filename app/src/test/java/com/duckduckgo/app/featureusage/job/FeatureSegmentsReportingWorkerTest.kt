@@ -73,4 +73,18 @@ internal class FeatureSegmentsReportingWorkerTest {
             verify(mockFeatureSegmentsManager, never()).fireFeatureSegmentsPixel()
             assertEquals(result, ListenableWorker.Result.success())
         }
+
+    @Test
+    fun whenDailyFeatureSegmentPixelIsSentThenRestartDailySearchesCount() =
+        runTest {
+            whenever(mockFeatureSegmentsManager.shouldFireSegmentsPixel()).thenReturn(true)
+            val worker = TestListenableWorkerBuilder<FeatureSegmentsReportingWorker>(context = context).build()
+            worker.featureSegmentsManager = mockFeatureSegmentsManager
+            worker.dispatchers = coroutineRule.testDispatcherProvider
+
+            val result = worker.doWork()
+
+            verify(mockFeatureSegmentsManager).restartDailySearchCount()
+            assertEquals(result, ListenableWorker.Result.success())
+        }
 }
