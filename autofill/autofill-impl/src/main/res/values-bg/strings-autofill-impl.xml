@@ -26,10 +26,13 @@
     <string name="saveLoginDialogButtonSave">Запазване на данните за вход</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не сега</string>
+    <string name="saveLoginDialogSubtitle">Данните за вход са сигурно съхранени само на Вашето устройство и могат да се управляват от менюто Данни за вход в Настройки.</string>
     <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази данните за вход?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
     <string name="useSavedLoginDialogTitle">Да се използват ли запазените данни за вход?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Парола за %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Парола за сайта</string>
     <string name="useSavedLoginDialogGroupThisWebsite">От този уебсайт</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">От %1$s</string>
 
@@ -62,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени данни за вход</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Данните за вход се съхраняват сигурно на Вашето устройство.</string>
 
     <string name="autofillManagementAddLogin">Добавяне на данни за вход</string>
     <string name="autofillManagementSearchLogins">Търсене на данни за вход</string>
@@ -74,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
     <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
+
+    <string name="autofill_password_generation_offer_title">Използване на парола, генерирана от DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Паролата ще бъде запазена в „Данни за вход“.</string>
+    <string name="autofill_password_generation_offer_accept">Използване на генерирана парола</string>
+    <string name="autofill_password_generation_offer_decline">Създаване на собствена</string>
+
+    <string name="deviceNotSupportedTitle">Устройството не се поддържа</string>
+    <string name="deviceNotSupportedSubtitle">За да съхраняваме сигурно данните Ви за вход, трябва да ги криптираме и да ги запазим на Вашето устройство. Тъй като Вашето устройство не поддържа криптирано съхранение, услугата „Данни за вход“ не е достъпна.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Данните за вход са изтрити</string>
+    <string name="autofillManagementUndoDeletion">Отмяна</string>
 
 </resources>

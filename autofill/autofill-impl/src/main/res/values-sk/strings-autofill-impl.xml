@@ -26,10 +26,13 @@
     <string name="saveLoginDialogButtonSave">Uložiť prihlasovacie údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložiť heslo</string>
     <string name="saveLoginDialogNotNow">Teraz nie</string>
+    <string name="saveLoginDialogSubtitle">Prihlasovacie údaje sú zabezpečene uložené len v tomto zariadení a môžete ich spravovať v ponuke Prihlasovacie údaje v Nastaveniach.</string>
     <string name="saveLoginDialogTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použiť uložené prihlasovacie údaje?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Heslo pre %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Heslo pre lokalitu</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z tejto webovej lokality</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Z adresy %1$s</string>
 
@@ -62,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatiaľ nie sú uložené žiadne prihlásenia</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Prihlasovacie údaje sú zabezpečeným spôsobom uložené vo vašom zariadení.</string>
 
     <string name="autofillManagementAddLogin">Pridať prihlásenie</string>
     <string name="autofillManagementSearchLogins">Vyhľadávanie prihlásení</string>
@@ -74,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Meno používateľa bolo skopírované</string>
     <string name="autofillManagementPasswordCopied">Heslo bolo skopírované</string>
+
+    <string name="autofill_password_generation_offer_title">Použiť vygenerované heslo z DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Heslo sa uloží do prihlasovacích údajov.</string>
+    <string name="autofill_password_generation_offer_accept">Použiť vygenerované heslo</string>
+    <string name="autofill_password_generation_offer_decline">Vytvoriť vlastné</string>
+
+    <string name="deviceNotSupportedTitle">Nepodporované zariadenie</string>
+    <string name="deviceNotSupportedSubtitle">Na uloženie prihlasovacích údajov zabezpečeným spôsobom ich musíme zašifrovať a uložiť vo vašom zariadení. Keďže vaše zariadenie nepodporuje šifrované ukladanie, funkcia Prihlasovacie údaje nie je k dispozícii.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Prihlasovacie údaje boli odstránené</string>
+    <string name="autofillManagementUndoDeletion">Zrušiť zmenu</string>
 
 </resources>
