@@ -26,10 +26,13 @@
     <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Agora não</string>
+    <string name="saveLoginDialogSubtitle">Os inícios de sessão são armazenados com segurança no teu dispositivo, e podes efetuar a gestão dos mesmos a partir do menu Inícios de sessão nas Definições.</string>
     <string name="saveLoginDialogTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
     <string name="useSavedLoginDialogTitle">Utilizar um início de sessão guardado?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Palavra-passe de %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Palavra-passe do site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">De %1$s</string>
 
@@ -62,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerido</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nenhum início de sessão guardado</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Os inícios de sessão são armazenados com segurança no teu dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Adicionar início de sessão</string>
     <string name="autofillManagementSearchLogins">Pesquisar inícios de sessão</string>
@@ -74,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Nome de utilizador copiado</string>
     <string name="autofillManagementPasswordCopied">Palavra-passe copiada</string>
+
+    <string name="autofill_password_generation_offer_title">Utilizar palavra-passe gerada pelo DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">A palavra-passe será guardada em Início de sessão.</string>
+    <string name="autofill_password_generation_offer_accept">Utilizar palavra-passe gerada</string>
+    <string name="autofill_password_generation_offer_decline">Criar a minha própria palavra-passe</string>
+
+    <string name="deviceNotSupportedTitle">Dispositivo não suportado</string>
+    <string name="deviceNotSupportedSubtitle">Para armazenar inícios de sessão com segurança, é necessário encriptá-los e armazená-los no teu dispositivo. Uma vez que o teu dispositivo não suporta armazenamento encriptado, os inícios de sessão não estão disponíveis.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Início de sessão eliminado</string>
+    <string name="autofillManagementUndoDeletion">Anular</string>
 
 </resources>

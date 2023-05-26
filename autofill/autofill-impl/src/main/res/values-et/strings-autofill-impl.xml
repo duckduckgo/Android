@@ -26,10 +26,13 @@
     <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Mitte praegu</string>
+    <string name="saveLoginDialogSubtitle">Sisselogimisandmed salvestatakse turvaliselt selles seadmes ja neid saab hallata sätete menüüst Sisselogimisandmed.</string>
     <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimisandmeid?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Saidi %1$s parool</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Saidi parool</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Sellelt veebisaidilt</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Saidilt %1$s</string>
 
@@ -62,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
     <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt sinu seadmesse.</string>
 
     <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>
     <string name="autofillManagementSearchLogins">Otsi sisselogimisandmeid</string>
@@ -74,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
+
+    <string name="autofill_password_generation_offer_title">Kas kasutada DuckDuckGo loodud parooli?</string>
+    <string name="autofill_password_generation_offer_message">Parool salvestatakse sisselogimisandmetesse.</string>
+    <string name="autofill_password_generation_offer_accept">Kasuta loodud parooli</string>
+    <string name="autofill_password_generation_offer_decline">Loon selle ise</string>
+
+    <string name="deviceNotSupportedTitle">Seadet ei toetata</string>
+    <string name="deviceNotSupportedSubtitle">Sisselogimisandmete turvaliseks salvestamiseks peame need krüptima ja sinu seadmesse salvestama. Kuna sinu seade ei toeta krüptitud salvestusruumi, ei ole sisselogimisandmete salvestamine võimalik.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Sisselogimisandmed kustutati</string>
+    <string name="autofillManagementUndoDeletion">Võta tagasi</string>
 
 </resources>
