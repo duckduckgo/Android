@@ -17,7 +17,10 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.impl.BuildConfig
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -31,6 +34,7 @@ import okhttp3.Response
 )
 class WgVpnControllerRequestInterceptor @Inject constructor(
     private val netpWaitlistRepository: NetPWaitlistRepository,
+    private val appBuildConfig: AppBuildConfig,
 ) : Interceptor, ApiInterceptorPlugin {
     override fun getInterceptor(): Interceptor = this
 
@@ -43,9 +47,18 @@ class WgVpnControllerRequestInterceptor @Inject constructor(
                 name = "Authorization",
                 value = "bearer ${netpWaitlistRepository.getAuthenticationToken()}",
             )
+
+            if (appBuildConfig.isInternalBuild()) {
+                newRequest.addHeader(
+                    name = "NetP-Debug-Code",
+                    value = BuildConfig.NETP_DEBUG_SERVER_TOKEN,
+                )
+            }
         }
 
-        return chain.proceed(newRequest.build())
+        return chain.proceed(
+            newRequest.build().also { logcat { "headers: ${it.headers}" } },
+        )
     }
 
     companion object {
