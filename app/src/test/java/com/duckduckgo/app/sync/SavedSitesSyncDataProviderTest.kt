@@ -94,7 +94,7 @@ class SavedSitesSyncDataProviderTest {
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
         store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
-        parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto())
+        parser = SavedSitesSyncDataProvider(repository, store, com.duckduckgo.sync.impl.sync.FakeCrypto())
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)

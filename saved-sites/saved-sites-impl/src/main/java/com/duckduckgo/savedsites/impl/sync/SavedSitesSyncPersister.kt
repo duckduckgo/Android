@@ -140,7 +140,6 @@ class SavedSitesSyncPersister @Inject constructor(
 
 data class SyncBookmarkRemoteUpdates(
     val bookmarks: SyncBookmarkEntries,
-    val client_timestamp: String,
 )
 
 data class SyncBookmarkEntries(

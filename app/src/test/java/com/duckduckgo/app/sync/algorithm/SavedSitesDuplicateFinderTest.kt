@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sync
+package com.duckduckgo.app.sync.algorithm
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room

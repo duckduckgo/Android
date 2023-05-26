@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sync
+package com.duckduckgo.app.sync.algorithm
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
@@ -30,11 +30,13 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFind
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncPersister
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
+import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
@@ -46,10 +48,14 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncPersisterTest {
 
+    //move this to unit test
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -63,6 +69,7 @@ class SavedSitesSyncPersisterTest {
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
     private lateinit var duplicateFinder: SavedSitesDuplicateFinder
     private lateinit var store: FeatureSyncStore
+    private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
 
     private lateinit var syncPersister: SavedSitesSyncPersister
 
@@ -79,14 +86,15 @@ class SavedSitesSyncPersisterTest {
         duplicateFinder = RealSavedSitesDuplicateFinder(repository)
 
         store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
-        syncPersister = SavedSitesSyncPersister(repository, store, duplicateFinder, FakeCrypto())
+        syncPersister = SavedSitesSyncPersister(repository, store, persisterAlgorithm)
     }
 
     @Test
     fun whenMergingCorruptedDataThenResultIsError() {
+        whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(SyncMergeResult.Error( reason = "error"))
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_invalid_data.json")
         val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
+        val result = syncPersister.process(corruptedChanges, TIMESTAMP)
 
         Assert.assertTrue(result is Error)
     }
@@ -95,7 +103,7 @@ class SavedSitesSyncPersisterTest {
     fun whenMergingNullEntriesThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_null_entries.json")
         val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
+        val result = syncPersister.process(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Error)
     }
@@ -104,7 +112,7 @@ class SavedSitesSyncPersisterTest {
     fun whenMergingDataInEmptyDBThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
         val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(validChanges, DEDUPLICATION)
+        val result = syncPersister.process(validChanges, DEDUPLICATION)
 
         assertTrue(result is Success)
 
@@ -125,7 +133,7 @@ class SavedSitesSyncPersisterTest {
     fun whenMergingEmptyEntriesThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_empty_entries.json")
         val corruptedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(corruptedChanges, TIMESTAMP)
+        val result = syncPersister.process(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Error)
     }
@@ -134,7 +142,7 @@ class SavedSitesSyncPersisterTest {
     fun whenMergingWithDeletedDataThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_deleted_entries.json")
         val deletedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.merge(deletedChanges, TIMESTAMP)
+        val result = syncPersister.process(deletedChanges, TIMESTAMP)
 
         Assert.assertTrue(result is Success)
     }
