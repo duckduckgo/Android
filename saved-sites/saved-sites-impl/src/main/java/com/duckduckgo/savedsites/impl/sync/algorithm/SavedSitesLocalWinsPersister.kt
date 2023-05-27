@@ -33,7 +33,6 @@ class SavedSitesLocalWinsPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
-        parentId: String,
         lastModified: String,
     ) {
         // if there's a folder with the same id locally we check the conflict resolution

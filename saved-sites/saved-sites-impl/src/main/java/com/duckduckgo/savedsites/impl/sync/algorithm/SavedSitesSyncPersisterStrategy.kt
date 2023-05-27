@@ -24,7 +24,6 @@ interface SavedSitesSyncPersisterStrategy {
 
     fun processBookmarkFolder(
         folder: BookmarkFolder,
-        parentId: String,
         lastModified: String,
     )
 
