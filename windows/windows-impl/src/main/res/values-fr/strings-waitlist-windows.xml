@@ -25,7 +25,7 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Partager le lien</string>
     <string name="windows_share_text">Prêt(e) à naviguer incognito sur Windows ?\n\nAccédez à cette URL sur votre ordinateur Windows pour télécharger l\'application :\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Vous recherchez la version Mac ?</string>
+    <string name="windows_waitlist_mac_link">Vous cherchez la version Mac ?</string>
     <string name="windows_join_waitlist">Rejoindre la liste d\'attente privée</string>
     <string name="windows_join_waitlist_error">Une erreur s\'est produite lors de l\'inscription sur la liste d\'attente. Veuillez réessayer plus tard.</string>
     <string name="windows_waitlist_footer">Vous n\'aurez pas à fournir d\'informations personnelles pour vous inscrire sur la liste d\'attente. Votre place sera assurée par un horodatage associé uniquement à votre appareil, qui nous permettra de vous informer quand viendra votre tour.</string>
