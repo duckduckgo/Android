@@ -26,10 +26,13 @@
     <string name="saveLoginDialogButtonSave">Gem login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Ikke nu</string>
+    <string name="saveLoginDialogSubtitle">Logins gemmes sikkert på din enhed og kan administreres fra menuen Logins i Indstillinger.</string>
     <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme dit login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruge et gemt login?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Adgangskode til %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Adgangskode til websted</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette websted</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
@@ -62,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen logins gemt endnu</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Login gemmes sikkert på din enhed.</string>
 
     <string name="autofillManagementAddLogin">Tilføj login</string>
     <string name="autofillManagementSearchLogins">Søg logins</string>
@@ -74,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Brugernavn kopieret</string>
     <string name="autofillManagementPasswordCopied">Adgangskode kopieret</string>
+
+    <string name="autofill_password_generation_offer_title">Brug genereret adgangskode fra DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Adgangskoden vil blive gemt i logins.</string>
+    <string name="autofill_password_generation_offer_accept">Brug genereret adgangskode</string>
+    <string name="autofill_password_generation_offer_decline">Opret min egen</string>
+
+    <string name="deviceNotSupportedTitle">Enheden understøttes ikke</string>
+    <string name="deviceNotSupportedSubtitle">For at gemme logins sikkert skal vi kryptere og gemme dem på din enhed. Da din enhed ikke understøtter krypteret lagring, er logins ikke tilgængelige.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Login slettet</string>
+    <string name="autofillManagementUndoDeletion">Fortryd</string>
 
 </resources>
