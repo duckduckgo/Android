@@ -26,10 +26,13 @@
     <string name="saveLoginDialogButtonSave">Lagre påloggingen</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke nå</string>
+    <string name="saveLoginDialogSubtitle">Pålogginger lagres trygt på enheten din og kan administreres i påloggingsmenyen i innstillinger.</string>
     <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruke en lagret pålogging?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Passord for %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Passord for nettstedet</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette nettstedet</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
@@ -62,6 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Forslag</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen pålogginger er lagret ennå</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Pålogginger lagres på enheten din på en sikker måte.</string>
 
     <string name="autofillManagementAddLogin">Legg til pålogging</string>
     <string name="autofillManagementSearchLogins">Søk i pålogginger</string>
@@ -74,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Brukernavnet er kopiert</string>
     <string name="autofillManagementPasswordCopied">Passordet er kopiert</string>
+
+    <string name="autofill_password_generation_offer_title">Vil du bruke et generert passord fra DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Passord blir lagret i pålogginger.</string>
+    <string name="autofill_password_generation_offer_accept">Bruk generert passord</string>
+    <string name="autofill_password_generation_offer_decline">Opprett eget passord</string>
+
+    <string name="deviceNotSupportedTitle">Enheten støttes ikke</string>
+    <string name="deviceNotSupportedSubtitle">For å lagre pålogginger på en sikker måte må vi kryptere dem og lagre dem på enheten din. Pålogginger er ikke tilgjengelig på enheten din fordi den ikke støtter kryptert lagring.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Påloggingen er slettet</string>
+    <string name="autofillManagementUndoDeletion">Angre</string>
 
 </resources>
