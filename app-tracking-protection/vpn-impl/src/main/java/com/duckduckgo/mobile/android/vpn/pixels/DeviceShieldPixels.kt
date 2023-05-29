@@ -349,8 +349,13 @@ class RealDeviceShieldPixels @Inject constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : DeviceShieldPixels {
 
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(DS_PIXELS_PREF_FILE, multiprocess = true, migrate = true)
+    private val preferences: SharedPreferences by lazy {
+        vpnSharedPreferencesProvider.getSharedPreferences(
+            DS_PIXELS_PREF_FILE,
+            multiprocess = true,
+            migrate = true,
+        )
+    }
 
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)

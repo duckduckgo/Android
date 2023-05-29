@@ -38,8 +38,13 @@ class RealNetpCohortStore @Inject constructor(
 ) : NetpCohortStore {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    private val preferences: SharedPreferences
-        get() = sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+            multiprocess = true,
+            migrate = false,
+        )
+    }
 
     override var cohortLocalDate: LocalDate?
         get() = preferences.getString(KEY_COHORT_LOCAL_DATE, null)?.let {

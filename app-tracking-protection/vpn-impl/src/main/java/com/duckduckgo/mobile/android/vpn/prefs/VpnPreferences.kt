@@ -42,8 +42,7 @@ class RealVpnPreferences @Inject constructor(
         get() = preferences.getString(VPN_ACTIVE_NETWORK_NAME, null)
         set(value) = preferences.edit(commit = true) { putString(VPN_ACTIVE_NETWORK_NAME, value) }
 
-    private val preferences: SharedPreferences
-        get() = applicationContext.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { applicationContext.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE) }
 }
 
 @VisibleForTesting

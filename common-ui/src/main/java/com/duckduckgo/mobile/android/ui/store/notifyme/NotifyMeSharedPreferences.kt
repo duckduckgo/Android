@@ -30,8 +30,7 @@ class NotifyMeSharedPreferences @Inject constructor(
     private val context: Context,
 ) : NotifyMeDataStore {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override fun isComponentDismissed(key: String, defaultValue: Boolean): Boolean {
         return preferences.getBoolean(key, defaultValue)

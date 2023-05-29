@@ -36,8 +36,7 @@ class AppTpPrivacyFeaturePlugin @Inject constructor(
 
     private val settings = plugins.sortedBy { it.settingName.value }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override fun store(featureName: String, jsonString: String): Boolean {
         @Suppress("NAME_SHADOWING")

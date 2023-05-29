@@ -29,8 +29,13 @@ class NetPWaitlistDataStoreSharedPreferences constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetPWaitlistDataStore {
 
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences by lazy {
+        vpnSharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+            multiprocess = true,
+            migrate = false,
+        )
+    }
 
     override var settingUnlocked: Boolean
         get() = preferences.getBoolean(KEY_SETTING_UNLOCKED, false)

@@ -23,8 +23,13 @@ import javax.inject.Inject
 class NetPInternalMtuProvider @Inject constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) {
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences by lazy {
+        vpnSharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+            multiprocess = true,
+            migrate = false,
+        )
+    }
 
     internal fun getMtu(): Int {
         return preferences.getInt(MTU_SIZE, 1280)
