@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ComponentTextInputViewBinding
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
 import com.google.android.material.snackbar.Snackbar
@@ -45,7 +46,10 @@ class ComponentTextInputFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        binding.outlinedinputtext4.onAction { toastOnClick(it) }
+        binding.outlinedinputtext4.apply {
+            setEndIcon(R.drawable.ic_copy)
+            onAction { toastOnClick(it) }
+        }
         binding.outlinedinputtext6.onAction { toastOnClick(it) }
         binding.outlinedinputtext8.onAction { toastOnClick(it) }
         binding.outlinedinputtext20.onAction { toastOnClick(it) }
