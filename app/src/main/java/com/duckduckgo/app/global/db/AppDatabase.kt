@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.db
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -683,15 +684,15 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         private val keyVersion = "com.duckduckgo.app.onboarding.currentVersion"
         private val currentVersion = 1
 
+        private val preferences: SharedPreferences by lazy { context.getSharedPreferences(fileName, Context.MODE_PRIVATE) }
+
         fun shouldShow(): Boolean {
-            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getInt(keyVersion, 0) < currentVersion
         }
 
         fun isReturningUser(): Boolean {
             // This was used by the 2 retuning users experiments.
             // First released in 5.103.0 and fully disabled in 5.114.0.
-            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getBoolean("HIDE_TIPS_FOR_RETURNING_USER", false)
         }
     }

@@ -35,8 +35,7 @@ interface RequestFiltererFeatureToggleStore {
 }
 
 class RealRequestFiltererFeatureToggleStore(private val context: Context) : RequestFiltererFeatureToggleStore {
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override fun deleteAll() {
         preferences.edit().clear().apply()

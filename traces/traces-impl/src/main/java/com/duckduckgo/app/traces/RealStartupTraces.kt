@@ -29,8 +29,7 @@ class RealStartupTraces @Inject constructor(
     private val context: Context,
 ) : StartupTraces {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var isTraceEnabled: Boolean
         get() = preferences.getBoolean(ENABLE_KEY, false)

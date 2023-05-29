@@ -37,8 +37,7 @@ class FeatureRetentionPixelSender @Inject constructor(
     private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
 ) : RefreshRetentionAtbPlugin {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }
 
     override fun onSearchRetentionAtbRefreshed() {
         tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)

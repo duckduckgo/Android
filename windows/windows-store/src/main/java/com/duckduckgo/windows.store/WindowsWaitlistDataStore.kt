@@ -29,8 +29,7 @@ interface WindowsWaitlistDataStore {
 class WindowsWaitlistDataStoreSharedPreferences constructor(private val context: Context) :
     WindowsWaitlistDataStore {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var waitlistTimestamp: Int
         get() = preferences.getInt(KEY_WAITLIST_TIMESTAMP, -1)

@@ -48,6 +48,10 @@ class InstallSourceLifecycleObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
+    private val sharedPreferences: SharedPreferences by lazy {
+        context.getSharedPreferences(SHARED_PREFERENCES_FILENAME, Context.MODE_PRIVATE)
+    }
+
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
 
@@ -69,17 +73,13 @@ class InstallSourceLifecycleObserver @Inject constructor(
 
     @VisibleForTesting
     fun recordInstallSourceProcessed() {
-        sharedPreferences().edit {
+        sharedPreferences.edit {
             putBoolean(SHARED_PREFERENCES_PROCESSED_KEY, true)
         }
     }
 
     private fun hasAlreadyProcessed(): Boolean {
-        return sharedPreferences().getBoolean(SHARED_PREFERENCES_PROCESSED_KEY, false)
-    }
-
-    private fun sharedPreferences(): SharedPreferences {
-        return context.getSharedPreferences(SHARED_PREFERENCES_FILENAME, Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean(SHARED_PREFERENCES_PROCESSED_KEY, false)
     }
 
     companion object {
