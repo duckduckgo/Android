@@ -31,8 +31,8 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
     <string name="useSavedLoginDialogTitle">Kayıtlı Giriş kullanılsın mı?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">%1$s için giriş yapın</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Site için giriş yapın</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">%1$s şifresi</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Site şifresi</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Bu Web Sitesinden</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">%1$s adresinden</string>
 
@@ -65,7 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz kaydedilmiş Giriş yok</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Girişler yalnızca bu cihazda güvenli bir şekilde saklanır.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Giriş bilgileri cihazınızda güvenli bir şekilde saklanır.</string>
 
     <string name="autofillManagementAddLogin">Giriş Ekle</string>
     <string name="autofillManagementSearchLogins">Giriş ara</string>
@@ -78,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Kullanıcı adı kopyalandı</string>
     <string name="autofillManagementPasswordCopied">Şifre kopyalandı</string>
+
+    <string name="autofill_password_generation_offer_title">DuckDuckGo\'dan oluşturulan şifre kullanılsın mı?</string>
+    <string name="autofill_password_generation_offer_message">Şifre, Girişlere kaydedilecektir.</string>
+    <string name="autofill_password_generation_offer_accept">Oluşturulan Şifreyi Kullan</string>
+    <string name="autofill_password_generation_offer_decline">Kendiminkini Oluştur</string>
+
+    <string name="deviceNotSupportedTitle">Cihaz desteklenmiyor</string>
+    <string name="deviceNotSupportedSubtitle">Giriş bilgilerini güvenli bir şekilde saklamak için bunları şifrelememiz ve cihazınızda depolamamız gerekir. Cihazınız şifreli depolamayı desteklemediği için Girişler kullanılamıyor.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Giriş bilgileri silindi</string>
+    <string name="autofillManagementUndoDeletion">Geri al</string>
 
 </resources>

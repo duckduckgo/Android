@@ -26,13 +26,13 @@
     <string name="saveLoginDialogButtonSave">Anmeldedaten speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Jetzt nicht</string>
-    <string name="saveLoginDialogSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
+    <string name="saveLoginDialogSubtitle">Die Anmeldedaten werden auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
     <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
     <string name="useSavedLoginDialogTitle">Gespeicherte Anmeldedaten verwenden?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Anmeldedaten für %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Anmeldedaten für Website</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Passwort für %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Passwort für die Website</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Von dieser Website</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Von %1$s</string>
 
@@ -65,7 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Anmeldedaten werden nur auf diesem Gerät sicher gespeichert.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Die Anmeldedaten werden sicher auf deinem Gerät gespeichert.</string>
 
     <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
     <string name="autofillManagementSearchLogins">Anmeldedaten suchen</string>
@@ -78,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Benutzername kopiert</string>
     <string name="autofillManagementPasswordCopied">Passwort kopiert</string>
+
+    <string name="autofill_password_generation_offer_title">Generiertes Passwort von DuckDuckGo verwenden?</string>
+    <string name="autofill_password_generation_offer_message">Das Passwort wird in den Anmeldedaten gespeichert.</string>
+    <string name="autofill_password_generation_offer_accept">Generiertes Passwort verwenden</string>
+    <string name="autofill_password_generation_offer_decline">Eigenes erstellen</string>
+
+    <string name="deviceNotSupportedTitle">Gerät nicht unterstützt</string>
+    <string name="deviceNotSupportedSubtitle">Um die Anmeldedaten sicher zu speichern, müssen sie auf deinem Gerät verschlüsselt und gespeichert werden. Da dein Gerät keine verschlüsselte Speicherung unterstützt, sind die Anmeldedaten nicht verfügbar.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Anmeldedaten gelöscht</string>
+    <string name="autofillManagementUndoDeletion">Rückgängig machen</string>
 
 </resources>

@@ -26,13 +26,13 @@
     <string name="saveLoginDialogButtonSave">Guardar inicio de sesión</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginDialogNotNow">Ahora no</string>
-    <string name="saveLoginDialogSubtitle">Los inicios de sesión se almacenan de forma segura solo en este dispositivo y se pueden administrar desde el menú de Inicios de Sesión en Ajustes.</string>
+    <string name="saveLoginDialogSubtitle">Los inicios de sesión se almacenan de forma segura en tu dispositivo y se pueden administrar desde el menú de Inicios de Sesión en Ajustes.</string>
     <string name="saveLoginDialogTitle">¿Quieres que DuckDuckGo guarde tu inicio de sesión?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Más opciones</string>
 
     <string name="useSavedLoginDialogTitle">¿Usar un inicio de sesión guardado?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Iniciar sesión para %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Iniciar sesión en el sitio</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Contraseña para %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Contraseña para el sitio</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Desde este sitio web</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Desde %1$s</string>
 
@@ -65,7 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerencias</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aún no hay inicios de sesión guardados</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Los inicios de sesión se almacenan de forma segura únicamente en este dispositivo.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Los inicios de sesión se almacenan de forma segura en tu dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Añadir inicio de sesión</string>
     <string name="autofillManagementSearchLogins">Buscar inicios de sesión</string>
@@ -78,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Nombre de usuario copiado</string>
     <string name="autofillManagementPasswordCopied">Contraseña copiada</string>
+
+    <string name="autofill_password_generation_offer_title">¿Usar contraseña generada por DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">La contraseña se guardará en Inicios de sesión.</string>
+    <string name="autofill_password_generation_offer_accept">Usar contraseña generada</string>
+    <string name="autofill_password_generation_offer_decline">Crear la mía propia</string>
+
+    <string name="deviceNotSupportedTitle">Dispositivo no compatible</string>
+    <string name="deviceNotSupportedSubtitle">Para almacenar los inicios de sesión de forma segura, necesitamos cifrarlos y almacenarlos en tu dispositivo. Debido a que tu dispositivo no admite el almacenamiento cifrado, los inicios de sesión no están disponibles.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Inicio de sesión eliminado</string>
+    <string name="autofillManagementUndoDeletion">Deshacer</string>
 
 </resources>
