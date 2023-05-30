@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
@@ -26,10 +27,12 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -71,7 +74,15 @@ class SavedSitesSyncPersister @Inject constructor(
 
         if (result is Success) {
             pruneDeletedObjects()
+
+            if (conflictResolution == DEDUPLICATION) {
+                // first sync has a special case, bookmarks and favorites that were added previously to sync need to be updated to lastModified
+                val modifiedSince = OffsetDateTime.parse(savedSitesSyncStore.modifiedSince)
+                val updatedModifiedSince = modifiedSince.plusSeconds(1)
+                savedSitesRepository.pruneModified(savedSitesSyncStore.modifiedSince, DatabaseDateFormatter.iso8601(updatedModifiedSince))
+            }
         }
+
 
         return result
     }

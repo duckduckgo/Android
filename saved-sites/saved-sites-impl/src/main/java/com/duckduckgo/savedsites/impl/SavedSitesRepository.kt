@@ -632,9 +632,26 @@ class RealSavedSitesRepository(
     }
 
     override fun pruneDeleted() {
+        Timber.d("Sync-Feature: pruning soft deleted entities")
         savedSitesEntitiesDao.allDeleted().forEach {
             savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
             savedSitesEntitiesDao.deletePermanently(it)
+        }
+    }
+
+    override fun pruneModified(
+        originalDate: String,
+        modifiedSince: String
+    ) {
+        Timber.d("Sync-Feature: updating entities modified before $originalDate to $modifiedSince")
+        val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filterNot { it.modifiedSince(originalDate) }
+        bookmarks.forEach { bookmark ->
+            savedSitesEntitiesDao.updateModified(bookmark.entityId, modifiedSince)
+        }
+
+        val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filterNot { it.modifiedSince(originalDate) }
+        folders.forEach { folder ->
+            savedSitesEntitiesDao.updateModified(folder.entityId, modifiedSince)
         }
     }
 

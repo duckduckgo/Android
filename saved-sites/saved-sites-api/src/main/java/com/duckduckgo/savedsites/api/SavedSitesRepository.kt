@@ -368,4 +368,10 @@ interface SavedSitesRepository {
      * This makes the deletion permanent
      */
     fun pruneDeleted()
+
+    /**
+     * Updates all bookmarks and folders modified before [originalDate] to [modifiedSince]
+     * Used after first sync to ensure old data in device can be synced
+     */
+    fun pruneModified(originalDate: String, modifiedSince: String)
 }

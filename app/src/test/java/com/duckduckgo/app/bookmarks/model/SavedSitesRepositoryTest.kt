@@ -1276,6 +1276,26 @@ class SavedSitesRepositoryTest {
         assert(savedSitesEntitiesDao.deletedEntity(favorite.id) != null)
     }
 
+    @Test
+    fun whenPruningModifiedThenDataIsProperlyUpdated(){
+        val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
+        val oneHourAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(1))
+
+        givenEmptyDBState()
+        val favorite = repository.insertFavorite("favourite1", "https://favorite.com", "favorite", twoHoursAgo)
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", twoHoursAgo)
+        repository.insert(bookmark)
+        val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, lastModified = twoHoursAgo)
+        repository.insert(folder)
+
+        repository.pruneModified(twoHoursAgo, oneHourAgo)
+
+        assert(repository.getFavoriteById(favorite.id)!!.lastModified == oneHourAgo)
+        assert(repository.getBookmarkById(bookmark.id)!!.lastModified == oneHourAgo)
+        assert(repository.getFolder(folder.id)!!.lastModified == oneHourAgo)
+
+    }
+
     private fun givenNoFavoritesStored() {
         Assert.assertFalse(repository.hasFavorites())
     }

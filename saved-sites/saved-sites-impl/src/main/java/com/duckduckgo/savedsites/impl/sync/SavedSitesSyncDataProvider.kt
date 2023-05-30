@@ -70,9 +70,9 @@ class SavedSitesSyncDataProvider @Inject constructor(
         val folders = repository.getFoldersModifiedSince(since)
         folders.forEach { folder ->
             if (folder.isDeleted()) {
-                addFolderContent(folder.id, updates, since)
-            } else {
                 updates.add(deletedEntry(folder.id, folder.deleted!!))
+            } else {
+                addFolderContent(folder.id, updates, since)
             }
         }
 
