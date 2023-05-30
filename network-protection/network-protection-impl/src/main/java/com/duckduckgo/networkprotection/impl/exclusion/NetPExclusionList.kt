@@ -20,6 +20,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategoryDetector
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import com.squareup.anvil.annotations.ContributesBinding
@@ -38,6 +39,7 @@ class NetPExclusionList @Inject constructor(
     private val packageManager: PackageManager,
     private val dispatcherProvider: DispatcherProvider,
     private val netPExclusionListRepository: NetPExclusionListRepository,
+    private val appCategoryDetector: AppCategoryDetector,
 ) : ExclusionList {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
@@ -51,8 +53,7 @@ class NetPExclusionList @Inject constructor(
                         TrackingProtectionAppInfo(
                             packageName = appInfo.packageName,
                             name = packageManager.getApplicationLabel(appInfo).toString(),
-                            type = appInfo.getAppType(),
-                            category = appInfo.parseAppCategory(),
+                            category = appCategoryDetector.getAppCategory(appInfo.packageName),
                             isExcluded = isExcluded,
                             knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
                             userModified = isUserModified(appInfo.packageName, userExclusionList),

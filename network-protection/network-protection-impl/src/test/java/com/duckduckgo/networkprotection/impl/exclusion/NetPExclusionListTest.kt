@@ -21,6 +21,8 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategoryDetector
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,6 +50,10 @@ class NetPExclusionListTest {
 
     @Mock
     private lateinit var netPExclusionListRepository: NetPExclusionListRepository
+
+    @Mock
+    private lateinit var appCategoryDetector: AppCategoryDetector
+
     private lateinit var testee: NetPExclusionList
 
     @Before
@@ -55,10 +61,17 @@ class NetPExclusionListTest {
         MockitoAnnotations.openMocks(this)
         whenever(packageManager.getApplicationLabel(any())).thenReturn("App Name")
         whenever(packageManager.getInstalledApplications(PackageManager.GET_META_DATA)).thenReturn(INSTALLED_APPS.asApplicationInfo())
+        INSTALLED_APPS.forEach {
+            if (it == "com.example.game") {
+                whenever(appCategoryDetector.getAppCategory(it)).thenReturn(AppCategory.Game)
+            } else {
+                whenever(appCategoryDetector.getAppCategory(it)).thenReturn(AppCategory.Undefined)
+            }
+        }
         whenever(netPExclusionListRepository.getManualAppExclusionList()).thenReturn(MANUAL_EXCLUSION_LIST)
         whenever(netPExclusionListRepository.getManualAppExclusionListFlow()).thenReturn(flowOf(MANUAL_EXCLUSION_LIST))
 
-        testee = NetPExclusionList(packageManager, coroutineRule.testDispatcherProvider, netPExclusionListRepository)
+        testee = NetPExclusionList(packageManager, coroutineRule.testDispatcherProvider, netPExclusionListRepository, appCategoryDetector)
     }
 
     @Test

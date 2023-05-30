@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.breakage
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -165,7 +165,6 @@ class ReportBreakageAppListViewModelTest {
     private val appWithoutIssues = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
-        type = "None",
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
@@ -175,7 +174,6 @@ class ReportBreakageAppListViewModelTest {
     private val appWithIssues = TrackingProtectionAppInfo(
         packageName = "com.issues.package.name",
         name = "App",
-        type = "None",
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
