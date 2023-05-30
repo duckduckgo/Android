@@ -24,6 +24,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.sync.algorithm.isDeleted
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
@@ -68,7 +69,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
         val folders = repository.getFoldersModifiedSince(since)
         folders.forEach { folder ->
-            if (folder.deleted == null) {
+            if (folder.isDeleted()) {
                 addFolderContent(folder.id, updates, since)
             } else {
                 updates.add(deletedEntry(folder.id, folder.deleted!!))
@@ -78,8 +79,10 @@ class SavedSitesSyncDataProvider @Inject constructor(
         // bookmarks that were deleted or edited won't be part of the previous check
         val bookmarks = repository.getBookmarksModifiedSince(since)
         bookmarks.forEach { bookmark ->
-            if (bookmark.deleted != null) {
+            if (bookmark.isDeleted()) {
                 updates.add(deletedEntry(bookmark.id, bookmark.deleted!!))
+            } else {
+                updates.add(encryptSavedSite(bookmark))
             }
         }
 
