@@ -18,11 +18,13 @@ package com.duckduckgo.networkprotection.store
 
 import com.duckduckgo.networkprotection.store.db.NetPExclusionListDao
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class RealNetPExclusionListRepositoryTest {
     @Mock
@@ -32,6 +34,7 @@ class RealNetPExclusionListRepositoryTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        whenever(exclusionListDao.getManualAppExclusionList()).thenReturn(MANUAL_EXCLUSION_LIST)
         testee = RealNetPExclusionListRepository(exclusionListDao)
     }
 
@@ -47,6 +50,14 @@ class RealNetPExclusionListRepositoryTest {
         testee.getManualAppExclusionListFlow()
 
         verify(exclusionListDao).getManualAppExclusionListFlow()
+    }
+
+    @Test
+    fun whenGetExcludedAppPackagesThenReturnUnprotectedAppsPackages() {
+        assertEquals(
+            listOf("com.example.app2", "com.example.app3"),
+            testee.getExcludedAppPackages(),
+        )
     }
 
     @Test
@@ -87,5 +98,13 @@ class RealNetPExclusionListRepositoryTest {
         testee.restoreDefaultProtectedList()
 
         verify(exclusionListDao).deleteManualAppExclusionList()
+    }
+
+    companion object {
+        private val MANUAL_EXCLUSION_LIST = listOf(
+            NetPManuallyExcludedApp("com.example.app1", true),
+            NetPManuallyExcludedApp("com.example.app2", false),
+            NetPManuallyExcludedApp("com.example.app3", false),
+        )
     }
 }

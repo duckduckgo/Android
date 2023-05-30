@@ -46,7 +46,7 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
         return mtuInternalProvider.getMtu()
     }
 
-    override suspend fun exclusionList(): Set<String> {
+    override fun exclusionList(): Set<String> {
         return mutableSetOf<String>().apply {
             addAll(realNetPConfigProvider.exclusionList())
             addAll(exclusionListProvider.getExclusionList())

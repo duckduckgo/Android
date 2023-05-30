@@ -67,7 +67,7 @@ class WgVpnNetworkStackTest {
             return mapOf("10.11.12.1" to 32)
         }
 
-        override suspend fun exclusionList(): Set<String> {
+        override fun exclusionList(): Set<String> {
             return setOf("com.example.app")
         }
     }
