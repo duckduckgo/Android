@@ -18,11 +18,12 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.NotificationManager.IMPORTANCE_LOW
 import android.content.Context
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 
@@ -40,10 +41,10 @@ class VpnEnabledNotificationBuilder {
                     NotificationChannel(
                         VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
                         VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
-                        NotificationManager.IMPORTANCE_LOW,
+                        IMPORTANCE_LOW,
                     )
                 channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val notificationManager = NotificationManagerCompat.from(context)
                 notificationManager.createNotificationChannel(channel)
             }
         }

@@ -28,8 +28,7 @@ interface AutoconsentSettingsDataStore {
 class RealAutoconsentSettingsDataStore constructor(private val context: Context) :
     AutoconsentSettingsDataStore {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var userSetting: Boolean
         get() = preferences.getBoolean(AUTOCONSENT_USER_SETTING, false)

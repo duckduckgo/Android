@@ -27,8 +27,7 @@ import javax.inject.*
 @ContributesBinding(
     scope = AppScope::class,
     boundType = DeviceSyncState::class,
-    // mitigation for https://app.asana.com/0/414730916066338/1204248963638410/f
-    priority = ContributesBinding.Priority.NORMAL,
+    priority = ContributesBinding.Priority.HIGHEST,
 )
 class AppDeviceSyncState @Inject constructor(
     private val appBuildConfig: AppBuildConfig,

@@ -35,8 +35,7 @@ interface AdClickFeatureToggleStore {
 }
 
 internal class RealAdClickFeatureToggleStore(private val context: Context) : AdClickFeatureToggleStore {
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override fun deleteAll() {
         preferences.edit().clear().apply()

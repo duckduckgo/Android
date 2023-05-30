@@ -21,7 +21,6 @@ import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BlockingTrack
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DaxDialogMessage
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyRemoteMessage
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OnboardingCustomizationExperiment
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyRemoteMessage
 import org.junit.Assert.*
@@ -47,22 +46,6 @@ class VariantManagerTest {
         val variant = variants.first { it.key == "se" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun onboardingCustomisationControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "mi" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(0, variant.features.size)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun onboardingCustomisationExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "mj" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(OnboardingCustomizationExperiment))
     }
 
     @Test

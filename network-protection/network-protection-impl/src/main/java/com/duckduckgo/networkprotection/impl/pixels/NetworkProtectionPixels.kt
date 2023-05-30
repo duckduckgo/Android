@@ -168,8 +168,13 @@ class RealNetworkProtectionPixel @Inject constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetworkProtectionPixels {
 
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(NETP_PIXELS_PREF_FILE, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences by lazy {
+        vpnSharedPreferencesProvider.getSharedPreferences(
+            NETP_PIXELS_PREF_FILE,
+            multiprocess = true,
+            migrate = false,
+        )
+    }
 
     override fun reportErrorInRegistration() {
         tryToFireDailyPixel(NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED_DAILY)

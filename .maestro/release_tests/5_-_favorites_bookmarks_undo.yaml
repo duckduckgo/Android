@@ -22,34 +22,16 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
-      text: "add favorite"
+    text: "add favorite"
 - tapOn:
     text: "add favorite"
-# Remove favorite from menu button
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-      text: "remove favorite"
-- tapOn:
-      text: "remove favorite"
-# Re-add favorite from menu button
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-      text: "add favorite"
-- tapOn:
-      text: "add favorite"
-# Check favorites from bookmarks screen
+# Navigate to bookmarks screen
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-- assertNotVisible:
-    text: "No bookmarks added yet"
-- assertVisible:
-    text: "Privacy Test Pages - Home"
 # Remove favorite from bookmarks screen
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/trailingIcon"
@@ -58,16 +40,10 @@ appId: com.duckduckgo.mobile.android
     text: "Delete"
 - tapOn:
     text: "delete"
-# When a favorite is removed, it still stays as Bookmark
-- assertVisible:
+# Undo remove favorite from bookmarks screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/snackbar_action"
+- assertNotVisible:
     text: "No favorites added yet"
 - assertNotVisible:
     text: "No bookmarks added yet"
-# Undo remove favorite from bookmarks screen
-- assertVisible: "Undo"
-#- tapOn:
-#    id: "com.duckduckgo.mobile.android:id/snackbar_action"
-#- assertNotVisible:
-#    text: "No favorites added yet"
-#- assertNotVisible:
-#    text: "No bookmarks added yet"

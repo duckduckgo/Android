@@ -40,8 +40,7 @@ interface WidgetPreferences {
 
 class AppWidgetThemePreferences @Inject constructor(private val context: Context) : WidgetPreferences {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override fun widgetTheme(widgetId: Int): WidgetTheme {
         return WidgetTheme.valueOf(

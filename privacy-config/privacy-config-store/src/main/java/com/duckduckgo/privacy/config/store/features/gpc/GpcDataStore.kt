@@ -27,8 +27,7 @@ interface GpcDataStore {
 
 class GpcSharedPreferences constructor(private val context: Context) : GpcDataStore {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var gpcEnabled: Boolean
         get() = preferences.getBoolean(KEY_GPC_ENABLED, true)

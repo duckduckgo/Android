@@ -29,8 +29,7 @@ interface SitePermissionsPreferences {
 
 class SitePermissionsPreferencesImp @Inject constructor(private val context: Context) : SitePermissionsPreferences {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var askCameraEnabled: Boolean
         get() = preferences.getBoolean(KEY_ASK_CAMERA_ENABLED, true)

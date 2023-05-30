@@ -400,7 +400,10 @@
                 "siteURL": "https://example2a.com",
                 "requestURL": "https://standard1.test/request-1a",
                 "requestType": "stylesheet",
-                "expectAction": "ignore"
+                "expectAction": "ignore",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "standard1 - path (2) matches, exception matches",
@@ -490,7 +493,10 @@
                 "siteURL": "https://example3.com",
                 "requestURL": "https://standard2.test/request-1",
                 "requestType": "stylesheet",
-                "expectAction": "block"
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "standard2 - path matches, exception does not (should not confuse with following exception)",
@@ -755,6 +761,7 @@
                 "requestType": "script",
                 "expectAction": "block",
                 "exceptPlatforms": [
+                    "ios-browser",
                     "web-extension-mv3"
                 ]
             },
@@ -790,21 +797,30 @@
                 "siteURL": "https://example2.com",
                 "requestURL": "https://options-trailing-exception.test/script.js",
                 "requestType": "stylesheet",
-                "expectAction": "ignore"
+                "expectAction": "ignore",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "options-trailing-ignore - block on options match",
                 "siteURL": "https://example.com",
                 "requestURL": "https://options-trailing-ignore.test/script.js",
                 "requestType": "stylesheet",
-                "expectAction": "block"
+                "expectAction": "block",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "options-trailing-ignore - ignore on no options match",
                 "siteURL": "https://example2.com",
                 "requestURL": "https://options-trailing-ignore.test/script.js",
                 "requestType": "stylesheet",
-                "expectAction": "ignore"
+                "expectAction": "ignore",
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "format.test - supports unescaped slashes",
@@ -908,37 +924,6 @@
                 "name": "format.test - domain in rule - don't match the inner request",
                 "siteURL": "https://example.com",
                 "requestURL": "https://sub2.format.test/test4b.js",
-                "requestType": "script",
-                "expectAction": "block"
-            },
-            {
-                "name": "format.test - with subdomain and explicit anchoring - don't match for incorrect subdomain",
-                "siteURL": "https://example.com",
-                "requestURL": "https://sub1nsub2.format.test/test4c.js",
-                "requestType": "script",
-                "expectAction": "block"
-            },
-            {
-                "name": "format.test - with subdomain and explicit anchoring - match on extra subdomain",
-                "siteURL": "https://example.com",
-                "requestURL": "https://sub0.sub1.sub2.format.test/test4c.js",
-                "requestType": "script",
-                "expectAction": "ignore",
-                "exceptPlatforms": [
-                    "ios-browser"
-                ]
-            },
-            {
-                "name": "format.test - with subdomain and explicit anchoring - don't match on incorrect subdomain",
-                "siteURL": "https://example.com",
-                "requestURL": "https://sub0.sub2.format.test/test4c.js",
-                "requestType": "script",
-                "expectAction": "block"
-            },
-            {
-                "name": "format.test - with subdomain and explicit anchoring - don't match on extended subdomain",
-                "siteURL": "https://example.com",
-                "requestURL": "https://ssub1.sub2.format.test/test4c.js",
                 "requestType": "script",
                 "expectAction": "block"
             },
