@@ -36,12 +36,11 @@ class SavedSitesDeduplicationPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
-        lastModified: String,
     ) {
         // in deduplication we replace local folder with remote folder (id, name, parentId, add children to existent ones)
         when (val result = duplicateFinder.findFolderDuplicate(folder)) {
             is Duplicate -> {
-                if (folder.deleted != null) {
+                if (folder.isDeleted()) {
                     Timber.d("Sync-Feature: folder ${folder.id} has a local duplicate in ${result.id} and needs to be deleted")
                     savedSitesRepository.delete(folder)
                 } else {
@@ -51,7 +50,7 @@ class SavedSitesDeduplicationPersister @Inject constructor(
             }
 
             is NotDuplicate -> {
-                if (folder.deleted != null) {
+                if (folder.isDeleted()) {
                     Timber.d("Sync-Feature: folder ${folder.id} not present locally but was deleted, nothing to do")
                 } else {
                     Timber.d("Sync-Feature: folder ${folder.id} not present locally, inserting")
@@ -63,38 +62,42 @@ class SavedSitesDeduplicationPersister @Inject constructor(
 
     override fun processBookmark(
         bookmark: Bookmark,
-        bookmarkId: String,
         folderId: String,
-        lastModified: String,
     ) {
-        // if there's a bookmark duplicate locally (url and name) then we replace it
-        when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
-            is Duplicate -> {
-                Timber.d("Sync-Feature: child $bookmarkId has a local duplicate in ${result.id}, replacing")
-                savedSitesRepository.replaceBookmark(bookmark, result.id)
-            }
+        if (bookmark.isDeleted()) {
+            Timber.d("Sync-Feature: child ${bookmark.id} is removed and not present locally, nothing to do")
+        } else {
+            // if there's a bookmark duplicate locally (url and name) then we replace it
+            when (val result = duplicateFinder.findBookmarkDuplicate(bookmark)) {
+                is Duplicate -> {
+                    Timber.d("Sync-Feature: child ${bookmark.id} has a local duplicate in ${result.id}, replacing")
+                    savedSitesRepository.replaceBookmark(bookmark, result.id)
+                }
 
-            is NotDuplicate -> {
-                Timber.d("Sync-Feature: child $bookmarkId not present locally, inserting")
-                savedSitesRepository.insert(bookmark)
+                is NotDuplicate -> {
+                    Timber.d("Sync-Feature: child ${bookmark.id} not present locally, inserting")
+                    savedSitesRepository.insert(bookmark)
+                }
             }
         }
     }
 
     override fun processFavourite(
         favourite: Favorite,
-        lastModified: String,
     ) {
-        Timber.d("Sync-Feature: is ${favourite.id} duplicated locally?")
-        when (val result = duplicateFinder.findFavouriteDuplicate(favourite)) {
-            is SavedSitesDuplicateResult.Duplicate -> {
-                Timber.d("Sync-Feature: child ${favourite.id} exists locally as ${result.id}, replacing")
-                savedSitesRepository.replaceFavourite(favourite, result.id)
-            }
+        if (favourite.isDeleted()) {
+            Timber.d("Sync-Feature: favourite ${favourite.id} is removed and not present locally, nothing to do")
+        } else {
+            when (val result = duplicateFinder.findFavouriteDuplicate(favourite)) {
+                is SavedSitesDuplicateResult.Duplicate -> {
+                    Timber.d("Sync-Feature: child ${favourite.id} exists locally as ${result.id}, replacing")
+                    savedSitesRepository.replaceFavourite(favourite, result.id)
+                }
 
-            is SavedSitesDuplicateResult.NotDuplicate -> {
-                Timber.d("Sync-Feature: child ${favourite.id} not present locally, inserting")
-                savedSitesRepository.insert(favourite)
+                is SavedSitesDuplicateResult.NotDuplicate -> {
+                    Timber.d("Sync-Feature: child ${favourite.id} not present locally, inserting")
+                    savedSitesRepository.insert(favourite)
+                }
             }
         }
     }

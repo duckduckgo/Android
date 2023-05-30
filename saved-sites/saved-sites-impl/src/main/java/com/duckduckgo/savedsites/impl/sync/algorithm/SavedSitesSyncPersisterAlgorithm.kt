@@ -136,10 +136,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT) {
             Timber.d("Sync-Feature: processing folder ${folder.id} with parentId $parentId")
             when (conflictResolution) {
-                DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder, lastModified)
-                REMOTE_WINS -> remoteWinsStrategy.processBookmarkFolder(folder, lastModified)
-                LOCAL_WINS -> localWinsStrategy.processBookmarkFolder(folder, lastModified)
-                TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder, lastModified)
+                DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder)
+                REMOTE_WINS -> remoteWinsStrategy.processBookmarkFolder(folder)
+                LOCAL_WINS -> localWinsStrategy.processBookmarkFolder(folder)
+                TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder)
             }
         }
         processIds.add(folder.id)
@@ -164,10 +164,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                     Timber.d("Sync-Feature: child $child is a Bookmark")
                     val bookmark = decryptBookmark(childEntry, folderId, lastModified)
                     when (conflictResolution) {
-                        DEDUPLICATION -> deduplicationStrategy.processBookmark(bookmark, child, folderId, lastModified)
-                        REMOTE_WINS -> remoteWinsStrategy.processBookmark(bookmark, child, folderId, lastModified)
-                        LOCAL_WINS -> localWinsStrategy.processBookmark(bookmark, child, folderId, lastModified)
-                        TIMESTAMP -> timestampStrategy.processBookmark(bookmark, child, folderId, lastModified)
+                        DEDUPLICATION -> deduplicationStrategy.processBookmark(bookmark, folderId)
+                        REMOTE_WINS -> remoteWinsStrategy.processBookmark(bookmark, folderId)
+                        LOCAL_WINS -> localWinsStrategy.processBookmark(bookmark, folderId)
+                        TIMESTAMP -> timestampStrategy.processBookmark(bookmark, folderId)
                     }
                 }
 
@@ -193,10 +193,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             } else {
                 val favourite = decryptFavourite(favouriteEntry, position, lastModified)
                 when (conflictResolution) {
-                    DEDUPLICATION -> deduplicationStrategy.processFavourite(favourite, lastModified)
-                    REMOTE_WINS -> remoteWinsStrategy.processFavourite(favourite, lastModified)
-                    LOCAL_WINS -> localWinsStrategy.processFavourite(favourite, lastModified)
-                    TIMESTAMP -> timestampStrategy.processFavourite(favourite, lastModified)
+                    DEDUPLICATION -> deduplicationStrategy.processFavourite(favourite)
+                    REMOTE_WINS -> remoteWinsStrategy.processFavourite(favourite)
+                    LOCAL_WINS -> localWinsStrategy.processFavourite(favourite)
+                    TIMESTAMP -> timestampStrategy.processFavourite(favourite)
                 }
             }
         }

@@ -33,15 +33,19 @@ class SavedSitesLocalWinsPersister @Inject constructor(
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
-        lastModified: String,
     ) {
         // if there's a folder with the same id locally we check the conflict resolution
-        // if LOCAL -> local object wins and no changes are applied
+        // if TIMESTAMP -> new timestamp wins
         val localFolder = savedSitesRepository.getFolder(folder.id)
         if (localFolder != null) {
-            Timber.d("Sync-Feature: local folder wins over remote, nothing to do")
+            if (folder.isDeleted()) {
+                Timber.d("Sync-Feature: folder ${localFolder.id} exists locally but was deleted remotely, deleting locally too")
+                savedSitesRepository.delete(localFolder)
+            } else {
+                Timber.d("Sync-Feature: folder ${localFolder.id} exists locally, nothing to do")
+            }
         } else {
-            if (folder.deleted != null) {
+            if (folder.isDeleted()) {
                 Timber.d("Sync-Feature: folder ${folder.id} not present locally but was deleted, nothing to do")
             } else {
                 Timber.d("Sync-Feature: folder ${folder.id} not present locally, inserting")
@@ -52,26 +56,46 @@ class SavedSitesLocalWinsPersister @Inject constructor(
 
     override fun processBookmark(
         bookmark: Bookmark,
-        bookmarkId: String,
         folderId: String,
-        lastModified: String,
     ) {
         // if there's a bookmark with the same id locally we check the conflict resolution
-        // if LOCAL -> local object wins and no changes are applied
-        val storedBookmark = savedSitesRepository.getBookmarkById(bookmarkId)
+        // if REMOTE -> remote object wins and replaces local
+        val storedBookmark = savedSitesRepository.getBookmarkById(bookmark.id)
         if (storedBookmark != null) {
-            Timber.d("Sync-Feature: local bookmark wins over remote, nothing to do")
+            if (bookmark.isDeleted()) {
+                Timber.d("Sync-Feature: remote bookmark ${bookmark.id} exists locally but was deleted remotely, deleting locally too")
+                savedSitesRepository.delete(bookmark)
+            } else {
+                Timber.d("Sync-Feature: remote bookmark ${bookmark.id} exists locally, nothing to do")
+            }
         } else {
-            Timber.d("Sync-Feature: child $bookmarkId not present locally, inserting")
-            savedSitesRepository.insert(bookmark)
+            if (bookmark.isDeleted()) {
+                Timber.d("Sync-Feature: bookmark ${bookmark.id} not present locally but was deleted, nothing to do")
+            } else {
+                Timber.d("Sync-Feature: child ${bookmark.id} not present locally, inserting")
+                savedSitesRepository.insert(bookmark)
+            }
         }
     }
 
     override fun processFavourite(
         favourite: Favorite,
-        lastModified: String,
     ) {
-        Timber.d("Sync-Feature: adding ${favourite.id} to Favourites")
-        savedSitesRepository.insert(favourite)
+        val storedFavorite = savedSitesRepository.getFavoriteById(favourite.id)
+        if (storedFavorite != null) {
+            if (favourite.isDeleted()) {
+                Timber.d("Sync-Feature: remote favourite ${favourite.id} exists locally but was deleted remotely, deleting locally too")
+                savedSitesRepository.delete(favourite)
+            } else {
+                Timber.d("Sync-Feature: remote favourite ${favourite.id} exists locally, nothing to do")
+            }
+        } else {
+            if (favourite.isDeleted()) {
+                Timber.d("Sync-Feature: favourite ${favourite.id} not present locally but was deleted, nothing to do")
+            } else {
+                Timber.d("Sync-Feature: adding ${favourite.id} to Favourites")
+                savedSitesRepository.insert(favourite)
+            }
+        }
     }
 }

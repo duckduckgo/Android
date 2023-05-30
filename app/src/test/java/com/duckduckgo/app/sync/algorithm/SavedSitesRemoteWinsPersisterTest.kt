@@ -22,15 +22,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDeduplicationPersister
-import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesRemoteWinsPersister
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import org.junit.Assert.assertTrue
@@ -38,9 +37,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
-class SavedSitesDeduplicationPersisterTest {
+class SavedSitesRemoteWinsPersisterTest {
 
     // move this to unit test
     @get:Rule
@@ -54,9 +55,10 @@ class SavedSitesDeduplicationPersisterTest {
     private lateinit var repository: SavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
-    private lateinit var duplicateFinder: SavedSitesDuplicateFinder
 
-    private lateinit var persister: SavedSitesDeduplicationPersister
+    private lateinit var persister: SavedSitesRemoteWinsPersister
+
+    private val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
 
     @Before
     fun setup() {
@@ -68,14 +70,13 @@ class SavedSitesDeduplicationPersisterTest {
         savedSitesRelationsDao = db.syncRelationsDao()
 
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
-        duplicateFinder = RealSavedSitesDuplicateFinder(repository)
 
-        persister = SavedSitesDeduplicationPersister(repository, duplicateFinder)
+        persister = SavedSitesRemoteWinsPersister(repository)
     }
 
     @Test
     fun whenProcessingBookmarkNotPresentLocallyThenBookmarkIsInserted() {
-        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", twoHoursAgo)
         assertTrue(repository.getBookmarkById(bookmark.id) == null)
 
         persister.processBookmark(bookmark, SavedSitesNames.BOOKMARKS_ROOT)
@@ -85,7 +86,7 @@ class SavedSitesDeduplicationPersisterTest {
 
     @Test
     fun whenProcessingDeletedBookmarkNotPresentLocallyThenBookmarkIsNotInserted() {
-        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp", deleted = "1")
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", twoHoursAgo, deleted = "1")
         assertTrue(repository.getBookmarkById(bookmark.id) == null)
 
         persister.processBookmark(bookmark, SavedSitesNames.BOOKMARKS_ROOT)
@@ -94,20 +95,32 @@ class SavedSitesDeduplicationPersisterTest {
     }
 
     @Test
-    fun whenProcessingBookmarkDuplicateThenBookmarkIdIsReplaced() {
-        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
+    fun whenProcessingRemoteBookmarkPresentLocallyThenBookmarkIsReplaced() {
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", twoHoursAgo)
         repository.insert(bookmark)
 
         assertTrue(repository.getBookmarkById(bookmark.id) != null)
 
-        val remoteBookmark = bookmark.copy(id = "remotebookmark1")
+        val remoteBookmark = bookmark.copy(title = "title replaced")
         persister.processBookmark(remoteBookmark, SavedSitesNames.BOOKMARKS_ROOT)
-
-        assertTrue(repository.getBookmarkById(bookmark.id) == null)
 
         val replacedBookmark = repository.getBookmarkById(remoteBookmark.id)
         assertTrue(replacedBookmark != null)
-        assertTrue(replacedBookmark!!.title == bookmark.title)
+        assertTrue(replacedBookmark!!.title == remoteBookmark.title)
+    }
+
+    @Test
+    fun whenProcessingDeletedRemoteBookmarkThenBookmarkIsDeleted() {
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", twoHoursAgo)
+        repository.insert(bookmark)
+
+        assertTrue(repository.getBookmarkById(bookmark.id) != null)
+
+        val remoteBookmark = bookmark.copy(deleted = "1")
+        persister.processBookmark(remoteBookmark, SavedSitesNames.BOOKMARKS_ROOT)
+
+        val replacedBookmark = repository.getBookmarkById(remoteBookmark.id)
+        assertTrue(replacedBookmark == null)
     }
 
     @Test
@@ -121,26 +134,44 @@ class SavedSitesDeduplicationPersisterTest {
     }
 
     @Test
-    fun whenProcessingDeletedFavouriteNotPresentLocallyThenFavouriteIsNotInserted() {
-        val favourite = Favorite("bookmark1", "title", "www.example.com", "timestamp", 0, deleted = "1")
-        assertTrue(repository.getFavoriteById(favourite.id) == null)
-
-        persister.processFavourite(favourite)
-
-        assertTrue(repository.getFavoriteById(favourite.id) == null)
-    }
-
-    @Test
-    fun whenProcessingFavouriteDuplicateThenFavouriteIdIsReplaced() {
-        val favourite = Favorite("bookmark1", "title", "www.example.com", "timestamp", 0)
+    fun whenProcessingDeletedFavouriteThenLocalFavouriteIsDeleted() {
+        val favourite = Favorite("bookmark1", "title", "www.example.com", twoHoursAgo, 0)
         repository.insert(favourite)
         assertTrue(repository.getFavoriteById(favourite.id) != null)
 
-        val remoteFavourite = favourite.copy(id = "remotebookmark1")
+        val remoteFavourite = favourite.copy(deleted = "1")
         persister.processFavourite(remoteFavourite)
 
         assertTrue(repository.getFavoriteById(favourite.id) == null)
-        assertTrue(repository.getFavoriteById(remoteFavourite.id) != null)
+        assertTrue(repository.getBookmarkById(favourite.id) != null)
+    }
+
+    @Test
+    fun whenProcessingDeletedFavouriteNotPresentLocallyThenFavouriteIsNotAdded() {
+        val favourite = Favorite("bookmark1", "title", "www.example.com", twoHoursAgo, 0, deleted = "1")
+
+        assertTrue(repository.getFavoriteById(favourite.id) == null)
+        persister.processFavourite(favourite)
+
+        assertTrue(repository.getFavoriteById(favourite.id) == null)
+        assertTrue(repository.getBookmarkById(favourite.id) == null)
+    }
+
+    @Test
+    fun whenProcessingFavouriteThenLocalFavouriteIsReplaced() {
+        val favourite1 = Favorite("bookmark1", "title", "www.example.com", twoHoursAgo, 0)
+        val favourite2 = Favorite("bookmark2", "title2", "www.example2.com", twoHoursAgo, 1)
+        repository.insert(favourite1)
+        repository.insert(favourite2)
+        assertTrue(repository.getFavoriteById(favourite1.id) != null)
+
+        val remoteFavourite = favourite1.copy(position = 1)
+        persister.processFavourite(remoteFavourite)
+
+        val storedFavourite = repository.getFavoriteById(favourite1.id)
+
+        assertTrue(storedFavourite != null)
+        assertTrue(storedFavourite!!.position == remoteFavourite.position)
     }
 
     @Test
@@ -154,30 +185,7 @@ class SavedSitesDeduplicationPersisterTest {
     }
 
     @Test
-    fun whenProcessingDeletedFolderNotPresentLocallyThenFolderIsNotInserted() {
-        val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, deleted = "1")
-        assertTrue(repository.getFolder(folder.id) == null)
-
-        persister.processBookmarkFolder(folder)
-
-        assertTrue(repository.getFolder(folder.id) == null)
-    }
-
-    @Test
-    fun whenProcessingFolderPresentLocallyThenFolderIsReplaced() {
-        val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0)
-        repository.insert(folder)
-        assertTrue(repository.getFolder(folder.id) != null)
-
-        val remoteFolder = folder.copy(name = "remotefolder1")
-        persister.processBookmarkFolder(remoteFolder)
-
-        assertTrue(repository.getFolder(folder.id) != null)
-        assertTrue(repository.getFolder(folder.id)!!.name == remoteFolder.name)
-    }
-
-    @Test
-    fun whenProcessingRemoteDeletdFolderPresentLocallyThenFolderIsDeleted() {
+    fun whenProcessingDeletedFolderPresentLocallyThenFolderIsDeleted() {
         val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0)
         repository.insert(folder)
         assertTrue(repository.getFolder(folder.id) != null)
@@ -186,5 +194,18 @@ class SavedSitesDeduplicationPersisterTest {
         persister.processBookmarkFolder(deletedFolder)
 
         assertTrue(repository.getFolder(folder.id) == null)
+    }
+
+    @Test
+    fun whenProcessingFolderThenFolderIsReplaced() {
+        val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, lastModified = twoHoursAgo)
+        repository.insert(folder)
+        assertTrue(repository.getFolder(folder.id) != null)
+
+        val updatedFolder = folder.copy(name = "remoteFolder1")
+        persister.processBookmarkFolder(updatedFolder)
+
+        assertTrue(repository.getFolder(folder.id) != null)
+        assertTrue(repository.getFolder(folder.id)!!.name == updatedFolder.name)
     }
 }

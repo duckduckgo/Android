@@ -24,18 +24,14 @@ interface SavedSitesSyncPersisterStrategy {
 
     fun processBookmarkFolder(
         folder: BookmarkFolder,
-        lastModified: String,
     )
 
     fun processFavourite(
         favourite: Favorite,
-        lastModified: String,
     )
 
     fun processBookmark(
         bookmark: Bookmark,
-        bookmarkId: String,
         folderId: String,
-        lastModified: String,
     )
 }
