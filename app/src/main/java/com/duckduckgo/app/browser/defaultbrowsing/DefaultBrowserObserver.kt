@@ -17,13 +17,13 @@
 package com.duckduckgo.app.browser.defaultbrowsing
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.featureusage.FeatureSegmentType
-import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 
 class DefaultBrowserObserver(
     private val defaultBrowserDetector: DefaultBrowserDetector,

@@ -17,10 +17,10 @@
 package com.duckduckgo.app.browser.defaultbrowsing
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock

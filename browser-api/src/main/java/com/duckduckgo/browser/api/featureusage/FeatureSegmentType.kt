@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.featureusage
+package com.duckduckgo.browser.api.featureusage
 
 enum class FeatureSegmentType {
     BOOKMARKS_IMPORTED,

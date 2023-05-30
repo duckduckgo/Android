@@ -2,11 +2,11 @@ package com.duckduckgo.app.featureusage.di
 
 import android.content.Context
 import com.duckduckgo.app.featureusage.FeatureSegmentManagerImpl
-import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStore
 import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStoreSharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import dagger.Module
 import dagger.Provides
 

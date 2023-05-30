@@ -19,7 +19,6 @@ package com.duckduckgo.app.onboarding.ui.page
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Command
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Companion.MAX_DIALOG_ATTEMPTS
@@ -29,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.featureusage.FeatureSegmentsManager
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

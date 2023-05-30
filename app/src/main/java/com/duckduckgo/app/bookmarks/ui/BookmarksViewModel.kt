@@ -24,12 +24,12 @@ import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.featureusage.FeatureSegmentType.BOOKMARKS_IMPORTED
-import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.BOOKMARKS_IMPORTED
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder

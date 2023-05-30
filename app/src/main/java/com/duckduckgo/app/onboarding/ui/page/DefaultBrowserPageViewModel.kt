@@ -20,12 +20,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.featureusage.FeatureSegmentType
-import com.duckduckgo.app.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 

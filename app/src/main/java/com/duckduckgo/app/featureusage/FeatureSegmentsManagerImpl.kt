@@ -16,31 +16,24 @@
 
 package com.duckduckgo.app.featureusage
 
-import com.duckduckgo.app.featureusage.FeatureSegmentType.APP_TP_ENABLED
-import com.duckduckgo.app.featureusage.FeatureSegmentType.BOOKMARKS_IMPORTED
-import com.duckduckgo.app.featureusage.FeatureSegmentType.EMAIL_PROTECTION_SET
-import com.duckduckgo.app.featureusage.FeatureSegmentType.FAVOURITE_SET
-import com.duckduckgo.app.featureusage.FeatureSegmentType.FIRE_BUTTON_USED
-import com.duckduckgo.app.featureusage.FeatureSegmentType.FIVE_SEARCHES_MADE
-import com.duckduckgo.app.featureusage.FeatureSegmentType.LOGIN_SAVED
-import com.duckduckgo.app.featureusage.FeatureSegmentType.SET_AS_DEFAULT
-import com.duckduckgo.app.featureusage.FeatureSegmentType.TEN_SEARCHES_MADE
-import com.duckduckgo.app.featureusage.FeatureSegmentType.TWO_SEARCHES_MADE
 import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
-import javax.inject.Inject
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.APP_TP_ENABLED
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.BOOKMARKS_IMPORTED
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.EMAIL_PROTECTION_SET
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.FAVOURITE_SET
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.FIRE_BUTTON_USED
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.FIVE_SEARCHES_MADE
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.LOGIN_SAVED
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.SET_AS_DEFAULT
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.TEN_SEARCHES_MADE
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.TWO_SEARCHES_MADE
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 
-interface FeatureSegmentsManager {
-    fun addUserToFeatureSegment(segment: FeatureSegmentType)
-    fun searchMade()
-    fun shouldFireSegmentsPixel(): Boolean
-    fun fireFeatureSegmentsPixel()
-    fun restartDailySearchCount()
-}
-
-class FeatureSegmentManagerImpl @Inject constructor(
+class FeatureSegmentManagerImpl(
     private val featureSegmentsDataStore: FeatureSegmentsDataStore,
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
