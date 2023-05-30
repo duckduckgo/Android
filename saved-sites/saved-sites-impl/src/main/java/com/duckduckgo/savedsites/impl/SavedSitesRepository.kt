@@ -506,6 +506,17 @@ class RealSavedSitesRepository(
         bookmark: Bookmark,
         localId: String,
     ) {
+        // check is bookmark has moved
+        val storedBookmark = getBookmarkById(bookmark.id)
+        if (storedBookmark != null) {
+            if (storedBookmark.parentId != bookmark.parentId) {
+                // bookmark has moved to another folder
+                Timber.d("Sync-Feature: ${bookmark.id} has moved from folder ${storedBookmark.parentId} to ${bookmark.parentId}")
+                savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, storedBookmark.parentId)
+                savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
+            }
+        }
+
         savedSitesEntitiesDao.updateId(localId, bookmark.id)
         savedSitesRelationsDao.updateEntityId(localId, bookmark.id)
         savedSitesEntitiesDao.update(
@@ -517,6 +528,7 @@ class RealSavedSitesRepository(
                 bookmark.lastModified ?: DatabaseDateFormatter.iso8601(),
             ),
         )
+
         savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
     }
 
@@ -641,7 +653,7 @@ class RealSavedSitesRepository(
 
     override fun pruneModified(
         originalDate: String,
-        modifiedSince: String
+        modifiedSince: String,
     ) {
         Timber.d("Sync-Feature: updating entities modified before $originalDate to $modifiedSince")
         val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filterNot { it.modifiedSince(originalDate) }

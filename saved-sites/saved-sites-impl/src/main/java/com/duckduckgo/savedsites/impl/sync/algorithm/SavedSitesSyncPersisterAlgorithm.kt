@@ -92,6 +92,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             )
         }
 
+        // 3. All objects deleted in the root
+        val allDeletedIds = bookmarks.entries.filter { it.deleted != null }.map { it.id }
+        processDeletedItems(allDeletedIds)
+
         // Favourites
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
             Timber.d("Sync-Feature: favourites root found, traversing from there")
@@ -153,11 +157,11 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         folderId: String,
         lastModified: String,
     ) {
-        Timber.d("Sync-Feature: processing child $child")
+        Timber.d("Sync-Feature: processing id $child")
         processIds.add(child)
         val childEntry = entries.find { it.id == child }
         if (childEntry == null) {
-            Timber.d("Sync-Feature: can't find child $child")
+            Timber.d("Sync-Feature: id $child not present in the payload, omitting")
         } else {
             when {
                 childEntry.isBookmark() -> {
@@ -189,7 +193,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             Timber.d("Sync-Feature: child $child is a Favourite")
             val favouriteEntry = entries.find { it.id == child }
             if (favouriteEntry == null) {
-                Timber.d("Sync-Feature: can't find favourite $child")
+                Timber.d("Sync-Feature: id $child not present in the payload, omitting")
             } else {
                 val favourite = decryptFavourite(favouriteEntry, position, lastModified)
                 when (conflictResolution) {
@@ -200,6 +204,9 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun processDeletedItems(deletedItems: List<String>) {
     }
 
     private fun decryptFolder(

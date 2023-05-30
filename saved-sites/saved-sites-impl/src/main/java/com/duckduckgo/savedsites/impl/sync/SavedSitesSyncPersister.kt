@@ -32,8 +32,8 @@ import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
@@ -82,7 +82,6 @@ class SavedSitesSyncPersister @Inject constructor(
                 savedSitesRepository.pruneModified(savedSitesSyncStore.modifiedSince, DatabaseDateFormatter.iso8601(updatedModifiedSince))
             }
         }
-
 
         return result
     }

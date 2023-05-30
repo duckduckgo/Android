@@ -1095,6 +1095,33 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenReplacingBookmarkWithBookmarkFromAnotherFolderThenDataIsUpdated() {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        val subFolder = BookmarkFolder(id = "folder", name = "Folder", lastModified = "timestamp", parentId = rootFolder.id)
+        repository.insert(rootFolder)
+        repository.insert(subFolder)
+
+        val bookmark = repository.insert(
+            Bookmark(
+                id = "bookmark1",
+                title = "title",
+                url = "foo.com",
+                lastModified = "timestamp",
+                parentId = rootFolder.id,
+            ),
+        ) as Bookmark
+
+        val updatedBookmark = bookmark.copy(title = "title2", parentId = subFolder.id)
+
+        repository.replaceBookmark(updatedBookmark, bookmark.id)
+
+        val bookmarkUpdated = repository.getBookmarkById(bookmark.id)!!
+
+        Assert.assertTrue(bookmark.id == bookmarkUpdated.id)
+        Assert.assertTrue(subFolder.id == bookmarkUpdated.parentId)
+    }
+
+    @Test
     fun whenFavouriteIsReplacedWithSameIdThenDataIsUpdated() {
         val favorite = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         givenFavoriteStored(favorite)
@@ -1227,6 +1254,24 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenFolderParentIsUpdatedThenReplacingItUpdatesData() = runTest {
+        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
+        repository.insert(rootFolder)
+
+        val secondFolder = BookmarkFolder(id = "secondFolder", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+        repository.insert(secondFolder)
+
+        val thirdFolder = BookmarkFolder(id = "thirdFolder", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+        repository.insert(thirdFolder)
+
+        val updatedFolder = thirdFolder.copy(parentId = secondFolder.id)
+        repository.replaceFolderContent(updatedFolder, thirdFolder.id)
+
+        val storedFolder = repository.getFolder(thirdFolder.id)!!
+        assertTrue(storedFolder.parentId == secondFolder.id)
+    }
+
+    @Test
     fun whenPruningDeletedBookmarkFolderDataIsPermanentlyDeleted() {
         givenEmptyDBState()
 
@@ -1277,7 +1322,7 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenPruningModifiedThenDataIsProperlyUpdated(){
+    fun whenPruningModifiedThenDataIsProperlyUpdated() {
         val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
         val oneHourAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(1))
 
@@ -1293,7 +1338,6 @@ class SavedSitesRepositoryTest {
         assert(repository.getFavoriteById(favorite.id)!!.lastModified == oneHourAgo)
         assert(repository.getBookmarkById(bookmark.id)!!.lastModified == oneHourAgo)
         assert(repository.getFolder(folder.id)!!.lastModified == oneHourAgo)
-
     }
 
     private fun givenNoFavoritesStored() {
