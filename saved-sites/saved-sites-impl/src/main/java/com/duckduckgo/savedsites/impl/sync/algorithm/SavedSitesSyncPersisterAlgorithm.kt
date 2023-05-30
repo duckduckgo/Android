@@ -17,6 +17,7 @@
 package com.duckduckgo.savedsites.impl.sync.algorithm
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -48,6 +49,7 @@ interface SavedSitesSyncPersisterAlgorithm {
 @ContributesBinding(AppScope::class)
 class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     private val syncCrypto: SyncCrypto,
+    private val repository: SavedSitesRepository,
     @Named("deduplicationStrategy") private val deduplicationStrategy: SavedSitesSyncPersisterStrategy,
     @Named("timestampStrategy") private val timestampStrategy: SavedSitesSyncPersisterStrategy,
     @Named("remoteWinsStrategy") private val remoteWinsStrategy: SavedSitesSyncPersisterStrategy,
@@ -207,6 +209,24 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     }
 
     private fun processDeletedItems(deletedItems: List<String>) {
+        Timber.d("Sync-Feature: processing deleted items $deletedItems")
+        deletedItems.forEach { id ->
+            val isBookmark = repository.getBookmarkById(id)
+            if (isBookmark != null) {
+                Timber.d("Sync-Feature: item $id is a bookmark, deleting it")
+                repository.delete(isBookmark)
+            }
+            val isFavourite = repository.getFavoriteById(id)
+            if (isFavourite != null) {
+                Timber.d("Sync-Feature: item $id is a favourite, deleting it")
+                repository.delete(isFavourite)
+            }
+            val isFolder = repository.getFolder(id)
+            if (isFolder != null) {
+                Timber.d("Sync-Feature: item $id is a folder, deleting it")
+                repository.delete(isFolder)
+            }
+        }
     }
 
     private fun decryptFolder(

@@ -396,6 +396,7 @@ class RealSavedSitesRepository(
     private fun deleteFavorite(favorite: Favorite) {
         savedSitesRelationsDao.deleteRelationByEntity(favorite.id, SavedSitesNames.FAVORITES_ROOT)
         savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
+        savedSitesEntitiesDao.updateModified(favorite.id)
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
@@ -404,6 +405,7 @@ class RealSavedSitesRepository(
         }
         savedSitesEntitiesDao.updateModified(bookmark.parentId)
         savedSitesEntitiesDao.delete(bookmark.id)
+        savedSitesEntitiesDao.updateModified(bookmark.id)
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
     }
 
@@ -506,7 +508,7 @@ class RealSavedSitesRepository(
         bookmark: Bookmark,
         localId: String,
     ) {
-        // check is bookmark has moved
+        // check if bookmark has moved
         val storedBookmark = getBookmarkById(bookmark.id)
         if (storedBookmark != null) {
             if (storedBookmark.parentId != bookmark.parentId) {

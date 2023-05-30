@@ -153,9 +153,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return if (since.isEmpty()) {
             true
         } else {
-            val entityModified = OffsetDateTime.parse(this.lastModified)
-            val sinceModified = OffsetDateTime.parse(since)
-            entityModified.isAfter(sinceModified)
+            if (this.lastModified == null) {
+                true
+            } else {
+                val entityModified = OffsetDateTime.parse(this.lastModified)
+                val sinceModified = OffsetDateTime.parse(since)
+                entityModified.isAfter(sinceModified)
+            }
         }
     }
 
@@ -163,9 +167,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return if (since.isEmpty()) {
             true
         } else {
-            val entityModified = OffsetDateTime.parse(this.lastModified)
-            val sinceModified = OffsetDateTime.parse(since)
-            entityModified.isAfter(sinceModified)
+            if (this.lastModified == null) {
+                true
+            } else {
+                val entityModified = OffsetDateTime.parse(this.lastModified)
+                val sinceModified = OffsetDateTime.parse(since)
+                entityModified.isAfter(sinceModified)
+            }
         }
     }
 

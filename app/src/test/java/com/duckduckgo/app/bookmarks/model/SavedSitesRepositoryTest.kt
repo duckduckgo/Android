@@ -1340,6 +1340,46 @@ class SavedSitesRepositoryTest {
         assert(repository.getFolder(folder.id)!!.lastModified == oneHourAgo)
     }
 
+    @Test
+    fun whenDeletingAFolderWithFavouriteThenDataIsDeleted() {
+        val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
+
+        givenEmptyDBState()
+
+        val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, lastModified = twoHoursAgo)
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", folder.id, twoHoursAgo)
+        repository.insertFavorite("bookmark1", "www.example.com", "title", twoHoursAgo)
+        repository.insert(folder)
+
+        repository.updateBookmark(bookmark, SavedSitesNames.BOOKMARKS_ROOT)
+
+        repository.delete(folder)
+
+        assert(repository.getFolder(folder.id) == null)
+        assert(repository.getFavoriteById(bookmark.id) == null)
+        assert(repository.getBookmarkById(bookmark.id) == null)
+    }
+
+    @Test
+    fun whenDeletingAFolderBranchWithFavouriteThenDataIsDeleted() {
+        val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
+
+        givenEmptyDBState()
+
+        val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, lastModified = twoHoursAgo)
+        val bookmark = Bookmark("bookmark1", "title", "www.example.com", folder.id, twoHoursAgo)
+        repository.insertFavorite("bookmark1", "www.example.com", "title", twoHoursAgo)
+        repository.insert(folder)
+
+        repository.updateBookmark(bookmark, SavedSitesNames.BOOKMARKS_ROOT)
+
+        repository.deleteFolderBranch(folder)
+
+        assert(repository.getFolder(folder.id) == null)
+        assert(repository.getFavoriteById(bookmark.id) == null)
+        assert(repository.getBookmarkById(bookmark.id) == null)
+    }
+
     private fun givenNoFavoritesStored() {
         Assert.assertFalse(repository.hasFavorites())
     }
