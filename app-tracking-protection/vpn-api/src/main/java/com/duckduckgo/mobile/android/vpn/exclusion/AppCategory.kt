@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.exclusion
+package com.duckduckgo.mobile.android.vpn.exclusion
 
 sealed class AppCategory {
     object Undefined : AppCategory() {
@@ -51,25 +51,5 @@ sealed class AppCategory {
 
     object Productivity : AppCategory() {
         override fun toString() = "CATEGORY_PRODUCTIVITY"
-    }
-}
-
-data class TrackingProtectionAppInfo(
-    val packageName: String,
-    val name: String,
-    val type: String? = null,
-    val category: AppCategory = AppCategory.Undefined,
-    val isExcluded: Boolean = false,
-    val knownProblem: Int,
-    val userModified: Boolean,
-) {
-    companion object {
-        const val NO_ISSUES = 0
-        const val KNOWN_ISSUES_EXCLUSION_REASON = 1
-        const val LOADS_WEBSITES_EXCLUSION_REASON = 2
-    }
-
-    fun isProblematic(): Boolean {
-        return knownProblem > 0
     }
 }

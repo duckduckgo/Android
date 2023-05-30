@@ -18,12 +18,10 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategoryDetector
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-
-interface AppCategoryDetector {
-    fun getAppCategory(packageName: String): AppCategory
-}
 
 @ContributesBinding(AppScope::class)
 class RealAppCategoryDetector @Inject constructor(context: Context) : AppCategoryDetector {

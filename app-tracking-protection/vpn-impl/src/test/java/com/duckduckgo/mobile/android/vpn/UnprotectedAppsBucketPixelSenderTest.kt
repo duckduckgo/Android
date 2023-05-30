@@ -17,9 +17,9 @@
 package com.duckduckgo.mobile.android.vpn
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -134,7 +134,6 @@ class UnprotectedAppsBucketPixelSenderTest {
     private val app = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
-        type = "None",
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
@@ -144,7 +143,6 @@ class UnprotectedAppsBucketPixelSenderTest {
     private val excludedApp = TrackingProtectionAppInfo(
         packageName = "com.package.name",
         name = "App",
-        type = "None",
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
