@@ -50,20 +50,22 @@ class RealWgServerApi @Inject constructor(
         // returns the closest one or "*" if list is empty
         val selectedServer = serverDebugProvider.fetchServers()
             .also { fetchedServers ->
+                logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
                 serverDebugProvider.cacheServers(fetchedServers)
             }
             .map { it.name }
             .firstOrNull { serverName ->
                 serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
                     serverName == userSelectedServer
-                } ?: true
+                } ?: false
             } ?: "*"
 
         return wgVpnControllerService.registerKey(RegisterKeyBody(publicKey = publicKey, server = selectedServer))
             .run {
-                logcat { "Eligible servers are: ${this.map { it.server.name }}" }
+                logcat { "Register key in $selectedServer" }
+                logcat { "Register key returned ${this.map { it.server.name }}" }
                 val server = this.firstOrNull()?.toWgServerData()
-                logcat { "Selected server is $server" }
+                logcat { "Selected Egress server is $server" }
                 server
             }
     }
