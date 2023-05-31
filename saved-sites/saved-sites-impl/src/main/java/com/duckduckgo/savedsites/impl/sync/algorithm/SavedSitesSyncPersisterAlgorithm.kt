@@ -190,31 +190,63 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         entries: List<SyncBookmarkEntry>,
         lastModified: String,
     ) {
-        // check ids in favourites
-        // if list empty -> remove all local favourite
-        // else
-        // for each id,
-        // if it exists in the payload -> it's a new favourite
-        // if it doesn't, has it moved?
-        // check local favourite
-        // for each local id
-        // if it's not in the favourite child list -> remove favourite
-        // reorder all favourites based on folder order
-        val favourites = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT }!!
-        favourites.folder?.children?.forEachIndexed { position, child ->
-            Timber.d("Sync-Feature: child $child is a Favourite")
-            val favouriteEntry = entries.find { it.id == child }
-            if (favouriteEntry == null) {
-                Timber.d("Sync-Feature: id $child not present in the payload, omitting")
-            } else {
-                val favourite = decryptFavourite(favouriteEntry, position, lastModified)
-                when (conflictResolution) {
-                    DEDUPLICATION -> deduplicationStrategy.processFavourite(favourite)
-                    REMOTE_WINS -> remoteWinsStrategy.processFavourite(favourite)
-                    LOCAL_WINS -> localWinsStrategy.processFavourite(favourite)
-                    TIMESTAMP -> timestampStrategy.processFavourite(favourite)
+        val favouriteFolder = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT }!!
+        val favourites = favouriteFolder.folder?.children ?: emptyList()
+        if (favourites.isEmpty()) {
+            Timber.d("Sync-Feature: Favourites folder is empty, removing all local favourites")
+            val storedFavourites = repository.getFavoritesSync()
+            storedFavourites.forEach {
+                repository.delete(it)
+            }
+        } else {
+            favourites.forEachIndexed { position, child ->
+                Timber.d("Sync-Feature: child $child is a Favourite")
+                val favouriteEntry = entries.find { it.id == child }
+                if (favouriteEntry == null) {
+                    Timber.d("Sync-Feature: id $child not present in the payload, has it moved position?")
+                    val storedFavorite = repository.getFavoriteById(child)
+                    if (storedFavorite == null) {
+                        Timber.d("Sync-Feature: id $child not present locally as Favourite")
+                        val storedBookmark = repository.getBookmarkById(child)
+                        if (storedBookmark == null) {
+                            Timber.d("Sync-Feature: id $child not present locally as Bookmark either, omitting")
+                        } else {
+                            Timber.d("Sync-Feature: id $child is a Bookmark locally, adding it as Favourite")
+                            repository.insertFavorite(url = storedBookmark.url, title = storedBookmark.title)
+                        }
+                    } else {
+                        if (storedFavorite.position != position) {
+                            Timber.d("Sync-Feature: id $child present locally and moved from position ${storedFavorite.position} to $position")
+                            processFavourite(conflictResolution, storedFavorite.copy(position = position, lastModified = lastModified))
+                        } else {
+                            Timber.d("Sync-Feature: id $child present locally but in the same position")
+                        }
+                    }
+                } else {
+                    val favourite = decryptFavourite(favouriteEntry, position, lastModified)
+                    processFavourite(conflictResolution, favourite)
                 }
             }
+            Timber.d("Sync-Feature: comparing local favourites vs remote ones")
+            val storedFavourites = repository.getFavoritesSync()
+            storedFavourites.forEach {
+                if (!favourites.contains(it.id)) {
+                    Timber.d("Sync-Feature: stored favourite ${it.id} no longer exists in remote, removing it")
+                    repository.delete(it)
+                }
+            }
+        }
+    }
+
+    private fun processFavourite(
+        conflictResolution: SyncConflictResolution,
+        favourite: Favorite,
+    ) {
+        when (conflictResolution) {
+            DEDUPLICATION -> deduplicationStrategy.processFavourite(favourite)
+            REMOTE_WINS -> remoteWinsStrategy.processFavourite(favourite)
+            LOCAL_WINS -> localWinsStrategy.processFavourite(favourite)
+            TIMESTAMP -> timestampStrategy.processFavourite(favourite)
         }
     }
 
