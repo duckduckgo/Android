@@ -110,7 +110,7 @@ class RealSyncEngine @Inject constructor(
                 Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
                 return
             } else {
-                Timber.d("Sync-Feature:${it.type}  sending local data $it")
+                Timber.d("Sync-Feature: ${it.type}  sending local data $it")
                 patchLocalChanges(it, LOCAL_WINS)
             }
         }

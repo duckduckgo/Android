@@ -86,7 +86,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
             }
         }
 
-        return updates
+        return updates.distinct()
     }
 
     @VisibleForTesting

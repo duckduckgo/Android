@@ -46,7 +46,7 @@ class SavedSitesTimestampPersister @Inject constructor(
             } else {
                 if (folder.modifiedAfter(localFolder.lastModified)) {
                     Timber.d("Sync-Feature: folder ${folder.id} modified after local folder, replacing content")
-                    savedSitesRepository.replaceFolderContent(folder, folder.id)
+                    savedSitesRepository.replaceFolderContent(folder, localFolder.id)
                 } else {
                     Timber.d("Sync-Feature: folder ${folder.id} modified before local folder, nothing to do")
                 }

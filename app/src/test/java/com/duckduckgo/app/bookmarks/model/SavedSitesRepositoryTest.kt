@@ -666,7 +666,9 @@ class SavedSitesRepositoryTest {
 
         val folderUpdated = folder.copy(name = "folder updated")
         repository.update(folderUpdated)
-        assertEquals(repository.getFolder(folderUpdated.id), folderUpdated)
+
+        val storedFolder = repository.getFolder(folder.id)!!
+        assertEquals(storedFolder.name, folderUpdated.name)
     }
 
     @Test
@@ -681,7 +683,9 @@ class SavedSitesRepositoryTest {
         val folderUpdated = folder.copy(parentId = folderTwo.id)
         repository.update(folderUpdated)
 
-        assertEquals(repository.getFolder(folder.id), folderUpdated)
+        val storedFolder = repository.getFolder(folder.id)!!
+
+        assertEquals(storedFolder.parentId, folderUpdated.parentId)
     }
 
     @Test
@@ -1011,18 +1015,20 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenSubFolderIsReplacedThenLocalDataIsUpdated() = runTest {
         val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
-        repository.insert(rootFolder)
+        val folderOne = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+        val folderTwo = BookmarkFolder(id = "folder2", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
 
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
-        repository.insert(parentFolder)
+        repository.insert(rootFolder)
+        repository.insert(folderOne)
+        repository.insert(folderTwo)
 
         val bookmarks = givenSomeBookmarks(10)
         savedSitesEntitiesDao.insertList(bookmarks)
 
-        val subFolder = givenFolderWithContent(parentFolder.id, bookmarks)
+        val subFolder = givenFolderWithContent(folderOne.id, bookmarks)
         savedSitesRelationsDao.insertList(subFolder)
 
-        repository.replaceFolder("folder2", parentFolder.id)
+        repository.replaceFolderContent(folderOne.copy(id = folderTwo.id), folderOne.id)
 
         repository.insert(
             Bookmark(
@@ -1030,11 +1036,11 @@ class SavedSitesRepositoryTest {
                 title = "title",
                 url = "foo.com",
                 lastModified = "timestamp",
-                parentId = "folder2",
+                parentId = folderTwo.id,
             ),
         )
 
-        repository.getSavedSites("folder2").test {
+        repository.getSavedSites(folderTwo.id).test {
             val savedSites = awaitItem()
             assertTrue(savedSites.bookmarks.size == 11)
             assertTrue(savedSites.favorites.isEmpty())
@@ -1256,12 +1262,11 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenFolderParentIsUpdatedThenReplacingItUpdatesData() = runTest {
         val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
-        repository.insert(rootFolder)
-
         val secondFolder = BookmarkFolder(id = "secondFolder", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
-        repository.insert(secondFolder)
-
         val thirdFolder = BookmarkFolder(id = "thirdFolder", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+
+        repository.insert(rootFolder)
+        repository.insert(secondFolder)
         repository.insert(thirdFolder)
 
         val updatedFolder = thirdFolder.copy(parentId = secondFolder.id)

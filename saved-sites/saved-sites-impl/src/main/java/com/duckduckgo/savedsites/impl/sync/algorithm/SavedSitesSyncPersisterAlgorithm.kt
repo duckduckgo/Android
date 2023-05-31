@@ -190,6 +190,16 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         entries: List<SyncBookmarkEntry>,
         lastModified: String,
     ) {
+        // check ids in favourites
+        // if list empty -> remove all local favourite
+        // else
+        // for each id,
+        // if it exists in the payload -> it's a new favourite
+        // if it doesn't, has it moved?
+        // check local favourite
+        // for each local id
+        // if it's not in the favourite child list -> remove favourite
+        // reorder all favourites based on folder order
         val favourites = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT }!!
         favourites.folder?.children?.forEachIndexed { position, child ->
             Timber.d("Sync-Feature: child $child is a Favourite")

@@ -396,17 +396,17 @@ class RealSavedSitesRepository(
     private fun deleteFavorite(favorite: Favorite) {
         savedSitesRelationsDao.deleteRelationByEntity(favorite.id, SavedSitesNames.FAVORITES_ROOT)
         savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
-        savedSitesEntitiesDao.updateModified(favorite.id)
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
-        if (savedSitesRelationsDao.countFavouritesByUrl(bookmark.url) > 0) {
-            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
-        }
-        savedSitesEntitiesDao.updateModified(bookmark.parentId)
-        savedSitesEntitiesDao.delete(bookmark.id)
-        savedSitesEntitiesDao.updateModified(bookmark.id)
+        val folders = savedSitesRelationsDao.relationsByEntityId(bookmark.id)
+
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
+        savedSitesEntitiesDao.delete(bookmark.id)
+
+        folders.forEach {
+            savedSitesEntitiesDao.updateModified(it.folderId)
+        }
     }
 
     override fun updateFavourite(favorite: Favorite) {
@@ -474,34 +474,42 @@ class RealSavedSitesRepository(
                 title = folder.name,
                 url = "",
                 type = FOLDER,
-                lastModified = folder.lastModified ?: DatabaseDateFormatter.iso8601(),
+                lastModified = DatabaseDateFormatter.iso8601(),
             ),
         )
 
         // has folder parent changed?
-        if (oldFolder.parentId != folder.id) {
+        if (oldFolder.parentId != folder.parentId) {
             savedSitesRelationsDao.deleteRelationByEntity(folder.id)
             savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
         }
     }
 
-    override fun replaceFolder(
-        remoteId: String,
-        localId: String,
-    ) {
-        savedSitesEntitiesDao.updateId(localId, remoteId)
-        savedSitesRelationsDao.updateEntityId(localId, remoteId)
-        savedSitesRelationsDao.updateFolderId(localId, remoteId)
-    }
-
     override fun replaceFolderContent(
         folder: BookmarkFolder,
-        localId: String,
+        oldId: String,
     ) {
-        savedSitesEntitiesDao.updateId(localId, folder.id)
-        savedSitesRelationsDao.updateEntityId(localId, folder.id)
-        savedSitesRelationsDao.updateFolderId(localId, folder.id)
-        update(folder)
+        savedSitesEntitiesDao.updateId(oldId, folder.id)
+        savedSitesRelationsDao.updateEntityId(oldId, folder.id)
+        savedSitesRelationsDao.updateFolderId(oldId, folder.id)
+
+        val oldFolder = getFolder(folder.id) ?: return
+
+        savedSitesEntitiesDao.update(
+            Entity(
+                entityId = folder.id,
+                title = folder.name,
+                url = "",
+                type = FOLDER,
+                lastModified = folder.lastModified ?: DatabaseDateFormatter.iso8601(),
+            ),
+        )
+
+        // has folder parent changed?
+        if (folder.parentId.isNotEmpty() && oldFolder.parentId != folder.parentId) {
+            savedSitesRelationsDao.deleteRelationByEntity(folder.id)
+            savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
+        }
     }
 
     override fun replaceBookmark(

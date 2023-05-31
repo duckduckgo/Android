@@ -272,22 +272,10 @@ interface SavedSitesRepository {
      * Replaces an existing [BookmarkFolder]
      * Used when syncing data from the backend
      * There are scenarios when a duplicate remote folder has to be replace the local one
-     * @param remoteId the id of the remote folder
-     * @param oldId the id of the local folder to be replaced
-     */
-    fun replaceFolder(
-        remoteId: String,
-        localId: String,
-    )
-
-    /**
-     * Replaces an existing [BookmarkFolder]
-     * Used when syncing data from the backend
-     * There are scenarios when a duplicate remote folder has to be replace the local one
      * @param folder the folder that will replace [localId]
      * @param localId the id of the local folder to be replaced
      */
-    fun replaceFolderContent(folder: BookmarkFolder, localId: String)
+    fun replaceFolderContent(folder: BookmarkFolder, oldId: String)
 
     /**
      * Replaces an existing [Bookmark]
