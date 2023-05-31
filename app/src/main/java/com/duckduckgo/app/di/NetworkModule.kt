@@ -37,6 +37,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import java.io.File
+import java.io.IOException
+import java.net.Proxy
+import java.net.ProxySelector
+import java.net.SocketAddress
+import java.net.URI
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
@@ -68,6 +73,23 @@ class NetworkModule {
                     addInterceptor(it.getInterceptor())
                 }
             }
+            // See https://app.asana.com/0/1202552961248957/1204588257103865/f and
+            // https://github.com/square/okhttp/issues/6877#issuecomment-1438554879
+            .proxySelector(
+                object : ProxySelector() {
+                    override fun select(uri: URI?): List<Proxy> {
+                        return try {
+                            getDefault().select(uri)
+                        } catch (t: Throwable) {
+                            listOf(Proxy.NO_PROXY)
+                        }
+                    }
+
+                    override fun connectFailed(uri: URI?, sa: SocketAddress?, ioe: IOException?) {
+                        getDefault().connectFailed(uri, sa, ioe)
+                    }
+                },
+            )
             .build()
     }
 
