@@ -18,7 +18,6 @@ package com.duckduckgo.app.featureusage
 
 import com.duckduckgo.app.featureusage.db.FeatureSegmentsDataStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.APP_TP_ENABLED
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.BOOKMARKS_IMPORTED
@@ -31,6 +30,7 @@ import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.SET_AS_
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.TEN_SEARCHES_MADE
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.TWO_SEARCHES_MADE
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -73,6 +73,14 @@ class FeatureSegmentManagerImpl @Inject constructor(
 
     override fun restartDailySearchCount() {
         featureSegmentsDataStore.dailySearchesCount = 0
+    }
+
+    override fun lastRetentionDayPixelSent(): Int {
+        return featureSegmentsDataStore.lastDayPixelSent
+    }
+
+    override fun updateLastRetentionDayPixelSent(retentionDay: Int) {
+        featureSegmentsDataStore.lastDayPixelSent = retentionDay
     }
 
     private fun getUserFeatureSegments(): Map<String, Boolean> {

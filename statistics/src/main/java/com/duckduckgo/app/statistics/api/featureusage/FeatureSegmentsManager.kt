@@ -21,4 +21,6 @@ interface FeatureSegmentsManager {
     fun searchMade()
     fun fireFeatureSegmentsPixel()
     fun restartDailySearchCount()
+    fun lastRetentionDayPixelSent(): Int
+    fun updateLastRetentionDayPixelSent(retentionDay: Int)
 }

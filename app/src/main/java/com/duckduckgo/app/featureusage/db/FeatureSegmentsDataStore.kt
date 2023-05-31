@@ -19,7 +19,6 @@ package com.duckduckgo.app.featureusage.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.dev.settings.db.DevSettingsSharedPreferences
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -37,6 +36,7 @@ interface FeatureSegmentsDataStore {
     var tenSearchesMade: Boolean
 
     var dailySearchesCount: Int
+    var lastDayPixelSent: Int
 }
 
 @ContributesBinding(AppScope::class)
@@ -44,8 +44,7 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
     private val context: Context,
 ) : FeatureSegmentsDataStore {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(DevSettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var bookmarksImported: Boolean
         get() = preferences.getBoolean(KEY_BOOKMARKS_IMPORTED, false)
@@ -80,6 +79,9 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
     override var dailySearchesCount: Int
         get() = preferences.getInt(KEY_SEARCHES_COUNT, 0)
         set(count) = preferences.edit { putInt(KEY_SEARCHES_COUNT, count) }
+    override var lastDayPixelSent: Int
+        get() = preferences.getInt(KEY_LAST_DAY_PIXEL_SENT, -1)
+        set(count) = preferences.edit { putInt(KEY_LAST_DAY_PIXEL_SENT, count) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.feature_segments.settings"
@@ -94,6 +96,6 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
         const val KEY_FIVE_SEARCHES_MADE = "FIVE_SEARCHES_MADE"
         const val KEY_TEN_SEARCHES_MADE = "TEN_SEARCHES_MADE"
         const val KEY_SEARCHES_COUNT = "SEARCHES_COUNT"
-        const val KEY_USER_ADDED_TO_SEGMENTS_EVENTS = "USER_ADDED_TO_SEGMENTS_EVENTS"
+        const val KEY_LAST_DAY_PIXEL_SENT = "LAST_DAY_PIXEL_SENT"
     }
 }
