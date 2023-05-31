@@ -1845,6 +1845,24 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onFavoriteMenuClicked() {
+        val url = url ?: return
+        viewModelScope.launch {
+            val favorite = currentBrowserViewState().favorite
+            if (favorite != null) {
+                pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
+                removeFavoriteSite(favorite)
+            } else {
+                val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
+                pixel.fire(
+                    AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName,
+                    mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString()),
+                )
+                saveFavoriteSite(url, title ?: "")
+            }
+        }
+    }
+
     private suspend fun saveSiteBookmark(
         url: String,
         title: String,
@@ -1858,22 +1876,6 @@ class BrowserTabViewModel @Inject constructor(
         val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(savedBookmark, bookmarkFolder))
-        }
-    }
-
-    fun onFavoriteMenuClicked() {
-        val url = url ?: return
-        val favorite = currentBrowserViewState().favorite
-        if (favorite != null) {
-            pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
-            removeFavoriteSite(favorite)
-        } else {
-            val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
-            pixel.fire(
-                AppPixelName.MENU_ACTION_ADD_FAVORITE_PRESSED.pixelName,
-                mapOf(FAVORITE_MENU_ITEM_STATE to buttonHighlighted.toString()),
-            )
-            saveFavoriteSite(url, title ?: "")
         }
     }
 
