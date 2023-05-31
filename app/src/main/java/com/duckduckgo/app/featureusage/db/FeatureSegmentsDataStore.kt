@@ -20,6 +20,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.dev.settings.db.DevSettingsSharedPreferences
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface FeatureSegmentsDataStore {
@@ -35,9 +37,9 @@ interface FeatureSegmentsDataStore {
     var tenSearchesMade: Boolean
 
     var dailySearchesCount: Int
-    var userAddedToSegmentsEvents: Boolean
 }
 
+@ContributesBinding(AppScope::class)
 class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
     private val context: Context,
 ) : FeatureSegmentsDataStore {
@@ -78,9 +80,6 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
     override var dailySearchesCount: Int
         get() = preferences.getInt(KEY_SEARCHES_COUNT, 0)
         set(count) = preferences.edit { putInt(KEY_SEARCHES_COUNT, count) }
-    override var userAddedToSegmentsEvents: Boolean
-        get() = preferences.getBoolean(KEY_USER_ADDED_TO_SEGMENTS_EVENTS, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_USER_ADDED_TO_SEGMENTS_EVENTS, enabled) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.feature_segments.settings"

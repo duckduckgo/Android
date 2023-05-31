@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.browser.rating.di.RatingModule
 import com.duckduckgo.app.email.di.EmailModule
-import com.duckduckgo.app.featureusage.di.FeatureSegmentsModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.onboarding.di.WelcomePageModule
@@ -71,7 +70,6 @@ import retrofit2.Retrofit
         WelcomePageModule::class,
         FormatterModule::class,
         EmailModule::class,
-        FeatureSegmentsModule::class,
     ],
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

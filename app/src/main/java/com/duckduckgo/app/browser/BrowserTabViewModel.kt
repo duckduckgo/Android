@@ -2798,6 +2798,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         credentials: LoginCredentials,
     ): LoginCredentials? {
+        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
         return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.saveCredentials(url, credentials)
         }

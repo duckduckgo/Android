@@ -49,6 +49,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import java.util.*
@@ -71,6 +73,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val credentialListFilter: CredentialListFilter,
     private val faviconManager: FaviconManager,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -360,6 +363,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     private suspend fun saveNewCredential(updatedCredentials: LoginCredentials) {
+        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
         autofillStore.saveCredentials(
             rawUrl = updatedCredentials.domain ?: "",
             credentials = updatedCredentials,

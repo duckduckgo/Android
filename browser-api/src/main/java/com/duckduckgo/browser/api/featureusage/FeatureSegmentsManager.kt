@@ -19,7 +19,6 @@ package com.duckduckgo.browser.api.featureusage
 interface FeatureSegmentsManager {
     fun addUserToFeatureSegment(segment: FeatureSegmentType)
     fun searchMade()
-    fun shouldFireSegmentsPixel(): Boolean
     fun fireFeatureSegmentsPixel()
     fun restartDailySearchCount()
 }

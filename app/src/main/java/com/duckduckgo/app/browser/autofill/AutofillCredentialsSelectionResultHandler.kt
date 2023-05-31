@@ -43,6 +43,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICA
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
@@ -64,6 +66,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) {
 
     suspend fun processAutofillCredentialSelectionResult(
@@ -244,6 +247,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
                 )?.id?.let { savedId ->
                     Timber.i("New login saved because no exact matches were found, with ID: $savedId")
                     autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
+                    featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
                 }
             }
         }

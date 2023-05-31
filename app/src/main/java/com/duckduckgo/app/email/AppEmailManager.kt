@@ -24,6 +24,8 @@ import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentType.EMAIL_PROTECTION_SET
+import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -48,6 +50,7 @@ class AppEmailManager @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : EmailManager, BrowserFeatureStateReporterPlugin {
 
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
@@ -72,6 +75,7 @@ class AppEmailManager @Inject constructor(
             generateNewAlias()
             pixel.fire(EMAIL_ENABLED)
         }
+        featureSegmentsManager.addUserToFeatureSegment(EMAIL_PROTECTION_SET)
     }
 
     override fun signOut() {

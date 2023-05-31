@@ -51,10 +51,8 @@ class FeatureSegmentsReportingWorker(
 
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
-            if (featureSegmentsManager.shouldFireSegmentsPixel()) {
-                featureSegmentsManager.fireFeatureSegmentsPixel()
-                featureSegmentsManager.restartDailySearchCount()
-            }
+            featureSegmentsManager.fireFeatureSegmentsPixel()
+            featureSegmentsManager.restartDailySearchCount()
             return@withContext Result.success()
         }
     }
