@@ -213,6 +213,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                         } else {
                             Timber.d("Sync-Feature: id $child is a Bookmark locally, adding it as Favourite")
                             repository.insertFavorite(url = storedBookmark.url, title = storedBookmark.title)
+                            // repository.markBookmarkAsFavourite(id)
                         }
                     } else {
                         if (storedFavorite.position != position) {

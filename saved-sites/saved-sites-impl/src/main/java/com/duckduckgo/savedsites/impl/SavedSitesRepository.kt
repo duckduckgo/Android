@@ -38,6 +38,7 @@ import io.reactivex.Single
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.threeten.bp.OffsetDateTime
@@ -215,20 +216,25 @@ class RealSavedSitesRepository(
     }
 
     override fun deleteFolderBranch(folder: BookmarkFolder): FolderBranch {
+        val foldersToDelete = mutableListOf<BookmarkFolder>()
+        val bookmarksToDelete = mutableListOf<Bookmark>()
         val folderContent = getFolderBranch(folder)
         folderContent.folders.forEach {
+            foldersToDelete.add(it)
             delete(it)
         }
         folderContent.bookmarks.forEach {
-            delete(it)
+            bookmarksToDelete.add(it)
+            // delete(it)
         }
 
+        foldersToDelete.add(folder)
         delete(folder)
         return folderContent
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
-        return savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).map { relations ->
+        return savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).distinctUntilChanged().map { relations ->
             relations.mapIndexed { index, relation ->
                 savedSitesEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
             }
