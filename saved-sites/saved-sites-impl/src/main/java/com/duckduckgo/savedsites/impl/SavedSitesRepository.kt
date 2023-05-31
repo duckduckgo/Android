@@ -216,19 +216,14 @@ class RealSavedSitesRepository(
     }
 
     override fun deleteFolderBranch(folder: BookmarkFolder): FolderBranch {
-        val foldersToDelete = mutableListOf<BookmarkFolder>()
-        val bookmarksToDelete = mutableListOf<Bookmark>()
         val folderContent = getFolderBranch(folder)
         folderContent.folders.forEach {
-            foldersToDelete.add(it)
             delete(it)
         }
         folderContent.bookmarks.forEach {
-            bookmarksToDelete.add(it)
-            // delete(it)
+            delete(it)
         }
 
-        foldersToDelete.add(folder)
         delete(folder)
         return folderContent
     }

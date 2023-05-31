@@ -1020,7 +1020,6 @@ class SavedSitesRepositoryTest {
 
         repository.insert(rootFolder)
         repository.insert(folderOne)
-        repository.insert(folderTwo)
 
         val bookmarks = givenSomeBookmarks(10)
         savedSitesEntitiesDao.insertList(bookmarks)
