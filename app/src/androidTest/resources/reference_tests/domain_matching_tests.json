@@ -844,6 +844,34 @@
                 "expectAction": "block"
             },
             {
+                "name": "format.test - supports CBR regexp - matching request (1)",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/aa123b.cdeffffg/test2b.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - supports CBR regexp - matching request (2)",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/ab.cd/test2b.js",
+                "requestType": "script",
+                "expectAction": "ignore"
+            },
+            {
+                "name": "format.test - supports CBR regexp - nonmatching request (1)",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/aa123b.cffffg/test2b.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
+                "name": "format.test - supports CBR regexp - nonmatching request (2)",
+                "siteURL": "https://example.com",
+                "requestURL": "https://format.test/ab1cd/test2b.js",
+                "requestType": "script",
+                "expectAction": "block"
+            },
+            {
                 "name": "format.test - with subdomain - match on sub subdomain",
                 "siteURL": "https://example.com",
                 "requestURL": "https://sub0.sub1.sub2.format.test/test4.js",

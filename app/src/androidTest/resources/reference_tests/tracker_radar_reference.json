@@ -768,6 +768,11 @@
                     "action": "ignore"
                 },
                 {
+                    "rule": "format\\.test/a.*.\\.[c]([de]+)f*g?/test2b\\.js",
+                    "comment": "Simple regexp (full CBR), see https://developer.apple.com/documentation/safariservices/creating_a_content_blocker#3030754",
+                    "action": "ignore"
+                },
+                {
                     "rule": "sub1\\.sub2\\.format\\.test/test4\\.js",
                     "comment": "With subdomain",
                     "action": "ignore"
