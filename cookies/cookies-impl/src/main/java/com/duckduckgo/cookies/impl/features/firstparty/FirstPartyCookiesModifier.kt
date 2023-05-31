@@ -78,9 +78,8 @@ class RealFirstPartyCookiesModifier @Inject constructor(
             fireproofRepository.fireproofWebsites() +
             DDG_COOKIE_DOMAINS.map { it.toUri().host!! }
 
-    private fun buildSQLWhereClause(timestampThreshold: Long, isOldDb: Boolean): String {
+    private fun buildSQLWhereClause(timestampThreshold: Long, isOldDb: Boolean, excludedSites: List<String>): String {
         val httpOnly = if (isOldDb) "httponly" else "is_httponly"
-        val excludedSites: List<String> = excludedSites()
         if (excludedSites.isEmpty()) {
             return "expires_utc > $timestampThreshold AND $httpOnly = 0"
         }
@@ -124,13 +123,16 @@ class RealFirstPartyCookiesModifier @Inject constructor(
 
                 if (columnExists > 0) {
                     val isOldDb = (columnExists == 2)
-                    execSQL(
-                        """
-                     UPDATE ${SQLCookieRemover.COOKIES_TABLE_NAME}
-                     SET expires_utc=$timestampMaxAge
-                     WHERE ${buildSQLWhereClause(timestampThreshold, isOldDb)}
-                        """.trimIndent(),
-                    )
+                    val excludedSites = excludedSites()
+                    excludedSites.chunked(CHUNKS).map {
+                        execSQL(
+                            """
+                             UPDATE ${SQLCookieRemover.COOKIES_TABLE_NAME}
+                             SET expires_utc=$timestampMaxAge
+                             WHERE ${buildSQLWhereClause(timestampThreshold, isOldDb, it)}
+                            """.trimIndent(),
+                        )
+                    }
                 }
             } catch (exception: Exception) {
                 val stacktrace = redactStacktraceInBase64(exception.asLog())
@@ -155,6 +157,7 @@ class RealFirstPartyCookiesModifier @Inject constructor(
     companion object {
         private const val TIME_1601_IN_MICRO = 11644473600000
         private const val MULTIPLIER = 1000
+        private const val CHUNKS = 450 // Max depth is 1000, each filter happens twice plus hardcoded filters, we use 450 to give some wiggle room
     }
 }
 

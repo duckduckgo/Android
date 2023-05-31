@@ -25,6 +25,7 @@ import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.cookies.api.CookieException
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.store.CookiesRepository
@@ -59,6 +60,7 @@ class RealFirstPartyCookiesModifierTest {
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
     private val mockFireproofRepository: FireproofRepository = mock()
+    private val mockPixel: Pixel = mock()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
 
     @Before
@@ -260,7 +262,19 @@ class RealFirstPartyCookiesModifierTest {
         }
     }
 
-    private suspend fun queryCookiesDB(host: String): Long? {
+    @Test
+    fun whenFiltersExceedOneThousandQueryShouldNotCrashAndPixelShouldNotBeSent() = runTest {
+        if (Build.VERSION.SDK_INT == 28) {
+            // this test fails on API 28 due to WAL. This effectively skips these tests on 28.
+            return@runTest
+        }
+        givenOneThousandFilters()
+        val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
+        sqlCookieRemover.expireFirstPartyCookies()
+        verifyNoInteractions(mockPixel)
+    }
+
+    private fun queryCookiesDB(host: String): Long? {
         val databasePath: String = webViewDatabaseLocator.getDatabasePath()
         if (databasePath.isNotEmpty()) {
             return query(databasePath, host)
@@ -325,10 +339,18 @@ class RealFirstPartyCookiesModifierTest {
             mockUnprotectedTemporary,
             mockUserAllowListRepository,
             webViewDatabaseLocator,
-            mock(),
+            mockPixel,
             mockFireproofRepository,
             DefaultDispatcherProvider(),
         )
+    }
+
+    private fun givenOneThousandFilters() {
+        val list = mutableListOf<String>()
+        (0..1000).forEach {
+            list.add("Element$it")
+        }
+        whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(list)
     }
 
     companion object {
