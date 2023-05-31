@@ -45,6 +45,8 @@ import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesBinding(scope = AppScope::class)
@@ -117,7 +119,7 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun performSync(trigger: SyncTrigger) {
-        if (syncStateRepository.current()?.state == IN_PROGRESS) {
+        if (syncInProgress()) {
             Timber.d("Sync-Feature: sync already in progress, throttling")
         } else {
             Timber.d("Sync-Feature: starting to sync")
@@ -133,6 +135,21 @@ class RealSyncEngine @Inject constructor(
                     patchLocalChanges(it, TIMESTAMP)
                 }
             }
+        }
+    }
+
+    private fun syncInProgress(): Boolean {
+        val currentSync = syncStateRepository.current()
+        return if (currentSync != null) {
+            if (currentSync.state == IN_PROGRESS) {
+                val syncTimestamp = OffsetDateTime.parse(currentSync.timestamp)
+                val now = OffsetDateTime.now()
+                Duration.between(syncTimestamp, now).toMinutes() > 10
+            } else {
+                false
+            }
+        } else {
+            false
         }
     }
 

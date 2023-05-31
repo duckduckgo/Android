@@ -212,12 +212,9 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes[3].id == bookmark4.id)
         assertTrue(changes[3].client_last_modified == modificationTimestamp)
         assertTrue(changes[3].deleted == null)
-        assertTrue(changes[4].id == bookmark1.id)
+        assertTrue(changes[4].id == bookmarksRootFolder.id)
         assertTrue(changes[4].client_last_modified == modificationTimestamp)
-        assertTrue(changes[4].deleted == null)
-        assertTrue(changes[5].id == bookmarksRootFolder.id)
-        assertTrue(changes[5].client_last_modified == modificationTimestamp)
-        assertTrue(changes[5].folder!!.children == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
+        assertTrue(changes[4].folder!!.children == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
         assertTrue(changes[4].deleted == null)
     }
 
