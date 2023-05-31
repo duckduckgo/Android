@@ -50,7 +50,7 @@ internal class SyncApiClientTest {
     fun whenPatchAndTokenEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn("")
 
-        val result = apiClient.patch(emptyList())
+        val result = apiClient.patch(SyncChangesRequest.empty())
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
     }
@@ -59,7 +59,7 @@ internal class SyncApiClientTest {
     fun whenPatchAndChangesEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
 
-        val result = apiClient.patch(emptyList())
+        val result = apiClient.patch(SyncChangesRequest.empty())
 
         assertEquals(result, Result.Error(reason = "Changes Empty"))
     }
@@ -71,7 +71,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(JSONObject()))
 
-        val result = apiClient.patch(listOf(bookmarksChanges))
+        val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Success)
     }
 
@@ -82,7 +82,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(patchAllError)
 
-        val result = apiClient.patch(listOf(bookmarksChanges))
+        val result = apiClient.patch(bookmarksChanges)
         assertTrue(result is Result.Error)
     }
 
@@ -99,7 +99,7 @@ internal class SyncApiClientTest {
     fun whenGetAndTokenEmptyThenReturnError() {
         whenever(syncStore.token).thenReturn("")
 
-        val result = apiClient.get("")
+        val result = apiClient.get(BOOKMARKS, "")
 
         assertEquals(result, Result.Error(reason = "Token Empty"))
     }
@@ -109,7 +109,7 @@ internal class SyncApiClientTest {
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.getBookmarks(any(), any())).thenReturn(getAllError)
 
-        val result = apiClient.get("")
+        val result = apiClient.get(BOOKMARKS, "")
         assertTrue(result is Result.Error)
     }
 }

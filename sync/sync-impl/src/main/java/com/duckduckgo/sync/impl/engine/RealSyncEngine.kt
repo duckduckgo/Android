@@ -117,17 +117,21 @@ class RealSyncEngine @Inject constructor(
     }
 
     private fun performSync(trigger: SyncTrigger) {
-        Timber.d("Sync-Feature: starting to sync")
-        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
+        if (syncStateRepository.current()?.state == IN_PROGRESS) {
+            Timber.d("Sync-Feature: sync already in progress, throttling")
+        } else {
+            Timber.d("Sync-Feature: starting to sync")
+            syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
-        // TODO: Is this good enough? Should we make the calls in parallel?
-        getChanges().forEach {
-            if (it.isEmpty()) {
-                Timber.d("Sync-Feature: no changes to sync for $it, asking for remote changes")
-                getRemoteChanges(it, TIMESTAMP)
-            } else {
-                Timber.d("Sync-Feature: $it changes to update $it")
-                patchLocalChanges(it, TIMESTAMP)
+            // TODO: Is this good enough? Should we make the calls in parallel?
+            getChanges().forEach {
+                if (it.isEmpty()) {
+                    Timber.d("Sync-Feature: no changes to sync for $it, asking for remote changes")
+                    getRemoteChanges(it, TIMESTAMP)
+                } else {
+                    Timber.d("Sync-Feature: $it changes to update $it")
+                    patchLocalChanges(it, TIMESTAMP)
+                }
             }
         }
     }

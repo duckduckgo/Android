@@ -62,7 +62,7 @@ internal class BackgroundSyncWorkerTest {
 
             val result = worker.doWork()
 
-            verify(mockSyncEngine).syncNow(BACKGROUND_SYNC)
+            verify(mockSyncEngine).triggerSync(BACKGROUND_SYNC)
             Assert.assertEquals(result, ListenableWorker.Result.success())
         }
 

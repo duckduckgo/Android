@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.impl.sync.algorithm
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.SyncCrypto
 import org.junit.Before
 import org.junit.Rule
@@ -41,13 +42,14 @@ class SavedSitesSyncPersisterAlgorithmTest {
     private val deduplicationStrategy: SavedSitesSyncPersisterStrategy = mock()
     private val remoteStrategy: SavedSitesSyncPersisterStrategy = mock()
     private val localStrategy: SavedSitesSyncPersisterStrategy = mock()
+    private val repository: SavedSitesRepository = mock()
     private val crypto: SyncCrypto = mock()
 
     private lateinit var algorithm: SavedSitesSyncPersisterAlgorithm
 
     @Before
     fun setup() {
-        algorithm = RealSavedSitesSyncPersisterAlgorithm(crypto, deduplicationStrategy, timestampStrategy, remoteStrategy, localStrategy)
+        algorithm = RealSavedSitesSyncPersisterAlgorithm(crypto, repository, deduplicationStrategy, timestampStrategy, remoteStrategy, localStrategy)
     }
 
     @Test

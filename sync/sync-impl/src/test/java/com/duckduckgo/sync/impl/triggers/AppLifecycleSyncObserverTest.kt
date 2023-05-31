@@ -65,6 +65,6 @@ class AppLifecycleSyncObserverTest {
 
         testee.onStart(mockLifecycleOwner)
 
-        verify(mockSyncEngine).syncNow(APP_OPEN)
+        verify(mockSyncEngine).triggerSync(APP_OPEN)
     }
 }

@@ -89,7 +89,7 @@ class AppSyncRepositoryTest {
 
     @Before
     fun before() {
-        syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncStateRepository, syncEngine)
+        syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine)
     }
 
     @Test

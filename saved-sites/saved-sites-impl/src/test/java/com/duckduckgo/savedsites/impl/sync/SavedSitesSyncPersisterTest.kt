@@ -19,6 +19,7 @@ package com.duckduckgo.savedsites.impl.sync
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
@@ -79,6 +80,7 @@ class SavedSitesSyncPersisterTest {
     @Test
     fun whenProcessingDataInEmptyDBThenResultIsSuccess() {
         whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(Success(true))
+        whenever(store.modifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
         val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
         val result = syncPersister.process(validChanges, DEDUPLICATION)

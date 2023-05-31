@@ -96,7 +96,7 @@ class AppSyncApiClient @Inject constructor(
                 if (result.code == API_CODE.NOT_MODIFIED.code) {
                     Result.Success(SyncChangesResponse.empty())
                 } else {
-                    Result.Success(SyncChangesResponse.empty())
+                    Result.Error(result.code, result.reason)
                 }
             }
 
