@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.browser.api.featureusage.FeatureSegmentType
-import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import java.util.UUID

@@ -42,8 +42,8 @@ import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
-import com.duckduckgo.browser.api.featureusage.FeatureSegmentType
-import com.duckduckgo.browser.api.featureusage.FeatureSegmentsManager
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.setAndPropagateUpFitsSystemWindows
@@ -58,14 +58,14 @@ private const val ANIMATION_SPEED_INCREMENT = 0.15f
 
 @SuppressLint("NoBottomSheetDialog")
 class FireDialog(
-    context: Context,
-    private val ctaViewModel: CtaViewModel,
-    private val clearPersonalDataAction: ClearDataAction,
-    private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore,
-    private val userEventsStore: UserEventsStore,
-    private val appCoroutineScope: CoroutineScope,
-    private val featureSegmentsManager: FeatureSegmentsManager,
+        context: Context,
+        private val ctaViewModel: CtaViewModel,
+        private val clearPersonalDataAction: ClearDataAction,
+        private val pixel: Pixel,
+        private val settingsDataStore: SettingsDataStore,
+        private val userEventsStore: UserEventsStore,
+        private val appCoroutineScope: CoroutineScope,
+        private val featureSegmentsManager: FeatureSegmentsManager,
 ) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding

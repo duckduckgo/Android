@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api.featureusage
+package com.duckduckgo.app.statistics.api.featureusage
 
 interface FeatureSegmentsManager {
     fun addUserToFeatureSegment(segment: FeatureSegmentType)
