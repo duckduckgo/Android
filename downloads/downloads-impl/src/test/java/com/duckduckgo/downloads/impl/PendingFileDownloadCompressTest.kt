@@ -22,14 +22,12 @@ import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class PendingFileDownloadCompressTest {
 
-    @Ignore
     @Test
     fun whenDownloadUrlIsTooLargeAndToInputDataCalledThenAddCompressedUrl() {
         val largeUrl =
@@ -38,7 +36,7 @@ class PendingFileDownloadCompressTest {
             """.trimIndent()
         val expectedEncodedUrl =
             """
-            H4sIAAAAAAAAAO3RTWrDMBAF4NOkq/woaROFgigl4HvIkrDV2FaQxk57+84kgQbvun+GkcfP1sjw
+            H4sIAAAAAAAA/+3RTWrDMBAF4NOkq/woaROFgigl4HvIkrDV2FaQxk57+84kgQbvun+GkcfP1sjw
             tUSX8r7ZuNZmWttLLOsmpaYLa5f6e/rh2mL2Sn1zvbi2t0Yt1XKrbsUBmQuvLpmqUnwtdqeqknah
             uTneE6UeyaORRFre6A0tXj+3ux2Hb7JstSzyzZFLz+owq70Uj+mMjNAyQssILSM0j9AnPavDrPZS
             8iedsYPPKXoOvuxk+VbIuvOKsnWBn+qcrHe2UA4uxClkzh5bVoM/89NYQl7ZJgz09Ooa6imGKyd/
