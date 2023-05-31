@@ -76,7 +76,6 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                         TrackingProtectionAppInfo(
                             packageName = it.packageName,
                             name = packageManager.getApplicationLabel(it).toString(),
-                            type = it.getAppType(),
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
                             knownProblem = hasKnownIssue(it, ddgExclusionList),

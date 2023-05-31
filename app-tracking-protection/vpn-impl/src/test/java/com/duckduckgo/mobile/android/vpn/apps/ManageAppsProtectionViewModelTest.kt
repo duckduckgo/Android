@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.apps
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.R.string
-import com.duckduckgo.mobile.android.vpn.apps.AppCategory.Undefined
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.InfoPanelType
@@ -28,6 +27,7 @@ import com.duckduckgo.mobile.android.vpn.apps.BannerContent.CUSTOMISED_PROTECTIO
 import com.duckduckgo.mobile.android.vpn.apps.BannerContent.UNPROTECTED_APPS
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
+import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import kotlin.time.ExperimentalTime
@@ -443,7 +443,6 @@ class ManageAppsProtectionViewModelTest {
         TrackingProtectionAppInfo(
             packageName = "com.package.name",
             name = "App",
-            type = "None",
             category = AppCategory.Undefined,
             isExcluded = true,
             knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
@@ -455,7 +454,6 @@ class ManageAppsProtectionViewModelTest {
         TrackingProtectionAppInfo(
             packageName = "com.package.name",
             name = "App",
-            type = "None",
             category = AppCategory.Undefined,
             isExcluded = true,
             knownProblem = TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
@@ -467,8 +465,7 @@ class ManageAppsProtectionViewModelTest {
         TrackingProtectionAppInfo(
             packageName = "com.package.name",
             name = "App",
-            type = "None",
-            category = Undefined,
+            category = AppCategory.Undefined,
             isExcluded = true,
             knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
             userModified = true,
@@ -479,7 +476,6 @@ class ManageAppsProtectionViewModelTest {
         TrackingProtectionAppInfo(
             packageName = "com.package.name",
             name = "App",
-            type = "None",
             category = AppCategory.Undefined,
             isExcluded = false,
             knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
@@ -491,7 +487,6 @@ class ManageAppsProtectionViewModelTest {
         TrackingProtectionAppInfo(
             packageName = "com.package.name",
             name = "App",
-            type = "None",
             category = AppCategory.Undefined,
             isExcluded = false,
             knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
