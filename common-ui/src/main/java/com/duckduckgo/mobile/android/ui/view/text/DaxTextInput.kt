@@ -55,9 +55,11 @@ interface TextInput {
     fun addTextChangedListener(textWatcher: TextWatcher)
     fun removeTextChangedListener(textWatcher: TextWatcher)
     fun setEndIcon(
-        @DrawableRes endIconRes: Int?,
+        @DrawableRes endIconRes: Int,
         contentDescription: String? = null,
     )
+
+    fun removeEndIcon()
 
     fun onAction(actionHandler: (Action) -> Unit)
 
@@ -172,20 +174,20 @@ class DaxTextInput @JvmOverloads constructor(
     }
 
     override fun setEndIcon(
-        endIconRes: Int?,
+        endIconRes: Int,
         contentDescription: String?,
     ) {
-        if (endIconRes != null) {
-            ContextCompat.getDrawable(context, endIconRes)?.let {
-                setupEndIconDrawable(it, contentDescription.orEmpty())
-            }
-        } else {
-            binding.internalInputLayout.apply {
-                endIconMode = END_ICON_NONE
-                endIconDrawable = null
-                isEndIconVisible = false
-                endIconContentDescription = null
-            }
+        ContextCompat.getDrawable(context, endIconRes)?.let {
+            setupEndIconDrawable(it, contentDescription.orEmpty())
+        }
+    }
+
+    override fun removeEndIcon() {
+        binding.internalInputLayout.apply {
+            endIconMode = END_ICON_NONE
+            endIconDrawable = null
+            isEndIconVisible = false
+            endIconContentDescription = null
         }
     }
 
