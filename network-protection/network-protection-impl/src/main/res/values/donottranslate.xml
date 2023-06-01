@@ -96,4 +96,8 @@
     <string name="netpReportBreakageCategoryIot">Can\'t connect local device</string>
     <string name="netpReportBreakageCategoryFeatureRequest">Feature request</string>
     <string name="netpReportBreakageCategoryOther">Something else</string>
+
+    <!-- Settings -->
+    <string name="netpManagementSettings">Settings</string>
+    <string name="netpManagementSettingsExclusion">Manage App Exclusions</string>
 </resources>
