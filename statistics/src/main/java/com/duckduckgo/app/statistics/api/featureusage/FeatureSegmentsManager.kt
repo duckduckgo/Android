@@ -23,4 +23,6 @@ interface FeatureSegmentsManager {
     fun restartDailySearchCount()
     fun lastRetentionDayPixelSent(): Int
     fun updateLastRetentionDayPixelSent(retentionDay: Int)
+    fun enableSendPixelForFeatureSegments()
+    fun isSendPixelEnabled(): Boolean
 }

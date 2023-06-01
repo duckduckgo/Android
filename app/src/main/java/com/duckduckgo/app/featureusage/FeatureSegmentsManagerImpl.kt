@@ -42,28 +42,32 @@ class FeatureSegmentManagerImpl @Inject constructor(
 ) : FeatureSegmentsManager {
 
     override fun addUserToFeatureSegment(segment: FeatureSegmentType) {
-        when (segment) {
-            BOOKMARKS_IMPORTED -> featureSegmentsDataStore.bookmarksImported = true
-            FAVOURITE_SET -> featureSegmentsDataStore.favouriteSet = true
-            SET_AS_DEFAULT -> featureSegmentsDataStore.setAsDefault = true
-            LOGIN_SAVED -> featureSegmentsDataStore.loginSaved = true
-            FIRE_BUTTON_USED -> featureSegmentsDataStore.fireButtonUsed = true
-            APP_TP_ENABLED -> featureSegmentsDataStore.appTpEnabled = true
-            EMAIL_PROTECTION_SET -> featureSegmentsDataStore.emailProtectionSet = true
-            TWO_SEARCHES_MADE -> featureSegmentsDataStore.twoSearchesMade = true
-            FIVE_SEARCHES_MADE -> featureSegmentsDataStore.fiveSearchesMade = true
-            TEN_SEARCHES_MADE -> featureSegmentsDataStore.tenSearchesMade = true
+        if (featureSegmentsDataStore.featureSegmentsEnabled) {
+            when (segment) {
+                BOOKMARKS_IMPORTED -> featureSegmentsDataStore.bookmarksImported = true
+                FAVOURITE_SET -> featureSegmentsDataStore.favouriteSet = true
+                SET_AS_DEFAULT -> featureSegmentsDataStore.setAsDefault = true
+                LOGIN_SAVED -> featureSegmentsDataStore.loginSaved = true
+                FIRE_BUTTON_USED -> featureSegmentsDataStore.fireButtonUsed = true
+                APP_TP_ENABLED -> featureSegmentsDataStore.appTpEnabled = true
+                EMAIL_PROTECTION_SET -> featureSegmentsDataStore.emailProtectionSet = true
+                TWO_SEARCHES_MADE -> featureSegmentsDataStore.twoSearchesMade = true
+                FIVE_SEARCHES_MADE -> featureSegmentsDataStore.fiveSearchesMade = true
+                TEN_SEARCHES_MADE -> featureSegmentsDataStore.tenSearchesMade = true
+            }
         }
     }
 
     override fun searchMade() {
-        val updatedSearchesMade = featureSegmentsDataStore.dailySearchesCount++
-        when (updatedSearchesMade) {
-            2 -> addUserToFeatureSegment(TWO_SEARCHES_MADE)
-            5 -> addUserToFeatureSegment(FIVE_SEARCHES_MADE)
-            10 -> addUserToFeatureSegment(TEN_SEARCHES_MADE)
+        if (featureSegmentsDataStore.featureSegmentsEnabled) {
+            val updatedSearchesMade = featureSegmentsDataStore.dailySearchesCount++
+            when (updatedSearchesMade) {
+                2 -> addUserToFeatureSegment(TWO_SEARCHES_MADE)
+                5 -> addUserToFeatureSegment(FIVE_SEARCHES_MADE)
+                10 -> addUserToFeatureSegment(TEN_SEARCHES_MADE)
+            }
+            featureSegmentsDataStore.dailySearchesCount = updatedSearchesMade
         }
-        featureSegmentsDataStore.dailySearchesCount = updatedSearchesMade
     }
 
     override fun fireFeatureSegmentsPixel() {
@@ -81,6 +85,14 @@ class FeatureSegmentManagerImpl @Inject constructor(
 
     override fun updateLastRetentionDayPixelSent(retentionDay: Int) {
         featureSegmentsDataStore.lastDayPixelSent = retentionDay
+    }
+
+    override fun enableSendPixelForFeatureSegments() {
+        featureSegmentsDataStore.featureSegmentsEnabled = true
+    }
+
+    override fun isSendPixelEnabled(): Boolean {
+        return featureSegmentsDataStore.featureSegmentsEnabled
     }
 
     private fun getUserFeatureSegments(): Map<String, Boolean> {

@@ -24,6 +24,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface FeatureSegmentsDataStore {
+    var featureSegmentsEnabled: Boolean
+
     var bookmarksImported: Boolean
     var favouriteSet: Boolean
     var setAsDefault: Boolean
@@ -46,6 +48,9 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
+    override var featureSegmentsEnabled: Boolean
+        get() = preferences.getBoolean(KEY_FEATURE_SEGMENTS_ENABLED, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_FEATURE_SEGMENTS_ENABLED, enabled) }
     override var bookmarksImported: Boolean
         get() = preferences.getBoolean(KEY_BOOKMARKS_IMPORTED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_BOOKMARKS_IMPORTED, enabled) }
@@ -85,6 +90,7 @@ class FeatureSegmentsDataStoreSharedPreferences @Inject constructor(
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.feature_segments.settings"
+        const val KEY_FEATURE_SEGMENTS_ENABLED = "FEATURE_SEGMENTS_ENABLED"
         const val KEY_BOOKMARKS_IMPORTED = "BOOKMARKS_IMPORTED"
         const val KEY_FAVOURITE_SET = "FAVOURITE_SET"
         const val KEY_SET_AS_DEFAULT = "SET_AS_DEFAULT"

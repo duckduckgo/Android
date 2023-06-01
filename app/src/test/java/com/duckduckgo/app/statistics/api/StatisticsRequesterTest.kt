@@ -21,6 +21,7 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Observable
@@ -37,13 +38,15 @@ class StatisticsRequesterTest {
     private var mockResponseBody: ResponseBody = mock()
     private var mockVariantManager: VariantManager = mock()
     private val mockEmailManager: EmailManager = mock()
+    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
 
     private val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
         override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
             return listOf()
         }
     }
-    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins, mockEmailManager)
+    private var testee: StatisticsRequester =
+        StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins, mockEmailManager, mockFeatureSegmentsManager)
 
     @get:Rule
     @Suppress("unused")
@@ -173,6 +176,20 @@ class StatisticsRequesterTest {
         testee.refreshAppRetentionAtb()
 
         verify(mockService).updateAppAtb(any(), any(), any(), eq(1))
+    }
+
+    @Test
+    fun whenNoStatisticsStoredThenEnableFeatureSegment() {
+        configureNoStoredStatistics()
+        testee.initializeAtb()
+        verify(mockFeatureSegmentsManager).enableSendPixelForFeatureSegments()
+    }
+
+    @Test
+    fun whenStatisticsStoredThenDontEnableFeatureSegment() {
+        configureStoredStatistics()
+        testee.initializeAtb()
+        verify(mockFeatureSegmentsManager, never()).enableSendPixelForFeatureSegments()
     }
 
     private fun configureNoStoredStatistics() {

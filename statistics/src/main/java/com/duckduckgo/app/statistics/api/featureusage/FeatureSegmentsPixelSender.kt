@@ -38,7 +38,8 @@ class FeatureSegmentsPixelSender @Inject constructor(
 
     private fun tryToFireDailyPixel() {
         val shouldFireSegmentPixel = browserProperties.daysSinceInstalled() > 0 &&
-            browserProperties.daysSinceInstalled() - 1 > featureSegmentsManager.lastRetentionDayPixelSent()
+            browserProperties.daysSinceInstalled() - 1 > featureSegmentsManager.lastRetentionDayPixelSent() &&
+            featureSegmentsManager.isSendPixelEnabled()
         if (shouldFireSegmentPixel) {
             featureSegmentsManager.fireFeatureSegmentsPixel()
             val retentionDayPixelSent = browserProperties.daysSinceInstalled() - 1
