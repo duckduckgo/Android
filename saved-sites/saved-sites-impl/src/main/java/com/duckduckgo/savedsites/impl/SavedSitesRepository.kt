@@ -483,6 +483,8 @@ class RealSavedSitesRepository(
         if (oldFolder.parentId != folder.parentId) {
             savedSitesRelationsDao.deleteRelationByEntity(folder.id)
             savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
+            savedSitesEntitiesDao.updateModified(folder.parentId)
+            savedSitesEntitiesDao.updateModified(oldFolder.parentId)
         }
     }
 

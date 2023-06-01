@@ -67,12 +67,24 @@ class SavedSitesSyncPersisterAlgorithmTest {
 
     @Before
     fun setup() {
-        algorithm = RealSavedSitesSyncPersisterAlgorithm(FakeCrypto(), repository, deduplicationStrategy, timestampStrategy, remoteStrategy, localStrategy)
+        algorithm = RealSavedSitesSyncPersisterAlgorithm(
+            FakeCrypto(),
+            repository,
+            deduplicationStrategy,
+            timestampStrategy,
+            remoteStrategy,
+            localStrategy,
+        )
     }
 
     @Test
     fun whenProcessingEntriesWithDeduplicationStrategyThenDeduplicationPersisterIsUsed() {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = SavedSitesNames.BOOKMARKS_NAME, lastModified = twoHoursAgo, parentId = "")
+        val rootFolder = BookmarkFolder(
+            id = SavedSitesNames.BOOKMARKS_ROOT,
+            name = SavedSitesNames.BOOKMARKS_NAME,
+            lastModified = twoHoursAgo,
+            parentId = "",
+        )
         val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = twoHoursAgo, parentId = SavedSitesNames.BOOKMARKS_ROOT)
         val bookmark = Bookmark(id = "bookmark1", title = "title", url = "foo.com", lastModified = twoHoursAgo, parentId = folder.id)
         val someEntries = SyncBookmarkEntries(
@@ -95,7 +107,12 @@ class SavedSitesSyncPersisterAlgorithmTest {
 
     @Test
     fun whenProcessingEntriesWithTimestampStrategyThenTimestampPersisterIsUsed() {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = SavedSitesNames.BOOKMARKS_NAME, lastModified = twoHoursAgo, parentId = "")
+        val rootFolder = BookmarkFolder(
+            id = SavedSitesNames.BOOKMARKS_ROOT,
+            name = SavedSitesNames.BOOKMARKS_NAME,
+            lastModified = twoHoursAgo,
+            parentId = "",
+        )
         val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = twoHoursAgo, parentId = SavedSitesNames.BOOKMARKS_ROOT)
         val bookmark = Bookmark(id = "bookmark1", title = "title", url = "foo.com", lastModified = twoHoursAgo, parentId = folder.id)
         val someEntries = SyncBookmarkEntries(
@@ -118,7 +135,12 @@ class SavedSitesSyncPersisterAlgorithmTest {
 
     @Test
     fun whenProcessingEntriesWithRemoteStrategyThenRemotePersisterIsUsed() {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = SavedSitesNames.BOOKMARKS_NAME, lastModified = twoHoursAgo, parentId = "")
+        val rootFolder = BookmarkFolder(
+            id = SavedSitesNames.BOOKMARKS_ROOT,
+            name = SavedSitesNames.BOOKMARKS_NAME,
+            lastModified = twoHoursAgo,
+            parentId = "",
+        )
         val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = twoHoursAgo, parentId = SavedSitesNames.BOOKMARKS_ROOT)
         val bookmark = Bookmark(id = "bookmark1", title = "title", url = "foo.com", lastModified = twoHoursAgo, parentId = folder.id)
         val someEntries = SyncBookmarkEntries(
@@ -141,7 +163,12 @@ class SavedSitesSyncPersisterAlgorithmTest {
 
     @Test
     fun whenProcessingEntriesWithLocalStrategyThenLocalPersisterIsUsed() {
-        val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = SavedSitesNames.BOOKMARKS_NAME, lastModified = twoHoursAgo, parentId = "")
+        val rootFolder = BookmarkFolder(
+            id = SavedSitesNames.BOOKMARKS_ROOT,
+            name = SavedSitesNames.BOOKMARKS_NAME,
+            lastModified = twoHoursAgo,
+            parentId = "",
+        )
         val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = twoHoursAgo, parentId = SavedSitesNames.BOOKMARKS_ROOT)
         val bookmark = Bookmark(id = "bookmark1", title = "title", url = "foo.com", lastModified = twoHoursAgo, parentId = folder.id)
         val someEntries = SyncBookmarkEntries(
@@ -196,5 +223,4 @@ class SavedSitesSyncPersisterAlgorithmTest {
             return data
         }
     }
-
 }
