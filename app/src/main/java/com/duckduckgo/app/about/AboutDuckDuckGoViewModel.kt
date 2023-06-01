@@ -19,7 +19,9 @@ package com.duckduckgo.app.about
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
@@ -39,6 +41,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val appBuildConfig: AppBuildConfig,
     private val variantManager: VariantManager,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
@@ -82,10 +85,12 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     fun onLearnMoreLinkClicked() {
         viewModelScope.launch { command.send(Command.LaunchBrowserWithLearnMoreUrl) }
+        pixel.fire(SETTINGS_ABOUT_DDG_LEARN_MORE_PRESSED)
     }
 
     fun onPrivacyPolicyClicked() {
         viewModelScope.launch { command.send(Command.LaunchWebViewWithPrivacyPolicyUrl) }
+        pixel.fire(SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED)
     }
 
     fun onVersionClicked() {
@@ -94,16 +99,19 @@ class AboutDuckDuckGoViewModel @Inject constructor(
             if (netPEasterEggCounter >= MAX_EASTER_EGG_COUNT) {
                 viewModelScope.launch { command.send(Command.ShowNetPUnlockedSnackbar) }
                 resetNetPEasterEggCounter()
+                pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
             }
         }
     }
 
     fun onProvideFeedbackClicked() {
         viewModelScope.launch { command.send(Command.LaunchFeedback) }
+        pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
     fun onNetPUnlockedActionClicked() {
         viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
+        pixel.fire(SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED)
     }
 
     fun resetNetPEasterEggCounter() {
