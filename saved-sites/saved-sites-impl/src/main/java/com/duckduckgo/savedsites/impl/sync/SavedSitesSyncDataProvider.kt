@@ -24,6 +24,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.sync.algorithm.isDeleted
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
@@ -68,22 +69,24 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
         val folders = repository.getFoldersModifiedSince(since)
         folders.forEach { folder ->
-            if (folder.deleted == null) {
-                addFolderContent(folder.id, updates, since)
-            } else {
+            if (folder.isDeleted()) {
                 updates.add(deletedEntry(folder.id, folder.deleted!!))
+            } else {
+                addFolderContent(folder.id, updates, since)
             }
         }
 
         // bookmarks that were deleted or edited won't be part of the previous check
         val bookmarks = repository.getBookmarksModifiedSince(since)
         bookmarks.forEach { bookmark ->
-            if (bookmark.deleted != null) {
+            if (bookmark.isDeleted()) {
                 updates.add(deletedEntry(bookmark.id, bookmark.deleted!!))
+            } else {
+                updates.add(encryptSavedSite(bookmark))
             }
         }
 
-        return updates
+        return updates.distinct()
     }
 
     @VisibleForTesting
@@ -150,9 +153,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return if (since.isEmpty()) {
             true
         } else {
-            val entityModified = OffsetDateTime.parse(this.lastModified)
-            val sinceModified = OffsetDateTime.parse(since)
-            entityModified.isAfter(sinceModified)
+            if (this.lastModified == null) {
+                true
+            } else {
+                val entityModified = OffsetDateTime.parse(this.lastModified)
+                val sinceModified = OffsetDateTime.parse(since)
+                entityModified.isAfter(sinceModified)
+            }
         }
     }
 
@@ -160,9 +167,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return if (since.isEmpty()) {
             true
         } else {
-            val entityModified = OffsetDateTime.parse(this.lastModified)
-            val sinceModified = OffsetDateTime.parse(since)
-            entityModified.isAfter(sinceModified)
+            if (this.lastModified == null) {
+                true
+            } else {
+                val entityModified = OffsetDateTime.parse(this.lastModified)
+                val sinceModified = OffsetDateTime.parse(since)
+                entityModified.isAfter(sinceModified)
+            }
         }
     }
 

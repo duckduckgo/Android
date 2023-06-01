@@ -38,6 +38,7 @@ import io.reactivex.Single
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.threeten.bp.OffsetDateTime
@@ -228,7 +229,7 @@ class RealSavedSitesRepository(
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
-        return savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).map { relations ->
+        return savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).distinctUntilChanged().map { relations ->
             relations.mapIndexed { index, relation ->
                 savedSitesEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
             }
@@ -399,12 +400,14 @@ class RealSavedSitesRepository(
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
-        if (savedSitesRelationsDao.countFavouritesByUrl(bookmark.url) > 0) {
-            savedSitesEntitiesDao.updateModified(SavedSitesNames.FAVORITES_ROOT)
-        }
-        savedSitesEntitiesDao.updateModified(bookmark.parentId)
-        savedSitesEntitiesDao.delete(bookmark.id)
+        val folders = savedSitesRelationsDao.relationsByEntityId(bookmark.id)
+
         savedSitesRelationsDao.deleteRelationByEntity(bookmark.id)
+        savedSitesEntitiesDao.delete(bookmark.id)
+
+        folders.forEach {
+            savedSitesEntitiesDao.updateModified(it.folderId)
+        }
     }
 
     override fun updateFavourite(favorite: Favorite) {
@@ -472,40 +475,61 @@ class RealSavedSitesRepository(
                 title = folder.name,
                 url = "",
                 type = FOLDER,
+                lastModified = DatabaseDateFormatter.iso8601(),
+            ),
+        )
+
+        // has folder parent changed?
+        if (oldFolder.parentId != folder.parentId) {
+            savedSitesRelationsDao.deleteRelationByEntity(folder.id)
+            savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
+            savedSitesEntitiesDao.updateModified(folder.parentId)
+            savedSitesEntitiesDao.updateModified(oldFolder.parentId)
+        }
+    }
+
+    override fun replaceFolderContent(
+        folder: BookmarkFolder,
+        oldId: String,
+    ) {
+        savedSitesEntitiesDao.updateId(oldId, folder.id)
+        savedSitesRelationsDao.updateEntityId(oldId, folder.id)
+        savedSitesRelationsDao.updateFolderId(oldId, folder.id)
+
+        val oldFolder = getFolder(folder.id) ?: return
+
+        savedSitesEntitiesDao.update(
+            Entity(
+                entityId = folder.id,
+                title = folder.name,
+                url = "",
+                type = FOLDER,
                 lastModified = folder.lastModified ?: DatabaseDateFormatter.iso8601(),
             ),
         )
 
         // has folder parent changed?
-        if (oldFolder.parentId != folder.id) {
+        if (folder.parentId.isNotEmpty() && oldFolder.parentId != folder.parentId) {
             savedSitesRelationsDao.deleteRelationByEntity(folder.id)
             savedSitesRelationsDao.insert(Relation(folderId = folder.parentId, entityId = folder.id))
         }
-    }
-
-    override fun replaceFolder(
-        remoteId: String,
-        localId: String,
-    ) {
-        savedSitesEntitiesDao.updateId(localId, remoteId)
-        savedSitesRelationsDao.updateEntityId(localId, remoteId)
-        savedSitesRelationsDao.updateFolderId(localId, remoteId)
-    }
-
-    override fun replaceFolderContent(
-        folder: BookmarkFolder,
-        localId: String,
-    ) {
-        savedSitesEntitiesDao.updateId(localId, folder.id)
-        savedSitesRelationsDao.updateEntityId(localId, folder.id)
-        savedSitesRelationsDao.updateFolderId(localId, folder.id)
-        update(folder)
     }
 
     override fun replaceBookmark(
         bookmark: Bookmark,
         localId: String,
     ) {
+        // check if bookmark has moved
+        val storedBookmark = getBookmarkById(bookmark.id)
+        if (storedBookmark != null) {
+            if (storedBookmark.parentId != bookmark.parentId) {
+                // bookmark has moved to another folder
+                Timber.d("Sync-Feature: ${bookmark.id} has moved from folder ${storedBookmark.parentId} to ${bookmark.parentId}")
+                savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, storedBookmark.parentId)
+                savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
+            }
+        }
+
         savedSitesEntitiesDao.updateId(localId, bookmark.id)
         savedSitesRelationsDao.updateEntityId(localId, bookmark.id)
         savedSitesEntitiesDao.update(
@@ -517,6 +541,7 @@ class RealSavedSitesRepository(
                 bookmark.lastModified ?: DatabaseDateFormatter.iso8601(),
             ),
         )
+
         savedSitesEntitiesDao.updateModified(bookmark.parentId, bookmark.lastModified ?: DatabaseDateFormatter.iso8601())
     }
 
@@ -632,9 +657,26 @@ class RealSavedSitesRepository(
     }
 
     override fun pruneDeleted() {
+        Timber.d("Sync-Feature: pruning soft deleted entities")
         savedSitesEntitiesDao.allDeleted().forEach {
             savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
             savedSitesEntitiesDao.deletePermanently(it)
+        }
+    }
+
+    override fun updateModifiedSince(
+        originalDate: String,
+        modifiedSince: String,
+    ) {
+        Timber.d("Sync-Feature: updating entities modified before $originalDate to $modifiedSince")
+        val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filterNot { it.modifiedSince(originalDate) }
+        bookmarks.forEach { bookmark ->
+            savedSitesEntitiesDao.updateModified(bookmark.entityId, modifiedSince)
+        }
+
+        val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filterNot { it.modifiedSince(originalDate) }
+        folders.forEach { folder ->
+            savedSitesEntitiesDao.updateModified(folder.entityId, modifiedSince)
         }
     }
 

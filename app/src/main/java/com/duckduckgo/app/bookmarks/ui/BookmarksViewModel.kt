@@ -90,7 +90,7 @@ class BookmarksViewModel @Inject constructor(
     init {
         viewState.value = ViewState()
         viewModelScope.launch(dispatcherProvider.io()) {
-            syncEngine.syncNow(FEATURE_READ)
+            syncEngine.triggerSync(FEATURE_READ)
         }
     }
 

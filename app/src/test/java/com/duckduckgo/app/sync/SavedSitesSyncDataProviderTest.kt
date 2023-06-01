@@ -39,6 +39,7 @@ import com.duckduckgo.savedsites.impl.sync.SyncBookmarksRequest
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -211,12 +212,9 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes[3].id == bookmark4.id)
         assertTrue(changes[3].client_last_modified == modificationTimestamp)
         assertTrue(changes[3].deleted == null)
-        assertTrue(changes[4].id == bookmark1.id)
+        assertTrue(changes[4].id == bookmarksRootFolder.id)
         assertTrue(changes[4].client_last_modified == modificationTimestamp)
-        assertTrue(changes[4].deleted == null)
-        assertTrue(changes[5].id == bookmarksRootFolder.id)
-        assertTrue(changes[5].client_last_modified == modificationTimestamp)
-        assertTrue(changes[5].folder!!.children == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
+        assertTrue(changes[4].folder!!.children == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
         assertTrue(changes[4].deleted == null)
     }
 
@@ -396,5 +394,15 @@ class SavedSitesSyncDataProviderTest {
             val adapter: JsonAdapter<SyncBookmarksRequest> =
                 moshi.adapter(SyncBookmarksRequest::class.java)
         }
+    }
+}
+
+class FakeCrypto : SyncCrypto {
+    override fun encrypt(text: String): String {
+        return text
+    }
+
+    override fun decrypt(data: String): String {
+        return data
     }
 }

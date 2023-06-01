@@ -23,7 +23,7 @@ interface SyncableDataPersister {
      * Each feature is responsible for merging and solving conflicts
      */
     fun persist(
-        changes: List<SyncChangesResponse>,
+        changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean>
 

@@ -33,7 +33,9 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
+import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState.FAIL
+import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import org.junit.Before
 import org.junit.Test
@@ -59,7 +61,7 @@ internal class SyncEngineTest {
 
     @Test
     fun whenCreatingSyncAccountAndNoLocalChangesThenNothingIsSent() {
-        syncEngine.syncNow(ACCOUNT_CREATION)
+        syncEngine.triggerSync(ACCOUNT_CREATION)
         verifyNoInteractions(syncStateRepository)
         verifyNoInteractions(syncApiClient)
     }
@@ -69,7 +71,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchSuccess()
 
-        syncEngine.syncNow(ACCOUNT_CREATION)
+        syncEngine.triggerSync(ACCOUNT_CREATION)
 
         verify(syncStateRepository).store(any())
         verify(syncApiClient).patch(any())
@@ -81,7 +83,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchError()
 
-        syncEngine.syncNow(ACCOUNT_CREATION)
+        syncEngine.triggerSync(ACCOUNT_CREATION)
 
         verify(syncStateRepository).store(any())
         verify(syncApiClient).patch(any())
@@ -93,9 +95,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetSuccess()
 
-        syncEngine.syncNow(APP_OPEN)
+        syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -104,9 +106,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetError()
 
-        syncEngine.syncNow(APP_OPEN)
+        syncEngine.triggerSync(APP_OPEN)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -115,7 +117,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchSuccess()
 
-        syncEngine.syncNow(APP_OPEN)
+        syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -126,7 +128,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchError()
 
-        syncEngine.syncNow(APP_OPEN)
+        syncEngine.triggerSync(APP_OPEN)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
@@ -137,9 +139,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetSuccess()
 
-        syncEngine.syncNow(FEATURE_READ)
+        syncEngine.triggerSync(FEATURE_READ)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -148,9 +150,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetError()
 
-        syncEngine.syncNow(FEATURE_READ)
+        syncEngine.triggerSync(FEATURE_READ)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -159,7 +161,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchSuccess()
 
-        syncEngine.syncNow(FEATURE_READ)
+        syncEngine.triggerSync(FEATURE_READ)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -170,7 +172,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchError()
 
-        syncEngine.syncNow(FEATURE_READ)
+        syncEngine.triggerSync(FEATURE_READ)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
@@ -181,9 +183,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetSuccess()
 
-        syncEngine.syncNow(DATA_CHANGE)
+        syncEngine.triggerSync(DATA_CHANGE)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -192,9 +194,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetError()
 
-        syncEngine.syncNow(DATA_CHANGE)
+        syncEngine.triggerSync(DATA_CHANGE)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -203,7 +205,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchSuccess()
 
-        syncEngine.syncNow(DATA_CHANGE)
+        syncEngine.triggerSync(DATA_CHANGE)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -214,7 +216,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchError()
 
-        syncEngine.syncNow(DATA_CHANGE)
+        syncEngine.triggerSync(DATA_CHANGE)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
@@ -234,9 +236,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetSuccess()
 
-        syncEngine.syncNow(BACKGROUND_SYNC)
+        syncEngine.triggerSync(BACKGROUND_SYNC)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
     }
 
@@ -246,9 +248,9 @@ internal class SyncEngineTest {
         givenNoLocalChanges()
         givenGetError()
 
-        syncEngine.syncNow(BACKGROUND_SYNC)
+        syncEngine.triggerSync(BACKGROUND_SYNC)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(FAIL)
     }
 
@@ -258,7 +260,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchSuccess()
 
-        syncEngine.syncNow(BACKGROUND_SYNC)
+        syncEngine.triggerSync(BACKGROUND_SYNC)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(SUCCESS)
@@ -270,7 +272,7 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenPatchError()
 
-        syncEngine.syncNow(BACKGROUND_SYNC)
+        syncEngine.triggerSync(BACKGROUND_SYNC)
 
         verify(syncApiClient).patch(any())
         verify(syncStateRepository).updateSyncState(FAIL)
@@ -281,10 +283,17 @@ internal class SyncEngineTest {
         givenLocalChanges()
         givenGetError()
 
-        syncEngine.syncNow(ACCOUNT_LOGIN)
+        syncEngine.triggerSync(ACCOUNT_LOGIN)
 
-        verify(syncApiClient).get(any())
+        verify(syncApiClient).get(any(), any())
         verify(syncStateRepository).updateSyncState(FAIL)
+    }
+
+    @Test
+    fun whenTriggeringSyncAndSyncAlreadyInProgressThenSyncIsDismissed() {
+        whenever(syncStateRepository.current()).thenReturn(SyncAttempt(state = IN_PROGRESS))
+        syncEngine.triggerSync(DATA_CHANGE)
+        verifyNoInteractions(syncApiClient)
     }
 
     private fun givenNoLocalChanges() {
@@ -299,20 +308,21 @@ internal class SyncEngineTest {
         val localChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "0")
         val fakePersisterPlugin = FakeSyncableDataPersister()
         val fakeProviderPlugin = FakeSyncableDataProvider(localChanges)
-        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin))
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(fakePersisterPlugin)).thenReturn(listOf(FakeSyncableDataPersister()))
         whenever(providerPlugins.getPlugins()).thenReturn(listOf(fakeProviderPlugin))
+            .thenReturn(listOf(FakeSyncableDataProvider(SyncChangesRequest.empty())))
     }
 
     private fun givenGetError() {
-        whenever(syncApiClient.get(any())).thenReturn(
+        whenever(syncApiClient.get(any(), any())).thenReturn(
             Result.Error(400, "get failed"),
         )
     }
 
     private fun givenGetSuccess() {
-        whenever(syncApiClient.get(any())).thenReturn(
+        whenever(syncApiClient.get(any(), any())).thenReturn(
             Success(
-                listOf(SyncChangesResponse.empty()),
+                SyncChangesResponse.empty(),
             ),
         )
     }
@@ -326,7 +336,7 @@ internal class SyncEngineTest {
     private fun givenPatchSuccess() {
         whenever(syncApiClient.patch(any())).thenReturn(
             Success(
-                listOf(SyncChangesResponse.empty()),
+                SyncChangesResponse.empty(),
             ),
         )
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.sync
+package com.duckduckgo.app.sync.algorithm
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
@@ -28,9 +28,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
-import com.duckduckgo.savedsites.impl.sync.RealSavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateFinder
-import com.duckduckgo.savedsites.impl.sync.SavedSitesDuplicateResult
+import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import org.junit.Assert

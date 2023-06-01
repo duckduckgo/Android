@@ -85,6 +85,7 @@ class AppDatabaseBookmarksMigrationCallback(
                     val entity = Entity(UUID.randomUUID().toString(), it.title, it.url, BOOKMARK)
                     entitiesMigration.add(entity)
                     favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
+                    favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = entity.entityId))
                 }
             }
 

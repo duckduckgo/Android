@@ -24,7 +24,7 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 class FakeSyncableDataPersister() : SyncableDataPersister {
 
     override fun persist(
-        changes: List<SyncChangesResponse>,
+        changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
         return SyncMergeResult.Success(false)

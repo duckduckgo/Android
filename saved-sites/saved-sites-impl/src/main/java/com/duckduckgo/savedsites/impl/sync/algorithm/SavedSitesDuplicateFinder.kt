@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.sync
+package com.duckduckgo.savedsites.impl.sync.algorithm
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
+import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -45,12 +47,12 @@ class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSit
         val existingFolder = repository.getFolderByName(bookmarkFolder.name)
         return if (existingFolder != null) {
             if (existingFolder.parentId == bookmarkFolder.parentId) {
-                SavedSitesDuplicateResult.Duplicate(existingFolder.id)
+                Duplicate(existingFolder.id)
             } else {
-                SavedSitesDuplicateResult.NotDuplicate
+                NotDuplicate
             }
         } else {
-            SavedSitesDuplicateResult.NotDuplicate
+            NotDuplicate
         }
     }
 
@@ -58,12 +60,12 @@ class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSit
         val presentUrl = repository.getFavorite(favorite.url)
         return if (presentUrl != null) {
             if (presentUrl.title == favorite.title) {
-                SavedSitesDuplicateResult.Duplicate(presentUrl.id)
+                Duplicate(presentUrl.id)
             } else {
-                SavedSitesDuplicateResult.NotDuplicate
+                NotDuplicate
             }
         } else {
-            SavedSitesDuplicateResult.NotDuplicate
+            NotDuplicate
         }
     }
 
@@ -71,12 +73,12 @@ class RealSavedSitesDuplicateFinder @Inject constructor(val repository: SavedSit
         val presentUrl = repository.getBookmark(bookmark.url)
         return if (presentUrl != null) {
             if (presentUrl.title == bookmark.title && presentUrl.parentId == bookmark.parentId) {
-                SavedSitesDuplicateResult.Duplicate(presentUrl.id)
+                Duplicate(presentUrl.id)
             } else {
-                SavedSitesDuplicateResult.NotDuplicate
+                NotDuplicate
             }
         } else {
-            SavedSitesDuplicateResult.NotDuplicate
+            NotDuplicate
         }
     }
 }

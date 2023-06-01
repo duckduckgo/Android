@@ -45,6 +45,8 @@ import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesBinding(scope = AppScope::class)
@@ -56,7 +58,7 @@ class RealSyncEngine @Inject constructor(
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
 ) : SyncEngine {
 
-    override fun syncNow(trigger: SyncTrigger) {
+    override fun triggerSync(trigger: SyncTrigger) {
         Timber.d("Sync-Feature: petition to sync now trigger: $trigger")
         when (trigger) {
             BACKGROUND_SYNC -> scheduleSync(trigger)
@@ -83,54 +85,79 @@ class RealSyncEngine @Inject constructor(
 
     private fun sendLocalData() {
         Timber.d("Sync-Feature: initiating first sync")
-        val changes = getChanges()
+        getChanges().forEach {
+            if (it.isEmpty()) {
+                Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
+                return
+            }
 
-        if (changes.isEmpty()) {
-            Timber.d("Sync-Feature: local data empty, nothing to send")
-            return
+            Timber.d("Sync-Feature: sending ${it.type} local data $it")
+            syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
+            patchLocalChanges(it, REMOTE_WINS)
         }
-
-        Timber.d("Sync-Feature: sending all local data $changes")
-        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
-        sendLocalChanges(changes, REMOTE_WINS)
     }
 
     private fun mergeRemoteData() {
         Timber.d("Sync-Feature: fetching remote data")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
 
-        getRemoteChanges(DEDUPLICATION)
-
-        val changes = getChanges()
-        if (changes.isEmpty()) {
-            Timber.d("Sync-Feature: local data empty, nothing to send")
-            return
+        // get remote changes and deduplicate them locally
+        getChanges().forEach {
+            getRemoteChanges(it, DEDUPLICATION)
         }
 
-        Timber.d("Sync-Feature: sending local data $changes")
-        sendLocalChanges(changes, LOCAL_WINS)
+        // there might be changes locally that need to be patched
+        getChanges().forEach {
+            if (it.isEmpty()) {
+                Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
+                return
+            } else {
+                Timber.d("Sync-Feature: ${it.type}  sending local data $it")
+                patchLocalChanges(it, LOCAL_WINS)
+            }
+        }
     }
 
     private fun performSync(trigger: SyncTrigger) {
-        val changes = getChanges()
-
-        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
-
-        if (changes.isEmpty()) {
-            Timber.d("Sync-Feature: no changes to sync, asking for remote changes")
-            getRemoteChanges(TIMESTAMP)
+        if (syncInProgress()) {
+            Timber.d("Sync-Feature: sync already in progress, throttling")
         } else {
-            Timber.d("Sync-Feature: changes to update $changes")
             Timber.d("Sync-Feature: starting to sync")
-            sendLocalChanges(changes, TIMESTAMP)
+            syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
+
+            // TODO: Is this good enough? Should we make the calls in parallel?
+            getChanges().forEach {
+                if (it.isEmpty()) {
+                    Timber.d("Sync-Feature: no changes to sync for $it, asking for remote changes")
+                    getRemoteChanges(it, TIMESTAMP)
+                } else {
+                    Timber.d("Sync-Feature: $it changes to update $it")
+                    patchLocalChanges(it, TIMESTAMP)
+                }
+            }
         }
     }
 
-    private fun sendLocalChanges(
-        changes: List<SyncChangesRequest>,
+    private fun syncInProgress(): Boolean {
+        val currentSync = syncStateRepository.current()
+        return if (currentSync != null) {
+            if (currentSync.state == IN_PROGRESS) {
+                val syncTimestamp = OffsetDateTime.parse(currentSync.timestamp)
+                val now = OffsetDateTime.now()
+                Duration.between(syncTimestamp, now).toMinutes() > 10
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    private fun patchLocalChanges(
+        changes: SyncChangesRequest,
         conflictResolution: SyncConflictResolution,
     ) {
-        when (val result = syncApiClient.patch(changes)) {
+        return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 Timber.d("Sync-Feature: patch failed ${result.reason}")
                 syncStateRepository.updateSyncState(FAIL)
@@ -138,17 +165,18 @@ class RealSyncEngine @Inject constructor(
 
             is Success -> {
                 Timber.d("Sync-Feature: patch success")
-                syncStateRepository.updateSyncState(SUCCESS)
                 persistChanges(result.data, conflictResolution)
+                syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }
 
-    private fun getRemoteChanges(conflictResolution: SyncConflictResolution) {
-        // TODO: refactor this to make one request per data type, now it's only bookmarks
-        val since = getBookmarksModifiedSince()
-        Timber.d("Sync-Feature: receive remote bookmarks change since $since")
-        when (val result = syncApiClient.get(since)) {
+    private fun getRemoteChanges(
+        changes: SyncChangesRequest,
+        conflictResolution: SyncConflictResolution,
+    ) {
+        Timber.d("Sync-Feature: receive remote change $changes")
+        when (val result = syncApiClient.get(changes.type, changes.modifiedSince)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
                 syncStateRepository.updateSyncState(FAIL)
@@ -162,24 +190,25 @@ class RealSyncEngine @Inject constructor(
         }
     }
 
-    private fun getBookmarksModifiedSince(): String {
-        return providerPlugins.getPlugins().map {
-            it.getModifiedSince()
-        }.filterNot { it.isEmpty() }.first()
-    }
-
     private fun getChanges(): List<SyncChangesRequest> {
         return providerPlugins.getPlugins().map {
             it.getChanges()
-        }.filterNot { it.isEmpty() }
+        }
     }
 
     private fun persistChanges(
-        remoteChanges: List<SyncChangesResponse>,
+        remoteChanges: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ) {
         persisterPlugins.getPlugins().map {
             it.persist(remoteChanges, conflictResolution)
+        }
+    }
+
+    override fun onSyncDisabled() {
+        syncStateRepository.clearAll()
+        persisterPlugins.getPlugins().map {
+            it.onSyncDisabled()
         }
     }
 }

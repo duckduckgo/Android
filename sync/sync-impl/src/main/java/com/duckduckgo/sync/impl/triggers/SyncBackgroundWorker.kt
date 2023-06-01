@@ -56,7 +56,7 @@ class SyncBackgroundWorker(
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
             if (deviceSyncState.isUserSignedInOnDevice()) {
-                syncEngine.syncNow(BACKGROUND_SYNC)
+                syncEngine.triggerSync(BACKGROUND_SYNC)
             }
             return@withContext Result.success()
         }

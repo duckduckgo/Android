@@ -53,7 +53,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
                 savedSitesRepository.lastModified().collect {
                     if (initialised) {
                         Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
-                        syncEngine.syncNow(DATA_CHANGE)
+                        syncEngine.triggerSync(DATA_CHANGE)
                     } else {
                         Timber.d("Sync-Feature: Changes to Saved Sites initialised")
                         initialised = true

@@ -689,14 +689,17 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenFavoriteAddedThenRepositoryUpdatedAndUserNotified() = runTest {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "A  title", "http://example.com", lastModified = "timestamp", 0)
-        loadUrl("www.example.com", "A title")
-        whenever(mockSavedSitesRepository.insertFavorite(any(), any(), any(), any())).thenReturn(savedSite)
+        val url = "http://www.example.com"
+        val title = "A title"
+
+        val savedSite = Favorite(UUID.randomUUID().toString(), title, url, lastModified = "timestamp", 0)
+        whenever(mockSavedSitesRepository.insertFavorite(url = url, title = title)).thenReturn(savedSite)
+        loadUrl(url = url, title = title)
 
         testee.onFavoriteMenuClicked()
-
-        verify(mockSavedSitesRepository).insertFavorite(title = "A title", url = "www.example.com")
-        assertCommandIssued<Command.ShowSavedSiteAddedConfirmation>()
+        verify(mockSavedSitesRepository).insertFavorite(title = title, url = url)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is Command.ShowSavedSiteAddedConfirmation)
     }
 
     @Test
