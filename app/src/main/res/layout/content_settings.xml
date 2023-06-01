@@ -29,45 +29,21 @@
         android:paddingBottom="20dp">
 
         <include
-            android:id="@+id/contentSettingsGeneral"
-            layout="@layout/content_settings_general"
+            android:id="@+id/contentSettingsPrivacy"
+            layout="@layout/content_settings_privacy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4" />
 
         <include
-            android:id="@+id/contentSettingsFeatures"
-            layout="@layout/content_settings_features"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include
-            android:id="@+id/contentSettingsAppearance"
-            layout="@layout/content_settings_appearance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include
-            android:id="@+id/contentSettingsPrivacy"
-            layout="@layout/content_settings_privacy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include
-            android:id="@+id/contentSettingsCustomize"
-            layout="@layout/content_settings_customize"
+            android:id="@+id/contentSettingsSettings"
+            layout="@layout/content_settings_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <include
             android:id="@+id/contentSettingsMore"
             layout="@layout/content_settings_other"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include
-            android:id="@+id/contentSettingsOther"
-            layout="@layout/content_settings_about"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

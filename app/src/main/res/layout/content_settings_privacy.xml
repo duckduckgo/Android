@@ -16,15 +16,10 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settingsSectionPrivacy"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/settingsPrivacyTitle"
@@ -32,46 +27,45 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsHeadingPrivacy"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/globalPrivacyControlSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
-        app:primaryText="@string/globalPrivacyControlSetting"
-        tools:secondaryText="test test test" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/autoconsentSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
-        app:primaryText="@string/autoconsentSetting" />
-
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/whitelist"
+        android:id="@+id/setAsDefaultBrowserSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsPrivacyProtectionWhitelist"/>
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/fireproofWebsites"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsFireproofWebsites"/>
+        app:primaryText="@string/settingsDefaultBrowserEnabled"
+        app:showSwitch="true"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/automaticallyClearWhatSetting"
+        android:id="@+id/privateSearchSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryTextTruncated="false"
-        app:primaryText="@string/settingsAutomaticallyClearWhat"
-        tools:secondaryText="test test test" />
+        app:primaryText="@string/settingsPrivateSearchTitle"
+        app:secondaryText="@string/settingsPrivateSearchDescription" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/automaticallyClearWhenSetting"
+        android:id="@+id/webTrackingProtectionSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsAutomaticallyClearWhen"
-        tools:secondaryText="test test test" />
+        app:primaryTextTruncated="false"
+        app:primaryText="@string/settingsWebTrackingProtectionTitle"
+        app:secondaryText="@string/settingsWebTrackingProtectionDescription" />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/emailSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsEmailProtectionTitle"
+        app:primaryTextTruncated="false"
+        app:secondaryText="@string/settingsEmailProtectionSubtitle"
+        app:showBetaPill="true" />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/vpnSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/atp_SettingsTitle"
+        app:primaryTextTruncated="false"
+        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
+        app:showBetaPill="true" />
 
 </LinearLayout>

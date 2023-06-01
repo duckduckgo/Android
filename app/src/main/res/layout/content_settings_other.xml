@@ -17,9 +17,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/settingsSectionOther"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:id="@+id/settingsOtherDivider"
@@ -33,40 +33,23 @@
         app:primaryText="@string/settingsHeadingMore" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/emailSetting"
+        android:id="@+id/macOsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsEmailProtectionTitle"
+        app:primaryText="@string/macos_settings_title"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsEmailProtectionSubtitle"
+        app:secondaryText="@string/macos_settings_description"
         app:showBetaPill="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/vpnSetting"
+        android:id="@+id/windowsSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/atp_SettingsTitle"
+        app:primaryText="@string/windows_settings_title"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
+        app:secondaryText="@string/windows_settings_description"
         app:showBetaPill="true" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-            android:id="@+id/macOsSetting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/macos_settings_title"
-            app:primaryTextTruncated="false"
-            app:secondaryText="@string/macos_settings_description"
-            app:showBetaPill="true" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-            android:id="@+id/windowsSetting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/windows_settings_title"
-            app:primaryTextTruncated="false"
-            app:secondaryText="@string/windows_settings_description"
-            app:showBetaPill="true" />
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/netpPSetting"
         android:layout_width="match_parent"
@@ -74,8 +57,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/vpnSetting"
-        app:showBetaPill="true"
+        app:primaryText="@string/netpSettingsTitle"
         app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
-        app:primaryText="@string/netpSettingsTitle" />
+        app:showBetaPill="true" />
 
 </LinearLayout>

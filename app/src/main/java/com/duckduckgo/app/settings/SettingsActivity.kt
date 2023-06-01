@@ -16,75 +16,43 @@
 
 package com.duckduckgo.app.settings
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
-import android.widget.Toast
-import androidx.annotation.StringRes
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
-import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
-import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
-import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.privacy.ui.WhitelistActivity
-import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTING
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.INVALID
-import com.duckduckgo.app.settings.SettingsViewModel.ViewState
-import com.duckduckgo.app.settings.clear.AppLinkSettingType
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
-import com.duckduckgo.app.settings.clear.FireAnimation.None
-import com.duckduckgo.app.settings.clear.getAppLinkSettingForIndex
-import com.duckduckgo.app.settings.clear.getClearWhatOptionForIndex
-import com.duckduckgo.app.settings.clear.getClearWhenForIndex
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
-import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
-import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
-import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
@@ -101,7 +69,6 @@ import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
-import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -136,44 +103,26 @@ class SettingsActivity : DuckDuckGoActivity() {
         viewModel.onDefaultBrowserToggled(isChecked)
     }
 
-    private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onAutocompleteSettingChanged(isChecked)
-    }
-
-    private val viewsGeneral
-        get() = binding.includeSettings.contentSettingsGeneral
-
-    private val viewsFeatures
-        get() = binding.includeSettings.contentSettingsFeatures
-
-    private val viewsAppearance
-        get() = binding.includeSettings.contentSettingsAppearance
-
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
 
-    private val viewsCustomize
-        get() = binding.includeSettings.contentSettingsCustomize
-
-    private val viewsInternal
-        get() = binding.includeSettings.contentSettingsInternal
+    private val viewsSettings
+        get() = binding.includeSettings.contentSettingsSettings
 
     private val viewsMore
         get() = binding.includeSettings.contentSettingsMore
 
-    private val viewsOther
-        get() = binding.includeSettings.contentSettingsOther
-
-    private var netPEasterEggCounter = 0
+    private val viewsInternal
+        get() = binding.includeSettings.contentSettingsInternal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
         configureUiEventHandlers()
         configureInternalFeatures()
-        configureAppLinksSettingVisibility()
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
@@ -184,91 +133,30 @@ class SettingsActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
 
-        val notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
-        viewModel.start(notificationsEnabled)
+        viewModel.start()
         viewModel.startPollingVpnState()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        netPEasterEggCounter = 0
-    }
-
     private fun configureUiEventHandlers() {
-        with(viewsGeneral) {
-            setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
-            homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
-        }
-
-        with(viewsFeatures) {
-            autofill.setClickListener { viewModel.onAutofillSettingsClick() }
-            syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
-        }
-
-        with(viewsAppearance) {
-            selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
-            changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
-            selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
-            accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
-        }
-
         with(viewsPrivacy) {
-            globalPrivacyControlSetting.setClickListener { viewModel.onGlobalPrivacyControlClicked() }
-            autoconsentSetting.setClickListener { viewModel.onAutoconsentClicked() }
-            fireproofWebsites.setClickListener { viewModel.onFireproofWebsitesClicked() }
-            automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
-            automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
-            whitelist.setClickListener { viewModel.onManageWhitelistSelected() }
+            setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
+            privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
+            webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
+            emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
+            vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
         }
 
-        with(viewsCustomize) {
-            autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
-            sitePermissions.setClickListener { viewModel.onSitePermissionsClicked() }
-            notificationsSetting.setClickListener { viewModel.userRequestedToChangeNotificationsSetting() }
-            appLinksSetting.setClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
-        }
-
-        with(viewsOther) {
-            provideFeedback.setClickListener { viewModel.userRequestedToSendFeedback() }
-            about.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
-            privacyPolicy.setClickListener {
-                startActivity(
-                    WebViewActivity.intent(
-                        this@SettingsActivity,
-                        PRIVACY_POLICY_WEB_LINK,
-                        getString(R.string.settingsPrivacyPolicyDuckduckgo),
-                    ),
-                )
-            }
+        with(viewsSettings) {
+            homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
+            autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
+            syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
+            aboutSetting.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
         }
 
         with(viewsMore) {
-            emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
-            vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
             windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
             netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
-        }
-
-        with(viewsOther) {
-            version.setClickListener {
-                if (viewModel.viewState().value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
-                    netPEasterEggCounter++
-                    if (netPEasterEggCounter >= 12) {
-                        Snackbar.make(
-                            binding.root,
-                            R.string.netpUnlockedSnackbar,
-                            Snackbar.LENGTH_LONG,
-                        ).setAction(R.string.netpUnlockedSnackbarAction) {
-                            launchNetpWaitlist()
-                        }.setDuration(3500) // LENGTH_LONG is not long enough, increase to 3.5 sec
-                            .show()
-                        // reset the counter
-                        netPEasterEggCounter = 0
-                    }
-                }
-            }
         }
     }
 
@@ -285,28 +173,13 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureAppLinksSettingVisibility() {
-        if (appBuildConfig.sdkInt < Build.VERSION_CODES.N) {
-            viewsCustomize.appLinksSetting.visibility = View.GONE
-        }
-    }
-
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .distinctUntilChanged()
             .onEach { viewState ->
                 viewState.let {
-                    viewsOther.version.setSecondaryText(it.version)
-                    updateSelectedTheme(it.theme)
-                    viewsCustomize.autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                     updateDefaultBrowserViewVisibility(it)
-                    updateAutomaticClearDataOptions(it.automaticallyClearData)
-                    setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
-                    viewsAppearance.changeAppIcon.setImageResource(it.appIcon.icon)
-                    setAutoconsentSetting(it.autoconsentEnabled)
-                    updateSelectedFireAnimation(it.selectedFireAnimation)
-                    updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
@@ -314,8 +187,8 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateNetPSettings(it.networkProtectionState, it.networkProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
                     updateWindowsSettings(it.windowsWaitlistState)
-                    updateFeaturesSection(it)
-                    viewsCustomize.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
+                    updateAutofill(it.showAutofill)
+                    updateSyncSetting(visible = it.showSyncSetting)
                 }
             }.launchIn(lifecycleScope)
 
@@ -325,15 +198,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun updateFeaturesSection(viewState: ViewState) {
-        updateAutofill(viewState.showAutofill)
-        updateSyncSetting(visible = viewState.showSyncSetting, deviceSyncEnabled = viewState.syncEnabled)
-        // section will be visible if more than 1 view (a part from horizontal divider) is visible.
-        val showFeaturesSection = viewsFeatures.settingsSectionFeatures.children.count { it.visibility == View.VISIBLE } > 1
-        viewsFeatures.settingsSectionFeatures.isVisible = showFeaturesSection
-    }
-
-    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsFeatures.autofill) {
+    private fun updateAutofill(autofillEnabled: Boolean) = with(viewsSettings.autofillLoginsSetting) {
         visibility = if (autofillEnabled) {
             View.VISIBLE
         } else {
@@ -356,170 +221,43 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun updateEmailSubtitle(emailAddress: String?) {
         val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
-        viewsMore.emailSetting.setSecondaryText(subtitle)
+        viewsPrivacy.emailSetting.setSecondaryText(subtitle)
     }
 
-    private fun updateSyncSetting(visible: Boolean, deviceSyncEnabled: Boolean) {
-        with(viewsFeatures.syncSetting) {
+    private fun updateSyncSetting(visible: Boolean) {
+        with(viewsSettings.syncSetting) {
             isVisible = visible
-            val deviceSyncStatus = if (deviceSyncEnabled) R.string.syncSettingsEnabled else R.string.syncSettingsDisabled
-            setSecondaryText(getString(deviceSyncStatus))
         }
-    }
-
-    private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
-        val stateText = if (enabled) {
-            getString(R.string.enabled)
-        } else {
-            getString(R.string.disabled)
-        }
-        viewsPrivacy.globalPrivacyControlSetting.setSecondaryText(stateText)
-    }
-
-    private fun setAutoconsentSetting(enabled: Boolean) {
-        val stateText = if (enabled) {
-            getString(R.string.enabled)
-        } else {
-            getString(R.string.disabled)
-        }
-        viewsPrivacy.autoconsentSetting.setSecondaryText(stateText)
-    }
-
-    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
-        val subtitle = getString(fireAnimation.nameResId)
-        viewsAppearance.selectedFireAnimationSetting.setSecondaryText(subtitle)
-    }
-
-    private fun updateSelectedTheme(selectedTheme: DuckDuckGoTheme) {
-        val subtitle = getString(
-            when (selectedTheme) {
-                DARK -> R.string.settingsDarkTheme
-                LIGHT -> R.string.settingsLightTheme
-                SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-            },
-        )
-        viewsAppearance.selectedThemeSetting.setSecondaryText(subtitle)
-    }
-
-    private fun updateAppLinkBehavior(appLinkSettingType: AppLinkSettingType) {
-        val subtitle = getString(
-            when (appLinkSettingType) {
-                AppLinkSettingType.ASK_EVERYTIME -> R.string.settingsAppLinksAskEveryTime
-                AppLinkSettingType.ALWAYS -> R.string.settingsAppLinksAlways
-                AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
-            },
-        )
-        viewsCustomize.appLinksSetting.setSecondaryText(subtitle)
-    }
-
-    private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
-        val clearWhatSubtitle = getString(automaticallyClearData.clearWhatOption.nameStringResourceId())
-        viewsPrivacy.automaticallyClearWhatSetting.setSecondaryText(clearWhatSubtitle)
-
-        val clearWhenSubtitle = getString(automaticallyClearData.clearWhenOption.nameStringResourceId())
-        viewsPrivacy.automaticallyClearWhenSetting.setSecondaryText(clearWhenSubtitle)
-
-        val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
-        viewsPrivacy.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
-    }
-
-    private fun launchAutomaticallyClearWhatDialog(option: ClearWhatOption) {
-        val currentOption = option.getOptionIndex()
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
-            .setOptions(
-                listOf(
-                    R.string.settingsAutomaticallyClearWhatOptionNone,
-                    R.string.settingsAutomaticallyClearWhatOptionTabs,
-                    R.string.settingsAutomaticallyClearWhatOptionTabsAndData,
-                ),
-                currentOption,
-            )
-            .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val clearWhatSelected = selectedItem.getClearWhatOptionForIndex()
-                        viewModel.onAutomaticallyWhatOptionSelected(clearWhatSelected)
-                    }
-                },
-            )
-            .show()
-        pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_SHOWN)
-    }
-
-    private fun launchAutomaticallyClearWhenDialog(option: ClearWhenOption) {
-        val currentOption = option.getOptionIndex()
-        val clearWhenOptions = mutableListOf(
-            R.string.settingsAutomaticallyClearWhenAppExitOnly,
-            R.string.settingsAutomaticallyClearWhenAppExit5Minutes,
-            R.string.settingsAutomaticallyClearWhenAppExit15Minutes,
-            R.string.settingsAutomaticallyClearWhenAppExit30Minutes,
-            R.string.settingsAutomaticallyClearWhenAppExit60Minutes,
-        )
-        if (appBuildConfig.isDebug) {
-            clearWhenOptions.add(R.string.settingsAutomaticallyClearWhenAppExit5Seconds)
-        }
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsAutomaticallyClearWhenDialogTitle)
-            .setOptions(clearWhenOptions, currentOption)
-            .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val clearWhenSelected = selectedItem.getClearWhenForIndex()
-                        viewModel.onAutomaticallyWhenOptionSelected(clearWhenSelected)
-                        Timber.d("Option selected: $clearWhenSelected")
-                    }
-                },
-            )
-            .show()
-        pixel.fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_SHOWN)
     }
 
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
-            is Command.LaunchFeedback -> launchFeedback()
-            is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
             is Command.LaunchAutofillSettings -> launchAutofillSettings()
-            is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
-            is Command.LaunchLocation -> launchLocation()
-            is Command.LaunchWhitelist -> launchWhitelist()
-            is Command.LaunchAppIcon -> launchAppIconChange()
-            is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
             is Command.LaunchNetPManagementScreen -> launchNetpManagementScreen()
             is Command.LaunchNetPWaitlist -> launchNetpWaitlist()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
-            is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
-            is Command.LaunchEmailProtectionNotSUpported -> launchEmailProtectionNotSupported()
-            is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
-            is Command.LaunchAppLinkSettings -> launchAppLinksSettingSelector(it.appLinksSettingType)
-            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
-            is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
-            is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
+            is Command.LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is Command.LaunchMacOs -> launchMacOsScreen()
-            is Command.LaunchAutoconsent -> launchAutoconsent()
-            is Command.LaunchNotificationsSettings -> launchNotificationsSettings()
             is Command.LaunchWindowsWaitlist -> launchWindowsWaitlistScreen()
             is Command.LaunchWindows -> launchWindowsScreen()
             is Command.LaunchSyncSettings -> launchSyncSettings()
+            is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchWebPage()
+            is Command.LaunchWebTrackingProtectionWebPage -> launchWebTrackingProtectionWebPage()
             null -> TODO()
         }
     }
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
-        with(viewsGeneral.setAsDefaultBrowserSetting) {
-            if (it.showDefaultBrowserSetting) {
+        with(viewsPrivacy.setAsDefaultBrowserSetting) {
+            visibility = if (it.showDefaultBrowserSetting) {
                 quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
-                visibility = View.VISIBLE
+                View.VISIBLE
             } else {
-                visibility = View.GONE
+                View.GONE
             }
         }
     }
@@ -528,7 +266,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         appTPEnabled: Boolean,
         appTrackingProtectionOnboardingShown: Boolean,
     ) {
-        with(viewsMore) {
+        with(viewsPrivacy) {
             if (appTPEnabled) {
                 vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
             } else {
@@ -573,133 +311,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun launchFeedback() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_REQUEST_CODE, options)
-    }
-
-    private fun launchFireproofWebsites() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(FireproofWebsitesActivity.intent(this), options)
-    }
-
     private fun launchAutofillSettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(autofillSettingsActivityLauncher.intent(this), options)
-    }
-
-    private fun launchAccessibilitySettings() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AccessibilityActivity.intent(this), options)
-    }
-
-    private fun launchLocation() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(SitePermissionsActivity.intent(this), options)
-    }
-
-    private fun launchWhitelist() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(WhitelistActivity.intent(this), options)
-    }
-
-    private fun launchAppIconChange() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivityForResult(Intent(ChangeIconActivity.intent(this)), CHANGE_APP_ICON_REQUEST_CODE, options)
-    }
-
-    private fun launchFireAnimationSelector(animation: FireAnimation) {
-        val currentAnimationOption = animation.getOptionIndex()
-
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsSelectFireAnimationDialog)
-            .setOptions(
-                listOf(
-                    R.string.settingsHeroFireAnimation,
-                    R.string.settingsHeroWaterAnimation,
-                    R.string.settingsHeroAbstractAnimation,
-                    R.string.settingsNoneAnimation,
-                ),
-                currentAnimationOption,
-            )
-            .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
-
-                        viewModel.onFireAnimationSelected(selectedAnimation)
-                    }
-
-                    override fun onRadioItemSelected(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
-                        if (selectedAnimation != None) {
-                            startActivity(FireAnimationActivity.intent(baseContext, selectedAnimation))
-                        }
-                    }
-                },
-            )
-            .show()
-    }
-
-    private fun launchThemeSelector(theme: DuckDuckGoTheme) {
-        val currentTheme = theme.getOptionIndex()
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsTheme)
-            .setOptions(
-                listOf(
-                    R.string.settingsSystemTheme,
-                    R.string.settingsLightTheme,
-                    R.string.settingsDarkTheme,
-                ),
-                currentTheme,
-            )
-            .setPositiveButton(R.string.settingsThemeDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedTheme = when (selectedItem) {
-                            2 -> LIGHT
-                            3 -> DARK
-                            else -> SYSTEM_DEFAULT
-                        }
-                        viewModel.onThemeSelected(selectedTheme)
-                    }
-                },
-            )
-            .show()
-    }
-
-    private fun launchAppLinksSettingSelector(appLinkSettingType: AppLinkSettingType) {
-        val currentAppLinkSetting = appLinkSettingType.getOptionIndex()
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsTitleAppLinksDialog)
-            .setOptions(
-                listOf(
-                    R.string.settingsAppLinksAskEveryTime,
-                    R.string.settingsAppLinksAlways,
-                    R.string.settingsAppLinksNever,
-                ),
-                currentAppLinkSetting,
-            )
-            .setPositiveButton(R.string.dialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedAppLinkSetting = selectedItem.getAppLinkSettingForIndex()
-                        viewModel.onAppLinksSettingChanged(selectedAppLinkSetting)
-                    }
-                },
-            )
-            .show()
-    }
-
-    private fun launchGlobalPrivacyControl() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
     private fun launchEmailProtectionScreen(url: String) {
@@ -732,26 +346,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, SyncActivityWithEmptyParams)
     }
 
-    private fun launchAutoconsent() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AutoconsentSettingsActivity.intent(this), options)
-    }
-
-    @SuppressLint("InlinedApi")
-    private fun launchNotificationsSettings() {
-        val settingsIntent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-        } else {
-            Intent(ANDROID_M_APP_NOTIFICATION_SETTINGS)
-                .putExtra(ANDROID_M_APP_PACKAGE, packageName)
-                .putExtra(ANDROID_M_APP_UID, applicationInfo.uid)
-        }
-
-        startActivity(settingsIntent, null)
-    }
-
     private fun launchAppTPTrackersScreen() {
         globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams)
     }
@@ -773,54 +367,29 @@ class SettingsActivity : DuckDuckGoActivity() {
         addWidgetLauncher.launchAddWidget(this)
     }
 
-    @Suppress("DEPRECATION")
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        when (requestCode) {
-            FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun launchPrivateSearchWebPage() {
+        startActivity(
+            WebViewActivity.intent(
+                this@SettingsActivity,
+                PRIVATE_SEARCH_WEB_LINK,
+                getString(R.string.settingsPrivateSearchTitle),
+            ),
+        )
     }
 
-    private fun handleFeedbackResult(resultCode: Int) {
-        if (resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    @StringRes
-    private fun ClearWhatOption.nameStringResourceId(): Int {
-        return when (this) {
-            ClearWhatOption.CLEAR_NONE -> R.string.settingsAutomaticallyClearWhatOptionNone
-            ClearWhatOption.CLEAR_TABS_ONLY -> R.string.settingsAutomaticallyClearWhatOptionTabs
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> R.string.settingsAutomaticallyClearWhatOptionTabsAndData
-        }
-    }
-
-    @StringRes
-    private fun ClearWhenOption.nameStringResourceId(): Int {
-        return when (this) {
-            ClearWhenOption.APP_EXIT_ONLY -> R.string.settingsAutomaticallyClearWhenAppExitOnly
-            ClearWhenOption.APP_EXIT_OR_5_MINS -> R.string.settingsAutomaticallyClearWhenAppExit5Minutes
-            ClearWhenOption.APP_EXIT_OR_15_MINS -> R.string.settingsAutomaticallyClearWhenAppExit15Minutes
-            ClearWhenOption.APP_EXIT_OR_30_MINS -> R.string.settingsAutomaticallyClearWhenAppExit30Minutes
-            ClearWhenOption.APP_EXIT_OR_60_MINS -> R.string.settingsAutomaticallyClearWhenAppExit60Minutes
-            ClearWhenOption.APP_EXIT_OR_5_SECONDS -> R.string.settingsAutomaticallyClearWhenAppExit5Seconds
-        }
+    private fun launchWebTrackingProtectionWebPage() {
+        startActivity(
+            WebViewActivity.intent(
+                this@SettingsActivity,
+                WEB_TRACKING_PROTECTION_WEB_LINK,
+                getString(R.string.settingsWebTrackingProtectionTitle),
+            ),
+        )
     }
 
     companion object {
-        private const val FEEDBACK_REQUEST_CODE = 100
-        private const val CHANGE_APP_ICON_REQUEST_CODE = 101
-        private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
-
-        private const val ANDROID_M_APP_NOTIFICATION_SETTINGS = "android.settings.APP_NOTIFICATION_SETTINGS"
-        private const val ANDROID_M_APP_PACKAGE = "app_package"
-        private const val ANDROID_M_APP_UID = "app_uid"
+        private const val PRIVATE_SEARCH_WEB_LINK = "https://spreadprivacy.com/is-duckduckgo-a-good-search-engine/"
+        private const val WEB_TRACKING_PROTECTION_WEB_LINK = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/"
 
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 

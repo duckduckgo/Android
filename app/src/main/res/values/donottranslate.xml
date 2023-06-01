@@ -32,4 +32,14 @@
     <string name="netpSettingsDisconnected">Disconnected</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivateSearchTitle">Private Search</string>
+    <string name="settingsPrivateSearchDescription">Enabled by default</string>
+    <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
+    <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
+    <string name="settingsHeadingSettings">Settings</string>
+    <string name="settingsPermissionsAndPrivacySetting">Permissions and Privacy</string>
+    <string name="settingsAutofillLoginsSetting">Autofill Logins</string>
+    <string name="settingsSyncSetting">Sync</string>
 </resources>
