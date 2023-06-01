@@ -310,6 +310,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         if (activeTun == null) {
             logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
             deviceShieldPixels.vpnEstablishTunInterfaceError()
+            stopVpn(VpnStopReason.ERROR, false)
             return@withContext
         }
 
