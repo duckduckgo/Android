@@ -1337,7 +1337,7 @@ class SavedSitesRepositoryTest {
         val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, lastModified = twoHoursAgo)
         repository.insert(folder)
 
-        repository.pruneModified(twoHoursAgo, oneHourAgo)
+        repository.updateModifiedSince(twoHoursAgo, oneHourAgo)
 
         assert(repository.getFavoriteById(favorite.id)!!.lastModified == oneHourAgo)
         assert(repository.getBookmarkById(bookmark.id)!!.lastModified == oneHourAgo)

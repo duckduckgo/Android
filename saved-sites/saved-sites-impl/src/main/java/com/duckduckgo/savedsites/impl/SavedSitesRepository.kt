@@ -662,7 +662,7 @@ class RealSavedSitesRepository(
         }
     }
 
-    override fun pruneModified(
+    override fun updateModifiedSince(
         originalDate: String,
         modifiedSince: String,
     ) {

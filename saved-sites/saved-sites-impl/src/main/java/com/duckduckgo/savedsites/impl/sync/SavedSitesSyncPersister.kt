@@ -79,7 +79,7 @@ class SavedSitesSyncPersister @Inject constructor(
                 // first sync has a special case, bookmarks and favorites that were added previously to sync need to be updated to lastModified
                 val modifiedSince = OffsetDateTime.parse(savedSitesSyncStore.modifiedSince)
                 val updatedModifiedSince = modifiedSince.plusSeconds(1)
-                savedSitesRepository.pruneModified(savedSitesSyncStore.modifiedSince, DatabaseDateFormatter.iso8601(updatedModifiedSince))
+                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.modifiedSince, DatabaseDateFormatter.iso8601(updatedModifiedSince))
             }
         }
 

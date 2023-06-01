@@ -190,7 +190,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         entries: List<SyncBookmarkEntry>,
         lastModified: String,
     ) {
-        val favouriteFolder = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT }!!
+        val favouriteFolder = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT } ?: return
         val favourites = favouriteFolder.folder?.children ?: emptyList()
         if (favourites.isEmpty()) {
             Timber.d("Sync-Feature: Favourites folder is empty, removing all local favourites")

@@ -43,7 +43,6 @@ import org.threeten.bp.ZoneOffset
 @RunWith(AndroidJUnit4::class)
 class SavedSitesRemoteWinsPersisterTest {
 
-    // move this to unit test
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()

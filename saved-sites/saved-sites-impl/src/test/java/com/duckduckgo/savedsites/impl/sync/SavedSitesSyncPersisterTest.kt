@@ -40,7 +40,6 @@ import org.mockito.kotlin.whenever
 
 class SavedSitesSyncPersisterTest {
 
-    // move this to unit test
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()

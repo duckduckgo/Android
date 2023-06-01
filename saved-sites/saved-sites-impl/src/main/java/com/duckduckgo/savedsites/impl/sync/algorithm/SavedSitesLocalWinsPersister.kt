@@ -34,8 +34,6 @@ class SavedSitesLocalWinsPersister @Inject constructor(
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
     ) {
-        // if there's a folder with the same id locally we check the conflict resolution
-        // if TIMESTAMP -> new timestamp wins
         val localFolder = savedSitesRepository.getFolder(folder.id)
         if (localFolder != null) {
             if (folder.isDeleted()) {
@@ -58,8 +56,6 @@ class SavedSitesLocalWinsPersister @Inject constructor(
         bookmark: Bookmark,
         folderId: String,
     ) {
-        // if there's a bookmark with the same id locally we check the conflict resolution
-        // if REMOTE -> remote object wins and replaces local
         val storedBookmark = savedSitesRepository.getBookmarkById(bookmark.id)
         if (storedBookmark != null) {
             if (bookmark.isDeleted()) {

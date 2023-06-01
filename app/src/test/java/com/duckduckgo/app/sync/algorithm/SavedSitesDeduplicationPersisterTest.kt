@@ -42,7 +42,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SavedSitesDeduplicationPersisterTest {
 
-    // move this to unit test
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()

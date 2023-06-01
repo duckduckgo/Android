@@ -282,6 +282,7 @@ interface SavedSitesRepository {
      * Used when syncing data from the backend
      * There are scenarios when a duplicate remote bookmark has to be replace the local one
      * @param bookmark the bookmark to replace locally
+     * @param localId the id of the local bookmark to be replaced
      */
     fun replaceBookmark(
         bookmark: Bookmark,
@@ -361,5 +362,5 @@ interface SavedSitesRepository {
      * Updates all bookmarks and folders modified before [originalDate] to [modifiedSince]
      * Used after first sync to ensure old data in device can be synced
      */
-    fun pruneModified(originalDate: String, modifiedSince: String)
+    fun updateModifiedSince(originalDate: String, modifiedSince: String)
 }
