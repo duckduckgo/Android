@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
@@ -57,6 +58,7 @@ class StatisticsRequesterJsonTest {
     private lateinit var statisticsStore: StatisticsDataStore
     private lateinit var testee: StatisticsRequester
     private var mockEmailManager: EmailManager = mock()
+    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
 
     private val server = MockWebServer()
 
@@ -76,7 +78,7 @@ class StatisticsRequesterJsonTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins, mockEmailManager)
+        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins, mockEmailManager, mockFeatureSegmentsManager)
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
     }
 

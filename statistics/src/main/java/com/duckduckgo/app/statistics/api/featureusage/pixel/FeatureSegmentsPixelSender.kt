@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.api.featureusage
+package com.duckduckgo.app.statistics.api.featureusage.pixel
 
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding

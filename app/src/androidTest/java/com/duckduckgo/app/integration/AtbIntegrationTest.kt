@@ -27,6 +27,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.api.StatisticsService
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
@@ -51,6 +52,7 @@ class AtbIntegrationTest {
     private lateinit var testee: StatisticsRequester
     private lateinit var statisticsStore: StatisticsDataStore
     private var emailManager: EmailManager = mock()
+    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
@@ -69,7 +71,7 @@ class AtbIntegrationTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins, emailManager)
+        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins, emailManager, mockFeatureSegmentsManager)
     }
 
     @Test

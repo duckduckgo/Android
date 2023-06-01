@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.featureusage.db
+package com.duckduckgo.app.statistics.api.featureusage.db
 
 import android.content.Context
 import android.content.SharedPreferences
