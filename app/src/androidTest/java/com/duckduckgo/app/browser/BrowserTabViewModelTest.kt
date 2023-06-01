@@ -693,7 +693,7 @@ class BrowserTabViewModelTest {
         val title = "A title"
 
         val savedSite = Favorite(UUID.randomUUID().toString(), title, url, lastModified = "timestamp", 0)
-        whenever(mockSavedSitesRepository.insertFavorite(any(), any(), any(), any())).thenReturn(savedSite)
+        whenever(mockSavedSitesRepository.insertFavorite(url = url, title = title)).thenReturn(savedSite)
         loadUrl(url = url, title = title)
 
         testee.onFavoriteMenuClicked()
