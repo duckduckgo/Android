@@ -103,6 +103,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         ) {
             viewModel.onReportIssuesClicked()
         }
+
+        binding.settings.settingsExclusion.setClickListener {
+            //TODO open exclusion
+        }
     }
 
     private fun observeViewModel() {
