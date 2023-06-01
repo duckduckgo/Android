@@ -47,6 +47,9 @@ dependencies {
     kapt AndroidX.room.compiler
 
     implementation project(path: ':saved-sites-api')
+    implementation project(path: ':common')
+
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
 
     testImplementation Testing.junit4
     testImplementation Testing.robolectric

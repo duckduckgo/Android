@@ -2234,7 +2234,7 @@ class BrowserTabFragment :
     private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
         val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
             savedSiteChangedViewState.savedSite,
-            savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOMARKS_ROOT,
+            savedSiteChangedViewState.bookmarkFolder?.id ?: SavedSitesNames.BOOKMARKS_ROOT,
             savedSiteChangedViewState.bookmarkFolder?.name,
         )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)

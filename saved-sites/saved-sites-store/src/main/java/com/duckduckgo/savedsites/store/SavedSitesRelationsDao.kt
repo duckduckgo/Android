@@ -44,9 +44,15 @@ interface SavedSitesRelationsDao {
     @Query("select * from relations where folderId =:folderId")
     fun relationsObservable(folderId: String): Single<List<Relation>>
 
+    @Query("update relations set folderId = :newId where folderId = :oldId")
+    fun updateFolderId(oldId: String, newId: String)
+
+    @Query("update relations set entityId = :newId where entityId = :oldId")
+    fun updateEntityId(oldId: String, newId: String)
+
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
-            "and entities.type = :type and relations.folderId = :folderId",
+            "and entities.type = :type and relations.folderId = :folderId and entities.deleted = 0",
     )
     fun countEntitiesInFolder(
         folderId: String,
@@ -85,7 +91,7 @@ interface SavedSitesRelationsDao {
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
-            "where entities.url LIKE :domain AND folderId == :folderId",
+            "where entities.url LIKE :domain AND folderId == :folderId AND entities.deleted = 0",
     )
     fun countFavouritesByUrl(
         domain: String,

@@ -54,6 +54,13 @@ interface SavedSitesRepository {
     fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
 
     /**
+     * Returns all [Bookmark] and [BookmarkFolder] inside a folder, also deleted objects
+     * @param folderId the id of the folder.
+     * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
+     */
+    fun getAllFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
+
+    /**
      * Returns complete list of [BookmarkFolderItem] inside a folder. This method traverses all folders.
      * @param selectedFolderId the id of the folder.
      * @param currentFolder folder currently selected, used to determine the current depth in the tree.
@@ -113,6 +120,20 @@ interface SavedSitesRepository {
     fun getBookmark(url: String): Bookmark?
 
     /**
+     * Returns [Bookmark] given an ID
+     * @param ID of the [Bookmark]
+     * @return [Bookmark] if found, or null if does not exist
+     */
+    fun getBookmarkById(id: String): Bookmark?
+
+    /**
+     * Returns [SavedSite] given an ID
+     * @param ID of the [SavedSite]
+     * @return [SavedSite] if found, or null if does not exist
+     */
+    fun getSavedSite(id: String): SavedSite?
+
+    /**
      * Returns all [Favorite] in the Database
      * @return [Flow] of all [Favorite] in the Database
      */
@@ -143,6 +164,13 @@ interface SavedSitesRepository {
      * @return [Favorite] if found or null if not found
      */
     fun getFavorite(url: String): Favorite?
+
+    /**
+     * Returns a [Favorite] given a domain
+     * @param id of the [Favorite]
+     * @return [Favorite] if found or null if not found
+     */
+    fun getFavoriteById(id: String): Favorite?
 
     /**
      * Returns if the user has any [Bookmark]
@@ -176,8 +204,10 @@ interface SavedSitesRepository {
      * @return [Favorite] inserted
      */
     fun insertFavorite(
+        id: String = "",
         url: String,
         title: String,
+        lastModified: String? = null,
     ): Favorite
 
     /**
@@ -204,7 +234,10 @@ interface SavedSitesRepository {
      * @param savedSite to be updated
      * @param fromFolderId id of the previous bookmark folder
      */
-    fun updateBookmark(bookmark: Bookmark, fromFolderId: String)
+    fun updateBookmark(
+        bookmark: Bookmark,
+        fromFolderId: String,
+    )
 
     /**
      * Updates the position of [Favorite]
@@ -236,6 +269,39 @@ interface SavedSitesRepository {
     fun delete(folder: BookmarkFolder)
 
     /**
+     * Replaces an existing [BookmarkFolder]
+     * Used when syncing data from the backend
+     * There are scenarios when a duplicate remote folder has to be replace the local one
+     * @param folder the folder that will replace [localId]
+     * @param localId the id of the local folder to be replaced
+     */
+    fun replaceFolderContent(folder: BookmarkFolder, oldId: String)
+
+    /**
+     * Replaces an existing [Bookmark]
+     * Used when syncing data from the backend
+     * There are scenarios when a duplicate remote bookmark has to be replace the local one
+     * @param bookmark the bookmark to replace locally
+     * @param localId the id of the local bookmark to be replaced
+     */
+    fun replaceBookmark(
+        bookmark: Bookmark,
+        localId: String,
+    )
+
+    /**
+     * Replaces an existing [Favorite]
+     * Used when syncing data from the backend
+     * There are scenarios when a duplicate remote favourite has to be replace the local one
+     * @param favorite the favourite to replace locally
+     * @param localId the local Id to be replaced
+     */
+    fun replaceFavourite(
+        favorite: Favorite,
+        localId: String,
+    )
+
+    /**
      * Returns a [BookmarkFolder] based on its id
      * @param folderId of the [BookmarkFolder]
      * @return [BookmarkFolder] if exists, or null if doesn't
@@ -265,4 +331,36 @@ interface SavedSitesRepository {
      * @return [Long] with total amount of [Favorite]
      */
     fun favoritesCount(): Long
+
+    /**
+     * Returns the id the last modified [SavedSite]
+     * @return [Flow] of [String]
+     */
+    fun lastModified(): Flow<String>
+
+    /**
+     * Returns the list of [BookmarkFolder] modified after [since]
+     * @param since timestamp of modification for filtering
+     * @return [List] of [BookmarkFolder]
+     */
+    fun getFoldersModifiedSince(since: String): List<BookmarkFolder>
+
+    /**
+     * Returns the list of [Bookmark] modified after [since]
+     * @param since timestamp of modification for filtering
+     * @return [List] of [Bookmark]
+     */
+    fun getBookmarksModifiedSince(since: String): List<Bookmark>
+
+    /**
+     * Deletes all entities with deleted = 1
+     * This makes the deletion permanent
+     */
+    fun pruneDeleted()
+
+    /**
+     * Updates all bookmarks and folders modified before [originalDate] to [modifiedSince]
+     * Used after first sync to ensure old data in device can be synced
+     */
+    fun updateModifiedSince(originalDate: String, modifiedSince: String)
 }
