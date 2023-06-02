@@ -21,6 +21,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -71,6 +73,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val credentialListFilter: CredentialListFilter,
     private val faviconManager: FaviconManager,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -360,6 +363,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     private suspend fun saveNewCredential(updatedCredentials: LoginCredentials) {
+        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
         autofillStore.saveCredentials(
             rawUrl = updatedCredentials.domain ?: "",
             credentials = updatedCredentials,

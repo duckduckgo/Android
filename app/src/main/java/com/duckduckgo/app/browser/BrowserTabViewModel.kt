@@ -99,6 +99,8 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
@@ -189,6 +191,7 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     UrlExtractionListener,
@@ -880,6 +883,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             searchCountDao.incrementSearchCount()
         }
+        featureSegmentsManager.searchMade()
 
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
@@ -1897,6 +1901,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
+                    featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.FAVOURITE_SET)
                     faviconManager.persistCachedFavicon(tabId, url)
                     savedSitesRepository.insertFavorite(title = title, url = url)
                 } else {
@@ -2793,6 +2798,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         credentials: LoginCredentials,
     ): LoginCredentials? {
+        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
         return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.saveCredentials(url, credentials)
         }

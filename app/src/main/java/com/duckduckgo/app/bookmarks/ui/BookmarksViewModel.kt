@@ -27,6 +27,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.BOOKMARKS_IMPORTED
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -55,6 +57,7 @@ class BookmarksViewModel @Inject constructor(
     private val pixel: Pixel,
     private val syncEngine: SyncEngine,
     private val dispatcherProvider: DispatcherProvider,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, ViewModel() {
 
     data class ViewState(
@@ -158,6 +161,9 @@ class BookmarksViewModel @Inject constructor(
             val result = savedSitesManager.import(uri)
             withContext(dispatcherProvider.main()) {
                 command.value = ImportedSavedSites(result)
+            }
+            if (result is ImportSavedSitesResult.Success) {
+                featureSegmentsManager.addUserToFeatureSegment(BOOKMARKS_IMPORTED)
             }
         }
     }

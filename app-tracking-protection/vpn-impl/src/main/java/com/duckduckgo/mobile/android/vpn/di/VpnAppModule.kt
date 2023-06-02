@@ -21,6 +21,7 @@ import android.content.res.Resources
 import android.net.ConnectivityManager
 import androidx.room.Room
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
@@ -99,8 +100,9 @@ object VpnAppModule {
     fun provideVpnFeaturesRegistry(
         context: Context,
         sharedPreferencesProvider: VpnSharedPreferencesProvider,
+        featureSegmentsManager: FeatureSegmentsManager,
     ): VpnFeaturesRegistry {
-        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider)
+        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider, featureSegmentsManager)
     }
 
     @Provides

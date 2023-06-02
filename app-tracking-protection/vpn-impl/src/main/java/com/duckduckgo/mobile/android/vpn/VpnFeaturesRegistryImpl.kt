@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import java.util.UUID
@@ -30,6 +32,7 @@ private const val IS_INITIALIZED = "IS_INITIALIZED"
 internal class VpnFeaturesRegistryImpl(
     private val vpnServiceWrapper: VpnServiceWrapper,
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : VpnFeaturesRegistry {
 
     private val preferences: SharedPreferences by lazy {
@@ -44,6 +47,7 @@ internal class VpnFeaturesRegistryImpl(
             putString(feature.featureName, UUID.randomUUID().toString())
         }
         vpnServiceWrapper.restartVpnService(forceRestart = true)
+        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.APP_TP_ENABLED)
     }
 
     @Synchronized
