@@ -52,7 +52,6 @@ class AtbIntegrationTest {
     private lateinit var testee: StatisticsRequester
     private lateinit var statisticsStore: StatisticsDataStore
     private var emailManager: EmailManager = mock()
-    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
@@ -71,7 +70,7 @@ class AtbIntegrationTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins, emailManager, mockFeatureSegmentsManager)
+        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins, emailManager)
     }
 
     @Test
