@@ -111,6 +111,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_AUTOFILL_MANAGEMENT_OPENED("m_autofill_settings_opened"),
     SETTINGS_PRIVATE_SEARCH_PRESSED("ms_private_search_setting_pressed"),
     SETTINGS_WEB_TRACKING_PROTECTION_PRESSED("ms_web_tracking_protection_setting_pressed"),
+    SETTINGS_ACCESSIBILITY_PRESSED("ms_accessibility_setting_pressed"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
     SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),

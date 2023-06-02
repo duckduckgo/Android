@@ -479,4 +479,16 @@ class SettingsViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenAccessibilitySettingClickedThenEmitCommandLaunchAccessibilitySettingsAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onAccessibilitySettingClicked()
+
+            assertEquals(Command.LaunchAccessibilitySettings, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_ACCESSIBILITY_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
