@@ -43,6 +43,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
+import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
@@ -105,7 +106,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         }
 
         binding.settings.settingsExclusion.setClickListener {
-            //TODO open exclusion
+            startActivity(NetpAppExclusionListActivity.intent(this))
         }
     }
 
@@ -124,8 +125,14 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         when (viewState.connectionState) {
             ConnectionState.Connecting -> binding.renderConnectingState()
-            ConnectionState.Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
-            ConnectionState.Disconnected -> binding.renderDisconnectedState()
+            ConnectionState.Connected -> {
+                binding.settings.root.show()
+                viewState.connectionDetails?.let { binding.renderConnectedState(it) }
+            }
+            ConnectionState.Disconnected -> {
+                binding.settings.root.gone()
+                binding.renderDisconnectedState()
+            }
             else -> {}
         }
 
