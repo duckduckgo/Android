@@ -70,6 +70,9 @@ dependencies {
     // WorkManager
     implementation AndroidX.work.runtimeKtx
     testImplementation AndroidX.work.testing
+
+    // Shimmer
+    implementation "com.facebook.shimmer:shimmer:_"
 }
 
 ext {
