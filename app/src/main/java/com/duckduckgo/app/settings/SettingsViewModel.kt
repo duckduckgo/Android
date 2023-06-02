@@ -101,6 +101,7 @@ class SettingsViewModel @Inject constructor(
         data class LaunchEmailProtection(val url: String) : Command()
         object LaunchEmailProtectionNotSupported : Command()
         object LaunchAutofillSettings : Command()
+        object LaunchAccessibilitySettings : Command()
         object LaunchAddHomeScreenWidget : Command()
         object LaunchAppTPTrackersScreen : Command()
         object LaunchNetPManagementScreen : Command()
@@ -187,6 +188,11 @@ class SettingsViewModel @Inject constructor(
     fun onAutofillSettingsClick() {
         viewModelScope.launch { command.send(Command.LaunchAutofillSettings) }
         pixel.fire(SETTINGS_AUTOFILL_MANAGEMENT_OPENED)
+    }
+
+    fun onAccessibilitySettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettings) }
+        pixel.fire(SETTINGS_ACCESSIBILITY_PRESSED)
     }
 
     fun onEmailProtectionSettingClicked() {
