@@ -70,7 +70,7 @@ class CohortPixelInterceptorTest {
     fun whenCohortNotSetPixelDropped() {
         Assert.assertNull(cohortStore.getCohortStoredLocalDate())
 
-        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_breakage_report")
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_ev_restart_c")
         val result = cohortPixelInterceptor.intercept(FakeChain(pixelUrl))
 
         Assert.assertEquals("Dropped ATP pixel because no cohort is assigned", result.message)
@@ -82,7 +82,7 @@ class CohortPixelInterceptorTest {
         val date = LocalDate.now().plusDays(3)
         cohortStore.setCohortLocalDate(date)
 
-        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_breakage_report")
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_atp_ev_restart_c")
         val result = cohortPixelInterceptor.intercept(FakeChain(pixelUrl))
         val resultUrl = result.request.url
 
