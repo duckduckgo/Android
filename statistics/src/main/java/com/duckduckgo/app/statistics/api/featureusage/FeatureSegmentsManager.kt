@@ -72,7 +72,7 @@ class FeatureSegmentManagerImpl @Inject constructor(
 
     override fun searchMade() {
         if (isSendPixelEnabled()) {
-            val updatedSearchesMade = featureSegmentsDataStore.dailySearchesCount++
+            val updatedSearchesMade = featureSegmentsDataStore.dailySearchesCount + 1
             when (updatedSearchesMade) {
                 2 -> addUserToFeatureSegment(TWO_SEARCHES_MADE)
                 5 -> addUserToFeatureSegment(FIVE_SEARCHES_MADE)
