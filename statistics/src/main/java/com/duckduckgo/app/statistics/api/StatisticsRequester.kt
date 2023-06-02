@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
@@ -42,7 +41,6 @@ class StatisticsRequester @Inject constructor(
     private val variantManager: VariantManager,
     private val plugins: PluginPoint<RefreshRetentionAtbPlugin>,
     private val emailManager: EmailManager,
-    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : StatisticsUpdater {
 
     /**
@@ -82,10 +80,7 @@ class StatisticsRequester @Inject constructor(
                 service.exti(atbWithVariant)
             }
             .subscribe(
-                {
-                    featureSegmentsManager.enableSendPixelForFeatureSegments()
-                    Timber.d("Atb initialization succeeded")
-                },
+                { Timber.d("Atb initialization succeeded") },
                 {
                     store.clearAtb()
                     Timber.w("Atb initialization failed ${it.localizedMessage}")

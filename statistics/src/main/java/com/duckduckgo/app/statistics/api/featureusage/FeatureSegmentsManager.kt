@@ -29,8 +29,6 @@ import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.TWO_SEA
 import com.duckduckgo.app.statistics.api.featureusage.db.FeatureSegmentsDataStore
 import com.duckduckgo.app.statistics.api.featureusage.pixel.FeatureSegmentsPixelName.DAILY_USER_EVENT_SEGMENT
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -50,7 +48,6 @@ interface FeatureSegmentsManager {
 class FeatureSegmentManagerImpl @Inject constructor(
     private val featureSegmentsDataStore: FeatureSegmentsDataStore,
     private val pixel: Pixel,
-    private val appBuildConfig: AppBuildConfig,
 ) : FeatureSegmentsManager {
 
     override fun addUserToFeatureSegment(segment: FeatureSegmentType) {
@@ -104,7 +101,7 @@ class FeatureSegmentManagerImpl @Inject constructor(
     }
 
     override fun isSendPixelEnabled(): Boolean {
-        return featureSegmentsDataStore.featureSegmentsEnabled && appBuildConfig.isInternalBuild()
+        return featureSegmentsDataStore.featureSegmentsEnabled
     }
 
     private fun getUserFeatureSegments(): Map<String, Boolean> {
