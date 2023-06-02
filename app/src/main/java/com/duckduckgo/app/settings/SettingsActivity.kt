@@ -29,6 +29,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
+import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
@@ -150,6 +151,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
+            accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
         }
 
@@ -233,6 +235,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchAutofillSettings -> launchAutofillSettings()
+            is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
             is Command.LaunchNetPManagementScreen -> launchNetpManagementScreen()
             is Command.LaunchNetPWaitlist -> launchNetpWaitlist()
@@ -313,6 +316,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAutofillSettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(autofillSettingsActivityLauncher.intent(this), options)
+    }
+
+    private fun launchAccessibilitySettings() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(AccessibilityActivity.intent(this), options)
     }
 
     private fun launchEmailProtectionScreen(url: String) {
