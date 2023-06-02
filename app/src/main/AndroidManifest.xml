@@ -396,6 +396,11 @@
             android:exported="false"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity"
+            android:exported="false"
+            android:label="@string/permissionsAndPrivacyActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"

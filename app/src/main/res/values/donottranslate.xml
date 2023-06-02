@@ -42,4 +42,8 @@
     <string name="settingsPermissionsAndPrivacySetting">Permissions and Privacy</string>
     <string name="settingsAutofillLoginsSetting">Autofill Logins</string>
     <string name="settingsSyncSetting">Sync</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Permissions and Privacy</string>
+
 </resources>

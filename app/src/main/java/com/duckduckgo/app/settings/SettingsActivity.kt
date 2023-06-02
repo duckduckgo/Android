@@ -38,6 +38,7 @@ import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState
@@ -151,6 +152,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
+            permissionsAndPrivacySetting.setClickListener { viewModel.onPermissionsAndPrivacySettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
         }
@@ -249,6 +251,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchSyncSettings -> launchSyncSettings()
             is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchWebPage()
             is Command.LaunchWebTrackingProtectionWebPage -> launchWebTrackingProtectionWebPage()
+            is Command.LaunchPermissionsAndPrivacyScreen -> launchPermissionsAndPrivacyScreen()
             null -> TODO()
         }
     }
@@ -392,6 +395,11 @@ class SettingsActivity : DuckDuckGoActivity() {
                 getString(R.string.settingsWebTrackingProtectionTitle),
             ),
         )
+    }
+
+    private fun launchPermissionsAndPrivacyScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(PermissionsAndPrivacyActivity.intent(this), options)
     }
 
     companion object {

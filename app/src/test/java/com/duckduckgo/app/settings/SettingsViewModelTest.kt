@@ -531,4 +531,16 @@ class SettingsViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenPermissionsAndPrivacySettingClickedThenEmitCommandLaunchPermissionsAndPrivacyScreenAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onPermissionsAndPrivacySettingClicked()
+
+            assertEquals(Command.LaunchPermissionsAndPrivacyScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_PERMISSIONS_AND_PRIVACY_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
