@@ -103,6 +103,8 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
     <string name="closeAllTabsMenuItem">Close All Tabs</string>
+    <!-- TODO: Add translations for other languages -->
+    <string name="bookmarkAllTabsMenuItem">Add all to Bookmarks</string>
     <string name="closeTab">Close Tab</string>
     <string name="tabClosed">Tab closed</string>
     <string name="tabClosedUndo">Undo</string>
@@ -217,6 +219,8 @@
     <string name="edit">Edit</string>
     <string name="remove">Remove</string>
     <string name="removeAll">Remove All</string>
+    <!-- TODO: Add translations for other languages -->
+    <string name="addAll">Add all</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
@@ -626,12 +630,29 @@
     <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Delete folder and its contents?"</string>
     <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
     <string name="bookmarkFolderEmpty">Empty</string>
+    <!-- TODO: Add translations for other languages -->
+    <string name="bookmarkBulkAddDialogTitle" instruction="Dialog title for add all tabs to bookmarks">"Add all tabs into bookmarks?"</string>
+    <!-- TODO: Add translations for other languages -->
+    <string name="bookmarkBulkAddDialogMessage">"Are you sure you want to add "</string>
 
     <plurals name="bookmarkFolderDeleteDialogMessage">
         <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d item?</item>
         <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d items?</item>
     </plurals>
 
+    <!-- TODO: Add translations for other languages -->
+    <plurals name="bookmarkBuldAddDialogMessage">
+        <item quantity="one" instruction="%1$s is the text from bookmarkBulkAddDialogMessage and %2$d is the number of opened tabs">%1$s%2$s tab into bookmarks?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkBulkAddDialogMessage and %2$d is the number of opened tabs">%1$s%2$d tabs into bookmarks?</item>
+    </plurals>
+
+    <!-- TODO: Add translations for other languages -->
+    <plurals name="bookmarkBuldConfirmationMessage">
+        <item quantity="one" instruction="%1$d is the number of added bookmarks">%1$d tab is now in bookmarks</item>
+        <item quantity="other" instruction="%1$d is the number of added bookmarks">%1$d tabs is now in bookmarks</item>
+    </plurals>
+
+    <!-- TODO: Add translations for other languages -->
     <plurals name="bookmarkFolderItems">
         <item quantity="one" instruction="Placeholder is the number of items">%1$d item</item>
         <item quantity="other" instruction="Placeholder is the number of items">%1$d items</item>

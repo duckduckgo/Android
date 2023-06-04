@@ -336,6 +336,29 @@ class RealSavedSitesRepository(
         return entity.mapToBookmark(SavedSitesNames.BOOKMARKS_ROOT)
     }
 
+    // TODO: Add tests
+    override fun insertBookmarks(
+        urlAndTitles: List<Pair<String, String>>,
+        folderId: String
+    ): List<Bookmark> {
+        val entities = urlAndTitles.map { (url, title) ->
+            val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
+            Entity(title = titleOrFallback, url = url, type = BOOKMARK)
+        }
+
+        val relations = entities.map { entity ->
+            Relation(folderId = folderId, entityId = entity.entityId)
+        }
+
+        savedSitesEntitiesDao.insertList(entities)
+        savedSitesRelationsDao.insertList(relations)
+        savedSitesEntitiesDao.updateModified(folderId, entities[0].lastModified ?: DatabaseDateFormatter.iso8601())
+
+        return entities.map { entity ->
+            entity.mapToBookmark(SavedSitesNames.BOOKMARKS_ROOT)
+        }
+    }
+
     override fun insertFavorite(
         id: String,
         url: String,

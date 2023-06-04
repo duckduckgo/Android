@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.R.plurals
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -45,8 +47,11 @@ import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarksAddedMessage
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder.EventListener
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -182,7 +187,26 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun processCommand(command: Command) {
         when (command) {
             is Close -> finishAfterTransition()
+            is BookmarksAddedMessage -> showBookmarsAddedMessage(command.count)
         }
+    }
+
+    private fun showBookmarsAddedMessage(count: Int) {
+        Snackbar.make(toolbar, getConfirmationMessageForBulkBookmarks(count), Snackbar.LENGTH_LONG)
+            .setDuration(3500) // 3.5 seconds
+            .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
+            .show()
+    }
+
+    private fun getConfirmationMessageForBulkBookmarks(bookmarksAdded: Int): SpannableString {
+        val string = SpannableString(
+            resources.getQuantityString(
+                plurals.bookmarkBuldConfirmationMessage,
+                bookmarksAdded,
+                bookmarksAdded,
+            ),
+        )
+        return string
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -197,6 +221,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
+            R.id.bookmarkAllTabs -> bookmarkAllTabs()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -254,6 +279,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                             BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
                             BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT,
                             -> launch { viewModel.purgeDeletableTabs() }
+
                             BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
                             BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL,
                             -> { /* noop */
@@ -272,6 +298,43 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 viewModel.onTabDeleted(it)
             }
         }
+    }
+
+    private fun bookmarkAllTabs() {
+        val tabsCount = viewModel.tabs.value?.size ?: 0
+        if (tabsCount == 0) return
+
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.bookmarkBulkAddDialogTitle)
+            .setMessage(getMessageForBulkBookmars(tabsCount))
+            .setDestructiveButtons(true)
+            .setPositiveButton(R.string.addAll)
+            .setNegativeButton(R.string.cancel)
+            .addEventListener(
+                object : EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        launch {
+                            viewModel.tabs.value?.run {
+                                viewModel.onTabsBookmarked(this)
+                            }
+                        }
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun getMessageForBulkBookmars(tabCount: Int): SpannableString {
+        val message = getString(R.string.bookmarkBulkAddDialogMessage)
+        val string = SpannableString(
+            resources.getQuantityString(
+                plurals.bookmarkBuldAddDialogMessage,
+                tabCount,
+                message,
+                tabCount,
+            ),
+        )
+        return string
     }
 
     private fun showDownloads() {

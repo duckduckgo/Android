@@ -23,6 +23,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -195,6 +196,18 @@ interface SavedSitesRepository {
         url: String,
         title: String,
     ): Bookmark
+
+    /**
+     * Inserts set of new [Bookmark]
+     * Used when adding a set of  [Bookmark] from the Tabs
+     * @param urlAndTitles list of pairs of url and title
+     * @param folderId the id of the folder, default is [SavedSitesNames.BOOKMARKS_ROOT].
+     * @return [List] of [Bookmark] inserted
+     */
+    fun insertBookmarks(
+        urlAndTitles: List<Pair<String, String>>,
+        folderId: String = SavedSitesNames.BOOKMARKS_ROOT
+    ): List<Bookmark>
 
     /**
      * Inserts a new [Favorite]

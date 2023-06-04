@@ -37,6 +37,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/bookmarkAllTabs"
+        android:title="@string/bookmarkAllTabsMenuItem"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/closeAllTabs"
         android:title="@string/closeAllTabsMenuItem"
         app:showAsAction="never" />
