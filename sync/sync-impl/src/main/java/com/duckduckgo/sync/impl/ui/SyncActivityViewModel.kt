@@ -23,6 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.api.SyncStateCallbacks
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
@@ -59,7 +60,7 @@ class SyncActivityViewModel @Inject constructor(
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncRepository: SyncRepository,
     private val dispatchers: DispatcherProvider,
-) : ViewModel() {
+) : ViewModel(), SyncStateCallbacks {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
@@ -70,21 +71,20 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.showDeviceListItemLoading())
             fetchRemoteDevices()
         }
-        observerSignedInState()
     }.flowOn(dispatchers.io())
 
-    private fun observerSignedInState() {
-        syncRepository.isSignedInFlow().onEach { signedIn ->
-            when (signedIn) {
-                true -> {
-                    if (!viewState.value.isSignedInState()) {
-                        viewState.emit(initViewStateThisDeviceState())
-                    }
-                }
+    override fun onSyncEnabled() {
+        super.onSyncEnabled()
+        viewModelScope.launch {
+            viewState.emit(initViewStateThisDeviceState())
+        }
+    }
 
-                false -> viewState.emit(signedOutState())
-            }
-        }.flowOn(dispatchers.io()).launchIn(viewModelScope)
+    override fun onSyncDisabled() {
+        super.onSyncDisabled()
+        viewModelScope.launch {
+            viewState.emit(signedOutState())
+        }
     }
 
     private suspend fun initViewStateThisDeviceState(): ViewState {
@@ -257,6 +257,7 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.toggle(true).showAccount())
         }
     }
+
     private fun signedOutState(): ViewState = ViewState()
     private fun ViewState.isSignedInState() = this.loginQRCode != null && this.showAccount
     private fun ViewState.toggle(isChecked: Boolean) = copy(syncToggleState = isChecked)

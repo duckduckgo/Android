@@ -398,7 +398,6 @@ class SyncActivityViewModelTest {
     private fun givenAuthenticatedUser() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
         isSignedInFlow = MutableStateFlow(true)
-        whenever(syncRepository.isSignedInFlow()).thenReturn(isSignedInFlow)
         whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncRepository.getConnectedDevices()).thenReturn(Result.Success(listOf(connectedDevice)))
