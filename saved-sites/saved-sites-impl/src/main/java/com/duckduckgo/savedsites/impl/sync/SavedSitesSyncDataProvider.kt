@@ -67,16 +67,20 @@ class SavedSitesSyncDataProvider @Inject constructor(
         Timber.d("Sync-Feature: generating changes since $since")
         val updates = mutableListOf<SyncBookmarkEntry>()
 
+        // we start adding individual folders that have been modified
         val folders = repository.getFoldersModifiedSince(since)
         folders.forEach { folder ->
             if (folder.isDeleted()) {
                 updates.add(deletedEntry(folder.id, folder.deleted!!))
             } else {
-                addFolderContent(folder.id, updates, since)
+                val folderEntry = addFolderEntry(folder.id)
+                if (folderEntry != null){
+                    updates.add(folderEntry)
+                }
             }
         }
 
-        // bookmarks that were deleted or edited won't be part of the previous check
+        // then we add individual bookmarks that have been modified
         val bookmarks = repository.getBookmarksModifiedSince(since)
         bookmarks.forEach { bookmark ->
             if (bookmark.isDeleted()) {
@@ -110,14 +114,35 @@ class SavedSitesSyncDataProvider @Inject constructor(
             }
         }
 
-        addFolderContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
+        addFolderEntryWithContent(SavedSitesNames.BOOKMARKS_ROOT, updates)
         return updates.distinct()
     }
 
-    private fun addFolderContent(
+    private fun addFolderEntry(folderId: String): SyncBookmarkEntry? {
+        val folderContent = repository.getAllFolderContentSync(folderId)
+        val storedFolder = repository.getFolder(folderId)
+        val folder = if (storedFolder != null) {
+            val childrenIds = mutableListOf<String>()
+            for (bookmark in folderContent.first) {
+                if (bookmark.deleted == null) {
+                    childrenIds.add(bookmark.id)
+                }
+            }
+            for (eachFolder in folderContent.second) {
+                if (eachFolder.deleted == null) {
+                    childrenIds.add(eachFolder.id)
+                }
+            }
+            encryptFolder(storedFolder, childrenIds)
+        } else {
+            null
+        }
+        return folder
+    }
+
+    private fun addFolderEntryWithContent(
         folderId: String,
-        updates: MutableList<SyncBookmarkEntry>,
-        lastModified: String = "",
+        updates: MutableList<SyncBookmarkEntry>
     ): List<SyncBookmarkEntry> {
         repository.getAllFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
@@ -128,9 +153,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
                         updates.add(deletedEntry(bookmark.id, bookmark.deleted!!))
                     } else {
                         childrenIds.add(bookmark.id)
-                        if (bookmark.modifiedSince(lastModified)) {
-                            updates.add(encryptSavedSite(bookmark))
-                        }
+                        updates.add(encryptSavedSite(bookmark))
                     }
                 }
                 for (eachFolder in this.second) {
@@ -138,43 +161,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
                         updates.add(deletedEntry(eachFolder.id, eachFolder.deleted!!))
                     } else {
                         childrenIds.add(eachFolder.id)
-                        if (eachFolder.modifiedSince(lastModified)) {
-                            addFolderContent(eachFolder.id, updates)
-                        }
+                        addFolderEntryWithContent(eachFolder.id, updates)
                     }
                 }
                 updates.add(encryptFolder(folder, childrenIds))
             }
         }
         return updates
-    }
-
-    private fun BookmarkFolder.modifiedSince(since: String): Boolean {
-        return if (since.isEmpty()) {
-            true
-        } else {
-            if (this.lastModified == null) {
-                true
-            } else {
-                val entityModified = OffsetDateTime.parse(this.lastModified)
-                val sinceModified = OffsetDateTime.parse(since)
-                entityModified.isAfter(sinceModified)
-            }
-        }
-    }
-
-    private fun Bookmark.modifiedSince(since: String): Boolean {
-        return if (since.isEmpty()) {
-            true
-        } else {
-            if (this.lastModified == null) {
-                true
-            } else {
-                val entityModified = OffsetDateTime.parse(this.lastModified)
-                val sinceModified = OffsetDateTime.parse(since)
-                entityModified.isAfter(sinceModified)
-            }
-        }
     }
 
     private fun encryptSavedSite(
