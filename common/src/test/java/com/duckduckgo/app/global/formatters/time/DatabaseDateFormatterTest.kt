@@ -17,10 +17,12 @@
 package com.duckduckgo.app.global.formatters.time
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 
 class DatabaseDateFormatterTest {
 
@@ -44,7 +46,7 @@ class DatabaseDateFormatterTest {
 
     @Test
     fun whenIso8601isParsedThenDateIsCorrect() {
-        val now = OffsetDateTime.now(ZoneOffset.UTC)
+        val now = OffsetDateTime.now()
         val format = DatabaseDateFormatter.iso8601(now)
         val offsetDateMillis = DatabaseDateFormatter.millisIso8601(now)
         val formatted = DatabaseDateFormatter.parseMillisIso8601(offsetDateMillis)

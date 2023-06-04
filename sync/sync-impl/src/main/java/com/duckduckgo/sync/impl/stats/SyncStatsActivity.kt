@@ -14,25 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.store.dao
+package com.duckduckgo.sync.impl.stats
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.duckduckgo.sync.store.model.SyncAttempt
-
-@Dao
-interface SyncAttemptDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(attempt: SyncAttempt)
-
-    @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
-    fun lastAttempt(): SyncAttempt?
-
-    @Query("SELECT * FROM sync_attempts ORDER BY id DESC")
-    fun attempts(): List<SyncAttempt>
-
-    @Query("DELETE from sync_attempts")
-    fun clear()
+class SyncStatsActivity {
 }

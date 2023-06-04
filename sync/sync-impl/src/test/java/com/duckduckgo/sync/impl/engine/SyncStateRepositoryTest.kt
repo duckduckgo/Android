@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.engine
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
@@ -29,6 +30,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class SyncStateRepositoryTest {
@@ -37,6 +40,8 @@ class SyncStateRepositoryTest {
     lateinit var syncAttemptDao: SyncAttemptDao
 
     private lateinit var db: SyncDatabase
+
+    private val now = OffsetDateTime.now(ZoneOffset.UTC)
 
     @Before
     fun before() {
@@ -73,5 +78,30 @@ class SyncStateRepositoryTest {
 
         assertEquals(syncInProgress.timestamp, lastSync!!.timestamp)
         assertEquals(SUCCESS, lastSync.state)
+    }
+
+    @Test
+    fun whenNoAttemptsThenGetAttemptsIsEmpty() {
+        val result = repository.attempts(now)
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenAttemptsMadeDifferentDateThenGetAttemptsIsEmpty(){
+        val yesterday = DatabaseDateFormatter.iso8601(now.minusDays(1))
+        val success = SyncAttempt(state = SyncState.SUCCESS, timestamp = yesterday)
+        repository.store(success)
+
+        val result = repository.attempts(now)
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun whenAttemptsMadeTodayThenGetAttemptsReturnsData(){
+        val success = SyncAttempt(state = SyncState.SUCCESS)
+        repository.store(success)
+
+        val result = repository.attempts(now)
+        assertTrue(result.isNotEmpty())
     }
 }

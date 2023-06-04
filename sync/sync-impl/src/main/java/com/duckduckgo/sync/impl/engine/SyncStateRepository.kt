@@ -16,9 +16,11 @@
 
 package com.duckduckgo.sync.impl.engine
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncState
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 interface SyncStateRepository {
@@ -27,6 +29,8 @@ interface SyncStateRepository {
     fun current(): SyncAttempt?
 
     fun updateSyncState(state: SyncState)
+
+    fun attempts(date: OffsetDateTime): List<SyncAttempt>
 
     fun clearAll()
 }
@@ -45,6 +49,15 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
         if (last != null) {
             val updated = last.copy(state = state)
             syncAttemptDao.insert(updated)
+        }
+    }
+
+    override fun attempts(date: OffsetDateTime): List<SyncAttempt> {
+        return syncAttemptDao.attempts().filter {
+            val attemptDate = OffsetDateTime.parse(it.timestamp)
+            date.year == attemptDate.year &&
+                date.monthValue == attemptDate.monthValue &&
+                date.dayOfMonth == attemptDate.dayOfMonth
         }
     }
 
