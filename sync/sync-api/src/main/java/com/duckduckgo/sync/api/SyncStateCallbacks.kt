@@ -18,20 +18,12 @@ package com.duckduckgo.sync.api
 
 interface SyncStateCallbacks {
 
-    fun onSyncEnabled() {
+    fun onSyncEnabled() {}
 
-    }
+    fun onSyncDisabled() {}
 
-    fun onSyncDisabled() {
+    fun onSyncStarted() {}
 
-    }
-
-    fun onSyncStarted() {
-
-    }
-
-    fun onSyncFinished(success: Boolean){
-
-    }
+    fun onSyncFinished(success: Boolean){}
 
 }
