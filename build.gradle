@@ -59,6 +59,10 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+//        maven {
+//            url "https://central.sonatype.com/repository/maven-snapshots/"
+//        }
+        mavenLocal()
         if (rootProject.ext.proprietaryFontAvailable) {
             maven {
                 url = uri("https://maven.pkg.github.com/duckduckgo/native-apps-ducksans")
