@@ -2,15 +2,125 @@
 (function () {
     'use strict';
 
+    /* global false */
+
+    let dummyWindow;
+    if ('document' in globalThis &&
+        // Prevent infinate recursion of injection into Chrome
+        globalThis.location.href !== 'about:blank') {
+        const injectionElement = getInjectionElement();
+        // injectionElement is null in some playwright context tests
+        if (injectionElement) {
+            dummyWindow = document.createElement('iframe');
+            dummyWindow.style.display = 'none';
+            injectionElement.appendChild(dummyWindow);
+        }
+    }
+
+    let dummyContentWindow = dummyWindow?.contentWindow;
+    // @ts-expect-error - Symbol is not defined on window
+    const dummySymbol = dummyContentWindow?.Symbol;
+    const iteratorSymbol = dummySymbol?.iterator;
+
+    // Capture prototype to prevent overloading
+    function captureGlobal (globalName) {
+        const global = dummyWindow?.contentWindow?.[globalName];
+
+        // if we were unable to create a dummy window, return the global
+        // this still has the advantage of preventing aliasing of the global through shawdowing
+        if (!global) {
+            return globalThis[globalName]
+        }
+
+        // Alias the iterator symbol to the local symbol so for loops work
+        if (iteratorSymbol &&
+            global?.prototype &&
+            iteratorSymbol in global.prototype) {
+            global.prototype[Symbol.iterator] = global.prototype[iteratorSymbol];
+        }
+        return global
+    }
+
+    const Set$1 = captureGlobal('Set');
+    const Reflect$1 = captureGlobal('Reflect');
+
+    // Clean up the dummy window
+    dummyWindow?.remove();
+
     /* global cloneInto, exportFunction, false */
+    // Tests don't define this variable so fallback to behave like chrome
+    const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+    const functionToString = Function.prototype.toString;
+    const objectKeys = Object.keys;
+
+    function defineProperty (object, propertyName, descriptor) {
+        {
+            Object.defineProperty(object, propertyName, descriptor);
+        }
+    }
+
+    /**
+     * add a fake toString() method to a wrapper function to resemble the original function
+     * @param {*} newFn
+     * @param {*} origFn
+     */
+    function wrapToString (newFn, origFn) {
+        if (typeof newFn !== 'function' || typeof origFn !== 'function') {
+            return
+        }
+        newFn.toString = function () {
+            if (this === newFn) {
+                return functionToString.call(origFn)
+            } else {
+                return functionToString.call(this)
+            }
+        };
+    }
+
+    /**
+     * Wrap a get/set or value property descriptor. Only for data properties. For methods, use wrapMethod(). For constructors, use wrapConstructor().
+     * @param {any} object - object whose property we are wrapping (most commonly a prototype)
+     * @param {string} propertyName
+     * @param {Partial<PropertyDescriptor>} descriptor
+     * @returns {PropertyDescriptor|undefined} original property descriptor, or undefined if it's not found
+     */
+    function wrapProperty (object, propertyName, descriptor) {
+        if (!object) {
+            return
+        }
+
+        const origDescriptor = getOwnPropertyDescriptor(object, propertyName);
+        if (!origDescriptor) {
+            // this happens if the property is not implemented in the browser
+            return
+        }
+
+        if (('value' in origDescriptor && 'value' in descriptor) ||
+            ('get' in origDescriptor && 'get' in descriptor) ||
+            ('set' in origDescriptor && 'set' in descriptor)
+        ) {
+            wrapToString(descriptor.value, origDescriptor.value);
+            wrapToString(descriptor.get, origDescriptor.get);
+            wrapToString(descriptor.set, origDescriptor.set);
+
+            defineProperty(object, propertyName, {
+                ...origDescriptor,
+                ...descriptor
+            });
+            return origDescriptor
+        } else {
+            // if the property is defined with get/set it must be wrapped with a get/set. If it's defined with a `value`, it must be wrapped with a `value`
+            throw new Error(`Property descriptor for ${propertyName} may only include the following keys: ${objectKeys(origDescriptor)}`)
+        }
+    }
+
+    /* global cloneInto, exportFunction, false */
+
     // Only use globalThis for testing this breaks window.wrappedJSObject code in Firefox
     // eslint-disable-next-line no-global-assign
     let globalObj = typeof window === 'undefined' ? globalThis : window;
     let Error$1 = globalObj.Error;
     let messageSecret;
-    const CapturedSet = globalObj.Set;
-    // Capture prototype to prevent overloading
-    const createSet = () => new CapturedSet();
 
     const taintSymbol = Symbol('taint');
 
@@ -145,7 +255,7 @@
 
     const lineTest = /(\()?(https?:[^)]+):[0-9]+:[0-9]+(\))?/;
     function getStackTraceUrls (stack) {
-        const urls = createSet();
+        const urls = new Set$1();
         try {
             const errorLines = stack.split('\n');
             // Should cater for Chrome and Firefox stacks, we only care about https? resources.
@@ -163,7 +273,7 @@
 
     function getStackTraceOrigins (stack) {
         const urls = getStackTraceUrls(stack);
-        const origins = createSet();
+        const origins = new Set$1();
         for (const url of urls) {
             origins.add(url.hostname);
         }
@@ -211,37 +321,6 @@
         return isWindowsSpecificFeature(feature)
             ? !args.site.enabledFeatures.includes(feature)
             : args.site.isBroken || args.site.allowlisted || !args.site.enabledFeatures.includes(feature)
-    }
-
-    /**
-     * For each property defined on the object, update it with the target value.
-     */
-    function overrideProperty (name, prop) {
-        // Don't update if existing value is undefined or null
-        if (!(prop.origValue === undefined)) {
-            /**
-             * When re-defining properties, we bind the overwritten functions to null. This prevents
-             * sites from using toString to see if the function has been overwritten
-             * without this bind call, a site could run something like
-             * `Object.getOwnPropertyDescriptor(Screen.prototype, "availTop").get.toString()` and see
-             * the contents of the function. Appending .bind(null) to the function definition will
-             * have the same toString call return the default [native code]
-             */
-            try {
-                defineProperty(prop.object, name, {
-                    // eslint-disable-next-line no-extra-bind
-                    get: (() => prop.targetValue).bind(null)
-                });
-            } catch (e) {
-            }
-        }
-        return prop.origValue
-    }
-
-    function defineProperty (object, propertyName, descriptor) {
-        {
-            Object.defineProperty(object, propertyName, descriptor);
-        }
     }
 
     function camelcase (dashCaseText) {
@@ -356,10 +435,42 @@
         }
     }
 
-    function hasTaintedMethod (scope) {
+    /**
+     * Returns a set of origins that are tainted
+     * @returns {Set<string> | null}
+     */
+    function taintedOrigins () {
+        return getGlobalObject('taintedOrigins')
+    }
+
+    /**
+     * @param {string} name
+     * @returns {any | null}
+     */
+    function getGlobalObject (name) {
+        if ('duckduckgo' in navigator &&
+            typeof navigator.duckduckgo === 'object' &&
+            navigator.duckduckgo &&
+            name in navigator.duckduckgo &&
+            navigator.duckduckgo[name]) {
+            return navigator.duckduckgo[name]
+        }
+        return null
+    }
+
+    function hasTaintedMethod (scope, shouldStackCheck = false) {
         if (document?.currentScript?.[taintSymbol]) return true
         if ('__ddg_taint__' in window) return true
         if (getContextId(scope)) return true
+        if (!shouldStackCheck || !taintedOrigins()) {
+            return false
+        }
+        const stackOrigins = getStackTraceOrigins(getStack());
+        for (const stackOrigin of stackOrigins) {
+            if (taintedOrigins()?.has(stackOrigin)) {
+                return true
+            }
+        }
         return false
     }
 
@@ -439,6 +550,12 @@
             {
                 this.objectScope[this.property] = this.internal;
             }
+        }
+
+        overloadDescriptor () {
+            defineProperty(this.objectScope, this.property, {
+                value: this.internal
+            });
         }
     }
 
@@ -584,8 +701,6 @@
         const topLevelHostname = getTabHostname();
         const site = computeLimitedSiteObject();
         const allowlisted = userList.filter(domain => domain === topLevelHostname).length > 0;
-        const remoteFeatureNames = Object.keys(data.features);
-        platformSpecificFeatures.filter((featureName) => !remoteFeatureNames.includes(featureName));
         /** @type {Record<string, any>} */
         const output = { ...preferences };
         if (output.platform) {
@@ -1399,7 +1514,7 @@
             })
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
         init (args) {
         }
 
@@ -1412,7 +1527,7 @@
             this.measure();
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
         load (args) {
         }
 
@@ -1446,8 +1561,6 @@
         update () {
         }
     }
-
-    new Set();
 
     function generateUniqueID () {
         return Symbol(undefined)
@@ -1565,7 +1678,7 @@
             return scope
         }
         return new Proxy(scope, {
-            get (target, property, receiver) {
+            get (target, property) {
                 const targetObj = target[property];
                 let targetOut = target;
                 if (typeof property === 'string' && property in outputs) {
@@ -1655,7 +1768,7 @@
             currentScope = aggregatedLookup;
             const pathOut = path[path.length - 1];
             // Traverse the path and create the nested objects
-            path.slice(0, -1).forEach((pathPart, index) => {
+            path.slice(0, -1).forEach((pathPart) => {
                 if (!currentScope.has(pathPart)) {
                     currentScope.set(pathPart, new Map());
                 }
@@ -1707,6 +1820,34 @@
         ${code}
     })(globalThis)
     `)
+    }
+
+    /**
+     * @typedef {object} Sizing
+     * @property {number} height
+     * @property {number} width
+     */
+
+    /**
+     * @param {Sizing[]} breakpoints
+     * @param {Sizing} screenSize
+     * @returns { Sizing | null}
+     */
+    function findClosestBreakpoint (breakpoints, screenSize) {
+        let closestBreakpoint = null;
+        let closestDistance = Infinity;
+
+        for (let i = 0; i < breakpoints.length; i++) {
+            const breakpoint = breakpoints[i];
+            const distance = Math.sqrt(Math.pow(breakpoint.height - screenSize.height, 2) + Math.pow(breakpoint.width - screenSize.width, 2));
+
+            if (distance < closestDistance) {
+                closestBreakpoint = breakpoint;
+                closestDistance = distance;
+            }
+        }
+
+        return closestBreakpoint
     }
 
     /* global TrustedScriptURL, TrustedScript */
@@ -1772,12 +1913,20 @@
         'text/x-javascript'
     ];
 
+    function getTaintFromScope (scope, args, shouldStackCheck = false) {
+        try {
+            scope = args.callee.caller;
+        } catch {}
+        return hasTaintedMethod(scope, shouldStackCheck)
+    }
+
     class DDGRuntimeChecks extends HTMLElement {
         #tagName
         #el
         #listeners
         #connected
         #sinks
+        #debug
 
         constructor () {
             super();
@@ -1786,6 +1935,7 @@
             this.#listeners = [];
             this.#connected = false;
             this.#sinks = {};
+            this.#debug = false;
             if (shadowDomEnabled) {
                 const shadow = this.attachShadow({ mode: 'open' });
                 const style = createStyleElement(`
@@ -1800,8 +1950,9 @@
         /**
          * This method is called once and externally so has to remain public.
          **/
-        setTagName (tagName) {
+        setTagName (tagName, debug = false) {
             this.#tagName = tagName;
+            this.#debug = debug;
 
             // Clear the method so it can't be called again
             // @ts-expect-error - error TS2790: The operand of a 'delete' operator must be optional.
@@ -1875,6 +2026,16 @@
             if (taintCheck) {
                 // Add a symbol to the element so we can identify it as a runtime checked element
                 Object.defineProperty(el, taintSymbol, { value: true, configurable: false, enumerable: false, writable: false });
+                // Only show this attribute whilst debugging
+                if (this.#debug) {
+                    el.setAttribute('data-ddg-runtime-checks', 'true');
+                }
+                try {
+                    const origin = this.src && new URL(this.src, window.location.href).hostname;
+                    if (origin && taintedOrigins() && getTabHostname() !== origin) {
+                        taintedOrigins()?.add(origin);
+                    }
+                } catch {}
             }
 
             // Reflect all attrs to the new element
@@ -1927,17 +2088,18 @@
                 this.computeScriptOverload(el);
             }
 
-            // TODO pollyfill WeakRef
-            this.#el = new WeakRef(el);
-
             if (replaceElement) {
                 this.replaceElement(el);
             } else {
                 this.insertAfterAndRemove(el);
             }
+
+            // TODO pollyfill WeakRef
+            this.#el = new WeakRef(el);
         }
 
         replaceElement (el) {
+            // This should be called before this.#el is set
             // @ts-expect-error - this is wrong node type
             super.parentElement?.replaceChild(el, this);
 
@@ -2011,7 +2173,7 @@
             if (shouldFilterKey(this.#tagName, 'attribute', name)) return
             if (supportedSinks.includes(name)) {
                 // Use Reflect to avoid infinite recursion
-                return Reflect.get(DDGRuntimeChecks.prototype, name, this)
+                return Reflect$1.get(DDGRuntimeChecks.prototype, name, this)
             }
             return this._callMethod('getAttribute', name, value)
         }
@@ -2020,14 +2182,14 @@
             if (namespace) {
                 return this._callMethod('getAttributeNS', namespace, name, value)
             }
-            return Reflect.apply(DDGRuntimeChecks.prototype.getAttribute, this, [name, value])
+            return Reflect$1.apply(DDGRuntimeChecks.prototype.getAttribute, this, [name, value])
         }
 
         setAttribute (name, value) {
             if (shouldFilterKey(this.#tagName, 'attribute', name)) return
             if (supportedSinks.includes(name)) {
                 // Use Reflect to avoid infinite recursion
-                return Reflect.set(DDGRuntimeChecks.prototype, name, value, this)
+                return Reflect$1.set(DDGRuntimeChecks.prototype, name, value, this)
             }
             return this._callMethod('setAttribute', name, value)
         }
@@ -2036,7 +2198,7 @@
             if (namespace) {
                 return this._callMethod('setAttributeNS', namespace, name, value)
             }
-            return Reflect.apply(DDGRuntimeChecks.prototype.setAttribute, this, [name, value])
+            return Reflect$1.apply(DDGRuntimeChecks.prototype.setAttribute, this, [name, value])
         }
 
         removeAttribute (name) {
@@ -2106,7 +2268,7 @@
                 if (args[0] instanceof DDGRuntimeChecks) {
                     return true
                 }
-                return Reflect.apply(fn, scope, args)
+                return Reflect$1.apply(fn, scope, args)
             }
         });
         // May throw, but we can ignore it
@@ -2157,7 +2319,7 @@
         });
     }
 
-    function overrideCreateElement () {
+    function overrideCreateElement (debug) {
         const proxy = new DDGProxy(featureName, Document.prototype, 'createElement', {
             apply (fn, scope, args) {
                 if (args.length >= 1) {
@@ -2165,16 +2327,49 @@
                     const initialTagName = String(args[0]).toLowerCase();
                     if (shouldInterrogate(initialTagName)) {
                         args[0] = 'ddg-runtime-checks';
-                        const el = Reflect.apply(fn, scope, args);
-                        el.setTagName(initialTagName);
+                        const el = Reflect$1.apply(fn, scope, args);
+                        el.setTagName(initialTagName, debug);
                         return el
                     }
                 }
-                return Reflect.apply(fn, scope, args)
+                return Reflect$1.apply(fn, scope, args)
             }
         });
         proxy.overload();
         initialCreateElement = proxy._native;
+    }
+
+    function overloadRemoveChild () {
+        const proxy = new DDGProxy(featureName, Node.prototype, 'removeChild', {
+            apply (fn, scope, args) {
+                const child = args[0];
+                if (child instanceof DDGRuntimeChecks) {
+                    // Should call the real removeChild method if it's already replaced
+                    const realNode = child._getElement();
+                    if (realNode) {
+                        args[0] = realNode;
+                    }
+                }
+                return Reflect$1.apply(fn, scope, args)
+            }
+        });
+        proxy.overloadDescriptor();
+    }
+
+    function overloadReplaceChild () {
+        const proxy = new DDGProxy(featureName, Node.prototype, 'replaceChild', {
+            apply (fn, scope, args) {
+                const newChild = args[1];
+                if (newChild instanceof DDGRuntimeChecks) {
+                    const realNode = newChild._getElement();
+                    if (realNode) {
+                        args[1] = realNode;
+                    }
+                }
+                return Reflect$1.apply(fn, scope, args)
+            }
+        });
+        proxy.overloadDescriptor();
     }
 
     class RuntimeChecks extends ContentFeature {
@@ -2182,7 +2377,7 @@
             // This shouldn't happen, but if it does we don't want to break the page
             try {
                 // @ts-expect-error TS node return here
-                customElements.define('ddg-runtime-checks', DDGRuntimeChecks);
+                globalThis.customElements.define('ddg-runtime-checks', DDGRuntimeChecks);
             } catch {}
         }
 
@@ -2203,9 +2398,8 @@
             ignoreMonitorList = this.getFeatureSetting('ignoreMonitorList') || defaultIgnoreMonitorList;
             replaceElement = this.getFeatureSettingEnabled('replaceElement') || false;
             monitorProperties = this.getFeatureSettingEnabled('monitorProperties') || true;
-            this.getFeatureSettingEnabled('injectGenericOverloads') || true;
 
-            overrideCreateElement();
+            overrideCreateElement(this.isDebug);
 
             if (this.getFeatureSettingEnabled('overloadInstanceOf')) {
                 overloadInstanceOfChecks(HTMLScriptElement);
@@ -2218,6 +2412,240 @@
                 }
             `);
             }
+
+            if (this.getFeatureSetting('injectGenericOverloads')) {
+                this.injectGenericOverloads();
+            }
+            if (this.getFeatureSettingEnabled('overloadRemoveChild')) {
+                overloadRemoveChild();
+            }
+            if (this.getFeatureSettingEnabled('overloadReplaceChild')) {
+                overloadReplaceChild();
+            }
+        }
+
+        injectGenericOverloads () {
+            const genericOverloads = this.getFeatureSetting('injectGenericOverloads');
+            if ('Date' in genericOverloads) {
+                this.overloadDate(genericOverloads.Date);
+            }
+            if ('Date.prototype.getTimezoneOffset' in genericOverloads) {
+                this.overloadDateGetTimezoneOffset(genericOverloads['Date.prototype.getTimezoneOffset']);
+            }
+            if ('NavigatorUAData.prototype.getHighEntropyValues' in genericOverloads) {
+                this.overloadHighEntropyValues(genericOverloads['NavigatorUAData.prototype.getHighEntropyValues']);
+            }
+            ['localStorage', 'sessionStorage'].forEach(storageType => {
+                if (storageType in genericOverloads) {
+                    const storageConfig = genericOverloads[storageType];
+                    if (storageConfig.scheme === 'memory') {
+                        this.overloadStorageWithMemory(storageConfig, storageType);
+                    } else if (storageConfig.scheme === 'session') {
+                        this.overloadStorageWithSession(storageConfig, storageType);
+                    }
+                }
+            });
+            const breakpoints = this.getFeatureSetting('breakpoints');
+            const screenSize = { height: screen.height, width: screen.width };
+            ['innerHeight', 'innerWidth', 'outerHeight', 'outerWidth', 'Screen.prototype.height', 'Screen.prototype.width'].forEach(sizing => {
+                if (sizing in genericOverloads) {
+                    const sizingConfig = genericOverloads[sizing];
+                    this.overloadScreenSizes(sizingConfig, breakpoints, screenSize, sizing, sizingConfig.offset || 0);
+                }
+            });
+        }
+
+        overloadDate (config) {
+            const offset = (new Date()).getTimezoneOffset();
+            globalThis.Date = new Proxy(globalThis.Date, {
+                construct (target, args) {
+                    const constructed = Reflect$1.construct(target, args);
+                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
+                        // Falible in that the page could brute force the offset to match. We should fix this.
+                        if (constructed.getTimezoneOffset() === offset) {
+                            return constructed.getUTCDate()
+                        }
+                    }
+                    return constructed
+                }
+            });
+        }
+
+        overloadDateGetTimezoneOffset (config) {
+            const offset = (new Date()).getTimezoneOffset();
+            defineProperty(globalThis.Date.prototype, 'getTimezoneOffset', {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value () {
+                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
+                        return 0
+                    }
+                    return offset
+                }
+            });
+        }
+
+        overloadHighEntropyValues (config) {
+            if (!('NavigatorUAData' in globalThis)) {
+                return
+            }
+
+            const originalGetHighEntropyValues = globalThis.NavigatorUAData.prototype.getHighEntropyValues;
+            defineProperty(globalThis.NavigatorUAData.prototype, 'getHighEntropyValues', {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value (hints) {
+                    let hintsOut = hints;
+                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
+                        // If tainted override with default values (using empty array)
+                        hintsOut = [];
+                    }
+                    return Reflect$1.apply(originalGetHighEntropyValues, this, [hintsOut])
+                }
+            });
+        }
+
+        overloadStorageWithMemory (config, key) {
+            /**
+             * @implements {Storage}
+             */
+            class MemoryStorage {
+                #data = {}
+
+                /**
+                 * @param {Parameters<Storage['setItem']>[0]} id
+                 * @param {Parameters<Storage['setItem']>[1]} val
+                 * @returns {ReturnType<Storage['setItem']>}
+                 */
+                setItem (id, val) {
+                    if (arguments.length < 2) throw new TypeError(`Failed to execute 'setItem' on 'Storage': 2 arguments required, but only ${arguments.length} present.`)
+                    this.#data[id] = String(val);
+                }
+
+                /**
+                 * @param {Parameters<Storage['getItem']>[0]} id
+                 * @returns {ReturnType<Storage['getItem']>}
+                 */
+                getItem (id) {
+                    return Object.prototype.hasOwnProperty.call(this.#data, id) ? this.#data[id] : null
+                }
+
+                /**
+                 * @param {Parameters<Storage['removeItem']>[0]} id
+                 * @returns {ReturnType<Storage['removeItem']>}
+                 */
+                removeItem (id) {
+                    delete this.#data[id];
+                }
+
+                /**
+                 * @returns {ReturnType<Storage['clear']>}
+                 */
+                clear () {
+                    this.#data = {};
+                }
+
+                /**
+                 * @param {Parameters<Storage['key']>[0]} n
+                 * @returns {ReturnType<Storage['key']>}
+                 */
+                key (n) {
+                    const keys = Object.keys(this.#data);
+                    return keys[n]
+                }
+
+                get length () {
+                    return Object.keys(this.#data).length
+                }
+            }
+            /** @satisfies {Storage} */
+            const instance = new MemoryStorage();
+            const storage = new Proxy(instance, {
+                set (target, prop, value, receiver) {
+                    Reflect$1.apply(target.setItem, target, [prop, value], receiver);
+                    return true
+                },
+                get (target, prop) {
+                    if (typeof target[prop] === 'function') {
+                        return target[prop].bind(instance)
+                    }
+                    return Reflect$1.get(target, prop, instance)
+                }
+            });
+            this.overrideStorage(config, key, storage);
+        }
+
+        overloadStorageWithSession (config, key) {
+            const storage = globalThis.sessionStorage;
+            this.overrideStorage(config, key, storage);
+        }
+
+        overrideStorage (config, key, storage) {
+            const originalStorage = globalThis[key];
+            defineProperty(globalThis, key, {
+                get () {
+                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
+                        return storage
+                    }
+                    return originalStorage
+                }
+            });
+        }
+
+        /**
+         * @typedef {import('./runtime-checks/helpers.js').Sizing} Sizing
+         */
+
+        /**
+         * Overloads the provided key with the closest breakpoint size
+         * @param {Sizing[]} breakpoints
+         * @param {Sizing} screenSize
+         * @param {string} key
+         * @param {number} [offset]
+         */
+        overloadScreenSizes (config, breakpoints, screenSize, key, offset = 0) {
+            const closest = findClosestBreakpoint(breakpoints, screenSize);
+            if (!closest) {
+                return
+            }
+            let returnVal = null;
+            /** @type {object} */
+            let scope = globalThis;
+            let overrideKey = key;
+            let receiver;
+            switch (key) {
+            case 'innerHeight':
+            case 'outerHeight':
+                returnVal = closest.height - offset;
+                break
+            case 'innerWidth':
+            case 'outerWidth':
+                returnVal = closest.width - offset;
+                break
+            case 'Screen.prototype.height':
+                scope = Screen.prototype;
+                overrideKey = 'height';
+                returnVal = closest.height - offset;
+                receiver = globalThis.screen;
+                break
+            case 'Screen.prototype.width':
+                scope = Screen.prototype;
+                overrideKey = 'width';
+                returnVal = closest.width - offset;
+                receiver = globalThis.screen;
+                break
+            }
+            const defaultVal = Reflect$1.get(scope, overrideKey, receiver);
+            defineProperty(scope, overrideKey, {
+                get () {
+                    if (getTaintFromScope(this, arguments, config.stackCheck)) {
+                        return returnVal
+                    }
+                    return defaultVal
+                }
+            });
         }
     }
 
@@ -4771,26 +5199,17 @@
 
     class FingerprintingHardware extends ContentFeature {
         init () {
-            const Navigator = globalThis.Navigator;
-            const navigator = globalThis.navigator;
-
-            overrideProperty('keyboard', {
-                object: Navigator.prototype,
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                origValue: navigator.keyboard,
+            wrapProperty(globalThis.Navigator.prototype, 'keyboard', {
                 // @ts-expect-error - error TS2554: Expected 2 arguments, but got 1.
-                targetValue: this.getFeatureAttr('keyboard')
+                get: () => this.getFeatureAttr('keyboard')
             });
-            overrideProperty('hardwareConcurrency', {
-                object: Navigator.prototype,
-                origValue: navigator.hardwareConcurrency,
-                targetValue: this.getFeatureAttr('hardwareConcurrency', 2)
+
+            wrapProperty(globalThis.Navigator.prototype, 'hardwareConcurrency', {
+                get: () => this.getFeatureAttr('hardwareConcurrency', 2)
             });
-            overrideProperty('deviceMemory', {
-                object: Navigator.prototype,
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                origValue: navigator.deviceMemory,
-                targetValue: this.getFeatureAttr('deviceMemory', 8)
+
+            wrapProperty(globalThis.Navigator.prototype, 'deviceMemory', {
+                get: () => this.getFeatureAttr('deviceMemory', 8)
             });
         }
     }
@@ -4812,10 +5231,8 @@
                     // if we don't have a matching referrer, just trim it to origin.
                     trimmedReferer = new URL(document.referrer).origin + '/';
                 }
-                overrideProperty('referrer', {
-                    object: Document.prototype,
-                    origValue: document.referrer,
-                    targetValue: trimmedReferer
+                wrapProperty(Document.prototype, 'referrer', {
+                    get: () => trimmedReferer
                 });
             }
         }
@@ -4912,40 +5329,38 @@
 
     class FingerprintingScreenSize extends ContentFeature {
         init () {
-            const Screen = globalThis.Screen;
-            const screen = globalThis.screen;
+            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+            origPropertyValues.availTop = globalThis.screen.availTop;
+            wrapProperty(globalThis.Screen.prototype, 'availTop', {
+                get: () => this.getFeatureAttr('availTop', 0)
+            });
 
-            origPropertyValues.availTop = overrideProperty('availTop', {
-                object: Screen.prototype,
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                origValue: screen.availTop,
-                targetValue: this.getFeatureAttr('availTop', 0)
+            // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
+            origPropertyValues.availLeft = globalThis.screen.availLeft;
+            wrapProperty(globalThis.Screen.prototype, 'availLeft', {
+                get: () => this.getFeatureAttr('availLeft', 0)
             });
-            origPropertyValues.availLeft = overrideProperty('availLeft', {
-                object: Screen.prototype,
-                // @ts-expect-error https://app.asana.com/0/1201614831475344/1203979574128023/f
-                origValue: screen.availLeft,
-                targetValue: this.getFeatureAttr('availLeft', 0)
+
+            origPropertyValues.availWidth = globalThis.screen.availWidth;
+            const forcedAvailWidthValue = globalThis.screen.width;
+            wrapProperty(globalThis.Screen.prototype, 'availWidth', {
+                get: () => forcedAvailWidthValue
             });
-            origPropertyValues.availWidth = overrideProperty('availWidth', {
-                object: Screen.prototype,
-                origValue: screen.availWidth,
-                targetValue: screen.width
+
+            origPropertyValues.availHeight = globalThis.screen.availHeight;
+            const forcedAvailHeightValue = globalThis.screen.height;
+            wrapProperty(globalThis.Screen.prototype, 'availHeight', {
+                get: () => forcedAvailHeightValue
             });
-            origPropertyValues.availHeight = overrideProperty('availHeight', {
-                object: Screen.prototype,
-                origValue: screen.availHeight,
-                targetValue: screen.height
+
+            origPropertyValues.colorDepth = globalThis.screen.colorDepth;
+            wrapProperty(globalThis.Screen.prototype, 'colorDepth', {
+                get: () => this.getFeatureAttr('colorDepth', 24)
             });
-            overrideProperty('colorDepth', {
-                object: Screen.prototype,
-                origValue: screen.colorDepth,
-                targetValue: this.getFeatureAttr('colorDepth', 24)
-            });
-            overrideProperty('pixelDepth', {
-                object: Screen.prototype,
-                origValue: screen.pixelDepth,
-                targetValue: this.getFeatureAttr('pixelDepth', 24)
+
+            origPropertyValues.pixelDepth = globalThis.screen.pixelDepth;
+            wrapProperty(globalThis.Screen.prototype, 'pixelDepth', {
+                get: () => this.getFeatureAttr('pixelDepth', 24)
             });
 
             window.addEventListener('resize', function () {
@@ -5002,7 +5417,8 @@
                     isDuckDuckGo () {
                         return DDGPromise.resolve(true)
                     },
-                    taints: new Set()
+                    taints: new Set(),
+                    taintedOrigins: new Set()
                 },
                 enumerable: true,
                 configurable: false,
@@ -5076,9 +5492,8 @@
      * Unhide previously hidden DOM element if content loaded into it
      * @param {HTMLElement} element
      * @param {Object} rule
-     * @param {HTMLElement} [previousElement]
      */
-    function expandNonEmptyDomNode (element, rule, previousElement) {
+    function expandNonEmptyDomNode (element, rule) {
         if (!element) {
             return
         }
@@ -5235,7 +5650,7 @@
         const strictHideRules = [];
         const timeoutRules = [];
 
-        rules.forEach((rule, i) => {
+        rules.forEach((rule) => {
             if (rule.type === 'hide') {
                 strictHideRules.push(rule);
             } else {
@@ -5335,7 +5750,7 @@
 
             // now have the final list of rules to apply, so we apply them when document is loaded
             if (document.readyState === 'loading') {
-                window.addEventListener('DOMContentLoaded', (event) => {
+                window.addEventListener('DOMContentLoaded', () => {
                     applyRules(activeRules);
                 });
             } else {
@@ -5351,7 +5766,7 @@
             });
             historyMethodProxy.overload();
             // listen for popstate events in order to run on back/forward navigations
-            window.addEventListener('popstate', (event) => {
+            window.addEventListener('popstate', () => {
                 applyRules(activeRules);
             });
         }
@@ -6422,6 +6837,377 @@
     }
 
     /**
+     * The following code is originally from https://github.com/mozilla-extensions/secure-proxy/blob/db4d1b0e2bfe0abae416bf04241916f9e4768fd2/src/commons/template.js
+     */
+    class Template {
+        constructor (strings, values) {
+            this.values = values;
+            this.strings = strings;
+        }
+
+        /**
+         * Escapes any occurrences of &, ", <, > or / with XML entities.
+         *
+         * @param {string} str
+         *        The string to escape.
+         * @return {string} The escaped string.
+         */
+        escapeXML (str) {
+            const replacements = {
+                '&': '&amp;',
+                '"': '&quot;',
+                "'": '&apos;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '/': '&#x2F;'
+            };
+            return String(str).replace(/[&"'<>/]/g, m => replacements[m])
+        }
+
+        potentiallyEscape (value) {
+            if (typeof value === 'object') {
+                if (value instanceof Array) {
+                    return value.map(val => this.potentiallyEscape(val)).join('')
+                }
+
+                // If we are an escaped template let join call toString on it
+                if (value instanceof Template) {
+                    return value
+                }
+
+                throw new Error('Unknown object to escape')
+            }
+            return this.escapeXML(value)
+        }
+
+        toString () {
+            const result = [];
+
+            for (const [i, string] of this.strings.entries()) {
+                result.push(string);
+                if (i < this.values.length) {
+                    result.push(this.potentiallyEscape(this.values[i]));
+                }
+            }
+            return result.join('')
+        }
+    }
+
+    function html (strings, ...values) {
+        return new Template(strings, values)
+    }
+
+    var cssVars = ":host {\n    /* Color palette */\n    --ddg-shade-06: rgba(0, 0, 0, 0.06);\n    --ddg-shade-12: rgba(0, 0, 0, 0.12);\n    --ddg-shade-18: rgba(0, 0, 0, 0.18);\n    --ddg-shade-36: rgba(0, 0, 0, 0.36);\n    --ddg-shade-84: rgba(0, 0, 0, 0.84);\n    --ddg-tint-12: rgba(255, 255, 255, 0.12);\n    --ddg-tint-18: rgba(255, 255, 255, 0.18);\n    --ddg-tint-24: rgba(255, 255, 255, 0.24);\n    --ddg-tint-84: rgba(255, 255, 255, 0.84);\n    /* Tokens */\n    --ddg-color-primary: #3969ef;\n    --ddg-color-bg-01: #ffffff;\n    --ddg-color-bg-02: #ababab;\n    --ddg-color-border: var(--ddg-shade-12);\n    --ddg-color-txt: var(--ddg-shade-84);\n    --ddg-color-txt-link-02: #ababab;\n}\n@media (prefers-color-scheme: dark) {\n    :host {\n        --ddg-color-primary: #7295f6;\n        --ddg-color-bg-01: #222222;\n        --ddg-color-bg-02: #444444;\n        --ddg-color-border: var(--ddg-tint-12);\n        --ddg-color-txt: var(--ddg-tint-84);\n    }\n}\n";
+
+    var css = ":host,\n* {\n    font-family: DuckDuckGoPrivacyEssentials, system, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto,\n        Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';\n    box-sizing: border-box;\n    font-weight: normal;\n    font-style: normal;\n    margin: 0;\n    padding: 0;\n    text-align: left;\n}\n\n:host,\n.DuckDuckGoSocialContainer {\n    display: inline-block;\n    border: 0;\n    padding: 0;\n    margin: auto;\n    inset: initial;\n    max-width: 600px;\n    min-height: 180px;\n}\n\n/* SHARED STYLES */\n/* Button */\n.DuckDuckGoButton {\n    border-radius: 8px;\n    padding: 11px 22px;\n    margin: 0px auto;\n    border-color: var(--ddg-color-primary);\n    border: none;\n    height: 36px;\n    font-size: 14px;\n\n    position: relative;\n    cursor: pointer;\n    box-shadow: none;\n    z-index: 2147483646;\n}\n.DuckDuckGoButton > div {\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    border: none;\n    padding: 0;\n    margin: 0;\n}\n.DuckDuckGoButton.tertiary {\n    color: var(--ddg-color-txt);\n    background-color: transparent;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    padding: 0px 16px;\n    border: 1px solid var(--ddg-color-border);\n    border-radius: 8px;\n}\n.DuckDuckGoButton.tertiary:hover {\n    background: var(--ddg-shade-06);\n    border-color: var(--ddg-shade-18);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:hover {\n        background: var(--ddg-tint-18);\n        border-color: var(--ddg-tint-24);\n    }\n}\n.DuckDuckGoButton.tertiary:active {\n    background: var(--ddg-shade-12);\n    border-color: var(--ddg-shade-36);\n}\n@media (prefers-color-scheme: dark) {\n    .DuckDuckGoButton.tertiary:active {\n        background: var(--ddg-tint-24);\n        border-color: var(--ddg-tint-24);\n    }\n}\n\n/* Toggle Button */\n.ddg-toggle-button-container {\n    display: flex;\n    align-items: center;\n    cursor: pointer;\n}\n.ddg-toggle-button {\n    cursor: pointer;\n    position: relative;\n    margin-top: -3px;\n    margin: 0;\n    padding: 0;\n    border: none;\n    background-color: transparent;\n    text-align: left;\n}\n.ddg-toggle-button,\n.ddg-toggle-button.md,\n.ddg-toggle-button-bg,\n.ddg-toggle-button.md .ddg-toggle-button-bg {\n    width: 32px;\n    height: 16px;\n    border-radius: 20px;\n}\n.ddg-toggle-button.lg,\n.ddg-toggle-button.lg .ddg-toggle-button-bg {\n    width: 56px;\n    height: 34px;\n    border-radius: 50px;\n}\n.ddg-toggle-button-bg {\n    right: 0;\n    overflow: visible;\n}\n.ddg-toggle-button.active .ddg-toggle-button-bg {\n    background: var(--ddg-color-primary);\n}\n.ddg-toggle-button.inactive .ddg-toggle-button-bg {\n    background: var(--ddg-color-bg-02);\n}\n.ddg-toggle-button-knob {\n    --ddg-toggle-knob-margin: 2px;\n    position: absolute;\n    display: inline-block;\n    border-radius: 50%;\n    background-color: #ffffff;\n    margin-top: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button-knob,\n.ddg-toggle-button.md .ddg-toggle-button-knob {\n    width: 12px;\n    height: 12px;\n    top: calc(50% - 16px / 2);\n}\n.ddg-toggle-button.lg .ddg-toggle-button-knob {\n    --ddg-toggle-knob-margin: 4px;\n    width: 26px;\n    height: 26px;\n    top: calc(50% - 34px / 2);\n}\n.ddg-toggle-button.active .ddg-toggle-button-knob {\n    right: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button.inactive .ddg-toggle-button-knob {\n    left: var(--ddg-toggle-knob-margin);\n}\n.ddg-toggle-button-label {\n    font-size: 14px;\n    line-height: 20px;\n    color: var(--ddg-color-txt);\n    margin-left: 12px;\n}\n\n/* Link styles */\n.ddg-text-link {\n    line-height: 1.4;\n    font-size: 14px;\n    font-weight: 700;\n    cursor: pointer;\n    text-decoration: none;\n    color: var(--ddg-color-primary);\n}\n\n/* Styles for DDGCtlPlaceholderBlocked */\n.DuckDuckGoButton.ddg-ctl-unblock-btn {\n    width: 100%;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .DuckDuckGoButton.ddg-ctl-unblock-btn {\n    width: auto;\n}\n\n.ddg-ctl-placeholder-card {\n    height: 100%;\n    overflow: auto;\n    padding: 16px;\n    color: var(--ddg-color-txt);\n    background: var(--ddg-color-bg-01);\n    border: 1px solid var(--ddg-color-border);\n    border-radius: 12px;\n    margin: auto;\n    display: grid;\n    justify-content: center;\n    align-items: center;\n    line-height: 1;\n}\n.ddg-ctl-placeholder-card.slim-card {\n    padding: 12px;\n}\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-body {\n    margin: auto;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card.with-feedback-link {\n    height: calc(100% - 30px);\n    max-width: initial;\n    min-height: initial;\n}\n\n.ddg-ctl-placeholder-card-header {\n    width: 100%;\n    display: flex;\n    align-items: center;\n    margin: auto;\n    margin-bottom: 8px;\n    text-align: left;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header {\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    margin-bottom: 12px;\n    width: 80%;\n    text-align: center;\n}\n\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header .ddg-ctl-placeholder-card-title,\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header .ddg-text-link {\n    text-align: center;\n}\n\n/* Show Learn More link in the header on mobile and\n * tablet size screens and hide it on desktop size */\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-header .ddg-learn-more {\n    display: none;\n}\n\n.ddg-ctl-placeholder-card-title,\n.ddg-ctl-placeholder-card-title .ddg-text-link {\n    font-family: DuckDuckGoPrivacyEssentialsBold;\n    font-weight: 700;\n    font-size: 16px;\n    line-height: 24px;\n}\n\n.ddg-ctl-placeholder-card-header-dax {\n    align-self: flex-start;\n    width: 48px;\n    height: 48px;\n    margin: 0 8px 0 0;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-placeholder-card-header-dax {\n    align-self: inherit;\n    margin: 0 0 12px 0;\n}\n\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-header-dax {\n    width: 56px;\n    height: 56px;\n}\n\n.ddg-ctl-placeholder-card-body-text {\n    font-size: 14px;\n    line-height: 21px;\n    text-align: center;\n    margin: 0 auto 12px;\n\n    display: none;\n}\n.DuckDuckGoSocialContainer.size-lg .ddg-ctl-placeholder-card-body-text {\n    width: 80%;\n    display: block;\n}\n\n.ddg-ctl-placeholder-card-footer {\n    width: 100%;\n    margin-top: 12px;\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n    align-self: end;\n}\n\n/* Only display the unblock button on really small placeholders */\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-header,\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-body-text,\n.DuckDuckGoSocialContainer.size-xs .ddg-ctl-placeholder-card-footer {\n    display: none;\n}\n\n.ddg-ctl-feedback-row {\n    display: none;\n}\n.DuckDuckGoSocialContainer:is(.size-md, .size-lg) .ddg-ctl-feedback-row {\n    height: 30px;\n    justify-content: flex-end;\n    align-items: center;\n    display: flex;\n}\n\n.ddg-ctl-feedback-link {\n    font-style: normal;\n    font-weight: 400;\n    font-size: 12px;\n    line-height: 12px;\n    color: var(--ddg-color-txt-link-02);\n    text-decoration: none;\n    display: inline;\n    background-color: transparent;\n    border: 0;\n    padding: 0;\n    cursor: pointer;\n}\n";
+
+    /**
+     * Size keys for a placeholder
+     * @typedef { 'size-xs' | 'size-sm' | 'size-md' | 'size-lg'| null } placeholderSize
+     */
+
+    /**
+     * @typedef WithToggleParams - Toggle params
+     * @property {boolean} isActive - Toggle state
+     * @property {string} dataKey - data-key attribute for toggle button
+     * @property {string} label - Text to be presented with toggle
+     * @property {'md' | 'lg'} [size=md] - Toggle size variant, 'md' by default
+     * @property {() => void} onClick - Toggle on click callback
+     */
+    /**
+     * @typedef WithFeedbackParams - Feedback link params
+     * @property {string=} label - "Share Feedback" link text
+     * @property {() => void} onClick - Feedback element on click callback
+     */
+    /**
+     * @typedef LearnMoreParams - "Learn More" link params
+     * @property {string} readAbout - "Learn More" aria-label text
+     * @property {string} learnMore - "Learn More" link text
+     */
+
+    /**
+     * The custom HTML element (Web Component) template with the placeholder for blocked
+     * embedded content. The constructor gets a list of parameters with the
+     * content and event handlers for this template.
+     * This is currently only used in our Mobile Apps, but can be expanded in the future.
+     */
+    class DDGCtlPlaceholderBlockedElement extends HTMLElement {
+        static CUSTOM_TAG_NAME = 'ddg-ctl-placeholder-blocked'
+        /**
+         * Min height that the placeholder needs to have in order to
+         * have enough room to display content.
+         */
+        static MIN_CONTENT_HEIGHT = 110
+        static MAX_CONTENT_WIDTH_SMALL = 480
+        static MAX_CONTENT_WIDTH_MEDIUM = 650
+        /**
+         * Set observed attributes that will trigger attributeChangedCallback()
+         */
+        static get observedAttributes () {
+            return ['style']
+        }
+
+        /**
+         * Placeholder element for blocked content
+         * @type {HTMLDivElement}
+         */
+        placeholderBlocked
+
+        /**
+         * Size variant of the latest calculated size of the placeholder.
+         * This is used to add the appropriate CSS class to the placeholder container
+         * and adapt the layout for each size.
+         * @type {placeholderSize}
+         */
+        size = null
+
+        /**
+         * @param {object} params - Params for building a custom element
+         *                          with a placeholder for blocked content
+         * @param {boolean} params.devMode - Used to create the Shadow DOM on 'open'(true) or 'closed'(false) mode
+         * @param {string} params.title - Card title text
+         * @param {string} params.body - Card body text
+         * @param {string} params.unblockBtnText - Unblock button text
+         * @param {boolean=} params.useSlimCard - Flag for using less padding on card (ie YT CTL on mobile)
+         * @param {HTMLElement} params.originalElement - The original element this placeholder is replacing.
+         * @param {LearnMoreParams} params.learnMore - Localized strings for "Learn More" link.
+         * @param {WithToggleParams=} params.withToggle - Toggle config to be displayed in the bottom of the placeholder
+         * @param {WithFeedbackParams=} params.withFeedback - Shows feedback link on tablet and desktop sizes,
+         * @param {(originalElement: HTMLIFrameElement | HTMLElement, replacementElement: HTMLElement) => (e: any) => void} params.onButtonClick
+         */
+        constructor (params) {
+            super();
+            this.params = params;
+            /**
+             * Create the shadow root, closed to prevent any outside observers
+             * @type {ShadowRoot}
+             */
+            const shadow = this.attachShadow({
+                mode: this.params.devMode ? 'open' : 'closed'
+            });
+
+            /**
+             * Add our styles
+             * @type {HTMLStyleElement}
+             */
+            const style = document.createElement('style');
+            style.innerText = cssVars + css;
+
+            /**
+             * Creates the placeholder for blocked content
+             * @type {HTMLDivElement}
+             */
+            this.placeholderBlocked = this.createPlaceholder();
+            /**
+             * Creates the Share Feedback element
+             * @type {HTMLDivElement | null}
+             */
+            const feedbackLink = this.params.withFeedback ? this.createShareFeedbackLink() : null;
+            /**
+             * Setup the click handlers
+             */
+            this.setupEventListeners(this.placeholderBlocked, feedbackLink);
+
+            /**
+             * Append both to the shadow root
+             */
+            feedbackLink && this.placeholderBlocked.appendChild(feedbackLink);
+            shadow.appendChild(this.placeholderBlocked);
+            shadow.appendChild(style);
+        }
+
+        /**
+         * Creates a placeholder for content blocked by Click to Load.
+         * Note: We're using arrow functions () => {} in this class due to a bug
+         * found in Firefox where it is getting the wrong "this" context on calls in the constructor.
+         * This is a temporary workaround.
+         * @returns {HTMLDivElement}
+         */
+        createPlaceholder = () => {
+            const { title, body, unblockBtnText, useSlimCard, withToggle, withFeedback } = this.params;
+
+            const container = document.createElement('div');
+            container.classList.add('DuckDuckGoSocialContainer');
+            const cardClassNames = [
+                ['slim-card', !!useSlimCard],
+                ['with-feedback-link', !!withFeedback]
+            ]
+                .map(([className, active]) => (active ? className : ''))
+                .join(' ');
+
+            // Only add a card footer if we have the toggle button to display
+            const cardFooterSection = withToggle
+                ? html`<div class="ddg-ctl-placeholder-card-footer">${this.createToggleButton()}</div> `
+                : '';
+            const learnMoreLink = this.createLearnMoreLink();
+
+            container.innerHTML = html`
+            <div class="ddg-ctl-placeholder-card ${cardClassNames}">
+                <div class="ddg-ctl-placeholder-card-header">
+                    <img class="ddg-ctl-placeholder-card-header-dax" src=${logoImg} alt="DuckDuckGo Dax" />
+                    <div class="ddg-ctl-placeholder-card-title">${title}. ${learnMoreLink}</div>
+                </div>
+                <div class="ddg-ctl-placeholder-card-body">
+                    <div class="ddg-ctl-placeholder-card-body-text">${body} ${learnMoreLink}</div>
+                    <button class="DuckDuckGoButton tertiary ddg-ctl-unblock-btn" type="button">
+                        <div>${unblockBtnText}</div>
+                    </button>
+                </div>
+                ${cardFooterSection}
+            </div>
+        `.toString();
+
+            return container
+        }
+
+        /**
+         * Creates a template string for Learn More link.
+         */
+        createLearnMoreLink = () => {
+            const { learnMore } = this.params;
+
+            return html`<a
+            class="ddg-text-link ddg-learn-more"
+            aria-label="${learnMore.readAbout}"
+            href="https://help.duckduckgo.com/duckduckgo-help-pages/privacy/embedded-content-protection/"
+            target="_blank"
+            >${learnMore.learnMore}</a
+        >`
+        }
+
+        /**
+         * Creates a Feedback Link container row
+         * @returns {HTMLDivElement}
+         */
+        createShareFeedbackLink = () => {
+            const { withFeedback } = this.params;
+
+            const container = document.createElement('div');
+            container.classList.add('ddg-ctl-feedback-row');
+
+            container.innerHTML = html`
+            <button class="ddg-ctl-feedback-link" type="button">${withFeedback?.label || 'Share Feedback'}</button>
+        `.toString();
+
+            return container
+        }
+
+        /**
+         * Creates a template string for a toggle button with text.
+         */
+        createToggleButton = () => {
+            const { withToggle } = this.params;
+            if (!withToggle) return
+
+            const { isActive, dataKey, label, size: toggleSize = 'md' } = withToggle;
+
+            const toggleButton = html`
+            <div class="ddg-toggle-button-container">
+                <button
+                    class="ddg-toggle-button ${isActive ? 'active' : 'inactive'} ${toggleSize}"
+                    type="button"
+                    aria-pressed=${!!isActive}
+                    data-key=${dataKey}
+                >
+                    <div class="ddg-toggle-button-bg"></div>
+                    <div class="ddg-toggle-button-knob"></div>
+                </button>
+                <div class="ddg-toggle-button-label">${label}</div>
+            </div>
+        `;
+            return toggleButton
+        }
+
+        /**
+         *
+         * @param {HTMLElement} containerElement
+         * @param {HTMLElement?} feedbackLink
+         */
+        setupEventListeners = (containerElement, feedbackLink) => {
+            const { withToggle, withFeedback, originalElement, onButtonClick } = this.params;
+
+            containerElement
+                .querySelector('button.ddg-ctl-unblock-btn')
+                ?.addEventListener('click', onButtonClick(originalElement, this));
+
+            if (withToggle) {
+                containerElement
+                    .querySelector('.ddg-toggle-button-container')
+                    ?.addEventListener('click', withToggle.onClick);
+            }
+            if (withFeedback && feedbackLink) {
+                feedbackLink.querySelector('.ddg-ctl-feedback-link')?.addEventListener('click', withFeedback.onClick);
+            }
+        }
+
+        /**
+         * Use JS to calculate the width and height of the root element placeholder. We could use a CSS Container Query, but full
+         * support to it was only added recently, so we're not using it for now.
+         * https://caniuse.com/css-container-queries
+         */
+        updatePlaceholderSize = () => {
+            /** @type {placeholderSize} */
+            let newSize = null;
+
+            const { height, width } = this.getBoundingClientRect();
+            if (height && height < DDGCtlPlaceholderBlockedElement.MIN_CONTENT_HEIGHT) {
+                newSize = 'size-xs';
+            } else if (width) {
+                if (width < DDGCtlPlaceholderBlockedElement.MAX_CONTENT_WIDTH_SMALL) {
+                    newSize = 'size-sm';
+                } else if (width < DDGCtlPlaceholderBlockedElement.MAX_CONTENT_WIDTH_MEDIUM) {
+                    newSize = 'size-md';
+                } else {
+                    newSize = 'size-lg';
+                }
+            }
+
+            if (newSize && newSize !== this.size) {
+                if (this.size) {
+                    this.placeholderBlocked.classList.remove(this.size);
+                }
+                this.placeholderBlocked.classList.add(newSize);
+                this.size = newSize;
+            }
+        }
+
+        /**
+         * Web Component lifecycle function.
+         * When element is first added to the DOM, trigger this callback and
+         * update the element CSS size class.
+         */
+        connectedCallback () {
+            this.updatePlaceholderSize();
+        }
+
+        /**
+         * Web Component lifecycle function.
+         * When the root element gets the 'style' attribute updated, reflect that in the container
+         * element inside the shadow root. This way, we can copy the size and other styles from the root
+         * element and have the inner context be able to use the same sizes to adapt the template layout.
+         * @param {string} attr Observed attribute key
+         * @param {*} _ Attribute old value, ignored
+         * @param {*} newValue Attribute new value
+         */
+        attributeChangedCallback (attr, _, newValue) {
+            if (attr === 'style') {
+                this.placeholderBlocked[attr].cssText = newValue;
+                this.updatePlaceholderSize();
+            }
+        }
+    }
+
+    /**
+     * Register custom elements in this wrapper function to be called only when we need to
+     * and also to allow remote-config later if needed.
+     */
+    function registerCustomElements () {
+        if (!customElements.get(DDGCtlPlaceholderBlockedElement.CUSTOM_TAG_NAME)) {
+            customElements.define(DDGCtlPlaceholderBlockedElement.CUSTOM_TAG_NAME, DDGCtlPlaceholderBlockedElement);
+        }
+    }
+
+    /**
      * @typedef {'darkMode' | 'lightMode' | 'loginMode' | 'cancelMode'} displayMode
      *   Key for theme value to determine the styling of buttons/placeholders.
      *   Matches `styles[mode]` keys:
@@ -6464,6 +7250,10 @@
     // essential messages to surrogate scripts.
     let afterPageLoadResolver;
     const afterPageLoad = new Promise(resolve => { afterPageLoadResolver = resolve; });
+
+    // Used to choose between extension/desktop flow or mobile apps flow.
+    // Updated on ClickToLoad.init()
+    let isMobileApp;
 
     /*********************************************************
      *  Widget Replacement logic
@@ -6528,7 +7318,33 @@
                         // with a light version, replace with full version.
                         this.clickAction.type = 'allowFull';
                     }
-                    value = attrSettings.default;
+
+                    // If the attribute is "width", try first to measure the parent's width and use that as a default value.
+                    if (attrName === 'data-width') {
+                        const windowWidth = window.innerWidth;
+                        const { parentElement } = this.originalElement;
+                        const parentStyles = parentElement
+                            ? window.getComputedStyle(parentElement)
+                            : null;
+                        let parentInnerWidth = null;
+
+                        // We want to calculate the inner width of the parent element as the iframe, when added back,
+                        // should not be bigger than the space available in the parent element. There is no straightforward way of
+                        // doing this. We need to get the parent's .clientWidth and remove the paddings size from it.
+                        if (parentElement && parentStyles && parentStyles.display !== 'inline') {
+                            parentInnerWidth = parentElement.clientWidth - parseFloat(parentStyles.paddingLeft) - parseFloat(parentStyles.paddingRight);
+                        }
+
+                        if (parentInnerWidth && parentInnerWidth < windowWidth) {
+                            value = parentInnerWidth.toString();
+                        } else {
+                            // Our default value for width is often greater than the window size of smaller
+                            // screens (ie mobile). Then use whatever is the smallest value.
+                            value = Math.min(attrSettings.default, windowWidth).toString();
+                        }
+                    } else {
+                        value = attrSettings.default;
+                    }
                 }
                 this.dataElements[attrName] = value;
             }
@@ -6962,17 +7778,42 @@
 
         // Facebook
         if (widget.replaceSettings.type === 'dialog') {
-            const icon = widget.replaceSettings.icon;
-            const button = makeButton(widget.replaceSettings.buttonText, widget.getMode());
-            const textButton = makeTextButton(widget.replaceSettings.buttonText, widget.getMode());
-            const { contentBlock, shadowRoot } = createContentBlock(
-                widget, button, textButton, icon
-            );
-            button.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
-            textButton.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
+            if (isMobileApp) {
+                /**
+                 * Creates a custom HTML element with the placeholder element for blocked
+                 * embedded content. The constructor gets a list of parameters with the
+                 * content and event handlers for this HTML element.
+                 */
+                const mobileBlockedPlaceholder = new DDGCtlPlaceholderBlockedElement({
+                    devMode,
+                    title: widget.replaceSettings.infoTitle, // Card title text
+                    body: widget.replaceSettings.infoText, // Card body text
+                    unblockBtnText: widget.replaceSettings.buttonText, // Unblock button text
+                    useSlimCard: false, // Flag for using less padding on card (ie YT CTL on mobile)
+                    originalElement: trackingElement, // The original element this placeholder is replacing.
+                    learnMore: { // Localized strings for "Learn More" link.
+                        readAbout: sharedStrings.readAbout,
+                        learnMore: sharedStrings.learnMore
+                    },
+                    onButtonClick: widget.clickFunction.bind(widget)
+                });
+                mobileBlockedPlaceholder.appendChild(makeFontFaceStyleElement());
 
-            replaceTrackingElement(widget, trackingElement, contentBlock);
-            showExtraUnblockIfShortPlaceholder(shadowRoot, contentBlock);
+                replaceTrackingElement(widget, trackingElement, mobileBlockedPlaceholder);
+                showExtraUnblockIfShortPlaceholder(null, mobileBlockedPlaceholder);
+            } else {
+                const icon = widget.replaceSettings.icon;
+                const button = makeButton(widget.replaceSettings.buttonText, widget.getMode());
+                const textButton = makeTextButton(widget.replaceSettings.buttonText, widget.getMode());
+                const { contentBlock, shadowRoot } = createContentBlock(
+                    widget, button, textButton, icon
+                );
+                button.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
+                textButton.addEventListener('click', widget.clickFunction(trackingElement, contentBlock));
+
+                replaceTrackingElement(widget, trackingElement, contentBlock);
+                showExtraUnblockIfShortPlaceholder(shadowRoot, contentBlock);
+            }
         }
 
         // YouTube
@@ -7015,11 +7856,49 @@
             // Block YouTube embedded video and display blocking dialog
             widget.autoplay = false;
             const oldPlaceholder = widget.placeholderElement;
-            const { blockingDialog, shadowRoot } = createYouTubeBlockingDialog(trackingElement, widget);
-            resizeElementToMatch(oldPlaceholder || trackingElement, blockingDialog);
-            replaceTrackingElement(widget, trackingElement, blockingDialog);
-            showExtraUnblockIfShortPlaceholder(shadowRoot, blockingDialog);
-            hideInfoTextIfNarrowPlaceholder(shadowRoot, blockingDialog, 460);
+
+            if (isMobileApp) {
+                /**
+                 * Creates a custom HTML element with the placeholder element for blocked
+                 * embedded content. The constructor gets a list of parameters with the
+                 * content and event handlers for this HTML element.
+                 */
+                const mobileBlockedPlaceholderElement = new DDGCtlPlaceholderBlockedElement({
+                    devMode,
+                    title: widget.replaceSettings.infoTitle, // Card title text
+                    body: widget.replaceSettings.infoText, // Card body text
+                    unblockBtnText: widget.replaceSettings.buttonText, // Unblock button text
+                    useSlimCard: true, // Flag for using less padding on card (ie YT CTL on mobile)
+                    originalElement: trackingElement, // The original element this placeholder is replacing.
+                    learnMore: { // Localized strings for "Learn More" link.
+                        readAbout: sharedStrings.readAbout,
+                        learnMore: sharedStrings.learnMore
+                    },
+                    withToggle: { // Toggle config to be displayed in the bottom of the placeholder
+                        isActive: false, // Toggle state
+                        dataKey: 'yt-preview-toggle', // data-key attribute for button
+                        label: widget.replaceSettings.previewToggleText, // Text to be presented with toggle
+                        size: isMobileApp ? 'lg' : 'md',
+                        onClick: () => sendMessage('setYoutubePreviewsEnabled', true) // Toggle click callback
+                    },
+                    withFeedback: {
+                        label: sharedStrings.shareFeedback,
+                        onClick: () => openShareFeedbackPage()
+                    },
+                    onButtonClick: widget.clickFunction.bind(widget)
+                });
+                mobileBlockedPlaceholderElement.appendChild(makeFontFaceStyleElement());
+                mobileBlockedPlaceholderElement.id = trackingElement.id;
+                resizeElementToMatch(oldPlaceholder || trackingElement, mobileBlockedPlaceholderElement);
+                replaceTrackingElement(widget, trackingElement, mobileBlockedPlaceholderElement);
+                showExtraUnblockIfShortPlaceholder(null, mobileBlockedPlaceholderElement);
+            } else {
+                const { blockingDialog, shadowRoot } = createYouTubeBlockingDialog(trackingElement, widget);
+                resizeElementToMatch(oldPlaceholder || trackingElement, blockingDialog);
+                replaceTrackingElement(widget, trackingElement, blockingDialog);
+                showExtraUnblockIfShortPlaceholder(shadowRoot, blockingDialog);
+                hideInfoTextIfNarrowPlaceholder(shadowRoot, blockingDialog, 460);
+            }
         }
     }
 
@@ -7028,7 +7907,7 @@
      * its parent is too short for the normal unblock button to be visible.
      * Note: This does not take into account the placeholder's vertical
      *       position in the parent element.
-     * @param {ShadowRoot} shadowRoot
+     * @param {ShadowRoot?} shadowRoot
      * @param {HTMLElement} placeholder Placeholder for tracking element
      */
     function showExtraUnblockIfShortPlaceholder (shadowRoot, placeholder) {
@@ -7046,22 +7925,25 @@
         const { height: placeholderHeight } = placeholder.getBoundingClientRect();
         const { height: parentHeight } = placeholder.parentElement.getBoundingClientRect();
 
-        if ((placeholderHeight > 0 && placeholderHeight <= 200) ||
-            (parentHeight > 0 && parentHeight <= 230)) {
-            /** @type {HTMLElement?} */
-            const titleRowTextButton = shadowRoot.querySelector(`#${titleID + 'TextButton'}`);
-            if (titleRowTextButton) {
-                titleRowTextButton.style.display = 'block';
+        if (
+            (placeholderHeight > 0 && placeholderHeight <= 200) ||
+            (parentHeight > 0 && parentHeight <= 230)
+        ) {
+            if (shadowRoot) {
+                /** @type {HTMLElement?} */
+                const titleRowTextButton = shadowRoot.querySelector(`#${titleID + 'TextButton'}`);
+                if (titleRowTextButton) {
+                    titleRowTextButton.style.display = 'block';
+                }
             }
-
             // Avoid the placeholder being taller than the containing element
             // and overflowing.
             /** @type {HTMLElement?} */
-            const innerDiv = shadowRoot.querySelector('.DuckDuckGoSocialContainer');
-            if (innerDiv) {
-                innerDiv.style.minHeight = 'initial';
-                innerDiv.style.maxHeight = parentHeight + 'px';
-                innerDiv.style.overflow = 'hidden';
+            const blockedDiv = shadowRoot?.querySelector('.DuckDuckGoSocialContainer') || placeholder;
+            if (blockedDiv) {
+                blockedDiv.style.minHeight = 'initial';
+                blockedDiv.style.maxHeight = parentHeight + 'px';
+                blockedDiv.style.overflow = 'hidden';
             }
         }
     }
@@ -8070,6 +8952,14 @@
             sharedStrings = localizedConfig.sharedStrings;
             // update styles if asset config was sent
             styles = getStyles(this.assetConfig);
+            isMobileApp = this.platform.name === 'ios' || this.platform.name === 'android';
+
+            /**
+             * Register Custom Elements only when Click to Load is initialized, to ensure it is only
+             * called when config is ready and any previous context have been appropriately invalidated
+             * prior when applicable (ie Firefox when hot reloading the Extension)
+             */
+            registerCustomElements();
 
             for (const entity of Object.keys(config)) {
                 // Strip config entities that are first-party, or aren't enabled in the
