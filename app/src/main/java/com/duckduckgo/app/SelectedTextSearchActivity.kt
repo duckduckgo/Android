@@ -38,15 +38,14 @@ class SelectedTextSearchActivity : AppCompatActivity() {
     }
 
     private fun extractQuery(intent: Intent?): String? {
-        if (intent == null) return null
-
-        val textSelectionQuery = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
-        if (textSelectionQuery != null) return textSelectionQuery
-
-        val webSearchQuery = intent.getStringExtra(SearchManager.QUERY)
-        if (webSearchQuery != null) return webSearchQuery
-
-        Timber.w("SelectedTextSearchActivity launched with unexpected intent format")
-        return null
+        return when {
+            intent == null -> null
+            intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)?.isNotBlank() == true -> intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+            intent.getStringExtra(SearchManager.QUERY)?.isNotBlank() == true -> intent.getStringExtra(SearchManager.QUERY)
+            else -> {
+                Timber.w("SelectedTextSearchActivity launched with unexpected intent format")
+                null
+            }
+        }
     }
 }
