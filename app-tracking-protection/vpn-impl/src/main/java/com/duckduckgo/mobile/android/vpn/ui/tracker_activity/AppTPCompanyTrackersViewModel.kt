@@ -66,7 +66,6 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
             statsRepository
                 .getTrackersForAppFromDate(date, packageName)
                 .map { aggregateDataPerApp(it, packageName) }
-                .flowOn(dispatchers.default())
                 .collectLatest { state ->
                     viewStateFlow.emit(state)
                 }
