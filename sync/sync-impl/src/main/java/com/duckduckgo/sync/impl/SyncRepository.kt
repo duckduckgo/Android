@@ -17,9 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.SyncStateCallbacks
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
@@ -35,8 +33,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
 
 interface SyncRepository {
 
@@ -66,23 +62,8 @@ class AppSyncRepository @Inject constructor(
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
     private val syncEngine: SyncEngine,
-    private val syncStateCallbackPluginPoint: PluginPoint<SyncStateCallbacks>
 ) : SyncRepository {
 
-    init {
-        syncStore.isSignedInFlow().onEach { signedIn ->
-            if (signedIn){
-                syncStateCallbackPluginPoint.getPlugins().forEach {
-                    it.onSyncEnabled()
-                }
-            } else {
-                syncStateCallbackPluginPoint.getPlugins().forEach {
-                    it.onSyncDisabled()
-                }
-            }
-        }
-
-    }
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
 

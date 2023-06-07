@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.di
+package com.duckduckgo.sync.api
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.SyncFeature
-import com.duckduckgo.sync.api.SyncStateCallbacks
+import kotlinx.coroutines.flow.Flow
 
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = SyncStateCallbacks::class,
-)
-@Suppress("unused")
-private interface UnusedSyncStatePluginCodegenTrigger
+interface SyncStateMonitor {
+
+    /**
+     * Returns a flow of Sync state changes
+     * It follows the following truth table:
+     * * when the user is not signed with Sync is disabled the flow will emit a [SyncState.OFF]
+     * * else it will map the state to the last [SyncAttempt]
+     */
+    fun syncState(): Flow<SyncState>
+}
+
+enum class SyncState {
+    READY,
+    IN_PROGRESS,
+    FAILED,
+    OFF,
+}

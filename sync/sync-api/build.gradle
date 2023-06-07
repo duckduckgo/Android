@@ -26,6 +26,8 @@ dependencies {
     api project(':navigation-api')
 
     implementation Kotlin.stdlib.jdk7
+    implementation AndroidX.core.ktx
+    implementation KotlinX.coroutines.core
 }
 
 android {

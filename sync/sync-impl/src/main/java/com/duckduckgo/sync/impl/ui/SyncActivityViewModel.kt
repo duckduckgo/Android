@@ -23,7 +23,11 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.api.SyncStateCallbacks
+import com.duckduckgo.sync.api.SyncState.FAILED
+import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
+import com.duckduckgo.sync.api.SyncState.OFF
+import com.duckduckgo.sync.api.SyncState.READY
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
@@ -47,7 +51,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -59,8 +62,9 @@ class SyncActivityViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncRepository: SyncRepository,
+    private val syncStateMonitor: SyncStateMonitor,
     private val dispatchers: DispatcherProvider,
-) : ViewModel(), SyncStateCallbacks {
+) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val viewState = MutableStateFlow(ViewState())
@@ -70,20 +74,19 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             viewState.emit(viewState.value.showDeviceListItemLoading())
             fetchRemoteDevices()
+            observerSyncState()
         }
     }.flowOn(dispatchers.io())
 
-    override fun onSyncEnabled() {
-        super.onSyncEnabled()
-        viewModelScope.launch {
-            viewState.emit(initViewStateThisDeviceState())
-        }
-    }
+    private fun observerSyncState() {
+        syncStateMonitor.syncState().onEach { syncState ->
 
-    override fun onSyncDisabled() {
-        super.onSyncDisabled()
-        viewModelScope.launch {
-            viewState.emit(signedOutState())
+            when (syncState) {
+                READY -> {}
+                IN_PROGRESS -> {}
+                FAILED -> {}
+                OFF -> {}
+            }
         }
     }
 
