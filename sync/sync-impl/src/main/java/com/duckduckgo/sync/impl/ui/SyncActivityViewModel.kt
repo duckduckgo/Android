@@ -56,6 +56,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
+import kotlin.math.sign
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -73,24 +75,23 @@ class SyncActivityViewModel @Inject constructor(
         viewState.emit(initViewStateThisDeviceState())
         viewModelScope.launch(dispatchers.io()) {
             viewState.emit(viewState.value.showDeviceListItemLoading())
-            fetchRemoteDevices()
             observerSyncState()
+            fetchRemoteDevices()
         }
     }.flowOn(dispatchers.io())
 
     private fun observerSyncState() {
         syncStateMonitor.syncState().onEach { syncState ->
-
-            when (syncState) {
-                READY -> {}
-                IN_PROGRESS -> {}
-                FAILED -> {}
-                OFF -> {}
+            Timber.d("Sync-Feature: new state $syncState")
+            val newState = when (syncState) {
+                OFF -> signedOutState()
+                else -> signedInState()
             }
+            viewState.emit(newState)
         }
     }
 
-    private suspend fun initViewStateThisDeviceState(): ViewState {
+    private suspend fun signedInState(): ViewState {
         if (!syncRepository.isSignedIn()) {
             return signedOutState()
         }
@@ -106,6 +107,14 @@ class SyncActivityViewModel @Inject constructor(
             loginQRCode = qrBitmap,
             syncedDevices = listOf(SyncedDevice(connectedDevice)),
         )
+    }
+
+    private suspend fun initViewStateThisDeviceState(): ViewState {
+        if (!syncRepository.isSignedIn()) {
+            return signedOutState()
+        }
+
+        return signedInState()
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -137,7 +146,7 @@ class SyncActivityViewModel @Inject constructor(
                 false -> {
                     syncRepository.getThisConnectedDevice()?.let {
                         command.send(AskTurnOffSync(it))
-                    } ?: hideOrShowAccountDetails()
+                    } ?: showAccountDetailsIfNeeded()
                 }
             }
         }
@@ -158,14 +167,14 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.hideAccount())
             val result = syncRepository.logout(connectedDevice.deviceId)
             if (result is Error) {
-                hideOrShowAccountDetails()
+                showAccountDetailsIfNeeded()
             }
         }
     }
 
     fun onTurnOffSyncCancelled() {
         viewModelScope.launch {
-            hideOrShowAccountDetails()
+            showAccountDetailsIfNeeded()
         }
     }
 
@@ -181,14 +190,14 @@ class SyncActivityViewModel @Inject constructor(
             viewState.emit(viewState.value.hideAccount())
             val result = syncRepository.deleteAccount()
             if (result is Error) {
-                hideOrShowAccountDetails()
+                showAccountDetailsIfNeeded()
             }
         }
     }
 
     fun onDeleteAccountCancelled() {
         viewModelScope.launch(dispatchers.io()) {
-            hideOrShowAccountDetails()
+            showAccountDetailsIfNeeded()
         }
     }
 
@@ -252,11 +261,8 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hideOrShowAccountDetails() {
-        if (!syncRepository.isSignedIn()) {
-            viewState.emit(signedOutState())
-            return
-        } else {
+    private suspend fun showAccountDetailsIfNeeded() {
+        if (syncRepository.isSignedIn()) {
             viewState.emit(viewState.value.toggle(true).showAccount())
         }
     }

@@ -56,6 +56,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -228,6 +229,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        Timber.d("Sync-Feature: new view state $viewState")
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.syncToggleState, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
