@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,9 +25,7 @@
         layout="@layout/include_default_toolbar" />
 
     <include
-        android:id="@+id/contentSettingsPrivacy"
-        layout="@layout/content_settings_privacy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:id="@+id/includePermissionsAndPrivacy"
+        layout="@layout/content_permissions_and_privacy" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
