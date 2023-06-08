@@ -23,5 +23,5 @@ interface ExternalVpnDetector {
      *
      * @return returns a boolean that identifies the connection being routed through a VPN
      */
-    fun isExternalVpnDetected(): Boolean
+    suspend fun isExternalVpnDetected(): Boolean
 }

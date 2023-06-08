@@ -30,6 +30,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit.HOURS
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
@@ -38,7 +39,7 @@ class NetPRekeyScheduler @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
             logcat { "NetPRekeyScheduler onVpnStarted called with NetP enabled" }
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)

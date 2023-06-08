@@ -34,6 +34,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @ContributesMultibinding(
@@ -51,7 +52,7 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
 ) : VpnConnectivityLossListenerPlugin {
 
     override fun onVpnConnectivityLoss(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
             coroutineScope.launch(dispatcherProvider.io()) {
                 handleConnectivityLoss(coroutineScope)
             }
@@ -59,7 +60,7 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
     }
 
     override fun onVpnConnected(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
             coroutineScope.launch(dispatcherProvider.io()) {
                 logcat { "onVpnConnected called." }
                 if (repository.reconnectStatus == Reconnecting) {
@@ -73,13 +74,13 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
         }
     }
 
-    private fun handleConnectivityLoss(coroutineScope: CoroutineScope) {
+    private suspend fun handleConnectivityLoss(coroutineScope: CoroutineScope) {
         logcat { " Vpn connectivity loss detected. attempted ${repository.reconnectAttemptCount} times" }
         repository.reconnectStatus = Reconnecting
 
         if (repository.reconnectAttemptCount < MAX_RECOVERY_ATTEMPTS) {
             repository.reconnectAttemptCount++
-            initiateRecovery(coroutineScope)
+            initiateRecovery()
         } else {
             giveUpRecovering()
         }
@@ -92,16 +93,14 @@ class NetpVpnConnectivityLossListenerPlugin @Inject constructor(
         logcat { "Successfully recovered from VPN connectivity loss." }
     }
 
-    private fun initiateRecovery(coroutineScope: CoroutineScope) {
+    private suspend fun initiateRecovery() {
         logcat { "Attempting to recover from vpn connectivity loss." }
         netpPixels.get().reportVpnConnectivityLoss()
         reconnectNotifications.clearNotifications()
-        coroutineScope.launch {
-            vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-        }
+        vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
     }
 
-    private fun giveUpRecovering() {
+    private suspend fun giveUpRecovering() {
         logcat { "Failed to recover from vpn connectivity loss after $MAX_RECOVERY_ATTEMPTS attempts" }
         repository.reconnectStatus = ReconnectingFailed
         resetReconnectValues()

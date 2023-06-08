@@ -34,6 +34,7 @@ import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsReposi
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -68,7 +69,7 @@ class AppTpEnabledNotificationContentPluginTest {
         appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
         vpnFeaturesRegistry = FakeVpnFeaturesRegistry().apply {
-            registerFeature(AppTpVpnFeature.APPTP_VPN)
+            runBlocking { registerFeature(AppTpVpnFeature.APPTP_VPN) }
         }
 
         plugin = AppTpEnabledNotificationContentPlugin(
@@ -94,7 +95,7 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getInitialContentAppTpNotEnabledThenReturnsCorrectNotificationContent() {
+    fun getInitialContentAppTpNotEnabledThenReturnsCorrectNotificationContent() = runTest {
         vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
         assertNull(plugin.getInitialContent())
     }
@@ -263,7 +264,7 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun isActiveWhenAppTpNotEnabledThenReturnsFalse() {
+    fun isActiveWhenAppTpNotEnabledThenReturnsFalse() = runTest {
         vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
         assertFalse(plugin.isActive())
     }

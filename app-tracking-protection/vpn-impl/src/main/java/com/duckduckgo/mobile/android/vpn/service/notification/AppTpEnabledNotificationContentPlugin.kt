@@ -39,6 +39,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -53,7 +54,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
-        return if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
+        return if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) }) {
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 message = SpannableStringBuilder(),
@@ -95,7 +96,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     }
 
     override fun isActive(): Boolean {
-        return vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+        return runBlocking { vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) }
     }
 
     // This fun interface is provided just for testing purposes

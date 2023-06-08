@@ -97,7 +97,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
     }
 
     @Test
-    fun whenOnVpnConnectedAndNotReconnectingThenDoNothing() {
+    fun whenOnVpnConnectedAndNotReconnectingThenDoNothing() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         repository.reconnectStatus = NotReconnecting
         testee.onVpnConnected(coroutineRule.testScope)
@@ -108,7 +108,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
     }
 
     @Test
-    fun whenOnVpnConnectedAndReconnectingFailedThenResetStatusToNotReconnecting() {
+    fun whenOnVpnConnectedAndReconnectingFailedThenResetStatusToNotReconnecting() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         repository.reconnectStatus = ReconnectingFailed
         testee.onVpnConnected(coroutineRule.testScope)
@@ -119,7 +119,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
     }
 
     @Test
-    fun whenOnVpnConnectedAndReconnectingThenRecoverSuccessfully() {
+    fun whenOnVpnConnectedAndReconnectingThenRecoverSuccessfully() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         repository.reconnectStatus = Reconnecting
         testee.onVpnConnected(coroutineRule.testScope)
@@ -131,7 +131,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
     }
 
     @Test
-    fun whenNetpVpnFeatureIsNotRegisteredThenOnVpnConnectedDoesNothing() {
+    fun whenNetpVpnFeatureIsNotRegisteredThenOnVpnConnectedDoesNothing() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         testee.onVpnConnected(coroutineRule.testScope)
@@ -143,7 +143,7 @@ class NetpVpnConnectivityLossListenerPluginTest {
     }
 
     @Test
-    fun whenNetpVpnFeatureIsNotRegisteredThenOnVpnConnectivityLossDoesNothing() {
+    fun whenNetpVpnFeatureIsNotRegisteredThenOnVpnConnectivityLossDoesNothing() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         testee.onVpnConnectivityLoss(coroutineRule.testScope)

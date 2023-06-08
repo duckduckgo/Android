@@ -34,6 +34,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerType
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 class NetpRealAppTrackerDetector constructor(
@@ -45,15 +46,16 @@ class NetpRealAppTrackerDetector constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : AppTrackerDetector {
 
-    private val isAppTpDisabled: Boolean
-        get() = !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+    private fun isAppTpDisabled(): Boolean {
+        return runBlocking { !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) }
+    }
 
     // cache packageId -> app name
     private val appNamesCache = LruCache<String, AppNameResolver.OriginatingApp>(100)
 
     override fun evaluate(domain: String, uid: Int): AppTrackerDetector.AppTracker? {
         // Check if AppTP is enabled first
-        if (isAppTpDisabled) {
+        if (isAppTpDisabled()) {
             logcat { "App tracker detector is DISABLED" }
             return null
         }

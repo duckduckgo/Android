@@ -91,7 +91,7 @@ class RealVpnStateMonitor @Inject constructor(
             } ?: false
         }
 
-        fun vpnKilledBySystem(): Boolean {
+        suspend fun vpnKilledBySystem(): Boolean {
             val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
             return lastHeartBeat?.type == VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE &&
                 !vpnFeaturesRegistry.isAnyFeatureRunning()

@@ -44,7 +44,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
@@ -117,9 +117,6 @@ class SettingsViewModelTest {
     private lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
 
     @Mock
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
-
-    @Mock
     private lateinit var autoconsent: Autoconsent
 
     @Mock
@@ -180,7 +177,7 @@ class SettingsViewModelTest {
             mockAppBuildConfig,
             mockEmailManager,
             autofillCapabilityChecker,
-            vpnFeaturesRegistry,
+            FakeVpnFeaturesRegistry(),
             autoconsent,
             windowsWaitlist,
             windowsFeature,

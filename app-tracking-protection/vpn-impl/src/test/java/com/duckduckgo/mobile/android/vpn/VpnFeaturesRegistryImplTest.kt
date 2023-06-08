@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
@@ -25,6 +26,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
@@ -32,6 +34,9 @@ import org.mockito.kotlin.*
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class VpnFeaturesRegistryImplTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider = mock()
     private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
@@ -48,11 +53,16 @@ class VpnFeaturesRegistryImplTest {
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.vpn.feature.registry.v1"), eq(true), eq(false)),
         ).thenReturn(prefs)
 
-        vpnFeaturesRegistry = VpnFeaturesRegistryImpl(vpnServiceWrapper, sharedPreferencesProvider, mockFeatureSegmentsManager)
+        vpnFeaturesRegistry = VpnFeaturesRegistryImpl(
+            vpnServiceWrapper,
+            sharedPreferencesProvider,
+            mockFeatureSegmentsManager,
+            coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
-    fun whenRegisterFeatureThenRestartVpnService() {
+    fun whenRegisterFeatureThenRestartVpnService() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
 
         assertEquals(0, vpnServiceWrapper.restartCount)
@@ -60,7 +70,7 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenFeaturesAreRegisteredThenVpnIsStarted() {
+    fun whenFeaturesAreRegisteredThenVpnIsStarted() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
 
@@ -70,7 +80,7 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenIsFeatureRegisteredAndFeaturesAreRegisteredAndVpnIsRunningThenReturnTrue() {
+    fun whenIsFeatureRegisteredAndFeaturesAreRegisteredAndVpnIsRunningThenReturnTrue() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
         vpnServiceWrapper.startService()
@@ -80,12 +90,12 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenIsAnyFeatureRegisteredAndFeaturesAreNotRegisteredThenReturnFalse() {
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreNotRegisteredThenReturnFalse() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
     }
 
     @Test
-    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredThenReturnTrue() {
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredThenReturnTrue() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
 
         assertTrue(vpnFeaturesRegistry.isAnyFeatureRunning())
@@ -93,7 +103,7 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredAndVpnDisabledThenReturnFalse() {
+    fun whenIsAnyFeatureRegisteredAndFeaturesAreRegisteredAndVpnDisabledThenReturnFalse() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnServiceWrapper.stopService()
 
@@ -102,7 +112,7 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenUnregisterFeatureThenFeatureIsUnregistered() {
+    fun whenUnregisterFeatureThenFeatureIsUnregistered() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
 
@@ -110,7 +120,7 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenUnregisterLastFeatureThenVpnIsNotRunning() {
+    fun whenUnregisterLastFeatureThenVpnIsNotRunning() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO)
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR)
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO)
@@ -120,7 +130,7 @@ class VpnFeaturesRegistryImplTest {
     }
 
     @Test
-    fun whenUnregisterFeatureIfFeaturesStillRegisteredThenRestartVpnService() {
+    fun whenUnregisterFeatureIfFeaturesStillRegisteredThenRestartVpnService() = runTest {
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.FOO) // no restart
         vpnFeaturesRegistry.registerFeature(TestVpnFeatures.BAR) // restart
         vpnFeaturesRegistry.unregisterFeature(TestVpnFeatures.FOO) // restart
