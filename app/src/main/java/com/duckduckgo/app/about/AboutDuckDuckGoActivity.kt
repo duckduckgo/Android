@@ -19,31 +19,144 @@ package com.duckduckgo.app.about
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
+import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetPWaitlistScreenNoParams
+import com.google.android.material.snackbar.Snackbar
+import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
+    private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()
     private val binding: ActivityAboutDuckDuckGoBinding by viewBinding()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.toolbar)
-
-        binding.includeContent.learnMoreLink.setOnClickListener {
-            startActivity(BrowserActivity.intent(this, Url.ABOUT))
-            finish()
+    private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
+        if (resultOk) {
+            Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
         }
     }
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
+
+        configureUiEventHandlers()
+        observeViewModel()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        viewModel.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.resetNetPEasterEggCounter()
+    }
+
+    private fun configureUiEventHandlers() {
+        binding.includeContent.learnMoreLink.setOnClickListener {
+            viewModel.onLearnMoreLinkClicked()
+        }
+
+        binding.includeContent.aboutPrivacyPolicy.setClickListener {
+            viewModel.onPrivacyPolicyClicked()
+        }
+
+        binding.includeContent.aboutVersion.setClickListener {
+            viewModel.onVersionClicked()
+        }
+
+        binding.includeContent.aboutProvideFeedback.setClickListener {
+            viewModel.onProvideFeedbackClicked()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach { viewState ->
+                viewState.let {
+                    binding.includeContent.aboutVersion.setSecondaryText(it.version)
+                }
+            }.launchIn(lifecycleScope)
+
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun launchNetPWaitlist() {
+        globalActivityStarter.start(this, NetPWaitlistScreenNoParams)
+    }
+
+    private fun processCommand(it: Command) {
+        when (it) {
+            is Command.LaunchBrowserWithLearnMoreUrl -> launchBrowserScreen()
+            is Command.LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen()
+            is Command.ShowNetPUnlockedSnackbar -> showNetPUnlockedSnackbar()
+            is Command.LaunchNetPWaitlist -> launchNetPWaitlist()
+            is Command.LaunchFeedback -> launchFeedback()
+        }
+    }
+
+    private fun launchBrowserScreen() {
+        startActivity(BrowserActivity.intent(this, Url.ABOUT))
+        finish()
+    }
+
+    private fun launchWebViewScreen() {
+        startActivity(
+            WebViewActivity.intent(
+                this,
+                PRIVACY_POLICY_WEB_LINK,
+                getString(R.string.settingsPrivacyPolicyDuckduckgo),
+            ),
+        )
+    }
+
+    private fun showNetPUnlockedSnackbar() {
+        Snackbar.make(
+            binding.root,
+            R.string.netpUnlockedSnackbar,
+            Snackbar.LENGTH_LONG,
+        ).setAction(R.string.netpUnlockedSnackbarAction) {
+            viewModel.onNetPUnlockedActionClicked()
+        }.setDuration(3500) // LENGTH_LONG is not long enough, increase to 3.5 sec
+            .show()
+    }
+
+    private fun launchFeedback() {
+        feedbackFlow.launch(null)
+    }
+
     companion object {
+        private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
+
         fun intent(context: Context): Intent {
             return Intent(context, AboutDuckDuckGoActivity::class.java)
         }
