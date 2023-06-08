@@ -2,50 +2,8 @@
 (function () {
     'use strict';
 
-    /* global false */
-
-    let dummyWindow;
-    if ('document' in globalThis &&
-        // Prevent infinate recursion of injection into Chrome
-        globalThis.location.href !== 'about:blank') {
-        const injectionElement = getInjectionElement();
-        // injectionElement is null in some playwright context tests
-        if (injectionElement) {
-            dummyWindow = document.createElement('iframe');
-            dummyWindow.style.display = 'none';
-            injectionElement.appendChild(dummyWindow);
-        }
-    }
-
-    let dummyContentWindow = dummyWindow?.contentWindow;
-    // @ts-expect-error - Symbol is not defined on window
-    const dummySymbol = dummyContentWindow?.Symbol;
-    const iteratorSymbol = dummySymbol?.iterator;
-
-    // Capture prototype to prevent overloading
-    function captureGlobal (globalName) {
-        const global = dummyWindow?.contentWindow?.[globalName];
-
-        // if we were unable to create a dummy window, return the global
-        // this still has the advantage of preventing aliasing of the global through shawdowing
-        if (!global) {
-            return globalThis[globalName]
-        }
-
-        // Alias the iterator symbol to the local symbol so for loops work
-        if (iteratorSymbol &&
-            global?.prototype &&
-            iteratorSymbol in global.prototype) {
-            global.prototype[Symbol.iterator] = global.prototype[iteratorSymbol];
-        }
-        return global
-    }
-
-    const Set$1 = captureGlobal('Set');
-    const Reflect$1 = captureGlobal('Reflect');
-
-    // Clean up the dummy window
-    dummyWindow?.remove();
+    const Set$1 = globalThis.Set;
+    const Reflect$1 = globalThis.Reflect;
 
     /* global cloneInto, exportFunction, false */
     // Tests don't define this variable so fallback to behave like chrome
@@ -2563,8 +2521,8 @@
             /** @satisfies {Storage} */
             const instance = new MemoryStorage();
             const storage = new Proxy(instance, {
-                set (target, prop, value, receiver) {
-                    Reflect$1.apply(target.setItem, target, [prop, value], receiver);
+                set (target, prop, value) {
+                    Reflect$1.apply(target.setItem, target, [prop, value]);
                     return true
                 },
                 get (target, prop) {
