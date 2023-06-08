@@ -91,7 +91,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     fun onVersionClicked() {
         if (viewState.value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
             netPEasterEggCounter++
-            if (netPEasterEggCounter >= 12) {
+            if (netPEasterEggCounter >= MAX_EASTER_EGG_COUNT) {
                 viewModelScope.launch { command.send(Command.ShowNetPUnlockedSnackbar) }
                 resetNetPEasterEggCounter()
             }
@@ -110,6 +110,10 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         netPEasterEggCounter = 0
     }
 
+    // This is used for testing only to check the `netPEasterEggCounter` is reset without
+    // exposing it.
+    internal fun hasResetNetPEasterEggCounter() = netPEasterEggCounter == 0
+
     private fun currentViewState(): ViewState {
         return viewState.value
     }
@@ -117,5 +121,9 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private fun obtainVersion(variantKey: String): String {
         val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
         return "${appBuildConfig.versionName}$formattedVariantKey(${appBuildConfig.versionCode})"
+    }
+
+    companion object {
+        internal const val MAX_EASTER_EGG_COUNT = 12
     }
 }
