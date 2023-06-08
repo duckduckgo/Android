@@ -24,10 +24,6 @@ import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
-import com.duckduckgo.sync.api.SyncState
-import com.duckduckgo.sync.api.SyncState.OFF
-import com.duckduckgo.sync.api.SyncState.READY
-import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
@@ -41,12 +37,6 @@ import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -72,20 +62,15 @@ class SyncActivityViewModelTest {
     private val qrEncoder: QREncoder = mock()
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncRepository: SyncRepository = mock()
-    private val syncStateMonitor: SyncStateMonitor = mock()
-
-    private val syncState = Channel<SyncState>(1, BufferOverflow.DROP_OLDEST)
 
     private lateinit var testee: SyncActivityViewModel
 
     @Before
     fun before() {
-        whenever(syncStateMonitor.syncState()).thenReturn(syncState.consumeAsFlow())
         testee = SyncActivityViewModel(
             qrEncoder = qrEncoder,
             syncRepository = syncRepository,
             dispatchers = coroutineTestRule.testDispatcherProvider,
-            syncStateMonitor = syncStateMonitor,
             recoveryCodePDF = recoveryPDF,
         )
     }
@@ -131,9 +116,7 @@ class SyncActivityViewModelTest {
 
         testee.viewState().test {
             val initialState = awaitItem()
-            assertEquals(1, initialState.syncedDevices.size)
-            val fetchViewState = awaitItem()
-            assertEquals(connectedDevices.size, fetchViewState.syncedDevices.size)
+            assertEquals(connectedDevices.size, initialState.syncedDevices.size)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -190,7 +173,6 @@ class SyncActivityViewModelTest {
             var viewState = awaitItem()
             assertTrue(viewState.syncToggleState)
             testee.onTurnOffSyncConfirmed(connectedDevice)
-            syncState.send(OFF)
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
             assertFalse(viewState.syncToggleState)
@@ -244,7 +226,6 @@ class SyncActivityViewModelTest {
             var viewState = awaitItem()
             assertTrue(viewState.syncToggleState)
             testee.onDeleteAccountConfirmed()
-            syncState.send(OFF)
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
             assertFalse(viewState.syncToggleState)
@@ -413,8 +394,7 @@ class SyncActivityViewModelTest {
         assertTrue(format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
     }
 
-    private suspend fun givenAuthenticatedUser() {
-        syncState.send(READY)
+    private fun givenAuthenticatedUser() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
         whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
