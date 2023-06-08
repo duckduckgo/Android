@@ -14,8 +14,70 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="com.duckduckgo.app.appearance.AppearanceActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/selectedThemeSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsTheme"
+            app:primaryTextTruncated="false"
+            app:secondaryText="@string/settingsSystemTheme" />
+
+        <LinearLayout
+            android:id="@+id/changeAppIconSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/changeAppIconLabel"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/oneLineItemHeight"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/changeIconCtaLabel"
+                app:typography="body1" />
+
+            <ImageView
+                android:id="@+id/changeAppIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/keyline_6"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:importantForAccessibility="no"
+                tools:srcCompat="@mipmap/ic_launcher_red_round" />
+
+        </LinearLayout>
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/selectedFireAnimationSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsFireAnimation"
+            app:primaryTextTruncated="false"
+            app:secondaryText="@string/settingsHeroFireAnimation" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

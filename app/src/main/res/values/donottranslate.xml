@@ -46,4 +46,7 @@
     <!-- Permissions and Privacy -->
     <string name="permissionsAndPrivacyActivityTitle">Permissions and Privacy</string>
 
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Appearance</string>
+
 </resources>
