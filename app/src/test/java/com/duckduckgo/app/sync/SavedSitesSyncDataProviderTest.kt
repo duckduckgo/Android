@@ -21,7 +21,6 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -329,7 +328,7 @@ class SavedSitesSyncDataProviderTest {
 
         val changes = parser.changesSince(lastSyncTimestamp)
         assertTrue(changes.isNotEmpty())
-        assertTrue(changes.size == 1)
+        assertTrue(changes.size == 2)
         assertTrue(changes[0].id == bookmarksRootFolder.id)
         assertTrue(changes[0].folder!!.children == listOf(subFolder.id))
         assertTrue(changes[1].id == subFolder.id)

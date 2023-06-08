@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.sync.algorithm.isDeleted
 import com.duckduckgo.sync.api.SyncCrypto
@@ -34,7 +33,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
@@ -74,7 +72,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
                 updates.add(deletedEntry(folder.id, folder.deleted!!))
             } else {
                 val folderEntry = addFolderEntry(folder.id)
-                if (folderEntry != null){
+                if (folderEntry != null) {
                     updates.add(folderEntry)
                 }
             }
@@ -142,7 +140,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     private fun addFolderEntryWithContent(
         folderId: String,
-        updates: MutableList<SyncBookmarkEntry>
+        updates: MutableList<SyncBookmarkEntry>,
     ): List<SyncBookmarkEntry> {
         repository.getAllFolderContentSync(folderId).apply {
             val folder = repository.getFolder(folderId)
