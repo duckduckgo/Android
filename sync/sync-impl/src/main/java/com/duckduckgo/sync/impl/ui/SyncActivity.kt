@@ -16,9 +16,11 @@
 
 package com.duckduckgo.sync.impl.ui
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -98,6 +100,12 @@ class SyncActivity : DuckDuckGoActivity() {
         // no-op
     }
 
+    var launcher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onDeviceConnected()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -133,7 +141,7 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command) {
         when (it) {
             LaunchDeviceSetupFlow -> {
-                startActivity(SetupAccountActivity.intentStartSetupFlow(this))
+                launcher.launch(SetupAccountActivity.intentStartSetupFlow(this))
             }
 
             is ScanQRCode -> {

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -118,8 +119,12 @@ class SaveRecoveryCodeFragment : DuckDuckGoFragment(R.layout.fragment_recovery_c
 
     private fun processCommand(it: Command) {
         when (it) {
-            Error -> requireActivity().finish()
+            Error -> {
+                requireActivity().setResult(Activity.RESULT_CANCELED)
+                requireActivity().finish()
+            }
             is Finish -> {
+                requireActivity().setResult(Activity.RESULT_OK)
                 requireActivity().finish()
             }
             is RecoveryCodePDFSuccess -> {

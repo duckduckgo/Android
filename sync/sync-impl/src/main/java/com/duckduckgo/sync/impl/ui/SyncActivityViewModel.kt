@@ -81,6 +81,7 @@ class SyncActivityViewModel @Inject constructor(
             }
             viewState.value = state
         }.onStart {
+            initViewStateThisDeviceState()
             fetchRemoteDevices()
         }
             .launchIn(viewModelScope)
@@ -93,12 +94,9 @@ class SyncActivityViewModel @Inject constructor(
         } ?: return signedOutState()
 
         val connectedDevices = viewState.value.syncedDevices
-        val thisDevice = syncRepository.getThisConnectedDevice() ?: return signedOutState()
-
-        val syncedDevices = if (connectedDevices.isEmpty()) {
+        val syncedDevices = connectedDevices.ifEmpty {
+            val thisDevice = syncRepository.getThisConnectedDevice() ?: return signedOutState()
             listOf(SyncedDevice(thisDevice))
-        } else {
-            connectedDevices
         }
 
         return ViewState(
@@ -249,6 +247,12 @@ class SyncActivityViewModel @Inject constructor(
                 is Error -> viewState.value = viewState.value.setDevices(oldList)
                 is Success -> fetchRemoteDevices()
             }
+        }
+    }
+
+    fun onDeviceConnected() {
+        viewModelScope.launch {
+            fetchRemoteDevices()
         }
     }
 

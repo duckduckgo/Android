@@ -425,6 +425,23 @@ class SyncActivityViewModelTest {
         }
     }
 
+    @Test
+    fun whenOnDeviceConnectedThenFetchRemoteDevices() = runTest {
+        givenAuthenticatedUser()
+        givenDataObserved()
+
+        val connectedDevices = listOf(connectedDevice, connectedDevice)
+        whenever(syncRepository.getConnectedDevices()).thenReturn(Result.Success(connectedDevices))
+
+        testee.viewState().test {
+            testee.onDeviceConnected()
+
+            val initialState = expectMostRecentItem()
+            assertEquals(connectedDevices.size, initialState.syncedDevices.size)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun Command.assertCommandType(expectedType: KClass<out Command>) {
         assertTrue(format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
     }

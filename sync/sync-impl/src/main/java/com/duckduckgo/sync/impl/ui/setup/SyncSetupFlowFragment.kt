@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Lifecycle
@@ -121,7 +122,10 @@ class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
 
     private fun processCommand(it: Command) {
         when (it) {
-            AbortFlow -> requireActivity().finish()
+            AbortFlow -> {
+                requireActivity().setResult(Activity.RESULT_CANCELED)
+                requireActivity().finish()
+            }
             FinishSetupFlow -> listener?.launchFinishSetupFlow()
             RecoverSyncData -> listener?.recoverYourSyncedData()
             AskSyncAnotherDevice -> listener?.askSyncAnotherDevice()
