@@ -22,8 +22,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState
-import com.duckduckgo.sync.store.model.SyncState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncAttemptState
+import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import junit.framework.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -56,7 +56,7 @@ class SyncStateRepositoryTest {
 
     @Test
     fun whenSyncInProgressThenCurrentReturnsAttempt() {
-        val sync = SyncAttempt(state = SyncState.IN_PROGRESS)
+        val sync = SyncAttempt(state = SyncAttemptState.IN_PROGRESS)
         repository.store(sync)
 
         val current = repository.current()
@@ -65,7 +65,7 @@ class SyncStateRepositoryTest {
 
     @Test
     fun whenSyncStateIsUpdatedThenDaoIsUpdated() {
-        val syncInProgress = SyncAttempt(state = SyncState.IN_PROGRESS)
+        val syncInProgress = SyncAttempt(state = SyncAttemptState.IN_PROGRESS)
         repository.store(syncInProgress)
 
         repository.updateSyncState(SUCCESS)

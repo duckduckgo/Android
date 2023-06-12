@@ -22,7 +22,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState
+import com.duckduckgo.sync.store.model.SyncAttemptState
 
 @Database(
     exportSchema = true,
@@ -42,17 +42,17 @@ object SyncTypeConverters {
 
     @TypeConverter
     @JvmStatic
-    fun toSyncState(state: String): SyncState {
+    fun toSyncState(state: String): SyncAttemptState {
         return try {
-            SyncState.valueOf(state)
+            SyncAttemptState.valueOf(state)
         } catch (t: Throwable) {
-            SyncState.FAIL
+            SyncAttemptState.FAIL
         }
     }
 
     @TypeConverter
     @JvmStatic
-    fun fromSyncState(syncState: SyncState): String {
+    fun fromSyncState(syncState: SyncAttemptState): String {
         return syncState.name
     }
 }

@@ -34,9 +34,9 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState.FAIL
-import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
-import com.duckduckgo.sync.store.model.SyncState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
+import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any

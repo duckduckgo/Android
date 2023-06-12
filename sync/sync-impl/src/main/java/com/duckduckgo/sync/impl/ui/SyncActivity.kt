@@ -127,6 +127,7 @@ class SyncActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
 
         viewModel.commands().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { processCommand(it) }.launchIn(lifecycleScope)
+        viewModel.observeState()
     }
 
     private fun processCommand(it: Command) {
@@ -134,19 +135,23 @@ class SyncActivity : DuckDuckGoActivity() {
             LaunchDeviceSetupFlow -> {
                 startActivity(SetupAccountActivity.intentStartSetupFlow(this))
             }
+
             is ScanQRCode -> {
                 connectFlow.launch(null)
             }
+
             is AskTurnOffSync -> askTurnOffsync(it.device)
             AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
             }
+
             CheckIfUserHasStoragePermission -> {
                 storagePermission.invokeOrRequestPermission {
                     viewModel.generateRecoveryCode(this@SyncActivity)
                 }
             }
+
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
             ShowTextCode -> {

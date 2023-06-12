@@ -23,6 +23,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.api.SyncState.OFF
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
@@ -45,7 +47,9 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -56,6 +60,7 @@ class SyncActivityViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncRepository: SyncRepository,
+    private val syncStateMonitor: SyncStateMonitor,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -63,10 +68,24 @@ class SyncActivityViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewState.emit(initViewStateThisDeviceState())
-        fetchRemoteDevices()
-    }.flowOn(dispatchers.io())
+    fun viewState(): StateFlow<ViewState> {
+        return viewState
+    }
+
+    fun observeState() {
+        syncStateMonitor.syncState().onEach { syncState ->
+            val state = if (syncState == OFF) {
+                signedOutState()
+            } else {
+                signedInState()
+            }
+            viewState.value = state
+        }.onStart {
+            initViewStateThisDeviceState()
+            fetchRemoteDevices()
+        }
+            .launchIn(viewModelScope)
+    }
 
     private suspend fun signedInState(): ViewState {
         val qrBitmap = withContext(dispatchers.io()) {
@@ -83,12 +102,14 @@ class SyncActivityViewModel @Inject constructor(
         )
     }
 
-    private suspend fun initViewStateThisDeviceState(): ViewState {
-        if (!syncRepository.isSignedIn()) {
-            return signedOutState()
+    private suspend fun initViewStateThisDeviceState() {
+        val state = if (!syncRepository.isSignedIn()) {
+            signedOutState()
+        } else {
+            signedInState()
         }
 
-        return signedInState()
+        viewState.value = state
     }
 
     data class ViewState(
@@ -112,7 +133,7 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onToggleClicked(isChecked: Boolean) {
         viewModelScope.launch {
-            viewState.emit(viewState.value.toggle(isChecked))
+            viewState.value = viewState.value.toggle(isChecked)
             when (isChecked) {
                 true -> command.send(LaunchDeviceSetupFlow)
                 false -> {
@@ -125,22 +146,24 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private suspend fun fetchRemoteDevices() {
-        viewState.emit(viewState.value.showDeviceListItemLoading())
-        val result = syncRepository.getConnectedDevices()
+        viewState.value = viewState.value.showDeviceListItemLoading()
+        val result = withContext(dispatchers.io()) {
+            syncRepository.getConnectedDevices()
+        }
         if (result is Success) {
             val newState = viewState.value.hideDeviceListItemLoading().setDevices(result.data.map { SyncedDevice(it) })
-            viewState.emit(newState)
+            viewState.value = newState
         } else {
-            viewState.emit(viewState.value.hideDeviceListItemLoading())
+            viewState.value = viewState.value.hideDeviceListItemLoading()
         }
     }
 
     fun onTurnOffSyncConfirmed(connectedDevice: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
-            viewState.emit(viewState.value.hideAccount())
+            viewState.value = viewState.value.hideAccount()
             when (syncRepository.logout(connectedDevice.deviceId)) {
-                is Error -> viewState.emit(viewState.value.toggle(true).showAccount())
-                is Success -> viewState.emit(signedOutState())
+                is Error -> viewState.value = viewState.value.toggle(true).showAccount()
+                is Success -> viewState.value = signedOutState()
             }
         }
     }
@@ -153,17 +176,17 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onDeleteAccountClicked() {
         viewModelScope.launch {
-            viewState.emit(viewState.value.toggle(false))
+            viewState.value = viewState.value.toggle(false)
             command.send(AskDeleteAccount)
         }
     }
 
     fun onDeleteAccountConfirmed() {
         viewModelScope.launch(dispatchers.io()) {
-            viewState.emit(viewState.value.hideAccount())
+            viewState.value = viewState.value.hideAccount()
             when (syncRepository.deleteAccount()) {
-                is Error -> viewState.emit(viewState.value.toggle(true).showAccount())
-                is Success -> viewState.emit(signedOutState())
+                is Error -> viewState.value = viewState.value.toggle(true).showAccount()
+                is Success -> viewState.value = signedOutState()
             }
         }
     }
@@ -203,9 +226,9 @@ class SyncActivityViewModel @Inject constructor(
     fun onRemoveDeviceConfirmed(device: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
             val oldList = viewState.value.syncedDevices
-            viewState.emit(viewState.value.showDeviceListItemLoading(device))
+            viewState.value = viewState.value.showDeviceListItemLoading(device)
             when (syncRepository.logout(device.deviceId)) {
-                is Error -> viewState.emit(viewState.value.setDevices(oldList))
+                is Error -> viewState.value = viewState.value.setDevices(oldList)
                 is Success -> fetchRemoteDevices()
             }
         }
@@ -214,9 +237,9 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeviceEdited(editedConnectedDevice: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
             val oldList = viewState.value.syncedDevices
-            viewState.emit(viewState.value.showDeviceListItemLoading(editedConnectedDevice))
+            viewState.value = viewState.value.showDeviceListItemLoading(editedConnectedDevice)
             when (syncRepository.renameDevice(editedConnectedDevice)) {
-                is Error -> viewState.emit(viewState.value.setDevices(oldList))
+                is Error -> viewState.value = viewState.value.setDevices(oldList)
                 is Success -> fetchRemoteDevices()
             }
         }
@@ -234,11 +257,11 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun showAccountDetailsIfNeeded() {
+    private fun showAccountDetailsIfNeeded() {
         if (syncRepository.isSignedIn()) {
-            viewState.emit(viewState.value.toggle(true).showAccount())
+            viewState.value = viewState.value.toggle(true).showAccount()
         } else {
-            viewState.emit(signedOutState())
+            viewState.value = signedOutState()
         }
     }
 

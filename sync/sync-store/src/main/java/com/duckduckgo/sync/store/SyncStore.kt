@@ -24,6 +24,7 @@ interface SyncStore {
         secretKey: String,
         token: String,
     )
+
     fun clearAll()
 }
 
@@ -36,6 +37,12 @@ constructor(
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
+
+    init {
+        appCoroutineScope.launch {
+            isSignedInStateFlow.emit(isSignedIn())
+        }
+    }
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
@@ -137,6 +144,7 @@ constructor(
             isSignedInStateFlow.emit(true)
         }
     }
+
     override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
         appCoroutineScope.launch {

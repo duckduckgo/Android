@@ -187,6 +187,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         val notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
         viewModel.start(notificationsEnabled)
         viewModel.startPollingVpnState()
+        viewModel.startPollingSyncEnableState()
     }
 
     override fun onResume() {

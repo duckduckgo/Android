@@ -19,8 +19,8 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
-import com.duckduckgo.sync.store.model.SyncState.FAIL
-import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
+import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import org.threeten.bp.Duration

@@ -25,15 +25,15 @@ import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState.FAIL
-import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
-import com.duckduckgo.sync.store.model.SyncState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
+import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 class RealSyncStateMonitor @Inject constructor(
@@ -48,23 +48,33 @@ class RealSyncStateMonitor @Inject constructor(
                 mapState(attempt, signedIn)
             }
             .flowOn(dispatcherProvider.io())
-            .distinctUntilChanged()
+    }
+
+    override fun isUserSignedInOnDevice(): Boolean {
+        return syncStore.isSignedIn()
     }
 
     private fun mapState(
         attempt: SyncAttempt?,
         signedIn: Boolean,
     ): SyncState {
-        if (!signedIn) {
+        Timber.d("Sync-Feature: Sync Monitor map state attempt $attempt, signedId $signedIn")
+        val state = if (signedIn) {
+            if (attempt == null) {
+                Timber.d("Sync-Feature: Sync Monitor signed in, READY state")
+                SyncState.READY
+            } else {
+                Timber.d("Sync-Feature: Sync Monitor signed in, sync in ${attempt.state} state")
+                when (attempt.state) {
+                    IN_PROGRESS -> SyncState.IN_PROGRESS
+                    SUCCESS -> SyncState.READY
+                    FAIL -> FAILED
+                }
+            }
+        } else {
+            Timber.d("Sync-Feature: Sync Monitor not signed in, OFF state")
             return OFF
         }
-        if (attempt == null) {
-            return OFF
-        }
-        return when (attempt.state) {
-            IN_PROGRESS -> SyncState.IN_PROGRESS
-            SUCCESS -> SyncState.READY
-            FAIL -> FAILED
-        }
+        return state
     }
 }

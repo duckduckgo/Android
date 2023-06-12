@@ -27,6 +27,11 @@ interface SyncStateMonitor {
      * * else it will map the state to the last [SyncAttempt]
      */
     fun syncState(): Flow<SyncState>
+
+    /**
+     * Checks if user is signed in on this device.
+     */
+    fun isUserSignedInOnDevice(): Boolean
 }
 
 enum class SyncState {

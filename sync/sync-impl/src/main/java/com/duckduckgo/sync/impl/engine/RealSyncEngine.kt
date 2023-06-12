@@ -40,9 +40,9 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState.FAIL
-import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
-import com.duckduckgo.sync.store.model.SyncState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
+import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import org.threeten.bp.Duration
@@ -85,14 +85,15 @@ class RealSyncEngine @Inject constructor(
 
     private fun sendLocalData() {
         Timber.d("Sync-Feature: initiating first sync")
+        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
         getChanges().forEach {
             if (it.isEmpty()) {
                 Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
+                syncStateRepository.updateSyncState(SUCCESS)
                 return
             }
 
             Timber.d("Sync-Feature: sending ${it.type} local data $it")
-            syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
             patchLocalChanges(it, REMOTE_WINS)
         }
     }
@@ -110,6 +111,7 @@ class RealSyncEngine @Inject constructor(
         getChanges().forEach {
             if (it.isEmpty()) {
                 Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
+                syncStateRepository.updateSyncState(SUCCESS)
                 return
             } else {
                 Timber.d("Sync-Feature: ${it.type}  sending local data $it")

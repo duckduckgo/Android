@@ -18,16 +18,19 @@ package com.duckduckgo.savedsites.impl.sync
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.SyncState.OFF
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -38,28 +41,43 @@ import timber.log.Timber
 class SavedSitesSyncDataObserver @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val syncEngine: SyncEngine,
-    private val deviceSyncState: DeviceSyncState,
+    private val syncStateMonitor: SyncStateMonitor,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
+    private var dataObserverJob: Job? = null
     private var initialised: Boolean = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        if (deviceSyncState.isUserSignedInOnDevice()) {
-            Timber.d("Sync-Feature: Listening to changes in Saved Sites")
-            coroutineScope.launch(dispatcherProvider.io()) {
-                savedSitesRepository.lastModified().collect {
-                    if (initialised) {
+        syncStateMonitor.syncState()
+            .onEach { state ->
+                when (state) {
+                    OFF -> cancelSavedSitesChanges()
+                    else -> observeSavedSitesChanges()
+                }
+            }
+            .launchIn(coroutineScope)
+    }
+
+    private fun observeSavedSitesChanges() {
+        if (dataObserverJob == null) {
+            dataObserverJob = coroutineScope.launch {
+                if (initialised) {
+                    savedSitesRepository.lastModified().onEach {
                         Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
                         syncEngine.triggerSync(DATA_CHANGE)
-                    } else {
-                        Timber.d("Sync-Feature: Changes to Saved Sites initialised")
-                        initialised = true
                     }
+                } else {
+                    initialised = true
+                    Timber.d("Sync-Feature: Listening for changes to Saved Sites")
                 }
             }
         }
+    }
+
+    private fun cancelSavedSitesChanges() {
+        Timber.d("Sync-Feature: Sync is OFF, not listening to changes to Saved Sites")
+        dataObserverJob?.cancel()
     }
 }

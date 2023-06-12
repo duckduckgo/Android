@@ -17,9 +17,9 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState.FAIL
-import com.duckduckgo.sync.store.model.SyncState.IN_PROGRESS
-import com.duckduckgo.sync.store.model.SyncState.SUCCESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
+import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
+import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
