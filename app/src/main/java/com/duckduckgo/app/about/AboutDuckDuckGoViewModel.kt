@@ -67,7 +67,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
-    fun start() {
+    fun onStartActivityCalled() {
         val variant = variantManager.getVariant()
 
         viewModelScope.launch {

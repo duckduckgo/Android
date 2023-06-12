@@ -19,7 +19,6 @@ package com.duckduckgo.app.about
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -48,7 +47,11 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
         if (resultOk) {
-            Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
+            Snackbar.make(
+                binding.root,
+                R.string.thanksForTheFeedback,
+                Snackbar.LENGTH_LONG,
+            ).show()
         }
     }
 
@@ -68,7 +71,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
 
-        viewModel.start()
+        viewModel.onStartActivityCalled()
     }
 
     override fun onResume() {
