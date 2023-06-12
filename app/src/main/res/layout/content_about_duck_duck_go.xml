@@ -30,10 +30,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
         android:orientation="vertical"
-        android:paddingBottom="10dp"
+        android:paddingTop="@dimen/keyline_7"
+        android:paddingBottom="@dimen/keyline_5"
         tools:ignore="UseCompoundDrawables">
 
         <ImageView
@@ -41,14 +40,15 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
             android:contentDescription="@string/duckDuckGoLogoDescription"
             app:srcCompat="@drawable/logo_full" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginBottom="@dimen/keyline_4"
             android:text="@string/duckDuckGoPrivacySimplified"
             android:textAlignment="center"
@@ -57,6 +57,8 @@
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="@dimen/keyline_6"
+            android:paddingEnd="@dimen/keyline_6"
             android:text="@string/aboutDescription"
             android:textAlignment="center"
             app:textType="secondary"
@@ -67,12 +69,38 @@
             android:id="@+id/learnMoreLink"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginTop="10dp"
+            android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginBottom="10dp"
             android:text="@string/aboutMoreLink"
             android:textAlignment="center"
             android:textColor="?attr/daxColorAccentBlue"
             app:typography="body1_bold" />
 
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:id="@+id/aboutPrivacyPolicy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsPrivacyPolicyDuckduckgo" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/aboutVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsVersion"
+            tools:secondaryText="123.43.5456" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:id="@+id/aboutProvideFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/leaveFeedback" />
+
     </LinearLayout>
+
 </ScrollView>

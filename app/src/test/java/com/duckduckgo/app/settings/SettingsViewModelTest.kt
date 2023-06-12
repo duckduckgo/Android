@@ -543,4 +543,16 @@ class SettingsViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenAppearanceSettingClickedThenEmitCommandLaunchAppearanceScreenAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onAppearanceSettingClicked()
+
+            assertEquals(Command.LaunchAppearanceScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_APPEARANCE_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
