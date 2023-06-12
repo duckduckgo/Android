@@ -71,7 +71,7 @@ class AppearanceViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
-    fun start() {
+    fun onStartActivityCalled() {
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
@@ -90,6 +90,7 @@ class AppearanceViewModel @Inject constructor(
 
     fun userRequestedToChangeIcon() {
         viewModelScope.launch { command.send(Command.LaunchAppIcon) }
+        pixel.fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
     }
 
     fun userRequestedToChangeFireAnimation() {

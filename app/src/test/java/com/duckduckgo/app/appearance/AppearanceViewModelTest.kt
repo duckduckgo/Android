@@ -81,8 +81,8 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
-    fun whenStartCalledThenViewStateEmittedWithDefaultValues() = runTest {
-        testee.start()
+    fun whenOnStartActivityCalledThenViewStateEmittedWithDefaultValues() = runTest {
+        testee.onStartActivityCalled()
 
         testee.viewState().test {
             val value = awaitItem()
@@ -113,11 +113,12 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
-    fun whenChangeIconRequestedThenCommandIsChangeIcon() = runTest {
+    fun whenChangeIconRequestedThenCommandIsChangeIconAndPixelSent() = runTest {
         testee.commands().test {
             testee.userRequestedToChangeIcon()
 
             assertEquals(Command.LaunchAppIcon, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }

@@ -64,7 +64,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
 
-        viewModel.start()
+        viewModel.onStartActivityCalled()
     }
 
     private fun configureUiEventHandlers() {
