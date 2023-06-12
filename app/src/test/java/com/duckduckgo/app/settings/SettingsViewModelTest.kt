@@ -491,4 +491,28 @@ class SettingsViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenPermissionsAndPrivacySettingClickedThenEmitCommandLaunchPermissionsAndPrivacyScreenAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onPermissionsAndPrivacySettingClicked()
+
+            assertEquals(Command.LaunchPermissionsAndPrivacyScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_PERMISSIONS_AND_PRIVACY_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAppearanceSettingClickedThenEmitCommandLaunchAppearanceScreenAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onAppearanceSettingClicked()
+
+            assertEquals(Command.LaunchAppearanceScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_APPEARANCE_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }
