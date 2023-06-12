@@ -50,6 +50,7 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistReposito
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
@@ -129,6 +130,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockWindowsDownloadLinkToggle: Toggle
 
+    @Mock
+    private lateinit var mockSyncStateMonitor: SyncStateMonitor
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -178,6 +182,7 @@ class SettingsViewModelTest {
             windowsWaitlist,
             windowsFeature,
             deviceSyncState,
+            mockSyncStateMonitor,
             mockNetPWaitlistRepository,
             mockWindowsDownloadLinkFeature,
             coroutineTestRule.testDispatcherProvider,
