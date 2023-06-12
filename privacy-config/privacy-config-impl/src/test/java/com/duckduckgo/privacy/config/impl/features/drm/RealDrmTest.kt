@@ -18,9 +18,11 @@ package com.duckduckgo.privacy.config.impl.features.drm
 
 import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
@@ -36,8 +38,10 @@ class RealDrmTest {
 
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockDrmRepository: DrmRepository = mock()
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
+    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
 
-    val testee: RealDrm = RealDrm(mockFeatureToggle, mockDrmRepository)
+    val testee: RealDrm = RealDrm(mockFeatureToggle, mockDrmRepository, mockUserAllowListRepository, mockUnprotectedTemporary)
 
     @Test
     fun whenGetDrmPermissionsForRequestIfFeatureIsEnabledAndProtectedMediaIdIsRequestedThenPermissionIsReturned() {
@@ -91,6 +95,34 @@ class RealDrmTest {
         assertEquals(0, value.size)
     }
 
+    @Test
+    fun whenGetDrmPermissionsForRequestAndIsInUserAllowListThenNoPermissionsAreReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsNotInExceptionList()
+        givenUriIsInUserAllowList()
+
+        val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        val url = "https://open.spotify.com"
+
+        val value = testee.getDrmPermissionsForRequest(url, permissions)
+
+        assertEquals(0, value.size)
+    }
+
+    @Test
+    fun whenGetDrmPermissionsForRequestAndIsInUnprotectedTemporaryThenNoPermissionsAreReturned() {
+        giveFeatureIsEnabled()
+        givenUrlIsNotInExceptionList()
+        givenUrlIsInUnprotectedTemporary()
+
+        val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        val url = "https://open.spotify.com"
+
+        val value = testee.getDrmPermissionsForRequest(url, permissions)
+
+        assertEquals(0, value.size)
+    }
+
     private fun giveFeatureIsEnabled() {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.DrmFeatureName.value), any())).thenReturn(true)
     }
@@ -102,5 +134,13 @@ class RealDrmTest {
 
     private fun givenUrlIsNotInExceptionList() {
         whenever(mockDrmRepository.exceptions).thenReturn(CopyOnWriteArrayList<DrmException>())
+    }
+
+    private fun givenUriIsInUserAllowList() {
+        whenever(mockUserAllowListRepository.isUriInUserAllowList(any())).thenReturn(true)
+    }
+
+    private fun givenUrlIsInUnprotectedTemporary() {
+        whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(true)
     }
 }
