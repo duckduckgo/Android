@@ -113,6 +113,8 @@ class SettingsViewModel @Inject constructor(
         object LaunchSyncSettings : Command()
         object LaunchPrivateSearchWebPage : Command()
         object LaunchWebTrackingProtectionWebPage : Command()
+        object LaunchPermissionsAndPrivacyScreen : Command()
+        object LaunchAppearanceScreen : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -260,6 +262,16 @@ class SettingsViewModel @Inject constructor(
 
     fun onSyncSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
+    }
+
+    fun onPermissionsAndPrivacySettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchPermissionsAndPrivacyScreen) }
+        pixel.fire(SETTINGS_PERMISSIONS_AND_PRIVACY_PRESSED)
+    }
+
+    fun onAppearanceSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAppearanceScreen) }
+        pixel.fire(SETTINGS_APPEARANCE_PRESSED)
     }
 
     fun onLaunchedFromNotification(pixelName: String) {

@@ -30,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
+import com.duckduckgo.app.appearance.AppearanceActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
@@ -38,6 +39,7 @@ import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState
@@ -151,6 +153,8 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
+            permissionsAndPrivacySetting.setClickListener { viewModel.onPermissionsAndPrivacySettingClicked() }
+            appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
         }
@@ -250,6 +254,8 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchSyncSettings -> launchSyncSettings()
             is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchWebPage()
             is Command.LaunchWebTrackingProtectionWebPage -> launchWebTrackingProtectionWebPage()
+            is Command.LaunchPermissionsAndPrivacyScreen -> launchPermissionsAndPrivacyScreen()
+            is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             null -> TODO()
         }
     }
@@ -393,6 +399,16 @@ class SettingsActivity : DuckDuckGoActivity() {
                 getString(R.string.settingsWebTrackingProtectionTitle),
             ),
         )
+    }
+
+    private fun launchPermissionsAndPrivacyScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(PermissionsAndPrivacyActivity.intent(this), options)
+    }
+
+    private fun launchAppearanceScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(AppearanceActivity.intent(this), options)
     }
 
     companion object {
