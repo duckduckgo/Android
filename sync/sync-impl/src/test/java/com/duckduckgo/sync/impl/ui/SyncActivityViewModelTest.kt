@@ -24,6 +24,7 @@ import com.duckduckgo.sync.TestSyncFixtures.connectedDevice
 import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
+import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
@@ -38,6 +39,8 @@ import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -50,6 +53,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -64,6 +68,8 @@ class SyncActivityViewModelTest {
     private val recoveryPDF: RecoveryCodePDF = mock()
     private val syncRepository: SyncRepository = mock()
     private val syncStateMonitor: SyncStateMonitor = mock()
+
+    private val stateFlow = MutableStateFlow(SyncState.READY)
 
     private lateinit var testee: SyncActivityViewModel
 
@@ -81,6 +87,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenUserSignedInThenDeviceSyncViewStateIsEnabled() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -92,6 +99,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenUserSignedInThenShowAccount() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -103,6 +111,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenUserSignedInThenLoginQRCodeIsNotNull() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -114,11 +123,13 @@ class SyncActivityViewModelTest {
     @Test
     fun whenUserHasMultipleConnectedDevicesThenShowDevices() = runTest {
         givenAuthenticatedUser()
+
         val connectedDevices = listOf(connectedDevice, connectedDevice)
         whenever(syncRepository.getConnectedDevices()).thenReturn(Result.Success(connectedDevices))
 
+        givenDataObserved()
         testee.viewState().test {
-            val initialState = awaitItem()
+            val initialState = expectMostRecentItem()
             assertEquals(connectedDevices.size, initialState.syncedDevices.size)
             cancelAndIgnoreRemainingEvents()
         }
@@ -148,6 +159,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenToggleDisabledThenAskTurnOffSync() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
 
         testee.onToggleClicked(false)
 
@@ -170,6 +182,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenLogoutSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
 
         testee.viewState().test {
@@ -186,6 +200,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenLogoutErrorThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
 
         testee.onTurnOffSyncConfirmed(connectedDevice)
@@ -201,6 +217,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenTurnOffSyncCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
 
         testee.viewState().test {
             testee.onTurnOffSyncCancelled()
@@ -223,6 +240,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenDeleteAccountSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.deleteAccount()).thenReturn(Result.Success(true))
 
         testee.viewState().test {
@@ -239,6 +258,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenDeleteAccountErrorThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.deleteAccount()).thenReturn(Result.Error(reason = "error"))
 
         testee.onDeleteAccountConfirmed()
@@ -264,6 +285,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenDeleteAccountCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
 
         testee.viewState().test {
             testee.onDeleteAccountCancelled()
@@ -287,6 +309,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenOnRemoveDeviceConfirmedThenRemoveDevice() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
 
         testee.onRemoveDeviceConfirmed(connectedDevice)
@@ -297,16 +321,20 @@ class SyncActivityViewModelTest {
     @Test
     fun whenOnRemoveDeviceSucceedsThenFetchRemoteDevices() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
 
         testee.onRemoveDeviceConfirmed(connectedDevice)
 
-        verify(syncRepository).getConnectedDevices()
+        verify(syncRepository, times(2)).getConnectedDevices()
     }
 
     @Test
     fun whenOnRemoveDeviceSucceedsThenReturnUpdateDevices() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Success(true))
 
         testee.viewState().test {
@@ -323,6 +351,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenOnRemoveDeviceFailsThenRestorePreviousList() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
 
         testee.viewState().test {
@@ -336,6 +366,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenOnDeviceEditedThenUpdateDevice() = runTest {
         givenAuthenticatedUser()
+        givenDataObserved()
+
         whenever(syncRepository.renameDevice(any())).thenReturn(Result.Success(true))
 
         testee.viewState().test {
@@ -399,9 +431,14 @@ class SyncActivityViewModelTest {
 
     private fun givenAuthenticatedUser() {
         whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncStateMonitor.syncState()).thenReturn(stateFlow.asStateFlow())
         whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
         whenever(qrEncoder.encodeAsBitmap(any(), any(), any())).thenReturn(qrBitmap())
+    }
+
+    private fun givenDataObserved() {
+        testee.observeState()
     }
 }

@@ -81,7 +81,6 @@ class SyncActivityViewModel @Inject constructor(
             }
             viewState.value = state
         }.onStart {
-            initViewStateThisDeviceState()
             fetchRemoteDevices()
         }
             .launchIn(viewModelScope)
@@ -92,13 +91,21 @@ class SyncActivityViewModel @Inject constructor(
             val recoveryCode = syncRepository.getRecoveryCode() ?: return@withContext null
             qrEncoder.encodeAsBitmap(recoveryCode, R.dimen.qrSizeLarge, R.dimen.qrSizeLarge)
         } ?: return signedOutState()
-        val connectedDevice = syncRepository.getThisConnectedDevice() ?: return signedOutState()
+
+        val connectedDevices = viewState.value.syncedDevices
+        val thisDevice = syncRepository.getThisConnectedDevice() ?: return signedOutState()
+
+        val syncedDevices = if (connectedDevices.isEmpty()) {
+            listOf(SyncedDevice(thisDevice))
+        } else {
+            connectedDevices
+        }
 
         return ViewState(
             syncToggleState = syncRepository.isSignedIn(),
             showAccount = syncRepository.isSignedIn(),
             loginQRCode = qrBitmap,
-            syncedDevices = listOf(SyncedDevice(connectedDevice)),
+            syncedDevices = syncedDevices,
         )
     }
 

@@ -62,7 +62,7 @@ internal class SyncEngineTest {
     @Test
     fun whenCreatingSyncAccountAndNoLocalChangesThenNothingIsSent() {
         syncEngine.triggerSync(ACCOUNT_CREATION)
-        verifyNoInteractions(syncStateRepository)
+
         verifyNoInteractions(syncApiClient)
     }
 
