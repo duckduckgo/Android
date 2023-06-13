@@ -35,8 +35,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object OnboardingCustomizationExperiment : VariantFeature()
-
         object OneEasyStepForPrivacyRemoteMessage : VariantFeature()
         object BlockingTrackersAcrossWebRemoteMessage : VariantFeature()
         object NextLevelPrivacyRemoteMessage : VariantFeature()
@@ -57,8 +55,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.OnboardingCustomizationExperiment), filterBy = { noFilter() }),
 
             // Experiment: Increase retention through AppTP promotions
             Variant(key = "ze", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
@@ -197,9 +193,6 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 }
-
-fun VariantManager.isOnboardingCustomizationExperimentEnabled() =
-    this.getVariant().hasFeature(VariantManager.VariantFeature.OnboardingCustomizationExperiment)
 
 fun VariantManager.isOneEasyStepForPrivacyRemoteMessageEnabled() = this.getVariant().hasFeature(OneEasyStepForPrivacyRemoteMessage)
 fun VariantManager.isBlockingTrackersAcrossWebRemoteMessageEnabled() = this.getVariant().hasFeature(BlockingTrackersAcrossWebRemoteMessage)

@@ -39,6 +39,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
@@ -162,6 +163,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is ShowCredentialMode -> showCredentialMode()
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Username)
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar(CopiedToClipboardDataType.Password)
+            is OfferUserUndoDeletion -> showUserCredentialDeletedWithUndoAction(command)
             is ShowListMode -> showListMode()
             is ShowDisabledMode -> showDisabledMode()
             is ShowDeviceUnsupportedMode -> showDeviceUnsupportedMode()
@@ -186,6 +188,16 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is CopiedToClipboardDataType.Password -> R.string.autofillManagementPasswordCopied
         }
         Snackbar.make(binding.root, getString(stringResourceId), Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun showUserCredentialDeletedWithUndoAction(command: OfferUserUndoDeletion) {
+        val snackbar = Snackbar.make(binding.root, R.string.autofillManagementDeletedConfirmation, Snackbar.LENGTH_LONG)
+        if (command.credentials != null) {
+            snackbar.setAction(R.string.autofillManagementUndoDeletion) {
+                viewModel.reinsertCredentials(command.credentials)
+            }
+        }
+        snackbar.show()
     }
 
     private fun showListMode() {
@@ -284,6 +296,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             searchBar.hideKeyboard()
         }
     }
+
     private fun isSearchBarVisible(): Boolean = binding.searchBar.isVisible
 
     override fun onBackPressed() {

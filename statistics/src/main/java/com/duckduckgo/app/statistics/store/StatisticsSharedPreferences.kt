@@ -59,8 +59,7 @@ class StatisticsSharedPreferences @Inject constructor(private val context: Conte
         preferences.edit { putString(KEY_ATB, null) }
     }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.app.statistics"

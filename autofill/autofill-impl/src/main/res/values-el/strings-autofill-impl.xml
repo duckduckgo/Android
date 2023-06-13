@@ -26,13 +26,13 @@
     <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Όχι τώρα</string>
-    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια μόνο σε αυτή τη συσκευή και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
+    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια στη συσκευή σας και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
     <string name="saveLoginDialogTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
     <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένων στοιχείων σύνδεσης;</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Σύνδεση για %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Σύνδεση για τον ιστότοπο</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Κωδικός πρόσβασης για %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Κωδικός πρόσβασης για τον ιστότοπο</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Από αυτόν τον ιστότοπο</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Από %1$s</string>
 
@@ -65,7 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα στοιχεία σύνδεσης</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια μόνο σε αυτήν τη συσκευή.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
 
     <string name="autofillManagementAddLogin">Προσθήκη στοιχείων σύνδεσης</string>
     <string name="autofillManagementSearchLogins">Αναζήτηση στοιχείων σύνδεσης</string>
@@ -78,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Το όνομα χρήστη αντιγράφηκε</string>
     <string name="autofillManagementPasswordCopied">Ο κωδικός πρόσβασης αντιγράφηκε</string>
+
+    <string name="autofill_password_generation_offer_title">Χρήση κωδικού πρόσβασης που δημιουργήθηκε από το DuckDuckGo;</string>
+    <string name="autofill_password_generation_offer_message">Ο κωδικός πρόσβασης θα αποθηκευτεί στις Συνδέσεις.</string>
+    <string name="autofill_password_generation_offer_accept">Χρήση του κωδικού πρόσβασης που δημιουργήθηκε</string>
+    <string name="autofill_password_generation_offer_decline">Δημιουργία δικού μου</string>
+
+    <string name="deviceNotSupportedTitle">Η συσκευή δεν υποστηρίζεται</string>
+    <string name="deviceNotSupportedSubtitle">Για ασφαλή αποθήκευση των στοιχείων σύνδεσής σας, πρέπει να τα κρυπτογραφήσουμε και να τα αποθηκεύσουμε στη συσκευή σας. Καθώς η συσκευή σας δεν υποστηρίζει κρυπτογραφημένο χώρο αποθήκευσης, τα στοιχεία σύνδεσης δεν είναι διαθέσιμα.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Η σύνδεση διαγράφηκε</string>
+    <string name="autofillManagementUndoDeletion">Αναίρεση</string>
 
 </resources>

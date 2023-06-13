@@ -31,8 +31,8 @@
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
     <string name="useSavedLoginDialogTitle">Naudoti išsaugotą prisijungimą?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Prisijungimas prie %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Prisijungimas prie svetainės</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">„%1$s“ slaptažodis</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Svetainės slaptažodis</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Iš šios svetainės</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Iš %1$s</string>
 
@@ -65,7 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų prisijungimų</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai saugomi tik šiame įrenginyje.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai laikomi jūsų įrenginyje.</string>
 
     <string name="autofillManagementAddLogin">Pridėti prisijungimą</string>
     <string name="autofillManagementSearchLogins">Ieškoti prisijungimų</string>
@@ -78,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Naudotojo vardas nukopijuotas</string>
     <string name="autofillManagementPasswordCopied">Slaptažodis nukopijuotas</string>
+
+    <string name="autofill_password_generation_offer_title">Naudoti sugeneruotą slaptažodį iš „DuckDuckGo“?</string>
+    <string name="autofill_password_generation_offer_message">Slaptažodis bus išsaugotas prisijungimų lange.</string>
+    <string name="autofill_password_generation_offer_accept">Naudoti sugeneruotą slaptažodį</string>
+    <string name="autofill_password_generation_offer_decline">Sukurti savo</string>
+
+    <string name="deviceNotSupportedTitle">Nepalaikomas įrenginys</string>
+    <string name="deviceNotSupportedSubtitle">Norėdami saugiai laikyti prisijungimus, turime juos užšifruoti ir išsaugoti jūsų įrenginyje. Kadangi jūsų įrenginys nepalaiko šifruoto saugojimo, prisijungimai nepasiekiami.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Prisijungimas ištrintas</string>
+    <string name="autofillManagementUndoDeletion">Anuliuoti</string>
 
 </resources>

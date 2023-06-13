@@ -45,8 +45,7 @@ class AppReferenceSharePreferences @Inject constructor(private val context: Cont
         get() = preferences.getBoolean(KEY_INSTALLED_FROM_EU_AUCTION, false)
         set(value) = preferences.edit(true) { putBoolean(KEY_INSTALLED_FROM_EU_AUCTION, value) }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.referral"

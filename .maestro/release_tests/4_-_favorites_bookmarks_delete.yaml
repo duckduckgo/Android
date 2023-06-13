@@ -1,0 +1,49 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+    text: "search or type URL"
+- inputText: "https://privacy-test-pages.glitch.me"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: ".*keep browsing.*"
+- tapOn:
+    text: "got it"
+# Add favorite from menu button
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "add favorite"
+- tapOn:
+    text: "add favorite"
+# Navigate to bookmarks screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "bookmarks"
+- tapOn:
+    text: "bookmarks"
+# Remove favorite from bookmarks screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    index: 0
+- assertVisible:
+    text: "Delete"
+- tapOn:
+    text: "delete"
+# When a favorite is removed, it still stays as Bookmark
+- assertVisible:
+    text: "No favorites added yet"
+- assertNotVisible:
+    text: "No bookmarks added yet"
+# Undo Snackbar should be visible
+- assertVisible: "Undo"

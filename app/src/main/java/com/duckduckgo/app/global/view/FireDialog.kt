@@ -40,6 +40,8 @@ import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAl
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.mobile.android.R as CommonR
@@ -63,6 +65,7 @@ class FireDialog(
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
     private val appCoroutineScope: CoroutineScope,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -199,6 +202,7 @@ class FireDialog(
             canRestart = true
             if (event is ClearAllDataFinished) {
                 binding.fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+                featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.FIRE_BUTTON_USED)
             }
         } else {
             clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)

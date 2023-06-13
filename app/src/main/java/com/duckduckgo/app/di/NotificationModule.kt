@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.di
 
-import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -39,12 +38,6 @@ import dagger.SingleInstanceIn
 
 @Module(includes = [DaoModule::class])
 object NotificationModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideNotificationManager(context: Context): NotificationManager {
-        return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
 
     @Provides
     @SingleInstanceIn(AppScope::class)

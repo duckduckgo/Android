@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.di
 
 import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
@@ -25,9 +26,12 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistDataStoreSharedPreferences
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionRepository
+import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -46,6 +50,24 @@ class DataModule {
     fun provideNetPWaitlistRepository(
         vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
     ): NetPWaitlistRepository = RealNetPWaitlistRepository(NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider))
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun bindNetPDatabase(context: Context): NetPDatabase {
+        return Room.databaseBuilder(context, NetPDatabase::class.java, "vpn-netp.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .addMigrations(*NetPDatabase.ALL_MIGRATIONS.toTypedArray())
+            .build()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideAppTrackerLoader(
+        database: NetPDatabase,
+    ): NetPExclusionListRepository {
+        return RealNetPExclusionListRepository(database.exclusionListDao())
+    }
 }
 
 @Module

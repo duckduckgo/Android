@@ -29,7 +29,9 @@ import android.util.SparseArray
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
@@ -52,6 +54,12 @@ interface TextInput {
 
     fun addTextChangedListener(textWatcher: TextWatcher)
     fun removeTextChangedListener(textWatcher: TextWatcher)
+    fun setEndIcon(
+        @DrawableRes endIconRes: Int,
+        contentDescription: String? = null,
+    )
+
+    fun removeEndIcon()
 
     fun onAction(actionHandler: (Action) -> Unit)
 
@@ -81,7 +89,7 @@ class DaxTextInput @JvmOverloads constructor(
         ).apply {
             text = getString(R.styleable.DaxTextInput_android_text).orEmpty()
             getDrawable(R.styleable.DaxTextInput_endIcon)?.let {
-                setupEndIcon(it, getString(R.styleable.DaxTextInput_endIconContentDescription).orEmpty())
+                setupEndIconDrawable(it, getString(R.styleable.DaxTextInput_endIconContentDescription).orEmpty())
             }
 
             // This needs to be done after we know that the view has the end icon set
@@ -165,13 +173,31 @@ class DaxTextInput @JvmOverloads constructor(
         binding.internalEditText.removeTextChangedListener(textWatcher)
     }
 
+    override fun setEndIcon(
+        endIconRes: Int,
+        contentDescription: String?,
+    ) {
+        ContextCompat.getDrawable(context, endIconRes)?.let {
+            setupEndIconDrawable(it, contentDescription.orEmpty())
+        }
+    }
+
+    override fun removeEndIcon() {
+        binding.internalInputLayout.apply {
+            endIconMode = END_ICON_NONE
+            endIconDrawable = null
+            isEndIconVisible = false
+            endIconContentDescription = null
+        }
+    }
+
     override fun onAction(actionHandler: (Action) -> Unit) {
         binding.internalInputLayout.setEndIconOnClickListener {
             actionHandler(PerformEndAction)
         }
     }
 
-    private fun setupEndIcon(
+    private fun setupEndIconDrawable(
         drawable: Drawable,
         contentDescription: String,
     ) {

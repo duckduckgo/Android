@@ -17,7 +17,10 @@
 package com.duckduckgo.app.global.formatters.time
 
 import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 
 class DatabaseDateFormatter {
@@ -35,6 +38,19 @@ class DatabaseDateFormatter {
 
         fun timestamp(date: LocalDateTime = LocalDateTime.now()): String {
             return FORMATTER_SECONDS.format(date)
+        }
+
+        fun iso8601(date: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)): String {
+            return date.format(DateTimeFormatter.ISO_INSTANT)
+        }
+
+        fun millisIso8601(date: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)): Long {
+            return date.toInstant().toEpochMilli()
+        }
+
+        fun parseMillisIso8601(offsetDateMillis: Long): String {
+            val odt = OffsetDateTime.ofInstant(Instant.ofEpochMilli(offsetDateMillis), ZoneOffset.UTC)
+            return odt.format(DateTimeFormatter.ISO_INSTANT)
         }
 
         fun duration(

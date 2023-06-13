@@ -67,14 +67,132 @@ In the built output you will see these dramatic differences in the bundled code 
 
 ### Features scope injection utilities
 
-To handle the difference in scope injection we expose multiple utilities which behave differently per browser in src/utils.js. for Firefox the code exposed handles [xrays correctly](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts) without needing the features to be authored differently.
+To handle the difference in scope injection we expose multiple utilities which behave differently per browser in src/utils.js and src/wrapper-utils.js. for Firefox the code exposed handles [xrays correctly](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts) without needing the features to be authored differently.
 
-- defineProperty
-    - defineProperty(object, propertyName, descriptor) behaves the same as Object.defineProperty(object, propertyName, descriptor) 
+- defineProperty()
+    - defineProperty(object, propertyName, descriptor) behaves the same as Object.defineProperty(object, propertyName, descriptor)
     - The difference is for Firefox we export the relevant functions so it can go across the xray
+- wrapProperty(object, propertyName, descriptor)
+    - a simple wrapper around defineProperty() that ignores non-existing properties and retains unspecified descriptor keys.
+    - Example usage: `wrapProperty('Navigator.prototype.userAgent', { get: () => 'fakeUA' })`
+- wrapMethod(object, propertyName, wrapperFn)
+    - overrides a native method. wrapperFn() will be called in place of the original method. The original method will be passed as the first argument.
+    - Example usage:
+    ```
+    wrapMethod(Permissions.prototype, 'query', async function (originalFn, queryObject) {
+        if (queryObject.name === 'blocked-permission') {
+            return {
+                name: queryObject.name,
+                state: 'denied',
+                status: 'denied'
+            }
+        }
+        return await nativeImpl.call(this, queryObject)
+    })
+    ```
+
+- wrapConstructor(object, propertyName, wrapperFn)
+    - overrides a constructor. It works similar to `wrapMethod()`, but handles extra constructor-specific details
+    - Example usage:
+    ```
+    wrapConstructor(window, 'Date', function (originalConstructor, ...args) {
+        // always return the same date
+        return new originalConstructor(1995, 11, 17)
+    })
+    ```
+
 - DDGProxy
     - Behaves a lot like new window.Proxy with a few differences:
         - has an overload function to actually apply the function to the native property.
         - Stores the native original property in _native such that it can be called elsewhere if needed without going through the proxy.
 - DDGReflect
     - Calls into wrappedJSObject.Reflect for Firefox but otherwise exactly the same as [window.Reflect](Sources/BrowserServicesKit/UserScript/ContentScopeUserScript.swift) 
+
+### Testing Locally
+
+Depending on what you are changing, you may need to run the build processes locally, or individual tests. 
+The following all run within GitHub Actions when you create a pull request, but you can run them locally as well.
+
+- eslint
+- Typescript 
+- Unit tests (jasmine)
+- Feature Integration Tests (puppeteer)
+- Feature Integration Tests (playwright)
+- Special Pages Integration Tests (playwright)
+- Feature Build process + Special Pages Build process
+
+If you want to get a good feeling for whether a PR or CI run will pass/fail, you can run the `test` command 
+which chains most of the following together
+
+```shell
+# run this if you want some confidence that your PR will pass
+npm test
+```
+
+#### eslint
+
+```shell
+# run eslint to check for errors
+npm run lint
+
+# run eslint and attempt to fix errors
+npm run lint-fix
+```
+
+#### Typescript
+
+```shell
+# run Typescript to check for errors
+npm run tsc
+
+# run Typescript in watch mode
+npm run tsc-watch
+```
+
+#### Unit Tests (jasmine)
+
+Everything for unit-testing is located in the `unit-test` folder. Jasmine configuration is in `unit-test/jasmine.json`.
+
+```shell
+npm run test-unit
+```
+
+#### Feature Integration Tests (puppeteer)
+
+Everything within `integration-test` (minus the playwright folder) is controlled by Jasmine + Puppeteer.
+The configuration is within `integration-test/config.js`
+
+Note: when you run this command, it will also be executed all workspaces too. For example, within `packages/special-pages` 
+
+```shell
+npm run test-int
+```
+
+#### Feature Integration Tests (playwright)
+Everything within `integration-test/playwright` is integration tests controlled by Playwright. These should be defaulted
+to for any new tests that include UI elements (such as click to load)
+
+```shell
+npm run playwright
+```
+
+#### Special Pages Integration Tests (playwright)
+There are tests within `packages/special-pages/tests` that are dedicated to testing the special pages.
+These tests will be ran automatically when you execute `npm run test-int` from the root. But during development
+you might find it useful to run them individually.
+
+```shell
+cd packages/special-pages
+npm run test-int
+```
+
+#### Feature Build process
+
+To produce all artefacts that are used by platforms, just run the `npm run build` command.
+This will create platform specific code within the `build` folder (that is not checked in)
+
+```shell
+npm run build
+```
+
+Note: This will also execute the build process witin `packages/special-pages`

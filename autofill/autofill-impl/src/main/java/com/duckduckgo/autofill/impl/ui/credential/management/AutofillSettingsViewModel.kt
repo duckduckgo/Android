@@ -21,6 +21,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -32,6 +34,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
@@ -70,6 +73,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val credentialListFilter: CredentialListFilter,
     private val faviconManager: FaviconManager,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -319,7 +323,10 @@ class AutofillSettingsViewModel @Inject constructor(
             loginCredentials.domain?.let {
                 faviconManager.deletePersistedFavicon(it)
             }
-            autofillStore.deleteCredentials(credentialsId)
+            val existingCredentials = autofillStore.deleteCredentials(credentialsId)
+            addCommand(OfferUserUndoDeletion(existingCredentials))
+
+            Timber.i("Deleted $existingCredentials")
         }
     }
 
@@ -332,6 +339,12 @@ class AutofillSettingsViewModel @Inject constructor(
             } else if (credentialMode is EditingNewEntry) {
                 saveNewCredential(credentials)
             }
+        }
+    }
+
+    fun reinsertCredentials(credentials: LoginCredentials) {
+        viewModelScope.launch(dispatchers.io()) {
+            autofillStore.reinsertCredentials(credentials)
         }
     }
 
@@ -350,6 +363,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     private suspend fun saveNewCredential(updatedCredentials: LoginCredentials) {
+        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
         autofillStore.saveCredentials(
             rawUrl = updatedCredentials.domain ?: "",
             credentials = updatedCredentials,
@@ -428,10 +442,8 @@ class AutofillSettingsViewModel @Inject constructor(
         class ShowUserUsernameCopied : Command()
         class ShowUserPasswordCopied : Command()
 
-        /**
-         * [credentials] Credentials to be used to render the credential view
-         * [isLaunchedDirectly] if true it means that the credential view was launched directly and didn't have to go through the management screen.
-         */
+        class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
+
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
         object ShowDisabledMode : Command()

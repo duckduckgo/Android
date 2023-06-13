@@ -26,13 +26,13 @@
     <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Teď ne</string>
-    <string name="saveLoginDialogSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení a dají se spravovat v nabídce Přihlášení v Nastaveních.</string>
+    <string name="saveLoginDialogSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení a dají se spravovat v nabídce Přihlášení v Nastavení.</string>
     <string name="saveLoginDialogTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použít uložené přihlášení?</string>
-    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Přihlášení pro %1$s</string>
-    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Přihlášení k webu</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Heslo pro %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Heslo pro web</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z této webové stránky</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Ze stránky %1$ss</string>
 
@@ -65,7 +65,7 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložené žádné přihlašovací údaje</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje jsou bezpečně uložené jen v tomhle zařízení.</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení.</string>
 
     <string name="autofillManagementAddLogin">Přidat přihlášení</string>
     <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>
@@ -78,5 +78,16 @@
 
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
+
+    <string name="autofill_password_generation_offer_title">Použít heslo vygenerované DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Heslo se uloží do části Přihlášení.</string>
+    <string name="autofill_password_generation_offer_accept">Použít vygenerované heslo</string>
+    <string name="autofill_password_generation_offer_decline">Vytvořit vlastní</string>
+
+    <string name="deviceNotSupportedTitle">Zařízení není podporované</string>
+    <string name="deviceNotSupportedSubtitle">Abychom mohli přihlašovací údaje bezpečně ukládat, musíme je zašifrovat a uložit do tvého zařízení. Protože tvoje zařízení nepodporuje šifrované úložiště, přihlašovací údaje není možné ukládat.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Přihlašovací údaje smazány</string>
+    <string name="autofillManagementUndoDeletion">Vrátit</string>
 
 </resources>

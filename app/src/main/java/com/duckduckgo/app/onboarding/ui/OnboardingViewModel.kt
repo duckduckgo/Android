@@ -23,14 +23,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isOnboardingCustomizationExperimentEnabled
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
-import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
@@ -38,17 +32,7 @@ class OnboardingViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val pageLayoutManager: OnboardingPageManager,
     private val dispatchers: DispatcherProvider,
-    private val variantManager: VariantManager,
 ) : ViewModel() {
-
-    private val command = Channel<Command>(1, DROP_OLDEST)
-    internal fun commands(): Flow<Command> = command.receiveAsFlow()
-
-    fun determineScreenOrientation() {
-        if (variantManager.isOnboardingCustomizationExperimentEnabled()) {
-            viewModelScope.launch { command.send(Command.ForceToPortraitForMobileDevices) }
-        }
-    }
 
     fun initializePages() {
         pageLayoutManager.buildPageBlueprints()
@@ -67,9 +51,5 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             userStageStore.stageCompleted(AppStage.NEW)
         }
-    }
-
-    internal sealed class Command {
-        object ForceToPortraitForMobileDevices : Command()
     }
 }

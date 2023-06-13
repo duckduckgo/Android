@@ -55,8 +55,12 @@ class AppDatabaseBookmarksMigrationCallback(
 
     private fun addRootFolders() {
         with(appDatabase.get()) {
-            syncEntitiesDao().insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER))
-            syncEntitiesDao().insert(Entity(SavedSitesNames.BOOMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "", FOLDER))
+            if (syncEntitiesDao().entityById(SavedSitesNames.BOOKMARKS_ROOT) == null) {
+                syncEntitiesDao().insert(Entity(SavedSitesNames.BOOKMARKS_ROOT, SavedSitesNames.BOOKMARKS_NAME, "", FOLDER, lastModified = null))
+            }
+            if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_ROOT) == null) {
+                syncEntitiesDao().insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER, lastModified = null))
+            }
         }
     }
 
@@ -81,6 +85,7 @@ class AppDatabaseBookmarksMigrationCallback(
                     val entity = Entity(UUID.randomUUID().toString(), it.title, it.url, BOOKMARK)
                     entitiesMigration.add(entity)
                     favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
+                    favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = entity.entityId))
                 }
             }
 
@@ -124,7 +129,7 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (parentId == SavedSitesNames.BOOMARKS_ROOT_ID) {
-                    relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
+                    relations.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = entity.entityId))
                 } else {
                     relations.add(Relation(folderId = folderMap[parentId]!!, entityId = entity.entityId))
                 }
@@ -135,7 +140,7 @@ class AppDatabaseBookmarksMigrationCallback(
                 entities.add(entity)
 
                 if (parentId == SavedSitesNames.BOOMARKS_ROOT_ID) {
-                    relations.add(Relation(folderId = SavedSitesNames.BOOMARKS_ROOT, entityId = entity.entityId))
+                    relations.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = entity.entityId))
                 } else {
                     relations.add(Relation(folderId = folderMap[parentId]!!, entityId = entity.entityId))
                 }

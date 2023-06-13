@@ -60,7 +60,18 @@ class RealPrivacyConfigPersister @Inject constructor(
         val currentPluginHashCode = privacyFeaturePluginPoint.signature()
         val previousPluginHashCode = persisterPreferences.getSignature()
 
-        if (newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)) {
+        val shouldPersist = newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
+
+        Timber.v(
+            "Should persist privacy config: %s. version=(existing: %s, new: %s), hash=(existing: %s, new: %s)",
+            shouldPersist,
+            previousVersion,
+            newVersion,
+            previousPluginHashCode,
+            currentPluginHashCode,
+        )
+
+        if (shouldPersist) {
             database.runInTransaction {
                 persisterPreferences.setSignature(currentPluginHashCode)
                 privacyFeatureTogglesRepository.deleteAll()
@@ -74,14 +85,6 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
             }
-        } else {
-            Timber.v(
-                "Privacy config persistence not required; version=(existing: %s, new: %s), hash=(existing: %s, new: %s)",
-                previousVersion,
-                newVersion,
-                previousPluginHashCode,
-                currentPluginHashCode,
-            )
         }
     }
 

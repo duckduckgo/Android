@@ -209,8 +209,7 @@ class SettingsSharedPreferences @Inject constructor(
         return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
     }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     private fun defaultIcon(): AppIcon {
         return if (appBuildConfig.isDebug) {

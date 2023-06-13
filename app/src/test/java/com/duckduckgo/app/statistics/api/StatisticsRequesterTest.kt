@@ -43,7 +43,8 @@ class StatisticsRequesterTest {
             return listOf()
         }
     }
-    private var testee: StatisticsRequester = StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins, mockEmailManager)
+    private var testee: StatisticsRequester =
+        StatisticsRequester(mockStatisticsStore, mockService, mockVariantManager, plugins, mockEmailManager)
 
     @get:Rule
     @Suppress("unused")

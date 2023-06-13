@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.config
 
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress
@@ -45,4 +46,10 @@ interface NetPDefaultConfigProvider {
 data class PcapConfig(val filename: String, val snapLen: Int, val fileSize: Int)
 
 @ContributesBinding(VpnScope::class)
-class RealNetPDefaultConfigProvider @Inject constructor() : NetPDefaultConfigProvider
+class RealNetPDefaultConfigProvider @Inject constructor(
+    private val netPExclusionListRepository: NetPExclusionListRepository,
+) : NetPDefaultConfigProvider {
+    override fun exclusionList(): Set<String> {
+        return netPExclusionListRepository.getExcludedAppPackages().toSet()
+    }
+}

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.db
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -69,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 46,
+    version = 47,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -572,7 +573,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    private val MIGRATION_43_TO_44: Migration = object : Migration(43, 44) {
+    val MIGRATION_43_TO_44: Migration = object : Migration(43, 44) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `tds_cname_entity` (`cloakedHostName` TEXT NOT NULL, " +
@@ -581,7 +582,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    private val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
+    val MIGRATION_44_TO_45: Migration = object : Migration(44, 45) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `entities` (`entityId` TEXT NOT NULL, " +
@@ -598,6 +599,14 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
     private val MIGRATION_45_TO_46: Migration = object : Migration(45, 46) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("DROP TABLE `UncaughtExceptionEntity`")
+        }
+    }
+
+    private val MIGRATION_46_TO_47: Migration = object : Migration(46, 47) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `entities` ADD COLUMN `lastModified` TEXT")
+            database.execSQL("ALTER TABLE `entities` ADD COLUMN `deleted` INTEGER NOT NULL DEFAULT 0")
+            database.execSQL("UPDATE `entities` SET deleted=0")
         }
     }
 
@@ -672,6 +681,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_43_TO_44,
             MIGRATION_44_TO_45,
             MIGRATION_45_TO_46,
+            MIGRATION_46_TO_47,
         )
 
     @Deprecated(
@@ -683,15 +693,15 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         private val keyVersion = "com.duckduckgo.app.onboarding.currentVersion"
         private val currentVersion = 1
 
+        private val preferences: SharedPreferences by lazy { context.getSharedPreferences(fileName, Context.MODE_PRIVATE) }
+
         fun shouldShow(): Boolean {
-            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getInt(keyVersion, 0) < currentVersion
         }
 
         fun isReturningUser(): Boolean {
             // This was used by the 2 retuning users experiments.
             // First released in 5.103.0 and fully disabled in 5.114.0.
-            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getBoolean("HIDE_TIPS_FOR_RETURNING_USER", false)
         }
     }

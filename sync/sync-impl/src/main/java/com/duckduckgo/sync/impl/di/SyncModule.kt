@@ -17,17 +17,18 @@
 package com.duckduckgo.sync.impl.di
 
 import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
 import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
-import com.duckduckgo.sync.impl.parser.RealSyncCrypter
-import com.duckduckgo.sync.impl.parser.SyncCrypter
+import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
+import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
 import com.duckduckgo.sync.store.SharedPrefsProvider
+import com.duckduckgo.sync.store.SyncDatabase
 import com.duckduckgo.sync.store.SyncSharedPrefsStore
 import com.duckduckgo.sync.store.SyncStore
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -64,20 +65,23 @@ object SyncStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideSyncCrypter(
-        repository: SavedSitesRepository,
-        nativeLib: SyncLib,
-        syncStore: SyncStore,
-    ): SyncCrypter {
-        return RealSyncCrypter(repository, nativeLib, syncStore)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
     fun provideQREncoder(
         context: Context,
     ): QREncoder {
         // create instance of BarcodeEncoder here so we don't need to add third-party dependency to :app module (classpath)
         return AppQREncoder(context, BarcodeEncoder())
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideSyncDatabase(context: Context): SyncDatabase {
+        return Room.databaseBuilder(context, SyncDatabase::class.java, "sync.db")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    fun provideSyncStateRepository(syncDatabase: SyncDatabase): SyncStateRepository {
+        return AppSyncStateRepository(syncDatabase.syncAttemptsDao())
     }
 }

@@ -36,8 +36,7 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
     }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var permissionDeclinedForever: Boolean
         get() = preferences.getBoolean(KEY_DECLINED_PERMISSION_FOREVER, false)

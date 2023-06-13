@@ -33,7 +33,10 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     interface EditSavedSiteListener {
         fun onFavouriteEdited(favorite: Favorite)
-        fun onBookmarkEdited(bookmark: Bookmark, oldFolderId: String)
+        fun onBookmarkEdited(
+            bookmark: Bookmark,
+            oldFolderId: String,
+        )
     }
 
     var listener: EditSavedSiteListener? = null
@@ -80,10 +83,11 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
         when (savedSite) {
             is Bookmark -> {
-                val parentId = arguments?.getString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: SavedSitesNames.BOOMARKS_ROOT
+                val parentId = arguments?.getString(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_ID) ?: SavedSitesNames.BOOKMARKS_ROOT
                 val updatedBookmark = savedSite.copy(title = updatedTitle, url = updatedUrl, parentId = parentId)
                 listener?.onBookmarkEdited(updatedBookmark, savedSite.parentId)
             }
+
             is Favorite -> {
                 listener?.onFavouriteEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl),
@@ -98,9 +102,11 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
                 editable.toString().isBlank() -> {
                     setConfirmationVisibility(ValidationState.INVALID)
                 }
+
                 editable.toString() != getSavedSite().url -> {
                     setConfirmationVisibility(ValidationState.CHANGED)
                 }
+
                 else -> {
                     setConfirmationVisibility(ValidationState.UNCHANGED)
                 }
@@ -127,7 +133,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
         fun instance(
             savedSite: SavedSite,
-            parentFolderId: String = SavedSitesNames.BOOMARKS_ROOT,
+            parentFolderId: String = SavedSitesNames.BOOKMARKS_ROOT,
             parentFolderName: String? = null,
         ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()

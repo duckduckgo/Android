@@ -37,6 +37,7 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
@@ -178,8 +179,14 @@ class TrackerFeedAdapter @Inject constructor(
             tracker?.let { item ->
                 with(activityMessage) {
                     val trackersCount = tracker.trackersTotalCount
-                    val trackingCompanies = tracker.trackingCompanyBadges.size
                     val trackingAppName = item.trackingApp.appDisplayName
+
+                    var trackingCompanies = tracker.trackingCompanyBadges.size
+                    if (tracker.trackingCompanyBadges.last() is TrackerCompanyBadge.Extra) {
+                        // Subtracting 1 since badge sizes contains the Extra icon with amount
+                        trackingCompanies += (tracker.trackingCompanyBadges.last() as TrackerCompanyBadge.Extra).amount - 1
+                    }
+
                     val textToStyle = if (trackersCount == 1) {
                         if (trackingCompanies == 1) {
                             resources.getString(

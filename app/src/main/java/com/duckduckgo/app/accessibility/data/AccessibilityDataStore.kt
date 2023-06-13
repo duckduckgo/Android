@@ -48,8 +48,7 @@ class AccessibilitySettingsSharedPreferences(
         ),
     )
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override val fontSize: Float
         get() {

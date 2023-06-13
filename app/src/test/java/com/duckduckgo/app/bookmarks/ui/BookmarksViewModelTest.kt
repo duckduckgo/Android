@@ -24,6 +24,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -35,6 +36,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.sync.api.engine.SyncEngine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -71,11 +73,14 @@ class BookmarksViewModelTest {
     private val savedSitesRepository: SavedSitesRepository = mock()
     private val faviconManager: FaviconManager = mock()
     private val savedSitesManager: SavedSitesManager = mock()
+    private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
+    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
 
-    private val bookmark = SavedSite.Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOMARKS_ROOT)
-    private val favorite = SavedSite.Favorite(id = "favorite1", title = "title", url = "www.example.com", position = 0)
-    private val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOMARKS_ROOT)
+    private val bookmark =
+        SavedSite.Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+    private val favorite = SavedSite.Favorite(id = "favorite1", title = "title", url = "www.example.com", position = 0, lastModified = "timestamp")
+    private val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
     private val bookmarkFolderItem = BookmarkFolderItem(0, bookmarkFolder, true)
 
     private val testee: BookmarksViewModel by lazy {
@@ -84,7 +89,9 @@ class BookmarksViewModelTest {
             faviconManager,
             savedSitesManager,
             pixel,
+            syncEngine,
             coroutineRule.testDispatcherProvider,
+            mockFeatureSegmentsManager,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
@@ -229,13 +236,13 @@ class BookmarksViewModelTest {
     fun whenFetchEverythingThenUpdateStateWithData() = runTest {
         whenever(savedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite))
         whenever(savedSitesRepository.getBookmarksTree()).thenReturn(listOf(bookmark, bookmark, bookmark))
-        whenever(savedSitesRepository.getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem, bookmarkFolderItem))
+        whenever(savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem, bookmarkFolderItem))
 
         testee.fetchAllBookmarksAndFolders()
 
         verify(savedSitesRepository).getFavoritesSync()
         verify(savedSitesRepository).getBookmarksTree()
-        verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null)
+        verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
 
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
@@ -273,9 +280,9 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
         whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
@@ -291,9 +298,9 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
         whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
@@ -307,9 +314,9 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOMARKS_ROOT)
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2")
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
         testee.insertDeletedFolderBranch(folderBranch)

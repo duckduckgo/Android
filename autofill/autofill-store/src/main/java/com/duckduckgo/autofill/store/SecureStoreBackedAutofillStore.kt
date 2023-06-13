@@ -172,8 +172,10 @@ class SecureStoreBackedAutofillStore(
         return secureStorage.websiteLoginDetailsWithCredentials().map { it.size }
     }
 
-    override suspend fun deleteCredentials(id: Long) {
+    override suspend fun deleteCredentials(id: Long): LoginCredentials? {
+        val existingCredential = secureStorage.getWebsiteLoginDetailsWithCredentials(id)
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
+        return existingCredential?.toLoginCredentials()
     }
 
     override suspend fun updateCredentials(credentials: LoginCredentials): LoginCredentials? {
@@ -227,6 +229,27 @@ class SecureStoreBackedAutofillStore(
 
         Timber.v("Determined match type is %s", matchType.javaClass.simpleName)
         return matchType
+    }
+
+    override suspend fun reinsertCredentials(credentials: LoginCredentials) {
+        val loginDetails = WebsiteLoginDetails(
+            id = credentials.id,
+            domain = credentials.domain,
+            username = credentials.username,
+            domainTitle = credentials.domainTitle,
+            lastUpdatedMillis = credentials.lastUpdatedMillis,
+        )
+        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
+            details = loginDetails,
+            password = credentials.password,
+            notes = credentials.notes,
+        )
+
+        withContext(dispatcherProvider.io()) {
+            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials).also {
+                Timber.d("Reinserted login. %s", it)
+            }
+        }
     }
 
     private fun usernameMatch(

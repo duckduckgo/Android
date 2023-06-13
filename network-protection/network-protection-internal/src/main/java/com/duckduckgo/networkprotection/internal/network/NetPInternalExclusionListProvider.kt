@@ -29,8 +29,13 @@ class NetPInternalExclusionListProvider @Inject constructor(
     private val netPInternalFeatureToggles: NetPInternalFeatureToggles,
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) {
-    private val preferences: SharedPreferences
-        get() = vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+    private val preferences: SharedPreferences by lazy {
+        vpnSharedPreferencesProvider.getSharedPreferences(
+            FILENAME,
+            multiprocess = true,
+            migrate = false,
+        )
+    }
 
     internal fun getExclusionList(): Set<String> {
         if (!netPInternalFeatureToggles.excludeSystemApps().isEnabled()) return excludeManuallySelectedApps()

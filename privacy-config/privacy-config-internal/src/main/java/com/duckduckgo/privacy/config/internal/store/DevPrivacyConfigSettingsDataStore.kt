@@ -39,8 +39,7 @@ class DevPrivacyConfigSettingsDataStoreImpl @Inject constructor(private val cont
         get() = preferences.getBoolean(KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED, enabled) }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     private fun selectedRemotePrivacyConfigUrlSavedValue(): String? {
         return preferences.getString(KEY_SELECTED_REMOTE_PRIVACY_CONFIG, null)

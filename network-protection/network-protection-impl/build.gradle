@@ -71,6 +71,11 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     testImplementation AndroidX.work.testing
 }
+
+ext {
+    NETP_DEBUG_SERVER_TOKEN="${System.getenv('NETP_DEBUG_SERVER_TOKEN')}"
+}
+
 android {
     namespace 'com.duckduckgo.networkprotection.impl'
     anvil {
@@ -83,5 +88,8 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+    defaultConfig {
+        buildConfigField "String", "NETP_DEBUG_SERVER_TOKEN", "\"${NETP_DEBUG_SERVER_TOKEN}\""
     }
 }

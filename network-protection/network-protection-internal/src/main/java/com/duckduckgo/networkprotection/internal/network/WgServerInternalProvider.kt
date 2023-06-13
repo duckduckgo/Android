@@ -16,19 +16,29 @@
 
 package com.duckduckgo.networkprotection.internal.network
 
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.Server
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
+import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.store.remote_config.NetPEgressServer
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
+import javax.inject.Inject
 
-class WgServerInternalProvider constructor(
+@ContributesBinding(
+    scope = AppScope::class,
+    priority = HIGHEST, // binding for internal build wins
+)
+class WgServerInternalProvider @Inject constructor(
     private val netPServerRepository: NetPServerRepository,
+    private val controllerService: WgVpnControllerService,
 ) : WgServerDebugProvider {
     override suspend fun getSelectedServerName(): String? {
         return netPServerRepository.getSelectedServer()?.name
     }
 
-    override suspend fun storeEligibleServers(servers: List<Server>) {
+    override suspend fun cacheServers(servers: List<Server>) {
         servers.map { server ->
             NetPEgressServer(
                 name = server.name,
@@ -40,5 +50,9 @@ class WgServerInternalProvider constructor(
         }.let {
             netPServerRepository.storeServers(it)
         }
+    }
+
+    override suspend fun fetchServers(): List<Server> {
+        return controllerService.getServers().map { it.server }
     }
 }

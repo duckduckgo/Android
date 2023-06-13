@@ -28,6 +28,8 @@ dependencies {
     implementation project(path: ':common')
     implementation project(path: ':common-ui')
     implementation project(path: ':saved-sites-api')
+    implementation project(path: ':sync-api')
+    implementation project(path: ':browser-api')
     api project(path: ':saved-sites-store')
 
     anvil project(path: ':anvil-compiler')
@@ -40,6 +42,11 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.core.ktx
     implementation 'org.jsoup:jsoup:_'
+    implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
 
     // Testing dependencies
     testImplementation project(path: ':common-test')

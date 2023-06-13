@@ -27,6 +27,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.BOOKMARKS_IMPORTED
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -39,6 +41,8 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -51,7 +55,9 @@ class BookmarksViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
+    private val syncEngine: SyncEngine,
     private val dispatcherProvider: DispatcherProvider,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, ViewModel() {
 
     data class ViewState(
@@ -86,6 +92,9 @@ class BookmarksViewModel @Inject constructor(
 
     init {
         viewState.value = ViewState()
+        viewModelScope.launch(dispatcherProvider.io()) {
+            syncEngine.triggerSync(FEATURE_READ)
+        }
     }
 
     override fun onFavouriteEdited(favorite: Favorite) {
@@ -114,6 +123,7 @@ class BookmarksViewModel @Inject constructor(
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         command.value = ShowEditSavedSite(savedSite)
     }
+
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
         if (savedSite is Favorite) {
             command.value = ConfirmDeleteSavedSite(savedSite)
@@ -152,6 +162,9 @@ class BookmarksViewModel @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 command.value = ImportedSavedSites(result)
             }
+            if (result is ImportSavedSitesResult.Success) {
+                featureSegmentsManager.addUserToFeatureSegment(BOOKMARKS_IMPORTED)
+            }
         }
     }
 
@@ -179,7 +192,7 @@ class BookmarksViewModel @Inject constructor(
     fun fetchAllBookmarksAndFolders() {
         viewModelScope.launch(dispatcherProvider.io()) {
             val favorites = savedSitesRepository.getFavoritesSync()
-            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOMARKS_ROOT, null).map { it.bookmarkFolder }
+            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null).map { it.bookmarkFolder }
             val bookmarks = savedSitesRepository.getBookmarksTree()
             withContext(dispatcherProvider.main()) {
                 onSavedSitesItemsChanged(emptyList(), bookmarks, folders)
@@ -218,7 +231,11 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    private fun onSavedSitesItemsChanged(favorites: List<Favorite>, bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>) {
+    private fun onSavedSitesItemsChanged(
+        favorites: List<Favorite>,
+        bookmarks: List<Bookmark>,
+        bookmarkFolders: List<BookmarkFolder>,
+    ) {
         viewState.value = viewState.value?.copy(
             favorites = favorites,
             bookmarks = bookmarks,

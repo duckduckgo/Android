@@ -33,7 +33,11 @@ data class LoginCredentials(
     val lastUpdatedMillis: Long? = null,
 ) : Parcelable {
     override fun toString(): String {
-        return "LoginCredentials(id=$id, domain=$domain, username=$username, password=********," +
-            " domainTitle=$domainTitle, lastUpdatedMillis=$lastUpdatedMillis, notes=$notes"
+        return """
+            LoginCredentials(
+                id=$id, domain=$domain, username=$username, password=********, domainTitle=$domainTitle, 
+                lastUpdatedMillis=$lastUpdatedMillis, notesLength=${notes?.length ?: 0}
+            )
+        """.trimIndent()
     }
 }

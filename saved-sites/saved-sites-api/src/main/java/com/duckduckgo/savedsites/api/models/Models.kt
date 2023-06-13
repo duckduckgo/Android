@@ -31,20 +31,26 @@ sealed class SavedSite(
     open val id: String,
     open val title: String,
     open val url: String,
+    open val lastModified: String?,
+    open val deleted: String? = null,
 ) : Serializable {
     data class Favorite(
         override val id: String,
         override val title: String,
         override val url: String,
+        override val lastModified: String?,
         val position: Int,
-    ) : SavedSite(id, title, url)
+        override val deleted: String? = null,
+    ) : SavedSite(id, title, url, lastModified)
 
     data class Bookmark(
         override val id: String,
         override val title: String,
         override val url: String,
-        val parentId: String = SavedSitesNames.BOOMARKS_ROOT,
-    ) : SavedSite(id, title, url)
+        val parentId: String = SavedSitesNames.BOOKMARKS_ROOT,
+        override val lastModified: String?,
+        override val deleted: String? = null,
+    ) : SavedSite(id, title, url, lastModified)
 }
 
 /**
@@ -73,12 +79,14 @@ data class BookmarkFolder(
     val parentId: String,
     val numBookmarks: Int = 0,
     val numFolders: Int = 0,
+    val lastModified: String? = null,
+    val deleted: String? = null,
 ) : Serializable
 
 object SavedSitesNames {
-    val FAVORITES_ROOT = "favorites_root"
-    val FAVORITES_NAME = "Favorites"
-    val BOOMARKS_ROOT = "bookmarks_root"
-    val BOOKMARKS_NAME = "Bookmarks"
-    val BOOMARKS_ROOT_ID = 0L
+    const val FAVORITES_ROOT = "favorites_root"
+    const val FAVORITES_NAME = "Favorites"
+    const val BOOKMARKS_ROOT = "bookmarks_root"
+    const val BOOKMARKS_NAME = "Bookmarks"
+    const val BOOMARKS_ROOT_ID = 0L
 }

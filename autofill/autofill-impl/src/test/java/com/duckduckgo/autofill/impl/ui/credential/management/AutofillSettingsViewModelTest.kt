@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -55,6 +56,7 @@ class AutofillSettingsViewModelTest {
     private val deviceAuthenticator: DeviceAuthenticator = mock()
     private val credentialListFilter: CredentialListFilter = mock()
     private val faviconManager: FaviconManager = mock()
+    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
@@ -63,6 +65,7 @@ class AutofillSettingsViewModelTest {
         dispatchers = coroutineTestRule.testDispatcherProvider,
         credentialListFilter = credentialListFilter,
         faviconManager = faviconManager,
+        featureSegmentsManager = mockFeatureSegmentsManager,
     )
 
     @Test

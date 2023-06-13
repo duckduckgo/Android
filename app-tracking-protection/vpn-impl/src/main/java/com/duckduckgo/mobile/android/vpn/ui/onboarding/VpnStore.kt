@@ -45,8 +45,13 @@ class SharedPreferencesVpnStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : VpnStore {
 
-    private val preferences: SharedPreferences
-        get() = sharedPreferencesProvider.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, multiprocess = true, migrate = true)
+    private val preferences: SharedPreferences by lazy {
+        sharedPreferencesProvider.getSharedPreferences(
+            DEVICE_SHIELD_ONBOARDING_STORE_PREFS,
+            multiprocess = true,
+            migrate = true,
+        )
+    }
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }

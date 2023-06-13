@@ -27,8 +27,7 @@ class OnboardingSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
         set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"

@@ -82,7 +82,7 @@ class BookmarksMigrationTest {
         whenMigrationApplied()
 
         val relations = savedSitesRelationsDao.relations()
-        assertTrue(relations.size == totalFavorites)
+        assertTrue(relations.size == totalFavorites * 2)
 
         val entities = savedSitesEntitiesDao.entities()
         assertTrue(entities.size == totalFavorites + 2)
@@ -126,7 +126,7 @@ class BookmarksMigrationTest {
         assertTrue(entities.size == totalFolder + bookmarksPerFolder + totalFavorites + ROOT_FOLDERS)
 
         val relations = (savedSitesRelationsDao.relations())
-        assertTrue(relations.size == totalFolder + bookmarksPerFolder + totalFavorites)
+        assertTrue(relations.size == totalFolder + bookmarksPerFolder + totalFavorites + totalFavorites)
     }
 
     @Test
@@ -160,7 +160,7 @@ class BookmarksMigrationTest {
         // two relations migrated, one for bookmarks and another for favorites
         assertTrue(savedSitesRelationsDao.relations().size == 2)
 
-        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOMARKS_ROOT)
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
 
         assertTrue(bookmarks.size == 1)
@@ -177,14 +177,15 @@ class BookmarksMigrationTest {
 
         whenMigrationApplied()
 
-        assertTrue(savedSitesEntitiesDao.entities().size == 2 + ROOT_FOLDERS)
-        assertTrue(savedSitesRelationsDao.relations().size == 2)
+        assertTrue(savedSitesEntitiesDao.entities().size == ROOT_FOLDERS + 2)
+        assertTrue(savedSitesRelationsDao.relations().size == ROOT_FOLDERS + 1)
 
-        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOMARKS_ROOT)
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
 
-        assertTrue(bookmarks.size == 1)
-        assertTrue(bookmarks.first().title == "Bookmark1")
+        assertTrue(bookmarks.size == 2)
+        assertTrue(bookmarks[0].title == "Bookmark1")
+        assertTrue(bookmarks[1].title == "Favorite1")
 
         assertTrue(favorites.size == 1)
         assertTrue(favorites.first().title == "Favorite1")

@@ -27,7 +27,15 @@ data class WebsiteLoginDetailsWithCredentials(
     val details: WebsiteLoginDetails,
     val password: String?,
     val notes: String? = null,
-)
+) {
+    override fun toString(): String {
+        return """
+            WebsiteLoginDetailsWithCredentials(
+                "details=$details, password=********, notesLength=${notes?.length ?: 0}"
+            )
+        """.trimIndent()
+    }
+}
 
 /**
  * Public data class that wraps all data that should only be covered with l1 encryption.
@@ -45,4 +53,12 @@ data class WebsiteLoginDetails(
     val id: Long? = null,
     val domainTitle: String? = null,
     val lastUpdatedMillis: Long? = null,
-)
+) {
+    override fun toString(): String {
+        return """
+            WebsiteLoginDetails(
+                id=$id, username=$username, domainTitle=$domainTitle, lastUpdatedMillis=$lastUpdatedMillis
+            )
+        """.trimIndent()
+    }
+}
