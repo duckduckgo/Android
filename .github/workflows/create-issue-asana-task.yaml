@@ -1,7 +1,7 @@
 name: Create a task
 
 on:
-  issue:
+  issues:
     types: [opened, reopened]
 
 jobs:
