@@ -242,7 +242,6 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        Timber.d("Sync-Feature: new view state $viewState")
         binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.syncToggleState, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 

@@ -55,10 +55,9 @@ class RealSyncStateMonitor @Inject constructor(
     }
 
     private fun mapState(
-        attempt: SyncAttempt?,
+        attempt: SyncAttempt,
         signedIn: Boolean,
     ): SyncState {
-        Timber.d("Sync-Feature: Sync Monitor map state attempt $attempt, signedId $signedIn")
         val state = if (signedIn) {
             if (attempt == null) {
                 Timber.d("Sync-Feature: Sync Monitor signed in, READY state")

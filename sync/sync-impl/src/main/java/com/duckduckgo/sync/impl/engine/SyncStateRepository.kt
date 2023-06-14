@@ -21,10 +21,11 @@ import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 
 interface SyncStateRepository {
 
-    fun state(): Flow<SyncAttempt?>
+    fun state(): Flow<SyncAttempt>
 
     fun store(syncAttempt: SyncAttempt)
 
@@ -36,8 +37,8 @@ interface SyncStateRepository {
 }
 
 class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: SyncAttemptDao) : SyncStateRepository {
-    override fun state(): Flow<SyncAttempt?> {
-        return syncAttemptDao.attempts()
+    override fun state(): Flow<SyncAttempt> {
+        return syncAttemptDao.attempts().filterNotNull()
     }
 
     override fun store(syncAttempt: SyncAttempt) {
