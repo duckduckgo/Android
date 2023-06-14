@@ -1,0 +1,145 @@
+/*
+ * Copyright (c) 2023 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.settings
+
+import android.content.Context
+import android.text.TextUtils
+import android.util.AttributeSet
+import android.view.View
+import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.children
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ViewCheckListItemBinding
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
+import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+
+class CheckListItem @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.checkListItemStyle,
+) : ConstraintLayout(context, attrs, defStyleAttr) {
+
+    private val binding: ViewCheckListItemBinding by viewBinding()
+
+    init {
+        context.obtainStyledAttributes(
+            attrs,
+            R.styleable.CheckListItem,
+            0,
+            R.style.Widget_DuckDuckGo_CheckListItem,
+        ).apply {
+
+            binding.primaryText.text = getString(R.styleable.CheckListItem_primaryText)
+            binding.secondaryText.text = getString(R.styleable.CheckListItem_secondaryText)
+
+            if (hasValue(R.styleable.CheckListItem_primaryTextColorOverlay)) {
+                binding.primaryText.setTextColor(getColorStateList(R.styleable.CheckListItem_primaryTextColorOverlay))
+            }
+
+            val truncated = getBoolean(R.styleable.CheckListItem_primaryTextTruncated, true)
+            if (truncated) {
+                binding.primaryText.maxLines = 1
+                binding.primaryText.ellipsize = TextUtils.TruncateAt.END
+            } else {
+                binding.primaryText.maxLines = Int.MAX_VALUE
+            }
+
+            if (hasValue(R.styleable.CheckListItem_secondaryTextColorOverlay)) {
+                binding.secondaryText.setTextColor(getColorStateList(R.styleable.CheckListItem_secondaryTextColorOverlay))
+            }
+
+            val status = if (hasValue(R.styleable.CheckListItem_itemState)) {
+                CheckItemStatus.from(getInt(R.styleable.CheckListItem_itemState, 0))
+            } else {
+                CheckItemStatus.DISABLED
+            }
+            setItemStatus(status)
+
+            setPillVisible(getBoolean(R.styleable.CheckListItem_showBetaPill, false))
+
+            recycle()
+        }
+    }
+
+    /** Sets the item title */
+    fun setPrimaryText(title: String) {
+        binding.primaryText.text = title
+    }
+
+    /** Sets the item subtitle */
+    fun setSecondaryText(subtitle: String) {
+        binding.secondaryText.text = subtitle
+    }
+
+    /** Sets the item click listener */
+    fun setClickListener(onClick: () -> Unit) {
+        binding.itemContainer.setOnClickListener { onClick() }
+    }
+
+    /** Sets the visibility for the pill image */
+    fun setPillVisible(isVisible: Boolean) {
+        if (isVisible) {
+            binding.betaPill.show()
+        } else {
+            binding.betaPill.gone()
+        }
+    }
+
+    /** Sets the status: enabled, disabled, warning */
+    fun setItemStatus(status: CheckItemStatus) {
+        when (status) {
+            CheckItemStatus.DISABLED -> binding.leadingIcon.setImageResource(R.drawable.ic_check_grey_round_16)
+            CheckItemStatus.ENABLED -> binding.leadingIcon.setImageResource(R.drawable.ic_check_green_round_16)
+            CheckItemStatus.WARNING -> binding.leadingIcon.setImageResource(R.drawable.ic_exclamation_yellow_16)
+        }
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        setEnabledOpacity(enabled)
+        recursiveEnable(enabled)
+        super.setEnabled(enabled)
+    }
+
+    fun View.recursiveEnable(enabled: Boolean) {
+        (this as? ViewGroup)?.children?.forEach {
+            it.isEnabled = enabled
+            it.recursiveEnable(enabled)
+        }
+    }
+
+    enum class CheckItemStatus {
+        DISABLED,
+        ENABLED,
+        WARNING,
+        ;
+
+        companion object {
+            fun from(value: Int): CheckItemStatus {
+                // same order as attrs-settings-check-list-item.xml
+                return when (value) {
+                    0 -> DISABLED
+                    1 -> ENABLED
+                    2 -> WARNING
+                    else -> DISABLED
+                }
+            }
+        }
+    }
+}

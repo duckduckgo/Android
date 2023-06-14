@@ -34,6 +34,9 @@
     <string name="netpUnlockedSnackbarAction">Open</string>
 
     <!-- Settings -->
+    <string name="settingsDefaultBrowserTitle">Default Browser</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is your default browser</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Make DuckDuckGo your default browser</string>
     <string name="settingsPrivateSearchTitle">Private Search</string>
     <string name="settingsPrivateSearchDescription">Enabled by default</string>
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
