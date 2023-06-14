@@ -68,4 +68,12 @@
         app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
         app:showBetaPill="true" />
 
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/netpPSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/netpSettingsTitle"
+        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
+        app:showBetaPill="true" />
+
 </LinearLayout>

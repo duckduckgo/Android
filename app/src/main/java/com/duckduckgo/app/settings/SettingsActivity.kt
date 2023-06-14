@@ -147,6 +147,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
+            netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
 
         with(viewsSettings) {
@@ -162,7 +163,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         with(viewsMore) {
             macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
             windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
-            netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
     }
 
@@ -288,7 +288,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateNetPSettings(networkProtectionState: NetPState, networkProtectionWaitlistState: NetPWaitlistState) {
-        with(viewsMore) {
+        with(viewsPrivacy) {
             when (networkProtectionWaitlistState) {
                 NetPWaitlistState.InBeta -> {
                     netpPSetting.show()
