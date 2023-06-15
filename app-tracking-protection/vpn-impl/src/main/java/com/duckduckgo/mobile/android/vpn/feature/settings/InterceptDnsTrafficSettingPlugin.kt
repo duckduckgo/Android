@@ -46,7 +46,7 @@ class InterceptDnsTrafficSettingPlugin @Inject constructor(
         return false
     }
 
-    override val settingName: SettingName = AppTpSetting.InterceptDnsTraffic
+    override val settingName: SettingName = AppTpSetting.InterceptDnsRequests
 
     private data class JsonConfigModel(val state: String?)
 }

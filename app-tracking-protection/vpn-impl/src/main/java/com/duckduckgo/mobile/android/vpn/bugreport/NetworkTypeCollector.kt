@@ -23,7 +23,12 @@ import android.net.ConnectivityManager.NetworkCallback
 import android.os.SystemClock
 import androidx.core.content.edit
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
+import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -31,8 +36,10 @@ import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
+import java.net.InetAddress
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -54,11 +61,15 @@ import org.json.JSONObject
 @SingleInstanceIn(VpnScope::class)
 class NetworkTypeCollector @Inject constructor(
     private val context: Context,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : VpnStateCollectorPlugin, VpnServiceCallbacks {
 
     private val databaseDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val adapter = Moshi.Builder().build().adapter(NetworkInfo::class.java)
+
+    private val isPrivateDnsSupportEnabled: Boolean
+        get() = appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)
 
     private val preferences: SharedPreferences
         get() = context.getHarmonySharedPreferences(FILENAME)
@@ -74,6 +85,8 @@ class NetworkTypeCollector @Inject constructor(
     private val cellularNetworkRequest = NetworkRequest.Builder()
         .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
         .build()
+
+    private val privateDnsRequest = NetworkRequest.Builder().build()
 
     private val wifiNetworkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -99,6 +112,42 @@ class NetworkTypeCollector @Inject constructor(
         }
     }
 
+    private val privateDnsCallback = object : NetworkCallback() {
+        private var privateDnsCacheValue: String? = null
+
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            super.onLinkPropertiesChanged(network, linkProperties)
+            logcat { "onLinkPropertiesChanged: $linkProperties" }
+            logcat { "network: $network" }
+
+            val shouldRestart = AtomicBoolean(false)
+
+            // check for Android Private DNS setting
+            val privateDnsServerName = context.getPrivateDnsServerName()
+            logcat {
+                """
+                    isPrivateDnsActive = ${context.isPrivateDnsActive()}, server = ${context.getPrivateDnsServerName()}
+                    (${runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }})
+                """.trimIndent()
+            }
+
+            // Check if VPN reconfiguration is needed
+            if (isPrivateDnsSupportEnabled && privateDnsCacheValue != privateDnsServerName) {
+                logcat { "Private DNS changed, should reconfigure VPN" }
+                shouldRestart.set(true)
+            }
+
+            // update values cached values anyways
+            privateDnsCacheValue = privateDnsServerName
+            if (shouldRestart.getAndSet(false)) {
+                logcat { "Reconfiguring VPN now" }
+                coroutineScope.launch {
+                    TrackerBlockingVpnService.restartVpnService(context)
+                }
+            }
+        }
+    }
+
     override val collectorName = "networkInfo"
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject = withContext(databaseDispatcher) {
@@ -109,6 +158,7 @@ class NetworkTypeCollector @Inject constructor(
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
             it.safeRegisterNetworkCallback(wifiNetworkRequest, wifiNetworkCallback)
             it.safeRegisterNetworkCallback(cellularNetworkRequest, cellularNetworkCallback)
+            it.safeRegisterNetworkCallback(privateDnsRequest, privateDnsCallback)
         }
     }
 
@@ -119,6 +169,7 @@ class NetworkTypeCollector @Inject constructor(
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
             it.safeUnregisterNetworkCallback(wifiNetworkCallback)
             it.safeUnregisterNetworkCallback(cellularNetworkCallback)
+            it.safeUnregisterNetworkCallback(privateDnsCallback)
         }
     }
 
