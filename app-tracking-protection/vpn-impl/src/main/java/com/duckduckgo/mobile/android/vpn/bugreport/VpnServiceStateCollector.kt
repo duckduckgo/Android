@@ -17,6 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import android.content.Context
+import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
+import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
@@ -29,13 +31,19 @@ class VpnServiceStateCollector @Inject constructor(
     private val context: Context,
 ) : VpnStateCollectorPlugin {
 
-    override val collectorName: String
-        get() = "vpnServiceState"
+    override val collectorName: String = "vpnServiceState"
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
             // VPN on/off state
             put("enabled", TrackerBlockingVpnService.isServiceRunning(context).toString())
+            put("privateDns", runCatching { getPrivateDnsServerName() }.getOrDefault(""))
         }
+    }
+
+    private fun getPrivateDnsServerName(): String {
+        // return "unknown" when private DNS is enabled but we can't get the server name, otherwise ""
+        val default = if (context.isPrivateDnsActive()) "unknown" else ""
+        return context.getPrivateDnsServerName() ?: default
     }
 }
