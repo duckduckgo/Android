@@ -72,7 +72,8 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun consumeIntentExtra() {
         val survey = intent.getSerializableExtra(SURVEY_EXTRA) as Survey
-        viewModel.start(survey)
+        val surveySource = intent.getSerializableExtra(SURVEY_SOURCE_EXTRA) as SurveySource
+        viewModel.start(survey, surveySource)
     }
 
     private fun configureListeners() {
@@ -146,13 +147,21 @@ class SurveyActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             survey: Survey,
+            source: SurveySource,
         ): Intent {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
+            intent.putExtra(SURVEY_SOURCE_EXTRA, source)
             return intent
         }
 
         const val SURVEY_EXTRA = "SURVEY_EXTRA"
+        const val SURVEY_SOURCE_EXTRA = "SURVEY_SOURCE_EXTRA"
+
+        enum class SurveySource {
+            PUSH,
+            IN_APP,
+        }
     }
 
     inner class SurveyWebViewClient : WebViewClient() {

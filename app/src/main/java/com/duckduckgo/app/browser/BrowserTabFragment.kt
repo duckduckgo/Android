@@ -165,6 +165,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
+import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -2588,7 +2589,7 @@ class BrowserTabFragment :
 
     private fun launchSurvey(survey: Survey) {
         context?.let {
-            startActivity(SurveyActivity.intent(it, survey))
+            startActivity(SurveyActivity.intent(it, survey, SurveySource.IN_APP))
         }
     }
 

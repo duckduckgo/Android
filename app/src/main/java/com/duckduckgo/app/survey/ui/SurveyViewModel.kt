@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -52,11 +53,13 @@ class SurveyViewModel @Inject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private lateinit var survey: Survey
+    private lateinit var source: SurveySource
     private var didError = false
 
-    fun start(survey: Survey) {
+    fun start(survey: Survey, source: SurveySource) {
         val url = survey.url ?: return
         this.survey = survey
+        this.source = source
         command.value = Command.LoadSurvey(addSurveyParameters(url))
     }
 
@@ -70,6 +73,7 @@ class SurveyViewModel @Inject constructor(
             .appendQueryParameter(SurveyParams.APP_VERSION, appBuildConfig.versionName)
             .appendQueryParameter(SurveyParams.MANUFACTURER, appBuildConfig.manufacturer)
             .appendQueryParameter(SurveyParams.MODEL, appBuildConfig.model)
+            .appendQueryParameter(SurveyParams.SOURCE, source.name.lowercase())
 
         return urlBuilder.build().toString()
     }
@@ -109,5 +113,7 @@ class SurveyViewModel @Inject constructor(
         const val APP_VERSION = "ddgv"
         const val MANUFACTURER = "man"
         const val MODEL = "mo"
+        const val LAST_ACTIVE_DATE="da"
+        const val SOURCE = "src"
     }
 }

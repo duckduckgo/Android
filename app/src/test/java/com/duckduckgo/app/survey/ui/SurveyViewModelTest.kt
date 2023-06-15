@@ -28,6 +28,7 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.concurrent.TimeUnit
@@ -65,6 +66,7 @@ class SurveyViewModelTest {
     private var mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: SurveyViewModel
+    private val testSource = SurveySource.IN_APP
 
     @Before
     fun before() {
@@ -92,7 +94,7 @@ class SurveyViewModelTest {
         val url = "https://survey.com"
         val captor = argumentCaptor<Command.LoadSurvey>()
 
-        testee.start(Survey("", url, null, SCHEDULED))
+        testee.start(Survey("", url, null, SCHEDULED), testSource)
         verify(mockCommandObserver).onChanged(captor.capture())
         assertTrue(captor.lastValue.url.contains(url))
     }
@@ -106,7 +108,7 @@ class SurveyViewModelTest {
         whenever(mockAppBuildConfig.manufacturer).thenReturn("pixel")
 
         val captor = argumentCaptor<Command.LoadSurvey>()
-        testee.start(Survey("", "https://survey.com", null, SCHEDULED))
+        testee.start(Survey("", "https://survey.com", null, SCHEDULED), testSource)
         verify(mockCommandObserver).onChanged(captor.capture())
         val loadedUri = captor.lastValue.url.toUri()
 
@@ -128,7 +130,7 @@ class SurveyViewModelTest {
         whenever(mockAppBuildConfig.model).thenReturn("XL")
 
         val captor = argumentCaptor<Command.LoadSurvey>()
-        testee.start(Survey("", "https://survey.com", null, SCHEDULED))
+        testee.start(Survey("", "https://survey.com", null, SCHEDULED), testSource)
         verify(mockCommandObserver).onChanged(captor.capture())
         val loadedUri = captor.lastValue.url.toUri()
 
@@ -155,7 +157,7 @@ class SurveyViewModelTest {
 
     @Test
     fun whenSurveyCompletedThenViewIsClosedAndRecordIsUpdatedAnd() {
-        testee.start(Survey("", "https://survey.com", null, SCHEDULED))
+        testee.start(Survey("", "https://survey.com", null, SCHEDULED), testSource)
         testee.onSurveyCompleted()
         verify(mockSurveyDao).update(Survey("", "https://survey.com", null, DONE))
         verify(mockCommandObserver).onChanged(Command.Close)
@@ -163,7 +165,7 @@ class SurveyViewModelTest {
 
     @Test
     fun whenSurveyDismissedThenViewIsClosedAndRecordIsNotUpdated() {
-        testee.start(Survey("", "https://survey.com", null, SCHEDULED))
+        testee.start(Survey("", "https://survey.com", null, SCHEDULED), testSource)
         testee.onSurveyDismissed()
         verify(mockSurveyDao, never()).update(any())
         verify(mockCommandObserver).onChanged(Command.Close)
