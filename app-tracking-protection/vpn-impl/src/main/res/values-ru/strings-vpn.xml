@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Блокировка отслеживания приложениями</string>
     <string name="refresh">Обновить</string>
 
@@ -219,13 +219,13 @@
     <string name="atp_ActivityPastWeekAcross">в</string>
 
     <plurals name="atp_ActivityPastWeekTrackerCount">
-        <item quantity="one">попытка отслеживания</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity">попытка отслеживания</item>
         <item quantity="few">попытки отслеживания</item>
         <item quantity="many">попыток отслеживания</item>
         <item quantity="other">попытки отслеживания</item>
     </plurals>
     <plurals name="atp_ActivityPastWeekAppCount">
-        <item quantity="one">приложении</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity">приложении</item>
         <item quantity="few">приложениях</item>
         <item quantity="many">приложениях</item>
         <item quantity="other">приложения</item>

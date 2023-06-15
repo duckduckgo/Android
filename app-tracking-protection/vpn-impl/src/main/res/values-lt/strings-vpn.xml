@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Programų sekimo apsauga</string>
     <string name="refresh">Atnaujinti</string>
 
@@ -219,13 +219,13 @@
     <string name="atp_ActivityPastWeekAcross">Per</string>
 
     <plurals name="atp_ActivityPastWeekTrackerCount">
-        <item quantity="one">Bandymas sekti</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity">Bandymas sekti</item>
         <item quantity="few">Bandymai sekti</item>
         <item quantity="many">Bandymų sekti</item>
         <item quantity="other">Bandymų sekti</item>
     </plurals>
     <plurals name="atp_ActivityPastWeekAppCount">
-        <item quantity="one">Programa</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity">Programa</item>
         <item quantity="few">Programos</item>
         <item quantity="many">Programų</item>
         <item quantity="other">Programų</item>
