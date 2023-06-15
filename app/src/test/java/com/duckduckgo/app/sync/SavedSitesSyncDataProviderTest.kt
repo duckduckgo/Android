@@ -21,7 +21,6 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -144,9 +143,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenFirstSyncAndUsersHasFoldersThenChangesAreFormatted() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_folders.json")
-
+    fun whenNewBookmarksSinceLastSyncThenChangesContainData() {
         repository.insert(bookmark3)
         repository.insert(bookmark4)
 
@@ -160,9 +157,7 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenFirstSyncAndUsersHasFavoritesAndSubfoldersThenChangesAreFormatted() {
-        val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/parser_folders_and_favourites.json")
-
+    fun whenNewFoldersAndBookmarksAndFavouritesSinceLastSyncThenChangesContainData() {
         repository.insert(bookmark1)
         repository.insert(bookmark2)
         repository.insert(favourite1)
@@ -188,9 +183,10 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenChangesAfterLastSyncInFavoritesThenChangesAreFormatted() {
+    fun whenNewFavouritesSinceLastSyncThenChangesContainData() {
         val modificationTimestamp = DatabaseDateFormatter.iso8601()
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastSyncTimestamp)
 
         repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
         repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
@@ -199,30 +195,28 @@ class SavedSitesSyncDataProviderTest {
         val changes = parser.changesSince(lastSyncTimestamp)
 
         assertTrue(changes.isNotEmpty())
-        assertTrue(changes[0].id == bookmark1.id)
+        assertTrue(changes[0].id == favoritesFolder.id)
         assertTrue(changes[0].client_last_modified == modificationTimestamp)
         assertTrue(changes[0].deleted == null)
-        assertTrue(changes[1].id == favoritesFolder.id)
+        assertTrue(changes[0].folder!!.children == listOf(bookmark1.id))
+        assertTrue(changes[1].id == bookmarksRootFolder.id)
         assertTrue(changes[1].client_last_modified == modificationTimestamp)
-        assertTrue(changes[1].deleted == null)
-        assertTrue(changes[1].folder!!.children == listOf(bookmark1.id))
+        assertTrue(changes[1].folder!!.children == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
         assertTrue(changes[2].id == bookmark3.id)
         assertTrue(changes[2].client_last_modified == modificationTimestamp)
         assertTrue(changes[2].deleted == null)
         assertTrue(changes[3].id == bookmark4.id)
         assertTrue(changes[3].client_last_modified == modificationTimestamp)
         assertTrue(changes[3].deleted == null)
-        assertTrue(changes[4].id == bookmarksRootFolder.id)
-        assertTrue(changes[4].client_last_modified == modificationTimestamp)
-        assertTrue(changes[4].folder!!.children == listOf(bookmark3.id, bookmark4.id, bookmark1.id))
+        assertTrue(changes[4].id == favourite1.id)
         assertTrue(changes[4].deleted == null)
     }
 
     @Test
-    fun whenNoChangesAfterLastSyncAreEmptyThenChangesAreEmpty() {
+    fun whenNoChangesAfterLastSyncThenChangesAreEmpty() {
         val modificationTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601()
-        store.modifiedSince = lastSyncTimestamp
+        setLastSyncTime(lastSyncTimestamp)
 
         repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
         repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
@@ -233,9 +227,10 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenBookmarkDeletedAfterLastSyncThenDataIsCorrect() {
+    fun whenBookmarkDeletedAfterLastSyncThenChangesContainData() {
         val modificationTimestamp = DatabaseDateFormatter.iso8601()
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastSyncTimestamp)
 
         val modifiedBookmark3 = bookmark3.copy(lastModified = modificationTimestamp)
         val modifiedBookmark4 = bookmark4.copy(lastModified = modificationTimestamp)
@@ -246,18 +241,19 @@ class SavedSitesSyncDataProviderTest {
 
         val changes = parser.changesSince(lastSyncTimestamp)
         assertTrue(changes.isNotEmpty())
-        assertTrue(changes[0].id == bookmark3.id)
+        assertTrue(changes[0].id == bookmarksRootFolder.id)
         assertTrue(changes[0].deleted == null)
-        assertTrue(changes[1].id == bookmark3.parentId)
+        assertTrue(changes[0].folder!!.children == listOf(bookmark3.id))
+        assertTrue(changes[1].id == bookmark3.id)
         assertTrue(changes[1].deleted == null)
-        assertTrue(changes[1].folder!!.children == listOf(bookmark3.id))
         assertTrue(changes[2].id == bookmark4.id)
         assertTrue(changes[2].deleted == "1")
     }
 
     @Test
-    fun whenFolderDeletedAfterLastSyncThenDataIsCorrect() {
+    fun whenFolderDeletedAfterLastSyncThenChangesContainData() {
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastSyncTimestamp)
 
         repository.insert(bookmark1)
         repository.insert(bookmark2)
@@ -281,8 +277,9 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenFavouriteDeletedAfterLastSyncThenDataIsCorrect() {
+    fun whenFavouriteDeletedAfterLastSyncThenChangesContainData() {
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastSyncTimestamp)
 
         repository.insert(favourite1)
         repository.insert(bookmark3)
@@ -296,8 +293,9 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenBookmarkAndFavouriteDeletedAfterLastSyncThenDataIsCorrect() {
+    fun whenFavouritesAndBookmarksDeletedAfterLastSyncThenChangesContainData() {
         val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastSyncTimestamp)
 
         repository.insert(bookmark1)
         repository.insert(favourite1)
@@ -316,23 +314,29 @@ class SavedSitesSyncDataProviderTest {
     }
 
     @Test
-    fun whenMovingABookmarkToAnotherFolderThenDataIsCorrect() {
+    fun whenFolderMovedToAnotherFolderAfterLastSyncThenChangesContainData() {
         val beforeLastSyncTimestamp = DatabaseDateFormatter.iso8601(threeHoursAgo)
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
         val modificationTimestamp = DatabaseDateFormatter.iso8601(oneHourAgo)
+        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastSyncTimestamp)
 
-        val modifiedBookmark1 = bookmark1.copy(lastModified = modificationTimestamp)
-        val modifiedBookmark2 = bookmark2.copy(lastModified = beforeLastSyncTimestamp)
+        val modifiedBookmark1 = bookmark1.copy(lastModified = beforeLastSyncTimestamp, parentId = subFolder.id)
+        val modifiedFolder = subFolder.copy(lastModified = modificationTimestamp)
 
         repository.insert(modifiedBookmark1)
-        repository.insert(modifiedBookmark2)
-        repository.insert(subFolder)
-        repository.updateBookmark(modifiedBookmark1.copy(parentId = subFolder.id), SavedSitesNames.BOOKMARKS_ROOT)
+        repository.insert(modifiedFolder)
 
         val changes = parser.changesSince(lastSyncTimestamp)
-        assertTrue(changes.filter { it.id == modifiedBookmark1.id } != null)
-        assertTrue(changes.filter { it.id == subFolder.id } != null)
-        assertTrue(changes.filter { it.id == SavedSitesNames.BOOKMARKS_ROOT } != null)
+        assertTrue(changes.isNotEmpty())
+        assertTrue(changes.size == 2)
+        assertTrue(changes[0].id == bookmarksRootFolder.id)
+        assertTrue(changes[0].folder!!.children == listOf(subFolder.id))
+        assertTrue(changes[1].id == subFolder.id)
+        assertTrue(changes[1].folder!!.children == listOf(bookmark1.id))
+    }
+
+    private fun setLastSyncTime(lastSyncTimestamp: String) {
+        store.modifiedSince = lastSyncTimestamp
     }
 
     private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {
