@@ -17,6 +17,7 @@
 package com.duckduckgo.app.httpsupgrade
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.httpsupgrade.impl.BloomFilter
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

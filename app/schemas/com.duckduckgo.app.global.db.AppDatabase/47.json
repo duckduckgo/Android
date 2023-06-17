@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 47,
-    "identityHash": "a3ddde833f33f8fa2fe1ae150708f482",
+    "identityHash": "b13c960144df708c126cd2e6e1707df9",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -134,70 +134,6 @@
       },
       {
         "tableName": "user_whitelist",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
-        "fields": [
-          {
-            "fieldPath": "domain",
-            "columnName": "domain",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "domain"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "https_bloom_filter_spec",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `bitCount` INTEGER NOT NULL, `errorRate` REAL NOT NULL, `totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "bitCount",
-            "columnName": "bitCount",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "errorRate",
-            "columnName": "errorRate",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "totalEntries",
-            "columnName": "totalEntries",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "sha256",
-            "columnName": "sha256",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": false,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "https_false_positive_domain",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
@@ -1037,7 +973,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a3ddde833f33f8fa2fe1ae150708f482')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b13c960144df708c126cd2e6e1707df9')"
     ]
   }
 }
