@@ -15,5 +15,5 @@
   -->
 
 <resources>
-
+    <string name="credentialManagementLinkButtonContentDescription">Open website</string>
 </resources>
