@@ -47,6 +47,9 @@ import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
 interface DialogCta {
     fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment
@@ -519,15 +522,21 @@ sealed class HomePanelCta(
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {
-    val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
+    val param = runBlocking {  onboardingStore.getOnBoardingDialogJourney()
+        .map { it?.split("-")?.toMutableList() ?: mutableListOf() }
+        .firstOrNull() ?: mutableListOf() }
     val daysInstalled = minOf(appInstallStore.daysInstalled().toInt(), MAX_DAYS_ALLOWED)
     param.add("$newCta:$daysInstalled")
     val finalParam = param.joinToString("-")
-    onboardingStore.onboardingDialogJourney = finalParam
+    runBlocking {
+        onboardingStore.setOnboardingDialogJourney(finalParam)
+    }
     return finalParam
 }
 
 fun DaxCta.canSendShownPixel(): Boolean {
-    val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
-    return !(param.isNotEmpty() && param.any { it.split(":").firstOrNull().orEmpty() == ctaPixelParam })
+    val param = runBlocking {onboardingStore.getOnBoardingDialogJourney()
+        .map { it?.split("-")?.toMutableList() ?: mutableListOf() }
+        .firstOrNull() ?: mutableListOf() }
+        return !(param.isNotEmpty() && param.any { it.split(":").firstOrNull().orEmpty() == ctaPixelParam })
 }
