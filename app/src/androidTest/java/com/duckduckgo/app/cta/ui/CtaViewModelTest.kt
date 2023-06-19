@@ -60,7 +60,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -245,7 +247,9 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() {
-        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
+        runBlocking {
+            whenever(mockOnboardingStore.getOnBoardingDialogJourney()).thenReturn(flowOf("s:0"))
+        }
         testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any(), any())
     }
