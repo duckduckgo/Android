@@ -29,7 +29,7 @@ class RealNetworkProtectionExclusionList @Inject constructor(
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : NetworkProtectionExclusionList {
-    override fun isExcluded(packageName: String): Boolean {
+    override suspend fun isExcluded(packageName: String): Boolean {
         return vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) &&
             netPExclusionListRepository.getExcludedAppPackages().contains(packageName)
     }

@@ -16,14 +16,11 @@
 
 package com.duckduckgo.networkprotection.api
 
-import androidx.annotation.WorkerThread
-
-@WorkerThread
 interface NetworkProtectionExclusionList {
     /**
      * This method returns if the specified app is excluded from NetworkProtection
      *
      * @param packageName - package name of the app to be checked from NetP exclusion list
      */
-    fun isExcluded(packageName: String): Boolean
+    suspend fun isExcluded(packageName: String): Boolean
 }
