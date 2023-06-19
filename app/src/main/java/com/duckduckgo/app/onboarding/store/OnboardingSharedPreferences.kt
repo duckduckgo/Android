@@ -19,18 +19,41 @@ package com.duckduckgo.app.onboarding.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class OnboardingSharedPreferences @Inject constructor(private val context: Context) : OnboardingStore {
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = FILENAME)
+    private val PREF_ONBOARDING by lazy { stringPreferencesKey(ONBOARDING_JOURNEY) }
 
-    override var onboardingDialogJourney: String?
-        get() = preferences.getString(ONBOARDING_JOURNEY, null)
-        set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
+    override suspend fun setOnboardingDialogJourney(dialogJourney: String) {
+        set(PREF_ONBOARDING, value = dialogJourney)
+    }
 
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+    override suspend fun getOnBoardingDialogJourney(): Flow<String?> =
+        get(PREF_ONBOARDING)
 
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
+    }
+
+    private suspend fun <T> set(key: Preferences.Key<T>, value: T) {
+        context.dataStore.edit { settings ->
+            settings[key] = value
+        }
+    }
+
+    private fun <T> get(key: Preferences.Key<T>): Flow<T?> {
+        return context.dataStore.data.map { settings ->
+            settings[key]
+        }
     }
 }

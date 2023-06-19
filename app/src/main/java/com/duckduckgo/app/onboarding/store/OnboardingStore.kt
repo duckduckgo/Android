@@ -16,6 +16,11 @@
 
 package com.duckduckgo.app.onboarding.store
 
+import kotlinx.coroutines.flow.Flow
+
 interface OnboardingStore {
-    var onboardingDialogJourney: String?
+    suspend fun setOnboardingDialogJourney(dialogJourney: String)
+
+    suspend fun getOnBoardingDialogJourney(): Flow<String?>
+
 }
