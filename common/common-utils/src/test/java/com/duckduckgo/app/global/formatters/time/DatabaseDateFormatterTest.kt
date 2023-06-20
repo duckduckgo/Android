@@ -18,9 +18,13 @@ package com.duckduckgo.app.global.formatters.time
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.ChronoUnit
+import org.threeten.bp.temporal.TemporalUnit
 
 class DatabaseDateFormatterTest {
 
@@ -50,6 +54,30 @@ class DatabaseDateFormatterTest {
         val formatted = DatabaseDateFormatter.parseMillisIso8601(offsetDateMillis)
 
         assertEquals(format, formatted)
+    }
+
+    @Test
+    fun whenParsingSystemTimeMillisToIso8601ThenStringRepresentsExpectedDateTime() {
+        val timeInMillisNow = System.currentTimeMillis()
+
+        val formattedMillis = DatabaseDateFormatter.parseMillisIso8601(timeInMillisNow)
+        val formattedIso8601Now = DatabaseDateFormatter.iso8601()
+
+        // truncate on minutes just to avoid seconds/millis difference
+        val isoParsed = Instant.parse(formattedIso8601Now).atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES)
+        val millisParsed = Instant.parse(formattedMillis).atOffset(ZoneOffset.UTC).truncatedTo(ChronoUnit.MINUTES)
+
+        assertEquals(isoParsed, millisParsed)
+    }
+
+    @Test
+    fun whenParsingIso8601ToMillisThenMillisRepresentsExpectedDateTime() {
+        val timeInMillisNow = System.currentTimeMillis()
+        val iso8601String = DatabaseDateFormatter.parseMillisIso8601(timeInMillisNow)
+
+        val millisParsed = DatabaseDateFormatter.parseIso8601ToMillis(iso8601String)
+
+        assertEquals(timeInMillisNow, millisParsed)
     }
 
     private fun fixedTime(): LocalDateTime {

@@ -53,6 +53,10 @@ class DatabaseDateFormatter {
             return odt.format(DateTimeFormatter.ISO_INSTANT)
         }
 
+        fun parseIso8601ToMillis(dateTime: String): Long {
+            return Instant.parse(dateTime).toEpochMilli()
+        }
+
         fun duration(
             start: String,
             end: String = FORMATTER_SECONDS.format(LocalDateTime.now()),
