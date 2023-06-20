@@ -24,12 +24,11 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTING
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.INVALID
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -51,8 +50,6 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
@@ -71,8 +68,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -97,9 +92,9 @@ class SettingsViewModel @Inject constructor(
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
-    private val vpnStateMonitor: VpnStateMonitor,
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -220,33 +215,19 @@ class SettingsViewModel @Inject constructor(
     // We need to fix this. This logic as inside the start method but it messes with the unit tests
     // because when doing runningBlockingTest {} there is no delay and the tests crashes because this
     // becomes a while(true) without any delay
-    fun startPollingAppTpEnableState() {
-        viewModelScope.launch {
+    fun startPollingVpnState() {
+        viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
-                if (currentViewState().appTrackingProtectionEnabled != isDeviceShieldEnabled) {
-                    viewState.value = currentViewState().copy(
-                        appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
-                        appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    )
-                }
+                val isNetPEnabled = vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
+                viewState.value = currentViewState().copy(
+                    appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
+                    appTrackingProtectionEnabled = isDeviceShieldEnabled,
+                    networkProtectionState = if (isNetPEnabled) CONNECTED else DISCONNECTED,
+                )
                 delay(1_000)
             }
         }
-    }
-
-    fun startPollingNetPEnableState() {
-        vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)
-            .onEach {
-                viewState.value = currentViewState().copy(
-                    networkProtectionState = when (it.state) {
-                        VpnRunningState.ENABLING -> CONNECTING
-                        VpnRunningState.ENABLED -> CONNECTED
-                        VpnRunningState.DISABLED -> DISCONNECTED
-                        else -> INVALID
-                    },
-                )
-            }.launchIn(viewModelScope)
     }
 
     fun viewState(): StateFlow<ViewState> {
