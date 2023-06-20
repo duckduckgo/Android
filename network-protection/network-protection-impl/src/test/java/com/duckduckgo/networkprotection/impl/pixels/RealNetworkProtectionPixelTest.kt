@@ -179,4 +179,56 @@ class RealNetworkProtectionPixelTest {
         verify(pixel).fire("m_netp_ev_open_settings_from_always_on_lockdown_dialog_d")
         verify(pixel, times(2)).fire("m_netp_ev_open_settings_from_always_on_lockdown_dialog_c")
     }
+
+    @Test
+    fun whenReportExclusionListShownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportExclusionListShown()
+        testee.reportExclusionListShown()
+
+        verify(pixel).fire("m_netp_imp_exclusion_list_d")
+        verify(pixel, times(2)).fire("m_netp_imp_exclusion_list_c")
+    }
+
+    @Test
+    fun whenReportAppAddedToExclusionListCalledTwiceThenFirePixelTwice() {
+        testee.reportAppAddedToExclusionList()
+        testee.reportAppAddedToExclusionList()
+
+        verify(pixel, times(2)).fire("m_netp_ev_exclusion_list_app_added_c")
+    }
+
+    @Test
+    fun whenReportAppRemovedFromExclusionListCalledTwiceThenFirePixelTwice() {
+        testee.reportAppRemovedFromExclusionList()
+        testee.reportAppRemovedFromExclusionList()
+
+        verify(pixel, times(2)).fire("m_netp_ev_exclusion_list_app_removed_c")
+    }
+
+    @Test
+    fun whenReportSkippedReportAfterExcludingAppCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportSkippedReportAfterExcludingApp()
+        testee.reportSkippedReportAfterExcludingApp()
+
+        verify(pixel).fire("m_netp_ev_skip_report_after_excluding_app_d")
+        verify(pixel, times(2)).fire("m_netp_ev_skip_report_after_excluding_app_c")
+    }
+
+    @Test
+    fun whenReportExclusionListRestoreDefaultsCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportExclusionListRestoreDefaults()
+        testee.reportExclusionListRestoreDefaults()
+
+        verify(pixel).fire("m_netp_ev_exclusion_list_restore_defaults_d")
+        verify(pixel, times(2)).fire("m_netp_ev_exclusion_list_restore_defaults_c")
+    }
+
+    @Test
+    fun whenReportExclusionListLaunchBreakageReportCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportExclusionListLaunchBreakageReport()
+        testee.reportExclusionListLaunchBreakageReport()
+
+        verify(pixel).fire("m_netp_ev_exclusion_list_launch_breakage_report_d")
+        verify(pixel, times(2)).fire("m_netp_ev_exclusion_list_launch_breakage_report_c")
+    }
 }
