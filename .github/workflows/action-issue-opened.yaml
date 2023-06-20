@@ -5,7 +5,7 @@ on:
     types: [opened, reopened]
 
 jobs:
-  sync:
+  create-asana-task:
     runs-on: ubuntu-latest
     steps:
       - uses: malmstein/github-asana-action@0.3.0

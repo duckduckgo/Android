@@ -5,7 +5,7 @@ on:
     types: [opened, reopened]
 
 jobs:
-  sync:
+  check-pr-opened:
     runs-on: ubuntu-latest
     steps:
       - uses: aitorvs/github-asana-action@0.1.0
