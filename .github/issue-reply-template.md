@@ -1,0 +1,2 @@
+Thank you for opening an Pull Request in our Repository.
+As stated in our [Contribution Guidelines](https://github.com/duckduckgo/Android/blob/develop/CONTRIBUTING.md), at the moment we are not looking for Community Contributions.

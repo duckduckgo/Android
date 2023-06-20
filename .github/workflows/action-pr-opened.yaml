@@ -1,16 +1,41 @@
-name: Add a comment
+name: Asana Integration after Pull Request submitted
 
 on:
   pull_request:
     types: [opened, reopened]
 
 jobs:
-  check-pr-opened:
+  pr-opened:
+    outputs:
+      output1: ${{ steps.step1.outputs.closed }}
     runs-on: ubuntu-latest
     steps:
-      - uses: aitorvs/github-asana-action@0.1.0
+      - name: Add Comment to Asana task
+        uses: malmstein/github-asana-action@master
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           trigger-phrase: "Task/Issue URL:"
-          action: 'pr-opened'
-          is-pinned: true
+          action: 'pr-created'
+  add-closed-comment:
+    runs-on: ubuntu-latest
+    needs: pr-opened
+    permissions:
+      issues: write
+    steps:
+      - name: Check if Pull Request was closed
+        if: ${{ needs.pr-opened.outputs.output1 == 'true' }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Render template
+        id: render_template
+        uses: chuhlomin/render-template@v1.7
+        with:
+          template: .github/issue-pr-template.md
+
+      - name: Add comment
+        uses: peter-evans/create-or-update-comment@v3.0.2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body-path: '.github/issue-pr-template.md'
