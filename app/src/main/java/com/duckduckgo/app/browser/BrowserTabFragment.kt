@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.content.*
+import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -3410,12 +3411,14 @@ class BrowserTabFragment :
 
         private fun goFullScreen() {
             Timber.i("Entering full screen")
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
             binding.webViewFullScreenContainer.show()
             activity?.toggleFullScreen()
         }
 
         private fun exitFullScreen() {
             Timber.i("Exiting full screen")
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()
