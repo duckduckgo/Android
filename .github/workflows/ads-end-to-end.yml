@@ -1,4 +1,4 @@
-name: Android Design System End-to-End tests
+ name: Android Design System End-to-End tests
 
 on:
   schedule:

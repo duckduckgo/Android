@@ -13,5 +13,5 @@ jobs:
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           trigger-phrase: "Task/Issue URL:"
-          action: 'complete-task'
+          action: 'pr-merged'
           is-complete: true
