@@ -19,27 +19,27 @@ package com.duckduckgo.mobile.android.vpn
 class FakeVpnFeaturesRegistry : VpnFeaturesRegistry {
     private val features = mutableSetOf<String>()
 
-    override fun registerFeature(feature: VpnFeature) {
+    override suspend fun registerFeature(feature: VpnFeature) {
         features.add(feature.featureName)
     }
 
-    override fun unregisterFeature(feature: VpnFeature) {
+    override suspend fun unregisterFeature(feature: VpnFeature) {
         features.remove(feature.featureName)
     }
 
-    override fun isFeatureRunning(feature: VpnFeature): Boolean {
+    override suspend fun isFeatureRunning(feature: VpnFeature): Boolean {
         return features.contains(feature.featureName)
     }
 
-    override fun isFeatureRegistered(feature: VpnFeature): Boolean {
+    override suspend fun isFeatureRegistered(feature: VpnFeature): Boolean {
         return isFeatureRunning(feature)
     }
 
-    override fun isAnyFeatureRunning(): Boolean {
+    override suspend fun isAnyFeatureRunning(): Boolean {
         return features.isNotEmpty()
     }
 
-    override fun isAnyFeatureRegistered(): Boolean {
+    override suspend fun isAnyFeatureRegistered(): Boolean {
         return isAnyFeatureRunning()
     }
 
@@ -47,7 +47,7 @@ class FakeVpnFeaturesRegistry : VpnFeaturesRegistry {
         // no-op
     }
 
-    override fun getRegisteredFeatures(): List<VpnFeature> {
+    override suspend fun getRegisteredFeatures(): List<VpnFeature> {
         return features.map { VpnFeature { it } }
     }
 }

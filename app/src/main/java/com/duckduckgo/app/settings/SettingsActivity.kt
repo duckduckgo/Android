@@ -103,6 +103,7 @@ import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -185,8 +186,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         val notificationsEnabled = NotificationManagerCompat.from(this).areNotificationsEnabled()
         viewModel.start(notificationsEnabled)
-        viewModel.startPollingAppTpEnableState()
-        viewModel.startPollingNetPEnableState()
+        viewModel.startPollingVpnState()
     }
 
     override fun onResume() {
@@ -294,6 +294,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .distinctUntilChanged()
             .onEach { viewState ->
                 viewState.let {
                     viewsOther.version.setSecondaryText(it.version)

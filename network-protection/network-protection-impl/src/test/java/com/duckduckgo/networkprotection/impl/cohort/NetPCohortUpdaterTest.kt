@@ -20,6 +20,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -47,11 +48,11 @@ class NetPCohortUpdaterTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = NetPCohortUpdater(vpnFeaturesRegistry, cohortStore)
+        testee = NetPCohortUpdater(vpnFeaturesRegistry, cohortStore, coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenNetPIsNotRegisteredThenDoNothingWithCohort() {
+    fun whenNetPIsNotRegisteredThenDoNothingWithCohort() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(false)
 
         testee.onVpnStarted(coroutineRule.testScope)
@@ -60,7 +61,7 @@ class NetPCohortUpdaterTest {
     }
 
     @Test
-    fun whenNetPIsRegisteredAndCohortNotSetThenUpdateCohort() {
+    fun whenNetPIsRegisteredAndCohortNotSetThenUpdateCohort() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(cohortStore.cohortLocalDate).thenReturn(null)
 
@@ -70,7 +71,7 @@ class NetPCohortUpdaterTest {
     }
 
     @Test
-    fun whenNetPIsRegisteredAndCohortetThenDoNothingWithCohort() {
+    fun whenNetPIsRegisteredAndCohortetThenDoNothingWithCohort() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         whenever(cohortStore.cohortLocalDate).thenReturn(LocalDate.of(2023, 1, 1))
 

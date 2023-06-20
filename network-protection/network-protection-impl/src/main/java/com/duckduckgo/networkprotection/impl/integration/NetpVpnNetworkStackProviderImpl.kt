@@ -33,7 +33,7 @@ class NetpVpnNetworkStackProviderImpl @Inject constructor(
     private val vpnNetworkStacks: PluginPoint<VpnNetworkStack>,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnNetworkStackProvider {
-    override fun provideNetworkStack(): VpnNetworkStack {
+    override suspend fun provideNetworkStack(): VpnNetworkStack {
         val features = vpnFeaturesRegistry.getRegisteredFeatures().map { it.featureName }
 
         val networkStack = if (features.contains(NetPVpnFeature.NETP_VPN.featureName)) {

@@ -25,6 +25,8 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
 import com.duckduckgo.mobile.android.vpn.trackers.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -53,7 +55,7 @@ class NetpAppTrackerDetectorTest {
         whenever(appNameResolver.getAppNameForPackageId(AppNameResolver.OriginatingApp.unknown().packageId))
             .thenReturn(AppNameResolver.OriginatingApp.unknown())
         whenever(packageManager.getApplicationInfo(any(), eq(0))).thenReturn(ApplicationInfo())
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
+        runBlocking { whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(true) }
 
         appTrackerDetector = NetpRealAppTrackerDetector(
             appTrackerRepository,
@@ -330,7 +332,7 @@ class NetpAppTrackerDetectorTest {
     }
 
     @Test
-    fun whenAppTpDisabledReturnNull() {
+    fun whenAppTpDisabledReturnNull() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
 
         val appTrackerDetectorDisabled = NetpRealAppTrackerDetector(

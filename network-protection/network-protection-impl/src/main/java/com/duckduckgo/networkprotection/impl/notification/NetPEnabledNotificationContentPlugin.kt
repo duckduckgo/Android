@@ -36,6 +36,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
@@ -47,7 +48,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
     override fun getInitialContent(): VpnEnabledNotificationContent? {
-        return if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+        return if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.netpEnabledNotificationTitle)),
                 message = SpannableStringBuilder(),
@@ -69,7 +70,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
     }
 
     override fun isActive(): Boolean {
-        return vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
+        return runBlocking { vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN) }
     }
 
     // This fun interface is provided just for testing purposes

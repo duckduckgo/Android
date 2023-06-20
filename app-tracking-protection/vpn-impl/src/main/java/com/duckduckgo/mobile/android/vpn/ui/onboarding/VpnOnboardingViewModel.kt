@@ -79,10 +79,12 @@ class VpnOnboardingViewModel @Inject constructor(
     )
 
     fun onTurnAppTpOffOn() {
-        if (vpnDetector.isExternalVpnDetected()) {
-            sendCommand(Command.ShowVpnConflictDialog)
-        } else {
-            sendCommand(Command.CheckVPNPermission)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (vpnDetector.isExternalVpnDetected()) {
+                sendCommand(Command.ShowVpnConflictDialog)
+            } else {
+                sendCommand(Command.CheckVPNPermission)
+            }
         }
     }
 

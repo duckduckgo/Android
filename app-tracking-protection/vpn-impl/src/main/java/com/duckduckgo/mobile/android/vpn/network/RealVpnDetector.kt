@@ -32,7 +32,7 @@ class RealExternalVpnDetector @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : ExternalVpnDetector {
 
-    override fun isExternalVpnDetected(): Boolean {
+    override suspend fun isExternalVpnDetected(): Boolean {
         // if we're the ones using the VPN, no VPN is detected
         if (vpnFeaturesRegistry.isAnyFeatureRunning()) return false
 

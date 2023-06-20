@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.cohort
 
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -24,6 +25,7 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 
 @ContributesMultibinding(
@@ -33,13 +35,16 @@ import org.threeten.bp.LocalDate
 class NetPCohortUpdater @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val cohortStore: NetpCohortStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
-            // skip if already stored
-            cohortStore.cohortLocalDate?.let { return }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+                // skip if already stored
+                cohortStore.cohortLocalDate?.let { return@launch }
 
-            cohortStore.cohortLocalDate = LocalDate.now()
+                cohortStore.cohortLocalDate = LocalDate.now()
+            }
         }
     }
 

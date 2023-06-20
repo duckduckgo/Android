@@ -101,8 +101,9 @@ object VpnAppModule {
         context: Context,
         sharedPreferencesProvider: VpnSharedPreferencesProvider,
         featureSegmentsManager: FeatureSegmentsManager,
+        dispatcherProvider: DispatcherProvider,
     ): VpnFeaturesRegistry {
-        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider, featureSegmentsManager)
+        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider, featureSegmentsManager, dispatcherProvider)
     }
 
     @Provides

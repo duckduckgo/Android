@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.*
@@ -49,14 +50,14 @@ class NetPEnabledNotificationContentPluginTest {
     @Before
     fun setup() {
         vpnFeaturesRegistry = FakeVpnFeaturesRegistry().apply {
-            registerFeature(NetPVpnFeature.NETP_VPN)
+            runBlocking { registerFeature(NetPVpnFeature.NETP_VPN) }
         }
 
         plugin = NetPEnabledNotificationContentPlugin(resources, vpnFeaturesRegistry) { null }
     }
 
     @Test
-    fun getInitialContentNetPDisabledReturnNull() {
+    fun getInitialContentNetPDisabledReturnNull() = runTest {
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
         val content = plugin.getInitialContent()
 
@@ -101,7 +102,7 @@ class NetPEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun isActiveNetPDisabledReturnFalse() {
+    fun isActiveNetPDisabledReturnFalse() = runTest {
         vpnFeaturesRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
         assertFalse(plugin.isActive())
     }

@@ -30,6 +30,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import logcat.logcat
 
@@ -48,7 +49,7 @@ class LatencyMonitorCallback @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (!vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+        if (runBlocking { !vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
             logcat { "NetP not enabled, not starting latency monitor" }
             return
         }

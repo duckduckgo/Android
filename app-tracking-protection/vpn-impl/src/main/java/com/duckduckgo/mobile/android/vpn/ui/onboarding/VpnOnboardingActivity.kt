@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
@@ -51,6 +52,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppTrackerOnboardingActivityWithEmptyParamsParams::class)
@@ -64,6 +66,8 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     private val viewModel: VpnOnboardingViewModel by bindViewModel()
     private val binding: ActivityVpnOnboardingBinding by viewBinding()
@@ -222,19 +226,12 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         startActivityForResult(intent, REQUEST_ASK_VPN_PERMISSION)
     }
 
-    private fun checkVpnPermission(): VpnPermissionStatus {
-        val intent = VpnService.prepare(this)
-        return if (intent == null) {
-            VpnPermissionStatus.Granted
-        } else {
-            VpnPermissionStatus.Denied(intent)
-        }
-    }
-
     private fun startVpn() {
-        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
-        launchDeviceShieldTrackerActivity()
-        viewModel.onAppTpEnabled()
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+            launchDeviceShieldTrackerActivity()
+            viewModel.onAppTpEnabled()
+        }
     }
 
     private fun showVpnConflictDialog() {

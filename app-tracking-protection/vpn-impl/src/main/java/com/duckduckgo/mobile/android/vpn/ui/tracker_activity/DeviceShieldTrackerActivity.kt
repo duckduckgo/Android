@@ -33,6 +33,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
@@ -100,6 +101,8 @@ class DeviceShieldTrackerActivity :
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
     @AppTpBreakageCategories
@@ -483,12 +486,16 @@ class DeviceShieldTrackerActivity :
 
     private fun startVPN() {
         quietlyToggleAppTpSwitch(true)
-        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+        }
     }
 
     private fun stopDeviceShield() {
         quietlyToggleAppTpSwitch(false)
-        vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+        }
     }
 
     private fun quietlyToggleAppTpSwitch(state: Boolean) {

@@ -157,7 +157,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
     }
 
-    private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(provider = { vpnNetworkStackProvider.provideNetworkStack() })
+    private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(provider = {
+        runBlocking { vpnNetworkStackProvider.provideNetworkStack() }
+    },)
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -252,7 +254,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 
     private suspend fun startVpn() = withContext(serviceDispatcher) {
-        fun updateNetworkStackUponRestart() {
+        suspend fun updateNetworkStackUponRestart() {
             logcat { "VPN log: updating the networking stack" }
             logcat { "VPN log: CURRENT network ${vpnNetworkStack.name}" }
             // stop the current networking stack

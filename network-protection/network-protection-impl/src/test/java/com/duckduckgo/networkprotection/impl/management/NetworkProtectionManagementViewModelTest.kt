@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.management
 import android.content.Intent
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -63,6 +64,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,7 +83,6 @@ class NetworkProtectionManagementViewModelTest {
     @Mock
     private lateinit var vpnStateMonitor: VpnStateMonitor
 
-    @Mock
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Mock
@@ -100,6 +102,8 @@ class NetworkProtectionManagementViewModelTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        vpnFeaturesRegistry = FakeVpnFeaturesRegistry()
+
         whenever(networkProtectionRepository.reconnectStatus).thenReturn(NotReconnecting)
         testee = NetworkProtectionManagementViewModel(
             vpnStateMonitor,
@@ -115,6 +119,8 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenOnNetpToggleClickedToEnabledThenEmitCheckVPNPermissionCommand() = runTest {
+        whenever(externalVpnDetector.isExternalVpnDetected()).thenReturn(false)
+
         testee.commands().test {
             testee.onNetpToggleClicked(true)
 
@@ -123,17 +129,21 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenOnStartVpnThenRegisterFeature() {
+    fun whenOnStartVpnThenRegisterFeature() = runTest {
+        assertFalse(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN))
+
         testee.onStartVpn()
 
-        verify(vpnFeaturesRegistry).registerFeature(NetPVpnFeature.NETP_VPN)
+        assertTrue(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN))
     }
 
     @Test
-    fun whenOnNetpToggleClickedToDisabledThenUnregisterFeature() {
+    fun whenOnNetpToggleClickedToDisabledThenUnregisterFeature() = runTest {
+        vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
+
         testee.onNetpToggleClicked(false)
 
-        verify(vpnFeaturesRegistry).unregisterFeature(NetPVpnFeature.NETP_VPN)
+        assertFalse(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN))
     }
 
     @Test
@@ -487,7 +497,7 @@ class NetworkProtectionManagementViewModelTest {
 
         testee.commands().test {
             testee.onStartVpn()
-            assertEquals(ShowAlwaysOnPromotionDialog, this.expectMostRecentItem())
+            assertEquals(ShowAlwaysOnPromotionDialog, this.awaitItem())
             verify(networkProtectionPixels).reportAlwaysOnPromotionDialogShown()
         }
     }

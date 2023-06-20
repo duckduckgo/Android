@@ -27,6 +27,7 @@ import com.duckduckgo.networkprotection.impl.fakes.FakeNetworkProtectionReposito
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,14 +70,14 @@ class LatencyMonitorCallbackTest {
     }
 
     @Test
-    fun onNativeStartedNetpOffDoNotEnqueueWork() {
+    fun onNativeStartedNetpOffDoNotEnqueueWork() = runTest {
         whenever(mockVpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(false)
         testee.onVpnStarted(coroutineRule.testScope)
         verifyNoInteractions(mockWorkManager)
     }
 
     @Test
-    fun onNativeStartedNetpOnEnqueueWork() {
+    fun onNativeStartedNetpOnEnqueueWork() = runTest {
         whenever(mockVpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
         testee.onVpnStarted(coroutineRule.testScope)
         verify(mockWorkManager).enqueueUniquePeriodicWork(

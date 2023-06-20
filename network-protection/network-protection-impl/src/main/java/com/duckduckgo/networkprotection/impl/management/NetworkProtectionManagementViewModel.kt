@@ -70,6 +70,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver") // does not subscribe to app lifecycle
 @ContributesViewModel(ActivityScope::class)
@@ -232,15 +233,17 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     fun onNetpToggleClicked(enabled: Boolean) {
-        if (enabled) {
-            if (externalVpnDetector.isExternalVpnDetected()) {
-                networkProtectionPixels.reportVpnConflictDialogShown()
-                sendCommand(Command.ShowVpnConflictDialog)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (enabled) {
+                if (externalVpnDetector.isExternalVpnDetected()) {
+                    networkProtectionPixels.reportVpnConflictDialogShown()
+                    sendCommand(Command.ShowVpnConflictDialog)
+                } else {
+                    sendCommand(CheckVPNPermission)
+                }
             } else {
-                sendCommand(CheckVPNPermission)
+                onStopVpn()
             }
-        } else {
-            onStopVpn()
         }
     }
 
@@ -254,13 +257,15 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     fun onStartVpn() {
-        featuresRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
-        // TODO find a better place to reset values when manually starting or stopping NetP.
-        networkProtectionRepository.reconnectStatus = NotReconnecting
-        networkProtectionRepository.enabledTimeInMillis = -1L
-        reconnectNotifications.clearNotifications()
-        forceUpdateRunningState()
-        tryShowAlwaysOnPromotion()
+        viewModelScope.launch(dispatcherProvider.io()) {
+            featuresRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
+            // TODO find a better place to reset values when manually starting or stopping NetP.
+            networkProtectionRepository.reconnectStatus = NotReconnecting
+            networkProtectionRepository.enabledTimeInMillis = -1L
+            reconnectNotifications.clearNotifications()
+            forceUpdateRunningState()
+            tryShowAlwaysOnPromotion()
+        }
     }
 
     fun onReportIssuesClicked() {
@@ -303,26 +308,26 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     private fun onStopVpn() {
-        featuresRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
-        reconnectNotifications.clearNotifications()
-        forceUpdateRunningState()
+        viewModelScope.launch(dispatcherProvider.io()) {
+            featuresRegistry.unregisterFeature(NetPVpnFeature.NETP_VPN)
+            reconnectNotifications.clearNotifications()
+            forceUpdateRunningState()
+        }
     }
 
     private suspend fun shouldShowAlwaysOnPromotion(): Boolean {
         return !vpnStateMonitor.isAlwaysOnEnabled() && vpnStateMonitor.vpnLastDisabledByAndroid()
     }
 
-    private fun forceUpdateRunningState() {
+    private suspend fun forceUpdateRunningState() = withContext(dispatcherProvider.io()) {
         // If the VPN is not started due to any issue, the getRunningState() won't be updated and the toggle is kept (wrongly) in ON state
         // Check after 1 second to ensure this doesn't happen
-        viewModelScope.launch {
-            delay(TimeUnit.SECONDS.toMillis(1))
-            refreshVpnRunningState.emit(System.currentTimeMillis())
-        }
+        delay(TimeUnit.SECONDS.toMillis(1))
+        refreshVpnRunningState.emit(System.currentTimeMillis())
     }
 
     private fun sendCommand(newCommand: Command) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             command.send(newCommand)
         }
     }
