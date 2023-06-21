@@ -17,15 +17,14 @@
 package com.duckduckgo.httpsupgrade.impl
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PACKAGE_PRIVATE
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.impl.BloomFilter.Config.PathConfig
 import com.duckduckgo.httpsupgrade.impl.HttpsUpgradePixelName.CREATE_BLOOM_FILTER_ERROR
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -34,7 +33,8 @@ interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
-internal class HttpsBloomFilterFactoryImpl constructor(
+@VisibleForTesting(otherwise = PACKAGE_PRIVATE)
+class HttpsBloomFilterFactoryImpl constructor(
     private val dao: com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao,
     private val binaryDataStore: BinaryDataStore,
     private val httpsEmbeddedDataPersister: HttpsEmbeddedDataPersister,

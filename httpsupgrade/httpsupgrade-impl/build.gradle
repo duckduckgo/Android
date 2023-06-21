@@ -45,8 +45,11 @@ dependencies {
 
     testImplementation project(':common-test')
     testImplementation Testing.junit4
+    androidTestImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.ext.junit
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.robolectric
 

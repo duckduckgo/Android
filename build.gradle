@@ -54,7 +54,7 @@ subprojects {
         apply plugin: 'org.jetbrains.dokka'
     }
 
-    String[] allowAndroidTestsIn = ["app", "sync-lib"]
+    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl"]
     if (!allowAndroidTestsIn.contains(project.name)) {
         project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
             if (parent.name == "src") {
