@@ -40,10 +40,10 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetPAppExclusionListNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
-import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowReconnecting
@@ -106,7 +106,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         }
 
         binding.settings.settingsExclusion.setClickListener {
-            startActivity(NetpAppExclusionListActivity.intent(this))
+            globalActivityStarter.start(this, NetPAppExclusionListNoParams)
         }
     }
 

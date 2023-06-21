@@ -16,8 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.exclusion.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -25,6 +23,7 @@ import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
@@ -35,6 +34,7 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetPAppExclusionListNoParams
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(NetPAppExclusionListNoParams::class)
 class NetpAppExclusionListActivity :
     DuckDuckGoActivity(),
     ManuallyDisableAppProtectionDialog.ManuallyDisableAppProtectionDialogListener,
@@ -232,10 +233,6 @@ class NetpAppExclusionListActivity :
             ALL,
             PROTECTED_ONLY,
             UNPROTECTED_ONLY,
-        }
-
-        internal fun intent(context: Context): Intent {
-            return Intent(context, NetpAppExclusionListActivity::class.java)
         }
     }
 }
