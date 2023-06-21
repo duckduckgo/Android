@@ -34,5 +34,5 @@ abstract class AppDaysUsedDao {
     abstract fun insert(appUsedEntity: AppDaysUsedEntity)
 
     @Query("SELECT * FROM app_days_used ORDER BY date DESC LIMIT 1")
-    abstract fun getLastDayAppUsed(): AppDaysUsedEntity
+    abstract fun getLastDayAppUsed(): AppDaysUsedEntity?
 }

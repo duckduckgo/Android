@@ -63,13 +63,13 @@ class SurveyViewModel @Inject constructor(
         val url = survey.url ?: return
         this.survey = survey
         this.source = source
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             lastActiveDay = when (source) {
                 SurveySource.IN_APP -> appDaysUsedRepository.getPreviousActiveDay().orEmpty()
                 SurveySource.PUSH -> appDaysUsedRepository.getLastActiveDay()
             }
+            command.value = Command.LoadSurvey(addSurveyParameters(url))
         }
-        command.value = Command.LoadSurvey(addSurveyParameters(url))
     }
 
     private fun addSurveyParameters(url: String): String {

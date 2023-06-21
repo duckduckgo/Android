@@ -41,7 +41,8 @@ class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) 
 
     override suspend fun recordAppUsedToday() = withContext(singleThreadedDispatcher) {
         val today = formatter.format((Date()))
-        when (val lastActiveDay = appDaysUsedDao.getLastDayAppUsed().date) {
+        when (val lastActiveDay = appDaysUsedDao.getLastDayAppUsed()?.date) {
+            null -> appDaysUsedDao.insert(AppDaysUsedEntity())
             today -> appDaysUsedDao.insert(AppDaysUsedEntity(previousDate = today))
             else -> appDaysUsedDao.insert(AppDaysUsedEntity(previousDate = lastActiveDay))
         }
@@ -61,13 +62,13 @@ class AppDaysUsedDatabaseRepository(private val appDaysUsedDao: AppDaysUsedDao) 
 
     override suspend fun getLastActiveDay(): String {
         return withContext(singleThreadedDispatcher) {
-            return@withContext appDaysUsedDao.getLastDayAppUsed().date
+            return@withContext appDaysUsedDao.getLastDayAppUsed()?.date ?: formatter.format((Date()))
         }
     }
 
     override suspend fun getPreviousActiveDay(): String? {
         return withContext(singleThreadedDispatcher) {
-            return@withContext appDaysUsedDao.getLastDayAppUsed().previousDate
+            return@withContext appDaysUsedDao.getLastDayAppUsed()?.previousDate
         }
     }
 }
