@@ -30,6 +30,7 @@ data class TrackingProtectionAppInfo(
         const val NO_ISSUES = 0
         const val KNOWN_ISSUES_EXCLUSION_REASON = 1
         const val LOADS_WEBSITES_EXCLUSION_REASON = 2
+        const val EXCLUDED_THROUGH_NETP = 3
     }
 
     fun isProblematic(): Boolean {

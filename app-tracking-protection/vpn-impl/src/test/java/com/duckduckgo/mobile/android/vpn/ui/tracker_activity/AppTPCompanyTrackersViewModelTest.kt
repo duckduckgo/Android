@@ -21,18 +21,29 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.PROTECTED
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.UNPROTECTED
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.UNPROTECTED_THROUGH_NETP
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerWithEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.BannerState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import org.junit.*
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Ignore
+import org.junit.Rule
+import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -58,7 +69,7 @@ class AppTPCompanyTrackersViewModelTest {
             appsRepository,
             timeDiffFormatter,
             deviceShieldPixels,
-            CoroutineTestRule().testDispatcherProvider,
+            coroutineRule.testDispatcherProvider,
         )
     }
 
@@ -70,12 +81,87 @@ class AppTPCompanyTrackersViewModelTest {
 
         val someTrackers = someTrackers()
 
-        whenever(statsRepository.getTrackersForAppFromDate(packageName, date)).thenReturn(getTrackersFlow(someTrackers))
+        whenever(statsRepository.getTrackersForAppFromDate(date, packageName)).thenReturn(getTrackersFlow(someTrackers))
         viewModel.viewState().test {
-            Assert.assertEquals(someTrackers, awaitItem())
+            assertEquals(someTrackers, awaitItem())
         }
 
         viewModel.loadData(date, packageName)
+    }
+
+    @Test
+    fun whenAppIsUnprotectedThroughNetpThenReturnViewStateWithtoggleUncheckedDisabledAndShowCorrectBanner() = runTest {
+        val date = "2020-10-21"
+        val packageName = "com.duckduckgo.android"
+
+        whenever(statsRepository.getTrackersForAppFromDate(date, packageName)).thenReturn(flowOf(emptyList()))
+        whenever(appsRepository.getAppProtectionStatus(packageName)).thenReturn(UNPROTECTED_THROUGH_NETP)
+
+        viewModel.loadData(date, packageName)
+
+        viewModel.viewState().test {
+            assertEquals(
+                ViewState(
+                    totalTrackingAttempts = 0,
+                    lastTrackerBlockedAgo = "",
+                    trackingCompanies = emptyList(),
+                    toggleChecked = false,
+                    bannerState = BannerState.SHOW_UNPROTECTED_THROUGH_NETP,
+                    toggleEnabled = false,
+                ),
+                expectMostRecentItem(),
+            )
+        }
+    }
+
+    @Test
+    fun whenAppIsProtectedThenReturnViewStateWithtoggleCheckedEnabledAndShowCorrectBanner() = runTest {
+        val date = "2020-10-21"
+        val packageName = "com.duckduckgo.android"
+
+        whenever(statsRepository.getTrackersForAppFromDate(date, packageName)).thenReturn(flowOf(emptyList()))
+        whenever(appsRepository.getAppProtectionStatus(packageName)).thenReturn(PROTECTED)
+
+        viewModel.loadData(date, packageName)
+
+        viewModel.viewState().test {
+            assertEquals(
+                ViewState(
+                    totalTrackingAttempts = 0,
+                    lastTrackerBlockedAgo = "",
+                    trackingCompanies = emptyList(),
+                    toggleChecked = true,
+                    bannerState = BannerState.NONE,
+                    toggleEnabled = true,
+                ),
+                expectMostRecentItem(),
+            )
+        }
+    }
+
+    @Test
+    fun whenAppIsUnProtectedThenReturnViewStateWithtoggleUnCheckedEnabledAndShowCorrectBanner() = runTest {
+        val date = "2020-10-21"
+        val packageName = "com.duckduckgo.android"
+
+        whenever(statsRepository.getTrackersForAppFromDate(date, packageName)).thenReturn(flowOf(emptyList()))
+        whenever(appsRepository.getAppProtectionStatus(packageName)).thenReturn(UNPROTECTED)
+
+        viewModel.loadData(date, packageName)
+
+        viewModel.viewState().test {
+            assertEquals(
+                ViewState(
+                    totalTrackingAttempts = 0,
+                    lastTrackerBlockedAgo = "",
+                    trackingCompanies = emptyList(),
+                    toggleChecked = false,
+                    bannerState = BannerState.SHOW_UNPROTECTED,
+                    toggleEnabled = true,
+                ),
+                expectMostRecentItem(),
+            )
+        }
     }
 
     private fun getTrackersFlow(trackers: List<VpnTrackerWithEntity>): Flow<List<VpnTrackerWithEntity>> = flow {

@@ -16,19 +16,11 @@
 
 package com.duckduckgo.networkprotection.api
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-
-/**
- * Use this model to launch the NetworkProtectionManagement screen
- */
-object NetworkProtectionManagementScreenNoParams : ActivityParams
-
-/**
- * Use this model to launch the NetPWaitlist screen
- */
-object NetPWaitlistScreenNoParams : ActivityParams
-
-/**
- * Use this model to launch the NetP app exclusion list screen
- */
-object NetPAppExclusionListNoParams : ActivityParams
+interface NetworkProtectionExclusionList {
+    /**
+     * This method returns if the specified app is excluded from NetworkProtection
+     *
+     * @param packageName - package name of the app to be checked from NetP exclusion list
+     */
+    suspend fun isExcluded(packageName: String): Boolean
+}
