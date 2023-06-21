@@ -20,11 +20,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
 
 @Dao
-@SingleInstanceIn(AppScope::class)
 interface HttpsBloomFilterSpecDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

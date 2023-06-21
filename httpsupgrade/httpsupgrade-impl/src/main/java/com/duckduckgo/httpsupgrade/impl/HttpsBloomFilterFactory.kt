@@ -34,8 +34,7 @@ interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
-@ContributesBinding(AppScope::class)
-class HttpsBloomFilterFactoryImpl @Inject constructor(
+internal class HttpsBloomFilterFactoryImpl constructor(
     private val dao: com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao,
     private val binaryDataStore: BinaryDataStore,
     private val httpsEmbeddedDataPersister: HttpsEmbeddedDataPersister,

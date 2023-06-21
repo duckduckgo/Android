@@ -25,6 +25,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
@@ -46,7 +47,7 @@ import logcat.logcat
 )
 class HttpsUpgraderImpl @Inject constructor(
     private val bloomFactory: HttpsBloomFilterFactory,
-    private val bloomFalsePositiveDao: com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao,
+    private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
     private val toggle: FeatureToggle,
     private val https: Https,
 ) : HttpsUpgrader, MainProcessLifecycleObserver {

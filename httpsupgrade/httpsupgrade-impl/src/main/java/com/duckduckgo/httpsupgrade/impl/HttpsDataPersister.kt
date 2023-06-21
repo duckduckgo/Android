@@ -23,10 +23,9 @@ import com.duckduckgo.httpsupgrade.store.HttpsFalsePositiveDomain
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
 import java.io.IOException
-import javax.inject.Inject
 import logcat.logcat
 
-class HttpsDataPersister @Inject constructor(
+class HttpsDataPersister constructor(
     private val binaryDataStore: BinaryDataStore,
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
     private val httpsFalsePositivesDao: HttpsFalsePositivesDao,

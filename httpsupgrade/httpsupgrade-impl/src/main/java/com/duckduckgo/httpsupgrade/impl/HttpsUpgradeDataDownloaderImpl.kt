@@ -17,22 +17,20 @@
 package com.duckduckgo.httpsupgrade.impl
 
 import com.duckduckgo.app.global.extensions.isCached
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec
+import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import io.reactivex.Completable
 import io.reactivex.Completable.fromAction
 import java.io.IOException
-import javax.inject.Inject
 import logcat.logcat
 
-@ContributesBinding(AppScope::class)
-class HttpsUpgradeDataDownloaderImpl @Inject constructor(
+internal class HttpsUpgradeDataDownloaderImpl constructor(
     private val service: HttpsUpgradeService,
     private val httpsUpgrader: HttpsUpgrader,
     private val dataPersister: HttpsDataPersister,
-    private val bloomFalsePositivesDao: com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao,
+    private val bloomFalsePositivesDao: HttpsFalsePositivesDao,
 ) : HttpsUpgradeDataDownloader {
 
     override fun download(): Completable {
@@ -48,7 +46,7 @@ class HttpsUpgradeDataDownloaderImpl @Inject constructor(
             }
     }
 
-    private fun downloadBloomFilter(specification: com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec): Completable {
+    private fun downloadBloomFilter(specification: HttpsBloomFilterSpec): Completable {
         return fromAction {
             logcat { "Downloading https bloom filter binary" }
 
