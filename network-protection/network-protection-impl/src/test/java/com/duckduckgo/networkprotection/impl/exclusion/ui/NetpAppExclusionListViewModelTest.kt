@@ -20,6 +20,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
@@ -58,6 +59,9 @@ class NetpAppExclusionListViewModelTest {
 
     @Mock
     private lateinit var netPExclusionListRepository: NetPExclusionListRepository
+
+    @Mock
+    private lateinit var systemAppOverridesProvider: SystemAppOverridesProvider
     private val testbreakageCategories = listOf(AppBreakageCategory("test", "test description"))
     private val exclusionListFlow = MutableStateFlow(MANUAL_EXCLUSION_LIST)
     private lateinit var testee: NetpAppExclusionListViewModel
@@ -73,6 +77,7 @@ class NetpAppExclusionListViewModelTest {
             coroutineRule.testDispatcherProvider,
             netPExclusionListRepository,
             testbreakageCategories,
+            systemAppOverridesProvider,
         )
 
         testee.initialize()
@@ -143,6 +148,30 @@ class NetpAppExclusionListViewModelTest {
                         FilterType(string.netpExclusionListFilterMenuUnprotectedLabel, 2),
                         AppType(NetpExclusionListApp("com.example.app2", "App Name", false)),
                         AppType(NetpExclusionListApp("com.example.app3", "App Name", false)),
+                    ),
+                ),
+                awaitItem(),
+            )
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetAppsAndSystemAppIsInOverrideThenReturnCorrectViewState() = runTest {
+        whenever(systemAppOverridesProvider.getSystemAppOverridesList()).thenReturn(listOf("com.example.system"))
+
+        testee.getApps().test {
+            assertEquals(
+                ViewState(
+                    listOf(
+                        HeaderType(headerContent = DEFAULT),
+                        FilterType(string.netpExclusionListFilterMenuAllLabel, 6),
+                        AppType(NetpExclusionListApp("com.example.app1", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.example.app2", "App Name", false)),
+                        AppType(NetpExclusionListApp("com.example.app3", "App Name", false)),
+                        AppType(NetpExclusionListApp("com.example.game", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.example.system", "App Name", true)),
+                        AppType(NetpExclusionListApp("com.duckduckgo.mobile", "App Name", true)),
                     ),
                 ),
                 awaitItem(),
