@@ -10,7 +10,7 @@ jobs:
       output1: ${{ steps.step1.outputs.closed }}
     runs-on: ubuntu-latest
     steps:
-      - name: Add Comment to Asana task
+      - name: Validating Pull Request
         uses: malmstein/github-asana-action@0.5.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
