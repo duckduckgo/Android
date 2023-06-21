@@ -20,6 +20,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
@@ -55,14 +56,21 @@ interface TrackingProtectionAppsRepository {
     suspend fun isAppProtectionEnabled(packageName: String): Boolean
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = TrackingProtectionAppsRepository::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = SystemAppOverridesProvider::class,
+)
 @SingleInstanceIn(AppScope::class)
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-) : TrackingProtectionAppsRepository {
+) : TrackingProtectionAppsRepository, SystemAppOverridesProvider {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
@@ -202,6 +210,8 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
         return !isExcluded
     }
+
+    override fun getSystemAppOverridesList(): List<String> = appTrackerRepository.getSystemAppOverrideList().map { it.packageId }
 
     companion object {
         private val BROWSERS = listOf(

@@ -26,6 +26,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
 import com.duckduckgo.networkprotection.impl.R.string
@@ -60,6 +61,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val netPExclusionListRepository: NetPExclusionListRepository,
     @NetpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
+    private val systemAppOverridesProvider: SystemAppOverridesProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
@@ -120,7 +122,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private fun refreshInstalledApps() {
         installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
-            .filter { !it.isSystemApp() }
+            .filterNot { !systemAppOverridesProvider.getSystemAppOverridesList().contains(it.packageName) && it.isSystemApp() }
     }
 
     private fun ApplicationInfo.isSystemApp(): Boolean {
@@ -202,7 +204,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     fun onAppProtectionChanged(
         app: NetpExclusionListApp,
-        enabled: Boolean
+        enabled: Boolean,
     ) {
         viewModelScope.launch {
             if (enabled) {
