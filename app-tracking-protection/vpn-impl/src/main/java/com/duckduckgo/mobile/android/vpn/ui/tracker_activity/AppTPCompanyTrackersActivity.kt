@@ -142,17 +142,21 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             }
             .launchIn(lifecycleScope)
 
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
         lifecycleScope.launch {
             viewModel.loadData(
                 getDate(),
                 getPackage(),
             )
         }
-
-        viewModel.commands()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { processCommand(it) }
-            .launchIn(lifecycleScope)
     }
 
     private fun renderViewState(viewState: ViewState) {
