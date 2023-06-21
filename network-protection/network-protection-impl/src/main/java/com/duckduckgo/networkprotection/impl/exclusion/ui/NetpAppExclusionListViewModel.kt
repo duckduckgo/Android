@@ -37,6 +37,7 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.AppsProtectionType.Hea
 import com.duckduckgo.networkprotection.impl.exclusion.ui.HeaderContent.DEFAULT
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter
 import com.duckduckgo.networkprotection.impl.exclusion.ui.NetpAppExclusionListActivity.Companion.AppsFilter.ALL
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.NetPManuallyExcludedApp
 import javax.inject.Inject
@@ -62,6 +63,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     private val netPExclusionListRepository: NetPExclusionListRepository,
     @NetpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
     private val systemAppOverridesProvider: SystemAppOverridesProvider,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val command = Channel<Command>(1, DROP_OLDEST)
     private val filterState = MutableStateFlow(ALL)
@@ -178,6 +180,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     }
 
     fun initialize() {
+        networkProtectionPixels.reportExclusionListShown()
         netPExclusionListRepository.getManualAppExclusionListFlow()
             .combine(refreshSnapshot.asStateFlow()) { excludedApps, timestamp ->
                 ManualProtectionSnapshot(timestamp, excludedApps)
@@ -229,8 +232,10 @@ class NetpAppExclusionListViewModel @Inject constructor(
         report: Boolean,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            networkProtectionPixels.reportAppAddedToExclusionList()
             netPExclusionListRepository.manuallyExcludeApp(packageName)
             if (report) {
+                networkProtectionPixels.reportExclusionListLaunchBreakageReport()
                 command.send(
                     Command.ShowIssueReportingPage(
                         OpenVpnBreakageCategoryWithBrokenApp(
@@ -241,12 +246,15 @@ class NetpAppExclusionListViewModel @Inject constructor(
                         ),
                     ),
                 )
+            } else {
+                networkProtectionPixels.reportSkippedReportAfterExcludingApp()
             }
         }
     }
 
     private fun onAppProtectionEnabled(packageName: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            networkProtectionPixels.reportAppRemovedFromExclusionList()
             netPExclusionListRepository.manuallyEnableApp(packageName)
         }
     }
@@ -257,6 +265,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     fun launchFeedback() {
         viewModelScope.launch(dispatcherProvider.io()) {
+            networkProtectionPixels.reportExclusionListLaunchBreakageReport()
             command.send(
                 Command.ShowIssueReportingPage(
                     OpenVpnBreakageCategoryWithBrokenApp(
@@ -272,6 +281,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
 
     fun restoreProtectedApps() {
         viewModelScope.launch(dispatcherProvider.io()) {
+            networkProtectionPixels.reportExclusionListRestoreDefaults()
             netPExclusionListRepository.restoreDefaultProtectedList()
             refreshSnapshot.refresh()
             command.send(Command.RestartVpn)
