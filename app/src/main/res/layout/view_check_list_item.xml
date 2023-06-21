@@ -21,7 +21,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:minHeight="58dp"
     android:paddingStart="@dimen/keyline_4"
     android:paddingTop="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_4"

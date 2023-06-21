@@ -105,6 +105,9 @@
     <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
     <dimen name="daxBubbleDialogEdge">9dp</dimen>
 
+    <!-- CheckListItem -->
+    <dimen name="checkListItemHeight">58dp</dimen>
+
     <!-- Legacy Dimensions -->
     <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
     <dimen name="changeAppIconSize">75dp</dimen>

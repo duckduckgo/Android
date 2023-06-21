@@ -83,6 +83,9 @@
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
 
         <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
+
+        <!-- CheckListItem Component -->
+        <item name="checkListItemStyle">@style/Widget.DuckDuckGo.CheckListItem</item>
     </style>
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">

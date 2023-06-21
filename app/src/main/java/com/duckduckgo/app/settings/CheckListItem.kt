@@ -25,6 +25,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewCheckListItemBinding
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
@@ -33,7 +34,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class CheckListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.checkListItemStyle,
+    defStyleAttr: Int = CommonR.attr.checkListItemStyle,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewCheckListItemBinding by viewBinding()
@@ -41,19 +42,19 @@ class CheckListItem @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(
             attrs,
-            R.styleable.CheckListItem,
+            CommonR.styleable.CheckListItem,
             0,
-            R.style.Widget_DuckDuckGo_CheckListItem,
+            CommonR.style.Widget_DuckDuckGo_CheckListItem,
         ).apply {
 
-            binding.primaryText.text = getString(R.styleable.CheckListItem_primaryText)
-            binding.secondaryText.text = getString(R.styleable.CheckListItem_secondaryText)
+            binding.primaryText.text = getString(CommonR.styleable.CheckListItem_primaryText)
+            binding.secondaryText.text = getString(CommonR.styleable.CheckListItem_secondaryText)
 
-            if (hasValue(R.styleable.CheckListItem_primaryTextColorOverlay)) {
-                binding.primaryText.setTextColor(getColorStateList(R.styleable.CheckListItem_primaryTextColorOverlay))
+            if (hasValue(CommonR.styleable.CheckListItem_primaryTextColorOverlay)) {
+                binding.primaryText.setTextColor(getColorStateList(CommonR.styleable.CheckListItem_primaryTextColorOverlay))
             }
 
-            val truncated = getBoolean(R.styleable.CheckListItem_primaryTextTruncated, true)
+            val truncated = getBoolean(CommonR.styleable.CheckListItem_primaryTextTruncated, true)
             if (truncated) {
                 binding.primaryText.maxLines = 1
                 binding.primaryText.ellipsize = TextUtils.TruncateAt.END
@@ -61,18 +62,18 @@ class CheckListItem @JvmOverloads constructor(
                 binding.primaryText.maxLines = Int.MAX_VALUE
             }
 
-            if (hasValue(R.styleable.CheckListItem_secondaryTextColorOverlay)) {
-                binding.secondaryText.setTextColor(getColorStateList(R.styleable.CheckListItem_secondaryTextColorOverlay))
+            if (hasValue(CommonR.styleable.CheckListItem_secondaryTextColorOverlay)) {
+                binding.secondaryText.setTextColor(getColorStateList(CommonR.styleable.CheckListItem_secondaryTextColorOverlay))
             }
 
-            val status = if (hasValue(R.styleable.CheckListItem_itemState)) {
-                CheckItemStatus.from(getInt(R.styleable.CheckListItem_itemState, 0))
+            val status = if (hasValue(CommonR.styleable.CheckListItem_itemState)) {
+                CheckItemStatus.from(getInt(CommonR.styleable.CheckListItem_itemState, 0))
             } else {
                 CheckItemStatus.DISABLED
             }
             setItemStatus(status)
 
-            setPillVisible(getBoolean(R.styleable.CheckListItem_showBetaPill, false))
+            setPillVisible(getBoolean(CommonR.styleable.CheckListItem_showBetaPill, false))
 
             recycle()
         }
