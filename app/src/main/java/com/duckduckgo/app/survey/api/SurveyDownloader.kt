@@ -35,6 +35,7 @@ class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
     private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
+    private val surveyRepository: SurveyRepository,
 ) {
 
     private fun getSurveyResponse(): Response<SurveyGroup?> {
@@ -86,7 +87,11 @@ class SurveyDownloader @Inject constructor(
             }
 
             newSurvey?.let {
-                surveyDao.insert(newSurvey)
+                if (surveyRepository.isUserEligibleForSurvey(newSurvey)) {
+                    Timber.d("User eligible for available survey")
+                    surveyDao.insert(newSurvey)
+                }
+                Timber.d("User not eligible for available survey")
             }
         }
     }

@@ -96,6 +96,7 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
+import com.duckduckgo.app.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -337,6 +338,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
 
+    @Mock
+    private lateinit var mockSurveyNotificationScheduler: SurveyNotificationScheduler
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -509,6 +513,7 @@ class BrowserTabViewModelTest {
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
             featureSegmentsManager = mockFeatureSegmentsManager,
+            surveyNotificationScheduler = mockSurveyNotificationScheduler,
         )
 
         testee.loadData("abc", null, false, false)

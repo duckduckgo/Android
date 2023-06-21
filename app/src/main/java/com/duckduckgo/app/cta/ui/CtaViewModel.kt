@@ -182,9 +182,8 @@ class CtaViewModel @Inject constructor(
         isBrowserShowing: Boolean,
         site: Site? = null,
         favoritesOnboarding: Boolean = false,
-        locale: Locale = Locale.getDefault(),
     ): Cta? {
-        surveyCta(locale)?.let {
+        surveyCta()?.let {
             return it
         }
 
@@ -230,14 +229,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun surveyCta(locale: Locale): HomePanelCta.Survey? {
+    private fun surveyCta(): HomePanelCta.Survey? {
         val survey = activeSurvey
 
         if (survey?.url == null) {
-            return null
-        }
-
-        if (!ALLOWED_LOCALES.contains(locale)) {
             return null
         }
 
@@ -401,6 +396,5 @@ class CtaViewModel @Inject constructor(
         private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
         private const val SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED = -1L
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
-        private val ALLOWED_LOCALES = listOf(Locale.US, Locale.UK, Locale.CANADA)
     }
 }

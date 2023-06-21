@@ -30,6 +30,7 @@ import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
+import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -65,6 +66,8 @@ class SurveyViewModelTest {
 
     private var mockAppBuildConfig: AppBuildConfig = mock()
 
+    private val mockAppDaysUsedRepository: AppDaysUsedRepository = mock()
+
     private lateinit var testee: SurveyViewModel
     private val testSource = SurveySource.IN_APP
 
@@ -80,6 +83,7 @@ class SurveyViewModelTest {
             mockAppInstallStore,
             mockAppBuildConfig,
             coroutineTestRule.testDispatcherProvider,
+            mockAppDaysUsedRepository,
         )
         testee.command.observeForever(mockCommandObserver)
     }
@@ -118,6 +122,7 @@ class SurveyViewModelTest {
         assertEquals("16", loadedUri.getQueryParameter("av"))
         assertEquals("name", loadedUri.getQueryParameter("ddgv"))
         assertEquals("pixel", loadedUri.getQueryParameter("man"))
+        assertEquals("in_app", loadedUri.getQueryParameter("src"))
     }
 
     @Test

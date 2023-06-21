@@ -27,11 +27,9 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.EnableAppTpNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
-import com.duckduckgo.app.notification.model.SurveyAvailableNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import dagger.Module
@@ -82,30 +80,18 @@ object NotificationModule {
     }
 
     @Provides
-    fun provideSurveyAvailableNotification(
-        context: Context,
-        notificationDao: NotificationDao,
-    ): SurveyAvailableNotification {
-        return SurveyAvailableNotification(context, notificationDao)
-    }
-
-    @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         enableAppTpNotification: EnableAppTpNotification,
-        surveyAvailableNotification: SurveyAvailableNotification,
-        userBrowserProperties: UserBrowserProperties,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
             enableAppTpNotification,
-            surveyAvailableNotification,
-            userBrowserProperties,
         )
     }
 

@@ -25,8 +25,10 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.survey.api.SurveyRepository
+import com.duckduckgo.app.survey.ui.SurveyActivity
+import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.text.SimpleDateFormat
@@ -36,7 +38,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
-class SurveyAvailableNotification(
+@ContributesMultibinding(AppScope::class)
+class SurveyAvailableNotification @Inject constructor(
     private val context: Context,
     private val notificationDao: NotificationDao,
 ) : SchedulableNotification {
@@ -72,11 +75,12 @@ class SurveyAvailableSpecification(context: Context) : NotificationSpec {
 @ContributesMultibinding(AppScope::class)
 class AvailableSurveyNotificationPlugin @Inject constructor(
     private val context: Context,
-    private val schedulableNotification: EnableAppTpNotification,
+    private val schedulableNotification: SurveyAvailableNotification,
     private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val pixel: Pixel,
     private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val surveyRepository: SurveyRepository,
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification {
@@ -101,7 +105,7 @@ class AvailableSurveyNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = SitePermissionsActivity.intent(context) // TODO Noelia change for surveyActivity
+        val intent = SurveyActivity.intent(context, surveyRepository.getScheduledSurvey(), SurveySource.PUSH)
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)

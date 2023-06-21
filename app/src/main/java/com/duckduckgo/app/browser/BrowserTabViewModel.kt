@@ -94,7 +94,7 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.app.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -193,7 +193,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val featureSegmentsManager: FeatureSegmentsManager,
-    private val notificationScheduler: AndroidNotificationScheduler,
+    private val surveyNotificationScheduler: SurveyNotificationScheduler,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     UrlExtractionListener,
@@ -2372,10 +2372,10 @@ class BrowserTabViewModel @Inject constructor(
         }
         viewModelScope.launch {
             if (survey != null) {
-                refreshCta(locale)
-                notificationScheduler.scheduleSurveyAvailableNotification(survey)
+                refreshCta()
+                surveyNotificationScheduler.scheduleSurveyAvailableNotification(survey)
             } else {
-                notificationScheduler.removeScheduledSurveyAvailableNotification()
+                surveyNotificationScheduler.removeScheduledSurveyAvailableNotification()
             }
         }
     }
@@ -2387,7 +2387,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
+    suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
@@ -2397,7 +2397,6 @@ class BrowserTabViewModel @Inject constructor(
                     isBrowserShowing,
                     siteLiveData.value,
                     showFavoritesOnboarding,
-                    locale,
                 )
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
