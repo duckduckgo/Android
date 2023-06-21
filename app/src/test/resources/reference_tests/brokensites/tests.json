@@ -3,6 +3,28 @@
         "name": "Broken site report testing",
         "tests": [
             {
+                "name": "Simple test with a common set of fields (without config version)",
+                "siteURL": "https://example.test/",
+                "wasUpgraded": true,
+                "category": "content",
+                "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+                "surrogates": ["surrogate.domain.test", "domain2.test"],
+                "atb": "v123-456g",
+                "blocklistVersion": "abc123",
+                "remoteConfigEtag": "abd142",
+                "remoteConfigVersion": "1234",
+                "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+                "expectReportURLParams": [
+                    {"name": "category", "value": "content"},
+                    {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+                    {"name": "upgradedHttps", "value": "true"},
+                    {"name": "tds", "value": "abc123"},
+                    {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+                    {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
+                ],
+                "exceptPlatforms": []
+            },
+            {
                 "name": "Simple test with a common set of fields",
                 "siteURL": "https://example.test/",
                 "wasUpgraded": true,
@@ -24,7 +46,9 @@
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
                     {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
                 ],
-                "exceptPlatforms": []
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "Test correct encoding of weak etags.",
@@ -48,7 +72,9 @@
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
                     {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
                 ],
-                "exceptPlatforms": []
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "Test correct encoding of non-weak etags.",
@@ -72,7 +98,9 @@
                     {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
                     {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
                 ],
-                "exceptPlatforms": []
+                "exceptPlatforms": [
+                    "ios-browser"
+                ]
             },
             {
                 "name": "Making sure that siteURL gets trimmed - path, query and fragment should be dropped",
