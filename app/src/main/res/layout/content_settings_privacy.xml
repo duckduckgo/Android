@@ -25,32 +25,34 @@
         android:id="@+id/settingsPrivacyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsHeadingPrivacy"/>
+        app:primaryText="@string/settingsHeadingPrivacy" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.app.settings.CheckListItem
         android:id="@+id/setAsDefaultBrowserSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsDefaultBrowserEnabled"
-        app:showSwitch="true"/>
+        app:primaryText="@string/settingsDefaultBrowserTitle"
+        app:secondaryText="@string/settingsDefaultBrowserNotSetDescription"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.app.settings.CheckListItem
         android:id="@+id/privateSearchSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
+        app:itemState="enabled"
         app:primaryText="@string/settingsPrivateSearchTitle"
+        app:primaryTextTruncated="false"
         app:secondaryText="@string/settingsPrivateSearchDescription" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.app.settings.CheckListItem
         android:id="@+id/webTrackingProtectionSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
+        app:itemState="enabled"
         app:primaryText="@string/settingsWebTrackingProtectionTitle"
+        app:primaryTextTruncated="false"
         app:secondaryText="@string/settingsWebTrackingProtectionDescription" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.app.settings.CheckListItem
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,12 +61,20 @@
         app:secondaryText="@string/settingsEmailProtectionSubtitle"
         app:showBetaPill="true" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.app.settings.CheckListItem
         android:id="@+id/vpnSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/atp_SettingsTitle"
         app:primaryTextTruncated="false"
+        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
+        app:showBetaPill="true" />
+
+    <com.duckduckgo.app.settings.CheckListItem
+        android:id="@+id/netpPSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/netpSettingsTitle"
         app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
         app:showBetaPill="true" />
 

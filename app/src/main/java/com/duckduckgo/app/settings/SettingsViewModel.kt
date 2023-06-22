@@ -52,7 +52,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
@@ -171,6 +170,14 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { command.send(Command.LaunchAddHomeScreenWidget) }
     }
 
+    fun onDefaultBrowserSettingClicked() {
+        val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(isAppDefaultBrowser = defaultBrowserSelected))
+            command.send(Command.LaunchDefaultBrowser)
+        }
+    }
+
     fun onPrivateSearchSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchPrivateSearchWebPage) }
         pixel.fire(SETTINGS_PRIVATE_SEARCH_PRESSED)
@@ -213,16 +220,6 @@ class SettingsViewModel @Inject constructor(
             } else {
                 command.send(Command.LaunchWindowsWaitlist)
             }
-        }
-    }
-
-    fun onDefaultBrowserToggled(enabled: Boolean) {
-        Timber.i("User toggled default browser, is now enabled: $enabled")
-        val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
-        if (enabled && defaultBrowserSelected) return
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(isAppDefaultBrowser = enabled))
-            command.send(Command.LaunchDefaultBrowser)
         }
     }
 

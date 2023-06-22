@@ -22,7 +22,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -102,10 +101,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onDefaultBrowserToggled(isChecked)
-    }
-
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
 
@@ -142,11 +137,12 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
-            setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
+            setAsDefaultBrowserSetting.setClickListener { viewModel.onDefaultBrowserSettingClicked() }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
+            netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
 
         with(viewsSettings) {
@@ -162,7 +158,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         with(viewsMore) {
             macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
             windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
-            netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
         }
     }
 
@@ -226,8 +221,13 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun updateEmailSubtitle(emailAddress: String?) {
-        val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
-        viewsPrivacy.emailSetting.setSecondaryText(subtitle)
+        if (emailAddress.isNullOrEmpty()) {
+            viewsPrivacy.emailSetting.setSecondaryText(getString(R.string.settingsEmailProtectionSubtitle))
+            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+        } else {
+            viewsPrivacy.emailSetting.setSecondaryText(emailAddress)
+            viewsPrivacy.emailSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
+        }
     }
 
     private fun updateSyncSetting(visible: Boolean) {
@@ -263,7 +263,13 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
         with(viewsPrivacy.setAsDefaultBrowserSetting) {
             visibility = if (it.showDefaultBrowserSetting) {
-                quietlySetIsChecked(it.isAppDefaultBrowser, defaultBrowserChangeListener)
+                if (it.isAppDefaultBrowser) {
+                    setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
+                    setSecondaryText(getString(R.string.settingsDefaultBrowserSetDescription))
+                } else {
+                    setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+                    setSecondaryText(getString(R.string.settingsDefaultBrowserNotSetDescription))
+                }
                 View.VISIBLE
             } else {
                 View.GONE
@@ -278,18 +284,21 @@ class SettingsActivity : DuckDuckGoActivity() {
         with(viewsPrivacy) {
             if (appTPEnabled) {
                 vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
             } else {
                 if (appTrackingProtectionOnboardingShown) {
                     vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.WARNING)
                 } else {
                     vpnSetting.setSecondaryText(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                    vpnSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
                 }
             }
         }
     }
 
     private fun updateNetPSettings(networkProtectionState: NetPState, networkProtectionWaitlistState: NetPWaitlistState) {
-        with(viewsMore) {
+        with(viewsPrivacy) {
             when (networkProtectionWaitlistState) {
                 NetPWaitlistState.InBeta -> {
                     netpPSetting.show()
@@ -301,11 +310,18 @@ class SettingsActivity : DuckDuckGoActivity() {
                     }?.run {
                         netpPSetting.setSecondaryText(getString(this))
                     }
+                    val netPItemStatus = if (networkProtectionState == CONNECTED) {
+                        CheckListItem.CheckItemStatus.ENABLED
+                    } else {
+                        CheckListItem.CheckItemStatus.DISABLED
+                    }
+                    netpPSetting.setItemStatus(netPItemStatus)
                 }
                 NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
                 NetPWaitlistState.CodeRedeemed, NetPWaitlistState.PendingInviteCode -> {
                     netpPSetting.show()
                     netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
+                    netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
                 }
             }
         }

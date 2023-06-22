@@ -50,15 +50,4 @@
         app:secondaryText="@string/windows_settings_description"
         app:showBetaPill="true" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/netpPSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/vpnSetting"
-        app:primaryText="@string/netpSettingsTitle"
-        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
-        app:showBetaPill="true" />
-
 </LinearLayout>

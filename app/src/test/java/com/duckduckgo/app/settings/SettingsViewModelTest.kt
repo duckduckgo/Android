@@ -158,10 +158,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserTogglesOffThenLaunchDefaultBrowserCommandIsSent() = runTest {
+    fun whenOnDefaultBrowserSettingClickedAndAlreadyDefaultBrowserThenLaunchDefaultBrowserCommandIsSent() = runTest {
         testee.commands().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-            testee.onDefaultBrowserToggled(false)
+            testee.onDefaultBrowserSettingClicked()
 
             assertEquals(Command.LaunchDefaultBrowser, awaitItem())
 
@@ -170,29 +170,16 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserTogglesOnThenLaunchDefaultBrowserCommandIsSent() = runTest {
+    fun whenOnDefaultBrowserSettingClickedAndNotDefaultBrowserThenLaunchDefaultBrowserCommandIsSent() = runTest {
         testee.commands().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-            testee.onDefaultBrowserToggled(true)
+            testee.onDefaultBrowserSettingClicked()
 
             assertEquals(Command.LaunchDefaultBrowser, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
     }
-
-    @Test
-    fun whenDefaultBrowserTogglesOnAndBrowserWasAlreadyDefaultThenLaunchDefaultBrowserCommandIsNotSent() =
-        runTest {
-            testee.commands().test {
-                whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-                testee.onDefaultBrowserToggled(true)
-
-                expectNoEvents()
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
 
     @Test
     fun whenDefaultBrowserAppAlreadySetToOursThenIsDefaultBrowserFlagIsTrue() = runTest {
