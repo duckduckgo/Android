@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update Asana task -> PR reviewed
-        uses: malmstein/github-asana-action@0.5.0
+        uses: malmstein/github-asana-action@0.6.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          action: 'pr-reviewed'
+          action: 'notify-pr-reviewed'
