@@ -37,12 +37,38 @@ class SurveyRepositoryImpl @Inject constructor(
 ) : SurveyRepository {
 
     override fun isUserEligibleForSurvey(survey: Survey): Boolean {
+        if (survey.url == null) {
+            return false
+        }
+
         val eligibleLocale = ALLOWED_LOCALES.contains(Locale.getDefault())
-        return remainingDaysForShowingSurvey(survey) >= 0 && eligibleLocale
+        return validDaysInstalled(survey) && eligibleLocale
     }
 
     override fun remainingDaysForShowingSurvey(survey: Survey): Long {
-        return (survey.daysInstalled ?: 0) - userBrowserProperties.daysSinceInstalled()
+        // Case for targeting users with app install > 30 days
+        if (survey.daysInstalled == null && userBrowserProperties.daysSinceInstalled() >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) {
+            return 0L
+        }
+        // Case for targeting all users
+        if (survey.daysInstalled == SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED) {
+            return 0L
+        }
+        // If any of the above, then remaining days since app install
+        if (survey.daysInstalled != null) {
+            return survey.daysInstalled - userBrowserProperties.daysSinceInstalled()
+        }
+        return -1
+    }
+
+    private fun validDaysInstalled(survey: Survey): Boolean {
+        if (survey.daysInstalled == null && userBrowserProperties.daysSinceInstalled() < SURVEY_DEFAULT_MIN_DAYS_INSTALLED) {
+            return false
+        }
+        if ((survey.daysInstalled ?: 0) - userBrowserProperties.daysSinceInstalled() < 0) {
+            return false
+        }
+        return true
     }
 
     override fun getScheduledSurvey(): Survey {
@@ -51,5 +77,7 @@ class SurveyRepositoryImpl @Inject constructor(
 
     companion object {
         private val ALLOWED_LOCALES = listOf(Locale.US, Locale.UK, Locale.CANADA)
+        const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
+        const val SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED = -1
     }
 }

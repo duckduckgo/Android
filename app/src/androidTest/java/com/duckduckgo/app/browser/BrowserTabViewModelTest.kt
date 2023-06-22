@@ -96,7 +96,6 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
-import com.duckduckgo.app.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -114,8 +113,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_APPTP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
@@ -341,6 +342,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockSurveyNotificationScheduler: SurveyNotificationScheduler
 
+    @Mock
+    private lateinit var mockSurveyRepository: SurveyRepository
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -446,6 +450,7 @@ class BrowserTabViewModelTest {
             appTheme = mockAppTheme,
             variantManager = mockVariantManager,
             vpnFeaturesRegistry = mockVpnFeaturesRegistry,
+            surveyRepository = mockSurveyRepository
         )
 
         val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
@@ -2048,14 +2053,6 @@ class BrowserTabViewModelTest {
     fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED), Locale.US)
         assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED), Locale.US)
-        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test

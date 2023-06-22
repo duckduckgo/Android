@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification
+package com.duckduckgo.app.survey.notification
 
 import android.content.Context
 import androidx.annotation.WorkerThread
@@ -23,7 +23,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.app.notification.model.SurveyAvailableNotification
+import com.duckduckgo.app.notification.NotificationSender
+import com.duckduckgo.app.notification.SchedulableNotificationWorker
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.di.scopes.AppScope
@@ -50,12 +51,12 @@ class SurveyNotificationSchedulerImpl @Inject constructor(
             0L -> {
                 scheduleNotification(
                     OneTimeWorkRequestBuilder<SurveyAvailableNotificationWorker>(),
-                    5,
+                    MIN_DELAY_DURATION_IN_SECONDS,
                     TimeUnit.SECONDS,
                     SURVEY_WORK_REQUEST_TAG,
                 )
             }
-            in 1..5 -> {
+            in 1..Long.MAX_VALUE -> {
                 scheduleNotification(
                     OneTimeWorkRequestBuilder<SurveyAvailableNotificationWorker>(),
                     delayDuration,
@@ -87,6 +88,7 @@ class SurveyNotificationSchedulerImpl @Inject constructor(
 
     companion object {
         const val SURVEY_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedulesurvey"
+        private const val MIN_DELAY_DURATION_IN_SECONDS = 5L
     }
 }
 

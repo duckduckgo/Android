@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.model
+package com.duckduckgo.app.survey.notification
 
 import android.app.PendingIntent
 import android.content.Context
@@ -24,6 +24,9 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.NotificationSpec
+import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.api.SurveyRepository
@@ -44,7 +47,7 @@ class SurveyAvailableNotification @Inject constructor(
     private val notificationDao: NotificationDao,
 ) : SchedulableNotification {
     val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-    val today = formatter.format((Date()))
+    val today: String? = formatter.format((Date()))
 
     override val id = "com.duckduckgo.survey.availablesurvey$today"
 

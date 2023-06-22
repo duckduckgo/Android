@@ -94,7 +94,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -107,6 +106,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent

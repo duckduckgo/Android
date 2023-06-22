@@ -41,6 +41,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
@@ -122,6 +123,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
+    @Mock
+    private lateinit var mockSurveyRepository: SurveyRepository
+
     private var mockVariantManager: VariantManager = mock()
 
     private var mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
@@ -168,6 +172,7 @@ class CtaViewModelTest {
             appTheme = mockAppTheme,
             variantManager = mockVariantManager,
             vpnFeaturesRegistry = mockVpnFeaturesRegistry,
+            surveyRepository = mockSurveyRepository,
         )
     }
 
