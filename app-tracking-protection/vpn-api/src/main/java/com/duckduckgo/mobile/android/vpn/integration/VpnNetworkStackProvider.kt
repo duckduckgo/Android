@@ -30,5 +30,5 @@ interface VpnNetworkStackProvider {
      * CAll this method to get the VPN network stack to be used in the VPN service.
      */
     @Throws(IllegalStateException::class)
-    fun provideNetworkStack(): VpnNetworkStack
+    suspend fun provideNetworkStack(): VpnNetworkStack
 }

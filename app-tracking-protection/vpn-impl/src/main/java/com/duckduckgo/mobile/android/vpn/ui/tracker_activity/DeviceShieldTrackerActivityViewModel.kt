@@ -78,14 +78,14 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
-        when {
-            enabled && vpnDetector.isExternalVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
-            enabled == true -> sendCommand(Command.CheckVPNPermission)
-            enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
-        }
-        // If the VPN is not started due to any issue, the getRunningState() won't be updated and the toggle is kept (wrongly) in ON state
-        // Check after 1 second to ensure this doesn't happen
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            when {
+                enabled && vpnDetector.isExternalVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
+                enabled == true -> sendCommand(Command.CheckVPNPermission)
+                enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
+            }
+            // If the VPN is not started due to any issue, the getRunningState() won't be updated and the toggle is kept (wrongly) in ON state
+            // Check after 1 second to ensure this doesn't happen
             delay(TimeUnit.SECONDS.toMillis(1))
             refreshVpnRunningState.emit(System.currentTimeMillis())
         }

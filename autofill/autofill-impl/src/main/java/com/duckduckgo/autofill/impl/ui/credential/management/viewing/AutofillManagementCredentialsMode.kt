@@ -40,6 +40,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
@@ -58,7 +59,6 @@ import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -67,7 +67,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@ExperimentalCoroutinesApi
 @InjectWith(FragmentScope::class)
 class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_edit_mode), MenuProvider {
 
@@ -88,6 +87,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     @Inject
     lateinit var initialExtractor: InitialExtractor
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     // we need to revert the toolbar title when this fragment is destroyed, so will track its initial value
     private var initialActionBarTitle: String? = null
@@ -216,7 +218,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun initializeEditStateIfNecessary(mode: EditingExisting) {
         if (!mode.hasPopulatedFields) {
-            populateFields(mode.credentialsViewed)
+            populateFields(mode.credentialsViewed, showLinkButton = false)
             initialiseTextWatchers()
             viewModel.onCredentialEditModePopulated()
         }
@@ -253,7 +255,10 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         viewModel.saveOrUpdateCredentials(updatedCredentials)
     }
 
-    private fun populateFields(credentials: LoginCredentials) {
+    private fun populateFields(
+        credentials: LoginCredentials,
+        showLinkButton: Boolean,
+    ) {
         loadDomainFavicon(credentials)
         binding.apply {
             domainTitleEditText.setText(credentials.domainTitle)
@@ -265,7 +270,21 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                 lastUpdatedView.text = getString(R.string.credentialManagementEditLastUpdated, lastUpdatedDateFormatter.format(it))
             }
 
+            configureDomainLinkButton(showLinkButton)
+
             getActionBar()?.title = credentials.extractTitle()
+        }
+    }
+
+    private fun configureDomainLinkButton(showLinkButton: Boolean) {
+        if (showLinkButton) {
+            binding.domainEditText.setEndIcon(R.drawable.ic_link_24, getString(R.string.credentialManagementLinkButtonContentDescription))
+            binding.domainEditText.onAction {
+                startActivity(browserNav.openInNewTab(binding.root.context, binding.domainEditText.text))
+                activity?.finish()
+            }
+        } else {
+            binding.domainEditText.removeEndIcon()
         }
     }
 
@@ -318,7 +337,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             .onEach { credentialMode ->
                 when (credentialMode) {
                     is Viewing -> {
-                        populateFields(credentialMode.credentialsViewed)
+                        populateFields(credentialMode.credentialsViewed, showLinkButton = credentialMode.showLinkButton)
                         showViewMode(credentialMode.credentialsViewed)
                         invalidateMenu()
                     }
@@ -396,6 +415,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             }
         }
     }
+
     private fun loadDomainFavicon(credentials: LoginCredentials) {
         lifecycleScope.launch(dispatchers.io()) {
             showPlaceholderFavicon(credentials)

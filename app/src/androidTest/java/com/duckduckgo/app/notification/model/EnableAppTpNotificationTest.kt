@@ -57,6 +57,7 @@ class EnableAppTpNotificationTest {
     fun whenNotificationNotSeenAndOneEasyStepForPrivacyNotificationEnabledThenCanShowIsTrue() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zm" })
+        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
 
         assertTrue(testee.canShow())
     }
@@ -65,6 +66,7 @@ class EnableAppTpNotificationTest {
     fun whenNotificationNotSeenAndNextLevelPrivacyNotificationEnabledThenCanShowIsTrue() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zn" })
+        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
 
         assertTrue(testee.canShow())
     }
@@ -73,6 +75,7 @@ class EnableAppTpNotificationTest {
     fun whenNotificationNotSeenAndOtherEnabledThenCanShowIsFalse() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "ze" })
+        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
 
         assertFalse(testee.canShow())
     }
