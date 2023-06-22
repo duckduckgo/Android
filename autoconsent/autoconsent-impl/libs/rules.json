@@ -4182,9 +4182,6 @@
       ],
       "detectCmp": [
         {
-          "wait": 1000
-        },
-        {
           "exists": "#truyo-cookieBarContent"
         }
       ],
