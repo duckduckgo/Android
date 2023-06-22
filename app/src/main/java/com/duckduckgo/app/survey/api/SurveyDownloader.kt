@@ -88,10 +88,8 @@ class SurveyDownloader @Inject constructor(
 
             newSurvey?.let {
                 if (surveyRepository.isUserEligibleForSurvey(newSurvey)) {
-                    Timber.d("User eligible for available survey")
                     surveyDao.insert(newSurvey)
                 }
-                Timber.d("User not eligible for available survey")
             }
         }
     }

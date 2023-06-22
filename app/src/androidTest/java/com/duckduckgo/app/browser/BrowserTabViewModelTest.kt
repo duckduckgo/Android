@@ -450,7 +450,7 @@ class BrowserTabViewModelTest {
             appTheme = mockAppTheme,
             variantManager = mockVariantManager,
             vpnFeaturesRegistry = mockVpnFeaturesRegistry,
-            surveyRepository = mockSurveyRepository
+            surveyRepository = mockSurveyRepository,
         )
 
         val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())

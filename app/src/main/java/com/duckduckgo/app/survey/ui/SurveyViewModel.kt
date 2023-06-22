@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
@@ -44,6 +45,7 @@ class SurveyViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val dispatchers: DispatcherProvider,
     private val appDaysUsedRepository: AppDaysUsedRepository,
+    private val surveyRepository: SurveyRepository,
 ) : ViewModel() {
 
     sealed class Command {
@@ -101,6 +103,7 @@ class SurveyViewModel @Inject constructor(
 
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
+        surveyRepository.clearSurveyNotification()
         viewModelScope.launch {
             withContext(dispatchers.io() + NonCancellable) {
                 surveyDao.update(survey)

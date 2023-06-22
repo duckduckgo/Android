@@ -18,6 +18,7 @@ package com.duckduckgo.app.survey.notification
 
 import android.content.Context
 import androidx.annotation.WorkerThread
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -43,6 +44,7 @@ interface SurveyNotificationScheduler {
 class SurveyNotificationSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,
     private val surveyRepository: SurveyRepository,
+    private val notificationManager: NotificationManagerCompat,
 ) : SurveyNotificationScheduler {
     override suspend fun scheduleSurveyAvailableNotification(survey: Survey) {
         workManager.cancelAllWorkByTag(SURVEY_WORK_REQUEST_TAG)

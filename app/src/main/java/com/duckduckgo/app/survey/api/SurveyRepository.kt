@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.survey.api
 
+import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.notification.NotificationRegistrar.NotificationId
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -28,12 +30,14 @@ interface SurveyRepository {
     fun isUserEligibleForSurvey(survey: Survey): Boolean
     fun remainingDaysForShowingSurvey(survey: Survey): Long
     fun getScheduledSurvey(): Survey
+    fun clearSurveyNotification()
 }
 
 @ContributesBinding(AppScope::class)
 class SurveyRepositoryImpl @Inject constructor(
     private val surveyDao: SurveyDao,
     private val userBrowserProperties: UserBrowserProperties,
+    private val notificationManager: NotificationManagerCompat,
 ) : SurveyRepository {
 
     override fun isUserEligibleForSurvey(survey: Survey): Boolean {
@@ -73,6 +77,10 @@ class SurveyRepositoryImpl @Inject constructor(
 
     override fun getScheduledSurvey(): Survey {
         return surveyDao.getScheduled().last()
+    }
+
+    override fun clearSurveyNotification() {
+        notificationManager.cancel(NotificationId.SurveyAvailable)
     }
 
     companion object {

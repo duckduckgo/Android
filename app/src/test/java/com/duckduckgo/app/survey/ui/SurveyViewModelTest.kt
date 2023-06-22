@@ -24,6 +24,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.DONE
@@ -68,6 +69,8 @@ class SurveyViewModelTest {
 
     private val mockAppDaysUsedRepository: AppDaysUsedRepository = mock()
 
+    private val mockSurveyRepository: SurveyRepository = mock()
+
     private lateinit var testee: SurveyViewModel
     private val testSource = SurveySource.IN_APP
 
@@ -84,6 +87,7 @@ class SurveyViewModelTest {
             mockAppBuildConfig,
             coroutineTestRule.testDispatcherProvider,
             mockAppDaysUsedRepository,
+            mockSurveyRepository,
         )
         testee.command.observeForever(mockCommandObserver)
     }
@@ -166,6 +170,13 @@ class SurveyViewModelTest {
         testee.onSurveyCompleted()
         verify(mockSurveyDao).update(Survey("", "https://survey.com", null, DONE))
         verify(mockCommandObserver).onChanged(Command.Close)
+    }
+
+    @Test
+    fun whenSurveyCompletedThenSurveyNotificationIsCleared() {
+        testee.start(Survey("", "https://survey.com", null, SCHEDULED), testSource)
+        testee.onSurveyCompleted()
+        verify(mockSurveyRepository).clearSurveyNotification()
     }
 
     @Test
