@@ -26,9 +26,9 @@ import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
-import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -127,11 +127,11 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun launchWebViewScreen() {
-        startActivity(
-            WebViewActivity.intent(
-                this,
-                PRIVACY_POLICY_WEB_LINK,
-                getString(R.string.settingsPrivacyPolicyDuckduckgo),
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = PRIVACY_POLICY_WEB_LINK,
+                screenTitle = getString(R.string.settingsPrivacyPolicyDuckduckgo),
             ),
         )
     }

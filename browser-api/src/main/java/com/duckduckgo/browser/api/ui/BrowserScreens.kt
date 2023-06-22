@@ -19,3 +19,7 @@ package com.duckduckgo.browser.api.ui
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 object FeedbackActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
+data class WebViewActivityWithParams(
+    val url: String,
+    val screenTitle: String,
+) : GlobalActivityStarter.ActivityParams
