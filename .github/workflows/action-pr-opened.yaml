@@ -29,7 +29,6 @@ jobs:
         uses: malmstein/github-asana-action@0.6.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: ${{ secrets.GH_ASANA_ISSUES_PROJECT_ID }}
           trigger-phrase: "Task/Issue URL:"
           action: 'add-asana-comment'
 
@@ -37,6 +36,7 @@ jobs:
         uses: malmstein/github-asana-action@0.6.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          trigger-phrase: "Task/Issue URL:"
           asana-project: '414730916066338'
           asana-section: '1138897782858216'
           action: 'add-task-asana-project'
@@ -45,6 +45,7 @@ jobs:
         uses: malmstein/github-asana-action@0.6.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          trigger-phrase: "Task/Issue URL:"
           asana-project: '488551667048375'
           asana-section: '488604899706669'
           action: 'add-task-asana-project'
