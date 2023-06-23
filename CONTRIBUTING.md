@@ -30,9 +30,9 @@ After our team has investigated each issue, we will label them as:
 
 ## Contribute Code
 We're always open to contributions from the community! There are different approaches depending on how you wish to contribute:
-* **For bug fixes**, feel free to open a pull request along with an associated issue. Someone from the team will review your issue/change within a few days.
+* **For bug fixes**, please feel free to open an issue to initiate a discussion before submitting any pull requests. If there's already an associated issue created, please add it to the description. Someone from the team will review your issue/change within a few days.
 * Refactoring, product changes and other features won't be considered and therefore the Pull Request will be closed.
-* If you're looking for a bug to work on, see the [Help Wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).  tag for a list of open issues.
+* If you're looking for a bug to work on, see the [Help Wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) tag for a list of open issues.
 
 ### Style Guide
 
