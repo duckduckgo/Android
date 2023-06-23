@@ -29,12 +29,10 @@ After our team has investigated each issue, we will label them as:
 * Won't fix: issue will be closed without a fix
 
 ## Contribute Code
-
-We welcome Pull Requests aimed at fixing bugs and security issues. Refactoring, product changes and other features won't be considered and therefore the Pull Request will be closed.
-
-If you have a great idea or a feature request, please refer to the Share Feedback section above. Any issue that is created with the aim to request a feature will be closed. Proposals that fit our product direction and timeline will be added to our backlog and labelled accordingly.
-
-We have also labeled tasks you can help with as [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22). Those tasks a great places to start contributing to DuckDuckGo and we'll support you through the process.
+We're always open to contributions from the community! There are different approaches depending on how you wish to contribute:
+* **For bug fixes**, feel free to open a pull request along with an associated issue. Someone from the team will review your issue/change within a few days.
+* Refactoring, product changes and other features won't be considered and therefore the Pull Request will be closed.
+* If you're looking for a bug to work on, see the [Help Wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).  tag for a list of open issues.
 
 ### Style Guide
 
