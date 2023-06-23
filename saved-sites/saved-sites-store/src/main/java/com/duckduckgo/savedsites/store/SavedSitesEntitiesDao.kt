@@ -73,7 +73,8 @@ interface SavedSitesEntitiesDao {
     )
 
     @Query(
-        "update entities set title = '', url = '', deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot",
+        "update entities set title = '', url = '', deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot " +
+            "AND entityId != :favoritesRoot",
     )
     fun deleteAll(
         bookmarksRoot: String = SavedSitesNames.BOOKMARKS_ROOT,
