@@ -36,6 +36,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -67,6 +68,7 @@ class ClearPersonalDataAction(
     private val adClickManager: AdClickManager,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val sitePermissionsManager: SitePermissionsManager,
+    private val deviceSyncState: DeviceSyncState,
     private val savedSitesRepository: SavedSitesRepository,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ClearDataAction {
@@ -91,7 +93,12 @@ class ClearPersonalDataAction(
             geoLocationPermissions.clearAllButFireproofed()
             sitePermissionsManager.clearAllButFireproof(fireproofDomains)
             thirdPartyCookieManager.clearAllData()
-            savedSitesRepository.pruneDeleted()
+
+            // https://app.asana.com/0/69071770703008/1204375817149200/f
+            if (!deviceSyncState.isUserSignedInOnDevice()) {
+                savedSitesRepository.pruneDeleted()
+            }
+
             clearTabsAsync(appInForeground)
         }
 

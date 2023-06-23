@@ -23,7 +23,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.engine.SyncEngine
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +34,6 @@ import kotlinx.coroutines.launch
 )
 class SavedSitesDataCleaner @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
-    private val syncEngine: SyncEngine,
     private val deviceSyncState: DeviceSyncState,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
