@@ -6,6 +6,7 @@ on:
 
 jobs:
   pr-reviewed:
+    if: github.event.review.state == 'approved'
     runs-on: ubuntu-latest
     steps:
       - name: Update Asana task -> PR reviewed

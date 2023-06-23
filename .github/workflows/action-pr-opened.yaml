@@ -31,24 +31,6 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           trigger-phrase: "Task/Issue URL:"
           action: 'add-asana-comment'
-
-      - name: Add Asana task to Internal Project / Incoming
-        uses: malmstein/github-asana-action@0.6.0
-        with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          trigger-phrase: "Task/Issue URL:"
-          asana-project: '414730916066338'
-          asana-section: '1138897782858216'
-          action: 'add-task-asana-project'
-
-      - name: Add Asana task to Android Releases Board Project / PR
-        uses: malmstein/github-asana-action@0.6.0
-        with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          trigger-phrase: "Task/Issue URL:"
-          asana-project: '488551667048375'
-          asana-section: '488604899706669'
-          action: 'add-task-asana-project'
   process-external-pr:
     name: Process external Pull Request
     if: ${{ needs.validate-pr.outputs.output1 == 'true' }}

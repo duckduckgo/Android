@@ -32,7 +32,7 @@ After our team has investigated each issue, we will label them as:
 
 We welcome Pull Requests aimed at fixing bugs and security issues. Refactoring, product changes and other features won't be considered and therefore the Pull Request will be closed.
 
-If you have a great idea or a feature request, please refer to the Share Feedback session. Any issue that is created with the aim to request a feature will be closed. Proposals that fit our product direction and timeline will be added to our backlog and labelled accordingly.
+If you have a great idea or a feature request, please refer to the Share Feedback section above. Any issue that is created with the aim to request a feature will be closed. Proposals that fit our product direction and timeline will be added to our backlog and labelled accordingly.
 
 We have also labeled tasks you can help with as [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22). Those tasks a great places to start contributing to DuckDuckGo and we'll support you through the process.
 
