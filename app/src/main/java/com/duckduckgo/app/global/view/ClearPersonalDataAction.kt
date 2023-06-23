@@ -34,6 +34,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -66,6 +67,7 @@ class ClearPersonalDataAction(
     private val adClickManager: AdClickManager,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val sitePermissionsManager: SitePermissionsManager,
+    private val savedSitesRepository: SavedSitesRepository,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ClearDataAction {
 
@@ -89,6 +91,7 @@ class ClearPersonalDataAction(
             geoLocationPermissions.clearAllButFireproofed()
             sitePermissionsManager.clearAllButFireproof(fireproofDomains)
             thirdPartyCookieManager.clearAllData()
+            savedSitesRepository.pruneDeleted()
             clearTabsAsync(appInForeground)
         }
 

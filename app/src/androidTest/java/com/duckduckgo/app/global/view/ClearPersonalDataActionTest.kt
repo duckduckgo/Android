@@ -30,6 +30,7 @@ import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -57,6 +58,7 @@ class ClearPersonalDataActionTest {
     private val mockThirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val mockAdClickManager: AdClickManager = mock()
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
+    private val mockSavedSitesRepository: SavedSitesRepository = mock()
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = MutableLiveData()
@@ -75,6 +77,7 @@ class ClearPersonalDataActionTest {
             thirdPartyCookieManager = mockThirdPartyCookieManager,
             adClickManager = mockAdClickManager,
             fireproofWebsiteRepository = mockFireproofWebsiteRepository,
+            savedSitesRepository = mockSavedSitesRepository,
             sitePermissionsManager = mockSitePermissionsManager,
         )
         whenever(mockFireproofWebsiteRepository.getFireproofWebsites()).thenReturn(fireproofWebsites)
@@ -126,5 +129,11 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenThirdPartyCookieSitesAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockThirdPartyCookieManager).clearAllData()
+    }
+
+    @Test
+    fun whenClearCalledThenSavedSitesPrunesDeleted() = runTest {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockSavedSitesRepository).pruneDeleted()
     }
 }

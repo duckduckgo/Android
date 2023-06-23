@@ -66,13 +66,15 @@ interface SavedSitesEntitiesDao {
     )
     fun allEntitiesInFolderSync(folderId: String): List<Entity>
 
-    @Query("update entities set deleted = 1, lastModified = :lastModified where entityId = :id")
+    @Query("update entities set title = '', url = '', deleted = 1, lastModified = :lastModified where entityId = :id")
     fun delete(
         id: String,
         lastModified: String = DatabaseDateFormatter.iso8601(),
     )
 
-    @Query("update entities set deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
+    @Query(
+        "update entities set title = '', url = '', deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot",
+    )
     fun deleteAll(
         bookmarksRoot: String = SavedSitesNames.BOOKMARKS_ROOT,
         favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
