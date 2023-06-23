@@ -36,17 +36,6 @@ If you have a great idea or a feature request, please refer to the Share Feedbac
 
 We have also labeled tasks you can help with as [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22). Those tasks a great places to start contributing to DuckDuckGo and we'll support you through the process.
 
-## What to expect
-
-When a new pull request is opened, our team will review it we will label it as:
-* Needs triage: needs a triage from a member of our team
-* under investigation: our team will investigate the issue
-
-After our team has investigated each issue, we will label them as:
-* Will fix: issue will be fixed internally by DuckDuckGo
-* [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22): community contributions are welcome
-* Won't fix: issue will be closed without a fix
-
 ### Style Guide
 
 Refer to our [style guide](STYLEGUIDE.md).
