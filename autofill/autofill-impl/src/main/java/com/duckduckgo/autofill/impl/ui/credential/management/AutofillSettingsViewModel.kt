@@ -21,9 +21,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository
+import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.*
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
@@ -49,12 +52,22 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Activated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Deactivated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FailedToObtainStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FetchingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotADuckAddress
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import javax.inject.Inject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,6 +87,9 @@ class AutofillSettingsViewModel @Inject constructor(
     private val credentialListFilter: CredentialListFilter,
     private val faviconManager: FaviconManager,
     private val webUrlIdentifier: WebUrlIdentifier,
+    private val duckAddressStatusRepository: DuckAddressStatusRepository,
+    private val emailDatastore: EmailDataStore,
+    private val duckAddressIdentifier: DuckAddressIdentifier,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -117,6 +133,8 @@ class AutofillSettingsViewModel @Inject constructor(
             credentialMode = Viewing(credentialsViewed = credentials, showLinkButton = credentials.shouldShowLinkButton()),
         )
         addCommand(ShowCredentialMode)
+
+        updateDuckAddressStatus(credentials.username)
     }
 
     fun onCreateNewCredentials() {
@@ -174,13 +192,7 @@ class AutofillSettingsViewModel @Inject constructor(
                 // if credential mode started with edit, it means that we need to exit credential mode right away instead of going
                 // back to view mode.
                 if (it is EditingExisting && !it.startedCredentialModeWithEdit) {
-                    _viewState.value =
-                        value.copy(
-                            credentialMode = Viewing(
-                                credentialsViewed = it.credentialsViewed,
-                                showLinkButton = it.credentialsViewed.shouldShowLinkButton(),
-                            ),
-                        )
+                    onViewCredentials(it.credentialsViewed)
                 } else {
                     onExitCredentialMode()
                 }
@@ -347,6 +359,8 @@ class AutofillSettingsViewModel @Inject constructor(
             } else if (credentialMode is EditingNewEntry) {
                 saveNewCredential(credentials)
             }
+
+            updateDuckAddressStatus(credentials.username)
         }
     }
 
@@ -410,6 +424,95 @@ class AutofillSettingsViewModel @Inject constructor(
         _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText, showAutofillEnabledToggle = showAutofillEnabledToggle)
     }
 
+    @OptIn(ExperimentalContracts::class)
+    private fun isPrivateDuckAddress(
+        username: String?,
+        mainDuckAddress: String?,
+    ): Boolean {
+        contract {
+            returns(true) implies (username != null)
+            returns(true) implies (mainDuckAddress != null)
+        }
+
+        if (username == null) return false
+
+        return duckAddressIdentifier.isPrivateDuckAddress(username, mainDuckAddress)
+    }
+
+    private fun updateDuckAddressStatus(username: String?) {
+        Timber.d("Determining duck address status for %s", username)
+
+        viewModelScope.launch(dispatchers.io()) {
+            val mainAddress = emailDatastore.emailUsername
+            if (!isPrivateDuckAddress(username, mainAddress)) {
+                Timber.d("Not a private duck address: %s", username)
+            } else {
+                val credMode = viewState.value.credentialMode
+                if (credMode is Viewing) {
+                    Timber.d("Fetching duck address status from the network for %s", username)
+                    retrieveStatusFromNetwork(credMode, username)
+                }
+            }
+        }
+    }
+
+    private fun retrieveStatusFromNetwork(
+        credMode: Viewing,
+        duckAddress: String,
+    ) {
+        _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FetchingActivationStatus(duckAddress)))
+
+        viewModelScope.launch(dispatchers.io()) {
+            when (duckAddressStatusRepository.getActivationStatus(duckAddress)) {
+                Activated -> {
+                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Activated(duckAddress)))
+                }
+
+                Deactivated -> {
+                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Deactivated(duckAddress)))
+                }
+
+                NotSignedIn -> {
+                    Timber.d("Not signed into email protection; can't manage %s", duckAddress)
+                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = DuckAddressStatus.NotSignedIn))
+                }
+
+                Unmanageable -> {
+                    Timber.w("Can't manage %s from this account", duckAddress)
+                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = NotManageable))
+                }
+
+                GeneralError -> {
+                    Timber.w("General error when querying status for %s", duckAddress)
+                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FailedToObtainStatus))
+                }
+            }
+        }
+    }
+
+    fun activationStatusChanged(
+        checked: Boolean,
+        duckAddress: String,
+    ) {
+        val credMode = viewState.value.credentialMode
+        if (credMode is Viewing) {
+            _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = SettingActivationStatus(checked)))
+
+            viewModelScope.launch {
+                val success = duckAddressStatusRepository.setActivationStatus(duckAddress, checked)
+                if (success) {
+                    if (checked) {
+                        _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Activated(duckAddress)))
+                    } else {
+                        _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Deactivated(duckAddress)))
+                    }
+                } else {
+                    _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FailedToObtainStatus))
+                }
+            }
+        }
+    }
+
     data class ViewState(
         val autofillEnabled: Boolean = true,
         val showAutofillEnabledToggle: Boolean = true,
@@ -433,6 +536,7 @@ class AutofillSettingsViewModel @Inject constructor(
         data class Viewing(
             val credentialsViewed: LoginCredentials,
             val showLinkButton: Boolean,
+            val duckAddressStatus: DuckAddressStatus = NotADuckAddress,
         ) : CredentialMode()
 
         abstract class Editing(
@@ -476,6 +580,17 @@ class AutofillSettingsViewModel @Inject constructor(
     sealed class CredentialModeCommand(val id: String = UUID.randomUUID().toString()) {
         data class ShowEditCredentialMode(val credentials: LoginCredentials) : CredentialModeCommand()
         object ShowManualCredentialMode : CredentialModeCommand()
+    }
+
+    sealed class DuckAddressStatus {
+        object NotADuckAddress : DuckAddressStatus()
+        data class FetchingActivationStatus(val address: String) : DuckAddressStatus()
+        data class SettingActivationStatus(val activating: Boolean) : DuckAddressStatus()
+        data class Activated(val address: String) : DuckAddressStatus()
+        data class Deactivated(val address: String) : DuckAddressStatus()
+        object NotManageable : DuckAddressStatus()
+        object FailedToObtainStatus : DuckAddressStatus()
+        object NotSignedIn : DuckAddressStatus()
     }
 }
 

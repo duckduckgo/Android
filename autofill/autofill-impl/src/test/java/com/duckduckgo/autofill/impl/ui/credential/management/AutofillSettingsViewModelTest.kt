@@ -19,8 +19,10 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
@@ -36,6 +38,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
+import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.RealDuckAddressIdentifier
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,12 +65,15 @@ class AutofillSettingsViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockStore: AutofillStore = mock()
+    private val emailDataStore: EmailDataStore = mock()
+    private val duckAddressStatusRepository: DuckAddressStatusRepository = mock()
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
     private val pixel: Pixel = mock()
     private val deviceAuthenticator: DeviceAuthenticator = mock()
     private val credentialListFilter: CredentialListFilter = mock()
     private val faviconManager: FaviconManager = mock()
     private val webUrlIdentifier: WebUrlIdentifier = mock()
+    private val duckAddressIdentifier: DuckAddressIdentifier = RealDuckAddressIdentifier()
     private val testee = AutofillSettingsViewModel(
         autofillStore = mockStore,
         clipboardInteractor = clipboardInteractor,
@@ -76,6 +83,9 @@ class AutofillSettingsViewModelTest {
         credentialListFilter = credentialListFilter,
         faviconManager = faviconManager,
         webUrlIdentifier = webUrlIdentifier,
+        emailDatastore = emailDataStore,
+        duckAddressStatusRepository = duckAddressStatusRepository,
+        duckAddressIdentifier = duckAddressIdentifier,
     )
 
     @Before

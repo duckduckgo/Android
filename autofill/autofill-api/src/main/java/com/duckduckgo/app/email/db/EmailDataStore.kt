@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.email.api
+package com.duckduckgo.app.email.db
 
-import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
-import com.duckduckgo.di.scopes.AppScope
-import retrofit2.http.Header
-import retrofit2.http.POST
-
-@ContributesNonCachingServiceApi(AppScope::class)
-interface EmailService {
-    @POST("https://quack.duckduckgo.com/api/email/addresses")
-    suspend fun newAlias(@Header("Authorization") authorization: String): EmailAlias
+/**
+ * Data store for Email Protection (duck addresses)
+ *
+ * Provides ability to store and retrieve data related to the duck address feature such as personal username, next alias etc...
+ */
+interface EmailDataStore {
+    var emailToken: String?
+    var nextAlias: String?
+    var emailUsername: String?
+    var cohort: String?
+    var lastUsedDate: String?
+    fun canUseEncryption(): Boolean
 }
-
-data class EmailAlias(val address: String)

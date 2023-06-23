@@ -26,15 +26,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import java.io.IOException
 import java.security.GeneralSecurityException
 
-interface EmailDataStore {
-    var emailToken: String?
-    var nextAlias: String?
-    var emailUsername: String?
-    var cohort: String?
-    var lastUsedDate: String?
-    fun canUseEncryption(): Boolean
-}
-
 class EmailEncryptedSharedPreferences(
     private val context: Context,
     private val pixel: Pixel,
