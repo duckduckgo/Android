@@ -35,6 +35,7 @@ import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -78,7 +79,7 @@ class SurveyViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        runTest {
+        runBlocking {
             whenever(mockAppDaysUsedRepository.getLastActiveDay()).thenReturn("today")
             whenever(mockAppBuildConfig.versionName).thenReturn("name")
 

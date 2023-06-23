@@ -68,7 +68,7 @@ class SurveyViewModel @Inject constructor(
         viewModelScope.launch {
             lastActiveDay = when (source) {
                 SurveySource.IN_APP -> appDaysUsedRepository.getLastActiveDay()
-                SurveySource.PUSH -> appDaysUsedRepository.getPreviousActiveDay().orEmpty()
+                SurveySource.PUSH -> appDaysUsedRepository.getPreviousActiveDay() ?: appDaysUsedRepository.getLastActiveDay()
             }
             command.value = Command.LoadSurvey(addSurveyParameters(url))
         }
