@@ -36,6 +36,33 @@
     }
 
     /**
+     * Wrap functions to fix toString but also behave as closely to their real function as possible like .name and .length etc.
+     * TODO: validate with firefox non runtimeChecks context and also consolidate with wrapToString
+     * @param {*} functionValue
+     * @param {*} realTarget
+     * @returns {Proxy} a proxy for the function
+     */
+    function wrapFunction (functionValue, realTarget) {
+        return new Proxy(realTarget, {
+            get (target, prop, receiver) {
+                if (prop === 'toString') {
+                    const method = Reflect.get(target, prop, receiver).bind(target);
+                    Object.defineProperty(method, 'toString', {
+                        value: functionToString.bind(functionToString),
+                        enumerable: false
+                    });
+                    return method
+                }
+                return Reflect.get(target, prop, receiver)
+            },
+            apply (target, thisArg, argumentsList) {
+                // This is where we call our real function
+                return Reflect.apply(functionValue, thisArg, argumentsList)
+            }
+        })
+    }
+
+    /**
      * Wrap a get/set or value property descriptor. Only for data properties. For methods, use wrapMethod(). For constructors, use wrapConstructor().
      * @param {any} object - object whose property we are wrapping (most commonly a prototype)
      * @param {string} propertyName
@@ -423,9 +450,13 @@
         if (!shouldStackCheck || !taintedOrigins()) {
             return false
         }
+        const currentTaintedOrigins = taintedOrigins();
+        if (!currentTaintedOrigins || currentTaintedOrigins.size === 0) {
+            return false
+        }
         const stackOrigins = getStackTraceOrigins(getStack());
         for (const stackOrigin of stackOrigins) {
-            if (taintedOrigins()?.has(stackOrigin)) {
+            if (currentTaintedOrigins.has(stackOrigin)) {
                 return true
             }
         }
@@ -3236,6 +3267,23 @@
             return super[method](...args)
         }
 
+        _callSetter (prop, value) {
+            const el = this._getElement();
+            if (el) {
+                el[prop] = value;
+                return
+            }
+            super[prop] = value;
+        }
+
+        _callGetter (prop) {
+            const el = this._getElement();
+            if (el) {
+                return el[prop]
+            }
+            return super[prop]
+        }
+
         /* Native DOM element methods we're capturing to supplant values into the constructed node or store data for. */
 
         set src (value) {
@@ -3409,6 +3457,87 @@
         });
     }
 
+    function isRuntimeElement (element) {
+        try {
+            return element instanceof DDGRuntimeChecks
+        } catch {}
+        return false
+    }
+
+    function overloadGetOwnPropertyDescriptor () {
+        const capturedDescriptors = {
+            HTMLScriptElement: Object.getOwnPropertyDescriptors(HTMLScriptElement),
+            HTMLScriptElementPrototype: Object.getOwnPropertyDescriptors(HTMLScriptElement.prototype)
+        };
+        /**
+         * @param {any} value
+         * @returns {string | undefined}
+         */
+        function getInterfaceName (value) {
+            let interfaceName;
+            if (value === HTMLScriptElement) {
+                interfaceName = 'HTMLScriptElement';
+            }
+            if (value === HTMLScriptElement.prototype) {
+                interfaceName = 'HTMLScriptElementPrototype';
+            }
+            return interfaceName
+        }
+        // TODO: Consoldiate with wrapProperty code
+        function getInterfaceDescriptor (interfaceValue, interfaceName, propertyName) {
+            const capturedInterface = capturedDescriptors[interfaceName] && capturedDescriptors[interfaceName][propertyName];
+            const capturedInterfaceOut = { ...capturedInterface };
+            if (capturedInterface.get) {
+                capturedInterfaceOut.get = wrapFunction(function () {
+                    let method = capturedInterface.get;
+                    if (isRuntimeElement(this)) {
+                        method = () => this._callGetter(propertyName);
+                    }
+                    return method.call(this)
+                }, capturedInterface.get);
+            }
+            if (capturedInterface.set) {
+                capturedInterfaceOut.set = wrapFunction(function (value) {
+                    let method = capturedInterface;
+                    if (isRuntimeElement(this)) {
+                        method = (value) => this._callSetter(propertyName, value);
+                    }
+                    return method.call(this, [value])
+                }, capturedInterface.set);
+            }
+            return capturedInterfaceOut
+        }
+        const proxy = new DDGProxy(featureName, Object, 'getOwnPropertyDescriptor', {
+            apply (fn, scope, args) {
+                const interfaceValue = args[0];
+                const interfaceName = getInterfaceName(interfaceValue);
+                const propertyName = args[1];
+                const capturedInterface = capturedDescriptors[interfaceName] && capturedDescriptors[interfaceName][propertyName];
+                if (interfaceName && capturedInterface) {
+                    return getInterfaceDescriptor(interfaceValue, interfaceName, propertyName)
+                }
+                return Reflect$1.apply(fn, scope, args)
+            }
+        });
+        proxy.overload();
+        const proxy2 = new DDGProxy(featureName, Object, 'getOwnPropertyDescriptors', {
+            apply (fn, scope, args) {
+                const interfaceValue = args[0];
+                const interfaceName = getInterfaceName(interfaceValue);
+                const capturedInterface = capturedDescriptors[interfaceName];
+                if (interfaceName && capturedInterface) {
+                    const out = {};
+                    for (const propertyName of Object.getOwnPropertyNames(capturedInterface)) {
+                        out[propertyName] = getInterfaceDescriptor(interfaceValue, interfaceName, propertyName);
+                    }
+                    return out
+                }
+                return Reflect$1.apply(fn, scope, args)
+            }
+        });
+        proxy2.overload();
+    }
+
     function overrideCreateElement (debug) {
         const proxy = new DDGProxy(featureName, Document.prototype, 'createElement', {
             apply (fn, scope, args) {
@@ -3512,6 +3641,9 @@
             if (this.getFeatureSettingEnabled('overloadReplaceChild')) {
                 overloadReplaceChild();
             }
+            if (this.getFeatureSettingEnabled('overloadGetOwnPropertyDescriptor')) {
+                overloadGetOwnPropertyDescriptor();
+            }
         }
 
         injectGenericOverloads () {
@@ -3540,6 +3672,7 @@
             ['innerHeight', 'innerWidth', 'outerHeight', 'outerWidth', 'Screen.prototype.height', 'Screen.prototype.width'].forEach(sizing => {
                 if (sizing in genericOverloads) {
                     const sizingConfig = genericOverloads[sizing];
+                    if (isBeingFramed() && !sizingConfig.applyToFrames) return
                     this.overloadScreenSizes(sizingConfig, breakpoints, screenSize, sizing, sizingConfig.offset || 0);
                 }
             });
@@ -3727,9 +3860,14 @@
                 receiver = globalThis.screen;
                 break
             }
-            const defaultVal = Reflect$1.get(scope, overrideKey, receiver);
+            const defaultGetter = Object.getOwnPropertyDescriptor(scope, overrideKey)?.get;
+            // Should never happen
+            if (!defaultGetter) {
+                return
+            }
             defineProperty(scope, overrideKey, {
                 get () {
+                    const defaultVal = Reflect$1.apply(defaultGetter, receiver, []);
                     if (getTaintFromScope(this, arguments, config.stackCheck)) {
                         return returnVal
                     }
