@@ -58,6 +58,10 @@ class RealMessagingContentScopeScripts @Inject constructor(
         webView.evaluateJavascript(ReplyHandler.constructReply(message, messageCallback, messageSecret), null)
     }
 
+    override fun isEnabled(): Boolean {
+        return coreContentScopeScripts.isEnabled()
+    }
+
     companion object {
         private val messageInterface = getSecret()
 

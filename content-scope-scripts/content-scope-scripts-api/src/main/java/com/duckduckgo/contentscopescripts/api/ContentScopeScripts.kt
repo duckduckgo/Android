@@ -38,4 +38,10 @@ interface ContentScopeScripts {
      * It requires a JSON message [String] and a [WebView] instance.
      */
     fun sendMessage(message: String, webView: WebView)
+
+    /**
+     * This method returns the enabled state for Content Scope Scripts
+     * @return a [Boolean] of true when enabled and false when disabled.
+     */
+    fun isEnabled(): Boolean
 }
