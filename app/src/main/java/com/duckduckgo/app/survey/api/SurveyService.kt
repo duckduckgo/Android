@@ -24,7 +24,7 @@ import retrofit2.http.GET
 @ContributesServiceApi(AppScope::class)
 interface SurveyService {
 
-    @GET("https://ddg-sandbox.s3.amazonaws.com/survey/v2/survey-mobile.json")
+    @GET("https://staticcdn.duckduckgo.com/survey/v2/survey-mobile.json")
     fun survey(): Call<SurveyGroup?>
 
     @GET("https://staticcdn.duckduckgo.com/survey/apptp/retention-survey-mobile.json")
