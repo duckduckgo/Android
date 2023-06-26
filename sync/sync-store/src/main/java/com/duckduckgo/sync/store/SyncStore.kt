@@ -38,12 +38,6 @@ constructor(
 
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
 
-    init {
-        appCoroutineScope.launch {
-            isSignedInStateFlow.emit(isSignedIn())
-        }
-    }
-
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
         return sharedPrefsProv.getSharedPrefs(FILENAME)

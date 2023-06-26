@@ -68,11 +68,15 @@ class SyncActivityViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    init {
+        observeState()
+    }
+
     fun viewState(): StateFlow<ViewState> {
         return viewState
     }
 
-    fun observeState() {
+    private fun observeState() {
         syncStateMonitor.syncState().onEach { syncState ->
             val state = if (syncState == OFF) {
                 signedOutState()
@@ -167,13 +171,24 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             viewState.value = viewState.value.hideAccount()
             when (syncRepository.logout(connectedDevice.deviceId)) {
-                is Error -> viewState.value = viewState.value.toggle(true).showAccount()
-                is Success -> viewState.value = signedOutState()
+                is Error -> {
+                    viewState.value = viewState.value.toggle(true).showAccount()
+                }
+
+                is Success -> {
+                    viewState.value = signedOutState()
+                }
             }
         }
     }
 
     fun onTurnOffSyncCancelled() {
+        viewModelScope.launch {
+            showAccountDetailsIfNeeded()
+        }
+    }
+
+    fun onConnectionCancelled() {
         viewModelScope.launch {
             showAccountDetailsIfNeeded()
         }
@@ -190,8 +205,13 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             viewState.value = viewState.value.hideAccount()
             when (syncRepository.deleteAccount()) {
-                is Error -> viewState.value = viewState.value.toggle(true).showAccount()
-                is Success -> viewState.value = signedOutState()
+                is Error -> {
+                    viewState.value = viewState.value.toggle(true).showAccount()
+                }
+
+                is Success -> {
+                    viewState.value = signedOutState()
+                }
             }
         }
     }
@@ -233,7 +253,10 @@ class SyncActivityViewModel @Inject constructor(
             val oldList = viewState.value.syncedDevices
             viewState.value = viewState.value.showDeviceListItemLoading(device)
             when (syncRepository.logout(device.deviceId)) {
-                is Error -> viewState.value = viewState.value.setDevices(oldList)
+                is Error -> {
+                    viewState.value = viewState.value.setDevices(oldList)
+                }
+
                 is Success -> fetchRemoteDevices()
             }
         }
@@ -244,7 +267,10 @@ class SyncActivityViewModel @Inject constructor(
             val oldList = viewState.value.syncedDevices
             viewState.value = viewState.value.showDeviceListItemLoading(editedConnectedDevice)
             when (syncRepository.renameDevice(editedConnectedDevice)) {
-                is Error -> viewState.value = viewState.value.setDevices(oldList)
+                is Error -> {
+                    viewState.value = viewState.value.setDevices(oldList)
+                }
+
                 is Success -> fetchRemoteDevices()
             }
         }
@@ -269,10 +295,12 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private fun showAccountDetailsIfNeeded() {
-        if (syncRepository.isSignedIn()) {
-            viewState.value = viewState.value.toggle(true).showAccount()
-        } else {
-            viewState.value = signedOutState()
+        viewModelScope.launch(dispatchers.io()) {
+            if (syncRepository.isSignedIn()) {
+                viewState.value = viewState.value.toggle(true).showAccount()
+            } else {
+                viewState.value = signedOutState()
+            }
         }
     }
 

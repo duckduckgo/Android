@@ -56,9 +56,7 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistReposito
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.SyncState.FAILED
-import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
-import com.duckduckgo.sync.api.SyncState.READY
+import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
@@ -242,10 +240,8 @@ class SettingsViewModel @Inject constructor(
             .onEach {
                 viewState.value = currentViewState().copy(
                     syncEnabled = when (it) {
-                        READY -> true
-                        IN_PROGRESS -> true
-                        FAILED -> true
-                        else -> false
+                        OFF -> false
+                        else -> true
                     },
                 )
             }.launchIn(viewModelScope)

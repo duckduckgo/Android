@@ -102,6 +102,8 @@ class SyncActivity : DuckDuckGoActivity() {
     var launcher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             viewModel.onDeviceConnected()
+        } else {
+            viewModel.onConnectionCancelled()
         }
     }
 
@@ -134,7 +136,6 @@ class SyncActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
 
         viewModel.commands().flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach { processCommand(it) }.launchIn(lifecycleScope)
-        viewModel.observeState()
     }
 
     private fun processCommand(it: Command) {
