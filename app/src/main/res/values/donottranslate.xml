@@ -32,24 +32,4 @@
     <string name="netpSettingsDisconnected">Disconnected</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
-
-    <!-- Settings -->
-    <string name="settingsDefaultBrowserTitle">Default Browser</string>
-    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is your default browser</string>
-    <string name="settingsDefaultBrowserNotSetDescription">Make DuckDuckGo your default browser</string>
-    <string name="settingsPrivateSearchTitle">Private Search</string>
-    <string name="settingsPrivateSearchDescription">Enabled by default</string>
-    <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
-    <string name="settingsHeadingSettings">Settings</string>
-    <string name="settingsPermissionsAndPrivacySetting">Permissions and Privacy</string>
-    <string name="settingsAutofillLoginsSetting">Autofill Logins</string>
-    <string name="settingsSyncSetting">Sync</string>
-
-    <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Permissions and Privacy</string>
-
-    <!-- Appearance -->
-    <string name="appearanceActivityTitle">Appearance</string>
-
 </resources>
