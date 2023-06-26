@@ -29,12 +29,10 @@ After our team has investigated each issue, we will label them as:
 * Won't fix: issue will be closed without a fix
 
 ## Contribute Code
-
-We welcome pull requests aimed at fixing bugs and security issues.
-
-If you have a great idea or a feature request that can help improving our browser, start by opening a [Discussion](https://github.com/duckduckgo/Android/discussions). Discussions is the right place to have an open conversation about an idea with our devs and maintainers. Proposals that fit our product direction and timeline will be added to our backlog and labelled accordingly.
-
-We have also labeled tasks you can help with as [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22). Those tasks a great places to start contributing to DuckDuckGo and we'll support you through the process.
+We're always open to contributions from the community! There are different approaches depending on how you wish to contribute:
+* **For bug fixes**, please feel free to open an issue to initiate a discussion before submitting any pull requests. If there's already an associated issue created, please add it to the description. Someone from the team will review your issue/change within a few days.
+* Refactoring, product changes and other features won't be considered and therefore the Pull Request will be closed.
+* If you're looking for a bug to work on, see the [Help Wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) tag for a list of open issues.
 
 ### Style Guide
 
@@ -53,4 +51,5 @@ You can also trigger an automatic code formatting of the code by executing:
 
 ```
 ./gradleW app:spotlessApply
+./gradleW formatKotlin
 ```
