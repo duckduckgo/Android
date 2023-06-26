@@ -183,7 +183,9 @@ class CtaViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysIsMinusOneThenCtaIsSurvey() = runTest {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", -1, SCHEDULED))
+        val testSurvey = Survey("abc", "http://example.com", -1, SCHEDULED)
+        whenever(mockSurveyRepository.shouldShowSurvey(testSurvey)).thenReturn(true)
+        testee.onSurveyChanged(testSurvey)
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
         assertTrue(value is HomePanelCta.Survey)
     }

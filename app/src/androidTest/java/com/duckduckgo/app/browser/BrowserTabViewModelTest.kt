@@ -2051,7 +2051,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED), Locale.US)
+        val testSurvey = Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED)
+        whenever(mockSurveyRepository.shouldShowSurvey(testSurvey)).thenReturn(true)
+        testee.onSurveyChanged(testSurvey, Locale.US)
         assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
     }
 
