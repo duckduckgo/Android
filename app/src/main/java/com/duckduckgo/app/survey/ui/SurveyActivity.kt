@@ -36,7 +36,6 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SurveyActivity : DuckDuckGoActivity() {
@@ -74,6 +73,9 @@ class SurveyActivity : DuckDuckGoActivity() {
     private fun consumeIntentExtra() {
         val survey = intent.getSerializableExtra(SURVEY_EXTRA) as Survey
         val surveySource = intent.getSerializableExtra(SURVEY_SOURCE_EXTRA) as SurveySource
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            pixel.fire(it)
+        }
         viewModel.start(survey, surveySource)
     }
 
@@ -101,7 +103,6 @@ class SurveyActivity : DuckDuckGoActivity() {
     private fun loadSurvey(url: String) {
         binding.progress.show()
         webView.loadUrl(url)
-        Timber.d("Survey URL: $url")
     }
 
     private fun showSurvey() {
@@ -150,15 +151,18 @@ class SurveyActivity : DuckDuckGoActivity() {
             context: Context,
             survey: Survey,
             source: SurveySource,
+            launchPixel: String? = null,
         ): Intent {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
             intent.putExtra(SURVEY_SOURCE_EXTRA, source)
+            intent.putExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, launchPixel)
             return intent
         }
 
-        const val SURVEY_EXTRA = "SURVEY_EXTRA"
-        const val SURVEY_SOURCE_EXTRA = "SURVEY_SOURCE_EXTRA"
+        private const val SURVEY_EXTRA = "SURVEY_EXTRA"
+        private const val SURVEY_SOURCE_EXTRA = "SURVEY_SOURCE_EXTRA"
+        private const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         enum class SurveySource {
             PUSH,

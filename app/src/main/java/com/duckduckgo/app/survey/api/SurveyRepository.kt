@@ -29,6 +29,7 @@ import javax.inject.Inject
 interface SurveyRepository {
     fun isUserEligibleForSurvey(survey: Survey): Boolean
     fun remainingDaysForShowingSurvey(survey: Survey): Long
+    fun shouldShowSurvey(survey: Survey): Boolean
     fun getScheduledSurvey(): Survey
     fun clearSurveyNotification()
 }
@@ -63,6 +64,10 @@ class SurveyRepositoryImpl @Inject constructor(
             return survey.daysInstalled - userBrowserProperties.daysSinceInstalled()
         }
         return -1
+    }
+
+    override fun shouldShowSurvey(survey: Survey): Boolean {
+        return remainingDaysForShowingSurvey(survey) == 0L
     }
 
     private fun validDaysInstalled(survey: Survey): Boolean {

@@ -233,7 +233,7 @@ class CtaViewModel @Inject constructor(
     private fun surveyCta(): HomePanelCta.Survey? {
         val survey = activeSurvey ?: return null
 
-        if (surveyRepository.remainingDaysForShowingSurvey(survey) == 0L) {
+        if (surveyRepository.shouldShowSurvey(survey)) {
             return HomePanelCta.Survey(survey)
         }
         return null

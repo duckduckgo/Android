@@ -108,7 +108,12 @@ class AvailableSurveyNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = SurveyActivity.intent(context, surveyRepository.getScheduledSurvey(), SurveySource.PUSH)
+        val intent = SurveyActivity.intent(
+            context,
+            surveyRepository.getScheduledSurvey(),
+            SurveySource.PUSH,
+            pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName),
+        )
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
