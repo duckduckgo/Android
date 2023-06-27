@@ -177,6 +177,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         pixel.fire(SETTINGS_OPENED)
+        observeSyncState()
     }
 
     fun start(notificationsEnabled: Boolean = false) {
@@ -235,7 +236,15 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun startPollingSyncEnableState() {
+    fun viewState(): StateFlow<ViewState> {
+        return viewState
+    }
+
+    fun commands(): Flow<Command> {
+        return command.receiveAsFlow()
+    }
+
+    private fun observeSyncState() {
         syncStateMonitor.syncState()
             .onEach {
                 viewState.value = currentViewState().copy(
@@ -245,14 +254,6 @@ class SettingsViewModel @Inject constructor(
                     },
                 )
             }.launchIn(viewModelScope)
-    }
-
-    fun viewState(): StateFlow<ViewState> {
-        return viewState
-    }
-
-    fun commands(): Flow<Command> {
-        return command.receiveAsFlow()
     }
 
     fun userRequestedToSendFeedback() {

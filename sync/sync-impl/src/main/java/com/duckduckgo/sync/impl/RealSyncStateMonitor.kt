@@ -58,7 +58,7 @@ class RealSyncStateMonitor @Inject constructor(
         attempt: SyncAttempt,
         signedIn: Boolean,
     ): SyncState {
-        val state = if (signedIn) {
+        return if (signedIn) {
             if (attempt == null) {
                 Timber.d("Sync-Feature: Sync Monitor signed in, READY state")
                 SyncState.READY
@@ -74,6 +74,5 @@ class RealSyncStateMonitor @Inject constructor(
             Timber.d("Sync-Feature: Sync Monitor not signed in, OFF state")
             return OFF
         }
-        return state
     }
 }

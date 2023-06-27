@@ -180,15 +180,11 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onTurnOffSyncCancelled() {
-        viewModelScope.launch {
-            showAccountDetailsIfNeeded()
-        }
+        showAccountDetailsIfNeeded()
     }
 
     fun onConnectionCancelled() {
-        viewModelScope.launch {
-            showAccountDetailsIfNeeded()
-        }
+        showAccountDetailsIfNeeded()
     }
 
     fun onDeleteAccountClicked() {
@@ -214,9 +210,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onDeleteAccountCancelled() {
-        viewModelScope.launch(dispatchers.io()) {
-            showAccountDetailsIfNeeded()
-        }
+        showAccountDetailsIfNeeded()
     }
 
     fun onSaveRecoveryCodeClicked() {

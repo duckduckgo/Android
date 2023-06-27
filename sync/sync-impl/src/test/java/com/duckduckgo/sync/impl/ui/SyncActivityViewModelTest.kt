@@ -25,6 +25,9 @@ import com.duckduckgo.sync.TestSyncFixtures.deviceId
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
 import com.duckduckgo.sync.api.SyncState
+import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
+import com.duckduckgo.sync.api.SyncState.OFF
+import com.duckduckgo.sync.api.SyncState.READY
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.RecoveryCodePDF
@@ -421,6 +424,48 @@ class SyncActivityViewModelTest {
 
             val initialState = expectMostRecentItem()
             assertEquals(connectedDevices.size, initialState.syncedDevices.size)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncStateIsDisabledThenViewStateChanges() = runTest {
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            val initialState = expectMostRecentItem()
+            assertEquals(initialState.syncToggleState, true)
+            stateFlow.value = OFF
+            val updatedState = awaitItem()
+            assertEquals(updatedState.syncToggleState, false)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncStateIsEnabledThenViewStateChanges() = runTest {
+        givenAuthenticatedUser()
+        stateFlow.value = SyncState.OFF
+
+        testee.viewState().test {
+            val initialState = expectMostRecentItem()
+            assertEquals(initialState.syncToggleState, false)
+            stateFlow.value = READY
+            val updatedState = awaitItem()
+            assertEquals(updatedState.syncToggleState, true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncStateIsInProgressEnabledThenViewStateDoesNotChange() = runTest {
+        givenAuthenticatedUser()
+
+        testee.viewState().test {
+            val initialState = expectMostRecentItem()
+            assertEquals(initialState.syncToggleState, true)
+            stateFlow.value = IN_PROGRESS
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
