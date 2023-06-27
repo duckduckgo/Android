@@ -97,12 +97,13 @@
     <string name="netpReportBreakageCategoryFeatureRequest">Feature request</string>
     <string name="netpReportBreakageCategoryOther">Something else</string>
 
-    <!-- Settings -->
-    <string name="netpManagementSettings">Settings</string>
-    <string name="netpManagementSettingsExclusion">Manage App Exclusions</string>
+    <!-- Manage -->
+    <string name="netpManagementManageHeader">Manage</string>
+    <string name="netpManagementManageItemExclusion">Having issues with an app?</string>
 
     <!-- Exclusion list -->
-    <string name="netpExclusionListHeaderDefault">By default Network Protection is enabled for all apps. However some apps may experience issues when Network Protection is enabled.</string>
+    <string name="netpExclusionListTitle">Manage Apps</string>
+    <string name="netpExclusionListHeaderDefault">Network Protection works across all apps by default. If you’re experiencing app issues with Network Protection enabled, try disabling protection for that app.</string>
     <string name="netpExclusionListHeaderDisabled">Network Protection is disabled.</string>
     <string name="netpExclusionListExcludedReasonManuallyDisabled">Manually disabled</string>
     <string name="netpExclusionListExcludedReasonManuallyEnabled">Manually enabled</string>
@@ -111,7 +112,7 @@
     <string name="netpExclusionListFilterMenuUnprotectedLabel">Protection Disabled</string>
     <string name="netpExclusionListFilterMenuAllLabel">All</string>
     <string name="netpExclusionListManuallyDisableAppDialogTitle">Report an issue?</string>
-    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Please let us know if you disabled Network Protection for %1$s because you experienced app issues.\n\nKeep in mind App Tracking Protection for this app is now also disabled.</string>
+    <string name="netpExclusionListManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Please let us know if you disabled Network Protection for %1$s because you experienced app issues.\n\nWe\'ll also disable App Tracking Protection for %1$s.</string>
     <string name="netpExclusionListManuallyCTAReportIssue">Report Issue</string>
     <string name="netpExclusionListManuallyCTANotNow">Not Now</string>
     <string name="netpExclusionListManuallyCTACancel">Cancel</string>
@@ -119,7 +120,7 @@
     <string name="netpExclusionListManuallyMenuRestore">Restore Default Protected Apps</string>
     <string name="netpExclusionListManuallyMenuReport">Report an Issue With an App</string>
     <string name="netpExclusionListRestoreDefaultsTitle">Restore default protection?</string>
-    <string name="netpExclusionListRestoreDefaultsMessage">Your custom protection settings will update to our the default protections. You can always change your protection settings again later.</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">Your custom protection settings will update to our default protections. You can always change your protection settings again later.</string>
     <string name="netpExclusionListRestoreDefaultSnackbar">Protection restored to default settings</string>
     <string name="netpExclusionListRestoreDefaultsDisclaimer">Enabling protection sends the app\'s name to DuckDuckGo.</string>
 
