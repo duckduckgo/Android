@@ -18,20 +18,29 @@ package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncState
+import com.duckduckgo.sync.store.model.SyncAttemptState
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 
 interface SyncStateRepository {
+
+    fun state(): Flow<SyncAttempt>
+
     fun store(syncAttempt: SyncAttempt)
 
     fun current(): SyncAttempt?
 
-    fun updateSyncState(state: SyncState)
+    fun updateSyncState(state: SyncAttemptState)
 
     fun clearAll()
 }
 
 class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: SyncAttemptDao) : SyncStateRepository {
+    override fun state(): Flow<SyncAttempt> {
+        return syncAttemptDao.attempts().filterNotNull()
+    }
+
     override fun store(syncAttempt: SyncAttempt) {
         syncAttemptDao.insert(syncAttempt)
     }
@@ -40,7 +49,7 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
         return syncAttemptDao.lastAttempt()
     }
 
-    override fun updateSyncState(state: SyncState) {
+    override fun updateSyncState(state: SyncAttemptState) {
         val last = syncAttemptDao.lastAttempt()
         if (last != null) {
             val updated = last.copy(state = state)

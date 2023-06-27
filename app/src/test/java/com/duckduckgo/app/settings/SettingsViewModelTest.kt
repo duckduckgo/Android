@@ -50,12 +50,17 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistReposito
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.SyncState.OFF
+import com.duckduckgo.sync.api.SyncState.READY
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -129,10 +134,15 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockWindowsDownloadLinkToggle: Toggle
 
+    @Mock
+    private lateinit var mockSyncStateMonitor: SyncStateMonitor
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    private val stateFlow = MutableStateFlow(READY)
 
     @Before
     fun before() {
@@ -158,6 +168,8 @@ class SettingsViewModelTest {
 
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
 
+        whenever(mockSyncStateMonitor.syncState()).thenReturn(stateFlow.asStateFlow())
+
         vpnFeaturesRegistry = FakeVpnFeaturesRegistry()
 
         testee = SettingsViewModel(
@@ -178,6 +190,7 @@ class SettingsViewModelTest {
             windowsWaitlist,
             windowsFeature,
             deviceSyncState,
+            mockSyncStateMonitor,
             mockNetPWaitlistRepository,
             mockWindowsDownloadLinkFeature,
             coroutineTestRule.testDispatcherProvider,
@@ -834,6 +847,26 @@ class SettingsViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.showSyncSetting)
             assertTrue(viewState.syncEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncFeatureChangesToDisableThenSettingVisibleAndStateDisabled() = runTest {
+        whenever(deviceSyncState.isFeatureEnabled()).thenReturn(true)
+        whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
+        testee.start()
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showSyncSetting)
+            assertTrue(viewState.syncEnabled)
+
+            stateFlow.value = OFF
+
+            val updatedState = awaitItem()
+            assertFalse(updatedState.syncEnabled)
+
             cancelAndConsumeRemainingEvents()
         }
     }
