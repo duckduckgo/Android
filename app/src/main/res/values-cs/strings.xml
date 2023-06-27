@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Oznámení</string>
     <string name="settingsSubtitleNotificationsDisabled">Zakázáno</string>
     <string name="settingsSubtitleNotificationsEnabled">Povoleno</string>
+    <string name="settingsDefaultBrowserTitle">Výchozí prohlížeč</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvůj výchozí prohlížeč</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Nastav si DuckDuckGo jako výchozí prohlížeč</string>
+    <string name="settingsPrivateSearchTitle">Soukromé vyhledávání</string>
+    <string name="settingsPrivateSearchDescription">Ve výchozím nastavení povoleno</string>
+    <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
+    <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
+    <string name="settingsHeadingSettings">Nastavení</string>
+    <string name="settingsPermissionsAndPrivacySetting">Oprávnění a ochrana osobních údajů</string>
+    <string name="settingsAutofillLoginsSetting">Automatické vyplňování přihlašovacích údajů</string>
+    <string name="settingsSyncSetting">Synchronizace</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Oprávnění a ochrana osobních údajů</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Vzhled</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
