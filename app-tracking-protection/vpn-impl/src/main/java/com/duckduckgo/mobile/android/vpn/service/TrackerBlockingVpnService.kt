@@ -30,6 +30,7 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
+import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.utils.checkMainThread
@@ -54,7 +55,6 @@ import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.duckduckgo.mobile.android.vpn.network.util.isLocal
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
@@ -100,9 +100,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             true
         }
     }
-
-    @Inject
-    lateinit var vpnPreferences: VpnPreferences
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -516,7 +513,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
 
         // Android Private DNS (added by the user)
-        if (isPrivateDnsSupportEnabled && vpnPreferences.isPrivateDnsEnabled) {
+        if (isInterceptDnsTrafficEnabled && isPrivateDnsSupportEnabled && this.isPrivateDnsActive()) {
             runCatching {
                 InetAddress.getAllByName(applicationContext.getPrivateDnsServerName())
             }.getOrNull()?.run { dns.addAll(this) }
