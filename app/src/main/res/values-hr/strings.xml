@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Obavijesti</string>
     <string name="settingsSubtitleNotificationsDisabled">Onemogućeno</string>
     <string name="settingsSubtitleNotificationsEnabled">Omogućeno</string>
+    <string name="settingsDefaultBrowserTitle">Zadani preglednik</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvoj zadani preglednik</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Postavi DuckDuckGo kao svoj zadani preglednik</string>
+    <string name="settingsPrivateSearchTitle">Privatno pretraživanje</string>
+    <string name="settingsPrivateSearchDescription">Omogućeno prema zadanim postavkama</string>
+    <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
+    <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
+    <string name="settingsHeadingSettings">Postavke</string>
+    <string name="settingsPermissionsAndPrivacySetting">Dozvole i privatnost</string>
+    <string name="settingsAutofillLoginsSetting">Automatsko popunjavanje prijave</string>
+    <string name="settingsSyncSetting">Sinkronizacija</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Dozvole i privatnost</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Izgled</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
