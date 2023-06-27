@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.sync.api.SyncState.OFF
@@ -29,8 +30,6 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -48,7 +47,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
-    private var dataObserverJob: Job? = null
+    private val dataObserverJob = ConflatedJob()
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -63,8 +62,8 @@ class SavedSitesSyncDataObserver @Inject constructor(
     }
 
     private fun observeSavedSitesChanges() {
-        if (dataObserverJob == null) {
-            dataObserverJob = coroutineScope.launch(dispatchers.io()) {
+        if (!dataObserverJob.isActive) {
+            dataObserverJob += coroutineScope.launch(dispatchers.io()) {
                 Timber.d("Sync-Feature: Listening for changes to Saved Sites")
                 savedSitesRepository.lastModified().collect {
                     Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
@@ -76,7 +75,6 @@ class SavedSitesSyncDataObserver @Inject constructor(
 
     private fun cancelSavedSitesChanges() {
         Timber.d("Sync-Feature: Sync is OFF, not listening to changes to Saved Sites")
-        dataObserverJob?.cancel()
-        dataObserverJob = null
+        dataObserverJob.cancel()
     }
 }
