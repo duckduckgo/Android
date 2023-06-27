@@ -64,6 +64,7 @@ class NotificationRegistrar @Inject constructor(
         const val AppFeature = 104
         const val OneEasyStepForPrivacy = 107 // 105 and 106 where already used previously
         const val NextLevelPrivacy = 108
+        const val SurveyAvailable = 109
     }
 
     object ChannelType {

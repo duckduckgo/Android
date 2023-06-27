@@ -72,7 +72,11 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun consumeIntentExtra() {
         val survey = intent.getSerializableExtra(SURVEY_EXTRA) as Survey
-        viewModel.start(survey)
+        val surveySource = intent.getSerializableExtra(SURVEY_SOURCE_EXTRA) as SurveySource
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            pixel.fire(it)
+        }
+        viewModel.start(survey, surveySource)
     }
 
     private fun configureListeners() {
@@ -146,13 +150,24 @@ class SurveyActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             survey: Survey,
+            source: SurveySource,
+            launchPixel: String? = null,
         ): Intent {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
+            intent.putExtra(SURVEY_SOURCE_EXTRA, source)
+            intent.putExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, launchPixel)
             return intent
         }
 
-        const val SURVEY_EXTRA = "SURVEY_EXTRA"
+        private const val SURVEY_EXTRA = "SURVEY_EXTRA"
+        private const val SURVEY_SOURCE_EXTRA = "SURVEY_SOURCE_EXTRA"
+        private const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+
+        enum class SurveySource {
+            PUSH,
+            IN_APP,
+        }
     }
 
     inner class SurveyWebViewClient : WebViewClient() {

@@ -27,7 +27,6 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -38,6 +37,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isDaxDialogMessageEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -75,6 +75,7 @@ class CtaViewModel @Inject constructor(
     private val appTheme: AppTheme,
     private val variantManager: VariantManager,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val surveyRepository: SurveyRepository,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
     var canShowAutoconsentCta: AtomicBoolean = AtomicBoolean(false)
@@ -182,9 +183,8 @@ class CtaViewModel @Inject constructor(
         isBrowserShowing: Boolean,
         site: Site? = null,
         favoritesOnboarding: Boolean = false,
-        locale: Locale = Locale.getDefault(),
     ): Cta? {
-        surveyCta(locale)?.let {
+        surveyCta()?.let {
             return it
         }
 
@@ -230,22 +230,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun surveyCta(locale: Locale): HomePanelCta.Survey? {
-        val survey = activeSurvey
+    private fun surveyCta(): HomePanelCta.Survey? {
+        val survey = activeSurvey ?: return null
 
-        if (survey?.url == null) {
-            return null
-        }
-
-        if (!ALLOWED_LOCALES.contains(locale)) {
-            return null
-        }
-
-        val showOnDay = survey.daysInstalled?.toLong()
-        val daysInstalled = appInstallStore.daysInstalled()
-        if ((showOnDay == null && daysInstalled >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) ||
-            showOnDay == daysInstalled || showOnDay == SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED
-        ) {
+        if (surveyRepository.shouldShowSurvey(survey)) {
             return HomePanelCta.Survey(survey)
         }
         return null
@@ -398,9 +386,6 @@ class CtaViewModel @Inject constructor(
     private fun hideTips() = settingsDataStore.hideTips
 
     companion object {
-        private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
-        private const val SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED = -1L
         private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
-        private val ALLOWED_LOCALES = listOf(Locale.US, Locale.UK, Locale.CANADA)
     }
 }
