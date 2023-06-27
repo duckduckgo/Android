@@ -33,7 +33,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -46,7 +45,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private val syncEngine: SyncEngine,
     private val syncStateMonitor: SyncStateMonitor,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     private var dataObserverJob: Job? = null
