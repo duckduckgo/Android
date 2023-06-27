@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -29,8 +30,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -43,10 +46,10 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private val syncEngine: SyncEngine,
     private val syncStateMonitor: SyncStateMonitor,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider
 ) : MainProcessLifecycleObserver {
 
     private var dataObserverJob: Job? = null
-    private var initialised: Boolean = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -62,15 +65,11 @@ class SavedSitesSyncDataObserver @Inject constructor(
 
     private fun observeSavedSitesChanges() {
         if (dataObserverJob == null) {
-            dataObserverJob = coroutineScope.launch {
-                if (initialised) {
-                    savedSitesRepository.lastModified().onEach {
-                        Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
-                        syncEngine.triggerSync(DATA_CHANGE)
-                    }
-                } else {
-                    initialised = true
-                    Timber.d("Sync-Feature: Listening for changes to Saved Sites")
+            dataObserverJob = coroutineScope.launch(dispatchers.io()) {
+                Timber.d("Sync-Feature: Listening for changes to Saved Sites")
+                savedSitesRepository.lastModified().collect {
+                    Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
+                    syncEngine.triggerSync(DATA_CHANGE)
                 }
             }
         }
@@ -79,5 +78,6 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private fun cancelSavedSitesChanges() {
         Timber.d("Sync-Feature: Sync is OFF, not listening to changes to Saved Sites")
         dataObserverJob?.cancel()
+        dataObserverJob = null
     }
 }

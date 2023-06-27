@@ -143,6 +143,7 @@ class RealSyncEngine @Inject constructor(
     private fun syncInProgress(): Boolean {
         val currentSync = syncStateRepository.current()
         return if (currentSync != null) {
+            Timber.d("Sync-Feature: current sync $currentSync")
             if (currentSync.state == IN_PROGRESS) {
                 val syncTimestamp = OffsetDateTime.parse(currentSync.timestamp)
                 val now = OffsetDateTime.now()
