@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Meddelelser</string>
     <string name="settingsSubtitleNotificationsDisabled">Deaktiveret</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktiveret</string>
+    <string name="settingsDefaultBrowserTitle">Standardbrowser</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo er din standardbrowser</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Gør DuckDuckGo til din standardbrowser</string>
+    <string name="settingsPrivateSearchTitle">Privat søgning</string>
+    <string name="settingsPrivateSearchDescription">Aktiveret som standard</string>
+    <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
+    <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
+    <string name="settingsHeadingSettings">Indstillinger</string>
+    <string name="settingsPermissionsAndPrivacySetting">Tilladelser og fortrolighed  </string>
+    <string name="settingsAutofillLoginsSetting">Automatisk udfyldning ved login</string>
+    <string name="settingsSyncSetting">Synkronisering</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Tilladelser og fortrolighed</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">udseende</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
