@@ -104,6 +104,7 @@ class NetpAppExclusionListActivity :
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val restoreDefault = menu.findItem(R.id.netp_exclusion_menu_restore)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
+        restoreDefault?.isVisible = isNetpEnabled
         restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
 
         return super.onPrepareOptionsMenu(menu)

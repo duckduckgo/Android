@@ -213,6 +213,7 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
                     }
                 } else {
                     isClickable = false
+                    isEnabled = false
                     quietlySetIsChecked(app.isProtected, null)
                 }
             }
