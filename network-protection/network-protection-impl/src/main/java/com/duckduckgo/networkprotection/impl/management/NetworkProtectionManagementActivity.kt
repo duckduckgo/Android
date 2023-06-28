@@ -125,14 +125,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         when (viewState.connectionState) {
             ConnectionState.Connecting -> binding.renderConnectingState()
-            ConnectionState.Connected -> {
-                binding.settings.root.show()
-                viewState.connectionDetails?.let { binding.renderConnectedState(it) }
-            }
-            ConnectionState.Disconnected -> {
-                binding.settings.root.gone()
-                binding.renderDisconnectedState()
-            }
+            ConnectionState.Connected -> viewState.connectionDetails?.let { binding.renderConnectedState(it) }
+            ConnectionState.Disconnected -> binding.renderDisconnectedState()
             else -> {}
         }
 
