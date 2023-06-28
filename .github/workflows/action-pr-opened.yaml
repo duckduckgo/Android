@@ -31,6 +31,7 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           trigger-phrase: "Task/Issue URL:"
           action: 'add-asana-comment'
+          is-pinned: true
   process-external-pr:
     name: Process external Pull Request
     if: ${{ needs.validate-pr.outputs.output1 == 'true' }}
