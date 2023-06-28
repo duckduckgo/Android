@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -110,7 +111,10 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private fun processCommand(it: Command) {
         when (it) {
-            Close -> finish()
+            Close -> {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
             RecoverSyncData -> loginFlow.launch(null)
             SyncAnotherDevice -> connectFlow.launch(null)
         }

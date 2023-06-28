@@ -23,6 +23,8 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import java.util.*
+import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
@@ -39,7 +41,10 @@ class SurveyDownloaderTest {
     private var mockService: SurveyService = mock()
     private var mockEmailManager: EmailManager = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
-    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager)
+    private val mockSurveyRepository: SurveyRepository = mock()
+    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockSurveyRepository)
+
+    private val testSurvey = Survey("abc", SURVEY_URL, 7, SCHEDULED)
 
     @get:Rule
     @Suppress("unused")
@@ -49,6 +54,7 @@ class SurveyDownloaderTest {
     fun setup() {
         val mockAppTPCall = mock<Call<SurveyGroup?>>()
         whenever(mockAppTPCall.execute()).thenReturn(Response.error(404, "error".toResponseBody()))
+        whenever(mockSurveyRepository.isUserEligibleForSurvey(testSurvey)).thenReturn(true)
     }
 
     @Test
@@ -62,10 +68,12 @@ class SurveyDownloaderTest {
 
     @Test
     fun whenNewSurveyNotAllocatedThenSavedAsUnallocatedAndUnusedSurveysDeleted() {
+        val surveyNotAllocated = Survey("abc", null, null, NOT_ALLOCATED)
+        whenever(mockSurveyRepository.isUserEligibleForSurvey(surveyNotAllocated)).thenReturn(true)
         whenever(mockCall.execute()).thenReturn(Response.success(surveyNoAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).insert(Survey("abc", null, null, NOT_ALLOCATED))
+        verify(mockDao).insert(surveyNotAllocated)
         verify(mockDao).deleteUnusedSurveys()
     }
 
@@ -96,12 +104,14 @@ class SurveyDownloaderTest {
 
     @Test
     fun whenSurveyForEmailReceivedAndUserIsSignedInThenCreateSurveyWithCorrectCohort() {
+        val surveyWithCohort = Survey("abc", SURVEY_URL_WITH_COHORT, -1, SCHEDULED)
+        whenever(mockSurveyRepository.isUserEligibleForSurvey(surveyWithCohort)).thenReturn(true)
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
-        verify(mockDao).insert(Survey("abc", SURVEY_URL_WITH_COHORT, -1, SCHEDULED))
+        verify(mockDao).insert(surveyWithCohort)
     }
 
     @Test
@@ -109,6 +119,24 @@ class SurveyDownloaderTest {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
+        whenever(mockService.survey()).thenReturn(mockCall)
+        testee.download().blockingAwait()
+        verify(mockDao, never()).insert(any())
+    }
+
+    @Test
+    fun whenNewSurveyAllocatedAndUserIsEligibleThenSavedAsScheduled() = runTest {
+        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
+        whenever(mockService.survey()).thenReturn(mockCall)
+        testee.download().blockingAwait()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockDao).deleteUnusedSurveys()
+    }
+
+    @Test
+    fun whenNewSurveyAllocatedAndUserIsNotEligibleThenSavedAsScheduled() = runTest {
+        whenever(mockSurveyRepository.isUserEligibleForSurvey(testSurvey)).thenReturn(false)
+        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
         verify(mockDao, never()).insert(any())

@@ -33,11 +33,9 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.*
-import kotlinx.coroutines.flow.Flow
 
 interface SyncRepository {
 
-    fun isSignedInFlow(): Flow<Boolean>
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
     fun login(recoveryCodeRawJson: String): Result<Boolean>
@@ -65,7 +63,6 @@ class AppSyncRepository @Inject constructor(
     private val syncStore: SyncStore,
     private val syncEngine: SyncEngine,
 ) : SyncRepository {
-    override fun isSignedInFlow(): Flow<Boolean> = syncStore.isSignedInFlow()
 
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()

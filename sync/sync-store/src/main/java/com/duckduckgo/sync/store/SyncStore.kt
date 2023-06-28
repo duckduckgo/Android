@@ -24,6 +24,7 @@ interface SyncStore {
         secretKey: String,
         token: String,
     )
+
     fun clearAll()
 }
 
@@ -137,6 +138,7 @@ constructor(
             isSignedInStateFlow.emit(true)
         }
     }
+
     override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
         appCoroutineScope.launch {

@@ -24,7 +24,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.api.*
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.DaggerSet
@@ -56,9 +55,8 @@ object StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
         listeners: DaggerSet<AtbInitializerListener>,
-        featureSegmentsManager: FeatureSegmentsManager,
     ): MainProcessLifecycleObserver {
-        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, featureSegmentsManager)
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
     }
 
     @SingleInstanceIn(AppScope::class)

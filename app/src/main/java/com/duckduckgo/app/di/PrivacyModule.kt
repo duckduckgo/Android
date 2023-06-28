@@ -46,7 +46,9 @@ import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.sync.api.DeviceSyncState
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -78,6 +80,8 @@ object PrivacyModule {
         adClickManager: AdClickManager,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         sitePermissionsManager: SitePermissionsManager,
+        deviceSyncState: DeviceSyncState,
+        savedSitesRepository: SavedSitesRepository,
         dispatcherProvider: DispatcherProvider,
     ): ClearDataAction {
         return ClearPersonalDataAction(
@@ -93,6 +97,8 @@ object PrivacyModule {
             adClickManager,
             fireproofWebsiteRepository,
             sitePermissionsManager,
+            deviceSyncState,
+            savedSitesRepository,
             dispatcherProvider,
         )
     }

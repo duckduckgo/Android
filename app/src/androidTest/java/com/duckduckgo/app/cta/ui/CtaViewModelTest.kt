@@ -41,6 +41,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
@@ -122,6 +123,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockAppTheme: AppTheme
 
+    @Mock
+    private lateinit var mockSurveyRepository: SurveyRepository
+
     private var mockVariantManager: VariantManager = mock()
 
     private var mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
@@ -168,6 +172,7 @@ class CtaViewModelTest {
             appTheme = mockAppTheme,
             variantManager = mockVariantManager,
             vpnFeaturesRegistry = mockVpnFeaturesRegistry,
+            surveyRepository = mockSurveyRepository,
         )
     }
 
@@ -178,42 +183,16 @@ class CtaViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysIsMinusOneThenCtaIsSurvey() = runTest {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", -1, SCHEDULED))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
+        val testSurvey = Survey("abc", "http://example.com", -1, SCHEDULED)
+        whenever(mockSurveyRepository.shouldShowSurvey(testSurvey)).thenReturn(true)
+        testee.onSurveyChanged(testSurvey)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
         assertTrue(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsUsThenCtaIsSurvey() = runTest {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
-        assertTrue(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsUkThenCtaIsSurvey() = runTest {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.UK)
-        assertTrue(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsCanadaThenCtaIsSurvey() = runTest {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.CANADA)
-        assertTrue(value is HomePanelCta.Survey)
-    }
-
-    @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocaleIsNotUsCanadaOrUkThenCtaIsNotSurvey() = runTest {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.FRANCE)
-        assertFalse(value is HomePanelCta.Survey)
     }
 
     @Test
     fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() = runTest {
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
         assertFalse(value is HomePanelCta.Survey)
     }
 

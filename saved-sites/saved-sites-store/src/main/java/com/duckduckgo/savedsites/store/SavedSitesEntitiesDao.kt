@@ -23,7 +23,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -66,18 +65,14 @@ interface SavedSitesEntitiesDao {
     )
     fun allEntitiesInFolderSync(folderId: String): List<Entity>
 
-    @Query("update entities set deleted = 1, lastModified = :lastModified where entityId = :id")
+    @Query("update entities set title = '', url = '', deleted = 1, lastModified = :lastModified where entityId = :id")
     fun delete(
         id: String,
         lastModified: String = DatabaseDateFormatter.iso8601(),
     )
 
-    @Query("update entities set deleted = 1, lastModified = :lastModified where entityId != :bookmarksRoot AND entityId != :favoritesRoot")
-    fun deleteAll(
-        bookmarksRoot: String = SavedSitesNames.BOOKMARKS_ROOT,
-        favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT,
-        lastModified: String = DatabaseDateFormatter.iso8601(),
-    )
+    @Query("delete from entities")
+    fun deleteAll()
 
     @Delete
     fun deletePermanently(entity: Entity)

@@ -106,6 +106,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -192,6 +193,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val featureSegmentsManager: FeatureSegmentsManager,
+    private val surveyNotificationScheduler: SurveyNotificationScheduler,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     UrlExtractionListener,
@@ -2368,9 +2370,12 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewState.value = currentCtaViewState().copy(cta = null)
             return
         }
-        if (survey != null) {
-            viewModelScope.launch {
-                refreshCta(locale)
+        viewModelScope.launch {
+            if (survey != null) {
+                refreshCta()
+                surveyNotificationScheduler.scheduleSurveyAvailableNotification(survey)
+            } else {
+                surveyNotificationScheduler.removeScheduledSurveyAvailableNotification()
             }
         }
     }
@@ -2382,7 +2387,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
+    suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val isBrowserShowing = currentBrowserViewState().browserShowing
             if (hasCtaBeenShownForCurrentPage.get() && isBrowserShowing) return null
@@ -2392,7 +2397,6 @@ class BrowserTabViewModel @Inject constructor(
                     isBrowserShowing,
                     siteLiveData.value,
                     showFavoritesOnboarding,
-                    locale,
                 )
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)

@@ -21,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.duckduckgo.sync.store.model.SyncAttempt
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SyncAttemptDao {
@@ -32,4 +33,7 @@ interface SyncAttemptDao {
 
     @Query("DELETE from sync_attempts")
     fun clear()
+
+    @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
+    fun attempts(): Flow<SyncAttempt?>
 }

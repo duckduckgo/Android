@@ -26,11 +26,11 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 data class SyncAttempt(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = DatabaseDateFormatter.iso8601(),
-    val state: SyncState,
+    val state: SyncAttemptState,
     val meta: String = "",
 )
 
-enum class SyncState {
+enum class SyncAttemptState {
     IN_PROGRESS,
     SUCCESS,
     FAIL,

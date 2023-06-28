@@ -1,0 +1,62 @@
+name: Asana Integration after Pull Request submitted
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  validate-pr:
+    name: Validate Pull Request
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.outputs.external }}
+    steps:
+      - name: Checking Pull Request sender membership
+        id: step1
+        uses: malmstein/github-asana-action@0.6.0
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          action: 'check-pr-membership'
+  process-internal-pr:
+    name: Process internal Pull Request
+    if: ${{ needs.validate-pr.outputs.output1 == 'false' }}
+    runs-on: ubuntu-latest
+    needs: validate-pr
+    permissions:
+      issues: write
+    steps:
+      - name: Add comment in Asana task
+        uses: malmstein/github-asana-action@0.6.0
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          trigger-phrase: "Task/Issue URL:"
+          action: 'add-asana-comment'
+  process-external-pr:
+    name: Process external Pull Request
+    if: ${{ needs.validate-pr.outputs.output1 == 'true' }}
+    runs-on: ubuntu-latest
+    needs: validate-pr
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Create Asana task in Internal Project
+        uses: malmstein/github-asana-action@0.6.0
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ secrets.GH_ASANA_ISSUES_PROJECT_ID }}
+          action: 'create-asana-pr-task'
+
+      - name: Ensure Action sees template files
+        uses: actions/checkout@v2
+
+      - name: Render response template
+        id: render_template
+        uses: chuhlomin/render-template@v1.7
+        with:
+          template: .github/pr-reply-template.md
+
+      - name: Add comment to Pull Request
+        uses: peter-evans/create-or-update-comment@v3.0.2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: '.github/pr-reply-template.md'

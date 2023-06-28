@@ -1,0 +1,17 @@
+name: Pull Request Reviewed
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  pr-reviewed:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Asana task -> PR reviewed
+        uses: malmstein/github-asana-action@0.6.0
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          trigger-phrase: "Task/Issue URL:"
+          action: 'notify-pr-reviewed'

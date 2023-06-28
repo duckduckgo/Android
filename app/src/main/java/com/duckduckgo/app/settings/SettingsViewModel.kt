@@ -56,6 +56,8 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistReposito
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
+import com.duckduckgo.sync.api.SyncState.OFF
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
@@ -68,6 +70,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -92,6 +96,7 @@ class SettingsViewModel @Inject constructor(
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
+    private val syncStateMonitor: SyncStateMonitor,
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
     private val dispatcherProvider: DispatcherProvider,
@@ -172,6 +177,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         pixel.fire(SETTINGS_OPENED)
+        observeSyncState()
     }
 
     fun start(notificationsEnabled: Boolean = false) {
@@ -236,6 +242,18 @@ class SettingsViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
+    }
+
+    private fun observeSyncState() {
+        syncStateMonitor.syncState()
+            .onEach {
+                viewState.value = currentViewState().copy(
+                    syncEnabled = when (it) {
+                        OFF -> false
+                        else -> true
+                    },
+                )
+            }.launchIn(viewModelScope)
     }
 
     fun userRequestedToSendFeedback() {

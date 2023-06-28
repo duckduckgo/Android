@@ -23,8 +23,6 @@ import androidx.core.content.edit
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
-import com.duckduckgo.mobile.android.vpn.prefs.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.Type.DISABLED
 import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriorityPluginForType
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnReminderNotificationBuilder
@@ -42,7 +40,10 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder,
     private val vpnReminderNotificationContentPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin>,
+    applicationContext: Context,
 ) : VpnReminderReceiverManager {
+
+    private val preferences: SharedPreferences by lazy { applicationContext.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE) }
 
     override fun showReminderNotificationIfVpnDisabled(context: Context) {
         if (TrackerBlockingVpnService.isServiceRunning(context)) {
@@ -50,10 +51,10 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
         } else {
             logcat { "Vpn is not running, showing reminder notification" }
             val notification = vpnReminderNotificationContentPluginPoint.getHighestPriorityPluginForType(DISABLED)?.getContent()?.let { content ->
-                val actualContent = if (wasReminderNotificationShown(context)) {
+                val actualContent = if (wasReminderNotificationShown()) {
                     content.copy(true)
                 } else {
-                    notificationWasShown(context)
+                    notificationWasShown()
                     content.copy(false)
                 }
                 vpnReminderNotificationBuilder.buildReminderNotification(actualContent)
@@ -65,15 +66,14 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
         }
     }
 
-    private fun wasReminderNotificationShown(context: Context): Boolean {
-        return prefs(context).getBoolean(PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
+    private fun wasReminderNotificationShown(): Boolean {
+        return preferences.getBoolean(PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
     }
 
-    private fun notificationWasShown(context: Context) {
-        prefs(context).edit { putBoolean(PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true) }
-    }
-
-    private fun prefs(context: Context): SharedPreferences {
-        return context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
+    private fun notificationWasShown() {
+        preferences.edit { putBoolean(PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true) }
     }
 }
+
+private const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.prefs"
+private const val PREFS_KEY_REMINDER_NOTIFICATION_SHOWN = "PREFS_KEY_REMINDER_NOTIFICATION_SHOWN"
