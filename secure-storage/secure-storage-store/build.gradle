@@ -38,6 +38,8 @@ dependencies {
     implementation AndroidX.room.ktx
     implementation AndroidX.security.crypto
     implementation Square.okio
+    implementation project(path: ':common')
+    implementation "org.threeten:threetenbp:_"
 
     kapt AndroidX.room.compiler
 

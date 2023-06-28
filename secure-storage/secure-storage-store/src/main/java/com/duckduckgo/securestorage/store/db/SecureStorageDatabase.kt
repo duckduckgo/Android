@@ -20,13 +20,19 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.duckduckgo.securestorage.store.sync.LoginCredentialsSync
+import com.duckduckgo.securestorage.store.sync.LoginCredentialsSyncDao
 
 @Database(
-    version = 3,
-    entities = [WebsiteLoginCredentialsEntity::class],
+    version = 4,
+    entities = [
+        WebsiteLoginCredentialsEntity::class,
+        LoginCredentialsSync::class,
+    ],
 )
 abstract class SecureStorageDatabase : RoomDatabase() {
     abstract fun websiteLoginCredentialsDao(): WebsiteLoginCredentialsDao
+    internal abstract fun syncLoginCredentialsDao(): LoginCredentialsSyncDao
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -45,4 +51,10 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS `website_login_credentials_sync_meta` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`syncId`))")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
