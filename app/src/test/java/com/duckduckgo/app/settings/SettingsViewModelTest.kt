@@ -34,7 +34,6 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncState.READY
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
@@ -373,26 +372,6 @@ class SettingsViewModelTest {
         testee.viewState().test {
             val viewState = awaitItem()
             assertTrue(viewState.showSyncSetting)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncFeatureChangesToDisableThenSettingVisibleAndStateDisabled() = runTest {
-        whenever(deviceSyncState.isFeatureEnabled()).thenReturn(true)
-        whenever(deviceSyncState.isUserSignedInOnDevice()).thenReturn(true)
-        testee.start()
-
-        testee.viewState().test {
-            val viewState = awaitItem()
-            assertTrue(viewState.showSyncSetting)
-            assertTrue(viewState.syncEnabled)
-
-            stateFlow.value = OFF
-
-            val updatedState = awaitItem()
-            assertFalse(updatedState.syncEnabled)
-
             cancelAndConsumeRemainingEvents()
         }
     }

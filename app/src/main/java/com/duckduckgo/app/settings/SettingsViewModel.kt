@@ -37,7 +37,6 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
@@ -51,8 +50,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -122,7 +119,6 @@ class SettingsViewModel @Inject constructor(
 
     init {
         pixel.fire(SETTINGS_OPENED)
-        observeSyncState()
     }
 
     fun start() {
