@@ -16,9 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.ui
 
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -28,9 +26,6 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
-import com.duckduckgo.mobile.android.vpn.prefs.RealVpnPreferences
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
@@ -64,13 +59,10 @@ class PrivacyReportViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var repository: AppTrackerBlockingStatsRepository
-    private lateinit var vpnPreferences: VpnPreferences
     private lateinit var db: VpnDatabase
     private val vpnStore = mock<VpnStore>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
     private val vpnFeatureRemover = mock<VpnFeatureRemover>()
-
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private lateinit var testee: PrivacyReportViewModel
 
@@ -80,9 +72,6 @@ class PrivacyReportViewModelTest {
         prepareDb()
 
         repository = RealAppTrackerBlockingStatsRepository(db, coroutineRule.testDispatcherProvider)
-
-        context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        vpnPreferences = RealVpnPreferences(context)
 
         testee = PrivacyReportViewModel(repository, vpnStore, vpnFeatureRemover, vpnStateMonitor, coroutineRule.testDispatcherProvider)
     }
