@@ -25,7 +25,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.sync.algorithm.isDeleted
 import com.duckduckgo.sync.api.SyncCrypto
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
@@ -38,7 +37,7 @@ import timber.log.Timber
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SavedSitesSyncDataProvider @Inject constructor(
     private val repository: SavedSitesRepository,
-    private val savedSitesSyncStore: FeatureSyncStore,
+    private val savedSitesSyncStore: SavedSitesSyncStore,
     private val syncCrypto: SyncCrypto,
 ) : SyncableDataProvider {
 
