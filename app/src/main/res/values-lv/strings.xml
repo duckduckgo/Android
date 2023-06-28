@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Paziņojumi</string>
     <string name="settingsSubtitleNotificationsDisabled">Atspējots</string>
     <string name="settingsSubtitleNotificationsEnabled">Iespējots</string>
+    <string name="settingsDefaultBrowserTitle">Noklusējuma pārlūks</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo ir tavs noklusējuma pārlūks</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Padari DuckDuckGo par savu noklusējuma pārlūku</string>
+    <string name="settingsPrivateSearchTitle">Privāta meklēšana</string>
+    <string name="settingsPrivateSearchDescription">Iespējots pēc noklusējuma</string>
+    <string name="settingsWebTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
+    <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
+    <string name="settingsHeadingSettings">Iestatījumi</string>
+    <string name="settingsPermissionsAndPrivacySetting">Atļaujas un privātums</string>
+    <string name="settingsAutofillLoginsSetting">Automātiski aizpildīt pieteikšanās datus</string>
+    <string name="settingsSyncSetting">Sinhronizēt</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Atļaujas un privātums</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Izskats</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
