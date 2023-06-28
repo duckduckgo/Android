@@ -37,7 +37,7 @@
             android:exported="false" />
         <activity
             android:name=".exclusion.ui.NetpAppExclusionListActivity"
-            android:label="@string/netpManagementSettingsExclusion"
+            android:label="@string/netpExclusionListTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
     </application>

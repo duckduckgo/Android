@@ -23,11 +23,11 @@
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/netpManagementSettings" />
+        app:primaryText="@string/netpManagementManageHeader" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/settings_exclusion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/netpManagementSettingsExclusion" />
+        app:primaryText="@string/netpManagementManageItemExclusion" />
 </LinearLayout>
