@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Meldingen</string>
     <string name="settingsSubtitleNotificationsDisabled">Uitgeschakeld</string>
     <string name="settingsSubtitleNotificationsEnabled">Ingeschakeld</string>
+    <string name="settingsDefaultBrowserTitle">Standaardbrowser</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is je standaardbrowser</string>
+    <string name="settingsDefaultBrowserNotSetDescription">DuckDuckGo instellen als standaardbrowser</string>
+    <string name="settingsPrivateSearchTitle">Privé-zoekopdracht</string>
+    <string name="settingsPrivateSearchDescription">Standaard ingeschakeld</string>
+    <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
+    <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
+    <string name="settingsHeadingSettings">Instellingen</string>
+    <string name="settingsPermissionsAndPrivacySetting">Toestemmingen en privacy</string>
+    <string name="settingsAutofillLoginsSetting">Login met automatisch invullen</string>
+    <string name="settingsSyncSetting">Synchroniseren</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Toestemmingen en privacy</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Uiterlijk</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
