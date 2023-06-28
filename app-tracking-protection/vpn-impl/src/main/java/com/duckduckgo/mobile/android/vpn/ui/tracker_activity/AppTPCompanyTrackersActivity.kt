@@ -37,9 +37,11 @@ import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -59,6 +61,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
@@ -91,6 +94,12 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private val toggleAppSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppPermissionToggled(isChecked, getPackage())
+    }
+
+    private val isAppTPEnabled by lazy {
+        runBlocking {
+            vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -173,7 +182,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
                 binding.appDisabledInfoPanel.show()
             }
         } else {
-            setToggleState(viewState.protectionEnabled)
+            setToggleState(viewState.protectionEnabled, isAppTPEnabled)
             if (viewState.protectionEnabled) {
                 binding.appDisabledInfoPanel.gone()
             } else {
@@ -182,9 +191,11 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun setToggleState(enabled: Boolean) {
+    private fun setToggleState(checked: Boolean, enabled: Boolean) {
         if (::appEnabledSwitch.isInitialized) {
-            appEnabledSwitch.quietlySetIsChecked(enabled, toggleAppSwitchListener)
+            appEnabledSwitch.quietlySetIsChecked(checked, toggleAppSwitchListener)
+            appEnabledSwitch.isEnabled = enabled
+            appEnabledSwitch.setEnabledOpacity(enabled)
         }
     }
 
@@ -207,6 +218,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
         appEnabledSwitch = switchMenuItem?.actionView as SwitchView
         appEnabledSwitch.setOnCheckedChangeListener(toggleAppSwitchListener)
+        appEnabledSwitch.isEnabled = isAppTPEnabled
+        appEnabledSwitch.setEnabledOpacity(isAppTPEnabled)
         return true
     }
 
