@@ -127,13 +127,13 @@ jobs:
           action: 'add-task-pr-description'
 
   process-failure:
-      - name: Create Asana task when workflow failed
-        if: ${{ failure() }}
-        uses: malmstein/github-asana-action@master
-        with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: GH Workflow Failure - Update content scope scripts
-          asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+    name: Create Asana task when workflow failed
+    if: ${{ failure() }}
+    uses: malmstein/github-asana-action@master
+    with:
+      asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+      asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+      asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+      asana-task-name: GH Workflow Failure - Update content scope scripts
+      asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
 
