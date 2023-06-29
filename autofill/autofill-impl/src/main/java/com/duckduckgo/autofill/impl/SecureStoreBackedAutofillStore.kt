@@ -176,6 +176,13 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             }
     }
 
+    override suspend fun getAllCredentialsModifiedSince(modifiedSince: Long): List<LoginCredentials> {
+        return secureStorage.websiteLoginDetailsWithCredentialsModifiedSince(modifiedSince)
+            .map {
+                it.toLoginCredentials()
+            }
+    }
+
     override suspend fun getCredentialCount(): Flow<Int> {
         return secureStorage.websiteLoginDetailsWithCredentials().map { it.size }
     }

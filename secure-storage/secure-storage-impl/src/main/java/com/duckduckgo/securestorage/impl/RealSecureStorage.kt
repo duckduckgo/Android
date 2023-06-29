@@ -114,6 +114,17 @@ class RealSecureStorage @Inject constructor(
             flowOf(emptyList())
         }
 
+    override suspend fun websiteLoginDetailsWithCredentialsModifiedSince(since: Long): List<WebsiteLoginDetailsWithCredentials> =
+        if (secureStorageRepository != null) {
+            withContext(dispatchers.io()) {
+                secureStorageRepository!!.websiteLoginCredentialsModifiedSince(since).map {
+                    it.toCredentials()
+                }
+            }
+        } else {
+            emptyList()
+        }
+
     override suspend fun updateWebsiteLoginDetailsWithCredentials(
         websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
     ): WebsiteLoginDetailsWithCredentials? =

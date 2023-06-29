@@ -87,6 +87,9 @@ interface AutofillStore {
      */
     suspend fun getAllCredentials(): Flow<List<LoginCredentials>>
 
+    // missing javadoc
+    suspend fun getAllCredentialsModifiedSince(modifiedSince: Long): List<LoginCredentials>
+
     /**
      * Returns a count of how many credentials are stored
      */
