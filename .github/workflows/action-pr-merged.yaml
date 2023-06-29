@@ -8,7 +8,7 @@ jobs:
   add-pr-merged-comment:
     runs-on: ubuntu-latest
     steps:
-      - uses: malmstein/github-asana-action@0.6.0
+      - uses: malmstein/github-asana-action@0.7.0
         if: github.event.pull_request.merged
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
