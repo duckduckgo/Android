@@ -32,18 +32,17 @@ jobs:
         continue-on-error: true
         run: ncu @duckduckgo/content-scope-scripts --errorLevel 2
 
-      - name: Update Content Scope scripts
+      - name: Update content scope scripts
         if: ${{ steps.update-check.outputs.outcome == 'failure' }}
-        needs: check-content-scope-scripts
-        steps:
-          - name: Update content scope scripts
-            run: ncu @duckduckgo/content-scope-scripts -u
+        run: ncu @duckduckgo/content-scope-scripts -u
 
-          - name: Install package
-            run: npm update
+      - name: Install package
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
+        run: npm update
 
-          - name: Copy files
-            run: copy-files-from-to
+      - name: Copy files
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
+        run: copy-files-from-to
 
   find-latest-version:
     name: Find latest release version of Content Scope scripts
