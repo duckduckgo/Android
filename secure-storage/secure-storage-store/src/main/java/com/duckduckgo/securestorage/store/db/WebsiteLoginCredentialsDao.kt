@@ -36,6 +36,9 @@ interface WebsiteLoginCredentialsDao {
     @Query("select * from website_login_credentials")
     fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
+    @Query("select * from website_login_credentials where lastUpdatedInMillis > :since")
+    fun websiteLoginCredentialsModifiedSince(since: Long): List<WebsiteLoginCredentialsEntity>
+
     @Query("select * from website_login_credentials where domain like '%' || :domain || '%'")
     fun websiteLoginCredentialsByDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 

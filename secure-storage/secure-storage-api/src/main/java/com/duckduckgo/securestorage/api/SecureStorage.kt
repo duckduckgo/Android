@@ -94,6 +94,19 @@ interface SecureStorage {
     suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>>
 
     /**
+     * This method returns all the [WebsiteLoginDetailsWithCredentials] stored in the [SecureStorage] modified [since].
+     * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
+     * If [canAccessSecureStorage] is false when this is invoked, an empty flow will be emitted.
+     *
+     * @param [since] Time in milliseconds indicating when the credential was last updated, used for filtering.
+     * @return List<WebsiteLoginDetailsWithCredentials> list of plain text WebsiteLoginDetailsWithCredentials stored
+     * in SecureStorage containing the plaintext password
+     * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
+     */
+    @Throws(SecureStorageException::class)
+    suspend fun websiteLoginDetailsWithCredentialsModifiedSince(since: Long): List<WebsiteLoginDetailsWithCredentials>
+
+    /**
      * This method updates an existing [WebsiteLoginDetailsWithCredentials] in the [SecureStorage].
      * If [canAccessSecureStorage] is false when this is invoked, nothing will be done.
      *
