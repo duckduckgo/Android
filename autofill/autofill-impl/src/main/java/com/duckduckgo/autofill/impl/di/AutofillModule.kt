@@ -33,8 +33,11 @@ import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
+import com.duckduckgo.autofill.store.sync.AutofillSyncStore
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.securestorage.api.SecureStorage
+import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -78,5 +81,13 @@ class AutofillModule {
         dispatcherProvider: DispatcherProvider,
     ): AutofillFeatureRepository {
         return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
+    }
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    @Named("autofillStore")
+    fun provideAutofillSyncStore(
+        context: Context,
+    ): FeatureSyncStore {
+        return AutofillSyncStore(context = context)
     }
 }
