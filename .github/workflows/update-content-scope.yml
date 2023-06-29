@@ -11,9 +11,10 @@ concurrency:
 
 jobs:
   check-ref-tests:
-    name: Check Content Scope Scripts
+    name: Check Content Scope scripts
     runs-on: ubuntu-latest
-
+    outputs:
+      outcome: ${{ steps.update-check.outputs.outcome }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -32,9 +33,11 @@ jobs:
         run: ncu @duckduckgo/content-scope-scripts --errorLevel 2
 
   update-ref-tests:
-    - name: Update content scope scripts
-      if: ${{ steps.update-check.outcome == 'failure' }}
+    - name: Update Content Scope scripts
+      if: ${{ needs.check-ref-tests.outputs.outcome == 'failure' }}
       needs: check-ref-tests
+      outputs:
+        version: ${{ steps.latest-release.outputs.version }}
       steps:
         - name: Update content scope scripts
           run: ncu @duckduckgo/content-scope-scripts -u
@@ -45,56 +48,81 @@ jobs:
         - name: Copy files
           run: copy-files-from-to
 
-        - name: Create PR
-          id: create-pr
-          uses: peter-evans/create-pull-request@v4
-          with:
-            base: "develop"
-            title: "Update content scope scripts to latest version"
-            author: daxmobile <daxmobile@users.noreply.github.com>
-            token: ${{ secrets.GT_DAXMOBILE }}
-            commit-message: "Update content scope scripts to latest version"
-            labels: content scope scripts, automated pr
-            branch: automated/update-content-scope-scripts-dependencies
-            body: |
-              - Automated content scope scripts dependency update
-              
-              This PR updates the content scope scripts dependency to the latest available version and copies the necessary files.
-              If tests have failed, see https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
-              
-              - [ ] All tests must pass
+  find-latest-version:
+  - name: Find latest release version of Content Scope scripts
+    if: ${{ needs.check-ref-tests.outputs.outcome == 'failure' }}
+    runs-on: ubuntu-latest
+    needs: update-ref-tests
+    outputs:
+      version: ${{ steps.latest-release.outputs.version }}
+    steps:
+      - name: Find latest release of content scope scripts
+        id: latest-release
+        uses: malmstein/github-asana-action@master
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-repository: 'content-scope-scripts'
+          github-org: 'duckduckgo'
+          action: 'get-latest-repo-release'
 
-        - name: Create Asana task when workflow succeeded
-          uses: honeycombio/gha-create-asana-task@main
-          with:
-            asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-            asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-            asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-            asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-            asana-task-name: Update content scope scripts to latest version
-            asana-task-description: |
-              Content scope scripts have been updated and a PR created.
-              
-              If tests failed check out https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
-              
-              See ${{ steps.create-pr.outputs.pull-request-url }}
+  process-update:
+    name: Process new release of Content Scope scripts
+    if: ${{ needs.check-ref-tests.outputs.outcome == 'failure' }}
+    runs-on: ubuntu-latest
+    needs: [update-ref-tests, find-latest-version]
+    env:
+      VERSION: ${{needs.find-latest-version.outputs.version}}
+    steps:
+      - name: Create Pull Request in Android repo
+        id: create-pr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          base: "develop"
+          title: Update content scope scripts to version ${{ env.VERSION }}
+          author: daxmobile <daxmobile@users.noreply.github.com>
+          token: ${{ secrets.GT_DAXMOBILE }}
+          commit-message: Update content scope scripts to version ${{ env.VERSION }}
+          labels: content scope scripts, automated pr
+          branch: automated/update-content-scope-scripts-dependencies
+          body: |           
+            - Automated content scope scripts dependency update
+            
+            This PR updates the content scope scripts dependency to the latest available version and copies the necessary files.
+            If tests have failed, see https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
+            
+            - [ ] All tests must pass
 
-        - name: Add Asana task to Release Board project when workflow succeeded
-          uses: malmstein/github-asana-action@0.6.0
-          with:
-            asana-pat: ${{ secrets.GH_ASANA_SECRET }}
-            asana-project: '488551667048375'
-            asana-section: '488604899706669'
-            action: 'add-task-asana-project'
+      - name: Create Asana task when workflow succeeded
+        id: create-task
+        uses: malmstein/github-asana-action@master
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: Update content scope scripts to version ${{ env.VERSION }}
+          asana-task-description: |                      
+            Content scope scripts have been updated and a PR created.
+            
+            If tests failed check out https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
+            
+            See ${{ steps.create-pr.outputs.pull-request-url }}
+          action: 'create-asana-task'
 
-        - name: Create Asana task when workflow failed
-          if: ${{ failure() }}
-          uses: honeycombio/gha-create-asana-task@main
-          with:
-            asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-            asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-            asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-            asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-            asana-task-name: GH Workflow Failure - Update content scope scripts
-            asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+      - name: Add Asana task to Release Board project when workflow succeeded
+        uses: malmstein/github-asana-action@master
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: '488551667048375'
+          asana-section: '488604899706669'
+          action: 'add-task-asana-project'
+
+      - name: Create Asana task when workflow failed
+        if: ${{ failure() }}
+        uses: malmstein/github-asana-action@master
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
+          asana-section: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-task-name: GH Workflow Failure - Update content scope scripts
+          asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
 
