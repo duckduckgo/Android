@@ -75,7 +75,7 @@ jobs:
     steps:
       - name: Create Pull Request in Android repo
         id: create-pr
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           base: "develop"
           title: Update content scope scripts to version ${{ env.VERSION }}
@@ -114,8 +114,21 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: '488551667048375'
           asana-section: '488604899706669'
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
           action: 'add-task-asana-project'
 
+      - name: Update PR description with Asana task
+        uses: malmstein/github-asana-action@master
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
+          github-repository: 'content-scope-scripts'
+          github-org: 'duckduckgo'
+          asana-project: '488551667048375'
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
+          action: 'add-task-pr-description'
+
+  process-failure:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         uses: malmstein/github-asana-action@master
