@@ -22,7 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "contentScopeScripts",
+    featureName = "clientContentFeatures",
 )
 
 interface ContentScopeScriptsFeature {
