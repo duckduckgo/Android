@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Meddelanden</string>
     <string name="settingsSubtitleNotificationsDisabled">Inaktiverad</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktiverad</string>
+    <string name="settingsDefaultBrowserTitle">Standardwebbläsare</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo är din standardwebbläsare</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Gör DuckDuckGo till din standardwebbläsare</string>
+    <string name="settingsPrivateSearchTitle">Privatsökning</string>
+    <string name="settingsPrivateSearchDescription">Aktiverat som standard</string>
+    <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
+    <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
+    <string name="settingsHeadingSettings">Inställningar</string>
+    <string name="settingsPermissionsAndPrivacySetting">Behörigheter och integritet</string>
+    <string name="settingsAutofillLoginsSetting">Fyll i inloggningar automatiskt</string>
+    <string name="settingsSyncSetting">Synkronisering</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Behörigheter och integritet</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Utseende</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
