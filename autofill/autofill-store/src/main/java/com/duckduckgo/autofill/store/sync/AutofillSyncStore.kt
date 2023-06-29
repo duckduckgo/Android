@@ -19,9 +19,12 @@ package com.duckduckgo.autofill.store.sync
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 
-class AutofillSyncStore constructor(private val context: Context) : FeatureSyncStore {
+interface AutofillSyncStore {
+    var modifiedSince: String
+}
+
+class RealAutofillSyncStore constructor(private val context: Context) : AutofillSyncStore {
     override var modifiedSince: String
         get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_MODIFIED_SINCE, value) }

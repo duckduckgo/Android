@@ -41,6 +41,7 @@ data class SyncChangesResponse(val type: SyncableType, val jsonString: String) {
 
 enum class SyncableType(val field: String) {
     BOOKMARKS("bookmarks"),
+    CREDENTIALS("credentials"),
 }
 
 sealed class SyncMergeResult<out R> {

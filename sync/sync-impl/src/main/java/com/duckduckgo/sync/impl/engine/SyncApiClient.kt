@@ -83,6 +83,9 @@ class AppSyncApiClient @Inject constructor(
 
         return when (type) {
             BOOKMARKS -> getBookmarks(type, token, since)
+            else -> {
+                TODO()
+            }
         }
     }
 
