@@ -19,16 +19,28 @@ package com.duckduckgo.autofill.store
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
+import com.duckduckgo.autofill.store.sync.LoginCredentialsSyncDao
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         AutofillExceptionEntity::class,
+        LoginCredentialsSync::class,
     ],
 )
 abstract class AutofillDatabase : RoomDatabase() {
     abstract fun autofillDao(): AutofillDao
+    abstract fun syncLoginCredentialsDao(): LoginCredentialsSyncDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("CREATE TABLE IF NOT EXISTS `website_login_credentials_sync_meta` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`syncId`))")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)

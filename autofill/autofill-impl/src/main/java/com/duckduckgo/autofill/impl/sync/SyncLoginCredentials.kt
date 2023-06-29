@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.securestorage.store.sync
+package com.duckduckgo.autofill.impl.sync
 
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
+import com.duckduckgo.autofill.store.sync.LoginCredentialsSyncDao
 
 internal class SyncLoginCredentials(
     private val dao: LoginCredentialsSyncDao,

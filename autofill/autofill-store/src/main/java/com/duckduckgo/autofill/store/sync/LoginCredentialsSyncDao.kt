@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.securestorage.store.sync
+package com.duckduckgo.autofill.store.sync
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import java.util.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
 
-@Entity(tableName = "website_login_credentials_sync_meta")
-data class LoginCredentialsSync(
-    @PrimaryKey val syncId: String = UUID.randomUUID().toString(),
-    val id: Long,
-    var deleted_at: String? = null,
-)
+@Dao
+interface LoginCredentialsSyncDao {
+
+    @Query("select * from website_login_credentials_sync_meta where id = :id")
+    fun getSyncId(id: Long): LoginCredentialsSync?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(entity: LoginCredentialsSync): Long
+
+    @Delete
+    fun delete(entity: LoginCredentialsSync)
+}
+
