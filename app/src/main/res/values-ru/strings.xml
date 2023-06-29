@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Уведомления</string>
     <string name="settingsSubtitleNotificationsDisabled">Отключено</string>
     <string name="settingsSubtitleNotificationsEnabled">Включено</string>
+    <string name="settingsDefaultBrowserTitle">Браузер по умолчанию</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo — ваш браузер по умолчанию</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Выберите DuckGo браузером по умолчанию</string>
+    <string name="settingsPrivateSearchTitle">Частный поиск</string>
+    <string name="settingsPrivateSearchDescription">Включено по умолчанию</string>
+    <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
+    <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
+    <string name="settingsHeadingSettings">Настройки</string>
+    <string name="settingsPermissionsAndPrivacySetting">Разрешения и конфиденциальность</string>
+    <string name="settingsAutofillLoginsSetting">Автозаполнение логинов</string>
+    <string name="settingsSyncSetting">Синхронизация</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Разрешения и конфиденциальность</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Внешний вид</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
