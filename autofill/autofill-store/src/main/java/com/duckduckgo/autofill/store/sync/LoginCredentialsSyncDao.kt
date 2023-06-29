@@ -31,6 +31,9 @@ interface LoginCredentialsSyncDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: LoginCredentialsSync): Long
 
+    @Query("select * from website_login_credentials_sync_meta where deleted_at > :since")
+    fun getRemovedIdsSince(since: String): List<LoginCredentialsSync>
+
     @Delete
     fun delete(entity: LoginCredentialsSync)
 }

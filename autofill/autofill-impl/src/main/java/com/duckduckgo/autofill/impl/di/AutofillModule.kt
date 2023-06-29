@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
 import com.duckduckgo.autofill.store.sync.AutofillSyncStore
+import com.duckduckgo.autofill.store.sync.LoginCredentialsSyncDao
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
@@ -43,6 +44,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.*
 
 @Module
 @ContributesTo(AppScope::class)
@@ -82,6 +84,7 @@ class AutofillModule {
     ): AutofillFeatureRepository {
         return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
     }
+
     @Provides
     @SingleInstanceIn(AppScope::class)
     @Named("autofillStore")
@@ -89,5 +92,13 @@ class AutofillModule {
         context: Context,
     ): FeatureSyncStore {
         return AutofillSyncStore(context = context)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesLoginCredentialsSyncDao(
+        database: AutofillDatabase,
+    ): LoginCredentialsSyncDao {
+        return database.syncLoginCredentialsDao()
     }
 }

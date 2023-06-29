@@ -19,8 +19,13 @@ package com.duckduckgo.autofill.impl.sync
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
 import com.duckduckgo.autofill.store.sync.LoginCredentialsSyncDao
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-internal class SyncLoginCredentials(
+@SingleInstanceIn(AppScope::class)
+class SyncLoginCredentials @Inject constructor(
     private val dao: LoginCredentialsSyncDao,
 ) {
     fun getSyncId(id: Long): String {
@@ -31,6 +36,10 @@ internal class SyncLoginCredentials(
             syncId = entity.syncId
         }
         return syncId
+    }
+
+    fun getRemovedEntitiesSince(since: String): List<LoginCredentialsSync> {
+        return dao.getRemovedIdsSince(since)
     }
 
     fun onEntityRemoved(id: Long) {
