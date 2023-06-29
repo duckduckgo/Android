@@ -33,37 +33,37 @@ jobs:
         run: ncu @duckduckgo/privacy-reference-tests --errorLevel 2
 
   update-ref-tests:
-    - name: Update reference tests
-      if: ${{ needs.check-ref-tests.outputs.outcome == 'failure' }}
-      needs: check-ref-tests
-      outputs:
-        version: ${{ steps.latest-release.outputs.version }}
-      steps:
-        - name: Update reference steps
-          run: ncu @duckduckgo/privacy-reference-tests -u
+    name: Update reference tests
+    if: ${{ needs.check-ref-tests.outputs.outcome == 'failure' }}
+    needs: check-ref-tests
+    outputs:
+      version: ${{ steps.latest-release.outputs.version }}
+    steps:
+      - name: Update reference steps
+        run: ncu @duckduckgo/privacy-reference-tests -u
 
-        - name: Install package
-          run: npm update
+      - name: Install package
+        run: npm update
 
-        - name: Copy files
-          run: copy-files-from-to
+      - name: Copy files
+        run: copy-files-from-to
 
   find-latest-version:
-    - name: Find latest release version of reference tests
-      if: ${{ needs.check-ref-tests.outputs.outcome == 'failure' }}
-      runs-on: ubuntu-latest
-      needs: update-ref-tests
-      outputs:
-        version: ${{ steps.latest-release.outputs.version }}
-      steps:
-        - name: Find latest release of reference tests
-          id: latest-release
-          uses: malmstein/github-asana-action@master
-          with:
-            github-pat: ${{ secrets.GT_DAXMOBILE }}
-            github-repository: 'privacy-reference-tests'
-            github-org: 'duckduckgo'
-            action: 'get-latest-repo-release'
+    name: Find latest release version of reference tests
+    if: ${{ needs.check-ref-tests.outputs.outcome == 'failure' }}
+    runs-on: ubuntu-latest
+    needs: update-ref-tests
+    outputs:
+      version: ${{ steps.latest-release.outputs.version }}
+    steps:
+      - name: Find latest release of reference tests
+        id: latest-release
+        uses: malmstein/github-asana-action@master
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-repository: 'privacy-reference-tests'
+          github-org: 'duckduckgo'
+          action: 'get-latest-repo-release'
 
   process-update:
     name: Process new release of reference tests

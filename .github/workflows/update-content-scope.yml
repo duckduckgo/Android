@@ -33,35 +33,35 @@ jobs:
         run: ncu @duckduckgo/content-scope-scripts --errorLevel 2
 
   update-content-scope-scripts:
-      name: Update Content Scope scripts
-      if: ${{ needs.check-content-scope-scripts.outputs.outcome == 'failure' }}
-      needs: check-ref-tests
-      steps:
-        - name: Update content scope scripts
-          run: ncu @duckduckgo/content-scope-scripts -u
+    name: Update Content Scope scripts
+    if: ${{ needs.check-content-scope-scripts.outputs.outcome == 'failure' }}
+    needs: check-ref-tests
+    steps:
+      - name: Update content scope scripts
+        run: ncu @duckduckgo/content-scope-scripts -u
 
-        - name: Install package
-          run: npm update
+      - name: Install package
+        run: npm update
 
-        - name: Copy files
-          run: copy-files-from-to
+      - name: Copy files
+        run: copy-files-from-to
 
   find-latest-version:
-      name: Find latest release version of Content Scope scripts
-      if: ${{ needs.check-content-scope-scripts.outputs.outcome == 'failure' }}
-      runs-on: ubuntu-latest
-      needs: update-check-content-scope-scripts
-      outputs:
-        version: ${{ steps.latest-release.outputs.version }}
-      steps:
-        - name: Find latest release of content scope scripts
-          id: latest-release
-          uses: malmstein/github-asana-action@master
-          with:
-            github-pat: ${{ secrets.GT_DAXMOBILE }}
-            github-repository: 'content-scope-scripts'
-            github-org: 'duckduckgo'
-            action: 'get-latest-repo-release'
+    name: Find latest release version of Content Scope scripts
+    if: ${{ needs.check-content-scope-scripts.outputs.outcome == 'failure' }}
+    runs-on: ubuntu-latest
+    needs: update-check-content-scope-scripts
+    outputs:
+      version: ${{ steps.latest-release.outputs.version }}
+    steps:
+      - name: Find latest release of content scope scripts
+        id: latest-release
+        uses: malmstein/github-asana-action@master
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-repository: 'content-scope-scripts'
+          github-org: 'duckduckgo'
+          action: 'get-latest-repo-release'
 
   process-update:
     name: Process new release of Content Scope scripts
@@ -127,7 +127,7 @@ jobs:
           action: 'add-task-pr-description'
 
   process-failure:
-        name: Create Asana task when workflow failed
+      - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         uses: malmstein/github-asana-action@master
         with:
