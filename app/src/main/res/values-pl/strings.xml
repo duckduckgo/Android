@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Powiadomienia</string>
     <string name="settingsSubtitleNotificationsDisabled">Wyłączone</string>
     <string name="settingsSubtitleNotificationsEnabled">Włączone</string>
+    <string name="settingsDefaultBrowserTitle">Domyślna przeglądarka</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo to Twoja domyślna przeglądarka</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Ustaw DuckDuckGo jako domyślną przeglądarkę.</string>
+    <string name="settingsPrivateSearchTitle">Prywatne Wyszukiwanie</string>
+    <string name="settingsPrivateSearchDescription">Domyślnie włączone</string>
+    <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
+    <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
+    <string name="settingsHeadingSettings">Ustawienia</string>
+    <string name="settingsPermissionsAndPrivacySetting">Zezwolenia i prywatność</string>
+    <string name="settingsAutofillLoginsSetting">Autouzupełnianie logowania</string>
+    <string name="settingsSyncSetting">Synchronizacja</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Zezwolenia i prywatność</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Wygląd</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
