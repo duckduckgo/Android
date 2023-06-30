@@ -26,13 +26,6 @@ interface SyncableDataProvider {
     fun getChanges(): SyncChangesRequest
 
     /**
-     * Used by the SyncClient to get the modifiedSince data per feature
-     * When calling /GET to receive data we need to pass one since parameter per model we request
-     * This data that will be sent to the Sync API
-     */
-    fun getModifiedSince(): String
-
-    /**
      * Sync Feature has been disabled / device has been removed
      * This is an opportunity for Features to do some local cleanup if needed
      */

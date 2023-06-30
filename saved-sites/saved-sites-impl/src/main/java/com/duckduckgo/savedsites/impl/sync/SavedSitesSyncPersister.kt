@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult
@@ -39,7 +38,7 @@ import timber.log.Timber
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
-    private val savedSitesSyncStore: FeatureSyncStore,
+    private val savedSitesSyncStore: SavedSitesSyncStore,
     private val algorithm: SavedSitesSyncPersisterAlgorithm,
 ) : SyncableDataPersister {
 

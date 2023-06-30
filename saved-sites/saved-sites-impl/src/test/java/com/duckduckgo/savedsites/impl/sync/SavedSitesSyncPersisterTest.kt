@@ -22,7 +22,6 @@ import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
@@ -48,7 +47,7 @@ class SavedSitesSyncPersisterTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val repository: SavedSitesRepository = mock()
-    private val store: FeatureSyncStore = mock()
+    private val store: SavedSitesSyncStore = mock()
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
 
     private lateinit var syncPersister: SavedSitesSyncPersister
