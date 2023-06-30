@@ -35,6 +35,7 @@
             android:id="@+id/selectedThemeSetting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
             app:primaryText="@string/settingsTheme"
             app:primaryTextTruncated="false"
             app:secondaryText="@string/settingsSystemTheme" />
@@ -69,14 +70,6 @@
                 tools:srcCompat="@mipmap/ic_launcher_red_round" />
 
         </LinearLayout>
-
-        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-            android:id="@+id/selectedFireAnimationSetting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:primaryText="@string/settingsFireAnimation"
-            app:primaryTextTruncated="false"
-            app:secondaryText="@string/settingsHeroFireAnimation" />
 
     </LinearLayout>
 

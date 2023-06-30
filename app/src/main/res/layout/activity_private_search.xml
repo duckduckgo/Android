@@ -16,47 +16,46 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/permissionsAndPrivacySectionPrivacy"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/privateSearchDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/keyline_4"
+        android:text="@string/privateSearchDescription"
+        app:textType="secondary"
+        app:typography="body2" />
 
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/settingsCustomizeTitle"
+        android:id="@+id/privateSearchHeadingSearchSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsHeadingCustomize" />
+        app:primaryText="@string/privateSearchHeadingSearchSettings" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/sitePermissions"
+        android:id="@+id/privateSearchAutocompleteToggle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsSitePermissions" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/autocompleteToggle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsAutocompleteEnabled"
+        android:layout_marginTop="16dp"
+        app:primaryText="@string/privateSearchAutocompleteToggle"
         app:showSwitch="true" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/notificationsSetting"
+        android:id="@+id/privateSearchMoreSearchSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsTitleNotifications"
-        app:primaryTextTruncated="false" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/appLinksSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsTitleAppLinks"
-        app:primaryTextTruncated="false" />
+        app:primaryText="@string/privateSearchMoreSearchSettingsPrimaryText"
+        app:secondaryText="@string/privateSearchMoreSearchSettingsSecondaryText" />
 
 </LinearLayout>

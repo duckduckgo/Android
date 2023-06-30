@@ -16,41 +16,18 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/permissionsAndPrivacySectionPrivacy"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/settingsPrivacyTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsHeadingPrivacy"/>
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/globalPrivacyControlSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
-        app:primaryText="@string/globalPrivacyControlSetting"
-        tools:secondaryText="test test test" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/autoconsentSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
-        app:primaryText="@string/autoconsentSetting" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/whitelist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsPrivacyProtectionWhitelist"/>
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/fireproofWebsites"
+        android:layout_marginTop="@dimen/keyline_4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsFireproofWebsites"/>
@@ -69,5 +46,13 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAutomaticallyClearWhen"
         tools:secondaryText="test test test" />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/selectedFireAnimationSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsFireAnimation"
+        app:primaryTextTruncated="false"
+        app:secondaryText="@string/settingsHeroFireAnimation" />
 
 </LinearLayout>

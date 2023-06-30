@@ -28,6 +28,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
@@ -68,6 +69,7 @@ class SettingsViewModel @Inject constructor(
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
     private val dispatcherProvider: DispatcherProvider,
+    private val autoconsent: Autoconsent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -81,6 +83,7 @@ class SettingsViewModel @Inject constructor(
         val windowsWaitlistState: WindowsWaitlistState? = null,
         val networkProtectionState: NetPState = DISCONNECTED,
         val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
+        val isAutoconsentEnabled: Boolean = false
     )
 
     enum class NetPState {
@@ -106,7 +109,9 @@ class SettingsViewModel @Inject constructor(
         object LaunchWindows : Command()
         object LaunchSyncSettings : Command()
         object LaunchPrivateSearchWebPage : Command()
-        object LaunchWebTrackingProtectionWebPage : Command()
+        object LaunchWebTrackingProtectionScreen : Command()
+        object LaunchCookiePopupProtectionScreen : Command()
+        object LaunchFireButtonScreen : Command()
         object LaunchPermissionsAndPrivacyScreen : Command()
         object LaunchAppearanceScreen : Command()
     }
@@ -134,6 +139,7 @@ class SettingsViewModel @Inject constructor(
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
+                    isAutoconsentEnabled = autoconsent.isSettingEnabled()
                 ),
             )
         }
@@ -185,8 +191,13 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onWebTrackingProtectionSettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchWebTrackingProtectionWebPage) }
+        viewModelScope.launch { command.send(Command.LaunchWebTrackingProtectionScreen) }
         pixel.fire(SETTINGS_WEB_TRACKING_PROTECTION_PRESSED)
+    }
+
+    fun onCookiePopupProtectionSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchCookiePopupProtectionScreen) }
+        pixel.fire(SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED)
     }
 
     fun onAutofillSettingsClick() {
@@ -260,6 +271,11 @@ class SettingsViewModel @Inject constructor(
     fun onSyncSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
         pixel.fire(SETTINGS_SYNC_PRESSED)
+    }
+
+    fun onFireButtonSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchFireButtonScreen) }
+        pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
     }
 
     fun onPermissionsAndPrivacySettingClicked() {

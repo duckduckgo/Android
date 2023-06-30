@@ -32,4 +32,30 @@
     <string name="netpSettingsDisconnected">Disconnected</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Private Search</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search is your default search engine, so you can search the web without being tracked.</string>
+    <string name="privateSearchHeadingSearchSettings">Search Settings</string>
+    <string name="privateSearchAutocompleteToggle">Autocomplete Suggestions</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
+    <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
+    <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
+    <string name="webTrackingProtectionDescription">
+        <![CDATA[DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default. <u><a href="">Learn More</a><u/>]]>
+    </string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Settings -->
+    <string name="settingsFireButton">Fire Button</string>
+    <string name="cookiePopupProtectionTitle">Cookie Pop-Up Protection</string>
+    <string name="cookiePopupProtectionDescription">Banish these pop-ups &amp; minimize cookies</string>
+    <string name="cookiePopupProtectionEnabled">Enabled</string>
+
 </resources>

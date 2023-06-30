@@ -396,7 +396,7 @@ class SettingsViewModelTest {
         testee.commands().test {
             testee.onWebTrackingProtectionSettingClicked()
 
-            assertEquals(Command.LaunchWebTrackingProtectionWebPage, awaitItem())
+            assertEquals(Command.LaunchWebTrackingProtectionScreen, awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED)
 
             cancelAndConsumeRemainingEvents()

@@ -148,7 +148,7 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
     <string name="settingsHeadingSettings">Settings</string>
-    <string name="settingsPermissionsAndPrivacySetting">Permissions and Privacy</string>
+    <string name="settingsPermissionsAndPrivacySetting">Permissions</string>
     <string name="settingsAutofillLoginsSetting">Autofill Logins</string>
     <string name="settingsSyncSetting">Sync</string>
 

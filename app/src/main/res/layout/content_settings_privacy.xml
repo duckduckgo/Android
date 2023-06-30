@@ -53,6 +53,15 @@
         app:secondaryText="@string/settingsWebTrackingProtectionDescription" />
 
     <com.duckduckgo.app.settings.CheckListItem
+        android:id="@+id/cookiePopupProtectionSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:itemState="enabled"
+        app:primaryText="@string/cookiePopupProtectionTitle"
+        app:primaryTextTruncated="false"
+        app:secondaryText="@string/cookiePopupProtectionDescription" />
+
+    <com.duckduckgo.app.settings.CheckListItem
         android:id="@+id/emailSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

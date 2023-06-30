@@ -27,12 +27,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -41,14 +36,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PermissionsAndPrivacyViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
-    private val gpc: Gpc,
-    private val featureToggle: FeatureToggle,
-    private val autoconsent: Autoconsent,
 ) : ViewModel() {
 
     data class ViewState(
@@ -71,12 +64,6 @@ class PermissionsAndPrivacyViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object LaunchGlobalPrivacyControl : Command()
-        object LaunchAutoconsent : Command()
-        object LaunchFireproofWebsites : Command()
-        data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
-        data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
-        object LaunchWhitelist : Command()
         object LaunchLocation : Command()
         object LaunchNotificationsSettings : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
@@ -86,18 +73,10 @@ class PermissionsAndPrivacyViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun start(notificationsEnabled: Boolean = false) {
-        val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
-        val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
-        val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
-
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-                    automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
-                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
-                    autoconsentEnabled = autoconsent.isSettingEnabled(),
                     notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                 ),
             )
@@ -110,42 +89,6 @@ class PermissionsAndPrivacyViewModel @Inject constructor(
 
     fun commands(): Flow<Command> {
         return command.receiveAsFlow()
-    }
-
-    fun onGlobalPrivacyControlClicked() {
-        viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
-        pixel.fire(AppPixelName.SETTINGS_GPC_PRESSED)
-    }
-
-    fun onAutoconsentClicked() {
-        viewModelScope.launch { command.send(Command.LaunchAutoconsent) }
-        pixel.fire(AppPixelName.SETTINGS_MANAGE_COOKIE_POPUPS_PRESSED)
-    }
-
-    fun onFireproofWebsitesClicked() {
-        viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
-        pixel.fire(AppPixelName.SETTINGS_FIREPROOF_WEBSITES_PRESSED)
-    }
-
-    fun onAutomaticallyClearWhatClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
-        pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
-    }
-
-    fun onAutomaticallyClearWhenClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)) }
-        pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHEN_PRESSED)
-    }
-
-    fun onManageWhitelistSelected() {
-        viewModelScope.launch { command.send(Command.LaunchWhitelist) }
-        pixel.fire(AppPixelName.SETTINGS_MANAGE_WHITELIST)
-    }
-
-    fun onAutocompleteSettingChanged(enabled: Boolean) {
-        Timber.i("User changed autocomplete setting, is now enabled: $enabled")
-        settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
     }
 
     fun onSitePermissionsClicked() {
@@ -189,52 +132,6 @@ class PermissionsAndPrivacyViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun onAutomaticallyWhatOptionSelected(clearWhatNewSetting: ClearWhatOption) {
-        if (settingsDataStore.isCurrentlySelected(clearWhatNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhatNewSetting; no need to do anything else")
-            return
-        }
-
-        pixel.fire(clearWhatNewSetting.pixelEvent())
-
-        settingsDataStore.automaticallyClearWhatOption = clearWhatNewSetting
-
-        viewModelScope.launch {
-            viewState.emit(
-                currentViewState().copy(
-                    automaticallyClearData = AutomaticallyClearData(
-                        clearWhatOption = clearWhatNewSetting,
-                        clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting),
-                    ),
-                ),
-            )
-        }
-    }
-
-    fun onAutomaticallyWhenOptionSelected(clearWhenNewSetting: ClearWhenOption) {
-        if (settingsDataStore.isCurrentlySelected(clearWhenNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhenNewSetting; no need to do anything else")
-            return
-        }
-
-        clearWhenNewSetting.pixelEvent()?.let {
-            pixel.fire(it)
-        }
-
-        settingsDataStore.automaticallyClearWhenOption = clearWhenNewSetting
-        viewModelScope.launch {
-            viewState.emit(
-                currentViewState().copy(
-                    automaticallyClearData = AutomaticallyClearData(
-                        settingsDataStore.automaticallyClearWhatOption,
-                        clearWhenNewSetting,
-                    ),
-                ),
-            )
-        }
-    }
-
     private fun getAppLinksSettingsState(
         appLinksEnabled: Boolean,
         showAppLinksPrompt: Boolean,
@@ -255,29 +152,6 @@ class PermissionsAndPrivacyViewModel @Inject constructor(
             R.string.settingsSubtitleNotificationsEnabled
         } else {
             R.string.settingsSubtitleNotificationsDisabled
-        }
-    }
-
-    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption?): Boolean {
-        return clearWhatOption != null && clearWhatOption != ClearWhatOption.CLEAR_NONE
-    }
-
-    private fun ClearWhatOption.pixelEvent(): Pixel.PixelName {
-        return when (this) {
-            ClearWhatOption.CLEAR_NONE -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
-            ClearWhatOption.CLEAR_TABS_ONLY -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
-        }
-    }
-
-    private fun ClearWhenOption.pixelEvent(): Pixel.PixelName? {
-        return when (this) {
-            ClearWhenOption.APP_EXIT_ONLY -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
-            ClearWhenOption.APP_EXIT_OR_5_MINS -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
-            ClearWhenOption.APP_EXIT_OR_15_MINS -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
-            ClearWhenOption.APP_EXIT_OR_30_MINS -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
-            ClearWhenOption.APP_EXIT_OR_60_MINS -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
-            else -> null
         }
     }
 

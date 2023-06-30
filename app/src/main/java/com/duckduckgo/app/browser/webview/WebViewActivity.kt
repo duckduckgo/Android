@@ -22,16 +22,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebSettings
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.autoconsent.api.WebViewActivityWithUrlParam
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithNotificationParams
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(WebViewActivityWithUrlParam::class)
 class WebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -75,6 +80,12 @@ class WebViewActivity : DuckDuckGoActivity() {
 
         url?.let {
             binding.simpleWebview.loadUrl(it)
+        }
+
+        if (url == null) {
+            intent?.getActivityParams(WebViewActivityWithUrlParam::class.java)?.let {
+                binding.simpleWebview.loadUrl(it.url)
+            }
         }
     }
 
