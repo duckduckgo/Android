@@ -187,7 +187,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         binding.siteName.text = url
 
         lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(url = url, view = binding.favicon)
+            faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = binding.favicon)
         }
     }
 

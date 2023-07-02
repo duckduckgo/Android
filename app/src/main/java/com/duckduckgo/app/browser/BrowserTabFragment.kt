@@ -1287,7 +1287,7 @@ class BrowserTabFragment :
             getString(R.string.preciseLocationSiteDialogSubtitle)
         }
         lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(tabId, domain, binding.sitePermissionDialogFavicon)
+            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, domain, binding.sitePermissionDialogFavicon)
         }
 
         val dialog = CustomAlertDialogBuilder(requireActivity())

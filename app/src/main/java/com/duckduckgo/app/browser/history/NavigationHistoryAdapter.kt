@@ -76,7 +76,7 @@ class NavigationHistoryAdapter(
         oneListItem: OneLineListItem,
     ) {
         lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(url = historyEntry.url, tabId = tabId, view = oneListItem.leadingIcon())
+            faviconManager.loadToViewFromLocalWithPlaceholder(url = historyEntry.url, tabId = tabId, view = oneListItem.leadingIcon())
         }
     }
 }

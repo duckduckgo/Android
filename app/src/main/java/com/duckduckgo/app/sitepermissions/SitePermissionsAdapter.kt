@@ -226,7 +226,7 @@ class SitePermissionsAdapter(
             val oneListItem = binding.root
             oneListItem.setPrimaryText(item.domain)
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = item.domain, view = oneListItem.leadingIcon())
+                faviconManager.loadToViewFromLocalWithPlaceholder(url = item.domain, view = oneListItem.leadingIcon())
             }
             oneListItem.setClickListener {
                 viewModel.allowedSiteSelected(item.domain)
