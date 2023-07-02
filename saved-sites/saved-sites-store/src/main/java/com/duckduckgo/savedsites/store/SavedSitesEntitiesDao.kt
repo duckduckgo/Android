@@ -99,7 +99,7 @@ interface SavedSitesEntitiesDao {
     fun entityByUrl(url: String): Entity?
 
     @Query(
-        "select count(*) from entities where entities.url and entities.deleted = 0 LIKE :domain",
+        "select count(*) from entities where entities.url LIKE :domain and entities.deleted = 0 ",
     )
     fun countEntitiesByUrl(
         domain: String,
