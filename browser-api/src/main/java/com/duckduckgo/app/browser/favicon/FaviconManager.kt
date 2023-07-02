@@ -52,6 +52,7 @@ interface FaviconManager {
         tabId: String? = null,
         url: String,
         view: ImageView,
+        placeholder: String? = null,
     )
 
     suspend fun loadFromDisk(

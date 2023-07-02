@@ -191,9 +191,9 @@ class DuckDuckGoFaviconManager constructor(
         return null
     }
 
-    override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView) {
+    override suspend fun loadToViewFromLocalWithPlaceholder(tabId: String?, url: String, view: ImageView, placeholder: String?) {
         val bitmap = loadFromDisk(tabId, url)
-        view.loadFavicon(bitmap, url)
+        view.loadFavicon(bitmap, url, placeholder)
     }
 
     override suspend fun persistCachedFavicon(
