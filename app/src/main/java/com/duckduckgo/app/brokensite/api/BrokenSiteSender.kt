@@ -62,7 +62,7 @@ class BrokenSiteSubmitter @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
-                DESCRIPTION_KEY to brokenSite.description,
+                DESCRIPTION_KEY to brokenSite.description.toString(),
                 SITE_URL_KEY to absoluteUrl,
                 UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
                 TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
