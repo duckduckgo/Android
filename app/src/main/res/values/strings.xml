@@ -126,7 +126,7 @@
     <string name="leaveFeedback">Share Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
-    <string name="settingsHeadingMore">More from DuckDuckGo</string>
+    <string name="settingsHeadingMore">More From DuckDuckGo</string>
     <string name="settingsLightTheme">Light</string>
     <string name="settingsTheme">Theme</string>
     <string name="settingsDarkTheme">Dark</string>
@@ -140,6 +140,23 @@
     <string name="settingsTitleNotifications">Notifications</string>
     <string name="settingsSubtitleNotificationsDisabled">Disabled</string>
     <string name="settingsSubtitleNotificationsEnabled">Enabled</string>
+    <string name="settingsDefaultBrowserTitle">Default Browser</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo is your default browser</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Make DuckDuckGo your default browser</string>
+    <string name="settingsPrivateSearchTitle">Private Search</string>
+    <string name="settingsPrivateSearchDescription">Enabled by default</string>
+    <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
+    <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
+    <string name="settingsHeadingSettings">Settings</string>
+    <string name="settingsPermissionsAndPrivacySetting">Permissions and Privacy</string>
+    <string name="settingsAutofillLoginsSetting">Autofill Logins</string>
+    <string name="settingsSyncSetting">Sync</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Permissions and Privacy</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Appearance</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>

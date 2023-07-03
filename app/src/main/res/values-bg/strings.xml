@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Известия</string>
     <string name="settingsSubtitleNotificationsDisabled">Деактивирано</string>
     <string name="settingsSubtitleNotificationsEnabled">Активирано</string>
+    <string name="settingsDefaultBrowserTitle">Браузър по подразбиране</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo е браузърът по подразбиране</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Направете DuckDuckGo браузър по подразбиране</string>
+    <string name="settingsPrivateSearchTitle">поверително търсене</string>
+    <string name="settingsPrivateSearchDescription">Активирано по подразбиране</string>
+    <string name="settingsWebTrackingProtectionTitle">Защита от проследяване в мрежата</string>
+    <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
+    <string name="settingsHeadingSettings">Настройки</string>
+    <string name="settingsPermissionsAndPrivacySetting">Разрешения и поверителност</string>
+    <string name="settingsAutofillLoginsSetting">Автоматично попълване на данни за вход</string>
+    <string name="settingsSyncSetting">Синхронизиране</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Разрешения и поверителност</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Външен вид</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>

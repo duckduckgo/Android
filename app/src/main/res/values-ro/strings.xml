@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Notificări</string>
     <string name="settingsSubtitleNotificationsDisabled">Dezactivat</string>
     <string name="settingsSubtitleNotificationsEnabled">Activat</string>
+    <string name="settingsDefaultBrowserTitle">Browser implicit</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo este browserul tău implicit</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Setează DuckDuckGo ca browser implicit</string>
+    <string name="settingsPrivateSearchTitle">Căutare Confidențială</string>
+    <string name="settingsPrivateSearchDescription">Activat în mod implicit</string>
+    <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
+    <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
+    <string name="settingsHeadingSettings">Setări</string>
+    <string name="settingsPermissionsAndPrivacySetting">Permisiuni și confidențialitate</string>
+    <string name="settingsAutofillLoginsSetting">Completare automată la autentificare</string>
+    <string name="settingsSyncSetting">Sincronizare</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Permisiuni și confidențialitate</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Aspect</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>

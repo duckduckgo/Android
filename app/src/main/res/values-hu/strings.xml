@@ -127,7 +127,7 @@
     <string name="leaveFeedback">Visszajelzés megosztása</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
     <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
-    <string name="settingsHeadingMore">Továbbiak a DuckDuckGo-tól</string>
+    <string name="settingsHeadingMore">Továbbiak a DuckDuckGótól</string>
     <string name="settingsLightTheme">Világos</string>
     <string name="settingsTheme">Kinézet</string>
     <string name="settingsDarkTheme">Sötét</string>
@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Értesítések</string>
     <string name="settingsSubtitleNotificationsDisabled">Letiltva</string>
     <string name="settingsSubtitleNotificationsEnabled">Engedélyezve</string>
+    <string name="settingsDefaultBrowserTitle">Alapértelmezett böngésző</string>
+    <string name="settingsDefaultBrowserSetDescription">A DuckDuckGo az alapértelmezett böngésző</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Legyen a DuckDuckGo az alapértelmezett böngésző</string>
+    <string name="settingsPrivateSearchTitle">privát keresés</string>
+    <string name="settingsPrivateSearchDescription">Alapértelmezés szerint engedélyezve</string>
+    <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
+    <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
+    <string name="settingsHeadingSettings">Beállítások</string>
+    <string name="settingsPermissionsAndPrivacySetting">Engedélyek és adatvédelem</string>
+    <string name="settingsAutofillLoginsSetting">Bejelentkezési adatok automatikus kitöltése</string>
+    <string name="settingsSyncSetting">Szinkronizálás</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Engedélyek és adatvédelem</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Megjelenés</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>

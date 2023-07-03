@@ -207,55 +207,60 @@ class PermissionsAndPrivacyViewModelTest {
     }
 
     @Test
-    fun whenOnGlobalPrivacyControlClickedThenCommandIsLaunchGlobalPrivacyControl() = runTest {
+    fun whenOnGlobalPrivacyControlClickedThenCommandIsLaunchGlobalPrivacyControlAndPixelFired() = runTest {
         testee.commands().test {
             testee.onGlobalPrivacyControlClicked()
 
             assertEquals(Command.LaunchGlobalPrivacyControl, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_GPC_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnAutomaticallyClearWhatClickedEmitCommandShowClearWhatDialog() = runTest {
+    fun whenOnAutomaticallyClearWhatClickedEmitCommandShowClearWhatDialogAndPixelFired() = runTest {
         testee.commands().test {
             testee.onAutomaticallyClearWhatClicked()
 
             assertEquals(Command.ShowClearWhatDialog(ClearWhatOption.CLEAR_NONE), awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnAutomaticallyClearWhenClickedEmitCommandShowClearWhenDialog() = runTest {
+    fun whenOnAutomaticallyClearWhenClickedEmitCommandShowClearWhenDialogAndPixelFired() = runTest {
         testee.commands().test {
             testee.onAutomaticallyClearWhenClicked()
 
             assertEquals(Command.ShowClearWhenDialog(ClearWhenOption.APP_EXIT_ONLY), awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHEN_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnFireproofWebsitesClickedThenEmitCommandLaunchFireproofWebsites() = runTest {
+    fun whenOnFireproofWebsitesClickedThenEmitCommandLaunchFireproofWebsitesAndPixelFired() = runTest {
         testee.commands().test {
             testee.onFireproofWebsitesClicked()
 
             assertEquals(Command.LaunchFireproofWebsites, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_FIREPROOF_WEBSITES_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnAutoconsentClickedThenEmitCommandLaunchAutoconsent() = runTest {
+    fun whenOnAutoconsentClickedThenEmitCommandLaunchAutoconsentAndPixelFired() = runTest {
         testee.commands().test {
             testee.onAutoconsentClicked()
 
             assertEquals(Command.LaunchAutoconsent, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_MANAGE_COOKIE_POPUPS_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -296,11 +301,12 @@ class PermissionsAndPrivacyViewModelTest {
     }
 
     @Test
-    fun whenOnSitePermissionsClickedThenEmitCommandLaunchLocation() = runTest {
+    fun whenOnSitePermissionsClickedThenEmitCommandLaunchLocationAndPixelFired() = runTest {
         testee.commands().test {
             testee.onSitePermissionsClicked()
 
             assertEquals(Command.LaunchLocation, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_SITE_PERMISSIONS_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }

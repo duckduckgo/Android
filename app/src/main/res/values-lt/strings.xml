@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Pranešimai</string>
     <string name="settingsSubtitleNotificationsDisabled">Išjungta</string>
     <string name="settingsSubtitleNotificationsEnabled">Įjungta</string>
+    <string name="settingsDefaultBrowserTitle">Numatytoji naršyklė</string>
+    <string name="settingsDefaultBrowserSetDescription">„DuckDuckGo“ yra jūsų numatytoji naršyklė</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Nustatykite „DuckDuckGo“ kaip savo numatytąją naršyklę</string>
+    <string name="settingsPrivateSearchTitle">privati paieška</string>
+    <string name="settingsPrivateSearchDescription">Įjungta pagal numatytuosius nustatymus</string>
+    <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
+    <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
+    <string name="settingsHeadingSettings">Nustatymai</string>
+    <string name="settingsPermissionsAndPrivacySetting">Leidimai ir privatumas</string>
+    <string name="settingsAutofillLoginsSetting">Automatiškai užpildyti prisijungimus</string>
+    <string name="settingsSyncSetting">Sinchronizuoti</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Leidimai ir privatumas</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Išvaizda</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>

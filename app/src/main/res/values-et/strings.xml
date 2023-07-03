@@ -141,6 +141,23 @@
     <string name="settingsTitleNotifications">Teavitused</string>
     <string name="settingsSubtitleNotificationsDisabled">Keelatud</string>
     <string name="settingsSubtitleNotificationsEnabled">Lubatud</string>
+    <string name="settingsDefaultBrowserTitle">Vaikebrauser</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on sinu vaikebrauser</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo oma vaikebrauseriks</string>
+    <string name="settingsPrivateSearchTitle">Privaatne otsing</string>
+    <string name="settingsPrivateSearchDescription">Vaikimisi sisse lülitatud</string>
+    <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
+    <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
+    <string name="settingsHeadingSettings">Sätted</string>
+    <string name="settingsPermissionsAndPrivacySetting">Õigused ja privaatsus</string>
+    <string name="settingsAutofillLoginsSetting">Sisesta sisselogimisandmed automaatselt</string>
+    <string name="settingsSyncSetting">Sünkrooni</string>
+
+    <!-- Permissions and Privacy -->
+    <string name="permissionsAndPrivacyActivityTitle">Load ja privaatsus</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Välimus</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>

@@ -37,7 +37,6 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
@@ -66,7 +65,6 @@ class SettingsViewModel @Inject constructor(
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
-    private val syncStateMonitor: SyncStateMonitor,
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
     private val dispatcherProvider: DispatcherProvider,
@@ -178,6 +176,7 @@ class SettingsViewModel @Inject constructor(
             viewState.emit(currentViewState().copy(isAppDefaultBrowser = defaultBrowserSelected))
             command.send(Command.LaunchDefaultBrowser)
         }
+        pixel.fire(SETTINGS_DEFAULT_BROWSER_PRESSED)
     }
 
     fun onPrivateSearchSettingClicked() {
@@ -209,10 +208,12 @@ class SettingsViewModel @Inject constructor(
             }
             this@SettingsViewModel.command.send(command)
         }
+        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
     }
 
     fun onMacOsSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchMacOs) }
+        pixel.fire(SETTINGS_MAC_APP_PRESSED)
     }
 
     fun windowsSettingClicked() {
@@ -223,6 +224,7 @@ class SettingsViewModel @Inject constructor(
                 command.send(Command.LaunchWindowsWaitlist)
             }
         }
+        pixel.fire(SETTINGS_WINDOWS_APP_PRESSED)
     }
 
     fun onAppTPSettingClicked() {
@@ -231,6 +233,7 @@ class SettingsViewModel @Inject constructor(
         } else {
             viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
         }
+        pixel.fire(SETTINGS_APPTP_PRESSED)
     }
 
     fun onNetPSettingClicked() {
@@ -239,6 +242,7 @@ class SettingsViewModel @Inject constructor(
         } else {
             viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
         }
+        pixel.fire(SETTINGS_NETP_PRESSED)
     }
 
     private fun windowsSettingState(): WindowsWaitlistState? {
@@ -255,6 +259,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onSyncSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
+        pixel.fire(SETTINGS_SYNC_PRESSED)
     }
 
     fun onPermissionsAndPrivacySettingClicked() {
