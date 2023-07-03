@@ -16,4 +16,74 @@
 
 package com.duckduckgo.app.privatesearch
 
-internal class PrivateSearchViewModelTest
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import app.cash.turbine.test
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privatesearch.PrivateSearchViewModel.Command
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.verify
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal class PrivateSearchViewModelTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    private lateinit var testee: PrivateSearchViewModel
+
+    @Mock
+    private lateinit var mockAppSettingsDataStore: SettingsDataStore
+
+    @Mock
+    private lateinit var mockPixel: Pixel
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
+    @Before
+    fun before() {
+        MockitoAnnotations.openMocks(this)
+
+        testee = PrivateSearchViewModel(
+            mockAppSettingsDataStore,
+            mockPixel,
+        )
+    }
+
+    @Test
+    fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
+        testee.onAutocompleteSettingChanged(true)
+
+        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = true
+    }
+
+    @Test
+    fun whenAutocompleteSwitchedOffThenDataStoreIsUpdated() {
+        testee.onAutocompleteSettingChanged(false)
+
+        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
+    }
+
+    @Test
+    fun whenMoreSearchSettingsClickedThenCommandLaunchCustomizeSearchWebPageAndPixelIsSent() = runTest {
+        testee.commands().test {
+            testee.onPrivateSearchMoreSearchSettingsClicked()
+
+            assertEquals(Command.LaunchCustomizeSearchWebPage, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+}

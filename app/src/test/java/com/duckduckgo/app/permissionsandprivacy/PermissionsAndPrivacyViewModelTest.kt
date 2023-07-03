@@ -23,29 +23,18 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PermissionsAndPrivacyViewModelTest {
@@ -62,15 +51,6 @@ class PermissionsAndPrivacyViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    @Mock
-    private lateinit var mockGpc: Gpc
-
-    @Mock
-    private lateinit var mockFeatureToggle: FeatureToggle
-
-    @Mock
-    private lateinit var mockAutoconsent: Autoconsent
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -78,55 +58,10 @@ class PermissionsAndPrivacyViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
-        whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
-
         testee = PermissionsAndPrivacyViewModel(
             mockAppSettingsDataStore,
             mockPixel,
-            mockGpc,
-            mockFeatureToggle,
-            mockAutoconsent,
         )
-    }
-
-    @Test
-    fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(false)
-        whenever(mockGpc.isEnabled()).thenReturn(true)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertFalse(awaitItem().globalPrivacyControlEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
-        whenever(mockGpc.isEnabled()).thenReturn(false)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertFalse(awaitItem().globalPrivacyControlEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(true)
-        whenever(mockGpc.isEnabled()).thenReturn(true)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertTrue(awaitItem().globalPrivacyControlEnabled)
-            cancelAndConsumeRemainingEvents()
-        }
     }
 
     @Test
@@ -166,20 +101,6 @@ class PermissionsAndPrivacyViewModelTest {
     }
 
     @Test
-    fun whenAutocompleteSwitchedOnThenDataStoreIsUpdated() {
-        testee.onAutocompleteSettingChanged(true)
-
-        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = true
-    }
-
-    @Test
-    fun whenAutocompleteSwitchedOffThenDataStoreIsUpdated() {
-        testee.onAutocompleteSettingChanged(false)
-
-        verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
-    }
-
-    @Test
     fun whenAppLinksSetToAskEverytimeThenDataStoreIsUpdatedAndPixelIsSent() {
         testee.onAppLinksSettingChanged(AppLinkSettingType.ASK_EVERYTIME)
 
@@ -204,100 +125,6 @@ class PermissionsAndPrivacyViewModelTest {
         verify(mockAppSettingsDataStore).appLinksEnabled = false
         verify(mockAppSettingsDataStore).showAppLinksPrompt = false
         verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED)
-    }
-
-    @Test
-    fun whenOnGlobalPrivacyControlClickedThenCommandIsLaunchGlobalPrivacyControlAndPixelFired() = runTest {
-        testee.commands().test {
-            testee.onGlobalPrivacyControlClicked()
-
-            assertEquals(Command.LaunchGlobalPrivacyControl, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_GPC_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnAutomaticallyClearWhatClickedEmitCommandShowClearWhatDialogAndPixelFired() = runTest {
-        testee.commands().test {
-            testee.onAutomaticallyClearWhatClicked()
-
-            assertEquals(Command.ShowClearWhatDialog(ClearWhatOption.CLEAR_NONE), awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnAutomaticallyClearWhenClickedEmitCommandShowClearWhenDialogAndPixelFired() = runTest {
-        testee.commands().test {
-            testee.onAutomaticallyClearWhenClicked()
-
-            assertEquals(Command.ShowClearWhenDialog(ClearWhenOption.APP_EXIT_ONLY), awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHEN_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnFireproofWebsitesClickedThenEmitCommandLaunchFireproofWebsitesAndPixelFired() = runTest {
-        testee.commands().test {
-            testee.onFireproofWebsitesClicked()
-
-            assertEquals(Command.LaunchFireproofWebsites, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_FIREPROOF_WEBSITES_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnAutoconsentClickedThenEmitCommandLaunchAutoconsentAndPixelFired() = runTest {
-        testee.commands().test {
-            testee.onAutoconsentClicked()
-
-            assertEquals(Command.LaunchAutoconsent, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_MANAGE_COOKIE_POPUPS_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenAutoconsentEnabledThenAutoconsentEnabledIsTrue() = runTest {
-        whenever(mockAutoconsent.isSettingEnabled()).thenReturn(true)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertTrue(awaitItem().autoconsentEnabled)
-        }
-    }
-
-    @Test
-    fun whenAutoconsentDisabledThenAutoconsentEnabledIsFalse() = runTest {
-        whenever(mockAutoconsent.isSettingEnabled()).thenReturn(false)
-
-        testee.start()
-
-        testee.viewState().test {
-            assertFalse(awaitItem().autoconsentEnabled)
-        }
-    }
-
-    @Test
-    fun whenOnManageWhitelistSelectedThenEmitCommandLaunchWhitelistAndSendPixel() = runTest {
-        testee.commands().test {
-            testee.onManageWhitelistSelected()
-
-            assertEquals(Command.LaunchWhitelist, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_MANAGE_WHITELIST)
-
-            cancelAndConsumeRemainingEvents()
-        }
     }
 
     @Test
@@ -333,54 +160,6 @@ class PermissionsAndPrivacyViewModelTest {
             verify(mockPixel).fire(AppPixelName.SETTINGS_APP_LINKS_PRESSED)
 
             cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnAutomaticallyWhatOptionSelectedWithNewOptionThenDataStoreIsUpdatedAndPixelSent() = runTest {
-        whenever(mockAppSettingsDataStore.isCurrentlySelected(ClearWhatOption.CLEAR_TABS_AND_DATA)).thenReturn(false)
-
-        testee.commands().test {
-            testee.onAutomaticallyWhatOptionSelected(ClearWhatOption.CLEAR_TABS_AND_DATA)
-
-            verify(mockAppSettingsDataStore).automaticallyClearWhatOption = ClearWhatOption.CLEAR_TABS_AND_DATA
-            verify(mockPixel).fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA)
-        }
-    }
-
-    @Test
-    fun whenOnAutomaticallyWhatOptionSelectedWithSameOptionThenDataStoreIsNotUpdatedAndPixelNotSent() = runTest {
-        whenever(mockAppSettingsDataStore.isCurrentlySelected(ClearWhatOption.CLEAR_NONE)).thenReturn(true)
-
-        testee.commands().test {
-            testee.onAutomaticallyWhatOptionSelected(ClearWhatOption.CLEAR_NONE)
-
-            verify(mockAppSettingsDataStore, never()).automaticallyClearWhatOption
-            verify(mockPixel, never()).fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE)
-        }
-    }
-
-    @Test
-    fun whenOnAutomaticallyWhenOptionSelectedWithNewOptionThenDataStoreIsUpdatedAndPixelSent() = runTest {
-        whenever(mockAppSettingsDataStore.isCurrentlySelected(ClearWhenOption.APP_EXIT_ONLY)).thenReturn(false)
-
-        testee.commands().test {
-            testee.onAutomaticallyWhenOptionSelected(ClearWhenOption.APP_EXIT_ONLY)
-
-            verify(mockAppSettingsDataStore).automaticallyClearWhenOption = ClearWhenOption.APP_EXIT_ONLY
-            verify(mockPixel).fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY)
-        }
-    }
-
-    @Test
-    fun whenOnAutomaticallyWhenOptionSelectedWithSameOptionThenDataStoreIsNotUpdatedAndPixelNotSent() = runTest {
-        whenever(mockAppSettingsDataStore.isCurrentlySelected(ClearWhenOption.APP_EXIT_ONLY)).thenReturn(true)
-
-        testee.commands().test {
-            testee.onAutomaticallyWhenOptionSelected(ClearWhenOption.APP_EXIT_ONLY)
-
-            verify(mockAppSettingsDataStore, never()).automaticallyClearWhenOption
-            verify(mockPixel, never()).fire(AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE)
         }
     }
 }

@@ -26,6 +26,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
@@ -92,6 +93,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockWindowsDownloadLinkToggle: Toggle
 
+    @Mock
+    private lateinit var mockAutoconsent: Autoconsent
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -131,6 +135,7 @@ class SettingsViewModelTest {
             mockNetPWaitlistRepository,
             mockWindowsDownloadLinkFeature,
             coroutineTestRule.testDispatcherProvider,
+            mockAutoconsent,
         )
 
         runTest {
@@ -512,6 +517,40 @@ class SettingsViewModelTest {
             verify(mockPixel).fire(AppPixelName.SETTINGS_APPEARANCE_PRESSED)
 
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnAutoconsentClickedThenEmitCommandLaunchAutoconsentAndPixelFired() = runTest {
+        testee.commands().test {
+            testee.onCookiePopupProtectionSettingClicked()
+
+            assertEquals(Command.LaunchCookiePopupProtectionScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED)
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAutoconsentEnabledThenAutoconsentEnabledIsTrue() = runTest {
+        whenever(mockAutoconsent.isSettingEnabled()).thenReturn(true)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertTrue(awaitItem().isAutoconsentEnabled)
+        }
+    }
+
+    @Test
+    fun whenAutoconsentDisabledThenAutoconsentEnabledIsFalse() = runTest {
+        whenever(mockAutoconsent.isSettingEnabled()).thenReturn(false)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertFalse(awaitItem().isAutoconsentEnabled)
         }
     }
 }
