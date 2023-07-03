@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +33,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class WebTrackingProtectionViewModel @Inject constructor(
@@ -56,7 +56,11 @@ class WebTrackingProtectionViewModel @Inject constructor(
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
-            viewState.emit(ViewState(globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value)))
+            viewState.emit(
+                ViewState(
+                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
+                ),
+            )
         }
     }
 
@@ -81,5 +85,4 @@ class WebTrackingProtectionViewModel @Inject constructor(
     companion object {
         const val LEARN_MORE_URL = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/"
     }
-
 }

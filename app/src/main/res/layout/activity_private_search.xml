@@ -16,6 +16,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -24,11 +25,37 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
+    <ImageView
+        android:id="@+id/privateSearchHeaderImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/keyline_3"
+        android:padding="@dimen/keyline_2"
+        app:srcCompat="@drawable/private_search_header_image"
+        tools:ignore="ContentDescription" />
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/privateSearchTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:gravity="center"
+        android:text="@string/privateSearchTitle"
+        app:typography="h2" />
+
+
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/privateSearchDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/keyline_4"
+        android:gravity="center"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_4"
         android:text="@string/privateSearchDescription"
         app:textType="secondary"
         app:typography="body2" />

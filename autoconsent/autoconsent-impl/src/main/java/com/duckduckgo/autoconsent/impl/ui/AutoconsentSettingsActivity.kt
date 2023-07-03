@@ -40,9 +40,9 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.ViewState
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AutoconsentSettingsActivity : DuckDuckGoActivity() {

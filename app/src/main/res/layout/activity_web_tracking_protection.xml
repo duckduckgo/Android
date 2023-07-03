@@ -25,11 +25,37 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
+    <ImageView
+        android:id="@+id/webTrackingProtectionHeaderImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/keyline_3"
+        android:padding="@dimen/keyline_2"
+        app:srcCompat="@drawable/web_tracking_header_image"
+        tools:ignore="ContentDescription" />
+
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/webTrackingProtectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:gravity="center"
+        android:text="@string/webTrackingProtectionTitle"
+        app:typography="h2" />
+
+
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/webTrackingProtectionDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/keyline_4"
+        android:gravity="center"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_4"
         android:text="@string/globalPrivacyControlDescription"
         app:textType="secondary"
         app:typography="body2" />

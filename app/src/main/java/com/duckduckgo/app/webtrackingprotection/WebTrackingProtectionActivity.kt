@@ -127,7 +127,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
             WebViewActivity.intent(
                 this,
                 url,
-                getString(R.string.webTrackingProtectionTitle),
+                getString(R.string.webTrackingProtectionLearnMoreTitle),
             ),
         )
     }

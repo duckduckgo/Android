@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.autoconsent.api.WebViewActivityWithUrlParam
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithNotificationParams
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject

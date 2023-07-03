@@ -16,6 +16,4 @@
 
 package com.duckduckgo.app.privatesearch
 
-internal class PrivateSearchViewModelTest {
-
-}
+internal class PrivateSearchViewModelTest

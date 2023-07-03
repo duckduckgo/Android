@@ -74,11 +74,11 @@ import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
+import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
-import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class SettingsActivity : DuckDuckGoActivity() {

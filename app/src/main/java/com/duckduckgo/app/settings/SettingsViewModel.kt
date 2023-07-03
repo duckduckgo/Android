@@ -83,7 +83,7 @@ class SettingsViewModel @Inject constructor(
         val windowsWaitlistState: WindowsWaitlistState? = null,
         val networkProtectionState: NetPState = DISCONNECTED,
         val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
-        val isAutoconsentEnabled: Boolean = false
+        val isAutoconsentEnabled: Boolean = false,
     )
 
     enum class NetPState {
@@ -139,7 +139,7 @@ class SettingsViewModel @Inject constructor(
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
-                    isAutoconsentEnabled = autoconsent.isSettingEnabled()
+                    isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
             )
         }
