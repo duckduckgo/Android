@@ -160,12 +160,14 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
             }
         }
 
+        binding.deviceShieldAppEntryShieldEnabled.isEnabled = isListEnabled
+        binding.deviceShieldAppEntryShieldEnabled.isClickable = isListEnabled
+
         if (isListEnabled) {
             binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded) { _, enabled ->
                 listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
             }
         } else {
-            binding.deviceShieldAppEntryShieldEnabled.isClickable = false
             binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded, null)
         }
     }

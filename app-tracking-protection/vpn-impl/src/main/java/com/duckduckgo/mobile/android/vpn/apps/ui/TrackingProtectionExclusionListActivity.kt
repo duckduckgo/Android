@@ -34,6 +34,7 @@ import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
@@ -55,6 +56,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 class TrackingProtectionExclusionListActivity :
@@ -82,6 +84,12 @@ class TrackingProtectionExclusionListActivity :
     lateinit var adapter: ExclusionListAdapter
 
     private val shimmerLayout by lazy { findViewById<ShimmerFrameLayout>(R.id.deviceShieldExclusionAppListSkeleton) }
+
+    private val isAppTPEnabled by lazy {
+        runBlocking {
+            vpnFeaturesRegistry.isFeatureRegistered(APPTP_VPN)
+        }
+    }
 
     private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
@@ -122,6 +130,7 @@ class TrackingProtectionExclusionListActivity :
         val restoreDefault = menu.findItem(R.id.restoreDefaults)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
         restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
+        restoreDefault?.isVisible = isAppTPEnabled
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -173,9 +182,8 @@ class TrackingProtectionExclusionListActivity :
         )
 
         val recyclerView = binding.excludedAppsRecycler
-        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
 
-        if (isListEnabled) {
+        if (isAppTPEnabled) {
             recyclerView.alpha = 1.0f
         } else {
             recyclerView.alpha = 0.45f
@@ -198,8 +206,7 @@ class TrackingProtectionExclusionListActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        val isListEnabled = intent.getBooleanExtra(KEY_LIST_ENABLED, false)
-        adapter.update(viewState, isListEnabled)
+        adapter.update(viewState, isAppTPEnabled)
         shimmerLayout.gone()
     }
 
@@ -302,7 +309,6 @@ class TrackingProtectionExclusionListActivity :
     companion object {
         const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         const val LEARN_WHY_ANNOTATION = "learn_why_link"
-        private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
         private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
 
         enum class AppsFilter {
@@ -313,11 +319,9 @@ class TrackingProtectionExclusionListActivity :
 
         internal fun intent(
             context: Context,
-            isRunning: Boolean = true,
             filter: AppsFilter = AppsFilter.ALL,
         ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
-            intent.putExtra(KEY_LIST_ENABLED, isRunning)
             intent.putExtra(KEY_FILTER_LIST, filter)
             return intent
         }
