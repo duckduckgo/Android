@@ -114,22 +114,27 @@ class PermissionsAndPrivacyViewModel @Inject constructor(
 
     fun onGlobalPrivacyControlClicked() {
         viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
+        pixel.fire(AppPixelName.SETTINGS_GPC_PRESSED)
     }
 
     fun onAutoconsentClicked() {
         viewModelScope.launch { command.send(Command.LaunchAutoconsent) }
+        pixel.fire(AppPixelName.SETTINGS_MANAGE_COOKIE_POPUPS_PRESSED)
     }
 
     fun onFireproofWebsitesClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
+        pixel.fire(AppPixelName.SETTINGS_FIREPROOF_WEBSITES_PRESSED)
     }
 
     fun onAutomaticallyClearWhatClicked() {
         viewModelScope.launch { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
+        pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
     }
 
     fun onAutomaticallyClearWhenClicked() {
         viewModelScope.launch { command.send(Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)) }
+        pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHEN_PRESSED)
     }
 
     fun onManageWhitelistSelected() {
@@ -145,6 +150,7 @@ class PermissionsAndPrivacyViewModel @Inject constructor(
 
     fun onSitePermissionsClicked() {
         viewModelScope.launch { command.send(Command.LaunchLocation) }
+        pixel.fire(AppPixelName.SETTINGS_SITE_PERMISSIONS_PRESSED)
     }
 
     fun userRequestedToChangeNotificationsSetting() {

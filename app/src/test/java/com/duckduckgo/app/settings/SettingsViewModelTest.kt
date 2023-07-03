@@ -34,16 +34,12 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.SyncState.READY
-import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -96,15 +92,10 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockWindowsDownloadLinkToggle: Toggle
 
-    @Mock
-    private lateinit var mockSyncStateMonitor: SyncStateMonitor
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
-
-    private val stateFlow = MutableStateFlow(READY)
 
     @Before
     fun before() {
@@ -124,8 +115,6 @@ class SettingsViewModelTest {
 
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
 
-        whenever(mockSyncStateMonitor.syncState()).thenReturn(stateFlow.asStateFlow())
-
         vpnFeaturesRegistry = FakeVpnFeaturesRegistry()
 
         testee = SettingsViewModel(
@@ -139,7 +128,6 @@ class SettingsViewModelTest {
             windowsWaitlist,
             windowsFeature,
             deviceSyncState,
-            mockSyncStateMonitor,
             mockNetPWaitlistRepository,
             mockWindowsDownloadLinkFeature,
             coroutineTestRule.testDispatcherProvider,
@@ -170,24 +158,26 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnDefaultBrowserSettingClickedAndAlreadyDefaultBrowserThenLaunchDefaultBrowserCommandIsSent() = runTest {
+    fun whenOnDefaultBrowserSettingClickedAndAlreadyDefaultBrowserThenLaunchDefaultBrowserCommandIsSentAndPixelFired() = runTest {
         testee.commands().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
             testee.onDefaultBrowserSettingClicked()
 
             assertEquals(Command.LaunchDefaultBrowser, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnDefaultBrowserSettingClickedAndNotDefaultBrowserThenLaunchDefaultBrowserCommandIsSent() = runTest {
+    fun whenOnDefaultBrowserSettingClickedAndNotDefaultBrowserThenLaunchDefaultBrowserCommandIsSentAndPixelFired() = runTest {
         testee.commands().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
             testee.onDefaultBrowserSettingClicked()
 
             assertEquals(Command.LaunchDefaultBrowser, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_DEFAULT_BROWSER_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -241,24 +231,26 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnEmailProtectionSettingClickedAndEmailIsSupportedThenEmitCommandLaunchEmailProtection() = runTest {
+    fun whenOnEmailProtectionSettingClickedAndEmailIsSupportedThenEmitCommandLaunchEmailProtectionAndPixelFired() = runTest {
         whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(true)
         testee.commands().test {
             testee.onEmailProtectionSettingClicked()
 
             assertEquals(Command.LaunchEmailProtection(EMAIL_PROTECTION_URL), awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenOnEmailProtectionSettingClickedAndEmailIsNotSupportedThenEmitCommandLaunchEmailProtectionNotSupported() = runTest {
+    fun whenOnEmailProtectionSettingClickedAndEmailIsNotSupportedThenEmitCommandLaunchEmailProtectionNotSupportedAndPixelFired() = runTest {
         whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
         testee.commands().test {
             testee.onEmailProtectionSettingClicked()
 
             assertEquals(Command.LaunchEmailProtectionNotSupported, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -276,11 +268,12 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnMacOsSettingClickedThenEmitCommandLaunchMacOs() = runTest {
+    fun whenOnMacOsSettingClickedThenEmitCommandLaunchMacOsAndPixelFired() = runTest {
         testee.commands().test {
             testee.onMacOsSettingClicked()
 
             assertEquals(Command.LaunchMacOs, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_MAC_APP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -327,26 +320,28 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenWindowsSettingClickedAndWindowsFeatureEnabledThenEmitCommandLaunchWindows() = runTest {
+    fun whenWindowsSettingClickedAndWindowsFeatureEnabledThenEmitCommandLaunchWindowsAndPixelFired() = runTest {
         whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(true)
 
         testee.commands().test {
             testee.windowsSettingClicked()
 
             assertEquals(Command.LaunchWindows, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_WINDOWS_APP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenWindowsSettingClickedAndWindowsFeatureDisabledThenEmitCommandLaunchWindowsWaitlist() = runTest {
+    fun whenWindowsSettingClickedAndWindowsFeatureDisabledThenEmitCommandLaunchWindowsWaitlistAndPixelFired() = runTest {
         whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(false)
 
         testee.commands().test {
             testee.windowsSettingClicked()
 
             assertEquals(Command.LaunchWindowsWaitlist, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_WINDOWS_APP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -421,59 +416,64 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenAppTPSettingClickedAndAppTpOnboardedThenEmitCommandLaunchAppTPTrackersScreen() = runTest {
+    fun whenAppTPSettingClickedAndAppTpOnboardedThenEmitCommandLaunchAppTPTrackersScreenAndPixelFierd() = runTest {
         whenever(appTrackingProtection.isOnboarded()).thenReturn(true)
         testee.commands().test {
             testee.onAppTPSettingClicked()
 
             assertEquals(Command.LaunchAppTPTrackersScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_APPTP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenAppTPSettingClickedAndAppTpNotOnboardedThenEmitCommandLaunchAppTPOnboarding() = runTest {
+    fun whenAppTPSettingClickedAndAppTpNotOnboardedThenEmitCommandLaunchAppTPOnboardingAndPixelFired() = runTest {
         whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
         testee.commands().test {
             testee.onAppTPSettingClicked()
 
             assertEquals(Command.LaunchAppTPOnboarding, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_APPTP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenNetPSettingClickedAndInternalBuildInBetaThenEmitCommandLaunchNetPManagementScreen() = runTest {
+    fun whenNetPSettingClickedAndInternalBuildInBetaThenEmitCommandLaunchNetPManagementScreenAndPixelFired() = runTest {
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.InBeta)
         testee.commands().test {
             testee.onNetPSettingClicked()
 
             assertEquals(Command.LaunchNetPManagementScreen, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_NETP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenNetPSettingClickedAndInternalBuildNotInBetaThenEmitCommandLaunchNetPWaitlist() = runTest {
+    fun whenNetPSettingClickedAndInternalBuildNotInBetaThenEmitCommandLaunchNetPWaitlistAndPixelFired() = runTest {
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
         testee.commands().test {
             testee.onNetPSettingClicked()
 
             assertEquals(Command.LaunchNetPWaitlist, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_NETP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncSettingClickedThenEmitCommandLaunchSyncSettings() = runTest {
+    fun whenSyncSettingClickedThenEmitCommandLaunchSyncSettingsAndPixelFired() = runTest {
         testee.commands().test {
             testee.onSyncSettingClicked()
 
             assertEquals(Command.LaunchSyncSettings, awaitItem())
+            verify(mockPixel).fire(AppPixelName.SETTINGS_SYNC_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }
