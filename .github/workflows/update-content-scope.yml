@@ -36,12 +36,15 @@ jobs:
         run: ncu @duckduckgo/content-scope-scripts -u
 
       - name: Install package
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
         run: npm update
 
       - name: Copy files
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
         run: copy-files-from-to
 
       - name: Find latest release version of Content Scope scripts
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
         id: latest-release
         uses: malmstein/github-asana-action@master
         with:
@@ -51,6 +54,7 @@ jobs:
           action: 'get-latest-repo-release'
 
       - name: Create Pull Request in Android repo
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
         id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
@@ -70,6 +74,7 @@ jobs:
             - [ ] All tests must pass
 
       - name: Create Asana task in Android App project
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
         id: create-task
         uses: malmstein/github-asana-action@master
         with:
@@ -86,6 +91,7 @@ jobs:
           action: 'create-asana-task'
 
       - name: Add Asana task to Release Board project
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
         uses: malmstein/github-asana-action@master
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
@@ -95,6 +101,7 @@ jobs:
           action: 'add-task-asana-project'
 
       - name: Update PR description with Asana task
+        if: ${{ steps.update-check.outputs.outcome == 'failure' }}
         uses: malmstein/github-asana-action@master
         with:
           github-pat: ${{ secrets.GT_DAXMOBILE }}
@@ -114,3 +121,4 @@ jobs:
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Update content scope scripts
           asana-task-description: The update content scope scripts tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
