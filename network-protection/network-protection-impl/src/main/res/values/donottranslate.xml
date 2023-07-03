@@ -117,10 +117,10 @@
     <string name="netpExclusionListManuallyCTANotNow">Not Now</string>
     <string name="netpExclusionListManuallyCTACancel">Cancel</string>
     <string name="netpExclusionListManuallyCTARestore">Restore</string>
-    <string name="netpExclusionListManuallyMenuRestore">Restore Default Protected Apps</string>
+    <string name="netpExclusionListManuallyMenuRestore">Restore Protection for All Apps</string>
     <string name="netpExclusionListManuallyMenuReport">Report an Issue With an App</string>
-    <string name="netpExclusionListRestoreDefaultsTitle">Restore default protection?</string>
-    <string name="netpExclusionListRestoreDefaultsMessage">Your custom protection settings will update to our default protections. You can always change your protection settings again later.</string>
+    <string name="netpExclusionListRestoreDefaultsTitle">Restore protection for all apps?</string>
+    <string name="netpExclusionListRestoreDefaultsMessage">This will update your custom protection settings and enable Network Protection for all apps. You can always change your protection settings again later.</string>
     <string name="netpExclusionListRestoreDefaultSnackbar">Protection restored to default settings</string>
     <string name="netpExclusionListRestoreDefaultsDisclaimer">Enabling protection sends the app\'s name to DuckDuckGo.</string>
 
