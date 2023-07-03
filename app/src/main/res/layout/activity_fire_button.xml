@@ -14,45 +14,59 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+    tools:context="com.duckduckgo.app.firebutton.FireButtonActivity">
 
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/fireproofWebsites"
-        android:layout_marginTop="@dimen/keyline_4"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsFireproofWebsites"/>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="Overdraw">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/automaticallyClearWhatSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryTextTruncated="false"
-        app:primaryText="@string/settingsAutomaticallyClearWhat"
-        tools:secondaryText="test test test" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/automaticallyClearWhenSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsAutomaticallyClearWhen"
-        tools:secondaryText="test test test" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/fireproofWebsites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:primaryText="@string/settingsFireproofWebsites" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/selectedFireAnimationSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsFireAnimation"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsHeroFireAnimation" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/automaticallyClearWhatSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsAutomaticallyClearWhat"
+                app:primaryTextTruncated="false"
+                tools:secondaryText="test test test" />
 
-</LinearLayout>
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/automaticallyClearWhenSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsAutomaticallyClearWhen"
+                tools:secondaryText="test test test" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/selectedFireAnimationSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsFireAnimation"
+                app:primaryTextTruncated="false"
+                app:secondaryText="@string/settingsHeroFireAnimation" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

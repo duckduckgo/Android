@@ -47,9 +47,7 @@
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection is Enabled</string>
-    <string name="webTrackingProtectionDescription">
-        <![CDATA[DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default. <u><a href="">Learn More</a><u/>]]>
-    </string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo never tracks you and we aim to protect your privacy as much as possible. We continually maintain and develop layers of protection to keep up with new tracking methods and provide many protections that other browsers don’t offer by default. <u><a href="">Learn More</a><u/>]]></string>
 
     <!-- Fire Button -->
     <string name="fireButtonActivityTitle">Fire Button</string>

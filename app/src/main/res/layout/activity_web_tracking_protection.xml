@@ -14,68 +14,82 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity">
 
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <ImageView
-        android:id="@+id/webTrackingProtectionHeaderImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/keyline_3"
-        android:padding="@dimen/keyline_2"
-        app:srcCompat="@drawable/web_tracking_header_image"
-        tools:ignore="ContentDescription" />
-
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        android:id="@+id/webTrackingProtectionTitle"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:gravity="center"
-        android:text="@string/webTrackingProtectionTitle"
-        app:typography="h2" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="Overdraw">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/keyline_5">
+
+            <ImageView
+                android:id="@+id/webTrackingProtectionHeaderImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_3"
+                android:padding="@dimen/keyline_2"
+                app:srcCompat="@drawable/web_tracking_header_image"
+                tools:ignore="ContentDescription" />
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/webTrackingProtectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:gravity="center"
+                android:text="@string/webTrackingProtectionTitle"
+                app:typography="h2" />
 
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        android:id="@+id/webTrackingProtectionDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingStart="@dimen/keyline_4"
-        android:paddingTop="@dimen/keyline_2"
-        android:paddingEnd="@dimen/keyline_4"
-        android:paddingBottom="@dimen/keyline_4"
-        android:text="@string/globalPrivacyControlDescription"
-        app:textType="secondary"
-        app:typography="body2" />
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/webTrackingProtectionDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_2"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_4"
+                android:text="@string/globalPrivacyControlDescription"
+                app:textType="secondary"
+                app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/globalPrivacyControlSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/globalPrivacyControlSetting"
-        app:primaryTextTruncated="false"
-        tools:secondaryText="Enabled" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/globalPrivacyControlSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/globalPrivacyControlSetting"
+                app:primaryTextTruncated="false"
+                tools:secondaryText="Enabled" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/whitelist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsPrivacyProtectionWhitelist" />
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/whitelist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsPrivacyProtectionWhitelist" />
 
-</LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

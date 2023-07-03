@@ -21,7 +21,6 @@
             android:name=".ui.AutoconsentSettingsActivity"
             android:exported="false"
             android:label="@string/autoconsentTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:screenOrientation="portrait" />
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 </manifest>

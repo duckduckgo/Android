@@ -14,75 +14,90 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context="com.duckduckgo.app.privatesearch.PrivateSearchActivity">
 
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <ImageView
-        android:id="@+id/privateSearchHeaderImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/keyline_3"
-        android:padding="@dimen/keyline_2"
-        app:srcCompat="@drawable/private_search_header_image"
-        tools:ignore="ContentDescription" />
-
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        android:id="@+id/privateSearchTitle"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
-        android:gravity="center"
-        android:text="@string/privateSearchTitle"
-        app:typography="h2" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="Overdraw">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/keyline_5">
 
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        android:id="@+id/privateSearchDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingStart="@dimen/keyline_4"
-        android:paddingTop="@dimen/keyline_2"
-        android:paddingEnd="@dimen/keyline_4"
-        android:paddingBottom="@dimen/keyline_4"
-        android:text="@string/privateSearchDescription"
-        app:textType="secondary"
-        app:typography="body2" />
+            <ImageView
+                android:id="@+id/privateSearchHeaderImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/keyline_3"
+                android:padding="@dimen/keyline_2"
+                app:srcCompat="@drawable/private_search_header_image"
+                tools:ignore="ContentDescription" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/privateSearchTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:gravity="center"
+                android:text="@string/privateSearchTitle"
+                app:typography="h2" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/privateSearchHeadingSearchSettings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/privateSearchHeadingSearchSettings" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/privateSearchAutocompleteToggle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:primaryText="@string/privateSearchAutocompleteToggle"
-        app:showSwitch="true" />
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/privateSearchDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_2"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_4"
+                android:text="@string/privateSearchDescription"
+                app:textType="secondary"
+                app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/privateSearchMoreSearchSettings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/privateSearchMoreSearchSettingsPrimaryText"
-        app:secondaryText="@string/privateSearchMoreSearchSettingsSecondaryText" />
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-</LinearLayout>
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/privateSearchHeadingSearchSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/privateSearchHeadingSearchSettings" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+                android:id="@+id/privateSearchAutocompleteToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:primaryText="@string/privateSearchAutocompleteToggle"
+                app:showSwitch="true" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/privateSearchMoreSearchSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/privateSearchMoreSearchSettingsPrimaryText"
+                app:secondaryText="@string/privateSearchMoreSearchSettingsSecondaryText" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
