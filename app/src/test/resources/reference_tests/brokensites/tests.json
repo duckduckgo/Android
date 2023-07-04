@@ -143,6 +143,7 @@
                     {"name": "surrogates", "value": "surrogate.domain.test,domain2.test"}
                 ],
                 "exceptPlatforms": [
+                    "android-browser",
                     "ios-browser",
                     "safari-extension"
                 ]
@@ -305,6 +306,7 @@
                     {"name": "truncated", "value": "1"}
                 ],
                 "exceptPlatforms": [
+                    "android-browser",
                     "ios-browser",
                     "macos-browser",
                     "safari-extension",
