@@ -23,6 +23,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.api.engine.SyncEngine
@@ -55,6 +56,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
             .onEach { state ->
                 when (state) {
                     OFF -> cancelSavedSitesChanges()
+                    IN_PROGRESS -> cancelSavedSitesChanges()
                     else -> observeSavedSitesChanges()
                 }
             }

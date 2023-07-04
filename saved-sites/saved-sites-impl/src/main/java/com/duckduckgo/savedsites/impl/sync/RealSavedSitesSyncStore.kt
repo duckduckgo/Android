@@ -20,14 +20,18 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+interface SavedSitesSyncStore {
+    var modifiedSince: String
+}
+
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class SavedSitesSyncStore @Inject constructor(private val context: Context) : FeatureSyncStore {
+class RealSavedSitesSyncStore @Inject constructor(private val context: Context) : SavedSitesSyncStore {
+
     override var modifiedSince: String
         get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_MODIFIED_SINCE, value) }

@@ -57,13 +57,13 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Experiment: Increase retention through AppTP promotions
-            Variant(key = "ze", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "ze", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "zh", weight = 0.0, features = listOf(OneEasyStepForPrivacyRemoteMessage), filterBy = { noFilter() }),
-            Variant(key = "zi", weight = 1.0, features = listOf(BlockingTrackersAcrossWebRemoteMessage), filterBy = { noFilter() }),
+            Variant(key = "zi", weight = 0.0, features = listOf(BlockingTrackersAcrossWebRemoteMessage), filterBy = { noFilter() }),
             Variant(key = "zl", weight = 0.0, features = listOf(NextLevelPrivacyRemoteMessage), filterBy = { noFilter() }),
             Variant(key = "zm", weight = 0.0, features = listOf(OneEasyStepForPrivacyNotification), filterBy = { noFilter() }),
-            Variant(key = "zn", weight = 1.0, features = listOf(NextLevelPrivacyNotification), filterBy = { noFilter() }),
-            Variant(key = "zo", weight = 1.0, features = listOf(DaxDialogMessage), filterBy = { noFilter() }),
+            Variant(key = "zn", weight = 0.0, features = listOf(NextLevelPrivacyNotification), filterBy = { noFilter() }),
+            Variant(key = "zo", weight = 0.0, features = listOf(DaxDialogMessage), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(

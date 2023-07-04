@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.engine
+package com.duckduckgo.networkprotection.impl.exclusion.ui
 
-/**
- * As per API requirement, each feature needs to store the date it was lastly modified
- * Implement this interface to do exactly that
- */
-interface FeatureSyncStore {
-    var modifiedSince: String
-}
+data class NetpExclusionListApp(
+    val packageName: String,
+    val name: String,
+    val isProtected: Boolean = false,
+)

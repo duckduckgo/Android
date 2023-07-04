@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.engine
+package com.duckduckgo.mobile.android.vpn.exclusion
 
-interface SyncableDataProvider {
-
+interface SystemAppOverridesProvider {
     /**
-     * Used by the SyncClient to get all the updates from each syncable feature
-     * since a specific time
-     * This data that will be sent to the Sync API
+     * This is method returns system apps that we want to be included in the exclusion list.
+     *
+     * @return a list of app packages that is part of the system app overrides list
      */
-    fun getChanges(): SyncChangesRequest
-
-    /**
-     * Sync Feature has been disabled / device has been removed
-     * This is an opportunity for Features to do some local cleanup if needed
-     */
-    fun onSyncDisabled()
+    fun getSystemAppOverridesList(): List<String>
 }

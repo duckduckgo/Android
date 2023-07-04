@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.engine
+package com.duckduckgo.networkprotection.api
 
-interface SyncableDataProvider {
-
+interface NetworkProtectionExclusionList {
     /**
-     * Used by the SyncClient to get all the updates from each syncable feature
-     * since a specific time
-     * This data that will be sent to the Sync API
+     * This method returns if the specified app is excluded from NetworkProtection
+     *
+     * @param packageName - package name of the app to be checked from NetP exclusion list
      */
-    fun getChanges(): SyncChangesRequest
-
-    /**
-     * Sync Feature has been disabled / device has been removed
-     * This is an opportunity for Features to do some local cleanup if needed
-     */
-    fun onSyncDisabled()
+    suspend fun isExcluded(packageName: String): Boolean
 }

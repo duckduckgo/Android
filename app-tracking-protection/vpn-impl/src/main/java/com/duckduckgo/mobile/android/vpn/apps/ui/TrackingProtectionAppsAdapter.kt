@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType
@@ -119,6 +120,7 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
         val appIcon = context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         binding.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
         binding.deviceShieldAppEntryName.text = excludedAppInfo.name
+        binding.handleToggleState(excludedAppInfo.knownProblem, isListEnabled)
 
         if (excludedAppInfo.isProblematic()) {
             if (excludedAppInfo.isExcluded) {
@@ -165,7 +167,6 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
                 listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
             }
         } else {
-            binding.deviceShieldAppEntryShieldEnabled.isClickable = false
             binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded, null)
         }
     }
@@ -177,15 +178,25 @@ class TrackingProtectionAppViewHolder(val binding: RowExclusionListAppBinding) :
         return when (excludingReason) {
             TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
                 context.getString(R.string.atp_ExcludedReasonIssuesMayOccur)
+            TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP -> context.getString(R.string.atp_ExcludedReasonExcludedThroughNetP)
             else -> ""
         }
     }
 
     private fun getAppExcludingReasonIcon(excludingReason: Int): Int {
         return when (excludingReason) {
-            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
-            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
+            TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
+            TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
+            TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP,
+            -> R.drawable.ic_apptp_alert
             else -> 0
         }
+    }
+}
+
+internal fun RowExclusionListAppBinding.handleToggleState(knownProblem: Int, isListEnabled: Boolean) {
+    (knownProblem != TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP).let { enabled ->
+        deviceShieldAppEntryShieldEnabled.isEnabled = enabled && isListEnabled
+        deviceShieldAppEntryShieldEnabled.setEnabledOpacity(enabled && isListEnabled)
     }
 }

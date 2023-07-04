@@ -35,6 +35,16 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_DISABLE_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_APP_ADDED
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_APP_REMOVED
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_RESTORE_DEFAULTS
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_RESTORE_DEFAULTS_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SHOWN_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_LATENCY_REPORT
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED_DAILY
@@ -159,6 +169,44 @@ interface NetworkProtectionPixels {
      * count -> fire a pixel on every call
      */
     fun reportOpenSettingsFromAlwaysOnLockdown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportExclusionListShown()
+
+    /**
+     * This fun will fire one pixel
+     */
+    fun reportAppAddedToExclusionList()
+
+    /**
+     * This fun will fire one pixel
+     */
+    fun reportAppRemovedFromExclusionList()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportSkippedReportAfterExcludingApp()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportExclusionListRestoreDefaults()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportExclusionListLaunchBreakageReport()
 }
 
 @ContributesBinding(AppScope::class)
@@ -251,6 +299,34 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportOpenSettingsFromAlwaysOnLockdown() {
         tryToFireDailyPixel(NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS_DAILY)
         firePixel(NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS)
+    }
+
+    override fun reportExclusionListShown() {
+        tryToFireDailyPixel(NETP_EXCLUSION_LIST_SHOWN_DAILY)
+        firePixel(NETP_EXCLUSION_LIST_SHOWN)
+    }
+
+    override fun reportAppAddedToExclusionList() {
+        firePixel(NETP_EXCLUSION_LIST_APP_ADDED)
+    }
+
+    override fun reportAppRemovedFromExclusionList() {
+        firePixel(NETP_EXCLUSION_LIST_APP_REMOVED)
+    }
+
+    override fun reportSkippedReportAfterExcludingApp() {
+        tryToFireDailyPixel(NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING_DAILY)
+        firePixel(NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING)
+    }
+
+    override fun reportExclusionListRestoreDefaults() {
+        tryToFireDailyPixel(NETP_EXCLUSION_LIST_RESTORE_DEFAULTS_DAILY)
+        firePixel(NETP_EXCLUSION_LIST_RESTORE_DEFAULTS)
+    }
+
+    override fun reportExclusionListLaunchBreakageReport() {
+        tryToFireDailyPixel(NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT_DAILY)
+        firePixel(NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT)
     }
 
     private fun firePixel(

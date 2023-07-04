@@ -9,9 +9,9 @@ jobs:
     if: github.event.review.state == 'approved'
     runs-on: ubuntu-latest
     steps:
-      - name: Update Asana task -> PR reviewed
-        uses: malmstein/github-asana-action@0.6.0
+      - name: Update Asana task -> PR approved
+        uses: malmstein/github-asana-action@master
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           trigger-phrase: "Task/Issue URL:"
-          action: 'notify-pr-reviewed'
+          action: 'notify-pr-approved'
