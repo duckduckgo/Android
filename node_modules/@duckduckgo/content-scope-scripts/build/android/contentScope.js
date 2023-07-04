@@ -361,7 +361,7 @@
     };
 
     /**
-     * Handles the processing of a config setting.
+     * Processes a structured config setting and returns the value according to its type
      * @param {*} configSetting
      * @param {*} [defaultValue]
      * @returns
@@ -824,15 +824,16 @@
         'clickToLoad',
         'windowsPermissionUsage',
         'webCompat',
-        'duckPlayer'
+        'duckPlayer',
+        'harmfulApis'
     ]);
 
     /** @typedef {baseFeatures[number]|otherFeatures[number]} FeatureName */
     /** @type {Record<string, FeatureName[]>} */
     const platformSupport = {
         apple: [
-            ...baseFeatures,
-            'webCompat'
+            'webCompat',
+            ...baseFeatures
         ],
         'apple-isolated': [
             'duckPlayer'
@@ -844,7 +845,8 @@
         windows: [
             ...baseFeatures,
             'windowsPermissionUsage',
-            'duckPlayer'
+            'duckPlayer',
+            'harmfulApis'
         ],
         firefox: [
             ...baseFeatures,
@@ -2573,12 +2575,13 @@
         }
 
         /**
+         * Return a specific setting from the feature settings
          * @param {string} featureKeyName
          * @param {string} [featureName]
          * @returns {any}
          */
         getFeatureSetting (featureKeyName, featureName) {
-            let result = this._getFeatureSetting(featureName);
+            let result = this._getFeatureSettings(featureName);
             if (featureKeyName === 'domains') {
                 throw new Error('domains is a reserved feature setting key name')
             }
@@ -2599,15 +2602,17 @@
         }
 
         /**
+         * Return the settings object for a feature
          * @param {string} [featureName] - The name of the feature to get the settings for; defaults to the name of the feature
          * @returns {any}
          */
-        _getFeatureSetting (featureName) {
+        _getFeatureSettings (featureName) {
             const camelFeatureName = featureName || camelcase(this.name);
             return this.#args?.featureSettings?.[camelFeatureName]
         }
 
         /**
+         * For simple boolean settings, return true if the setting is 'enabled'
          * @param {string} featureKeyName
          * @param {string} [featureName]
          * @returns {boolean}
@@ -2618,13 +2623,14 @@
         }
 
         /**
+         * Given a config key, interpret the value as a list of domain overrides, and return the elements that match the current page
          * @param {string} featureKeyName
          * @return {any[]}
          */
         matchDomainFeatureSetting (featureKeyName) {
             const domain = this.#args?.site.domain;
             if (!domain) return []
-            const domains = this._getFeatureSetting()?.[featureKeyName] || [];
+            const domains = this._getFeatureSettings()?.[featureKeyName] || [];
             return domains.filter((rule) => {
                 if (Array.isArray(rule.domain)) {
                     return rule.domain.some((domainRule) => {
