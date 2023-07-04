@@ -75,9 +75,7 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
-    fun whenOnStartActivityCalledThenViewStateEmittedWithDefaultValues() = runTest {
-        testee.onStartActivityCalled()
-
+    fun whenInitialisedThenViewStateEmittedWithDefaultValues() = runTest {
         testee.viewState().test {
             val value = awaitItem()
 

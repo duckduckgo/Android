@@ -58,12 +58,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        viewModel.onStartActivityCalled()
-    }
-
     private fun configureUiEventHandlers() {
         binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }

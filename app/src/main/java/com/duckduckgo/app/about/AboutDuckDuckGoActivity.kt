@@ -68,12 +68,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        viewModel.onStartActivityCalled()
-    }
-
     override fun onResume() {
         super.onResume()
 

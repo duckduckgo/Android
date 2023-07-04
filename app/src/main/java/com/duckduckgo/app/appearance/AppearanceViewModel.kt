@@ -31,7 +31,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -57,15 +57,7 @@ class AppearanceViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    fun viewState(): StateFlow<ViewState> {
-        return viewState
-    }
-
-    fun commands(): Flow<Command> {
-        return command.receiveAsFlow()
-    }
-
-    fun onStartActivityCalled() {
+    fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
@@ -74,6 +66,10 @@ class AppearanceViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    fun commands(): Flow<Command> {
+        return command.receiveAsFlow()
     }
 
     fun userRequestedToChangeTheme() {

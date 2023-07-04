@@ -83,9 +83,7 @@ internal class AboutDuckDuckGoViewModelTest {
     }
 
     @Test
-    fun whenOnStartActivityCalledThenViewStateEmittedWithDefaultValues() = runTest {
-        testee.onStartActivityCalled()
-
+    fun whenInitialisedThenViewStateEmittedWithDefaultValues() = runTest {
         testee.viewState().test {
             val value = awaitItem()
 
@@ -123,7 +121,6 @@ internal class AboutDuckDuckGoViewModelTest {
     @Test
     fun whenVersionClickedAndNetPWaitlistStateIsOtherThanNotUnlockedThenNoCommandIsSentAndPixelNotSent() = runTest {
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.InBeta)
-        testee.onStartActivityCalled()
 
         testee.commands().test {
             testee.onVersionClicked()
@@ -136,7 +133,6 @@ internal class AboutDuckDuckGoViewModelTest {
     @Test
     fun whenVersionClickedLessThanMaxTimesAndNetPWaitlistStateIsNotUnlockedThenNoCommandIsSentAndPixelNotSent() = runTest {
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
-        testee.onStartActivityCalled()
 
         testee.commands().test {
             testee.onVersionClicked()
@@ -149,7 +145,6 @@ internal class AboutDuckDuckGoViewModelTest {
     @Test
     fun whenVersionClickedMaxTimesAndNetPWaitlistStateIsNotUnlockedThenCommandShowNetPUnlockedSnackbarIsSentAndCounterResetAndPixelSent() = runTest {
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
-        testee.onStartActivityCalled()
 
         testee.commands().test {
             for (i in 1..MAX_EASTER_EGG_COUNT) {
