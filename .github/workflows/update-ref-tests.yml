@@ -64,7 +64,7 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           commit-message: Update content scope scripts to version ${{ steps.latest-release.outputs.version }}
           labels: reference tests, automated pr
-          branch: automated/update-ref-tests-dependencies
+          branch: automated/update-ref-tests-dependencies-${{ steps.latest-release.outputs.version }}
           body: |
             - Automated reference tests dependency update
             

@@ -64,7 +64,7 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           commit-message: Update content scope scripts to version ${{ steps.latest-release.outputs.version }}
           labels: content scope scripts, automated pr
-          branch: automated/update-content-scope-scripts-dependencies
+          branch: automated/update-content-scope-scripts-dependencies-${{ steps.latest-release.outputs.version }}
           body: |
             - Automated content scope scripts dependency update
             
