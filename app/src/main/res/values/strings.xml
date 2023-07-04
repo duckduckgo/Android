@@ -186,7 +186,7 @@
     <string name="brokenSiteCategoryLogin">I can\'t sign in</string>
     <string name="brokenSiteCategoryUnsupported">The browser is incompatible</string>
     <string name="brokenSiteCategoryOther">Something else</string>
-    <string name="brokenSiteDescriptionTextInputHint">Please tell us how this site is broken</string>
+    <string name="brokenSiteDescriptionTextInputHint">If you\'d like, tell us about the problem you experienced</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
