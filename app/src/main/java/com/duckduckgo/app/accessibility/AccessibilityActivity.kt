@@ -16,14 +16,13 @@
 
 package com.duckduckgo.app.accessibility
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -37,6 +36,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AccessibilityScreenNoParams::class)
 class AccessibilityActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityAccessibilitySettingsBinding by viewBinding()
@@ -95,11 +95,5 @@ class AccessibilityActivity : DuckDuckGoActivity() {
 
         binding.fontSizeSettingsGroup.alpha = if (overrideSystemFontSize) 1.0f else 0.40f
         binding.accessibilitySlider.isEnabled = overrideSystemFontSize
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, AccessibilityActivity::class.java)
-        }
     }
 }

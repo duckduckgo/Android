@@ -27,18 +27,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.about.AboutDuckDuckGoActivity
-import com.duckduckgo.app.accessibility.AccessibilityActivity
-import com.duckduckgo.app.appearance.AppearanceActivity
+import com.duckduckgo.app.about.AboutScreenNoParams
+import com.duckduckgo.app.accessibility.AccessibilityScreenNoParams
+import com.duckduckgo.app.appearance.AppearanceScreenNoParams
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
-import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
+import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.permissions.PermissionsActivity
+import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
@@ -157,7 +157,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
-            aboutSetting.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
+            aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
         }
 
         with(viewsMore) {
@@ -274,6 +274,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchFireButtonScreen -> launchFireButtonScreen()
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
+            is Command.LaunchAboutScreen -> launchAboutScreen()
             null -> TODO()
         }
     }
@@ -361,7 +362,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAccessibilitySettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AccessibilityActivity.intent(this), options)
+        globalActivityStarter.start(this, AccessibilityScreenNoParams, options)
     }
 
     private fun launchEmailProtectionScreen(url: String) {
@@ -372,7 +373,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchEmailProtectionNotSupported() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(EmailProtectionUnsupportedActivity.intent(this), options)
+        globalActivityStarter.start(this, EmailProtectionUnsupportedScreenNoParams, options)
     }
 
     private fun launchMacOsScreen() {
@@ -391,23 +392,28 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchSyncSettings() {
-        globalActivityStarter.start(this, SyncActivityWithEmptyParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, SyncActivityWithEmptyParams, options)
     }
 
     private fun launchAppTPTrackersScreen() {
-        globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams, options)
     }
 
     private fun launchNetpManagementScreen() {
-        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams, options)
     }
 
     private fun launchNetpWaitlist() {
-        globalActivityStarter.start(this, NetPWaitlistScreenNoParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, NetPWaitlistScreenNoParams, options)
     }
 
     private fun launchAppTPOnboardingScreen() {
-        globalActivityStarter.start(this, AppTrackerOnboardingActivityWithEmptyParamsParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, AppTrackerOnboardingActivityWithEmptyParamsParams, options)
     }
 
     private fun launchAddHomeScreenWidget() {
@@ -416,11 +422,13 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchPrivateSearchScreen() {
-        globalActivityStarter.start(this, PrivateSearchScreenNoParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, PrivateSearchScreenNoParams, options)
     }
 
     private fun launchWebTrackingProtectionScreen() {
-        globalActivityStarter.start(this, WebTrackingProtectionScreenNoParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, WebTrackingProtectionScreenNoParams, options)
     }
 
     private fun launchCookiePopupProtectionScreen() {
@@ -429,17 +437,23 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFireButtonScreen() {
-        globalActivityStarter.start(this, FireButtonScreenNoParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, FireButtonScreenNoParams, options)
     }
 
     private fun launchPermissionsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(PermissionsActivity.intent(this), options)
+        globalActivityStarter.start(this, PermissionsScreenNoParams, options)
     }
 
     private fun launchAppearanceScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AppearanceActivity.intent(this), options)
+        globalActivityStarter.start(this, AppearanceScreenNoParams, options)
+    }
+
+    private fun launchAboutScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, AboutScreenNoParams, options)
     }
 
     companion object {

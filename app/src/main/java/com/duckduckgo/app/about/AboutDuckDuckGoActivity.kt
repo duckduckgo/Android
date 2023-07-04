@@ -16,12 +16,11 @@
 
 package com.duckduckgo.app.about
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command
 import com.duckduckgo.app.browser.BrowserActivity
@@ -40,6 +39,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AboutScreenNoParams::class)
 class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     private val viewModel: AboutDuckDuckGoViewModel by bindViewModel()
@@ -153,9 +153,5 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
-
-        fun intent(context: Context): Intent {
-            return Intent(context, AboutDuckDuckGoActivity::class.java)
-        }
     }
 }

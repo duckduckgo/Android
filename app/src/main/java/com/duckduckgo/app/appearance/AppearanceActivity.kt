@@ -16,12 +16,11 @@
 
 package com.duckduckgo.app.appearance
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.R
@@ -37,6 +36,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AppearanceScreenNoParams::class)
 class AppearanceActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppearanceViewModel by bindViewModel()
@@ -129,11 +129,5 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, AppearanceActivity::class.java)
-        }
     }
 }

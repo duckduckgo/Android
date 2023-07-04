@@ -18,7 +18,6 @@ package com.duckduckgo.app.permissions
 
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -28,6 +27,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPermissionsBinding
@@ -46,6 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(PermissionsScreenNoParams::class)
 class PermissionsActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -171,9 +172,5 @@ class PermissionsActivity : DuckDuckGoActivity() {
         private const val ANDROID_M_APP_NOTIFICATION_SETTINGS = "android.settings.APP_NOTIFICATION_SETTINGS"
         private const val ANDROID_M_APP_PACKAGE = "app_package"
         private const val ANDROID_M_APP_UID = "app_uid"
-
-        fun intent(context: Context): Intent {
-            return Intent(context, PermissionsActivity::class.java)
-        }
     }
 }
