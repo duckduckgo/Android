@@ -32,20 +32,9 @@ interface FaviconManager {
         url: String,
     ): File?
 
-    suspend fun saveFaviconForUrl(
-        url: String,
-    )
-
     suspend fun persistCachedFavicon(
         tabId: String,
         url: String,
-    )
-
-    suspend fun loadToViewFromLocalOrFallback(
-        tabId: String? = null,
-        url: String,
-        view: ImageView,
-        placeholder: String? = null,
     )
 
     suspend fun loadToViewFromLocalWithPlaceholder(
@@ -56,11 +45,6 @@ interface FaviconManager {
     )
 
     suspend fun loadFromDisk(
-        tabId: String?,
-        url: String,
-    ): Bitmap?
-
-    suspend fun loadFromDiskOrFallback(
         tabId: String?,
         url: String,
     ): Bitmap?

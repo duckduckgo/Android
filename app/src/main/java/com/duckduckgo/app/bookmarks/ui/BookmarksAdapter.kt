@@ -48,26 +48,13 @@ class BookmarksAdapter(
     companion object {
         const val EMPTY_STATE_TYPE = 0
         const val BOOKMARK_TYPE = 1
-        private const val FAVICON_REQ_CHANNEL_CONSUMERS = 10
     }
 
     private val bookmarkItems = mutableListOf<BookmarksItemTypes>()
 
-    private val faviconRequestsChannel = Channel<String>(Channel.UNLIMITED)
-
     interface BookmarksItemTypes
     object EmptyHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
-
-    init {
-        repeat(FAVICON_REQ_CHANNEL_CONSUMERS) {
-            lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
-                for (item in faviconRequestsChannel) {
-                    faviconManager.saveFaviconForUrl(item)
-                }
-            }
-        }
-    }
 
     fun setItems(
         bookmarkItems: List<BookmarkItem>,
@@ -82,12 +69,6 @@ class BookmarksAdapter(
 
         if (filteringMode || bookmarkItems.isEmpty()) {
             return
-        }
-
-        lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
-            bookmarkItems.forEach {
-                faviconRequestsChannel.send(it.bookmark.url)
-            }
         }
     }
 
