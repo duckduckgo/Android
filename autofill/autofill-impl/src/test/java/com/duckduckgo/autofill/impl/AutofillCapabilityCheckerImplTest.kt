@@ -168,6 +168,9 @@ class AutofillCapabilityCheckerImplTest {
             return object : Toggle {
                 override fun isEnabled(): Boolean = topLevelFeatureEnabled
                 override fun setEnabled(state: State) {}
+                override fun getRawStoredState(): State? {
+                    TODO("Not yet implemented")
+                }
             }
         }
 
@@ -175,6 +178,9 @@ class AutofillCapabilityCheckerImplTest {
             return object : Toggle {
                 override fun isEnabled(): Boolean = canInjectCredentials
                 override fun setEnabled(state: State) {}
+                override fun getRawStoredState(): State? {
+                    TODO("Not yet implemented")
+                }
             }
         }
 
@@ -182,6 +188,9 @@ class AutofillCapabilityCheckerImplTest {
             return object : Toggle {
                 override fun isEnabled(): Boolean = canSaveCredentials
                 override fun setEnabled(state: State) {}
+                override fun getRawStoredState(): State? {
+                    TODO("Not yet implemented")
+                }
             }
         }
 
@@ -189,6 +198,9 @@ class AutofillCapabilityCheckerImplTest {
             return object : Toggle {
                 override fun isEnabled(): Boolean = canGeneratePassword
                 override fun setEnabled(state: State) {}
+                override fun getRawStoredState(): State? {
+                    TODO("Not yet implemented")
+                }
             }
         }
 
@@ -196,6 +208,9 @@ class AutofillCapabilityCheckerImplTest {
             return object : Toggle {
                 override fun isEnabled(): Boolean = canAccessCredentialManagement
                 override fun setEnabled(state: State) {}
+                override fun getRawStoredState(): State? {
+                    TODO("Not yet implemented")
+                }
             }
         }
     }
