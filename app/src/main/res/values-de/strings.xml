@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Standardmäßig aktiviert</string>
     <string name="settingsHeadingSettings">Einstellungen</string>
-    <string name="settingsPermissionsAndPrivacySetting">Berechtigungen und Privatsphäre</string>
+    <string name="settingsPermissionsSetting">Berechtigungen und Privatsphäre</string>
     <string name="settingsAutofillLoginsSetting">Anmeldedaten automatisch ausfüllen</string>
     <string name="settingsSyncSetting">Synchronisieren</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Berechtigungen und Privatsphäre</string>
+    <string name="permissionsActivityTitle">Berechtigungen und Privatsphäre</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aussehen</string>

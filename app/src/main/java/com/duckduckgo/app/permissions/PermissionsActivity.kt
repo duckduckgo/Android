@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.permissionsandprivacy
+package com.duckduckgo.app.permissions
 
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
@@ -30,9 +30,9 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityPermissionsAndPrivacyBinding
+import com.duckduckgo.app.browser.databinding.ActivityPermissionsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyViewModel.Command
+import com.duckduckgo.app.permissions.PermissionsViewModel.Command
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.getAppLinkSettingForIndex
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
@@ -46,9 +46,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-class PermissionsAndPrivacyActivity : DuckDuckGoActivity() {
-
-    // TODO: [ANA] Rename this class to "PermissionsActivity" + package + everything else
+class PermissionsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -56,8 +54,8 @@ class PermissionsAndPrivacyActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
-    private val viewModel: PermissionsAndPrivacyViewModel by bindViewModel()
-    private val binding: ActivityPermissionsAndPrivacyBinding by viewBinding()
+    private val viewModel: PermissionsViewModel by bindViewModel()
+    private val binding: ActivityPermissionsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,14 +76,14 @@ class PermissionsAndPrivacyActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.includePermissionsAndPrivacy.sitePermissions.setClickListener { viewModel.onSitePermissionsClicked() }
-        binding.includePermissionsAndPrivacy.notificationsSetting.setClickListener { viewModel.userRequestedToChangeNotificationsSetting() }
-        binding.includePermissionsAndPrivacy.appLinksSetting.setClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
+        binding.includePermissions.sitePermissions.setClickListener { viewModel.onSitePermissionsClicked() }
+        binding.includePermissions.notificationsSetting.setClickListener { viewModel.userRequestedToChangeNotificationsSetting() }
+        binding.includePermissions.appLinksSetting.setClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
     }
 
     private fun configureAppLinksSettingVisibility() {
         if (appBuildConfig.sdkInt < Build.VERSION_CODES.N) {
-            binding.includePermissionsAndPrivacy.appLinksSetting.visibility = View.GONE
+            binding.includePermissions.appLinksSetting.visibility = View.GONE
         }
     }
 
@@ -95,7 +93,7 @@ class PermissionsAndPrivacyActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateAppLinkBehavior(it.appLinksSettingType)
-                    binding.includePermissionsAndPrivacy.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
+                    binding.includePermissions.notificationsSetting.setSecondaryText(getString(it.notificationsSettingSubtitleId))
                 }
             }.launchIn(lifecycleScope)
 
@@ -113,7 +111,7 @@ class PermissionsAndPrivacyActivity : DuckDuckGoActivity() {
                 AppLinkSettingType.NEVER -> R.string.settingsAppLinksNever
             },
         )
-        binding.includePermissionsAndPrivacy.appLinksSetting.setSecondaryText(subtitle)
+        binding.includePermissions.appLinksSetting.setSecondaryText(subtitle)
     }
 
     private fun processCommand(it: Command) {
@@ -175,7 +173,7 @@ class PermissionsAndPrivacyActivity : DuckDuckGoActivity() {
         private const val ANDROID_M_APP_UID = "app_uid"
 
         fun intent(context: Context): Intent {
-            return Intent(context, PermissionsAndPrivacyActivity::class.java)
+            return Intent(context, PermissionsActivity::class.java)
         }
     }
 }

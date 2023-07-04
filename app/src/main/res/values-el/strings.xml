@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="settingsWebTrackingProtectionDescription">Ενεργοποιημένο βάσει προεπιλογής</string>
     <string name="settingsHeadingSettings">Ρυθμίσεις</string>
-    <string name="settingsPermissionsAndPrivacySetting">Άδειες και απόρρητο</string>
+    <string name="settingsPermissionsSetting">Άδειες και απόρρητο</string>
     <string name="settingsAutofillLoginsSetting">Συνδέσεις αυτόματης συμπλήρωσης</string>
     <string name="settingsSyncSetting">Συγχρονισμός</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Άδειες και απόρρητο</string>
+    <string name="permissionsActivityTitle">Άδειες και απόρρητο</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Εμφάνιση</string>

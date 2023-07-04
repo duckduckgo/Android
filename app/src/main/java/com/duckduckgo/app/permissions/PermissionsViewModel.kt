@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.permissionsandprivacy
+package com.duckduckgo.app.permissions
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
-class PermissionsAndPrivacyViewModel @Inject constructor(
+class PermissionsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
 ) : ViewModel() {

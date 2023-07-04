@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.permissionsandprivacy
+package com.duckduckgo.app.permissions
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyViewModel.Command
+import com.duckduckgo.app.permissions.PermissionsViewModel.Command
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -37,13 +37,13 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PermissionsAndPrivacyViewModelTest {
+class PermissionsViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var testee: PermissionsAndPrivacyViewModel
+    private lateinit var testee: PermissionsViewModel
 
     @Mock
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
@@ -58,7 +58,7 @@ class PermissionsAndPrivacyViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        testee = PermissionsAndPrivacyViewModel(
+        testee = PermissionsViewModel(
             mockAppSettingsDataStore,
             mockPixel,
         )

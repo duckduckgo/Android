@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
     <string name="settingsHeadingSettings">Ustawienia</string>
-    <string name="settingsPermissionsAndPrivacySetting">Zezwolenia i prywatność</string>
+    <string name="settingsPermissionsSetting">Zezwolenia i prywatność</string>
     <string name="settingsAutofillLoginsSetting">Autouzupełnianie logowania</string>
     <string name="settingsSyncSetting">Synchronizacja</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Zezwolenia i prywatność</string>
+    <string name="permissionsActivityTitle">Zezwolenia i prywatność</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Wygląd</string>

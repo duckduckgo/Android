@@ -411,9 +411,9 @@
             android:label="@string/fireButtonActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity"
+            android:name="com.duckduckgo.app.permissions.PermissionsActivity"
             android:exported="false"
-            android:label="@string/permissionsAndPrivacyActivityTitle"
+            android:label="@string/permissionsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.appearance.AppearanceActivity"

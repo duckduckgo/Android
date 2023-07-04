@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
-    <string name="settingsPermissionsAndPrivacySetting">İzinler ve Gizlilik</string>
+    <string name="settingsPermissionsSetting">İzinler ve Gizlilik</string>
     <string name="settingsAutofillLoginsSetting">Girişleri Otomatik Doldur</string>
     <string name="settingsSyncSetting">Senkronizasyon</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">İzinler ve Gizlilik</string>
+    <string name="permissionsActivityTitle">İzinler ve Gizlilik</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>

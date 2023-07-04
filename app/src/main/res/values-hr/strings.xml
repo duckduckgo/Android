@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
     <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
     <string name="settingsHeadingSettings">Postavke</string>
-    <string name="settingsPermissionsAndPrivacySetting">Dozvole i privatnost</string>
+    <string name="settingsPermissionsSetting">Dozvole i privatnost</string>
     <string name="settingsAutofillLoginsSetting">Automatsko popunjavanje prijave</string>
     <string name="settingsSyncSetting">Sinkronizacija</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Dozvole i privatnost</string>
+    <string name="permissionsActivityTitle">Dozvole i privatnost</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izgled</string>

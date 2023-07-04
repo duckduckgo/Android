@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
-    <string name="settingsPermissionsAndPrivacySetting">Permisiuni și confidențialitate</string>
+    <string name="settingsPermissionsSetting">Permisiuni și confidențialitate</string>
     <string name="settingsAutofillLoginsSetting">Completare automată la autentificare</string>
     <string name="settingsSyncSetting">Sincronizare</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Permisiuni și confidențialitate</string>
+    <string name="permissionsActivityTitle">Permisiuni și confidențialitate</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aspect</string>

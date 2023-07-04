@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
     <string name="settingsHeadingSettings">Paramètres</string>
-    <string name="settingsPermissionsAndPrivacySetting">Autorisations et confidentialité</string>
+    <string name="settingsPermissionsSetting">Autorisations et confidentialité</string>
     <string name="settingsAutofillLoginsSetting">Saisie automatique des identifiants</string>
     <string name="settingsSyncSetting">Synchronisation</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Autorisations et confidentialité</string>
+    <string name="permissionsActivityTitle">Autorisations et confidentialité</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Apparence</string>

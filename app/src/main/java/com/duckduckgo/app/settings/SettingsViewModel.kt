@@ -112,7 +112,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchWebTrackingProtectionScreen : Command()
         object LaunchCookiePopupProtectionScreen : Command()
         object LaunchFireButtonScreen : Command()
-        object LaunchPermissionsAndPrivacyScreen : Command()
+        object LaunchPermissionsScreen : Command()
         object LaunchAppearanceScreen : Command()
     }
 
@@ -278,9 +278,9 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
     }
 
-    fun onPermissionsAndPrivacySettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchPermissionsAndPrivacyScreen) }
-        pixel.fire(SETTINGS_PERMISSIONS_AND_PRIVACY_PRESSED)
+    fun onPermissionsSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchPermissionsScreen) }
+        pixel.fire(SETTINGS_PERMISSIONS_PRESSED)
     }
 
     fun onAppearanceSettingClicked() {

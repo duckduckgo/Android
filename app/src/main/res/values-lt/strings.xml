@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsHeadingSettings">Nustatymai</string>
-    <string name="settingsPermissionsAndPrivacySetting">Leidimai ir privatumas</string>
+    <string name="settingsPermissionsSetting">Leidimai ir privatumas</string>
     <string name="settingsAutofillLoginsSetting">Automatiškai užpildyti prisijungimus</string>
     <string name="settingsSyncSetting">Sinchronizuoti</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Leidimai ir privatumas</string>
+    <string name="permissionsActivityTitle">Leidimai ir privatumas</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Išvaizda</string>

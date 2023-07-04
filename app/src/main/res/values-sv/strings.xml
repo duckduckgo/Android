@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
     <string name="settingsHeadingSettings">Inställningar</string>
-    <string name="settingsPermissionsAndPrivacySetting">Behörigheter och integritet</string>
+    <string name="settingsPermissionsSetting">Behörigheter och integritet</string>
     <string name="settingsAutofillLoginsSetting">Fyll i inloggningar automatiskt</string>
     <string name="settingsSyncSetting">Synkronisering</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Behörigheter och integritet</string>
+    <string name="permissionsActivityTitle">Behörigheter och integritet</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Utseende</string>

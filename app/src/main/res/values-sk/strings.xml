@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
     <string name="settingsHeadingSettings">Nastavenia</string>
-    <string name="settingsPermissionsAndPrivacySetting">Povolenia a ochrana osobných údajov</string>
+    <string name="settingsPermissionsSetting">Povolenia a ochrana osobných údajov</string>
     <string name="settingsAutofillLoginsSetting">Automatické vyplňovanie prihlasovacích údajov</string>
     <string name="settingsSyncSetting">Synchronizácia</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Povolenia a ochrana osobných údajov</string>
+    <string name="permissionsActivityTitle">Povolenia a ochrana osobných údajov</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhľad</string>

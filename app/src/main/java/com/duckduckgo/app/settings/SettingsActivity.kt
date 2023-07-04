@@ -38,7 +38,7 @@ import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity
+import com.duckduckgo.app.permissions.PermissionsActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
@@ -154,7 +154,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
-            permissionsAndPrivacySetting.setClickListener { viewModel.onPermissionsAndPrivacySettingClicked() }
+            permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
             aboutSetting.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
@@ -272,7 +272,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
             is Command.LaunchCookiePopupProtectionScreen -> launchCookiePopupProtectionScreen()
             is Command.LaunchFireButtonScreen -> launchFireButtonScreen()
-            is Command.LaunchPermissionsAndPrivacyScreen -> launchPermissionsAndPrivacyScreen()
+            is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             null -> TODO()
         }
@@ -432,9 +432,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, FireButtonScreenNoParams)
     }
 
-    private fun launchPermissionsAndPrivacyScreen() {
+    private fun launchPermissionsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(PermissionsAndPrivacyActivity.intent(this), options)
+        startActivity(PermissionsActivity.intent(this), options)
     }
 
     private fun launchAppearanceScreen() {
