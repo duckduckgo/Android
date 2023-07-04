@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +14,10 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="atp_ExcludedReasonExcludedThroughNetP">Manually disabled in Network Protection</string>
-    <string name="atp_CompanyDetailsBannerForUnprotectedThroughNetP">Protection has been manually disabled for this app through Network Protection. To re-enable, configure in <annotation type="manage_app_exclusion_link">Network Protection</annotation>.</string>
-</resources>
+<com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/exclusion_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/keyline_2"
+    app:showSwitch="true" />

@@ -20,15 +20,22 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.PROTECTED
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.UNPROTECTED
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.UNPROTECTED_THROUGH_NETP
+import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionExclusionList
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
@@ -52,17 +59,30 @@ interface TrackingProtectionAppsRepository {
     suspend fun restoreDefaultProtectedList()
 
     /** Returns if an app tracking attempts are being blocked or not */
-    suspend fun isAppProtectionEnabled(packageName: String): Boolean
+    suspend fun getAppProtectionStatus(packageName: String): ProtectionState
+    enum class ProtectionState {
+        PROTECTED,
+        UNPROTECTED,
+        UNPROTECTED_THROUGH_NETP,
+    }
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = TrackingProtectionAppsRepository::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = SystemAppOverridesProvider::class,
+)
 @SingleInstanceIn(AppScope::class)
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val appTpFeatureConfig: AppTpFeatureConfig,
-) : TrackingProtectionAppsRepository {
+    private val networkProtectionExclusionList: NetworkProtectionExclusionList,
+) : TrackingProtectionAppsRepository, SystemAppOverridesProvider {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
@@ -72,15 +92,17 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                 logcat { "getProtectedApps flow" }
                 installedApps
                     .map {
-                        val isExcluded = shouldBeExcluded(it, ddgExclusionList, manualList)
-                        TrackingProtectionAppInfo(
-                            packageName = it.packageName,
-                            name = packageManager.getApplicationLabel(it).toString(),
-                            category = it.parseAppCategory(),
-                            isExcluded = isExcluded,
-                            knownProblem = hasKnownIssue(it, ddgExclusionList),
-                            userModified = isUserModified(it.packageName, manualList),
-                        )
+                        val isExcluded = isExcludedFromAppTP(it, ddgExclusionList, manualList)
+                        runBlocking {
+                            TrackingProtectionAppInfo(
+                                packageName = it.packageName,
+                                name = packageManager.getApplicationLabel(it).toString(),
+                                category = it.parseAppCategory(),
+                                isExcluded = networkProtectionExclusionList.isExcluded(it.packageName) || isExcluded,
+                                knownProblem = hasKnownIssue(it, ddgExclusionList),
+                                userModified = isUserModified(it.packageName, manualList),
+                            )
+                        }
                     }
                     .sortedBy { it.name.lowercase() }
                     .toList()
@@ -101,7 +123,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         val manualExclusionList = appTrackerRepository.getManualAppExclusionList()
         return@withContext packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
-            .filter { shouldBeExcluded(it, exclusionList, manualExclusionList) }
+            .filter { isExcludedFromAppTP(it, exclusionList, manualExclusionList) }
             .sortedBy { it.name }
             .map { it.packageName }
             .toList()
@@ -123,7 +145,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         }
     }
 
-    private fun shouldBeExcluded(
+    private fun isExcludedFromAppTP(
         appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>,
         userExclusionList: List<AppTrackerManualExcludedApp>,
@@ -150,10 +172,13 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         return ddgExclusionList.any { it.packageId == appInfo.packageName }
     }
 
-    private fun hasKnownIssue(
+    private suspend fun hasKnownIssue(
         appInfo: ApplicationInfo,
         ddgExclusionList: List<AppTrackerExcludedPackage>,
     ): Int {
+        if (networkProtectionExclusionList.isExcluded(appInfo.packageName)) {
+            return TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP
+        }
         if (BROWSERS.contains(appInfo.packageName)) {
             return TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
         }
@@ -192,16 +217,24 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         }
     }
 
-    override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
+    override suspend fun getAppProtectionStatus(packageName: String): ProtectionState {
         logcat { "TrackingProtectionAppsRepository: Checking $packageName protection status" }
-        val appInfo = runCatching { packageManager.getApplicationInfo(packageName, 0) }.getOrElse { return true }
+        val appInfo = runCatching { packageManager.getApplicationInfo(packageName, 0) }.getOrElse { return PROTECTED }
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
 
-        val isExcluded = shouldBeExcluded(appInfo, appExclusionList, manualAppExclusionList)
+        val isExcludedFromAppTP = isExcludedFromAppTP(appInfo, appExclusionList, manualAppExclusionList)
 
-        return !isExcluded
+        return if (networkProtectionExclusionList.isExcluded(packageName)) {
+            UNPROTECTED_THROUGH_NETP
+        } else if (isExcludedFromAppTP) {
+            UNPROTECTED
+        } else {
+            PROTECTED
+        }
     }
+
+    override fun getSystemAppOverridesList(): List<String> = appTrackerRepository.getSystemAppOverrideList().map { it.packageId }
 
     companion object {
         private val BROWSERS = listOf(

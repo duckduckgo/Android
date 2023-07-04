@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.api
+package com.duckduckgo.networkprotection.impl.exclusion.ui
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-
-/**
- * Use this model to launch the NetworkProtectionManagement screen
- */
-object NetworkProtectionManagementScreenNoParams : ActivityParams
-
-/**
- * Use this model to launch the NetPWaitlist screen
- */
-object NetPWaitlistScreenNoParams : ActivityParams
-
-/**
- * Use this model to launch the NetP app exclusion list screen
- */
-object NetPAppExclusionListNoParams : ActivityParams
+data class NetpExclusionListApp(
+    val packageName: String,
+    val name: String,
+    val isProtected: Boolean = false,
+)
