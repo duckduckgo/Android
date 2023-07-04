@@ -42,7 +42,7 @@ class FeatureSegmentsPixelSender @Inject constructor(
             browserProperties.daysSinceInstalled() - 1 > featureSegmentsManager.lastRetentionDayPixelSent() &&
             featureSegmentsManager.isSendPixelEnabled()
         if (shouldFireSegmentPixel) {
-            featureSegmentsManager.fireFeatureSegmentsPixel()
+            featureSegmentsManager.fireFeatureSegmentsPixel(browserProperties.daysSinceInstalled())
             val retentionDayPixelSent = browserProperties.daysSinceInstalled() - 1
             featureSegmentsManager.updateLastRetentionDayPixelSent(retentionDayPixelSent.toInt())
             featureSegmentsManager.restartDailySearchCount()

@@ -21,3 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 enum class FeatureSegmentsPixelName(override val pixelName: String) : Pixel.PixelName {
     DAILY_USER_EVENT_SEGMENT("m_daily_user_event_segment"),
 }
+
+object FeatureSegmentsPixelParameters {
+    const val DAYS_SINCE_APP_INSTALL = "days_since_app_install"
+}

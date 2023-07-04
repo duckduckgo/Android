@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.TEN_SEA
 import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType.TWO_SEARCHES_MADE
 import com.duckduckgo.app.statistics.api.featureusage.db.FeatureSegmentsDataStore
 import com.duckduckgo.app.statistics.api.featureusage.pixel.FeatureSegmentsPixelName.DAILY_USER_EVENT_SEGMENT
+import com.duckduckgo.app.statistics.api.featureusage.pixel.FeatureSegmentsPixelParameters
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,7 +37,7 @@ import javax.inject.Inject
 interface FeatureSegmentsManager {
     fun addUserToFeatureSegment(segment: FeatureSegmentType)
     fun searchMade()
-    fun fireFeatureSegmentsPixel()
+    fun fireFeatureSegmentsPixel(retentionDay: Long)
     fun restartDailySearchCount()
     fun lastRetentionDayPixelSent(): Int
     fun updateLastRetentionDayPixelSent(retentionDay: Int)
@@ -79,8 +80,9 @@ class FeatureSegmentManagerImpl @Inject constructor(
         }
     }
 
-    override fun fireFeatureSegmentsPixel() {
-        val params = getUserFeatureSegments().map { it.key to it.value.toString() }.toMap()
+    override fun fireFeatureSegmentsPixel(retentionDay: Long) {
+        val params = getUserFeatureSegments().map { it.key to it.value.toString() }.toMap().toMutableMap()
+        params[FeatureSegmentsPixelParameters.DAYS_SINCE_APP_INSTALL] = retentionDay.toString()
         pixel.fire(DAILY_USER_EVENT_SEGMENT, params)
     }
 
