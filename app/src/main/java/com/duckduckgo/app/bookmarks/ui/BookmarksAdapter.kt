@@ -34,7 +34,6 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
 class BookmarksAdapter(

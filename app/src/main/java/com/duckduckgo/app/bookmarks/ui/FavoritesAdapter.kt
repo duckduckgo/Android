@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(
