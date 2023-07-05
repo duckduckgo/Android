@@ -131,7 +131,7 @@ class BrowserViewModel @Inject constructor(
     }
 
     init {
-        appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
+        // appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
     suspend fun onNewTabRequested(sourceTabId: String? = null): String {

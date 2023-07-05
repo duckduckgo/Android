@@ -3164,13 +3164,13 @@ class BrowserTabFragment :
                 Timber.v("RMF: render $newMessage, $viewState")
                 when {
                     viewState.cta != null -> {
-                        showCta(viewState.cta, viewState.favorites)
+                        // showCta(viewState.cta, viewState.favorites)
                     }
 
                     viewState.message != null -> {
-                        showRemoteMessage(viewState.message, newMessage)
-                        showHomeBackground(viewState.favorites, hideLogo = true)
-                        hideHomeCta()
+                        // showRemoteMessage(viewState.message, newMessage)
+                        // showHomeBackground(viewState.favorites, hideLogo = true)
+                        // hideHomeCta()
                     }
 
                     else -> {

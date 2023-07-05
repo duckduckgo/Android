@@ -93,7 +93,7 @@ class SettingsSharedPreferences @Inject constructor(
         }
 
     override var hideTips: Boolean
-        get() = preferences.getBoolean(KEY_HIDE_TIPS, false)
+        get() = preferences.getBoolean(KEY_HIDE_TIPS, true)
         set(enabled) = preferences.edit { putBoolean(KEY_HIDE_TIPS, enabled) }
 
     override var autoCompleteSuggestionsEnabled: Boolean
@@ -101,19 +101,19 @@ class SettingsSharedPreferences @Inject constructor(
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
     override var appLoginDetection: Boolean
-        get() = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", true)
+        get() = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", false)
         set(enabled) = preferences.edit { putBoolean("KEY_LOGIN_DETECTION_ENABLED", enabled) }
 
     override var automaticFireproofSetting: AutomaticFireproofSetting
-        get() = AutomaticFireproofSetting.valueOf(preferences.getString(KEY_AUTOMATIC_FIREPROOF_SETTING, ASK_EVERY_TIME.name) ?: ASK_EVERY_TIME.name)
+        get() = AutomaticFireproofSetting.NEVER
         set(loginDetectionSetting) = preferences.edit { putString(KEY_AUTOMATIC_FIREPROOF_SETTING, loginDetectionSetting.name) }
 
     override var appLocationPermission: Boolean
-        get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, true)
+        get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, enabled) }
 
     override var appLocationPermissionDeniedForever: Boolean
-        get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, false)
+        get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, true)
         set(enabled) = preferences.edit { putBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, enabled) }
 
     override var appIcon: AppIcon
@@ -142,7 +142,7 @@ class SettingsSharedPreferences @Inject constructor(
         set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, enabled) }
 
     override var automaticallyClearWhatOption: ClearWhatOption
-        get() = automaticallyClearWhatSavedValue() ?: ClearWhatOption.CLEAR_NONE
+        get() = automaticallyClearWhatSavedValue() ?: ClearWhatOption.CLEAR_TABS_AND_DATA
         set(value) = preferences.edit { putString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, value.name) }
 
     override var automaticallyClearWhenOption: ClearWhenOption
@@ -170,7 +170,7 @@ class SettingsSharedPreferences @Inject constructor(
         set(enabled) = preferences.edit { putBoolean(SHOW_APP_LINKS_PROMPT, enabled) }
 
     override var showAutomaticFireproofDialog: Boolean
-        get() = preferences.getBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, true)
+        get() = preferences.getBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, false)
         set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
@@ -205,8 +205,9 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     private fun selectedFireAnimationSavedValue(): FireAnimation {
-        val selectedFireAnimationSavedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
-        return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
+        return FireAnimation.HeroFire
+        // val selectedFireAnimationSavedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
+        // return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
