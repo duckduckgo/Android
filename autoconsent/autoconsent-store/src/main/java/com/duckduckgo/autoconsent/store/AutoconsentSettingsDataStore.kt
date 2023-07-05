@@ -31,7 +31,7 @@ class RealAutoconsentSettingsDataStore constructor(private val context: Context)
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var userSetting: Boolean
-        get() = preferences.getBoolean(AUTOCONSENT_USER_SETTING, false)
+        get() = preferences.getBoolean(AUTOCONSENT_USER_SETTING, true)
         set(value) {
             preferences.edit(commit = true) {
                 putBoolean(AUTOCONSENT_USER_SETTING, value)

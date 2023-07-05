@@ -675,7 +675,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun hideWebContent() {
         Timber.d("Hiding web view content")
         removeObservers()
-        binding.clearingInProgressView.show()
+        // binding.clearingInProgressView.show()
     }
 
     private fun launchPlayStore() {

@@ -466,11 +466,11 @@ class BrowserTabFragment :
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val tabsButton: TabSwitcherButton?
-        get() = omnibar.tabsMenu
+    // private val tabsButton: TabSwitcherButton?
+    //     get() = omnibar.tabsMenu
 
-    private val fireMenuButton: ViewGroup?
-        get() = omnibar.fireIconMenu
+    // private val fireMenuButton: ViewGroup?
+    //     get() = omnibar.fireIconMenu
 
     private val menuButton: ViewGroup?
         get() = omnibar.browserMenu
@@ -2745,8 +2745,8 @@ class BrowserTabFragment :
         }
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
-            tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
+            // tabsButton?.isVisible = viewState.showTabsButton
+            // fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
             menuButton?.isVisible = viewState.showMenuButton is HighlightableButton.Visible
 
             val targetView = if (viewState.showMenuButton.isHighlighted()) {
@@ -2776,16 +2776,16 @@ class BrowserTabFragment :
         }
 
         private fun decorateToolbarWithButtons() {
-            fireMenuButton?.show()
-            fireMenuButton?.setOnClickListener {
-                browserActivity?.launchFire()
-                pixel.fire(
-                    AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
-                )
-            }
-
-            tabsButton?.show()
+            // fireMenuButton?.show()
+            // fireMenuButton?.setOnClickListener {
+            //     browserActivity?.launchFire()
+            //     pixel.fire(
+            //         AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            //         mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString()),
+            //     )
+            // }
+            //
+            // tabsButton?.show()
         }
 
         private fun createPopupMenu() {
@@ -2883,33 +2883,33 @@ class BrowserTabFragment :
         }
 
         private fun configureShowTabSwitcherListener() {
-            tabsButton?.setOnClickListener {
-                launch { viewModel.userLaunchingTabSwitcher() }
-            }
+            // tabsButton?.setOnClickListener {
+            //     launch { viewModel.userLaunchingTabSwitcher() }
+            // }
         }
 
         private fun configureLongClickOpensNewTabListener() {
-            tabsButton?.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab() }
-                return@setOnLongClickListener true
-            }
+            // tabsButton?.setOnLongClickListener {
+            //     launch { viewModel.userRequestedOpeningNewTab() }
+            //     return@setOnLongClickListener true
+            // }
         }
 
         fun animateTabsCount() {
-            tabsButton?.animateCount()
+            // tabsButton?.animateCount()
         }
 
         fun renderTabIcon(tabs: List<TabEntity>) {
-            context?.let {
-                tabsButton?.count = tabs.count()
-                tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
-            }
+            // context?.let {
+            //     tabsButton?.count = tabs.count()
+            //     tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
+            // }
         }
 
         fun incrementTabs() {
-            tabsButton?.increment {
-                addTabsObserver()
-            }
+            // tabsButton?.increment {
+            //     addTabsObserver()
+            // }
         }
     }
 
