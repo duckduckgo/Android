@@ -93,6 +93,7 @@ class FireDialog(
             fireCtaBinding = IncludeDaxDialogCtaBinding.bind(inflated)
         }
         setContentView(binding.root)
+        playAnimation()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -180,7 +181,8 @@ class FireDialog(
                 override fun onAnimationCancel(animation: Animator) {}
                 override fun onAnimationStart(animation: Animator) {}
                 override fun onAnimationEnd(animation: Animator) {
-                    onFireDialogClearAllEvent(AnimationFinished)
+                    clearPersonalDataAction.killProcess()
+                    // onFireDialogClearAllEvent(AnimationFinished)
                 }
             },
         )

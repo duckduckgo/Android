@@ -1855,6 +1855,8 @@ class BrowserTabFragment :
         omnibar.clearTextButton.setOnClickListener { omnibar.omnibarTextInput.setText("") }
     }
 
+
+
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         appCoroutineScope.launch {
@@ -2431,6 +2433,7 @@ class BrowserTabFragment :
 
     fun onBackPressed(): Boolean {
         if (!isAdded) return false
+
         return viewModel.onUserPressedBack()
     }
 

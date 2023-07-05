@@ -23,6 +23,7 @@ import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
@@ -69,15 +70,14 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -166,6 +166,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
+    }
+
+    override fun onUserLeaveHint() {
+        launchFire()
+        super.onUserLeaveHint()
     }
 
     override fun onStop() {
@@ -433,6 +438,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             removeObservers()
         }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
+        dialog.setOnDismissListener {
+            destroyedByBackPress = true
+            super.onBackPressed()
+        }
         dialog.setOnCancelListener {
             pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
@@ -496,8 +505,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (currentTab?.onBackPressed() != true) {
             // signal user press back button to exit the app so that BrowserApplicationStateInfo
             // can call the right callback
-            destroyedByBackPress = true
-            super.onBackPressed()
+            // destroyedByBackPress = true
+            launchFire()
+            // super.onBackPressed()
         }
     }
 

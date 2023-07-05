@@ -32,11 +32,11 @@ class SitePermissionsPreferencesImp @Inject constructor(private val context: Con
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override var askCameraEnabled: Boolean
-        get() = preferences.getBoolean(KEY_ASK_CAMERA_ENABLED, false)
+        get() = preferences.getBoolean(KEY_ASK_CAMERA_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_ASK_CAMERA_ENABLED, enabled) }
 
     override var askMicEnabled: Boolean
-        get() = preferences.getBoolean(KEY_ASK_MIC_ENABLED, false)
+        get() = preferences.getBoolean(KEY_ASK_MIC_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_ASK_MIC_ENABLED, enabled) }
 
     companion object {

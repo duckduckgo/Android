@@ -109,11 +109,11 @@ class SettingsSharedPreferences @Inject constructor(
         set(loginDetectionSetting) = preferences.edit { putString(KEY_AUTOMATIC_FIREPROOF_SETTING, loginDetectionSetting.name) }
 
     override var appLocationPermission: Boolean
-        get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, false)
+        get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, enabled) }
 
     override var appLocationPermissionDeniedForever: Boolean
-        get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, true)
+        get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, false)
         set(enabled) = preferences.edit { putBoolean(KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER, enabled) }
 
     override var appIcon: AppIcon
