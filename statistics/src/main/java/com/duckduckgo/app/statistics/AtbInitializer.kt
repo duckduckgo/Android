@@ -21,6 +21,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ class AtbInitializer(
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: Set<AtbInitializerListener>,
+    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -62,6 +64,7 @@ class AtbInitializer(
             statisticsUpdater.refreshAppRetentionAtb()
         } else {
             statisticsUpdater.initializeAtb()
+            featureSegmentsManager.enableSendPixelForFeatureSegments()
         }
     }
 }

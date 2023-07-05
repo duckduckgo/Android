@@ -25,6 +25,7 @@ import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.DaggerSet
@@ -109,8 +110,9 @@ class StubStatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
         listeners: DaggerSet<AtbInitializerListener>,
+        featureSegmentsManager: FeatureSegmentsManager,
     ): MainProcessLifecycleObserver {
-        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, featureSegmentsManager)
     }
 
     @Provides
