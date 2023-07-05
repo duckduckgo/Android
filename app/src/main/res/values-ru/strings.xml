@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Не могу войти</string>
     <string name="brokenSiteCategoryUnsupported">Несовместимость браузера</string>
     <string name="brokenSiteCategoryOther">Что-то другое</string>
+    <string name="brokenSiteDescriptionTextInputHint">По желанию оставьте пояснение</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Закладки</string>

@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Negaliu prisijungti</string>
     <string name="brokenSiteCategoryUnsupported">Naršyklė nesuderinama</string>
     <string name="brokenSiteCategoryOther">Kažkas kito</string>
+    <string name="brokenSiteDescriptionTextInputHint">Jei norite, papasakokite apie problemą, su kuria susidūrėte</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Žymės</string>

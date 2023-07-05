@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Jeg kan ikke logge inn</string>
     <string name="brokenSiteCategoryUnsupported">Nettleseren er inkompatibel</string>
     <string name="brokenSiteCategoryOther">Noe annet</string>
+    <string name="brokenSiteDescriptionTextInputHint">Fortell oss om problemet du opplevde, hvis du har lyst</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmerker</string>

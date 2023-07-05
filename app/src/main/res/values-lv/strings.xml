@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Es nevaru pierakstīties</string>
     <string name="brokenSiteCategoryUnsupported">Pārlūks nav saderīgs</string>
     <string name="brokenSiteCategoryOther">Kaut kas cits</string>
+    <string name="brokenSiteDescriptionTextInputHint">Ja vēlies, pastāsti mums par savu problēmu</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>

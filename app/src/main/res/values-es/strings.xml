@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">No puedo iniciar sesión</string>
     <string name="brokenSiteCategoryUnsupported">El navegador es incompatible</string>
     <string name="brokenSiteCategoryOther">Otro problema</string>
+    <string name="brokenSiteDescriptionTextInputHint">Si quieres, cuéntanos qué problema has encontrado</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>

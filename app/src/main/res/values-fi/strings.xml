@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">En pysty kirjautumaan sisään</string>
     <string name="brokenSiteCategoryUnsupported">Selain ei ole yhteensopiva</string>
     <string name="brokenSiteCategoryOther">Jotain muuta</string>
+    <string name="brokenSiteDescriptionTextInputHint">Jos haluat, kerro meille ongelmasta</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>

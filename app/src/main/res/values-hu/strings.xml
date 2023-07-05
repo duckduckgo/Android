@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Nem tudok bejelentkezni</string>
     <string name="brokenSiteCategoryUnsupported">A böngésző nem kompatibilis</string>
     <string name="brokenSiteCategoryOther">Valami más</string>
+    <string name="brokenSiteDescriptionTextInputHint">Ha szeretnéd, írd le részletesebben a problémát</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>

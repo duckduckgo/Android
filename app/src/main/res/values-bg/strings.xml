@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Не мога да вляза</string>
     <string name="brokenSiteCategoryUnsupported">Браузърът е несъвместим</string>
     <string name="brokenSiteCategoryOther">Нещо друго</string>
+    <string name="brokenSiteDescriptionTextInputHint">Ако искате, опишете ни за възникналия проблем</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Отметки</string>

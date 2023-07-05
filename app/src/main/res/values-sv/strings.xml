@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Jag kan inte logga in</string>
     <string name="brokenSiteCategoryUnsupported">Webbläsaren är inte kompatibel</string>
     <string name="brokenSiteCategoryOther">Övrigt</string>
+    <string name="brokenSiteDescriptionTextInputHint">Om du vill kan du berätta mer om det problem som du har stött på</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmärken</string>

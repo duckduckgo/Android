@@ -185,6 +185,7 @@
     <string name="brokenSiteCategoryLogin">Nemohu se přihlásit</string>
     <string name="brokenSiteCategoryUnsupported">Prohlížeč je nekompatibilní</string>
     <string name="brokenSiteCategoryOther">Něco jiného</string>
+    <string name="brokenSiteDescriptionTextInputHint">Jestli chceš, řekni nám o svém problému víc</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
