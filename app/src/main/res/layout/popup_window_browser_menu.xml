@@ -95,6 +95,7 @@
                 android:id="@+id/siteOptionsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="wrap_content" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
@@ -123,6 +124,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_library_16"
+                android:visibility="gone"
                 app:primaryText="@string/bookmarksMenuTitle" />
 
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
@@ -199,6 +201,7 @@
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/settingsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -207,6 +210,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_key_16"
+                android:visibility="gone"
                 app:primaryText="@string/autofillManagementScreenTitle" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
@@ -214,6 +218,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_downloads_16"
+                android:visibility="gone"
                 app:primaryText="@string/downloadsMenuTitle" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
@@ -221,6 +226,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_settings_16"
+                android:visibility="gone"
                 app:primaryText="@string/settingsMenuItemTitle" />
 
         </LinearLayout>
