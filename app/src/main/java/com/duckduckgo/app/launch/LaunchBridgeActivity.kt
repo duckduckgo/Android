@@ -42,7 +42,9 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        lifecycleScope.launch { viewModel.determineViewToShow() }
+        showHome()
+
+        // lifecycleScope.launch { viewModel.determineViewToShow() }
     }
 
     private fun configureObservers() {
