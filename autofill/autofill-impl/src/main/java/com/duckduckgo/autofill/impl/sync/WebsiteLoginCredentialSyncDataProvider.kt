@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.store.sync.AutofillSyncStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
@@ -40,6 +41,7 @@ class WebsiteLoginCredentialSyncDataProvider @Inject constructor(
     private val syncLoginCredentials: SyncLoginCredentials,
     private val autofillRepository: AutofillStore,
     private val autofillSyncStore: AutofillSyncStore,
+    private val syncCrypto: SyncCrypto,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : SyncableDataProvider {
@@ -51,9 +53,9 @@ class WebsiteLoginCredentialSyncDataProvider @Inject constructor(
         } else {
             changesSince(since)
         }
-        val request = formatUpdates(allContent()) //update for updates
+        val request = formatUpdates(updates)
         Timber.d("Sync-autofill: request: $request")
-        return SyncChangesRequest.empty()
+        return request
     }
 
     override fun onSyncDisabled() {
@@ -72,11 +74,11 @@ class WebsiteLoginCredentialSyncDataProvider @Inject constructor(
             LoginCredentialEntry(
                 id = syncId,
                 client_last_modified = DatabaseDateFormatter.parseMillisIso8601(lastUpdatedMillis),
-                domain = it.domain,
-                title = it.domainTitle,
-                username = it.username,
-                password = it.password,
-                notes = it.notes,
+                domain = it.domain.encrypt(),
+                title = it.domainTitle.encrypt(),
+                username = it.username.encrypt(),
+                password = it.password.encrypt(),
+                notes = it.notes.encrypt(),
             )
         }.filterNotNull()
 
@@ -100,11 +102,11 @@ class WebsiteLoginCredentialSyncDataProvider @Inject constructor(
             LoginCredentialEntry(
                 id = syncId,
                 client_last_modified = DatabaseDateFormatter.parseMillisIso8601(lastUpdatedMillis),
-                domain = it.domain,
-                title = it.domainTitle,
-                username = it.username,
-                password = it.password,
-                notes = it.notes,
+                domain = it.domain.encrypt(),
+                title = it.domainTitle.encrypt(),
+                username = it.username.encrypt(),
+                password = it.password.encrypt(),
+                notes = it.notes.encrypt(),
             )
         }.filterNotNull()
 
@@ -115,6 +117,10 @@ class WebsiteLoginCredentialSyncDataProvider @Inject constructor(
         Timber.d("Sync-autofill: modifiedSince: $values")
         Timber.d("Sync-autofill: modifiedSince removed: $removedItems")
         return values + removedItems
+    }
+
+    private fun String?.encrypt(): String {
+        return this?.let { syncCrypto.encrypt(this) } ?: ""
     }
 
     private fun formatUpdates(updates: List<LoginCredentialEntry>): SyncChangesRequest {

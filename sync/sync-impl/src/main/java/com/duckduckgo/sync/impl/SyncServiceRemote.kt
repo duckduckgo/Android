@@ -71,6 +71,11 @@ interface SyncApi {
         token: String,
         since: String,
     ): Result<JSONObject>
+
+    fun getCredentials(
+        token: String,
+        since: String,
+    ): Result<JSONObject>
 }
 
 @ContributesBinding(AppScope::class)
@@ -248,6 +253,27 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
                 syncService.bookmarksSince("Bearer $token", since)
             } else {
                 syncService.bookmarks("Bearer $token")
+            }
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            Result.Success(data)
+        }
+    }
+
+    override fun getCredentials(
+        token: String,
+        since: String,
+    ): Result<JSONObject> {
+        val response = runCatching {
+            val patchCall = if (since.isNotEmpty()) {
+                syncService.credentialsSince("Bearer $token", since)
+            } else {
+                syncService.credentials("Bearer $token")
             }
             patchCall.execute()
         }.getOrElse { throwable ->
