@@ -29,6 +29,7 @@ import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.autofill.sync.SyncLoginCredentials
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -49,6 +50,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val autofillPrefsStore: AutofillPrefsStore,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val autofillUrlMatcher: AutofillUrlMatcher,
+    private val syncLoginCredentials: SyncLoginCredentials,
 ) : AutofillStore {
 
     override val autofillAvailable: Boolean
@@ -190,6 +192,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override suspend fun deleteCredentials(id: Long): LoginCredentials? {
         val existingCredential = secureStorage.getWebsiteLoginDetailsWithCredentials(id)
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
+        syncLoginCredentials.onEntityRemoved(id)
         return existingCredential?.toLoginCredentials()
     }
 

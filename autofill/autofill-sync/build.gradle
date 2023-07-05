@@ -23,20 +23,10 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':feature-toggles-api')
     implementation project(path: ':di')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':common-ui')
+    implementation project(path: ':common')
     implementation project(path: ':autofill-api')
     implementation project(path: ':secure-storage-api')
-    implementation project(path: ':device-auth-api')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':autofill-store')
-    implementation project(path: ':autofill-sync')
-    implementation project(path: ':statistics')
-    testImplementation project(path: ':autofill-test')
     implementation project(path: ':sync-api')
 
     anvil project(path: ':anvil-compiler')
@@ -84,6 +74,7 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+    namespace 'com.duckduckgo.autofill.sync'
     lint {
         baseline file("lint-baseline.xml")
     }

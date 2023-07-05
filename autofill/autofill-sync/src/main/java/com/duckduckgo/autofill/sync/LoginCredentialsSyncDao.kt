@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.store.sync
+package com.duckduckgo.autofill.sync
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -36,4 +36,10 @@ interface LoginCredentialsSyncDao {
 
     @Delete
     fun delete(entity: LoginCredentialsSync)
+
+    @Query("select id from website_login_credentials_sync_meta where syncId = :syncId")
+    fun getLocalId(syncId: String): Long?
+
+    @Query("Delete from website_login_credentials_sync_meta where deleted_at <= :before")
+    fun removeDeletedEntities(before: String)
 }

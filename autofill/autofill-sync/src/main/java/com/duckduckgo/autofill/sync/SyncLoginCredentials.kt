@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.sync
+package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
-import com.duckduckgo.autofill.store.sync.LoginCredentialsSyncDao
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
@@ -28,6 +25,10 @@ import javax.inject.Inject
 class SyncLoginCredentials @Inject constructor(
     private val dao: LoginCredentialsSyncDao,
 ) {
+    fun add(entity: LoginCredentialsSync): Long {
+        return dao.insert(entity)
+    }
+
     fun getSyncId(id: Long): String {
         var syncId = dao.getSyncId(id)?.syncId
         if (syncId == null) {
@@ -36,6 +37,10 @@ class SyncLoginCredentials @Inject constructor(
             syncId = entity.syncId
         }
         return syncId
+    }
+
+    fun getLocalId(syncId: String): Long? {
+        return dao.getLocalId(syncId)
     }
 
     fun getRemovedEntitiesSince(since: String): List<LoginCredentialsSync> {
@@ -48,5 +53,9 @@ class SyncLoginCredentials @Inject constructor(
             syncId.deleted_at = DatabaseDateFormatter.iso8601()
             dao.insert(syncId)
         }
+    }
+
+    fun removeDeletedEntities(before: String) {
+        dao.removeDeletedEntities(before)
     }
 }

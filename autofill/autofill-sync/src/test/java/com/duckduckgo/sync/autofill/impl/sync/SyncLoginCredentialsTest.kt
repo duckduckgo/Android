@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.sync
+package com.duckduckgo.sync.autofill.impl.sync
 
-import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.autofill.store.AutofillDatabase
-import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
+import com.duckduckgo.autofill.sync.LoginCredentialsSync
+import com.duckduckgo.autofill.sync.SyncLoginCredentials
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RuntimeEnvironment
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -37,8 +35,7 @@ internal class SyncLoginCredentialsTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val db = Room.inMemoryDatabaseBuilder(RuntimeEnvironment.getApplication(), AutofillDatabase::class.java).allowMainThreadQueries().build()
-    private val dao = db.syncLoginCredentialsDao()
+    private val dao = FakeSyncLoginCredentialsDao()
 
     private val testee = SyncLoginCredentials(dao)
 

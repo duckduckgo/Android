@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.store.sync
+package com.duckduckgo.autofill.sync
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 interface AutofillSyncStore {
     var modifiedSince: String
 }
 
-class RealAutofillSyncStore constructor(private val context: Context) : AutofillSyncStore {
+@ContributesBinding(AppScope::class)
+class RealAutofillSyncStore @Inject constructor(private val context: Context) : AutofillSyncStore {
     override var modifiedSince: String
         get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_MODIFIED_SINCE, value) }

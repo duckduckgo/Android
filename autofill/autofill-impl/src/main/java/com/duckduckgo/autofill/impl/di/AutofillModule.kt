@@ -33,10 +33,9 @@ import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
-import com.duckduckgo.autofill.store.sync.AutofillSyncStore
-import com.duckduckgo.autofill.store.sync.LoginCredentialsSyncDao
-import com.duckduckgo.autofill.store.sync.RealAutofillSyncStore
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
+import com.duckduckgo.autofill.sync.LoginCredentialsSyncDao
+import com.duckduckgo.autofill.sync.SyncLoginCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.squareup.anvil.annotations.ContributesTo
@@ -44,14 +43,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.*
 
 @Module
 @ContributesTo(AppScope::class)
 class AutofillModule {
 
-    @Provides
-    fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
+    @Provides fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -63,8 +60,8 @@ class AutofillModule {
         return RealAutofillPrefsStore(context, internalTestUserChecker)
     }
 
-    @Provides
-    fun provideAutofillUrlMatcher(unicodeNormalizer: UrlUnicodeNormalizer): AutofillUrlMatcher = AutofillDomainNameUrlMatcher(unicodeNormalizer)
+    @Provides fun provideAutofillUrlMatcher(unicodeNormalizer: UrlUnicodeNormalizer): AutofillUrlMatcher =
+        AutofillDomainNameUrlMatcher(unicodeNormalizer)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -83,14 +80,6 @@ class AutofillModule {
         dispatcherProvider: DispatcherProvider,
     ): AutofillFeatureRepository {
         return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideAutofillSyncStore(
-        context: Context,
-    ): AutofillSyncStore {
-        return RealAutofillSyncStore(context = context)
     }
 
     @Provides

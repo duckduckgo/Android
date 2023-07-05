@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.store.sync
+package com.duckduckgo.autofill.sync.persister
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import java.util.*
+import com.duckduckgo.autofill.sync.LoginCredentialEntryResponse
+import com.duckduckgo.sync.api.engine.SyncMergeResult
 
-@Entity(tableName = "website_login_credentials_sync_meta")
-data class LoginCredentialsSync(
-    @PrimaryKey val syncId: String = UUID.randomUUID().toString(),
-    val id: Long,
-    var deleted_at: String? = null,
-)
+interface CredentialsMergeStrategy {
+    fun processEntries(entries: List<LoginCredentialEntryResponse>): SyncMergeResult<Boolean>
+}

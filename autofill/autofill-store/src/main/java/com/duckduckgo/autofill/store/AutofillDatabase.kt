@@ -20,8 +20,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
-import com.duckduckgo.autofill.store.sync.LoginCredentialsSyncDao
+import com.duckduckgo.autofill.sync.LoginCredentialsSync
+import com.duckduckgo.autofill.sync.LoginCredentialsSyncDao
 
 @Database(
     exportSchema = true,

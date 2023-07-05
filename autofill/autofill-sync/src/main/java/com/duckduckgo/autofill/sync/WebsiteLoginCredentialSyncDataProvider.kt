@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.sync
+package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.api.store.AutofillStore
-import com.duckduckgo.autofill.store.sync.AutofillSyncStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
@@ -29,12 +28,12 @@ import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class WebsiteLoginCredentialSyncDataProvider @Inject constructor(
@@ -56,10 +55,6 @@ class WebsiteLoginCredentialSyncDataProvider @Inject constructor(
         val request = formatUpdates(updates)
         Timber.d("Sync-autofill: request: $request")
         return request
-    }
-
-    override fun onSyncDisabled() {
-        autofillSyncStore.modifiedSince = "0"
     }
 
     private fun allContent(): List<LoginCredentialEntry> {
