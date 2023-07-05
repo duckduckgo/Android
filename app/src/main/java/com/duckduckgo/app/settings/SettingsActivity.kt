@@ -332,7 +332,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     val netPItemStatus = if (networkProtectionState == CONNECTED) {
                         CheckListItem.CheckItemStatus.ENABLED
                     } else {
-                        CheckListItem.CheckItemStatus.DISABLED
+                        CheckListItem.CheckItemStatus.WARNING
                     }
                     netpPSetting.setItemStatus(netPItemStatus)
                 }

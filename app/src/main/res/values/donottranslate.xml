@@ -28,8 +28,8 @@
     <string name="netpSettingsTitle">Network Protection</string>
     <string name="netpSettingsNeverEnabled">Secure your network connection</string>
     <string name="netpSettingsConnecting">Connecting</string>
-    <string name="netpSettingsConnected">Connected</string>
-    <string name="netpSettingsDisconnected">Disconnected</string>
+    <string name="netpSettingsConnected">Enabled</string>
+    <string name="netpSettingsDisconnected">Disabled</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
 
