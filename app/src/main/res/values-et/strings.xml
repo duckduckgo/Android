@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsHeadingSettings">Sätted</string>
-    <string name="settingsPermissionsSetting">Õigused ja privaatsus</string>
+    <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsAutofillLoginsSetting">Sisesta sisselogimisandmed automaatselt</string>
     <string name="settingsSyncSetting">Sünkrooni</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Load ja privaatsus</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Privaatne otsing</string>
+    <string name="privateSearchTitle">Private Search on lubatud</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search on sinu vaikeotsimootor, mille abil saad veebis otsida ilma, et sind jälgitaks.</string>
+    <string name="privateSearchHeadingSearchSettings">Otsingu seaded</string>
+    <string name="privateSearchAutocompleteToggle">Automaatselt täidetavad ettepanekud</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Rohkem otsingu seadeid</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Kohanda oma otsingukeelt, piirkonda ja muud</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Rohkem otsinguseadeid</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
+    <string name="webTrackingProtectionTitle">Veebijälgimise kaitse on lubatud</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei jälgi sind kunagi ja meie eesmärk on kaitsta sinu privaatsust nii palju kui võimalik. Me haldame ja arendame pidevalt kaitsekihte, et pidada sammu uute jälgimismeetoditega ja pakkuda palju kaitsemeetmeid, mida teised brauserid vaikimisi ei paku. <u><a href=\"\">Lisateave</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
+    <string name="cookiePopupProtectionDescription">Keelusta need hüpikaknad ja minimeeri küpsised</string>
+    <string name="cookiePopupProtectionEnabled">Lubatud</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Load</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Välimus</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="disabled">Keelatud</string>
