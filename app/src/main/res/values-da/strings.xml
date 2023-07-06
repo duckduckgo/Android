@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
     <string name="settingsHeadingSettings">Indstillinger</string>
-    <string name="settingsPermissionsSetting">Tilladelser og fortrolighed  </string>
+    <string name="settingsPermissionsSetting">Tilladelser</string>
     <string name="settingsAutofillLoginsSetting">Automatisk udfyldning ved login</string>
     <string name="settingsSyncSetting">Synkronisering</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Tilladelser og fortrolighed</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Privat søgning</string>
+    <string name="privateSearchTitle">Private Search er aktiveret</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search er din standardsøgemaskine, så du kan søge på nettet uden at blive sporet.</string>
+    <string name="privateSearchHeadingSearchSettings">Indstillinger for søgning</string>
+    <string name="privateSearchAutocompleteToggle">Vis forslag til Autoudfyld</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Flere indstillinger for søgning</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpas dit søgesprog, område med mere</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Flere indstillinger for søgning</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
+    <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet er aktiveret</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer dig aldrig, og vi bestræber os på at beskytte dit privatliv så meget som muligt. Vi vedligeholder og udvikler løbende beskyttelseslagene for at holde trit med nye sporingsmetoder og beskytter mod mange ting, som andre browsere ikke tilbyder som standard. <u><a href=\"\">Lær mere</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
+    <string name="cookiePopupProtectionDescription">Fjern disse pop op-beskeder og minimer cookies</string>
+    <string name="cookiePopupProtectionEnabled">Aktiveret</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Tilladelser</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">udseende</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokerer automatisk mange trackere. Med Global Privacy Control (GPC) kan du også bede deltagende websteder om at begrænse salg eller deling af dine personoplysninger med andre virksomheder. <u><a href=\"\">Få mere at vide</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokerer automatisk mange trackere. Med Global Privacy Control (GPC) kan du også bede deltagende websteder om at begrænse salg eller deling af dine personoplysninger med andre virksomheder. <u><a href=\"\">Få mere at vide</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Deaktiveret</string>
