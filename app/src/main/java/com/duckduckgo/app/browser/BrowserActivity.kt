@@ -168,11 +168,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    override fun onUserLeaveHint() {
-        launchFire()
-        super.onUserLeaveHint()
-    }
-
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
         super.onStop()
