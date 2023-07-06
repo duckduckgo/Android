@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.brokensite
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -114,14 +113,14 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             viewModel.onSubmitPressed(webViewVersion, description)
         }
 
-        val descTextWatcher = object: TextWatcher {
+        val descTextWatcher = object : TextWatcher {
             private var ignoreThisChange = false
             private val textMax = 2048
             override fun beforeTextChanged(
                 p0: CharSequence?,
                 p1: Int,
                 p2: Int,
-                p3: Int
+                p3: Int,
             ) {
             }
 
@@ -129,11 +128,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 p0: CharSequence?,
                 p1: Int,
                 p2: Int,
-                p3: Int
+                p3: Int,
             ) {
             }
 
-            @SuppressLint("StringFormatInvalid")
             override fun afterTextChanged(s: Editable) {
                 if (ignoreThisChange) return
                 ignoreThisChange = true // prevent infinite loop
