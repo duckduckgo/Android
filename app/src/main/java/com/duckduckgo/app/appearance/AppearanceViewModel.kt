@@ -19,11 +19,8 @@ package com.duckduckgo.app.appearance
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -34,7 +31,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -43,19 +40,16 @@ import timber.log.Timber
 class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
-    private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
         val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
-        val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
         val appIcon: AppIcon = AppIcon.DEFAULT,
     )
 
     sealed class Command {
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
-        data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
         object LaunchAppIcon : Command()
         object UpdateTheme : Command()
     }
@@ -63,24 +57,19 @@ class AppearanceViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
-    fun viewState(): StateFlow<ViewState> {
-        return viewState
-    }
-
-    fun commands(): Flow<Command> {
-        return command.receiveAsFlow()
-    }
-
-    fun onStartActivityCalled() {
+    fun viewState(): Flow<ViewState> = viewState.onStart {
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     theme = themingDataStore.theme,
                     appIcon = settingsDataStore.appIcon,
-                    selectedFireAnimation = settingsDataStore.selectedFireAnimation,
                 ),
             )
         }
+    }
+
+    fun commands(): Flow<Command> {
+        return command.receiveAsFlow()
     }
 
     fun userRequestedToChangeTheme() {
@@ -91,11 +80,6 @@ class AppearanceViewModel @Inject constructor(
     fun userRequestedToChangeIcon() {
         viewModelScope.launch { command.send(Command.LaunchAppIcon) }
         pixel.fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
-    }
-
-    fun userRequestedToChangeFireAnimation() {
-        viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
-        pixel.fire(AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
@@ -117,19 +101,6 @@ class AppearanceViewModel @Inject constructor(
                 DuckDuckGoTheme.SYSTEM_DEFAULT -> AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
-    }
-
-    fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
-        if (settingsDataStore.isCurrentlySelected(selectedFireAnimation)) {
-            Timber.v("User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
-            return
-        }
-        settingsDataStore.selectedFireAnimation = selectedFireAnimation
-        fireAnimationLoader.preloadSelectedAnimation()
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(selectedFireAnimation = selectedFireAnimation))
-        }
-        pixel.fire(AppPixelName.FIRE_ANIMATION_NEW_SELECTED, mapOf(Pixel.PixelParameter.FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
     }
 
     private fun currentViewState(): ViewState {

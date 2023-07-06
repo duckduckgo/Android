@@ -16,20 +16,16 @@
 
 package com.duckduckgo.app.appearance
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.settings.FireAnimationActivity
-import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.FireAnimation.HeroAbstract.getAnimationForIndex
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
@@ -40,6 +36,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(AppearanceScreenNoParams::class)
 class AppearanceActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppearanceViewModel by bindViewModel()
@@ -61,16 +58,9 @@ class AppearanceActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        viewModel.onStartActivityCalled()
-    }
-
     private fun configureUiEventHandlers() {
         binding.selectedThemeSetting.setClickListener { viewModel.userRequestedToChangeTheme() }
         binding.changeAppIconSetting.setOnClickListener { viewModel.userRequestedToChangeIcon() }
-        binding.selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
     }
 
     private fun observeViewModel() {
@@ -80,7 +70,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 viewState.let {
                     updateSelectedTheme(it.theme)
                     binding.changeAppIcon.setImageResource(it.appIcon.icon)
-                    updateSelectedFireAnimation(it.selectedFireAnimation)
                 }
             }.launchIn(lifecycleScope)
 
@@ -101,17 +90,11 @@ class AppearanceActivity : DuckDuckGoActivity() {
         binding.selectedThemeSetting.setSecondaryText(subtitle)
     }
 
-    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
-        val subtitle = getString(fireAnimation.nameResId)
-        binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
-    }
-
     private fun processCommand(it: Command) {
         when (it) {
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchThemeSettings -> launchThemeSelector(it.theme)
-            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
         }
     }
 
@@ -146,46 +129,5 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
-    }
-
-    private fun launchFireAnimationSelector(animation: FireAnimation) {
-        val currentAnimationOption = animation.getOptionIndex()
-
-        RadioListAlertDialogBuilder(this)
-            .setTitle(R.string.settingsSelectFireAnimationDialog)
-            .setOptions(
-                listOf(
-                    R.string.settingsHeroFireAnimation,
-                    R.string.settingsHeroWaterAnimation,
-                    R.string.settingsHeroAbstractAnimation,
-                    R.string.settingsNoneAnimation,
-                ),
-                currentAnimationOption,
-            )
-            .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave)
-            .setNegativeButton(R.string.cancel)
-            .addEventListener(
-                object : RadioListAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
-
-                        viewModel.onFireAnimationSelected(selectedAnimation)
-                    }
-
-                    override fun onRadioItemSelected(selectedItem: Int) {
-                        val selectedAnimation = selectedItem.getAnimationForIndex()
-                        if (selectedAnimation != FireAnimation.None) {
-                            startActivity(FireAnimationActivity.intent(baseContext, selectedAnimation))
-                        }
-                    }
-                },
-            )
-            .show()
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, AppearanceActivity::class.java)
-        }
     }
 }

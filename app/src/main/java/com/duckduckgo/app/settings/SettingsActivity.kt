@@ -27,19 +27,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.about.AboutDuckDuckGoActivity
-import com.duckduckgo.app.accessibility.AccessibilityActivity
-import com.duckduckgo.app.appearance.AppearanceActivity
+import com.duckduckgo.app.about.AboutScreenNoParams
+import com.duckduckgo.app.accessibility.AccessibilityScreenNoParams
+import com.duckduckgo.app.appearance.AppearanceScreenNoParams
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
-import com.duckduckgo.app.browser.webview.WebViewActivity
-import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity
+import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
+import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity
+import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
@@ -48,8 +49,10 @@ import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.INVALID
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
@@ -140,6 +143,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             setAsDefaultBrowserSetting.setClickListener { viewModel.onDefaultBrowserSettingClicked() }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
+            cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
             netpPSetting.setClickListener { viewModel.onNetPSettingClicked() }
@@ -149,10 +153,11 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
-            permissionsAndPrivacySetting.setClickListener { viewModel.onPermissionsAndPrivacySettingClicked() }
+            fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
+            permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
-            aboutSetting.setClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
+            aboutSetting.setClickListener { viewModel.onAboutSettingClicked() }
         }
 
         with(viewsMore) {
@@ -190,6 +195,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateWindowsSettings(it.windowsWaitlistState)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
+                    updateAutoconsent(it.isAutoconsentEnabled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -236,6 +242,16 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun updateAutoconsent(enabled: Boolean) {
+        if (enabled) {
+            viewsPrivacy.cookiePopupProtectionSetting.setSecondaryText(getString(R.string.cookiePopupProtectionEnabled))
+            viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.ENABLED)
+        } else {
+            viewsPrivacy.cookiePopupProtectionSetting.setSecondaryText(getString(R.string.cookiePopupProtectionDescription))
+            viewsPrivacy.cookiePopupProtectionSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+        }
+    }
+
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
@@ -252,10 +268,13 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchWindowsWaitlist -> launchWindowsWaitlistScreen()
             is Command.LaunchWindows -> launchWindowsScreen()
             is Command.LaunchSyncSettings -> launchSyncSettings()
-            is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchWebPage()
-            is Command.LaunchWebTrackingProtectionWebPage -> launchWebTrackingProtectionWebPage()
-            is Command.LaunchPermissionsAndPrivacyScreen -> launchPermissionsAndPrivacyScreen()
+            is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
+            is Command.LaunchWebTrackingProtectionScreen -> launchWebTrackingProtectionScreen()
+            is Command.LaunchCookiePopupProtectionScreen -> launchCookiePopupProtectionScreen()
+            is Command.LaunchFireButtonScreen -> launchFireButtonScreen()
+            is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
+            is Command.LaunchAboutScreen -> launchAboutScreen()
             null -> TODO()
         }
     }
@@ -313,7 +332,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     val netPItemStatus = if (networkProtectionState == CONNECTED) {
                         CheckListItem.CheckItemStatus.ENABLED
                     } else {
-                        CheckListItem.CheckItemStatus.DISABLED
+                        CheckListItem.CheckItemStatus.WARNING
                     }
                     netpPSetting.setItemStatus(netPItemStatus)
                 }
@@ -343,7 +362,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchAccessibilitySettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AccessibilityActivity.intent(this), options)
+        globalActivityStarter.start(this, AccessibilityScreenNoParams, options)
     }
 
     private fun launchEmailProtectionScreen(url: String) {
@@ -354,7 +373,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun launchEmailProtectionNotSupported() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(EmailProtectionUnsupportedActivity.intent(this), options)
+        globalActivityStarter.start(this, EmailProtectionUnsupportedScreenNoParams, options)
     }
 
     private fun launchMacOsScreen() {
@@ -373,23 +392,28 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchSyncSettings() {
-        globalActivityStarter.start(this, SyncActivityWithEmptyParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, SyncActivityWithEmptyParams, options)
     }
 
     private fun launchAppTPTrackersScreen() {
-        globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams, options)
     }
 
     private fun launchNetpManagementScreen() {
-        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams, options)
     }
 
     private fun launchNetpWaitlist() {
-        globalActivityStarter.start(this, NetPWaitlistScreenNoParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, NetPWaitlistScreenNoParams, options)
     }
 
     private fun launchAppTPOnboardingScreen() {
-        globalActivityStarter.start(this, AppTrackerOnboardingActivityWithEmptyParamsParams)
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, AppTrackerOnboardingActivityWithEmptyParamsParams, options)
     }
 
     private fun launchAddHomeScreenWidget() {
@@ -397,40 +421,42 @@ class SettingsActivity : DuckDuckGoActivity() {
         addWidgetLauncher.launchAddWidget(this)
     }
 
-    private fun launchPrivateSearchWebPage() {
-        startActivity(
-            WebViewActivity.intent(
-                this@SettingsActivity,
-                PRIVATE_SEARCH_WEB_LINK,
-                getString(R.string.settingsPrivateSearchTitle),
-            ),
-        )
-    }
-
-    private fun launchWebTrackingProtectionWebPage() {
-        startActivity(
-            WebViewActivity.intent(
-                this@SettingsActivity,
-                WEB_TRACKING_PROTECTION_WEB_LINK,
-                getString(R.string.settingsWebTrackingProtectionTitle),
-            ),
-        )
-    }
-
-    private fun launchPermissionsAndPrivacyScreen() {
+    private fun launchPrivateSearchScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(PermissionsAndPrivacyActivity.intent(this), options)
+        globalActivityStarter.start(this, PrivateSearchScreenNoParams, options)
+    }
+
+    private fun launchWebTrackingProtectionScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, WebTrackingProtectionScreenNoParams, options)
+    }
+
+    private fun launchCookiePopupProtectionScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(AutoconsentSettingsActivity.intent(this), options)
+    }
+
+    private fun launchFireButtonScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, FireButtonScreenNoParams, options)
+    }
+
+    private fun launchPermissionsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, PermissionsScreenNoParams, options)
     }
 
     private fun launchAppearanceScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AppearanceActivity.intent(this), options)
+        globalActivityStarter.start(this, AppearanceScreenNoParams, options)
+    }
+
+    private fun launchAboutScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, AboutScreenNoParams, options)
     }
 
     companion object {
-        private const val PRIVATE_SEARCH_WEB_LINK = "https://spreadprivacy.com/is-duckduckgo-a-good-search-engine/"
-        private const val WEB_TRACKING_PROTECTION_WEB_LINK = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/"
-
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
 
         fun intent(context: Context): Intent {

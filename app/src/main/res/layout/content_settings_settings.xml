@@ -50,10 +50,16 @@
         app:primaryText="@string/settingsAddHomeScreenWidget" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/permissionsAndPrivacySetting"
+        android:id="@+id/fireButtonSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsPermissionsAndPrivacySetting" />
+        app:primaryText="@string/settingsFireButton" />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/permissionsSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/settingsPermissionsSetting" />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/appearanceSetting"

@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
     <string name="settingsWebTrackingProtectionDescription">Aktiveret som standard</string>
     <string name="settingsHeadingSettings">Indstillinger</string>
-    <string name="settingsPermissionsAndPrivacySetting">Tilladelser og fortrolighed  </string>
+    <string name="settingsPermissionsSetting">Tilladelser og fortrolighed  </string>
     <string name="settingsAutofillLoginsSetting">Automatisk udfyldning ved login</string>
     <string name="settingsSyncSetting">Synkronisering</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Tilladelser og fortrolighed</string>
+    <string name="permissionsActivityTitle">Tilladelser og fortrolighed</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">udseende</string>

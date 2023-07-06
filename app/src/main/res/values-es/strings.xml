@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Protección de rastreo en la web</string>
     <string name="settingsWebTrackingProtectionDescription">Habilitado de forma predeterminada</string>
     <string name="settingsHeadingSettings">Ajustes</string>
-    <string name="settingsPermissionsAndPrivacySetting">Permisos y privacidad</string>
+    <string name="settingsPermissionsSetting">Permisos y privacidad</string>
     <string name="settingsAutofillLoginsSetting">Autocompletar inicios de sesión</string>
     <string name="settingsSyncSetting">Sincronizar</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Permisos y privacidad</string>
+    <string name="permissionsActivityTitle">Permisos y privacidad</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Apariencia</string>

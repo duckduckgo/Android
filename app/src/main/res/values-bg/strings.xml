@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsPermissionsAndPrivacySetting">Разрешения и поверителност</string>
+    <string name="settingsPermissionsSetting">Разрешения и поверителност</string>
     <string name="settingsAutofillLoginsSetting">Автоматично попълване на данни за вход</string>
     <string name="settingsSyncSetting">Синхронизиране</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Разрешения и поверителност</string>
+    <string name="permissionsActivityTitle">Разрешения и поверителност</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Външен вид</string>

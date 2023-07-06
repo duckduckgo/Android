@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsHeadingSettings">Iestatījumi</string>
-    <string name="settingsPermissionsAndPrivacySetting">Atļaujas un privātums</string>
+    <string name="settingsPermissionsSetting">Atļaujas un privātums</string>
     <string name="settingsAutofillLoginsSetting">Automātiski aizpildīt pieteikšanās datus</string>
     <string name="settingsSyncSetting">Sinhronizēt</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Atļaujas un privātums</string>
+    <string name="permissionsActivityTitle">Atļaujas un privātums</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izskats</string>

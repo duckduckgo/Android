@@ -20,7 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -37,7 +36,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -59,9 +57,6 @@ internal class AppearanceViewModelTest {
     private lateinit var mockAppSettingsDataStore: SettingsDataStore
 
     @Mock
-    private lateinit var mockFireAnimationLoader: FireAnimationLoader
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     @Before
@@ -75,21 +70,17 @@ internal class AppearanceViewModelTest {
         testee = AppearanceViewModel(
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
-            mockFireAnimationLoader,
             mockPixel,
         )
     }
 
     @Test
-    fun whenOnStartActivityCalledThenViewStateEmittedWithDefaultValues() = runTest {
-        testee.onStartActivityCalled()
-
+    fun whenInitialisedThenViewStateEmittedWithDefaultValues() = runTest {
         testee.viewState().test {
             val value = awaitItem()
 
             assertEquals(DuckDuckGoTheme.SYSTEM_DEFAULT, value.theme)
             assertEquals(AppIcon.DEFAULT, value.appIcon)
-            assertEquals(FireAnimation.HeroFire, value.selectedFireAnimation)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -122,24 +113,6 @@ internal class AppearanceViewModelTest {
 
             cancelAndConsumeRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenFireAnimationSettingClickedThenCommandIsLaunchFireAnimationSettings() = runTest {
-        testee.commands().test {
-            testee.userRequestedToChangeFireAnimation()
-
-            assertEquals(Command.LaunchFireAnimationSettings(FireAnimation.HeroFire), awaitItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenFireAnimationSettingClickedThenPixelSent() {
-        testee.userRequestedToChangeFireAnimation()
-
-        verify(mockPixel).fire(AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
     @Test
@@ -192,61 +165,8 @@ internal class AppearanceViewModelTest {
         }
     }
 
-    @Test
-    fun whenNewFireAnimationSelectedThenUpdateViewState() = runTest {
-        val expectedAnimation = FireAnimation.HeroAbstract
-        testee.onFireAnimationSelected(expectedAnimation)
-
-        testee.viewState().test {
-            assertEquals(expectedAnimation, awaitItem().selectedFireAnimation)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNewFireAnimationSelectedThenStoreNewSelectedAnimation() {
-        testee.onFireAnimationSelected(FireAnimation.HeroWater)
-
-        verify(mockAppSettingsDataStore).selectedFireAnimation = FireAnimation.HeroWater
-    }
-
-    @Test
-    fun whenNewFireAnimationSelectedThenPreLoadAnimation() {
-        testee.onFireAnimationSelected(FireAnimation.HeroWater)
-
-        verify(mockFireAnimationLoader).preloadSelectedAnimation()
-    }
-
-    @Test
-    fun whenNewFireAnimationSelectedThenPixelSent() {
-        testee.onFireAnimationSelected(FireAnimation.HeroWater)
-
-        verify(mockPixel).fire(
-            AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
-            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL),
-        )
-    }
-
-    @Test
-    fun whenSameFireAnimationSelectedThenDoNotSendPixel() {
-        givenSelectedFireAnimation(FireAnimation.HeroFire)
-
-        testee.onFireAnimationSelected(FireAnimation.HeroFire)
-
-        verify(mockPixel, times(0)).fire(
-            AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
-            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO),
-        )
-    }
-
     private fun givenThemeSelected(theme: DuckDuckGoTheme) {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
-    }
-
-    private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
-        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
-        whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
     }
 }

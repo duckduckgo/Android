@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Veebijälgimise kaitse</string>
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsHeadingSettings">Sätted</string>
-    <string name="settingsPermissionsAndPrivacySetting">Õigused ja privaatsus</string>
+    <string name="settingsPermissionsSetting">Õigused ja privaatsus</string>
     <string name="settingsAutofillLoginsSetting">Sisesta sisselogimisandmed automaatselt</string>
     <string name="settingsSyncSetting">Sünkrooni</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Load ja privaatsus</string>
+    <string name="permissionsActivityTitle">Load ja privaatsus</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Välimus</string>

@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsHeadingSettings">Asetukset</string>
-    <string name="settingsPermissionsAndPrivacySetting">Käyttöoikeudet ja yksityisyys</string>
+    <string name="settingsPermissionsSetting">Käyttöoikeudet ja yksityisyys</string>
     <string name="settingsAutofillLoginsSetting">Täytä kirjautumistiedot automaattisesti</string>
     <string name="settingsSyncSetting">Synkronoi</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Käyttöoikeudet ja yksityisyys</string>
+    <string name="permissionsActivityTitle">Käyttöoikeudet ja yksityisyys</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Ulkoasu</string>

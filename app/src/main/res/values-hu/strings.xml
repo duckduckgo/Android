@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
-    <string name="settingsPermissionsAndPrivacySetting">Engedélyek és adatvédelem</string>
+    <string name="settingsPermissionsSetting">Engedélyek és adatvédelem</string>
     <string name="settingsAutofillLoginsSetting">Bejelentkezési adatok automatikus kitöltése</string>
     <string name="settingsSyncSetting">Szinkronizálás</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Engedélyek és adatvédelem</string>
+    <string name="permissionsActivityTitle">Engedélyek és adatvédelem</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Megjelenés</string>

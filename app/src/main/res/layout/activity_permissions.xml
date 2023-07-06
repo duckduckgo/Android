@@ -18,14 +18,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity">
+    tools:context="com.duckduckgo.app.permissions.PermissionsActivity">
 
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
     <include
-        android:id="@+id/includePermissionsAndPrivacy"
-        layout="@layout/content_permissions_and_privacy" />
+        android:id="@+id/includePermissions"
+        layout="@layout/content_permissions" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

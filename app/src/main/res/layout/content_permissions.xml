@@ -29,17 +29,26 @@
         android:orientation="vertical"
         android:paddingBottom="@dimen/keyline_5">
 
-        <include
-            android:id="@+id/contentPermissionsAndPrivacySectionPrivacy"
-            layout="@layout/content_permissions_and_privacy_section_privacy"
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:id="@+id/sitePermissions"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            app:primaryText="@string/settingsSitePermissions" />
 
-        <include
-            android:id="@+id/contentPermissionsAndPrivacySectionCustomize"
-            layout="@layout/content_permissions_and_privacy_section_customize"
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/notificationsSetting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsTitleNotifications"
+            app:primaryTextTruncated="false" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/appLinksSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/settingsTitleAppLinks"
+            app:primaryTextTruncated="false" />
 
     </LinearLayout>
 

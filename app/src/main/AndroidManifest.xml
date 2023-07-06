@@ -396,9 +396,24 @@
             android:exported="false"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.permissionsandprivacy.PermissionsAndPrivacyActivity"
+            android:name="com.duckduckgo.app.privatesearch.PrivateSearchActivity"
             android:exported="false"
-            android:label="@string/permissionsAndPrivacyActivityTitle"
+            android:label="@string/privateSearchActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity"
+            android:exported="false"
+            android:label="@string/webTrackingProtectionActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.firebutton.FireButtonActivity"
+            android:exported="false"
+            android:label="@string/fireButtonActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.permissions.PermissionsActivity"
+            android:exported="false"
+            android:label="@string/permissionsActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.appearance.AppearanceActivity"

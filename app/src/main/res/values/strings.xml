@@ -148,12 +148,12 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
     <string name="settingsHeadingSettings">Settings</string>
-    <string name="settingsPermissionsAndPrivacySetting">Permissions and Privacy</string>
+    <string name="settingsPermissionsSetting">Permissions</string>
     <string name="settingsAutofillLoginsSetting">Autofill Logins</string>
     <string name="settingsSyncSetting">Sync</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Permissions and Privacy</string>
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Permissions</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Appearance</string>
@@ -587,9 +587,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies. <u><a href="">Learn More</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automatically blocks many trackers. With Global Privacy Control (GPC), you can also ask participating websites to restrict selling or sharing your personal data with other companies. <u><a href="">Learn More</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Disabled</string>

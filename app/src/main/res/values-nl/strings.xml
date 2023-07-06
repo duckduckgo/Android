@@ -149,12 +149,12 @@
     <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
     <string name="settingsHeadingSettings">Instellingen</string>
-    <string name="settingsPermissionsAndPrivacySetting">Toestemmingen en privacy</string>
+    <string name="settingsPermissionsSetting">Toestemmingen en privacy</string>
     <string name="settingsAutofillLoginsSetting">Login met automatisch invullen</string>
     <string name="settingsSyncSetting">Synchroniseren</string>
 
     <!-- Permissions and Privacy -->
-    <string name="permissionsAndPrivacyActivityTitle">Toestemmingen en privacy</string>
+    <string name="permissionsActivityTitle">Toestemmingen en privacy</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Uiterlijk</string>
