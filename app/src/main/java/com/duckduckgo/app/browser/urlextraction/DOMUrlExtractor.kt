@@ -31,12 +31,12 @@ class JsUrlExtractor : DOMUrlExtractor {
     private val javaScriptDetector = JavaScriptDetector()
 
     override fun addUrlExtraction(webView: WebView, onUrlExtracted: (extractedUrl: String?) -> Unit) {
-        webView.addJavascriptInterface(UrlExtractionJavascriptInterface(onUrlExtracted), URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME)
+        // webView.addJavascriptInterface(UrlExtractionJavascriptInterface(onUrlExtracted), URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME)
     }
 
     @UiThread
     override fun injectUrlExtractionJS(webView: WebView) {
-        webView.evaluateJavascript("javascript:${javaScriptDetector.getUrlExtractionJS(webView.context)}", null)
+        // webView.evaluateJavascript("javascript:${javaScriptDetector.getUrlExtractionJS(webView.context)}", null)
     }
 
     private class JavaScriptDetector {

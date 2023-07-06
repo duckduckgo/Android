@@ -42,20 +42,20 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
         webView: WebView,
         url: String?,
     ) {
-        coroutineScope.launch(dispatchers.io()) {
-            if (canJsBeInjected(url)) {
-                Timber.v("Injecting autofill JS into WebView for %s", url)
-
-                val rawJs = javascriptInjector.getFunctionsJS()
-                val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
-
-                withContext(dispatchers.main()) {
-                    webView.evaluateJavascript("javascript:$formatted", null)
-                }
-            } else {
-                Timber.v("Won't inject autofill JS into WebView for: %s", url)
-            }
-        }
+        // coroutineScope.launch(dispatchers.io()) {
+        //     if (canJsBeInjected(url)) {
+        //         Timber.v("Injecting autofill JS into WebView for %s", url)
+        //
+        //         val rawJs = javascriptInjector.getFunctionsJS()
+        //         val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
+        //
+        //         withContext(dispatchers.main()) {
+        //             webView.evaluateJavascript("javascript:$formatted", null)
+        //         }
+        //     } else {
+        //         Timber.v("Won't inject autofill JS into WebView for: %s", url)
+        //     }
+        // }
     }
 
     private suspend fun canJsBeInjected(url: String?): Boolean {

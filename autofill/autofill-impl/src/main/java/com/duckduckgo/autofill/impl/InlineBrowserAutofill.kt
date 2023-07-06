@@ -39,11 +39,11 @@ class InlineBrowserAutofill @Inject constructor(
     ) {
         Timber.v("Injecting BrowserAutofill interface")
         // Adding the interface regardless if the feature is available or not
-        webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
-        autofillInterface.webView = webView
-        autofillInterface.callback = callback
-        autofillInterface.autoSavedLoginsMonitor = autoSavedLoginsMonitor
-        autofillInterface.tabId = tabId
+        // webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
+        // autofillInterface.webView = webView
+        // autofillInterface.callback = callback
+        // autofillInterface.autoSavedLoginsMonitor = autoSavedLoginsMonitor
+        // autofillInterface.tabId = tabId
     }
 
     override fun removeJsInterface() {

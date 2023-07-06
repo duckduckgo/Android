@@ -54,7 +54,7 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
         webView: WebView,
         onLoginDetected: () -> Unit,
     ) {
-        webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
+        // webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
     }
 
     @UiThread
@@ -85,12 +85,12 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
 
     @UiThread
     private fun scanForPasswordFields(webView: WebView) {
-        webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
+        // webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
     }
 
     @UiThread
     private fun injectLoginFormDetectionJS(webView: WebView) {
-        webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormEventsDetector(webView.context)}", null)
+        // webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormEventsDetector(webView.context)}", null)
     }
 
     private class JavaScriptDetector {

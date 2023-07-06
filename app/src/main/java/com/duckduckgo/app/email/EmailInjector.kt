@@ -58,10 +58,10 @@ class EmailInjectorJs(
         onTooltipShown: () -> Unit,
     ) {
         // We always add the interface irrespectively if the feature is enabled or not
-        webView.addJavascriptInterface(
-            EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, autofillFeature, autofill, onTooltipShown),
-            JAVASCRIPT_INTERFACE_NAME,
-        )
+        // webView.addJavascriptInterface(
+        //     EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, autofillFeature, autofill, onTooltipShown),
+        //     JAVASCRIPT_INTERFACE_NAME,
+        // )
     }
 
     @UiThread
@@ -72,7 +72,7 @@ class EmailInjectorJs(
     ) {
         url?.let {
             if (isFeatureEnabled() && !autofill.isAnException(url)) {
-                webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+                // webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
             }
         }
     }
@@ -84,7 +84,7 @@ class EmailInjectorJs(
     ) {
         url?.let {
             if (isFeatureEnabled() && isDuckDuckGoUrl(url) && !emailManager.isSignedIn()) {
-                webView.evaluateJavascript("javascript:${javaScriptInjector.getSignOutFunctions(webView.context)}", null)
+                // webView.evaluateJavascript("javascript:${javaScriptInjector.getSignOutFunctions(webView.context)}", null)
             }
         }
     }
