@@ -186,6 +186,8 @@
     <string name="brokenSiteCategoryUnsupported">Browseren er inkompatibel</string>
     <string name="brokenSiteCategoryOther">Noget andet</string>
     <string name="brokenSiteDescriptionTextInputHint">Hvis du vil, kan du fortælle os om det problem, du oplevede</string>
+    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
+    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bogmærker</string>

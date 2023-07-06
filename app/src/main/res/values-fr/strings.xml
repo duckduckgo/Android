@@ -186,6 +186,8 @@
     <string name="brokenSiteCategoryUnsupported">Le navigateur est incompatible</string>
     <string name="brokenSiteCategoryOther">Autre</string>
     <string name="brokenSiteDescriptionTextInputHint">Si vous le souhaitez, vous pouvez nous en dire plus au sujet du problème rencontré</string>
+    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
+    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>

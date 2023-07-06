@@ -186,6 +186,8 @@
     <string name="brokenSiteCategoryUnsupported">Selain ei ole yhteensopiva</string>
     <string name="brokenSiteCategoryOther">Jotain muuta</string>
     <string name="brokenSiteDescriptionTextInputHint">Jos haluat, kerro meille ongelmasta</string>
+    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
+    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>

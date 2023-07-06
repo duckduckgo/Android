@@ -186,6 +186,8 @@
     <string name="brokenSiteCategoryUnsupported">Pārlūks nav saderīgs</string>
     <string name="brokenSiteCategoryOther">Kaut kas cits</string>
     <string name="brokenSiteDescriptionTextInputHint">Ja vēlies, pastāsti mums par savu problēmu</string>
+    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
+    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>

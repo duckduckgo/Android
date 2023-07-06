@@ -186,6 +186,8 @@
     <string name="brokenSiteCategoryUnsupported">Webbläsaren är inte kompatibel</string>
     <string name="brokenSiteCategoryOther">Övrigt</string>
     <string name="brokenSiteDescriptionTextInputHint">Om du vill kan du berätta mer om det problem som du har stött på</string>
+    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
+    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmärken</string>

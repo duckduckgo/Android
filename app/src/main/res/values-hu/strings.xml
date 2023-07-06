@@ -186,6 +186,8 @@
     <string name="brokenSiteCategoryUnsupported">A böngésző nem kompatibilis</string>
     <string name="brokenSiteCategoryOther">Valami más</string>
     <string name="brokenSiteDescriptionTextInputHint">Ha szeretnéd, írd le részletesebben a problémát</string>
+    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
+    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>
