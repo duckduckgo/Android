@@ -79,10 +79,26 @@
             app:editable="true"
             app:type="multi_line"
             android:minLines="3"
-            android:maxLength="2000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/categoriesSelection" />
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/brokenSiteCharCounter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:paddingStart="@dimen/keyline_2"
+            android:paddingEnd="@dimen/keyline_2"
+            android:gravity="end"
+            android:text="@string/brokenSiteDescriptionCounterStarterText"
+            app:textType="secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brokenSiteFormFeedbackInput"
+            app:typography="body2" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/submitButton"
@@ -91,9 +107,9 @@
             android:layout_marginTop="@dimen/keyline_4"
             android:text="@string/brokenSiteSubmitButton"
             app:buttonSize="large"
-            app:layout_constraintEnd_toEndOf="@id/brokenSiteFormFeedbackInput"
-            app:layout_constraintStart_toStartOf="@id/brokenSiteFormFeedbackInput"
-            app:layout_constraintTop_toBottomOf="@id/brokenSiteFormFeedbackInput" />
+            app:layout_constraintEnd_toEndOf="@id/brokenSiteCharCounter"
+            app:layout_constraintStart_toStartOf="@id/brokenSiteCharCounter"
+            app:layout_constraintTop_toBottomOf="@id/brokenSiteCharCounter" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
