@@ -66,6 +66,7 @@
         </FrameLayout>
 
         <FrameLayout
+            android:visibility="gone"
             android:id="@+id/fireIconMenuMockup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -76,7 +77,7 @@
             app:layout_constraintEnd_toStartOf="@id/tabsMenuMockup"
             app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
             app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
             <ImageView
                 android:id="@+id/fireIconImageViewMockup"
@@ -90,6 +91,7 @@
         </FrameLayout>
 
         <com.duckduckgo.app.browser.TabSwitcherButton
+            android:visibility="gone"
             android:id="@+id/tabsMenuMockup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
