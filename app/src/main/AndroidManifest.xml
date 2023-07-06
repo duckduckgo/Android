@@ -295,196 +295,196 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.duckduckgo.app.tabs.ui.TabSwitcherActivity"
-            android:exported="false"
-            android:label="@string/tabActivityTitle" />
-        <activity
-            android:name="com.duckduckgo.app.settings.SettingsActivity"
-            android:exported="true"
-            android:label="@string/settingsActivityTitle"
-            android:parentActivityName=".BrowserActivity">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
-            android:exported="false"
-            android:label="@string/feedbackActivityTitle"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
-            android:exported="false"
-            android:label="@string/brokenSiteHeading"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
-            android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="false"
-            android:label="@string/surveyActivityTitle"
-            android:parentActivityName=".BrowserActivity"
-            android:theme="@style/Theme.DuckDuckGo.Survey" />
-        <activity
-            android:name="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity"
-            android:exported="false"
-            android:label="@string/addWidgetInstructionsActivityTitle"
-            android:theme="@style/Theme.DuckDuckGo.Survey" />
-        <activity
-            android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"
-            android:exported="false"
-            android:label="@string/aboutActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
-            android:exported="false"
-            android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
-        <activity
-            android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
-            android:exported="false"
-            android:label="@string/fireproofWebsitesActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.sitepermissions.SitePermissionsActivity"
-            android:exported="false"
-            android:label="@string/settingsSitePermissions"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity"
-            android:exported="false"
-            android:parentActivityName="com.duckduckgo.app.sitepermissions.SitePermissionsActivity" />
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.tabs.ui.TabSwitcherActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/tabActivityTitle" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.settings.SettingsActivity"-->
+<!--            android:exported="true"-->
+<!--            android:label="@string/settingsActivityTitle"-->
+<!--            android:parentActivityName=".BrowserActivity">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/feedbackActivityTitle"-->
+<!--            android:windowSoftInputMode="adjustResize" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/brokenSiteHeading"-->
+<!--            android:parentActivityName=".BrowserActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.survey.ui.SurveyActivity"-->
+<!--            android:configChanges="keyboardHidden|orientation|screenSize"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/surveyActivityTitle"-->
+<!--            android:parentActivityName=".BrowserActivity"-->
+<!--            android:theme="@style/Theme.DuckDuckGo.Survey" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/addWidgetInstructionsActivityTitle"-->
+<!--            android:theme="@style/Theme.DuckDuckGo.Survey" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.about.AboutDuckDuckGoActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/aboutActivityTitle"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/bookmarksActivityTitle"-->
+<!--            android:parentActivityName=".BrowserActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/fireproofWebsitesActivityTitle"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.sitepermissions.SitePermissionsActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/settingsSitePermissions"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteActivity"-->
+<!--            android:exported="false"-->
+<!--            android:parentActivityName="com.duckduckgo.app.sitepermissions.SitePermissionsActivity" />-->
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:exported="false"
             android:theme="@style/Theme.DuckDuckGo.Dark"
             android:process="@string/fireProcessName" />
-        <activity
-            android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"
-            android:exported="false"
-            android:label="@string/changeIconActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.privacy.ui.WhitelistActivity"
-            android:exported="false"
-            android:label="@string/whitelistActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"
-            android:exported="false"
-            android:label="@string/globalPrivacyControlActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.accessibility.AccessibilityActivity"
-            android:exported="false"
-            android:label="@string/accessibilityActivityTitle"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity"
-            android:exported="false"
-            android:label="@string/emailProtectionActivityTitle"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.duckduckgo.app.settings.FireAnimationActivity"
-            android:exported="false"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
-        <activity
-            android:name="com.duckduckgo.app.browser.webview.WebViewActivity"
-            android:exported="false"
-            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
-        <activity
-            android:name="com.duckduckgo.app.WidgetThemeConfiguration"
-            android:exported="false"
-            android:label="@string/widgetConfigurationActivityTitle"
-            android:theme="@style/Theme.DuckDuckGo.Light">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/changeIconActivityTitle"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.privacy.ui.WhitelistActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/whitelistActivityTitle"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/globalPrivacyControlActivityTitle"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.accessibility.AccessibilityActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/accessibilityActivityTitle"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/emailProtectionActivityTitle"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"-->
+<!--            tools:ignore="LockedOrientationActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.settings.FireAnimationActivity"-->
+<!--            android:exported="false"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"-->
+<!--            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.browser.webview.WebViewActivity"-->
+<!--            android:exported="false"-->
+<!--            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />-->
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.WidgetThemeConfiguration"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/widgetConfigurationActivityTitle"-->
+<!--            android:theme="@style/Theme.DuckDuckGo.Light">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
-        <activity
-            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"
-            android:exported="false"
-            android:label="@string/folderLocationTitle"
-            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/folderLocationTitle"-->
+<!--            android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />-->
 
-        <activity
-            android:name="com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity"
-            android:exported="false"
-            android:label="@string/voiceSearchTitle"
-            android:parentActivityName=".BrowserActivity" />
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/voiceSearchTitle"-->
+<!--            android:parentActivityName=".BrowserActivity" />-->
 
-        <activity
-            android:name="com.duckduckgo.app.downloads.DownloadsActivity"
-            android:exported="false"
-            android:label="@string/downloadsActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
+<!--        <activity-->
+<!--            android:name="com.duckduckgo.app.downloads.DownloadsActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/downloadsActivityTitle"-->
+<!--            android:parentActivityName=".BrowserActivity" />-->
 
-        <service
-            android:name="com.duckduckgo.app.job.AppConfigurationJobService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+<!--        <service-->
+<!--            android:name="com.duckduckgo.app.job.AppConfigurationJobService"-->
+<!--            android:exported="false"-->
+<!--            android:permission="android.permission.BIND_JOB_SERVICE" />-->
 
-        <service
-            android:name="com.duckduckgo.widget.FavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
+<!--        <service-->
+<!--            android:name="com.duckduckgo.widget.FavoritesWidgetService"-->
+<!--            android:exported="false"-->
+<!--            android:permission="android.permission.BIND_REMOTEVIEWS" />-->
 
-        <service
-            android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
+<!--        <service-->
+<!--            android:name="com.duckduckgo.widget.EmptyFavoritesWidgetService"-->
+<!--            android:exported="false"-->
+<!--            android:permission="android.permission.BIND_REMOTEVIEWS" />-->
 
-        <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />
+<!--        <service android:name="com.duckduckgo.app.notification.NotificationHandlerService" />-->
 
-        <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />
+<!--        <receiver android:name=".shortcut.ShortcutReceiver" android:exported="false" />-->
 
-        <receiver
-            android:name="com.duckduckgo.widget.SearchWidget"
-            android:exported="false"
-            android:label="@string/searchWidgetLabel">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/search_widget_info" />
-        </receiver>
+<!--        <receiver-->
+<!--            android:name="com.duckduckgo.widget.SearchWidget"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/searchWidgetLabel">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
+<!--            </intent-filter>-->
+<!--            <meta-data-->
+<!--                android:name="android.appwidget.provider"-->
+<!--                android:resource="@xml/search_widget_info" />-->
+<!--        </receiver>-->
 
-        <receiver
-            android:name="com.duckduckgo.widget.SearchWidgetLight"
-            android:exported="false"
-            android:label="@string/searchWidgetLabel">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/search_widget_info_light" />
-        </receiver>
+<!--        <receiver-->
+<!--            android:name="com.duckduckgo.widget.SearchWidgetLight"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/searchWidgetLabel">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
+<!--            </intent-filter>-->
+<!--            <meta-data-->
+<!--                android:name="android.appwidget.provider"-->
+<!--                android:resource="@xml/search_widget_info_light" />-->
+<!--        </receiver>-->
 
-        <receiver
-            android:name="com.duckduckgo.widget.SearchAndFavoritesWidget"
-            android:exported="false"
-            android:label="@string/favoritesWidgetLabel">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/search_favorites_widget_info" />
-        </receiver>
+<!--        <receiver-->
+<!--            android:name="com.duckduckgo.widget.SearchAndFavoritesWidget"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/favoritesWidgetLabel">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
+<!--            </intent-filter>-->
+<!--            <meta-data-->
+<!--                android:name="android.appwidget.provider"-->
+<!--                android:resource="@xml/search_favorites_widget_info" />-->
+<!--        </receiver>-->
 
-        <receiver
-            android:name="com.duckduckgo.widget.VoiceSearchWidgetUpdater"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.LOCALE_CHANGED" />
-            </intent-filter>
-        </receiver>
+<!--        <receiver-->
+<!--            android:name="com.duckduckgo.widget.VoiceSearchWidgetUpdater"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.LOCALE_CHANGED" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
 
     </application>
 

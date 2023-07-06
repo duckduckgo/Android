@@ -81,16 +81,16 @@ class AppShortcutCreator @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     fun configureAppShortcuts() {
-        appCoroutineScope.launch(dispatchers.io()) {
-            val shortcutList = mutableListOf<ShortcutInfo>()
-
-            shortcutList.add(buildNewTabShortcut(context))
-            shortcutList.add(buildClearDataShortcut(context))
-            shortcutList.add(buildBookmarksShortcut(context))
-
-            val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-            kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
-        }
+        // appCoroutineScope.launch(dispatchers.io()) {
+        //     val shortcutList = mutableListOf<ShortcutInfo>()
+        //
+        //     shortcutList.add(buildNewTabShortcut(context))
+        //     shortcutList.add(buildClearDataShortcut(context))
+        //     shortcutList.add(buildBookmarksShortcut(context))
+        //
+        //     val shortcutManager = context.getSystemService(ShortcutManager::class.java)
+        //     kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
+        // }
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
