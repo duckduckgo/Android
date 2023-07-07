@@ -93,8 +93,8 @@
             android:name="com.duckduckgo.app.launch.Launcher"
             android:enabled="true"
             android:exported="true"
-            android:icon="${appIcon}"
-            android:roundIcon="${appIconRound}"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher"
             android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
