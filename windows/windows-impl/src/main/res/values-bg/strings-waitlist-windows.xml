@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Споделяне на връзка</string>
     <string name="windows_share_text">Готови ли сте да започнете поверително сърфиране с Windows?\n\nПосетете този URL адрес на компютър с Windows, за да изтеглите:\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Търсите версията за Mac?</string>
+    <string name="windows_mac_link">Търсите версията за Mac?</string>
 </resources>

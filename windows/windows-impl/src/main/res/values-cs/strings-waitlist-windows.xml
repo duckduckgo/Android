@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Sdílet odkaz</string>
     <string name="windows_share_text">Cítíš se na to začít si ve Windows prohlížet web v naprostém soukromí?\n\nPro stažení přejdi v počítači s Windows sem:\nduckduckgo.com/windows.</string>
-    <string name="windows_waitlist_mac_link">Hledáš verzi pro Mac?</string>
+    <string name="windows_mac_link">Hledáš verzi pro Mac?</string>
 </resources>

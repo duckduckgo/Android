@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Podijeli poveznicu</string>
     <string name="windows_share_text">Jesi li spreman za privatno pregledavanje u sustavu Windows?\n\nPosjeti ovaj URL na svom Windows računalu za preuzimanje:\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Tražiš verziju za Mac?</string>
+    <string name="windows_mac_link">Tražiš verziju za Mac?</string>
 </resources>

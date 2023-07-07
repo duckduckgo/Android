@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Поделиться ссылкой</string>
     <string name="windows_share_text">Конфиденциальность в Интернете на Windows?\n\nЗагрузите наше приложение по ссылке: \nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Ищете версию для Mac?</string>
+    <string name="windows_mac_link">Ищете версию для Mac?</string>
 </resources>

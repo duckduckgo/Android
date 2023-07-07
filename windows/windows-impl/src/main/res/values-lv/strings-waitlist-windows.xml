@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Kopīgot saiti</string>
     <string name="windows_share_text">Vai esi gatavs sākt privātu pārlūkošanu operētājsistēmā Windows?\n\nApmeklē šo URL savā Windows datorā, lai lejupielādētu:\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Vai meklē Mac versiju?</string>
+    <string name="windows_mac_link">Vai meklē Mac versiju?</string>
 </resources>

@@ -113,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/keyline_4"
-                android:text="@string/windows_waitlist_mac_link"
+                android:text="@string/windows_mac_link"
                 app:buttonSize="small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

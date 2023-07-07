@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Udostępnij link</string>
     <string name="windows_share_text">Chcesz rozpocząć prywatne przeglądanie w systemie Windows?\n\nOdwiedź ten adres na komputerze z systemem Windows, aby pobrać:\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Szukasz wersji na komputer Mac?</string>
+    <string name="windows_mac_link">Szukasz wersji na komputer Mac?</string>
 </resources>

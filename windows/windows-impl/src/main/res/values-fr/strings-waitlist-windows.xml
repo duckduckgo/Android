@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Partager le lien</string>
     <string name="windows_share_text">Prêt(e) à naviguer incognito sur Windows ?\n\nAccédez à cette URL sur votre ordinateur Windows pour télécharger l\'application :\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Vous cherchez la version Mac ?</string>
+    <string name="windows_mac_link">Vous cherchez la version Mac ?</string>
 </resources>

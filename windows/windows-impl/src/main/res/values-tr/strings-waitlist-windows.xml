@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Bağlantıyı paylaş</string>
     <string name="windows_share_text">Windows\'ta özel olarak gezinmeye hazır mısınız?\n\nİndirmek için Windows bilgisayarınızda bu URL\'yi ziyaret edin:\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Mac Sürümünü mü arıyorsunuz?</string>
+    <string name="windows_mac_link">Mac Sürümünü mü arıyorsunuz?</string>
 </resources>

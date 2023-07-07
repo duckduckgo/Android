@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Partajează linkul</string>
     <string name="windows_share_text">Ești gata să începi să navighezi în mod privat folosind Windows?\n\nVizitează această adresă URL pe computerul tău Windows pentru a descărca:\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Cauți versiunea pentru Mac?</string>
+    <string name="windows_mac_link">Cauți versiunea pentru Mac?</string>
 </resources>

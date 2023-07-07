@@ -23,5 +23,5 @@
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Jaga linki</string>
     <string name="windows_share_text">Kas oled valmis Windowsis privaatseks sirvimiseks?\n\nAllalaadimiseks ava oma Windowsi arvutis see URL:\nhttps://duckduckgo.com/windows</string>
-    <string name="windows_waitlist_mac_link">Kas otsid Maci versiooni?</string>
+    <string name="windows_mac_link">Kas otsid Maci versiooni?</string>
 </resources>
