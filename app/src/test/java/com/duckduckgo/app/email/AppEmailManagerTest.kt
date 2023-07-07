@@ -26,7 +26,6 @@ import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -62,19 +61,11 @@ class AppEmailManagerTest {
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = FakeEmailDataStore()
     private val mockPixel: Pixel = mock()
-    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
     lateinit var testee: AppEmailManager
 
     @Before
     fun setup() {
-        testee = AppEmailManager(
-            mockEmailService,
-            mockEmailDataStore,
-            coroutineRule.testDispatcherProvider,
-            TestScope(),
-            mockPixel,
-            mockFeatureSegmentsManager,
-        )
+        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider, TestScope(), mockPixel)
     }
 
     @Test

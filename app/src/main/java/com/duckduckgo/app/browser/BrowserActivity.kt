@@ -63,7 +63,6 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -115,9 +114,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var featureSegmentsManager: FeatureSegmentsManager
 
     @Inject
     @AppCoroutineScope
@@ -427,7 +423,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
-            featureSegmentsManager = featureSegmentsManager,
         )
         dialog.clearStarted = {
             removeObservers()

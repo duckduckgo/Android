@@ -25,8 +25,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
@@ -66,7 +64,6 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
-    private val featureSegmentsManager: FeatureSegmentsManager,
 ) {
 
     suspend fun processAutofillCredentialSelectionResult(
@@ -247,7 +244,6 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
                 )?.id?.let { savedId ->
                     Timber.i("New login saved because no exact matches were found, with ID: $savedId")
                     autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
-                    featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
                 }
             }
         }

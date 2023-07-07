@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHan
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.AuthorizeEverything
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.CancelEverything
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.FailEverything
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
@@ -63,7 +62,6 @@ class AutofillCredentialsSelectionResultHandlerTest {
     private val declineCounter: AutofillDeclineCounter = mock()
     private val autofillStore: AutofillStore = mock()
     private val pixel: Pixel = mock()
-    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
     private val dummyFragment = Fragment()
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
     private lateinit var deviceAuthenticator: FakeAuthenticator
@@ -337,7 +335,6 @@ class AutofillCredentialsSelectionResultHandlerTest {
             autoSavedLoginsMonitor = autoSavedLoginsMonitor,
             existingCredentialMatchDetector = existingCredentialMatchDetector,
             dispatchers = coroutineTestRule.testDispatcherProvider,
-            featureSegmentsManager = mockFeatureSegmentsManager,
         )
     }
 

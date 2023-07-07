@@ -62,7 +62,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -145,9 +144,8 @@ class BrowserModule {
         defaultBrowserDetector: DefaultBrowserDetector,
         appInstallStore: AppInstallStore,
         pixel: Pixel,
-        featureSegmentsManager: FeatureSegmentsManager,
     ): MainProcessLifecycleObserver {
-        return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel, featureSegmentsManager)
+        return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
     }
 
     @SingleInstanceIn(AppScope::class)

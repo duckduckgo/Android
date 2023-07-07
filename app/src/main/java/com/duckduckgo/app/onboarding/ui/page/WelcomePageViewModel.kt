@@ -23,8 +23,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -35,7 +33,6 @@ class WelcomePageViewModel(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : ViewModel() {
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
@@ -71,7 +68,7 @@ class WelcomePageViewModel(
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             ),
         )
-        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.SET_AS_DEFAULT)
+
         emit(WelcomePageView.State.Finish)
     }
 
@@ -97,7 +94,6 @@ class WelcomePageViewModelFactory(
     private val context: Context,
     private val pixel: Pixel,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -108,7 +104,6 @@ class WelcomePageViewModelFactory(
                     context,
                     pixel,
                     defaultRoleBrowserDialog,
-                    featureSegmentsManager,
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

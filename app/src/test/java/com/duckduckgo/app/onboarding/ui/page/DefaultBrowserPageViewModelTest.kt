@@ -25,7 +25,6 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Compani
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Origin
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.ViewState.*
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
@@ -58,9 +57,6 @@ class DefaultBrowserPageViewModelTest {
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
 
-    @Mock
-    private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
-
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -69,7 +65,7 @@ class DefaultBrowserPageViewModelTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockFeatureSegmentsManager)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -95,7 +91,7 @@ class DefaultBrowserPageViewModelTest {
     fun whenInitializingIfThereIsADefaultBrowserThenShowSettingsUI() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
 
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockFeatureSegmentsManager)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
 
         assertTrue(viewState() is DefaultBrowserSettingsUI)
     }
@@ -104,7 +100,7 @@ class DefaultBrowserPageViewModelTest {
     fun whenInitializingIfThereIsNotADefaultBrowserThenShowDialogUI() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
 
-        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore, mockFeatureSegmentsManager)
+        testee = DefaultBrowserPageViewModel(mockDefaultBrowserDetector, mockPixel, mockInstallStore)
 
         assertTrue(viewState() is DefaultBrowserDialogUI)
     }
