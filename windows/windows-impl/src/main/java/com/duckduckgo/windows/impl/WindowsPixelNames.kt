@@ -19,8 +19,6 @@ package com.duckduckgo.windows.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class WindowsPixelNames(override val pixelName: String) : Pixel.PixelName {
-    WINDOWS_WAITLIST_NOTIFICATION_CANCELLED("m_notification_cancel_windows_waitlist"),
-    WINDOWS_WAITLIST_NOTIFICATION_SHOWN("m_notification_shown_windows_waitlist"),
     WINDOWS_WAITLIST_SHARE_PRESSED("m_windows_waitlist_did_press_share_button"),
     WINDOWS_WAITLIST_SHARE_SHARED("m_windows_waitlist_did_press_share_button_shared"),
 }
