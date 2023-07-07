@@ -30,10 +30,7 @@ import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
-import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
@@ -52,9 +49,11 @@ import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
+import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton.Visible
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
@@ -232,13 +231,13 @@ class BrowserTabViewModel @Inject constructor(
         val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
-        val fireButton: HighlightableButton = HighlightableButton.Visible(),
-        val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
+        val fireButton: HighlightableButton = Visible(),
+        val showMenuButton: HighlightableButton = Visible(),
         val canSharePage: Boolean = false,
         val canSaveSite: Boolean = false,
-        val bookmark: SavedSite.Bookmark? = null,
-        val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
-        val favorite: SavedSite.Favorite? = null,
+        val bookmark: Bookmark? = null,
+        val addFavorite: HighlightableButton = Visible(enabled = false),
+        val favorite: Favorite? = null,
         val canFireproofSite: Boolean = false,
         val isFireproofWebsite: Boolean = false,
         val canGoBack: Boolean = false,
@@ -255,6 +254,7 @@ class BrowserTabViewModel @Inject constructor(
         val forceRenderingTicker: Long = System.currentTimeMillis(),
         val canPrintPage: Boolean = false,
         val showAutofill: Boolean = false,
+        val browserError: WebViewErrorResponse = OMITTED
     )
 
     sealed class HighlightableButton {
@@ -939,7 +939,7 @@ class BrowserTabViewModel @Inject constructor(
             shouldMoveCaretToEnd = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
         )
-        browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false, browserError = OMITTED)
         autoCompleteViewState.value =
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
@@ -2858,6 +2858,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedError(errorType: WebViewErrorResponse) {
+        browserViewState.value = currentBrowserViewState().copy(browserError = errorType)
         command.postValue(WebViewError(errorType))
     }
 
