@@ -198,6 +198,13 @@
                 app:iconDrawable="@drawable/ic_feedback_16"
                 app:primaryText="@string/brokenSiteReportBrokenSiteMenuItem" />
 
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/openInDDG"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconDrawable="@drawable/ic_dax_icon"
+                app:primaryText="Open in DuckDuckGo" />
+
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                 android:id="@+id/settingsMenuDivider"
                 style="@style/Widget.DuckDuckGo.PopupMenuHorizontalDivider"

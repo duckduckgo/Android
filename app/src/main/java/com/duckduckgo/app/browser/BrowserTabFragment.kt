@@ -162,7 +162,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
@@ -198,9 +197,6 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
-import com.duckduckgo.mobile.android.ui.view.DaxDialog
-import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
-import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
@@ -218,13 +214,13 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.cancellable
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.cancellable
-import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -2869,6 +2865,9 @@ class BrowserTabFragment :
                 onMenuItemClicked(menuBinding.autofillMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_AUTOFILL_PRESSED)
                     viewModel.onAutofillMenuSelected()
+                }
+                onMenuItemClicked(menuBinding.openInDDG) {
+                    startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(viewModel.url)))
                 }
             }
             omnibar.browserMenu.setOnClickListener {
