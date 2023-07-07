@@ -29,7 +29,6 @@ fun Action.asBrowserTabCommand(): Command? {
         is PlayStore -> LaunchPlayStore(this.value)
         is Url -> SubmitUrl(this.value)
         is DefaultBrowser -> LaunchDefaultBrowser
-        is AppNavigation -> NavigateToScreen(this.intent)
         is AppTpOnboarding -> LaunchAppTPOnboarding
     }
 }

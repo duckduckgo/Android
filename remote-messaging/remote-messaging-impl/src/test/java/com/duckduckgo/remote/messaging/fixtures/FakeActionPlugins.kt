@@ -16,26 +16,14 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
-import android.content.Intent
-import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.api.JsonMessageAction
-import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.impl.mappers.DefaultBrowserActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.DismissActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.PlayStoreActionMapper
 import com.duckduckgo.remote.messaging.impl.mappers.UrlActionMapper
 
 val messageActionPlugins = listOf(
-    FakeAppNavigationMapper(),
     UrlActionMapper(),
     DismissActionMapper(),
     PlayStoreActionMapper(),
     DefaultBrowserActionMapper(),
 ).toSet()
-
-class FakeAppNavigationMapper : MessageActionMapperPlugin {
-    override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
-        if (jsonMessageAction.type != "appNavigation") return null
-        return Action.AppNavigation(Intent(), jsonMessageAction.value)
-    }
-}

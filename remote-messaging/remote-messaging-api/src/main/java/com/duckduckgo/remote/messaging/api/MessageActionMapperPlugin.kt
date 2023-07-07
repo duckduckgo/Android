@@ -30,6 +30,5 @@ sealed class JsonActionType(val jsonValue: String) {
     object PLAYSTORE : JsonActionType("playstore")
     object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
     object DISMISS : JsonActionType("dismiss")
-    object APP_NAVIGATION : JsonActionType("appNavigation")
     object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
 }

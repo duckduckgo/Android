@@ -26,11 +26,11 @@ import com.squareup.moshi.ToJson
 class ActionAdapter constructor(
     private val actionMappers: Set<MessageActionMapperPlugin>,
 ) {
-    @ToJson fun userProfileToJson(model: Action): ActionJson {
+    @ToJson fun actionToJson(model: Action): ActionJson {
         return ActionJson(model.actionType, model.value)
     }
 
-    @FromJson fun userProfileFromJson(json: ActionJson): Action {
+    @FromJson fun actionFromJson(json: ActionJson): Action {
         val type = mapTypeBackwardsCompatible(json.actionType)
         val jsonAction = JsonMessageAction(type, json.value)
         actionMappers.forEach {
