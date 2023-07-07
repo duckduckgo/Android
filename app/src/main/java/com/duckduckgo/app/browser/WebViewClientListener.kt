@@ -25,6 +25,8 @@ import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -37,7 +39,11 @@ interface WebViewClientListener {
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
-    fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>)
+    fun onSitePermissionRequested(
+        request: PermissionRequest,
+        sitePermissionsAllowedToAsk: Array<String>
+    )
+
     fun onSiteLocationPermissionRequested(
         origin: String,
         callback: GeolocationPermissions.Callback,
@@ -90,4 +96,5 @@ interface WebViewClientListener {
     fun prefetchFavicon(url: String)
     fun linkOpenedInNewTab(): Boolean
     fun isActiveTab(): Boolean
+    fun onReceivedError(errorType: WebViewErrorResponse)
 }

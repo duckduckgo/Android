@@ -30,7 +30,10 @@ import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
@@ -2434,7 +2437,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         command.value =
-            if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
+            if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxEndEnableAppTpCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2869,6 +2872,10 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         return false
+    }
+
+    override fun onReceivedError(errorType: WebViewErrorResponse) {
+        command.postValue(WebViewError(errorType))
     }
 
     fun onAutofillMenuSelected() {
