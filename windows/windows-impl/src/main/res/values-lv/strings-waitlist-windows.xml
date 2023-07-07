@@ -18,36 +18,10 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="windows_app">DuckDuckGo lietotne operētājsistēmai Windows</string>
-    <string name="windows_waitlist_title">Iegūsti agrīnu piekļuvi, lai izmēģinātu DuckDuckGo operētājsistēmai Windows!</string>
     <string name="windows_title">Iegūsti DuckDuckGo operētājsistēmai Windows!</string>
-    <string name="windows_waitlist_description">DuckDuckGo operētājsistēmai Windows sniedz visu, kas nepieciešams, lai pārlūkotu ar lielāku konfidencialitāti – privātu meklēšanu, izsekošanas bloķēšanu, piespiedu šifrēšanu un sīkfailu uznirstošo logu bloķēšanu, kā arī citas savā klasē labākās aizsardzības iespējas.</string>
     <string name="windows_description">DuckDuckGo operētājsistēmai Windows sniedz visu, kas nepieciešams, lai pārlūkotu ar lielāku konfidencialitāti – privātu meklēšanu, izsekošanas bloķēšanu, piespiedu šifrēšanu un sīkfailu uznirstošo logu bloķēšanu, kā arī citas savā klasē labākās aizsardzības iespējas.\n\nSavā Windows datorā dodies uz:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Kopīgot saiti</string>
     <string name="windows_share_text">Vai esi gatavs sākt privātu pārlūkošanu operētājsistēmā Windows?\n\nApmeklē šo URL savā Windows datorā, lai lejupielādētu:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Vai meklē Mac versiju?</string>
-    <string name="windows_join_waitlist">Pievienojies privātajam nogaides sarakstam</string>
-    <string name="windows_join_waitlist_error">Radās kļūda, pievienojoties nogaides sarakstam. Lūdzu, mēģini vēlāk vēlreiz.</string>
-    <string name="windows_waitlist_footer">Lai pievienotos gaidīšanas sarakstam, tev nav jādalās ar personisku informāciju. Tu ieņemsi vietu rindā, izmantojot laikspiedolu, kas pastāv tikai tavā ierīcē, lai mēs varētu tevi informēt, kad pienāks tava kārta.</string>
-
-    <string name="windows_waitlist_on_the_list_title">Tu esi sarakstā!</string>
-    <string name="windows_waitlist_on_the_list_notification_enabled">Mēs nosūtīsim tev paziņojumu, kad tavs DuckDuckGo Mac datoram būs gatavs lejupielādei.</string>
-    <string name="windows_waitlist_on_the_list_notification_disabled">Tavs uzaicinājums izmēģināt DuckDuckGo Mac datoram parādīsies šeit. Drīzumā ieskaties šeit vēlreiz, vai arī mēs varam tev nosūtīt paziņojumu, kad pienāks tava kārta.</string>
-
-    <string name="notification_channel_windows_waitlist">Gaidīšanas saraksta uzaicinājumi</string>
-    <string name="windows_notification_title">Sāc testēt DuckDuckGo operētājsistēmai Windows!</string>
-    <string name="windows_notification_text">Atver savu ielūgumu</string>
-
-    <string name="windows_waitlist_code_title">Tu esi uzaicināts(-ta)!</string>
-    <string name="windows_waitlist_code_invite">Uzaicinājuma kods</string>`
-    <string name="windows_waitlist_code_description">Vai esi gatavs izmantot DuckDuckGo operētājsistēmā Windows?\n\n<b>1. solis</b>\nLai lejupielādētu, savā Windows ierīcē apmeklē šo URL:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>2. solis</b>\nLejupielāžu sadaļā atver DuckDuckGo instalētāju, izvēlies Instalēt, pēc tam ievad uzaicinājuma kodu.</string>
-    <string name="windows_waitlist_code_share_text"><![CDATA[Vai esi gatavs izmantot DuckDuckGo operētājsistēmā Windows?<br/><br/><b>1. solis</b><br/>Lai lejupielādētu, savā Windows ierīcē apmeklē šo URL:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows.</b></a><br/><br/><b>2. solis</b><br/>Atver DuckDuckGo instalētāju lejupielāžu sadaļā, pēc tam ievadi uzaicinājuma kodu.<br/><br/>Uzaicinājuma kods: %1$s]]></string>
-
-    <string name="windows_waitlist_clipboard_invite_copied">Uzaicinājums ir nokopēts starpliktuvē</string>
-    <string name="windows_waitlist_clipboard_code_copied">Kopds ir nokopēts starpliktuvē</string>
-
-    <string name="windows_waitlist_share_invite">Kopīgo savu uzaicinājumu</string>
-
-    <string name="waitlistNotifyMeTitle">Uzzini uzreiz, kad esi uzaicināts</string>
-    <string name="waitlistNotifyMeSubtitle">Saņem paziņojumu, kad varēsi lejupielādēt DuckDuckGo operētājsistēmai Windows.</string>
 </resources>

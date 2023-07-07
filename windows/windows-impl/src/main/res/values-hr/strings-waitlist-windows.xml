@@ -18,36 +18,10 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="windows_app">Aplikacija DuckDuckGo za Windows</string>
-    <string name="windows_waitlist_title">Možeš dobiti rani pristup da isprobaš DuckDuckGo za Windows!</string>
     <string name="windows_title">Nabavi DuckDuckGo za Windows!</string>
-    <string name="windows_waitlist_description">DuckDuckGo za Windows ima sve što ti je potrebno za pregledavanje s više privatnosti - privatno pretraživanje, blokiranje praćenja, prisilno šifriranje i blokiranje skočnih prozora kolačića, a u skoroj budućnosti dodat ćemo još vrhunskih značajki zaštite.</string>
     <string name="windows_description">DuckDuckGo za Windows ima sve što ti je potrebno za pregledavanje s više privatnosti - privatno pretraživanje, blokiranje praćenja, prisilno šifriranje i blokiranje skočnih prozora kolačića, a u skoroj budućnosti dodat ćemo još vrhunskih značajki zaštite.\n\nNa računalu sa sustavom Windows idi na:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Podijeli poveznicu</string>
     <string name="windows_share_text">Jesi li spreman za privatno pregledavanje u sustavu Windows?\n\nPosjeti ovaj URL na svom Windows računalu za preuzimanje:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Tražiš verziju za Mac?</string>
-    <string name="windows_join_waitlist">Pridruži se privatnoj listi čekanja</string>
-    <string name="windows_join_waitlist_error">Došlo je do pogreške prilikom pridruživanja listi čekanja; pokušaj ponovno kasnije</string>
-    <string name="windows_waitlist_footer">Nećeš morati podijeliti nikakve osobne podatke za pridruživanje listi čekanja. Svoje ćeš mjesto osigurati u skladu s vremenskom oznakom koja postoji samo na tvom uređaju kako bismo te mogli obavijestiti kada na tebe dođe red.</string>
-
-    <string name="windows_waitlist_on_the_list_title">Na popisu si!</string>
-    <string name="windows_waitlist_on_the_list_notification_enabled">Poslat ćemo ti obavijest kad tvoj primjerak DuckDuckGoa za Windows bude spreman za preuzimanje.</string>
-    <string name="windows_waitlist_on_the_list_notification_disabled">Tvoja pozivnica da isprobaš DuckDuckGo za Windows stići će ovdje. Možeš ponovno provjeriti uskoro, ili ti možemo poslati obavijest kada dođeš na red.</string>
-
-    <string name="notification_channel_windows_waitlist">Pozivnice s liste čekanja</string>
-    <string name="windows_notification_title">Počni testirati DuckDuckGo za Windows!</string>
-    <string name="windows_notification_text">Otvori svoju pozivnicu</string>
-
-    <string name="windows_waitlist_code_title">Pozvani ste!</string>
-    <string name="windows_waitlist_code_invite">Pozivna šifra</string>`
-    <string name="windows_waitlist_code_description">Jesi li spreman na korištenje DuckDuckGoa u sustavu Windows?\n\n<b>1. korak</b>\nZa preuzimanje aplikacije, posjeti ovaj URL na uređaju sa sustavom Windows:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>2. korak</b>\nOtvori instalacijsku datoteku za DuckDuckGo pod Preuzimanja, odaberi Instaliraj, zatim unesi svoju pozivnu šifru.</string>
-    <string name="windows_waitlist_code_share_text"><![CDATA[Jesi li spreman na korištenje DuckDuckGoa u sustavu Windows?<br/><b>1. korak</b><br/>Za preuzimanje aplikacije, posjeti ovaj URL na uređaju sa sustavom Windows:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>2. korak</b><br/>Otvori instalacijsku datoteku za DuckDuckGo pod Preuzimanja, odaberi Instaliraj, zatim unesi svoju pozivnu šifru.<br/><br/>Pozivna šifra: %1$s]]></string>
-
-    <string name="windows_waitlist_clipboard_invite_copied">Pozivnica je kopirana u međuspremnik</string>
-    <string name="windows_waitlist_clipboard_code_copied">Šifra je kopirana u međuspremnik</string>
-
-    <string name="windows_waitlist_share_invite">Podijeli svoju pozivnicu</string>
-
-    <string name="waitlistNotifyMeTitle">Primi obavijest čim si pozvan</string>
-    <string name="waitlistNotifyMeSubtitle">Primi obavijest kad tvoj primjerak DuckDuckGoa za Windows bude spreman za preuzimanje.</string>
 </resources>

@@ -18,36 +18,10 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="windows_app">Εφαρμογή DuckDuckGo για Windows</string>
-    <string name="windows_waitlist_title">Αποκτήστε πρόωρη πρόσβαση για να δοκιμάσετε το DuckDuckGo για Windows!</string>
     <string name="windows_title">Αποκτήστε το DuckDuckGo για Windows!</string>
-    <string name="windows_waitlist_description">Το DuckDuckGo για Windows έχει ό,τι χρειάζεστε για να περιηγηθείτε με περισσότερη ιδιωτικότητα — ιδιωτική αναζήτηση, αποκλεισμός εφαρμογών παρακολούθησης, αναγκαστική κρυπτογράφηση και αποκλεισμός αναδυόμενων παραθύρων για cookie, ενώ έρχονται σύντομα και περισσότερες κορυφαίες προστασίες στην κατηγορία τους.</string>
     <string name="windows_description">Το DuckDuckGo για Windows έχει ό,τι χρειάζεστε για να περιηγηθείτε με περισσότερη ιδιωτικότητα — ιδιωτική αναζήτηση, αποκλεισμός εφαρμογών παρακολούθησης, αναγκαστική κρυπτογράφηση και αποκλεισμός αναδυόμενων παραθύρων για cookie, ενώ έρχονται σύντομα και περισσότερες κορυφαίες προστασίες στην κατηγορία τους.\n\nΣτον υπολογιστή σας με Windows, μεταβείτε στη διεύθυνση:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Κοινή χρήση συνδέσμου</string>
     <string name="windows_share_text">Είστε έτοιμοι να αρχίσετε μια ιδιωτική περιήγηση σε Windows;\n\nΕπισκεφθείτε αυτήν τη διεύθυνση URL στον υπολογιστή σας με Windows για να κάνετε λήψη:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Αναζητάτε την έκδοση των Mac;</string>
-    <string name="windows_join_waitlist">Εγγραφείτε στην Ιδιωτική λίστα αναμονής</string>
-    <string name="windows_join_waitlist_error">Προέκυψε σφάλμα κατά την εγγραφή στη Λίστα αναμονής. Ξαναπροσπαθήστε αργότερα.</string>
-    <string name="windows_waitlist_footer">Δεν θα χρειαστεί να κοινοποιήσετε προσωπικά στοιχεία για εγγραφή στη λίστα αναμονής. Θα εξασφαλίσετε τη θέση σας στην αναμονή βάσει χρονικής σήμανσης που υπάρχει αποκλειστικά στη συσκευή σας, ώστε να μπορούμε να σας ειδοποιήσουμε μόλις έρθει η σειρά σας.</string>
-
-    <string name="windows_waitlist_on_the_list_title">Είστε στη λίστα!</string>
-    <string name="windows_waitlist_on_the_list_notification_enabled">Θα σας στείλουμε ειδοποίηση όταν θα είναι έτοιμο προς λήψη το αντίγραφό σας DuckDuckGo για Windows.</string>
-    <string name="windows_waitlist_on_the_list_notification_disabled">Η πρόσκλησή σας για να δοκιμάσετε το DuckDuckGo για Windows θα σταλεί εδώ. Ελέγξτε πάλι σύντομα. Διαφορετικά, μπορούμε να σας στείλουμε ειδοποίηση όταν έρθει η σειρά σας.</string>
-
-    <string name="notification_channel_windows_waitlist">Προσκλήσεις για λίστα αναμονής</string>
-    <string name="windows_notification_title">Αρχίστε τη δοκιμή του DuckDuckGo για Windows!</string>
-    <string name="windows_notification_text">Ανοίξτε την πρόσκλησή σας</string>
-
-    <string name="windows_waitlist_code_title">Έχετε προσκληθεί!</string>
-    <string name="windows_waitlist_code_invite">Κωδικός πρόσκλησης</string>`
-    <string name="windows_waitlist_code_description">Είστε έτοιμοι να χρησιμοποιήσετε το DuckDuckGo σε Windows;\n\n<b> Βήμα 1</b>\nΕπισκεφτείτε αυτήν τη διεύθυνση URL στη συσκευή σας Windows για να πραγματοποιήσετε λήψη:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>Βήμα 2</b>\nΑνοίξτε το πρόγραμμα εγκατάστασης του DuckDuckGo στις Λήψεις, επιλέξτε Εγκατάσταση και έπειτα εισαγάγετε τον κωδικό πρόσκλησής σας.</string>
-    <string name="windows_waitlist_code_share_text"><![CDATA[Είστε έτοιμοι να χρησιμοποιήσετε το DuckDuckGo σε Windows; <br/><br/><b>Βήμα 1</b><br/>Επισκεφτείτε αυτήν τη διεύθυνση URL στη συσκευή σας Windows για να πραγματοποιήσετε λήψη:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>Βήμα 2</b><br/>Ανοίξτε το πρόγραμμα εγκατάστασης του DuckDuckGo στις Λήψεις, επιλέξτε Εγκατάσταση και έπειτα εισαγάγετε τον κωδικό πρόσκλησής σας.<br/><br/>Κωδικός πρόσκλησης: %1$s]]></string>
-
-    <string name="windows_waitlist_clipboard_invite_copied">Έγινε αντιγραφή της πρόσκλησης στο πρόχειρο</string>
-    <string name="windows_waitlist_clipboard_code_copied">Έγινε αντιγραφή του κωδικού στο πρόχειρο</string>
-
-    <string name="windows_waitlist_share_invite">Μοιραστείτε την πρόσκλησή σας</string>
-
-    <string name="waitlistNotifyMeTitle">Μάθετε ακριβώς πότε θα προσκληθείτε</string>
-    <string name="waitlistNotifyMeSubtitle">Λάβετε ειδοποίηση όταν θα είναι έτοιμο προς λήψη το αντίγραφό σας DuckDuckGo για Windows.</string>
 </resources>

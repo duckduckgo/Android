@@ -18,36 +18,10 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="windows_app">„DuckDuckGo“ programa, skirta „Windows“</string>
-    <string name="windows_waitlist_title">Gaukite ankstyvą prieigą ir išbandykite „DuckDuckGo“, skirtą „Windows“!</string>
     <string name="windows_title">Gaukite „DuckDuckGo“, skirtą „Windows“!</string>
-    <string name="windows_waitlist_description">„Windows“ skirta „DuckDuckGo“ turi viską, ko reikia norint naršyti dar privačiau – privačią paiešką, stebėjimo priemonių blokavimą, priverstinį šifravimą ir iššokančiųjų slapukų langų blokavimą bei dar daugiau geriausių savo klasėje apsaugos priemonių.</string>
     <string name="windows_description">„Windows“ skirta „DuckDuckGo“ turi viską, ko reikia norint naršyti dar privačiau – privačią paiešką, stebėjimo priemonių blokavimą, priverstinį šifravimą ir iššokančiųjų slapukų langų blokavimą bei dar daugiau geriausių savo klasėje apsaugos priemonių.\n\n„Windows“ kompiuteryje eikite į:</string>
     <string name="windows_description_link">duckduckgo.com/windows</string>
     <string name="windows_share_title">Bendrinti nuorodą</string>
     <string name="windows_share_text">Pasiruošę pradėti privačiai naršyti „Windows“?\n\nNorėdami atsisiųsti, „Windows“ kompiuteryje apsilankykite šiuo URL adresu:\nhttps://duckduckgo.com/windows</string>
     <string name="windows_waitlist_mac_link">Ieškote „Mac“ versijos?</string>
-    <string name="windows_join_waitlist">Prisijungti prie privataus laukimo sąrašo</string>
-    <string name="windows_join_waitlist_error">Prisijungiant prie laukimo sąrašo įvyko klaida, bandykite dar kartą vėliau</string>
-    <string name="windows_waitlist_footer">Jums nereikia dalintis savo asmenine informacija, kad prisijungtumėte prie laukiančiųjų sąrašo. Užsitikrinsite vietą eilėje laiko žyma, kuri egzistuoja tik jūsų įrenginyje, kad galėtumėte jus įspėti, kai ateis jūsų eilė.</string>
-
-    <string name="windows_waitlist_on_the_list_title">Jūs jau sąraše!</string>
-    <string name="windows_waitlist_on_the_list_notification_enabled">Atsiųsime jums pranešimą, kai jūsų „Mac“ skirta „DuckDuckGo“ kopija bus paruošta atsisiųsti.</string>
-    <string name="windows_waitlist_on_the_list_notification_disabled">Pakvietimą išbandyti „Mac“ skirtą „DuckDuckGo“ matysite čia. Netrukus patikrinkite arba galime jums atsiųsti pranešimą, kai bus jūsų eilė.</string>
-
-    <string name="notification_channel_windows_waitlist">Kvietimai į laukiančiųjų sąrašą</string>
-    <string name="windows_notification_title">Išbandykite „DuckDuckGo“, skirtą „Windows“!</string>
-    <string name="windows_notification_text">Atidaryti pakvietimą</string>
-
-    <string name="windows_waitlist_code_title">Esate pakviesti!</string>
-    <string name="windows_waitlist_code_invite">Pakvietimo kodas</string>`
-    <string name="windows_waitlist_code_description">Ar esate pasiruošę naudoti „DuckDuckGo“ sistemoje „Windows“?\n\n<b>1 veiksmas</b>\nNorėdami atsisiųsti, „Windows“ įrenginyje apsilankykite šiuo URL adresu:\n<b><annotation type="beta_link">duckduckgo.com/windows</annotation></b>\n\n<b>2 veiksmas</b>\nAtsidarykite „DuckDuckGo“ diegimo programą atsisiuntimų skiltyje, pasirinkite „Įdiegti“ ir įveskite pakvietimo kodą.</string>
-    <string name="windows_waitlist_code_share_text"><![CDATA[Ar esate pasirengę naudoti „DuckDuckGo“ sistemoje „Windows“?<br/><br/><b>1 veiksmas</b><br/>Norėdami atsisiųsti, „Windows“ įrenginyje apsilankykite šiuo URL adresu:<br/><a href=\"https://duckduckgo.com/windows\"><b>https://duckduckgo.com/windows</b></a><br/><br/><b>2 veiksmas</b><br/>Atsidarykite „DuckDuckGo“ diegimo programą atsisiuntimų skiltyje, pasirinkite „Įdiegti“ ir įveskite pakvietimo kodą.<br/><br/>Pakvietimo kodas: %1$s]]></string>
-
-    <string name="windows_waitlist_clipboard_invite_copied">Pakvietimas nukopijuotas į iškarpinę</string>
-    <string name="windows_waitlist_clipboard_code_copied">Kodas nukopijuotas į iškarpinę</string>
-
-    <string name="windows_waitlist_share_invite">Dalytis pakvietimu</string>
-
-    <string name="waitlistNotifyMeTitle">Sužinokite iš karto, kai esate pakviesti</string>
-    <string name="waitlistNotifyMeSubtitle">Gaukite pranešimą, kai jūsų „Windows“ skirta „DuckDuckGo“ kopija bus paruošta atsisiųsti.</string>
 </resources>
