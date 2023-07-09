@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Webes követés elleni védelem</string>
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
-    <string name="settingsPermissionsSetting">Engedélyek és adatvédelem</string>
+    <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsAutofillLoginsSetting">Bejelentkezési adatok automatikus kitöltése</string>
     <string name="settingsSyncSetting">Szinkronizálás</string>
+    <string name="settingsFireButton">Tűz gomb</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Engedélyek és adatvédelem</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">privát keresés</string>
+    <string name="privateSearchTitle">A Private Search engedélyezve van</string>
+    <string name="privateSearchDescription">A DuckDuckGo Private Search az alapértelmezett keresőmotor, így nyomon követés nélkül kereshetsz az interneten.</string>
+    <string name="privateSearchHeadingSearchSettings">Keresési beállítások</string>
+    <string name="privateSearchAutocompleteToggle">Automatikus kiegészítési javaslatok megjelenítése</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">További keresési beállítások</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Szabd személyre a keresési nyelvet, a régiót és egyebeket</string>
+    <string name="privateSearchMoreSearchSettingsTitle">További keresési beállítások</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
+    <string name="webTrackingProtectionTitle">A webes követés elleni védelem engedélyezve van</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[A DuckDuckGo soha nem követ, és igyekszünk a lehető legjobban védeni az adataid. Folyamatosan karbantartjuk és fejlesztjük a védelmi rétegeket, hogy lépést tartsunk az új követési módszerekkel, és számos olyan védelmet biztosítsunk, amelyet más böngészők nem kínálnak alapértelmezés szerint. <u><a href=\"\">További részletek</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
+    <string name="cookiePopupProtectionDescription">Szabadulj meg ezektől a felugró ablakoktól és minimalizáld a sütiket</string>
+    <string name="cookiePopupProtectionEnabled">Engedélyezve</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Tűz gomb</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Engedélyek</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Megjelenés</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="disabled">Letiltva</string>
