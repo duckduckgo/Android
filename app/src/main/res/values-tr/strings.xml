@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">Oturum açamıyorum</string>
     <string name="brokenSiteCategoryUnsupported">Tarayıcı uyumsuz</string>
     <string name="brokenSiteCategoryOther">Başka bir şey</string>
-    <string name="brokenSiteDescriptionTextInputHint">İsterseniz bize yaşadığınız sorun hakkında bilgi verin</string>
+    <string name="brokenSiteDescriptionTextInputHint">Daha fazla ayrıntı paylaşmak, bu sorunu çözmemize yardımcı olabilir</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
