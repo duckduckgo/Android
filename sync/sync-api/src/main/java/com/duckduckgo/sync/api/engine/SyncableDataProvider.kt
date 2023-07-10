@@ -24,10 +24,4 @@ interface SyncableDataProvider {
      * This data that will be sent to the Sync API
      */
     fun getChanges(): SyncChangesRequest
-
-    /**
-     * Sync Feature has been disabled / device has been removed
-     * This is an opportunity for Features to do some local cleanup if needed
-     */
-    fun onSyncDisabled()
 }

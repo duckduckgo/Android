@@ -62,18 +62,6 @@ class RealSyncStateMonitorTest {
     }
 
     @Test
-    fun whenUserSignedOffThenReturnFalse() = runTest {
-        whenever(syncStore.isSignedIn()).thenReturn(false)
-        Assert.assertFalse(testee.isUserSignedInOnDevice())
-    }
-
-    @Test
-    fun whenUserSignedInThenReturnTrue() = runTest {
-        whenever(syncStore.isSignedIn()).thenReturn(true)
-        Assert.assertTrue(testee.isUserSignedInOnDevice())
-    }
-
-    @Test
     fun whenSyncDisabledThenStateIsOff() = runTest {
         testee.syncState().test {
             val state = awaitItem()
