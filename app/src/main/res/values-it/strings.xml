@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Protezione dal tracciamento web</string>
     <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsHeadingSettings">Impostazioni</string>
-    <string name="settingsPermissionsSetting">Autorizzazioni e privacy</string>
+    <string name="settingsPermissionsSetting">Autorizzazioni</string>
     <string name="settingsAutofillLoginsSetting">Compilazione automatica dei dati di accesso</string>
     <string name="settingsSyncSetting">Sincronizzazione</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Autorizzazioni e privacy</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Ricerca privata</string>
+    <string name="privateSearchTitle">Private Search è abilitato</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search è il tuo motore di ricerca predefinito, quindi puoi effettuare ricerche sul Web senza essere tracciato.</string>
+    <string name="privateSearchHeadingSearchSettings">Impostazioni di ricerca</string>
+    <string name="privateSearchAutocompleteToggle">Mostra suggerimenti di completamento automatico</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Altre impostazioni di ricerca</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizza la lingua di ricerca, la regione e altro ancora</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Altre impostazioni di ricerca</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Protezione dal tracciamento web</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Protezione dal tracciamento web</string>
+    <string name="webTrackingProtectionTitle">La protezione dal tracciamento Web è abilitata</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo non tiene mai traccia delle tue azioni e protegge la tua privacy il più possibile. Manteniamo e sviluppiamo continuamente livelli di protezione per stare al passo con i nuovi metodi di tracciamento e forniamo in modalità predefinita molte protezioni che altri browser non offrono. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Protezione pop-up dei cookie</string>
+    <string name="cookiePopupProtectionDescription">Elimina questi pop-up e riduci al minimo i cookie</string>
+    <string name="cookiePopupProtectionEnabled">Attivato</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Autorizzazioni</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aspetto</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blocca automaticamente molti sistemi di tracciamento. Con la funzione Global Privacy Control (GPC), puoi anche chiedere ai siti web aderenti di impedire la vendita o la condivisione dei tuoi dati personali con altre aziende. <u><a href=\"\">Ulteriori informazioni</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blocca automaticamente molti sistemi di tracciamento. Con la funzione Global Privacy Control (GPC), puoi anche chiedere ai siti web aderenti di impedire la vendita o la condivisione dei tuoi dati personali con altre aziende. <u><a href=\"\">Ulteriori informazioni</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Disattivato</string>

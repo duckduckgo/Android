@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Protección de rastreo en la web</string>
     <string name="settingsWebTrackingProtectionDescription">Habilitado de forma predeterminada</string>
     <string name="settingsHeadingSettings">Ajustes</string>
-    <string name="settingsPermissionsSetting">Permisos y privacidad</string>
+    <string name="settingsPermissionsSetting">Permisos</string>
     <string name="settingsAutofillLoginsSetting">Autocompletar inicios de sesión</string>
     <string name="settingsSyncSetting">Sincronizar</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Permisos y privacidad</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Búsqueda Privada</string>
+    <string name="privateSearchTitle">La búsqueda privada está habilitada</string>
+    <string name="privateSearchDescription">La búsqueda privada de DuckDuckGo es tu motor de búsqueda predeterminado para que puedas buscar en la web sin que te rastreen.</string>
+    <string name="privateSearchHeadingSearchSettings">Configuración de búsqueda</string>
+    <string name="privateSearchAutocompleteToggle">Sugerencias de autocompletado</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Más opciones de búsqueda</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza tu idioma de búsqueda, región y más</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Más opciones de búsqueda</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Protección de rastreo en la web</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Protección de rastreo en la web</string>
+    <string name="webTrackingProtectionTitle">La protección de rastreo en la web está habilitada</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nunca te rastrea y nuestro objetivo es proteger tu privacidad tanto como sea posible. Mantenemos y desarrollamos continuamente capas de protección para mantenernos al día con los nuevos métodos de rastreo y proporcionar muchas formas de protección que otros navegadores no ofrecen por defecto. <u><a href=\"\">Más información</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Protección contra ventanas emergentes de cookies</string>
+    <string name="cookiePopupProtectionDescription">Elimina estas ventanas emergentes y minimiza las cookies</string>
+    <string name="cookiePopupProtectionEnabled">Activado</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Permisos</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Apariencia</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Control Global de Privacidad (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloquea automáticamente muchos rastreadores. Con el Control Global de Privacidad (GPC), también puedes solicitar a los sitios web participantes que restrinjan la venta o el uso compartido de tus datos personales con otras empresas. <u><a href=\"\">Más información</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo bloquea automáticamente muchos rastreadores. Con el Control Global de Privacidad (GPC), también puedes solicitar a los sitios web participantes que restrinjan la venta o el uso compartido de tus datos personales con otras empresas. <u><a href=\"\">Más información</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Control Global de Privacidad (GPC)</string>
     <string name="globalPrivacyControlToggle">Control Global de Privacidad (GPC)</string>
     <string name="disabled">Desactivado</string>

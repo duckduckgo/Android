@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="settingsWebTrackingProtectionDescription">Standardmäßig aktiviert</string>
     <string name="settingsHeadingSettings">Einstellungen</string>
-    <string name="settingsPermissionsSetting">Berechtigungen und Privatsphäre</string>
+    <string name="settingsPermissionsSetting">Berechtigungen</string>
     <string name="settingsAutofillLoginsSetting">Anmeldedaten automatisch ausfüllen</string>
     <string name="settingsSyncSetting">Synchronisieren</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Berechtigungen und Privatsphäre</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Private Suche</string>
+    <string name="privateSearchTitle">Private Search ist aktiviert</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search ist deine Standardsuchmaschine – du kannst also das Web durchsuchen, ohne getrackt zu werden.</string>
+    <string name="privateSearchHeadingSearchSettings">Sucheinstellungen</string>
+    <string name="privateSearchAutocompleteToggle">Vorschläge für die Autovervollständigung</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Weitere Sucheinstellungen</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Pass deine Sprache, Region und mehr für die Suche an</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Weitere Sucheinstellungen</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
+    <string name="webTrackingProtectionTitle">Web Tracking Protection ist aktiviert</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo trackt dich niemals und wir versuchen, deine Privatsphäre so weit wie möglich zu schützen. Wir pflegen und entwickeln kontinuierlich Schutzmechanismen, um mit neuen Tracking-Methoden Schritt zu halten und viele Schutzfunktionen bereitzustellen, die andere Browser standardmäßig nicht bieten. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Cookie-Pop-up-Schutz</string>
+    <string name="cookiePopupProtectionDescription">Verbanne diese Pop-ups und minimiere Cookies</string>
+    <string name="cookiePopupProtectionEnabled">Aktiviert</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Berechtigungen</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aussehen</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Deaktiviert</string>

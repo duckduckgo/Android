@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от отслеживания онлайн</string>
     <string name="settingsWebTrackingProtectionDescription">Включено по умолчанию</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsPermissionsSetting">Разрешения и конфиденциальность</string>
+    <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsAutofillLoginsSetting">Автозаполнение логинов</string>
     <string name="settingsSyncSetting">Синхронизация</string>
+    <string name="settingsFireButton">Кнопка «Тревога»</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Разрешения и конфиденциальность</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Частный поиск</string>
+    <string name="privateSearchTitle">Включена система Private Search</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search — ваша поисковая система по умолчанию. Вы можете пользоваться поиском в интернете, не опасаясь слежки.</string>
+    <string name="privateSearchHeadingSearchSettings">Настройки поиска</string>
+    <string name="privateSearchAutocompleteToggle">Показать предложения автозаполнения</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Дополнительно</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Выбор языка поиска, региона и так далее</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Дополнительные настройки поиска</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
+    <string name="webTrackingProtectionTitle">Включена защита от отслеживания онлайн</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo не следит за вами онлайн и максимально защищает ваши данные. Мы постоянно укрепляем и развиваем защиту от новых способов отслеживания, которую по умолчанию не предоставляют другие браузеры. <u><a href=\"\">Подробнее...</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>
+    <string name="cookiePopupProtectionDescription">Избавьтесь от надоедливых окон и принимайте только минимум куки-файлов</string>
+    <string name="cookiePopupProtectionEnabled">Включено</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Кнопка «Тревога»</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Разрешения</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Внешний вид</string>
@@ -590,9 +615,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобальный контроль конфиденциальности (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href=\"\">Подробнее…</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href=\"\">Подробнее…</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlToggle">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="disabled">Отключено</string>

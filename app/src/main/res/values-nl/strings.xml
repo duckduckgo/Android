@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
     <string name="settingsHeadingSettings">Instellingen</string>
-    <string name="settingsPermissionsSetting">Toestemmingen en privacy</string>
+    <string name="settingsPermissionsSetting">Toestemmingen</string>
     <string name="settingsAutofillLoginsSetting">Login met automatisch invullen</string>
     <string name="settingsSyncSetting">Synchroniseren</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Toestemmingen en privacy</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Privé-zoekopdracht</string>
+    <string name="privateSearchTitle">Private Search is ingeschakeld</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search is je standaardzoekmachine, zodat je op het web kunt zoeken zonder gevolgd te worden.</string>
+    <string name="privateSearchHeadingSearchSettings">Zoekinstellingen</string>
+    <string name="privateSearchAutocompleteToggle">Suggesties voor automatisch aanvullen weergeven</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Meer zoekinstellingen</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Pas je zoektaal, regio en meer aan</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Meer zoekinstellingen</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
+    <string name="webTrackingProtectionTitle">Bescherming tegen webtracking is ingeschakeld</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo volgt je nooit en we proberen je privacy zo goed mogelijk te beschermen. We onderhouden en ontwikkelen voortdurend beschermingslagen om bij te blijven met nieuwe trackingmethoden en bieden veel bescherming die andere browsers niet standaard bieden. <u><a href=\"\">Meer informatie</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Bescherming tegen cookiepop-ups</string>
+    <string name="cookiePopupProtectionDescription">Ban deze pop-ups en beperk het aantal cookies tot een minimum</string>
+    <string name="cookiePopupProtectionEnabled">Ingeschakeld</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Toestemmingen</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Uiterlijk</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href=\"\">Meer informatie</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href=\"\">Meer informatie</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Uitgeschakeld</string>

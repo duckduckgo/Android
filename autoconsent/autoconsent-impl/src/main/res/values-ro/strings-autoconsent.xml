@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autoconsentTitle">Gestionează ferestrele pop-up cu privire la modulele cookie</string>
-    <string name="autoconsentDescription">Când DuckDuckGo detectează ferestre pop-up în care ți se solicită consimțământul cu privire la modulele cookie pe site-urile pe care le vizitezi, putem încerca să îți setăm automat preferințele privind modulele cookie pentru a minimiza modulele cookie și a maximiza confidențialitatea și, apoi, pentru a închide ferestrele pop-up. Unele site-uri nu oferă o opțiune de gestionare a preferințelor privind modulele cookie, prin urmare putem doar să ascundem ferestrele pop-up precum acestea.</string>
-    <string name="autoconsentToggle">Lasă DuckDuckGo să gestioneze ferestrele pop-up de solicitare a consimțământului cu privire la modulele cookie</string>
+    <string name="autoconsentTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
+    <string name="autoconsentDescription"><![CDATA[Când DuckDuckGo detectează ferestre pop-up aferente modulelor cookie pe site-urile pe care le vizitezi, îți putem seta automat preferințele privind modulele cookie pentru a minimiza modulele cookie și a maximiza confidențialitatea și, apoi, pentru a închide ferestrele pop-up. <u><a href=\"\">Află mai multe</a><u/>]]></string>
+    <string name="autoconsentToggle">Lasă DuckDuckGo să se ocupe de ferestrele pop-up aferente modulelor cookie</string>
 </resources>

@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
     <string name="settingsWebTrackingProtectionDescription">Ativado por predefinição</string>
     <string name="settingsHeadingSettings">Definições</string>
-    <string name="settingsPermissionsSetting">Permissões e Privacidade</string>
+    <string name="settingsPermissionsSetting">Permissões</string>
     <string name="settingsAutofillLoginsSetting">Preenchimento automático de inícios de sessão</string>
     <string name="settingsSyncSetting">Sincronizar</string>
+    <string name="settingsFireButton">Botão de proteção</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Permissões e Privacidade</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Pesquisa Privada</string>
+    <string name="privateSearchTitle">A Private Search está ativada</string>
+    <string name="privateSearchDescription">O DuckDuckGo Private Search é o teu motor de pesquisa predefinido, para que possas pesquisar a web sem seres rastreado.</string>
+    <string name="privateSearchHeadingSearchSettings">Definições de pesquisa</string>
+    <string name="privateSearchAutocompleteToggle">Mostrar sugestões de preenchimento automático</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Mais definições de pesquisa</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Personaliza o teu idioma de pesquisa, região e muito mais</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Mais definições de pesquisa</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Proteção contra rastreamento na internet</string>
+    <string name="webTrackingProtectionTitle">A proteção contra rastreamento na Internet está ativada</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[O DuckDuckGo nunca te rastreia. Queremos proteger a tua privacidade ao máximo. Mantemos e desenvolvemos continuamente camadas de proteção para acompanharmos os novos métodos de rastreamento e oferecermos muitas proteções que outros navegadores não oferecem por predefinição. <u><a href=\"\">Sabe mais</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Proteção contra pop-ups de cookies</string>
+    <string name="cookiePopupProtectionDescription">Livra-te destes pop-ups e minimiza os cookies</string>
+    <string name="cookiePopupProtectionEnabled">Ativado</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Botão de proteção</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Permissões</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aparência</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href=\"\">Saiba mais</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href=\"\">Saiba mais</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlToggle">Controlo Global de Privacidade (CGP)</string>
     <string name="disabled">Desativado</string>

@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Web İzleme Koruması</string>
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
-    <string name="settingsPermissionsSetting">İzinler ve Gizlilik</string>
+    <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsAutofillLoginsSetting">Girişleri Otomatik Doldur</string>
     <string name="settingsSyncSetting">Senkronizasyon</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">İzinler ve Gizlilik</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Gizli Arama</string>
+    <string name="privateSearchTitle">Private Search Etkinleştirildi</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search, varsayılan arama motorunuz olduğunda web\'de izlenmeden arama yapabilirsiniz.</string>
+    <string name="privateSearchHeadingSearchSettings">Arama Ayarları</string>
+    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
+    <string name="webTrackingProtectionTitle">Web İzleme Engelleyici Etkinleştirildi</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sizi asla izlemez ve gizliliğinizi mümkün olduğunca korumayı amaçlar. Yeni izleme yöntemlerine ayak uydurmak ve diğer tarayıcıların varsayılan olarak sunmadığı birçok engellemeyi sağlamak için engelleme katmanlarını sürekli olarak güncel tutuyor ve geliştiriyoruz. <u><a href=\"\">Daha fazla bilgi edin</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>
+    <string name="cookiePopupProtectionDescription">Bu açılır pencereleri kaldırın ve çerezleri en aza indirin</string>
+    <string name="cookiePopupProtectionEnabled">Etkin</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">İzinler</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href=\"\">Daha Fazla Bilgi</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href=\"\">Daha Fazla Bilgi</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlToggle">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="disabled">Devre Dışı</string>

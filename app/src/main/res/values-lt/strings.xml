@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="settingsWebTrackingProtectionDescription">Įjungta pagal numatytuosius nustatymus</string>
     <string name="settingsHeadingSettings">Nustatymai</string>
-    <string name="settingsPermissionsSetting">Leidimai ir privatumas</string>
+    <string name="settingsPermissionsSetting">Leidimai</string>
     <string name="settingsAutofillLoginsSetting">Automatiškai užpildyti prisijungimus</string>
     <string name="settingsSyncSetting">Sinchronizuoti</string>
+    <string name="settingsFireButton">Mygtukas „Fire“</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Leidimai ir privatumas</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">privati paieška</string>
+    <string name="privateSearchTitle">„Private Search“ įjungta</string>
+    <string name="privateSearchDescription">„DuckDuckGo Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
+    <string name="privateSearchHeadingSearchSettings">Paieškos nustatymai</string>
+    <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
+    <string name="webTrackingProtectionTitle">Žiniatinklio sekimo apsauga įjungta</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[„DuckDuckGo“ niekada jūsų neseka ir stengiamės kuo geriau apsaugoti jūsų privatumą. Nuolat prižiūrime ir tobuliname apsaugos sluoksnius, kad neatsiliktume nuo naujų sekimo metodų ir užtikrintume daugybę apsaugos priemonių, kurių kitos naršyklės nesiūlo. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
+    <string name="cookiePopupProtectionDescription">Panaikinkite šiuos iškylančiuosius langus ir sumažinkite slapukų skaičių</string>
+    <string name="cookiePopupProtectionEnabled">Įjungta</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Mygtukas „Fire“</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Leidimai</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Išvaizda</string>
@@ -590,9 +615,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="disabled">Išjungta</string>

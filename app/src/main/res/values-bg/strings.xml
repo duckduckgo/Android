@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Защита от проследяване в мрежата</string>
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
-    <string name="settingsPermissionsSetting">Разрешения и поверителност</string>
+    <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsAutofillLoginsSetting">Автоматично попълване на данни за вход</string>
     <string name="settingsSyncSetting">Синхронизиране</string>
+    <string name="settingsFireButton">Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Разрешения и поверителност</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">поверително търсене</string>
+    <string name="privateSearchTitle">Private Search е разрешено</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search е търсачката по подразбиране, затова можете да търсите в мрежата, без да бъдете проследявани.</string>
+    <string name="privateSearchHeadingSearchSettings">Настройки за търсене</string>
+    <string name="privateSearchAutocompleteToggle">Показване на предложенията за автоматично довършване</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Още настройки за търсене</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Персонализирайте езика за търсене, региона и др.</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Още настройки за търсене</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Защита от проследяване в мрежата</string>
+    <string name="webTrackingProtectionTitle">Защитата от проследяване в мрежата е активирана</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo никога не Ви проследява и се стремим да защитим Вашата поверителност във възможно най-голяма степен. Непрекъснато поддържаме и развиваме слоеве на защита, за да сме в крак с новите методи за проследяване и да осигуряваме много защити, които другите браузъри не предлагат по подразбиране. <u><a href=\"\">Научете повече</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Защита от изскачащи прозорци за бисквитки</string>
+    <string name="cookiePopupProtectionDescription">Отървете се от тези изскачащи прозорци и намалете бисквитките</string>
+    <string name="cookiePopupProtectionEnabled">Активирано</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Разрешения</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Външен вид</string>
@@ -586,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобален контрол на поверителността (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo блокира автоматично много тракери. С настройката \"Глобален контрол на поверителността\" (GPC) можете също да поискате от участващите уебсайтове да ограничат продажбата или споделянето на Вашите лични данни на/с други компании. <u><a href=\"\">Научете повече</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo блокира автоматично много тракери. С настройката \"Глобален контрол на поверителността\" (GPC) можете също да поискате от участващите уебсайтове да ограничат продажбата или споделянето на Вашите лични данни на/с други компании. <u><a href=\"\">Научете повече</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Глобален контрол на поверителността (GPC)</string>
     <string name="globalPrivacyControlToggle">Глобален контрол на поверителността (GPC)</string>
     <string name="disabled">Деактивирано</string>

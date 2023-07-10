@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
     <string name="settingsWebTrackingProtectionDescription">Privzeto omogočeno</string>
     <string name="settingsHeadingSettings">Nastavitve</string>
-    <string name="settingsPermissionsSetting">Dovoljenja in zasebnost</string>
+    <string name="settingsPermissionsSetting">Dovoljenja</string>
     <string name="settingsAutofillLoginsSetting">Samodejno izpolnjevanje obrazcev za prijavo</string>
     <string name="settingsSyncSetting">Sinhronizacija</string>
+    <string name="settingsFireButton">Gumb Fire Button</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Dovoljenja in zasebnost</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">zasebno iskanje</string>
+    <string name="privateSearchTitle">Zasebno iskanje je omogočeno</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search je vaš privzeti iskalnik, zato lahko po spletu iščete, ne da bi vam kdo sledil.</string>
+    <string name="privateSearchHeadingSearchSettings">Nastavitve iskanja</string>
+    <string name="privateSearchAutocompleteToggle">Pokaži predloge za samodokončanje</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Več nastavitev iskanja</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodite jezik iskanja, regijo in drugo</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Več nastavitev iskanja</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
+    <string name="webTrackingProtectionTitle">Zaščita spletnega sledenja je omogočena</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo vam nikoli ne sledi in si prizadeva čim bolj zaščititi vašo zasebnost. Nenehno vzdržujemo in razvijamo ravni zaščite, da lahko sledimo novim načinom sledenja in zagotavljamo številne zaščite, ki jih drugi brskalniki privzeto ne ponujajo. <u><a href=\"\">Več o tem</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>
+    <string name="cookiePopupProtectionDescription">Odpravite ta pojavna okna in kar najbolj zmanjšajte uporabljene piškotke</string>
+    <string name="cookiePopupProtectionEnabled">Omogočeno</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Gumb Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Dovoljenja</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izgled</string>
@@ -590,9 +615,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="disabled">Onemogočeno</string>
