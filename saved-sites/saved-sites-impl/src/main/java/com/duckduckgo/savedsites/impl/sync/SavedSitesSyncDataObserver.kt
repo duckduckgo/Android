@@ -31,6 +31,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        syncStateMonitor.syncState()
+        syncStateMonitor.syncState().distinctUntilChanged()
             .onEach { state ->
                 when (state) {
                     OFF -> cancelSavedSitesChanges()
