@@ -24,6 +24,8 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.EnableAppTpNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isNotificationSchedulingBugFixEnabled
 import com.duckduckgo.di.scopes.AppScope
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -41,6 +43,7 @@ class NotificationScheduler(
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
     private val enableAppTpNotification: SchedulableNotification,
+    private val variantManager: VariantManager,
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
@@ -50,6 +53,14 @@ class NotificationScheduler(
     private suspend fun scheduleInactiveUserNotifications() {
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
+        if (variantManager.isNotificationSchedulingBugFixEnabled()) {
+            scheduleUnusedAppNotificationsWithBugFix()
+        } else {
+            scheduleUnusedAppNotifications()
+        }
+    }
+
+    private suspend fun scheduleUnusedAppNotifications() {
         when {
             enableAppTpNotification.canShow() -> {
                 scheduleNotification(
@@ -59,6 +70,7 @@ class NotificationScheduler(
                     UNUSED_APP_WORK_REQUEST_TAG,
                 )
             }
+
             privacyNotification.canShow() -> {
                 scheduleNotification(
                     OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
@@ -67,6 +79,7 @@ class NotificationScheduler(
                     UNUSED_APP_WORK_REQUEST_TAG,
                 )
             }
+
             clearDataNotification.canShow() -> {
                 scheduleNotification(
                     OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
@@ -75,7 +88,35 @@ class NotificationScheduler(
                     UNUSED_APP_WORK_REQUEST_TAG,
                 )
             }
+
             else -> Timber.v("Notifications not enabled for this variant")
+        }
+    }
+
+    private suspend fun scheduleUnusedAppNotificationsWithBugFix() {
+        if (enableAppTpNotification.canShow()) {
+            scheduleNotification(
+                OneTimeWorkRequestBuilder<EnableAppTpNotificationWorker>(),
+                ENABLE_APP_TP_DELAY_DURATION_IN_DAYS,
+                TimeUnit.DAYS,
+                UNUSED_APP_WORK_REQUEST_TAG,
+            )
+        }
+        if (privacyNotification.canShow()) {
+            scheduleNotification(
+                OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
+                PRIVACY_DELAY_DURATION_IN_DAYS,
+                TimeUnit.DAYS,
+                UNUSED_APP_WORK_REQUEST_TAG,
+            )
+        }
+        if (clearDataNotification.canShow()) {
+            scheduleNotification(
+                OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
+                CLEAR_DATA_DELAY_DURATION_IN_DAYS,
+                TimeUnit.DAYS,
+                UNUSED_APP_WORK_REQUEST_TAG,
+            )
         }
     }
 

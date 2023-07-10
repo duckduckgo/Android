@@ -88,12 +88,14 @@ object NotificationModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         enableAppTpNotification: EnableAppTpNotification,
+        variantManager: VariantManager,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
             enableAppTpNotification,
+            variantManager
         )
     }
 
