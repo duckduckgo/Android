@@ -141,6 +141,48 @@
     <string name="settingsTitleNotifications">Notifications</string>
     <string name="settingsSubtitleNotificationsDisabled">Désactivé</string>
     <string name="settingsSubtitleNotificationsEnabled">Activé</string>
+    <string name="settingsDefaultBrowserTitle">Navigateur par défaut</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo est votre navigateur par défaut</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Faites de DuckDuckGo votre navigateur par défaut</string>
+    <string name="settingsPrivateSearchTitle">Recherche privée</string>
+    <string name="settingsPrivateSearchDescription">Activation par défaut</string>
+    <string name="settingsWebTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
+    <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
+    <string name="settingsHeadingSettings">Paramètres</string>
+    <string name="settingsPermissionsSetting">Autorisations</string>
+    <string name="settingsAutofillLoginsSetting">Saisie automatique des identifiants</string>
+    <string name="settingsSyncSetting">Synchronisation</string>
+    <string name="settingsFireButton">Fire Button</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Recherche privée</string>
+    <string name="privateSearchTitle">Private Search est activé</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search est votre moteur de recherche par défaut, qui vous permet d\'effectuer des recherches sur le Web sans être suivi(e).</string>
+    <string name="privateSearchHeadingSearchSettings">Paramètres de recherche</string>
+    <string name="privateSearchAutocompleteToggle">Afficher les suggestions de saisie semi-automatique</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Autres paramètres de recherche</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Personnalisez votre langue de recherche, votre région et plus encore</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Autres paramètres de recherche</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
+    <string name="webTrackingProtectionTitle">La protection contre le pistage sur le Web est activée</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ne vous suit jamais et fait de son mieux pour préserver votre vie privée. Nous ne cessons d\'entretenir et de développer des couches de protection pour ne jamais nous laisser dépasser par les nouvelles méthodes de pistage. Nous fournissons aussi de nombreuses protections que les autres navigateurs ne proposent pas par défaut. <u><a href=\"\">En savoir plus</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>
+    <string name="cookiePopupProtectionDescription">Bannissez ces fenêtres contextuelles et réduisez les cookies au minimum</string>
+    <string name="cookiePopupProtectionEnabled">Activé</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Autorisations</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Apparence</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Enregistrer</string>
@@ -569,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloque automatiquement de nombreux traqueurs. Grâce au Global Privacy Control (GPC), vous pouvez également demander aux sites web participants de limiter la vente ou le partage de vos données personnelles avec d\'autres entreprises. <u><a href=\"\">En savoir plus</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo bloque automatiquement de nombreux traqueurs. Grâce au Global Privacy Control (GPC), vous pouvez également demander aux sites web participants de limiter la vente ou le partage de vos données personnelles avec d\'autres entreprises. <u><a href=\"\">En savoir plus</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Désactivé</string>

@@ -141,6 +141,48 @@
     <string name="settingsTitleNotifications">Obavijesti</string>
     <string name="settingsSubtitleNotificationsDisabled">Onemogućeno</string>
     <string name="settingsSubtitleNotificationsEnabled">Omogućeno</string>
+    <string name="settingsDefaultBrowserTitle">Zadani preglednik</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvoj zadani preglednik</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Postavi DuckDuckGo kao svoj zadani preglednik</string>
+    <string name="settingsPrivateSearchTitle">Privatno pretraživanje</string>
+    <string name="settingsPrivateSearchDescription">Omogućeno prema zadanim postavkama</string>
+    <string name="settingsWebTrackingProtectionTitle">Zaštita od praćenja na webu</string>
+    <string name="settingsWebTrackingProtectionDescription">Omogućeno prema zadanim postavkama</string>
+    <string name="settingsHeadingSettings">Postavke</string>
+    <string name="settingsPermissionsSetting">Dozvole</string>
+    <string name="settingsAutofillLoginsSetting">Automatsko popunjavanje prijave</string>
+    <string name="settingsSyncSetting">Sinkronizacija</string>
+    <string name="settingsFireButton">Fire Button</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Privatno pretraživanje</string>
+    <string name="privateSearchTitle">Omogućen je Private Search</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search tvoja je zadana tražilica, tako da možeš pretraživati web bez praćenja.</string>
+    <string name="privateSearchHeadingSearchSettings">Postavke pretraživanja</string>
+    <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Dodatne postavke pretraživanja</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Zaštita od praćenja na webu</string>
+    <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu je omogućena</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo te nikad ne prati i nastojimo zaštititi tvoju privatnost što je više moguće. Neprestano održavamo i razvijamo slojeve zaštite kako bismo bili u toku s novim metodama praćenja i pružamo mnoge zaštite koje drugi preglednici ne nude prema zadanim postavkama. <u><a href=\"\">Saznaj više</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>
+    <string name="cookiePopupProtectionDescription">Ukloni ove skočne prozore i minimiziraj kolačiće</string>
+    <string name="cookiePopupProtectionEnabled">Omogućeno</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Dozvole</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Izgled</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
@@ -573,9 +615,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna kontrola privatnosti (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href=\"\">Saznajte više</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href=\"\">Saznajte više</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalna kontrola privatnosti (GPC)</string>
     <string name="disabled">Onemogućeno</string>

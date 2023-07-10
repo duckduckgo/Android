@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autoconsentTitle">Valdyti slapukų iššokančiuosius langus</string>
-    <string name="autoconsentDescription">Kai „DuckDuckGo“ jūsų lankomose svetainėse aptinka sutikimo su slapukais iškylančiuosius langus, galime automatiškai nustatyti jūsų slapukų nuostatas, kad sumažintume slapukų skaičių, sustiprintume privatumą ir uždarytume iškylančiuosius langus. Kai kuriose svetainėse nėra galimybės tvarkyti slapukų nuostatas, todėl galime tik paslėpti tokius iškylančiuosius langus.</string>
-    <string name="autoconsentToggle">Leiskite „DuckDuckGo“ valdyti sutikimo su slapukais iššokančiuosius langus</string>
+    <string name="autoconsentTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
+    <string name="autoconsentDescription"><![CDATA[Kai „DuckDuckGo“ jūsų lankomose svetainėse aptinka slapukų iškylančiuosius langus, galime automatiškai nustatyti jūsų slapukų nuostatas, kad sumažintume slapukų skaičių, sustiprintume privatumą ir uždarytume iškylančiuosius langus. <u><a href=\"\">Sužinokite daugiau</a><u/>]]></string>
+    <string name="autoconsentToggle">Leiskite „DuckDuckGo“ tvarkyti slapukų iškylančiuosius langus</string>
 </resources>

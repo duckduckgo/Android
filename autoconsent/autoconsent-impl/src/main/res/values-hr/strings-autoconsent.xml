@@ -17,7 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="autoconsentTitle">Upravljanje skočnim prozorima kolačića</string>
-    <string name="autoconsentDescription">Kada DuckDuckGo otkrije skočne prozore pristanka na kolačiće na web lokacijama koje posjećuješ, mi možemo pokušati automatski odrediti tvoje postavke kolačića kako bismo minimizirali kolačiće i maksimizirali privatnost, a zatim zatvorili skočne prozore. Neke web lokacije ne nude opciju upravljanja postavkama kolačića, tako da možemo sakriti samo ovakve skočne prozore.</string>
-    <string name="autoconsentToggle">Neka DuckDuckGo upravlja skočnim prozorima za pristanak na kolačiće</string>
+    <string name="autoconsentTitle">Zaštita od kolačića i skočnih prozora</string>
+    <string name="autoconsentDescription"><![CDATA[Kada DuckDuckGo otkrije skočne prozore kolačića na web lokacijama koje posjećuješ, možemo automatski postaviti tvoje postavke kolačića kako bismo minimizirali kolačiće i maksimizirali privatnost, a zatim zatvorili skočne prozore. <u><a href=\"\">Saznaj više</a><u/>]]></string>
+    <string name="autoconsentToggle">Neka DuckDuckGo upravlja skočnim prozorima kolačića</string>
 </resources>
