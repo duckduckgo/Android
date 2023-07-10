@@ -149,12 +149,37 @@
     <string name="settingsWebTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
     <string name="settingsWebTrackingProtectionDescription">Activat în mod implicit</string>
     <string name="settingsHeadingSettings">Setări</string>
-    <string name="settingsPermissionsSetting">Permisiuni și confidențialitate</string>
+    <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsAutofillLoginsSetting">Completare automată la autentificare</string>
     <string name="settingsSyncSetting">Sincronizare</string>
+    <string name="settingsFireButton">Butonul Foc</string>
 
-    <!-- Permissions and Privacy -->
-    <string name="permissionsActivityTitle">Permisiuni și confidențialitate</string>
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Căutare Confidențială</string>
+    <string name="privateSearchTitle">Private Search este activată</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
+    <string name="privateSearchHeadingSearchSettings">Setări de căutare</string>
+    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
+    <string name="webTrackingProtectionTitle">Protecția împotriva urmăririi pe web este activată</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo nu te urmărește niciodată și ne propunem să îți protejăm confidențialitatea cât mai mult posibil. Menținem și dezvoltăm în permanență niveluri de protecție pentru a ține pasul cu noile metode de urmărire și pentru a oferi numeroase modalități de protecție pe care alte browsere nu le oferă în mod implicit. <u><a href=\"\">Află mai multe</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>
+    <string name="cookiePopupProtectionDescription">Elimină aceste ferestre pop-up și minimizează modulele cookie</string>
+    <string name="cookiePopupProtectionEnabled">Activat</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Butonul Foc</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Permisiuni</string>
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aspect</string>
@@ -588,9 +613,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Dezactivat</string>
