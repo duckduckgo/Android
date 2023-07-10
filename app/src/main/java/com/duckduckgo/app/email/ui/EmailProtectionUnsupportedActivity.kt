@@ -16,9 +16,8 @@
 
 package com.duckduckgo.app.email.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityEmailUnsupportedBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -26,6 +25,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(EmailProtectionUnsupportedScreenNoParams::class)
 class EmailProtectionUnsupportedActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityEmailUnsupportedBinding by viewBinding()
@@ -38,11 +38,5 @@ class EmailProtectionUnsupportedActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(toolbar)
-    }
-
-    companion object {
-        fun intent(context: Context): Intent {
-            return Intent(context, EmailProtectionUnsupportedActivity::class.java)
-        }
     }
 }

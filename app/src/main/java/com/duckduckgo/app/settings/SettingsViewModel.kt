@@ -16,48 +16,28 @@
 
 package com.duckduckgo.app.settings
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
 import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
-import com.duckduckgo.app.settings.clear.AppLinkSettingType
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.clear.ClearWhenOption
-import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.clear.getPixelValue
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.sync.api.SyncState.OFF
-import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
 import com.duckduckgo.windows.api.WindowsWaitlist
 import com.duckduckgo.windows.api.WindowsWaitlistFeature
@@ -70,67 +50,40 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
-    private val themingDataStore: ThemingDataStore,
-    private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
-    private val variantManager: VariantManager,
-    private val fireAnimationLoader: FireAnimationLoader,
     private val appTrackingProtection: AppTrackingProtection,
-    private val gpc: Gpc,
-    private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val autoconsent: Autoconsent,
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
-    private val syncStateMonitor: SyncStateMonitor,
     private val netpWaitlistRepository: NetPWaitlistRepository,
     private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
     private val dispatcherProvider: DispatcherProvider,
+    private val autoconsent: Autoconsent,
 ) : ViewModel() {
 
     data class ViewState(
-        val loading: Boolean = true,
-        val version: String = "",
-        val theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT,
-        val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
-        val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
-        val appIcon: AppIcon = AppIcon.DEFAULT,
-        val globalPrivacyControlEnabled: Boolean = false,
-        val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionOnboardingShown: Boolean = false,
         val appTrackingProtectionEnabled: Boolean = false,
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
-        val syncEnabled: Boolean = false,
-        val autoconsentEnabled: Boolean = false,
-        @StringRes val notificationsSettingSubtitleId: Int = R.string.settingsSubtitleNotificationsDisabled,
         val windowsWaitlistState: WindowsWaitlistState? = null,
         val networkProtectionState: NetPState = DISCONNECTED,
         val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
-    )
-
-    data class AutomaticallyClearData(
-        val clearWhatOption: ClearWhatOption,
-        val clearWhenOption: ClearWhenOption,
-        val clearWhenOptionEnabled: Boolean = true,
+        val isAutoconsentEnabled: Boolean = false,
     )
 
     enum class NetPState {
@@ -143,32 +96,25 @@ class SettingsViewModel @Inject constructor(
     sealed class Command {
         object LaunchDefaultBrowser : Command()
         data class LaunchEmailProtection(val url: String) : Command()
-        object LaunchEmailProtectionNotSUpported : Command()
-        object LaunchFeedback : Command()
-        object LaunchFireproofWebsites : Command()
+        object LaunchEmailProtectionNotSupported : Command()
         object LaunchAutofillSettings : Command()
         object LaunchAccessibilitySettings : Command()
-        object LaunchLocation : Command()
-        object LaunchWhitelist : Command()
-        object LaunchAppIcon : Command()
         object LaunchAddHomeScreenWidget : Command()
-        data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
-        data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
-        data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
-        object LaunchGlobalPrivacyControl : Command()
-        object LaunchAutoconsent : Command()
         object LaunchAppTPTrackersScreen : Command()
         object LaunchNetPManagementScreen : Command()
         object LaunchNetPWaitlist : Command()
         object LaunchAppTPOnboarding : Command()
-        object UpdateTheme : Command()
-        data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
-        data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         object LaunchMacOs : Command()
-        object LaunchNotificationsSettings : Command()
         object LaunchWindowsWaitlist : Command()
         object LaunchWindows : Command()
         object LaunchSyncSettings : Command()
+        object LaunchPrivateSearchWebPage : Command()
+        object LaunchWebTrackingProtectionScreen : Command()
+        object LaunchCookiePopupProtectionScreen : Command()
+        object LaunchFireButtonScreen : Command()
+        object LaunchPermissionsScreen : Command()
+        object LaunchAppearanceScreen : Command()
+        object LaunchAboutScreen : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -177,41 +123,24 @@ class SettingsViewModel @Inject constructor(
 
     init {
         pixel.fire(SETTINGS_OPENED)
-        observeSyncState()
     }
 
-    fun start(notificationsEnabled: Boolean = false) {
+    fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
-        val variant = variantManager.getVariant()
-        val savedTheme = themingDataStore.theme
-        val automaticallyClearWhat = settingsDataStore.automaticallyClearWhatOption
-        val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
-        val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
 
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    loading = false,
-                    theme = savedTheme,
-                    autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
                     isAppDefaultBrowser = defaultBrowserAlready,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
-                    version = obtainVersion(variant.key),
-                    automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
-                    appIcon = settingsDataStore.appIcon,
-                    selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
-                    appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
-                    autoconsentEnabled = autoconsent.isSettingEnabled(),
-                    notificationsSettingSubtitleId = getNotificationsSettingSubtitleId(notificationsEnabled),
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
-                    syncEnabled = deviceSyncState.isUserSignedInOnDevice(),
                     networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
+                    isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
             )
         }
@@ -244,56 +173,32 @@ class SettingsViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
-    private fun observeSyncState() {
-        syncStateMonitor.syncState()
-            .onEach {
-                viewState.value = currentViewState().copy(
-                    syncEnabled = when (it) {
-                        OFF -> false
-                        else -> true
-                    },
-                )
-            }.launchIn(viewModelScope)
-    }
-
-    fun userRequestedToSendFeedback() {
-        viewModelScope.launch { command.send(Command.LaunchFeedback) }
-    }
-
-    fun userRequestedToChangeIcon() {
-        viewModelScope.launch { command.send(Command.LaunchAppIcon) }
-    }
-
     fun userRequestedToAddHomeScreenWidget() {
         viewModelScope.launch { command.send(Command.LaunchAddHomeScreenWidget) }
     }
 
-    fun userRequestedToChangeFireAnimation() {
-        viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
-        pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
+    fun onDefaultBrowserSettingClicked() {
+        val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(isAppDefaultBrowser = defaultBrowserSelected))
+            command.send(Command.LaunchDefaultBrowser)
+        }
+        pixel.fire(SETTINGS_DEFAULT_BROWSER_PRESSED)
     }
 
-    fun onAccessibilitySettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettings) }
+    fun onPrivateSearchSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchPrivateSearchWebPage) }
+        pixel.fire(SETTINGS_PRIVATE_SEARCH_PRESSED)
     }
 
-    fun userRequestedToChangeTheme() {
-        viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
-        pixel.fire(SETTINGS_THEME_OPENED)
+    fun onWebTrackingProtectionSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchWebTrackingProtectionScreen) }
+        pixel.fire(SETTINGS_WEB_TRACKING_PROTECTION_PRESSED)
     }
 
-    fun userRequestedToChangeNotificationsSetting() {
-        viewModelScope.launch { command.send(Command.LaunchNotificationsSettings) }
-        pixel.fire(SETTINGS_NOTIFICATIONS_PRESSED)
-    }
-
-    fun userRequestedToChangeAppLinkSetting() {
-        viewModelScope.launch { command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType)) }
-        pixel.fire(SETTINGS_APP_LINKS_PRESSED)
-    }
-
-    fun onFireproofWebsitesClicked() {
-        viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
+    fun onCookiePopupProtectionSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchCookiePopupProtectionScreen) }
+        pixel.fire(SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED)
     }
 
     fun onAutofillSettingsClick() {
@@ -301,39 +206,31 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_AUTOFILL_MANAGEMENT_OPENED)
     }
 
-    fun onSitePermissionsClicked() {
-        viewModelScope.launch { command.send(Command.LaunchLocation) }
+    fun onAccessibilitySettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettings) }
+        pixel.fire(SETTINGS_ACCESSIBILITY_PRESSED)
     }
 
-    fun onAutomaticallyClearWhatClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
-    }
-
-    fun onAutomaticallyClearWhenClicked() {
-        viewModelScope.launch { command.send(Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)) }
-    }
-
-    fun onGlobalPrivacyControlClicked() {
-        viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
-    }
-
-    fun onAutoconsentClicked() {
-        viewModelScope.launch { command.send(Command.LaunchAutoconsent) }
+    fun onAboutSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAboutScreen) }
+        pixel.fire(SETTINGS_ABOUT_PRESSED)
     }
 
     fun onEmailProtectionSettingClicked() {
         viewModelScope.launch {
-            val com = if (emailManager.isEmailFeatureSupported()) {
+            val command = if (emailManager.isEmailFeatureSupported()) {
                 Command.LaunchEmailProtection(EMAIL_PROTECTION_URL)
             } else {
-                Command.LaunchEmailProtectionNotSUpported
+                Command.LaunchEmailProtectionNotSupported
             }
-            command.send(com)
+            this@SettingsViewModel.command.send(command)
         }
+        pixel.fire(SETTINGS_EMAIL_PROTECTION_PRESSED)
     }
 
     fun onMacOsSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchMacOs) }
+        pixel.fire(SETTINGS_MAC_APP_PRESSED)
     }
 
     fun windowsSettingClicked() {
@@ -344,16 +241,7 @@ class SettingsViewModel @Inject constructor(
                 command.send(Command.LaunchWindowsWaitlist)
             }
         }
-    }
-
-    fun onDefaultBrowserToggled(enabled: Boolean) {
-        Timber.i("User toggled default browser, is now enabled: $enabled")
-        val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
-        if (enabled && defaultBrowserSelected) return
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(isAppDefaultBrowser = enabled))
-            command.send(Command.LaunchDefaultBrowser)
-        }
+        pixel.fire(SETTINGS_WINDOWS_APP_PRESSED)
     }
 
     fun onAppTPSettingClicked() {
@@ -362,6 +250,7 @@ class SettingsViewModel @Inject constructor(
         } else {
             viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
         }
+        pixel.fire(SETTINGS_APPTP_PRESSED)
     }
 
     fun onNetPSettingClicked() {
@@ -370,108 +259,7 @@ class SettingsViewModel @Inject constructor(
         } else {
             viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
         }
-    }
-
-    fun onAutocompleteSettingChanged(enabled: Boolean) {
-        Timber.i("User changed autocomplete setting, is now enabled: $enabled")
-        settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
-    }
-
-    fun onAppLinksSettingChanged(appLinkSettingType: AppLinkSettingType) {
-        Timber.i("User changed app links setting, is now: ${appLinkSettingType.name}")
-
-        val pixelName =
-            when (appLinkSettingType) {
-                AppLinkSettingType.ASK_EVERYTIME -> {
-                    settingsDataStore.appLinksEnabled = true
-                    settingsDataStore.showAppLinksPrompt = true
-                    SETTINGS_APP_LINKS_ASK_EVERY_TIME_SELECTED
-                }
-                AppLinkSettingType.ALWAYS -> {
-                    settingsDataStore.appLinksEnabled = true
-                    settingsDataStore.showAppLinksPrompt = false
-                    SETTINGS_APP_LINKS_ALWAYS_SELECTED
-                }
-                AppLinkSettingType.NEVER -> {
-                    settingsDataStore.appLinksEnabled = false
-                    settingsDataStore.showAppLinksPrompt = false
-                    SETTINGS_APP_LINKS_NEVER_SELECTED
-                }
-            }
-        viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType)) }
-
-        pixel.fire(pixelName)
-    }
-
-    private fun getAppLinksSettingsState(
-        appLinksEnabled: Boolean,
-        showAppLinksPrompt: Boolean,
-    ): AppLinkSettingType {
-        return if (appLinksEnabled) {
-            if (showAppLinksPrompt) {
-                AppLinkSettingType.ASK_EVERYTIME
-            } else {
-                AppLinkSettingType.ALWAYS
-            }
-        } else {
-            AppLinkSettingType.NEVER
-        }
-    }
-
-    private fun obtainVersion(variantKey: String): String {
-        val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
-        return "${appBuildConfig.versionName}$formattedVariantKey(${appBuildConfig.versionCode})"
-    }
-
-    fun onAutomaticallyWhatOptionSelected(clearWhatNewSetting: ClearWhatOption) {
-        if (settingsDataStore.isCurrentlySelected(clearWhatNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhatNewSetting; no need to do anything else")
-            return
-        }
-
-        pixel.fire(clearWhatNewSetting.pixelEvent())
-
-        settingsDataStore.automaticallyClearWhatOption = clearWhatNewSetting
-
-        viewModelScope.launch {
-            viewState.emit(
-                currentViewState().copy(
-                    automaticallyClearData = AutomaticallyClearData(
-                        clearWhatOption = clearWhatNewSetting,
-                        clearWhenOption = settingsDataStore.automaticallyClearWhenOption,
-                        clearWhenOptionEnabled = isAutomaticallyClearingDataWhenSettingEnabled(clearWhatNewSetting),
-                    ),
-                ),
-            )
-        }
-    }
-
-    private fun isAutomaticallyClearingDataWhenSettingEnabled(clearWhatOption: ClearWhatOption?): Boolean {
-        return clearWhatOption != null && clearWhatOption != ClearWhatOption.CLEAR_NONE
-    }
-
-    fun onAutomaticallyWhenOptionSelected(clearWhenNewSetting: ClearWhenOption) {
-        if (settingsDataStore.isCurrentlySelected(clearWhenNewSetting)) {
-            Timber.v("User selected same thing they already have set: $clearWhenNewSetting; no need to do anything else")
-            return
-        }
-
-        clearWhenNewSetting.pixelEvent()?.let {
-            pixel.fire(it)
-        }
-
-        settingsDataStore.automaticallyClearWhenOption = clearWhenNewSetting
-        viewModelScope.launch {
-            viewState.emit(
-                currentViewState().copy(
-                    automaticallyClearData = AutomaticallyClearData(
-                        settingsDataStore.automaticallyClearWhatOption,
-                        clearWhenNewSetting,
-                    ),
-                ),
-            )
-        }
+        pixel.fire(SETTINGS_NETP_PRESSED)
     }
 
     private fun windowsSettingState(): WindowsWaitlistState? {
@@ -482,78 +270,28 @@ class SettingsViewModel @Inject constructor(
         return windowsWaitlist.getWaitlistState()
     }
 
-    fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
-        Timber.d("User toggled theme, theme to set: $selectedTheme")
-        if (themingDataStore.isCurrentlySelected(selectedTheme)) {
-            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
-            return
-        }
-        themingDataStore.theme = selectedTheme
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(theme = selectedTheme))
-            command.send(Command.UpdateTheme)
-        }
-
-        val pixelName =
-            when (selectedTheme) {
-                DuckDuckGoTheme.LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
-                DuckDuckGoTheme.DARK -> SETTINGS_THEME_TOGGLED_DARK
-                DuckDuckGoTheme.SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
-            }
-        pixel.fire(pixelName)
-    }
-
-    fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
-        if (settingsDataStore.isCurrentlySelected(selectedFireAnimation)) {
-            Timber.v("User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
-            return
-        }
-        settingsDataStore.selectedFireAnimation = selectedFireAnimation
-        fireAnimationLoader.preloadSelectedAnimation()
-        viewModelScope.launch {
-            viewState.emit(currentViewState().copy(selectedFireAnimation = selectedFireAnimation))
-        }
-        pixel.fire(FIRE_ANIMATION_NEW_SELECTED, mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
-    }
-
-    fun onManageWhitelistSelected() {
-        pixel.fire(SETTINGS_MANAGE_WHITELIST)
-        viewModelScope.launch { command.send(Command.LaunchWhitelist) }
-    }
-
     private fun currentViewState(): ViewState {
         return viewState.value
     }
 
-    private fun ClearWhatOption.pixelEvent(): PixelName {
-        return when (this) {
-            ClearWhatOption.CLEAR_NONE -> AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE
-            ClearWhatOption.CLEAR_TABS_ONLY -> AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> AUTOMATIC_CLEAR_DATA_WHAT_OPTION_TABS_AND_DATA
-        }
-    }
-
-    private fun ClearWhenOption.pixelEvent(): PixelName? {
-        return when (this) {
-            ClearWhenOption.APP_EXIT_ONLY -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_ONLY
-            ClearWhenOption.APP_EXIT_OR_5_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_5_MINS
-            ClearWhenOption.APP_EXIT_OR_15_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_15_MINS
-            ClearWhenOption.APP_EXIT_OR_30_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
-            ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
-            else -> null
-        }
-    }
-
-    private fun getNotificationsSettingSubtitleId(notificationsEnabled: Boolean): Int {
-        return if (notificationsEnabled) {
-            R.string.settingsSubtitleNotificationsEnabled
-        } else {
-            R.string.settingsSubtitleNotificationsDisabled
-        }
-    }
-
     fun onSyncSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
+        pixel.fire(SETTINGS_SYNC_PRESSED)
+    }
+
+    fun onFireButtonSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchFireButtonScreen) }
+        pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
+    }
+
+    fun onPermissionsSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchPermissionsScreen) }
+        pixel.fire(SETTINGS_PERMISSIONS_PRESSED)
+    }
+
+    fun onAppearanceSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchAppearanceScreen) }
+        pixel.fire(SETTINGS_APPEARANCE_PRESSED)
     }
 
     fun onLaunchedFromNotification(pixelName: String) {

@@ -141,6 +141,48 @@
     <string name="settingsTitleNotifications">Oznámení</string>
     <string name="settingsSubtitleNotificationsDisabled">Zakázáno</string>
     <string name="settingsSubtitleNotificationsEnabled">Povoleno</string>
+    <string name="settingsDefaultBrowserTitle">Výchozí prohlížeč</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo je tvůj výchozí prohlížeč</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Nastav si DuckDuckGo jako výchozí prohlížeč</string>
+    <string name="settingsPrivateSearchTitle">Soukromé vyhledávání</string>
+    <string name="settingsPrivateSearchDescription">Ve výchozím nastavení povoleno</string>
+    <string name="settingsWebTrackingProtectionTitle">Ochrana před sledováním na webu</string>
+    <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
+    <string name="settingsHeadingSettings">Nastavení</string>
+    <string name="settingsPermissionsSetting">Oprávnění</string>
+    <string name="settingsAutofillLoginsSetting">Automatické vyplňování přihlašovacích údajů</string>
+    <string name="settingsSyncSetting">Synchronizace</string>
+    <string name="settingsFireButton">Fire Button</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Soukromé vyhledávání</string>
+    <string name="privateSearchTitle">Soukromé vyhledávání je povolené</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search je tvůj výchozí vyhledávač, takže můžeš hledat na webu, aniž by tě někdo sledoval.</string>
+    <string name="privateSearchHeadingSearchSettings">Nastavení vyhledávání</string>
+    <string name="privateSearchAutocompleteToggle">Zobrazit návrhy automatického doplňování</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Ochrana před sledováním na webu</string>
+    <string name="webTrackingProtectionTitle">Ochrana před sledováním na webu je povolená</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo tě nikdy nesleduje a snaží se co nejvíc chránit tvoje soukromí. Neustále vylepšujeme a vyvíjíme další vrstvy ochrany, abychom drželi krok s novými metodami sledování a poskytovali co nejkomplexnější ochranu. Něco takového jiné prohlížeče ve výchozím nastavení nenabízejí. <u><a href=\"\">Další informace</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Ochrana před vyskakovacími okny ohledně cookies</string>
+    <string name="cookiePopupProtectionDescription">Zakaž tato vyskakovací okna a omez soubory cookie na nezbytné minimum</string>
+    <string name="cookiePopupProtectionEnabled">Povoleno</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Oprávnění</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Vzhled</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
@@ -573,9 +615,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automaticky blokuje mnoho trackerů. Pomocí Globální kontroly ochrany osobních údajů (GPC) můžete také požádat zúčastněné webové stránky, aby omezily prodej nebo sdílení vašich osobních údajů s jinými společnostmi. <u><a href=\"\">Více informací</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo automaticky blokuje mnoho trackerů. Pomocí Globální kontroly ochrany osobních údajů (GPC) můžete také požádat zúčastněné webové stránky, aby omezily prodej nebo sdílení vašich osobních údajů s jinými společnostmi. <u><a href=\"\">Více informací</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlToggle">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="disabled">Zakázáno</string>

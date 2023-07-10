@@ -141,6 +141,48 @@
     <string name="settingsTitleNotifications">Ilmoitukset</string>
     <string name="settingsSubtitleNotificationsDisabled">Pois käytöstä</string>
     <string name="settingsSubtitleNotificationsEnabled">Käytössä</string>
+    <string name="settingsDefaultBrowserTitle">Oletusselain</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo on oletusselaimesi</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Tee DuckDuckGo:sta oletusselain</string>
+    <string name="settingsPrivateSearchTitle">Yksityinen haku</string>
+    <string name="settingsPrivateSearchDescription">Oletusarvoisesti käytössä</string>
+    <string name="settingsWebTrackingProtectionTitle">Verkkoseurannan suojaus</string>
+    <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
+    <string name="settingsHeadingSettings">Asetukset</string>
+    <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
+    <string name="settingsAutofillLoginsSetting">Täytä kirjautumistiedot automaattisesti</string>
+    <string name="settingsSyncSetting">Synkronoi</string>
+    <string name="settingsFireButton">Fire-painike</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Yksityinen haku</string>
+    <string name="privateSearchTitle">Private Search on käytössä</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search on oletushakukoneesi, ja sen avulla voit hakea netistä ilman, että sinua seurataan.</string>
+    <string name="privateSearchHeadingSearchSettings">Hakuasetukset</string>
+    <string name="privateSearchAutocompleteToggle">Näytä automaattisen täydennyksen ehdotukset</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Lisää hakuasetuksia</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Mukauta haun kieli, alue ja muuta</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Lisää hakuasetuksia</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
+    <string name="webTrackingProtectionTitle">Verkkoseurantasuojaus on käytössä</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo ei koskaan seuraa sinua. Pyrimme suojaamaan yksityisyyttäsi mahdollisimman paljon. Ylläpidämme ja kehitämme suojaustasoja jatkuvasti pysyäksemme uusien seurantamenetelmien vauhdissa ja tarjotaksemme monia suojauksia, joita muut selaimet eivät tarjoa oletuksena. <u><a href=\"\">Lisätietoja</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>
+    <string name="cookiePopupProtectionDescription">Karkota ponnahdusikkunat ja minimoi evästeet</string>
+    <string name="cookiePopupProtectionEnabled">Käytössä</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire-painike</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Käyttöoikeudet</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Ulkoasu</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -569,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href=\"\">Lue lisää</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href=\"\">Lue lisää</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Pois käytöstä</string>

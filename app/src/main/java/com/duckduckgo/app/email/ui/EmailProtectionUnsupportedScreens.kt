@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api.engine
+package com.duckduckgo.app.email.ui
+
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 /**
- * As per API requirement, each feature needs to store the date it was lastly modified
- * Implement this interface to do exactly that
+ * Use this model to launch the EmailProtectionUnsupported screen
  */
-interface FeatureSyncStore {
-    var modifiedSince: String
-}
+object EmailProtectionUnsupportedScreenNoParams : GlobalActivityStarter.ActivityParams

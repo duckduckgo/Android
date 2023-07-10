@@ -30,6 +30,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
@@ -39,7 +40,6 @@ import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
-import com.duckduckgo.sync.api.engine.FeatureSyncStore
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
@@ -65,7 +65,7 @@ class SavedSitesSyncDataProviderTest {
     private lateinit var repository: SavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
-    private lateinit var store: FeatureSyncStore
+    private lateinit var store: SavedSitesSyncStore
 
     private lateinit var parser: SavedSitesSyncDataProvider
 
@@ -92,7 +92,7 @@ class SavedSitesSyncDataProviderTest {
         savedSitesRelationsDao = db.syncRelationsDao()
 
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
-        store = SavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
+        store = RealSavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
         parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto())
 

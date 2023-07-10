@@ -27,3 +27,8 @@ object NetworkProtectionManagementScreenNoParams : ActivityParams
  * Use this model to launch the NetPWaitlist screen
  */
 object NetPWaitlistScreenNoParams : ActivityParams
+
+/**
+ * Use this model to launch the NetP app exclusion list screen
+ */
+object NetPAppExclusionListNoParams : ActivityParams

@@ -16,5 +16,6 @@
   -->
 
 <resources>
-
+    <string name="atp_ExcludedReasonExcludedThroughNetP">Manually disabled in Network Protection</string>
+    <string name="atp_CompanyDetailsBannerForUnprotectedThroughNetP">Protection has been manually disabled for this app through Network Protection. To re-enable, configure in <annotation type="manage_app_exclusion_link">Network Protection</annotation>.</string>
 </resources>

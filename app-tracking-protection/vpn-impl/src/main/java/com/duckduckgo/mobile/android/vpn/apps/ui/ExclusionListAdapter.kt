@@ -245,6 +245,7 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
             binding.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
             binding.deviceShieldAppEntryName.text = excludedAppInfo.name
+            binding.handleToggleState(excludedAppInfo.knownProblem, isListEnabled)
 
             if (excludedAppInfo.isProblematic()) {
                 if (excludedAppInfo.isExcluded) {
@@ -291,7 +292,6 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
                     listener.onAppProtectionChanged(excludedAppInfo, enabled, position)
                 }
             } else {
-                binding.deviceShieldAppEntryShieldEnabled.isClickable = false
                 binding.deviceShieldAppEntryShieldEnabled.quietlySetIsChecked(!excludedAppInfo.isExcluded, null)
             }
         }
@@ -303,15 +303,17 @@ class ExclusionListAdapter(val listener: ExclusionListListener) :
             return when (excludingReason) {
                 TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON, TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON ->
                     context.getString(R.string.atp_ExcludedReasonIssuesMayOccur)
-
+                TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP -> context.getString(R.string.atp_ExcludedReasonExcludedThroughNetP)
                 else -> ""
             }
         }
 
         private fun getAppExcludingReasonIcon(excludingReason: Int): Int {
             return when (excludingReason) {
-                TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
-                TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON -> R.drawable.ic_apptp_alert
+                TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
+                TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
+                TrackingProtectionAppInfo.EXCLUDED_THROUGH_NETP,
+                -> R.drawable.ic_apptp_alert
                 else -> 0
             }
         }

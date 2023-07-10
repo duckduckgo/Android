@@ -141,6 +141,48 @@
     <string name="settingsTitleNotifications">Varsler</string>
     <string name="settingsSubtitleNotificationsDisabled">Deaktivert</string>
     <string name="settingsSubtitleNotificationsEnabled">Aktivert</string>
+    <string name="settingsDefaultBrowserTitle">Standardnettleser</string>
+    <string name="settingsDefaultBrowserSetDescription">DuckDuckGo er standardnettleseren din</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Gjør DuckDuckGo til standardnettleser</string>
+    <string name="settingsPrivateSearchTitle">Privat søk</string>
+    <string name="settingsPrivateSearchDescription">Aktivert som standard</string>
+    <string name="settingsWebTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
+    <string name="settingsWebTrackingProtectionDescription">Aktivert som standard</string>
+    <string name="settingsHeadingSettings">Innstillinger</string>
+    <string name="settingsPermissionsSetting">Tillatelser</string>
+    <string name="settingsAutofillLoginsSetting">Fyll inn pålogginger automatisk</string>
+    <string name="settingsSyncSetting">Synkr.</string>
+    <string name="settingsFireButton">Fire Button</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Privat søk</string>
+    <string name="privateSearchTitle">Private Search er aktivert</string>
+    <string name="privateSearchDescription">DuckDuckGo Private Search er standardsøkemotoren din, så du kan søke på nettet uten å bli sporet.</string>
+    <string name="privateSearchHeadingSearchSettings">Søkeinnstillinger</string>
+    <string name="privateSearchAutocompleteToggle">Vis forslag fra autofullføring</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Flere søkeinnstillinger</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Tilpass søkespråk, region med mer</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Flere søkeinnstillinger</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Beskyttelse mot nettsporing</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mot nettsporing</string>
+    <string name="webTrackingProtectionTitle">Nettsporingsbeskyttelse er aktivert</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[DuckDuckGo sporer deg aldri, og vi er opptatt av å beskytte personvernet ditt så godt som mulig. Vi vedlikeholder og utvikler kontinuerlig beskyttelseslag for å holde tritt med nye sporingsmetoder og tilbyr mange beskyttelsestiltak som andre nettlesere ikke har som standard. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>
+    <string name="cookiePopupProtectionDescription">Fjern disse popup-vinduene og minimer informasjonskapsler</string>
+    <string name="cookiePopupProtectionEnabled">Aktivert</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Fire Button</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Tillatelser</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Utseende</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Lagre</string>
@@ -569,9 +611,7 @@
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href=\"\">Finn ut mer</a><u/>]]>
-    </string>
+    <string name="globalPrivacyControlDescription"><![CDATA[DuckDuckGo blokkerer mange sporere automatisk. Med Global Privacy Control (GPC) kan du også be deltakende nettsteder om å begrense salg eller deling av dine personopplysninger med andre selskaper. <u><a href=\"\">Finn ut mer</a><u/>]]></string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
     <string name="disabled">Deaktivert</string>

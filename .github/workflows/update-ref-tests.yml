@@ -1,4 +1,4 @@
-name: Update Reference Tests
+name: Update Privacy Reference Tests
 
 on:
   schedule:
@@ -31,7 +31,7 @@ jobs:
         continue-on-error: true
         run: ncu @duckduckgo/privacy-reference-tests --errorLevel 2
 
-      - name: Update reference tests
+      - name: Update reference steps
         if: ${{ steps.update-check.outcome == 'failure' }}
         run: ncu @duckduckgo/privacy-reference-tests -u
 
@@ -43,18 +43,28 @@ jobs:
         if: ${{ steps.update-check.outcome == 'failure' }}
         run: copy-files-from-to
 
-      - name: Create PR
-        id: create-pr
+      - name: Find latest release version of reference tests
         if: ${{ steps.update-check.outcome == 'failure' }}
-        uses: peter-evans/create-pull-request@v4
+        id: latest-release
+        uses: malmstein/github-asana-action@master
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-repository: 'privacy-reference-tests'
+          github-org: 'duckduckgo'
+          action: 'get-latest-repo-release'
+
+      - name: Create Pull Request in Android repo
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        id: create-pr
+        uses: peter-evans/create-pull-request@v5
         with:
           base: "develop"
-          title: "Update reference tests to latest version"
+          title: Update reference tests to version ${{ steps.latest-release.outputs.version }}
           author: daxmobile <daxmobile@users.noreply.github.com>
           token: ${{ secrets.GT_DAXMOBILE }}
-          commit-message: "Update reference tests to latest version"
+          commit-message: Update content scope scripts to version ${{ steps.latest-release.outputs.version }}
           labels: reference tests, automated pr
-          branch: automated/update-ref-tests-dependencies
+          branch: automated/update-ref-tests-dependencies-${{ steps.latest-release.outputs.version }}
           body: |
             - Automated reference tests dependency update
             
@@ -63,30 +73,52 @@ jobs:
             
             - [ ] All tests must pass
 
-      - name: Create Asana task when workflow succeeded
+      - name: Create Asana task in Android App project
         if: ${{ steps.update-check.outcome == 'failure' }}
-        uses: honeycombio/gha-create-asana-task@main
+        id: create-task
+        uses: malmstein/github-asana-action@master
         with:
-          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
-          asana-task-name: Update reference tests to latest version
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
+          asana-task-name: Update reference tests to version ${{ steps.latest-release.outputs.version }}
           asana-task-description: |
             Reference tests have been updated and a PR created.
             
             If tests failed check out https://app.asana.com/0/0/1203766026095653/f for further information on what to do next.
             
             See ${{ steps.create-pr.outputs.pull-request-url }}
+          action: 'create-asana-task'
+
+      - name: Add Asana task to Release Board project
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        uses: malmstein/github-asana-action@master
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_PR_SECTION_ID }}
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
+          action: 'add-task-asana-project'
+
+      - name: Update PR description with Asana task
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        uses: malmstein/github-asana-action@master
+        with:
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
+          github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
+          github-repository: 'android'
+          github-org: 'duckduckgo'
+          asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          asana-task-id: ${{ steps.create-task.outputs.taskId }}
+          action: 'add-task-pr-description'
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: honeycombio/gha-create-asana-task@main
+        uses: malmstein/github-asana-action@master
         with:
-          asana-secret: ${{ secrets.GH_ASANA_SECRET }}
-          asana-workspace-id: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
-          asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Update reference tests
           asana-task-description: The update reference tests workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-
+          action: 'create-asana-task'

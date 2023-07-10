@@ -52,11 +52,11 @@
     <dimen name="listItemImageContainerSize">40dp</dimen>
     <dimen name="listItemImageSize">24dp</dimen>
     <dimen name="listItemTrailingIconWidth">52dp</dimen>
-    <dimen name="oneLineItemHeight">48dp</dimen>
-    <dimen name="twoLineItemHeight">72dp</dimen>
+    <dimen name="oneLineItemHeight">44dp</dimen>
+    <dimen name="twoLineItemHeight">64dp</dimen>
     <dimen name="twoLineItemVerticalPadding">16dp</dimen>
     <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
-    <dimen name="sectionHeaderListItemHeight">48dp</dimen>
+    <dimen name="sectionHeaderListItemHeight">44dp</dimen>
     <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>
 
     <!-- PopupMenu -->
@@ -104,6 +104,9 @@
     <!-- Card -->
     <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
     <dimen name="daxBubbleDialogEdge">9dp</dimen>
+
+    <!-- CheckListItem -->
+    <dimen name="checkListItemHeight">58dp</dimen>
 
     <!-- Legacy Dimensions -->
     <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>

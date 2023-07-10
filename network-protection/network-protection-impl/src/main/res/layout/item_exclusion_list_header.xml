@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,24 +14,25 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settingsSectionGeneral"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_margin="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/setAsDefaultBrowserSetting"
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/exclusion_item_header_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsDefaultBrowserEnabled"
-        app:showSwitch="true"/>
+        app:textType="secondary"
+        app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/homeScreenWidgetSetting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/settingsAddHomeScreenWidget"/>
+    <com.duckduckgo.mobile.android.ui.view.InfoPanel
+        android:id="@+id/exclusion_item_header_banner"
+        style="@style/Widget.DuckDuckGo.InfoPanel"
+        app:panelBackground="@drawable/info_panel_alert_background"
+        app:panelDrawable="@drawable/ic_info_panel_alert" />
 
-</LinearLayout>
+</FrameLayout>
+
+

@@ -58,6 +58,7 @@ dependencies {
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':statistics')
     implementation project(':library-loader-api')
+    implementation project(':network-protection-api')
 
     implementation Kotlin.stdlib.jdk7
 
