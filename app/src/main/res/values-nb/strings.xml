@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">Jeg kan ikke logge inn</string>
     <string name="brokenSiteCategoryUnsupported">Nettleseren er inkompatibel</string>
     <string name="brokenSiteCategoryOther">Noe annet</string>
-    <string name="brokenSiteDescriptionTextInputHint">Fortell oss om problemet du opplevde, hvis du har lyst</string>
+    <string name="brokenSiteDescriptionTextInputHint">Hvis du gir oss flere detaljer, kan det hjelpe oss å løse dette problemet</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
