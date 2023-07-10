@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api
+package com.duckduckgo.sync.impl
 
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "deviceSync",
+)
 interface SyncFeature {
     @Toggle.DefaultValue(false)
     fun self(): Toggle

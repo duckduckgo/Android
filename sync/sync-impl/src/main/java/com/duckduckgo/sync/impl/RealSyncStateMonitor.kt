@@ -50,10 +50,6 @@ class RealSyncStateMonitor @Inject constructor(
             .flowOn(dispatcherProvider.io())
     }
 
-    override fun isUserSignedInOnDevice(): Boolean {
-        return syncStore.isSignedIn()
-    }
-
     private fun mapState(
         attempt: SyncAttempt,
         signedIn: Boolean,
