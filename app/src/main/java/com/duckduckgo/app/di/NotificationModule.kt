@@ -95,7 +95,7 @@ object NotificationModule {
             clearDataNotification,
             privacyProtectionNotification,
             enableAppTpNotification,
-            variantManager
+            variantManager,
         )
     }
 

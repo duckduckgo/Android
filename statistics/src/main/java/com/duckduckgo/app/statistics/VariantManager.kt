@@ -42,7 +42,7 @@ interface VariantManager {
         object OneEasyStepForPrivacyNotification : VariantFeature()
         object NextLevelPrivacyNotification : VariantFeature()
         object DaxDialogMessage : VariantFeature()
-        object NotificationSchedulingBugFix: VariantFeature()
+        object NotificationSchedulingBugFix : VariantFeature()
     }
 
     companion object {
@@ -67,7 +67,7 @@ interface VariantManager {
             Variant(key = "zn", weight = 0.0, features = listOf(NextLevelPrivacyNotification), filterBy = { noFilter() }),
             Variant(key = "zo", weight = 0.0, features = listOf(DaxDialogMessage), filterBy = { noFilter() }),
 
-            //Experiment: Increase retention through push notification bug fix
+            // Experiment: Increase retention through push notification bug fix
             Variant(key = "zp", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "zq", weight = 1.0, features = listOf(NotificationSchedulingBugFix), filterBy = { noFilter() }),
         )
