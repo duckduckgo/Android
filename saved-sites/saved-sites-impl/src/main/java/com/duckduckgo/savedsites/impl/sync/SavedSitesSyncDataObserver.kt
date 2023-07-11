@@ -53,8 +53,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private val dataObserverJob = ConflatedJob()
 
     override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        syncStateMonitor.syncState().distinctUntilChanged()
+        syncStateMonitor.syncState()
             .onEach { state ->
                 when (state) {
                     OFF -> cancelSavedSitesChanges()
