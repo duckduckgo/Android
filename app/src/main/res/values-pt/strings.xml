@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">Não consigo entrar</string>
     <string name="brokenSiteCategoryUnsupported">O navegador é incompatível</string>
     <string name="brokenSiteCategoryOther">Outra coisa</string>
-    <string name="brokenSiteDescriptionTextInputHint">Se preferires, fala-nos do problema que enfrentaste</string>
+    <string name="brokenSiteDescriptionTextInputHint">Indica mais detalhes para nos ajudares a resolver este problema</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
