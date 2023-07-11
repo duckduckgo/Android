@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">No puedo iniciar sesión</string>
     <string name="brokenSiteCategoryUnsupported">El navegador es incompatible</string>
     <string name="brokenSiteCategoryOther">Otro problema</string>
-    <string name="brokenSiteDescriptionTextInputHint">Si quieres, cuéntanos qué problema has encontrado</string>
+    <string name="brokenSiteDescriptionTextInputHint">Si compartes más detalles, nos ayudarás a resolver esta incidencia</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
