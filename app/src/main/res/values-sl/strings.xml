@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">Ne morem se prijaviti</string>
     <string name="brokenSiteCategoryUnsupported">Brskalnik ni združljiv</string>
     <string name="brokenSiteCategoryOther">Nekaj drugega</string>
-    <string name="brokenSiteDescriptionTextInputHint">Če želite, nam opišite težavo, na katero ste naleteli.</string>
+    <string name="brokenSiteDescriptionTextInputHint">Če z nami delite več podrobnosti, nam to lahko pomaga pri reševanju te težave</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
