@@ -320,7 +320,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
 
         // set underlying networks
-        configureUnderlyingNetworks()
+        // configureUnderlyingNetworks()
 
         logcat { "VPN log: Enable new error handling for onStartVpn" }
         vpnNetworkStack.onStartVpn(activeTun!!).getOrElse {

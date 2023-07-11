@@ -38,6 +38,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
@@ -70,7 +71,14 @@ class VpnActiveNetworkManager @Inject constructor(
         .build()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        if (runBlocking { !shouldHandleNetworkChanges() }) {
+            logcat { "Do not handle network changes" }
+            return
+        }
+
         if (isInterceptDnsRequestsEnabled) {
+            service.get().configureUnderlyingNetworks()
+
             (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
                 it.safeRegisterNetworkCallback(wifiNetworkRequest, wifiNetworkCallback)
                 it.safeRegisterNetworkCallback(cellularNetworkRequest, cellularNetworkCallback)
@@ -78,6 +86,11 @@ class VpnActiveNetworkManager @Inject constructor(
         } else {
             logcat { "DNS based blocking is disabled, noop" }
         }
+    }
+
+    override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
+        // both when VPN is first started and reconfigured we check if we need to handle network changes
+        onVpnStarted(coroutineScope)
     }
 
     override fun onVpnStopped(
@@ -94,7 +107,7 @@ class VpnActiveNetworkManager @Inject constructor(
         val service = service.get()
         if (ignoreRestartEvent()) {
             service.configureUnderlyingNetworks()
-            logcat { "AppTP is not enabled, ignoring restartIfActiveNetworkChanged() event" }
+            logcat { "AppTP (only) is not enabled, ignoring restartIfActiveNetworkChanged() event" }
             return
         }
 
@@ -124,6 +137,10 @@ class VpnActiveNetworkManager @Inject constructor(
 
     private suspend fun ignoreRestartEvent(): Boolean {
         return vpnFeaturesRegistry.getRegisteredFeatures().size > 1 || !vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+    }
+
+    private suspend fun shouldHandleNetworkChanges(): Boolean {
+        return vpnFeaturesRegistry.getRegisteredFeatures().size == 1 && vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
     }
 
     private val wifiNetworkCallback = object : NetworkCallback() {
