@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">Negaliu prisijungti</string>
     <string name="brokenSiteCategoryUnsupported">Naršyklė nesuderinama</string>
     <string name="brokenSiteCategoryOther">Kažkas kito</string>
-    <string name="brokenSiteDescriptionTextInputHint">Jei norite, papasakokite apie problemą, su kuria susidūrėte</string>
+    <string name="brokenSiteDescriptionTextInputHint">Jei pasidalinsime daugiau informacijos, galime padėti išspręsti šią problemą</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
