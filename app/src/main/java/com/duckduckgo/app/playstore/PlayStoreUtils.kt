@@ -35,17 +35,22 @@ class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
 
     override fun installedFromPlayStore(): Boolean {
         return try {
-            val installSource = context.packageManager.getInstallerPackageName(DDG_APP_PACKAGE)
-            return matchesPlayStoreInstallSource(installSource)
+            val initiatingPackageName = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                val installerSourceInfo = context.packageManager.getInstallSourceInfo(DDG_APP_PACKAGE)
+                installerSourceInfo.initiatingPackageName
+            } else {
+                context.packageManager.getInstallerPackageName(DDG_APP_PACKAGE)
+            }
+            return matchesPlayStoreInstallSource(initiatingPackageName)
         } catch (e: IllegalArgumentException) {
             Timber.w(e, "Can't determine if app was installed from Play Store; assuming it wasn't")
             false
         }
     }
 
-    private fun matchesPlayStoreInstallSource(installSource: String?): Boolean {
-        Timber.i("DuckDuckGo app install source detected: $installSource")
-        return installSource == PLAY_STORE_PACKAGE
+    private fun matchesPlayStoreInstallSource(initiatingPackageName: String?): Boolean {
+        Timber.i("DuckDuckGo app install source detected: $initiatingPackageName")
+        return initiatingPackageName == PLAY_STORE_PACKAGE
     }
 
     override fun isPlayStoreInstalled(): Boolean {
@@ -65,8 +70,11 @@ class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
     }
 
     private fun isPlayStoreAppEnabled(): Boolean {
-        context.packageManager.getPackageInfo(PLAY_STORE_PACKAGE, 0)
-        val appInfo = context.packageManager.getApplicationInfo(PLAY_STORE_PACKAGE, 0)
+        val appInfo = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            context.packageManager.getApplicationInfo(PLAY_STORE_PACKAGE, PackageManager.ApplicationInfoFlags.of(0))
+        } else {
+            context.packageManager.getApplicationInfo(PLAY_STORE_PACKAGE, 0)
+        }
         return appInfo.enabled
     }
 
