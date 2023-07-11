@@ -32,6 +32,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -68,7 +69,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
         if (!dataObserverJob.isActive) {
             dataObserverJob += coroutineScope.launch(dispatchers.io()) {
                 Timber.d("Sync-Feature: Listening for changes to Saved Sites")
-                savedSitesRepository.lastModified().collect {
+                savedSitesRepository.lastModified().drop(1).collect {
                     Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
                     syncEngine.triggerSync(DATA_CHANGE)
                 }
@@ -77,7 +78,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
     }
 
     private fun cancelSavedSitesChanges() {
-        Timber.d("Sync-Feature: Sync is OFF, not listening to changes to Saved Sites")
+        Timber.d("Sync-Feature: not listening to changes to Saved Sites")
         dataObserverJob.cancel()
     }
 }
