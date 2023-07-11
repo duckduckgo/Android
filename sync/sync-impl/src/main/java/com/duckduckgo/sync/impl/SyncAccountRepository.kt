@@ -34,7 +34,7 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.*
 
-interface SyncRepository {
+interface SyncAccountRepository {
 
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
@@ -56,13 +56,13 @@ interface SyncRepository {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 @WorkerThread
-class AppSyncRepository @Inject constructor(
+class AppSyncAccountRepository @Inject constructor(
     private val syncDeviceIds: SyncDeviceIds,
     private val nativeLib: SyncLib,
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
     private val syncEngine: SyncEngine,
-) : SyncRepository {
+) : SyncAccountRepository {
 
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()

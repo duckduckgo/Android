@@ -21,7 +21,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.ShowCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.ShowCodeViewModel.ViewState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,25 +41,25 @@ internal class ShowCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepository: SyncRepository = mock()
+    private val syncAccountRepository: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
 
     private val testee = ShowCodeViewModel(
-        syncRepository,
+        syncAccountRepository,
         clipboard,
         coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
     fun whenUserClicksOnCopyCodeThenClipboardIsCopied() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         testee.onCopyCodeClicked()
         verify(clipboard).copyToClipboard(jsonRecoveryKeyEncoded)
     }
 
     @Test
     fun whenViewStateInitializedButNoRecoveryCodeThenShowError() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(null)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(null)
         testee.viewState().test {
             awaitItem()
         }
@@ -70,7 +70,7 @@ internal class ShowCodeViewModelTest {
 
     @Test
     fun whenViewStateInitializedThenViewIsUpdated() = runTest {
-        whenever(syncRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(jsonRecoveryKeyEncoded)
         testee.viewState().test {
             assertEquals(ViewState(jsonRecoveryKeyEncoded), awaitItem())
         }

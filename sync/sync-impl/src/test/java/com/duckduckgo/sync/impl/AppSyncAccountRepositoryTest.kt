@@ -76,7 +76,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class AppSyncRepositoryTest {
+class AppSyncAccountRepositoryTest {
 
     private var nativeLib: SyncLib = mock()
     private var syncDeviceIds: SyncDeviceIds = mock()
@@ -85,11 +85,11 @@ class AppSyncRepositoryTest {
     private var syncEngine: SyncEngine = mock()
     private var syncStateRepository: SyncStateRepository = mock()
 
-    private lateinit var syncRepo: SyncRepository
+    private lateinit var syncRepo: SyncAccountRepository
 
     @Before
     fun before() {
-        syncRepo = AppSyncRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine)
+        syncRepo = AppSyncAccountRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine)
     }
 
     @Test

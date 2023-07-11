@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.FinishSetupFlow
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncSetupFlowViewModel @Inject constructor(
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 

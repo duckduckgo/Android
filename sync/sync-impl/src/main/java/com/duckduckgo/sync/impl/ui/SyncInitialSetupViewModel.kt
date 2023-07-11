@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 class SyncInitialSetupViewModel
 @Inject
 constructor(
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -74,7 +74,7 @@ constructor(
 
     fun onCreateAccountClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.createAccount()
+            val result = syncAccountRepository.createAccount()
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -85,15 +85,15 @@ constructor(
 
     fun onResetClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            syncRepository.removeAccount()
+            syncAccountRepository.removeAccount()
             updateViewState()
         }
     }
 
     fun onLogoutClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val currentDeviceId = syncRepository.getAccountInfo().deviceId
-            val result = syncRepository.logout(currentDeviceId)
+            val currentDeviceId = syncAccountRepository.getAccountInfo().deviceId
+            val result = syncAccountRepository.logout(currentDeviceId)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -103,7 +103,7 @@ constructor(
 
     fun onDeviceLogoutClicked(deviceId: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.logout(deviceId)
+            val result = syncAccountRepository.logout(deviceId)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -113,7 +113,7 @@ constructor(
 
     fun onDeleteAccountClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.deleteAccount()
+            val result = syncAccountRepository.deleteAccount()
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -123,7 +123,7 @@ constructor(
 
     private fun getConnectedDevices() {
         viewModelScope.launch(dispatchers.io()) {
-            when (val connectedDevices = syncRepository.getConnectedDevices()) {
+            when (val connectedDevices = syncAccountRepository.getConnectedDevices()) {
                 is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
                 is Success -> {
                     viewState.emit(
@@ -139,7 +139,7 @@ constructor(
 
     private fun startInitialSync() {
         viewModelScope.launch(dispatchers.io()) {
-            when (val connectedDevices = syncRepository.getConnectedDevices()) {
+            when (val connectedDevices = syncAccountRepository.getConnectedDevices()) {
                 is Error -> command.send(Command.ShowMessage(connectedDevices.reason))
                 is Success -> {
                     viewState.emit(
@@ -154,14 +154,14 @@ constructor(
     }
 
     private suspend fun updateViewState() {
-        val accountInfo = syncRepository.getAccountInfo()
+        val accountInfo = syncAccountRepository.getAccountInfo()
         viewState.emit(
             viewState.value.copy(
                 userId = accountInfo.userId,
                 deviceName = accountInfo.deviceName,
                 deviceId = accountInfo.deviceId,
                 isSignedIn = accountInfo.isSignedIn,
-                token = syncRepository.latestToken(),
+                token = syncAccountRepository.latestToken(),
                 primaryKey = accountInfo.primaryKey,
                 secretKey = accountInfo.secretKey,
             ),
@@ -176,14 +176,14 @@ constructor(
 
     fun onShowQRClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCode = syncRepository.getRecoveryCode() ?: return@launch
+            val recoveryCode = syncAccountRepository.getRecoveryCode() ?: return@launch
             command.send(ShowQR(recoveryCode))
         }
     }
 
     fun onQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.login(contents)
+            val result = syncAccountRepository.login(contents)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -193,7 +193,7 @@ constructor(
 
     fun onConnectQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.connectDevice(contents)
+            val result = syncAccountRepository.connectDevice(contents)
             when (result) {
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))
@@ -208,7 +208,7 @@ constructor(
 
     fun onConnectStart() {
         viewModelScope.launch(dispatchers.io()) {
-            val qrCode = when (val qrCodeResult = syncRepository.getConnectQR()) {
+            val qrCode = when (val qrCodeResult = syncAccountRepository.getConnectQR()) {
                 is Error -> {
                     command.send(ShowMessage("$qrCodeResult"))
                     return@launch
@@ -220,7 +220,7 @@ constructor(
             var polling = true
             while (polling) {
                 delay(7000)
-                when (val result = syncRepository.pollConnectionKeys()) {
+                when (val result = syncAccountRepository.pollConnectionKeys()) {
                     is Error -> {
                         command.send(Command.ShowMessage("$result"))
                     }

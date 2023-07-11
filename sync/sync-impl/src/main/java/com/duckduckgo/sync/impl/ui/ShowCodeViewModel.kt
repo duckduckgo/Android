@@ -22,7 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class ShowCodeViewModel @Inject constructor(
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -45,7 +45,7 @@ class ShowCodeViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val code = syncRepository.getRecoveryCode()
+        val code = syncAccountRepository.getRecoveryCode()
         if (code == null) { // It shouldn't be null, but recovery code returns nullable.
             command.send(Command.Error)
         } else {
@@ -63,7 +63,7 @@ class ShowCodeViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCode = syncRepository.getRecoveryCode() ?: return@launch
+            val recoveryCode = syncAccountRepository.getRecoveryCode() ?: return@launch
             clipboard.copyToClipboard(recoveryCode)
         }
     }

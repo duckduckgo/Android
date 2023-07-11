@@ -24,7 +24,7 @@ import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,7 +47,7 @@ class ShowQRCodeViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val qrEncoder: QREncoder = mock()
-    private val syncRepostitory: SyncRepository = mock()
+    private val syncRepostitory: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
 
     private val testee = ShowQRCodeViewModel(
