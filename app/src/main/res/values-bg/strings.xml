@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">Не мога да вляза</string>
     <string name="brokenSiteCategoryUnsupported">Браузърът е несъвместим</string>
     <string name="brokenSiteCategoryOther">Нещо друго</string>
-    <string name="brokenSiteDescriptionTextInputHint">Ако искате, опишете ни за възникналия проблем</string>
+    <string name="brokenSiteDescriptionTextInputHint">Ако споделите повече подробности, може да ни помогне да се справим с този проблем</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
