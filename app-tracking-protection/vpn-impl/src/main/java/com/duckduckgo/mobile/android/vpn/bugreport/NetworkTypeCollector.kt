@@ -26,6 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -63,6 +65,7 @@ class NetworkTypeCollector @Inject constructor(
     private val context: Context,
     private val appTpFeatureConfig: AppTpFeatureConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnStateCollectorPlugin, VpnServiceCallbacks {
 
     private val databaseDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
@@ -70,6 +73,9 @@ class NetworkTypeCollector @Inject constructor(
 
     private val isPrivateDnsSupportEnabled: Boolean
         get() = appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)
+
+    private val isInterceptDnsRequestsEnabled: Boolean
+        get() = appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsRequests)
 
     private val preferences: SharedPreferences
         get() = context.getHarmonySharedPreferences(FILENAME)
@@ -140,9 +146,15 @@ class NetworkTypeCollector @Inject constructor(
             // update values cached values anyways
             privateDnsCacheValue = privateDnsServerName
             if (shouldRestart.getAndSet(false)) {
-                logcat { "Reconfiguring VPN now" }
                 coroutineScope.launch {
-                    TrackerBlockingVpnService.restartVpnService(context)
+                    // we check for skip here because the check needs a coroutine scope and we don't want to wrap the whole callback
+                    // inside a coroutine
+                    if (shouldProceedWithVpnRestart()) {
+                        logcat { "Reconfiguring VPN now" }
+                        TrackerBlockingVpnService.restartVpnService(context)
+                    } else {
+                        logcat { "Reconfiguring VPN SKIPPED" }
+                    }
                 }
             }
         }
@@ -167,10 +179,17 @@ class NetworkTypeCollector @Inject constructor(
         vpnStopReason: VpnStopReason,
     ) {
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
+            // always unregistered, even if not previously registered
             it.safeUnregisterNetworkCallback(wifiNetworkCallback)
             it.safeUnregisterNetworkCallback(cellularNetworkCallback)
             it.safeUnregisterNetworkCallback(privateDnsCallback)
         }
+    }
+
+    private suspend fun shouldProceedWithVpnRestart(): Boolean {
+        return vpnFeaturesRegistry.getRegisteredFeatures().size == 1 &&
+            vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) &&
+            isInterceptDnsRequestsEnabled
     }
 
     private fun updateNetworkInfo(connection: Connection) {
