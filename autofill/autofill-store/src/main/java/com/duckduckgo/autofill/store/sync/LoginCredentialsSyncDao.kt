@@ -21,7 +21,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.duckduckgo.autofill.store.sync.LoginCredentialsSync
 
 @Dao
 interface LoginCredentialsSyncDao {
@@ -35,4 +34,3 @@ interface LoginCredentialsSyncDao {
     @Delete
     fun delete(entity: LoginCredentialsSync)
 }
-

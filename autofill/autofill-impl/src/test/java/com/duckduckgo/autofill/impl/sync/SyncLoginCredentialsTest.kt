@@ -33,7 +33,9 @@ import org.robolectric.RuntimeEnvironment
 @RunWith(AndroidJUnit4::class)
 internal class SyncLoginCredentialsTest {
 
-    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val db = Room.inMemoryDatabaseBuilder(RuntimeEnvironment.getApplication(), AutofillDatabase::class.java).allowMainThreadQueries().build()
     private val dao = db.syncLoginCredentialsDao()

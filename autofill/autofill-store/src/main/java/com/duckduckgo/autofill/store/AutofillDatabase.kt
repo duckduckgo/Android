@@ -36,10 +36,11 @@ abstract class AutofillDatabase : RoomDatabase() {
     abstract fun syncLoginCredentialsDao(): LoginCredentialsSyncDao
 }
 
-
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("CREATE TABLE IF NOT EXISTS `website_login_credentials_sync_meta` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`syncId`))")
+        database.execSQL(
+            "CREATE TABLE IF NOT EXISTS `website_login_credentials_sync_meta` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`syncId`))",
+        )
     }
 }
 
