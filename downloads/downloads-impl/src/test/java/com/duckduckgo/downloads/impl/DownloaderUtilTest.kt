@@ -191,26 +191,102 @@ class DownloaderUtilTest {
 
     @Test
     fun whenContentDispositionWithAttachmentAndFilenameBetweenQuotesAndSpaceAfterSemicolonThenCorrectFilenameExtracted() {
-        assertEquals("filename.jpg", DownloaderUtil.parseContentDisposition("""attachment; filename="filename.jpg""""))
+        assertEquals("filename.jpg", DownloaderUtil.fileNameFromContentDisposition("""attachment; filename="filename.jpg""""))
     }
 
     @Test
     fun whenContentDispositionWithAttachmentAndFilenameBetweenQuotesAndSpacesBeforeAndAfterSemicolonThenCorrectFilenameExtracted() {
-        assertEquals("filename.jpg", DownloaderUtil.parseContentDisposition("""attachment ; filename="filename.jpg""""))
+        assertEquals("filename.jpg", DownloaderUtil.fileNameFromContentDisposition("""attachment ; filename="filename.jpg""""))
     }
 
     @Test
     fun whenContentDispositionWithAttachmentAndFilenameBetweenQuotesAndNoSpacesThenCorrectFilenameExtracted() {
-        assertEquals("filename.jpg", DownloaderUtil.parseContentDisposition("""attachment;filename="filename.jpg""""))
+        assertEquals("filename.jpg", DownloaderUtil.fileNameFromContentDisposition("""attachment;filename="filename.jpg""""))
     }
 
     @Test
     fun whenContentDispositionWithAttachmentAndFilenameWithoutQuotesAndWithSpaceAfterSemicolonThenCorrectFilenameExtracted() {
-        assertEquals("filename.jpg", DownloaderUtil.parseContentDisposition("""attachment; filename=filename.jpg"""))
+        assertEquals("filename.jpg", DownloaderUtil.fileNameFromContentDisposition("""attachment; filename=filename.jpg"""))
     }
 
     @Test
     fun whenContentDispositionWithInlineAndFilenameBetweenQuotesAndSpaceAfterSemicolonThenCorrectFilenameExtracted() {
-        assertEquals("filename.jpg", DownloaderUtil.parseContentDisposition("""inline; filename="filename.jpg""""))
+        assertEquals("filename.jpg", DownloaderUtil.fileNameFromContentDisposition("""inline; filename="filename.jpg""""))
+    }
+
+    @Test
+    fun whenContentDispositionWithInlineAndFilenameEncodedThenEncodedFilenameExtracted() {
+        assertEquals(
+            "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt",
+            DownloaderUtil.fileNameFromContentDisposition(
+                """attachment; filename*= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt"""",
+            ),
+        )
+    }
+
+    @Test
+    fun whenContentDispositionWithInlineAndFilenameStarEncodedThenDecodedFilenameExtracted() {
+        assertEquals(
+            "中文文件名测试.txt",
+            DownloaderUtil.fileNameFromContentDisposition(
+                """attachment; filename*=utf-8''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt""",
+            ),
+        )
+    }
+
+    @Test
+    fun whenContentDispositionWithInlineAndFilenameStarEncodedAndFilenameThenDecodedFilenameExtracted() {
+        assertEquals(
+            "中文文件名测试.txt",
+            DownloaderUtil.fileNameFromContentDisposition(
+                """
+                    attachment; 
+                    filename*=utf-8''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt
+                """.trimIndent(),
+            ),
+        )
+    }
+
+    @Test
+    fun whenContentDispositionWithInlineAndFilenameAndFilenameStarEncodedThenDecodedFilenameExtracted() {
+        assertEquals(
+            "中文文件名测试.txt",
+            DownloaderUtil.fileNameFromContentDisposition(
+                """
+                    attachment; 
+                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    filename*=utf-8''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt;
+                """.trimIndent(),
+            ),
+        )
+    }
+
+    @Test
+    fun whenContentDispositionWithInlineAndFilenameStarEncodedWithNoEncodingAndFilenameThenDecodedFilenameExtractedFallback() {
+        assertEquals(
+            "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt",
+            DownloaderUtil.fileNameFromContentDisposition(
+                """
+                    attachment; 
+                    filename*=%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt
+                """.trimIndent(),
+            ),
+        )
+    }
+
+    @Test
+    fun whenContentDispositionWithInlineAndFilenameStarEncodedWithInvalidEncodingAndFilenameThenDecodedFilenameExtractedFallback() {
+        assertEquals(
+            "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt",
+            DownloaderUtil.fileNameFromContentDisposition(
+                """
+                    attachment; 
+                    filename*=test''%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt; 
+                    filename= "%E4%B8%AD%E6%96%87%E6%96%87%E4%BB%B6%E5%90%8D%E6%B5%8B%E8%AF%95.txt
+                """.trimIndent(),
+            ),
+        )
     }
 }
