@@ -142,7 +142,7 @@ class TabSwitcherAdapter(
     ) {
         val url = tab.url ?: return
         lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(tab.tabId, url, view)
+            faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, url, view)
         }
     }
 

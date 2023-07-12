@@ -114,28 +114,6 @@ class DuckDuckGoFaviconManagerTest {
     }
 
     @Test
-    @UiThreadTest
-    fun whenLoadToViewFromLocalOrFallbackIfCannotFindFaviconThenDownloadFromUrl() = runTest {
-        val view = ImageView(context)
-        val url = "https://example.com"
-
-        testee.loadToViewFromLocalOrFallback(url = url, view = view)
-
-        verify(mockFaviconDownloader).getFaviconFromUrl(url.toUri().faviconLocation()!!)
-    }
-
-    @Test
-    @UiThreadTest
-    fun whenLoadToViewFromLocalOrFallbackWithTabIdIfCannotFindFaviconThenDownloadFromUrl() = runTest {
-        val view = ImageView(context)
-        val url = "https://example.com"
-
-        testee.loadToViewFromLocalOrFallback("subFolder", "example.com", view)
-
-        verify(mockFaviconDownloader).getFaviconFromUrl(url.toUri().faviconLocation()!!)
-    }
-
-    @Test
     fun whenTryFetchFaviconForUrlThenGetFaviconFromUrlAndStoreFile() = runTest {
         val bitmap = asBitmap()
         val url = "https://example.com"
@@ -232,30 +210,6 @@ class DuckDuckGoFaviconManagerTest {
         testee.deleteAllTemp()
 
         verify(mockFaviconPersister).deleteAll(FAVICON_TEMP_DIR)
-    }
-
-    @Test
-    fun whenSaveFaviconForUrlCalledForCachedFaviconThenFaviconIsNotDownloadedAndSavedAgain() = runTest {
-        givenFaviconExistsInDirectory(FAVICON_PERSISTED_DIR)
-        val url = "https://example.com"
-
-        testee.saveFaviconForUrl(url = url)
-
-        verify(mockFaviconDownloader, never()).getFaviconFromUrl(any())
-        verify(mockFaviconPersister, never()).store(any(), any(), any(), any())
-    }
-
-    @Test
-    fun whenSaveFaviconForUrlCalledForNonCachedFaviconThenFaviconIsDownloadedAndSaved() = runTest {
-        val bitmap = asBitmap()
-        val url = "https://example.com"
-        whenever(mockFaviconPersister.faviconFile(any(), any(), any())).thenReturn(null)
-        whenever(mockFaviconDownloader.getFaviconFromUrl(any())).thenReturn(bitmap)
-
-        testee.saveFaviconForUrl(url = url)
-
-        verify(mockFaviconDownloader).getFaviconFromUrl(any())
-        verify(mockFaviconPersister).store(FAVICON_TEMP_DIR, "", bitmap, "example.com")
     }
 
     @Test
