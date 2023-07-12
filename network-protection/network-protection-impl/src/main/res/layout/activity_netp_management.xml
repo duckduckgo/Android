@@ -86,6 +86,10 @@
                 android:id="@+id/settings"
                 layout="@layout/section_settings" />
 
+            <include
+                android:id="@+id/about"
+                layout="@layout/section_about" />
+
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/netp_beta_description"
                 android:layout_width="match_parent"
