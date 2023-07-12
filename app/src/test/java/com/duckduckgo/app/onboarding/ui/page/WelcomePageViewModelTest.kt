@@ -23,7 +23,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,9 +65,6 @@ class WelcomePageViewModelTest {
     @Mock
     private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 
-    @Mock
-    private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
-
     private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
 
     lateinit var viewModel: WelcomePageViewModel
@@ -83,7 +79,6 @@ class WelcomePageViewModelTest {
             context = mock(),
             pixel = pixel,
             defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-            featureSegmentsManager = mockFeatureSegmentsManager,
         )
 
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }

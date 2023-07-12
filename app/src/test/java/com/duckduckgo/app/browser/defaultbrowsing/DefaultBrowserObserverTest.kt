@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.defaultbrowsing
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import org.junit.Before
 import org.junit.Test
@@ -40,15 +39,12 @@ class DefaultBrowserObserverTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    @Mock
-    private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
-
     private val mockOwner: LifecycleOwner = mock()
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = DefaultBrowserObserver(mockDefaultBrowserDetector, mockAppInstallStore, mockPixel, mockFeatureSegmentsManager)
+        testee = DefaultBrowserObserver(mockDefaultBrowserDetector, mockAppInstallStore, mockPixel)
     }
 
     @Test

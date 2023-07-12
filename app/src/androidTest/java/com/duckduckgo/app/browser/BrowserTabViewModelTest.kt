@@ -108,7 +108,6 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_APPTP_CTA
@@ -337,9 +336,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
-    private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
-
-    @Mock
     private lateinit var mockSurveyNotificationScheduler: SurveyNotificationScheduler
 
     @Mock
@@ -517,7 +513,6 @@ class BrowserTabViewModelTest {
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
-            featureSegmentsManager = mockFeatureSegmentsManager,
             surveyNotificationScheduler = mockSurveyNotificationScheduler,
         )
 

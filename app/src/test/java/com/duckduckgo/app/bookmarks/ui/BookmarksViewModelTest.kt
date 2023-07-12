@@ -24,7 +24,6 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -75,7 +74,6 @@ class BookmarksViewModelTest {
     private val savedSitesManager: SavedSitesManager = mock()
     private val syncEngine: SyncEngine = mock()
     private val pixel: Pixel = mock()
-    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
 
     private val bookmark =
         SavedSite.Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
@@ -91,7 +89,6 @@ class BookmarksViewModelTest {
             pixel,
             syncEngine,
             coroutineRule.testDispatcherProvider,
-            mockFeatureSegmentsManager,
         )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
