@@ -19,8 +19,6 @@ package com.duckduckgo.app.brokensite
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
@@ -112,39 +110,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             val description = brokenSites.brokenSiteFormFeedbackInput?.text
             viewModel.onSubmitPressed(webViewVersion, description)
         }
-
-        val descTextWatcher = object : TextWatcher {
-            private var ignoreThisChange = false
-            private val textMax = 2048
-            override fun beforeTextChanged(
-                p0: CharSequence?,
-                p1: Int,
-                p2: Int,
-                p3: Int,
-            ) {
-            }
-
-            override fun onTextChanged(
-                p0: CharSequence?,
-                p1: Int,
-                p2: Int,
-                p3: Int,
-            ) {
-            }
-
-            override fun afterTextChanged(s: Editable) {
-                if (ignoreThisChange) return
-                ignoreThisChange = true // prevent infinite loop
-                if (textMax >= s.trim().length) {
-                    brokenSites.brokenSiteCharCounter?.text = getString(R.string.brokenSiteDescriptionCounterText, s.trim().length)
-                } else {
-                    brokenSites.brokenSiteFormFeedbackInput?.text = s.subSequence(0..2048).toString()
-                    brokenSites.brokenSiteCharCounter?.text = getString(R.string.brokenSiteDescriptionCounterText, textMax)
-                }
-                ignoreThisChange = false
-            }
-        }
-        brokenSites.brokenSiteFormFeedbackInput?.addTextChangedListener(descTextWatcher)
     }
 
     private fun configureObservers() {
