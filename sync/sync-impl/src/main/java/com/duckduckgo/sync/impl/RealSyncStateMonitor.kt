@@ -32,6 +32,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 
@@ -46,7 +47,7 @@ class RealSyncStateMonitor @Inject constructor(
         return syncStateRepository.state()
             .combine(syncStore.isSignedInFlow()) { attempt, signedIn ->
                 mapState(attempt, signedIn)
-            }
+            }.distinctUntilChanged()
             .flowOn(dispatcherProvider.io())
     }
 

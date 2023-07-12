@@ -67,6 +67,8 @@ class SavedSitesSyncDataObserver @Inject constructor(
         if (!dataObserverJob.isActive) {
             dataObserverJob += coroutineScope.launch(dispatchers.io()) {
                 Timber.d("Sync-Feature: Listening for changes to Saved Sites")
+                // we drop the first value emitted because it is the current value of the flow
+                // we are only interested in actual data changes
                 savedSitesRepository.lastModified().drop(1).collect {
                     Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
                     syncEngine.triggerSync(DATA_CHANGE)
