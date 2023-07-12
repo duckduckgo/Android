@@ -23,6 +23,7 @@ import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BlockingTrack
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DaxDialogMessage
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyRemoteMessage
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationSchedulingBugFix
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyRemoteMessage
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -41,6 +42,7 @@ interface VariantManager {
         object OneEasyStepForPrivacyNotification : VariantFeature()
         object NextLevelPrivacyNotification : VariantFeature()
         object DaxDialogMessage : VariantFeature()
+        object NotificationSchedulingBugFix : VariantFeature()
     }
 
     companion object {
@@ -64,6 +66,10 @@ interface VariantManager {
             Variant(key = "zm", weight = 0.0, features = listOf(OneEasyStepForPrivacyNotification), filterBy = { noFilter() }),
             Variant(key = "zn", weight = 0.0, features = listOf(NextLevelPrivacyNotification), filterBy = { noFilter() }),
             Variant(key = "zo", weight = 0.0, features = listOf(DaxDialogMessage), filterBy = { noFilter() }),
+
+            // Experiment: Increase retention through push notification bug fix
+            Variant(key = "zp", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "zq", weight = 1.0, features = listOf(NotificationSchedulingBugFix), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -200,6 +206,7 @@ fun VariantManager.isNextLevelPrivacyRemoteMessageEnabled() = this.getVariant().
 fun VariantManager.isOneEasyStepForPrivacyNotificationEnabled() = this.getVariant().hasFeature(OneEasyStepForPrivacyNotification)
 fun VariantManager.isNextLevelPrivacyNotificationEnabled() = this.getVariant().hasFeature(NextLevelPrivacyNotification)
 fun VariantManager.isDaxDialogMessageEnabled() = this.getVariant().hasFeature(DaxDialogMessage)
+fun VariantManager.isNotificationSchedulingBugFixEnabled() = this.getVariant().hasFeature(NotificationSchedulingBugFix)
 
 /**
  * A variant which can be used for experimentation.
