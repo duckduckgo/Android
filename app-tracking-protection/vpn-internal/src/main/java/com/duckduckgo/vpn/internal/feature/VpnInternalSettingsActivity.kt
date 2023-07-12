@@ -242,7 +242,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.InterceptDnsTraffic) {
+        with(AppTpSetting.InterceptDnsRequests) {
             binding.vpnInterceptDnsTrafficToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.vpnInterceptDnsTrafficToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
