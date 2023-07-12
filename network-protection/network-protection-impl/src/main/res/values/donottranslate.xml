@@ -124,4 +124,38 @@
     <string name="netpExclusionListRestoreDefaultSnackbar">Protection restored to default settings</string>
     <string name="netpExclusionListRestoreDefaultsDisclaimer">Enabling protection sends the app\'s name to DuckDuckGo.</string>
 
+    <!-- About -->
+    <string name="netpManagementAboutHeader">About</string>
+    <string name="netpManagementAboutItemInfoVpn">What is a VPN?</string>
+    <string name="netpManagementAboutItemFaqs">Network Protection FAQs</string>
+
+    <!-- Info VPN -->
+    <string name="netpInfoVPNTitle">What is a VPN?</string>
+    <string name="netpInfoVPNFirstQuestion">What is a VPN?</string>
+    <string name="netpInfoVPNFirstAnswer">A virtual private network, commonly known as a VPN, is a tool that protects your privacy and anonymity while online. It hides your real IP address so that websites cannot identify you or your location with it. It also encrypts your online data so that others sharing your network cannot see the links you click, the files you download, or the messages you send.\n\nA VPN is especially important when connecting to public Wi-Fi at coffee shops and airports where you could be exposing your private information and browsing habits to others on that network. A VPN should also be considered for use at home where it can hide your browsing history from your internet service provider who may log and sell that information to other third parties.</string>
+    <string name="netpInfoVPNSecondQuestion">How does a VPN work?</string>
+    <string name="netpInfoVPNSecondAnswer">A VPN creates a "tunnel" between your device and a remote server in another location operated by the VPN provider. All of your online activity is then routed through that tunnel so that it exits from the remote server using a different IP address from yours. Along the way, all of your data is also encrypted (or scrambled) so that others cannot read it.\n\nThere can be some drawbacks to using a VPN. You may experience slower internet speeds depending on how far way the remote server so it\'s recommended to use the nearest server when possible. You may also experience issues accessing or loading certain websites or applications as some developers intentionally block VPN traffic.</string>
+
+    <!-- FAQS -->
+    <string name="netpFaqTitle">Network Protection FAQs</string>
+    <string name="netpFaqQuestionOne">How does Network Protection work?</string>
+    <string name="netpFaqAnswerOne">Network Protection uses the WireGuard protocol to configure a virtual private network (VPN) on your device. When enabled, all of your device traffic is first encrypted and then routed through the nearest DuckDuckGo server to hide your browsing activity from your internet service provider and your location from the sites you visit.</string>
+    <string name="netpFaqQuestionTwo">Is all of my traffic protected or just web surfing?</string>
+    <string name="netpFaqAnswerTwo">All of your device traffic is protected.</string>
+    <string name="netpFaqQuestionThree">Does DuckDuckGo keep logs of my data?</string>
+    <string name="netpFaqAnswerThree">No, we do not store activity logs of any kind.</string>
+    <string name="netpFaqQuestionFour">Where are Network Protection servers located?</string>
+    <string name="netpFaqAnswerFour">DuckDuckGo offers a limited number of servers today in the United States, Canada, and Europe while it is in beta.</string>
+    <string name="netpFaqQuestionFive">Why can\'t I choose my server?</string>
+    <string name="netpFaqAnswerFive">Network Protection automatically selects the nearest server to you to ensure your browsing speeds remain as high as possible while connected.</string>
+    <string name="netpFaqQuestionSix">Does DuckDuckGo limit my speed or bandwidth?</string>
+    <string name="netpFaqAnswerSix">No, we do not throttle your connection speeds or bandwidth. You may however naturally experience a decrease in your speeds based on your proximity to the nearest server.</string>
+    <string name="netpFaqQuestionSeven">Why do some apps not work when Network Protection is on?</string>
+    <string name="netpFaqAnswerSeven">Some app or website developers intentionally block VPN traffic or they may require you to complete a captcha first to prove you\'re a real person. If you consistently experience issues with an app, you can exclude it from the VPN altogether under Network Protection settings.</string>
+    <string name="netpFaqQuestionEight">Why can\'t I dismiss the Network Protection notifications?</string>
+    <string name="netpFaqAnswerEight">Android devices require that we display a permanent notification while the VPN is enabled.</string>
+    <string name="netpFaqQuestionNine">Is Network Protection compatible with App Tracking Protection?</string>
+    <string name="netpFaqAnswerNine">Yes, both Network Protection and App Tracking Protection can be enabled at the same time. No other VPN is compatible with App Tracking Protection.</string>
+    <string name="netpFaqQuestionTen">Is Network Protection free to use?</string>
+    <string name="netpFaqAnswerTen">Network Protection is free to use during the beta.</string>
 </resources>
