@@ -185,7 +185,7 @@
     <string name="brokenSiteCategoryLogin">Nie mogę się zalogować</string>
     <string name="brokenSiteCategoryUnsupported">Przeglądarka jest niezgodna</string>
     <string name="brokenSiteCategoryOther">Coś innego</string>
-    <string name="brokenSiteDescriptionTextInputHint">Jeśli chcesz, opowiedz nam o napotkanym problemie</string>
+    <string name="brokenSiteDescriptionTextInputHint">Udostępnienie szczegółowych informacji może pomóc nam rozwiązać ten problem</string>
     <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
     <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
 
