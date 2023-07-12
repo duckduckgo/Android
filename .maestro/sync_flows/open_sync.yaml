@@ -1,0 +1,14 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+- assertVisible:
+      text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+      text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+      id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+- tapOn: "Settings"
+- tapOn:
+      id: "com.duckduckgo.mobile.android.debug:id/item_container"
+      index: 8

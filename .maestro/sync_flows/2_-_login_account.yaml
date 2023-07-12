@@ -1,0 +1,30 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: "open_sync.yaml"
+- tapOn:
+      id: "com.duckduckgo.mobile.android.debug:id/trailingSwitch"
+- tapOn: "Turn On Sync"
+- tapOn: "Not Now"
+- tapOn: "Not Now"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/item_container"
+    index: 2
+- tapOn: "Copy Code"
+- tapOn: "Navigate up"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/trailingSwitch"
+- tapOn: "Turn Off"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/trailingSwitch"
+- tapOn: "Recover Your Synced Data"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/item_container"
+    index: 1
+- tapOn: "Paste Code"
+- tapOn: "Next"
+- tapOn: "Not Now"
+- assertVisible:
+      id: "com.duckduckgo.mobile.android.debug:id/qrCodeImageView"
