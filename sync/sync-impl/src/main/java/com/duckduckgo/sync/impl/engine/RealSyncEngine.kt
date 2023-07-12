@@ -187,8 +187,8 @@ class RealSyncEngine @Inject constructor(
 
             is Success -> {
                 Timber.d("Sync-Feature: get success")
-                syncStateRepository.updateSyncState(SUCCESS)
                 persistChanges(result.data, conflictResolution)
+                syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }
