@@ -28,12 +28,12 @@ internal class AppDeviceSyncStateTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
     private val syncFeature: SyncFeature = mock()
-    private val syncRepository: SyncRepository = mock()
-    private val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+    private val syncAccountRepository: SyncAccountRepository = mock()
+    private val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncAccountRepository)
 
     @Test
     fun whenUserSignedInThenDeviceSyncEnabled() {
-        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         assertTrue(appDeviceSyncState.isUserSignedInOnDevice())
     }

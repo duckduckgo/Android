@@ -29,7 +29,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Finish
 import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.RecoveryCodePDFSuccess
@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 class SaveRecoveryCodeViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
     private val recoveryCodePDF: RecoveryCodePDF,
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -60,8 +60,8 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
 
     private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
-        if (syncRepository.isSignedIn()) {
-            syncRepository.getRecoveryCode()?.let {
+        if (syncAccountRepository.isSignedIn()) {
+            syncAccountRepository.getRecoveryCode()?.let {
                 val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
                 val newState = SignedIn(
                     loginQRCode = bitmap,
@@ -71,13 +71,13 @@ class SaveRecoveryCodeViewModel @Inject constructor(
             } ?: command.send(Command.Error)
         } else {
             viewState.emit(ViewState(CreatingAccount))
-            when (syncRepository.createAccount()) {
+            when (syncAccountRepository.createAccount()) {
                 is Error -> {
                     command.send(Command.Error)
                 }
 
                 is Success -> {
-                    syncRepository.getRecoveryCode()?.let {
+                    syncAccountRepository.getRecoveryCode()?.let {
                         val bitmap = qrEncoder.encodeAsBitmap(it, R.dimen.qrSizeSmall, R.dimen.qrSizeSmall)
                         viewState.emit(ViewState(SignedIn(bitmap, it)))
                     } ?: command.send(Command.Error)
@@ -116,7 +116,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
+            val recoveryCodeB64 = syncAccountRepository.getRecoveryCode() ?: return@launch
             clipboard.copyToClipboard(recoveryCodeB64)
             command.send(ShowMessage(R.string.sync_code_copied_message))
         }
@@ -130,7 +130,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
 
     fun generateRecoveryCode(viewContext: Context) {
         viewModelScope.launch(dispatchers.io()) {
-            val recoveryCodeB64 = syncRepository.getRecoveryCode() ?: return@launch
+            val recoveryCodeB64 = syncAccountRepository.getRecoveryCode() ?: return@launch
             val generateRecoveryCodePDF = recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
             command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
         }

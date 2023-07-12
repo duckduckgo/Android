@@ -22,8 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
-import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
@@ -36,7 +35,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncLoginViewModel @Inject constructor(
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -69,7 +68,7 @@ class SyncLoginViewModel @Inject constructor(
 
     fun onConnectQRScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncRepository.login(qrCode)
+            val result = syncAccountRepository.login(qrCode)
             if (result is Error) {
                 command.send(Command.Error)
             } else {

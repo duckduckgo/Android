@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.Result
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class EnterCodeViewModel @Inject constructor(
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -77,8 +77,8 @@ class EnterCodeViewModel @Inject constructor(
         pastedCode: String,
     ) {
         val result = when (codeType) {
-            RECOVERY_CODE -> syncRepository.login(pastedCode)
-            CONNECT_CODE -> syncRepository.connectDevice(pastedCode)
+            RECOVERY_CODE -> syncAccountRepository.login(pastedCode)
+            CONNECT_CODE -> syncAccountRepository.connectDevice(pastedCode)
         }
         when (result) {
             is Result.Success -> command.send(Command.LoginSucess)

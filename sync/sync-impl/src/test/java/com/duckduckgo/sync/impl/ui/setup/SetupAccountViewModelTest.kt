@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode
@@ -34,7 +34,7 @@ class SetupAccountViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepostitory: SyncRepository = mock()
+    private val syncRepostitory: SyncAccountRepository = mock()
 
     private val testee = SetupAccountViewModel(
         syncRepostitory,

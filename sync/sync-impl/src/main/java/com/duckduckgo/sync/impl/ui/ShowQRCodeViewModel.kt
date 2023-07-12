@@ -28,7 +28,7 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.R.string
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.ShowQRCodeViewModel.Command.ShowMessage
 import javax.inject.*
@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
 @ContributesViewModel(ActivityScope::class)
 class ShowQRCodeViewModel @Inject constructor(
     private val qrEncoder: QREncoder,
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -62,7 +62,7 @@ class ShowQRCodeViewModel @Inject constructor(
             var polling = true
             while (polling) {
                 delay(POLLING_INTERVAL)
-                when (syncRepository.pollConnectionKeys()) {
+                when (syncAccountRepository.pollConnectionKeys()) {
                     is Success -> {
                         command.send(LoginSucess)
                         polling = false
@@ -89,7 +89,7 @@ class ShowQRCodeViewModel @Inject constructor(
     }
 
     private suspend fun showQRCode() {
-        when (val result = syncRepository.getConnectQR()) {
+        when (val result = syncAccountRepository.getConnectQR()) {
             is Error -> {
                 command.send(Command.Error)
             }
@@ -109,7 +109,7 @@ class ShowQRCodeViewModel @Inject constructor(
 
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            when (val result = syncRepository.getConnectQR()) {
+            when (val result = syncAccountRepository.getConnectQR()) {
                 is Error -> command.send(Command.Error)
                 is Success -> {
                     clipboard.copyToClipboard(result.data)

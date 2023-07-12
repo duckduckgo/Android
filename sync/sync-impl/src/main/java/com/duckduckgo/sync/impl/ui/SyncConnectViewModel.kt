@@ -23,8 +23,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncRepository
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -40,7 +39,7 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class SyncConnectViewModel @Inject constructor(
-    private val syncRepository: SyncRepository,
+    private val syncAccountRepository: SyncAccountRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -48,7 +47,7 @@ class SyncConnectViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        val viewMode = if (syncRepository.isSignedIn()) {
+        val viewMode = if (syncAccountRepository.isSignedIn()) {
             ViewMode.SignedIn
         } else {
             ViewMode.UnAuthenticated
@@ -87,7 +86,7 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onConnectQRScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            when (syncRepository.connectDevice(qrCode)) {
+            when (syncAccountRepository.connectDevice(qrCode)) {
                 is Error -> command.send(Command.Error)
                 is Success -> command.send(LoginSucess)
             }

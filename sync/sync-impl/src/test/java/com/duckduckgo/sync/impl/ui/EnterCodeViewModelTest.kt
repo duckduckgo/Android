@@ -24,7 +24,7 @@ import com.duckduckgo.sync.TestSyncFixtures.jsonRecoveryKeyEncoded
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
@@ -46,11 +46,11 @@ internal class EnterCodeViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncRepository: SyncRepository = mock()
+    private val syncAccountRepository: SyncAccountRepository = mock()
     private val clipboard: Clipboard = mock()
 
     private val testee = EnterCodeViewModel(
-        syncRepository,
+        syncAccountRepository,
         clipboard,
         coroutineTestRule.testDispatcherProvider,
     )
@@ -76,7 +76,7 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenUserClicksOnPasteCodeWithRecoveryCodeThenLoginWithCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(syncAccountRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
 
         testee.onPasteCodeClicked(Code.RECOVERY_CODE)
 
@@ -90,7 +90,7 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenUserClicksOnPasteCodeWithConnectCodeThenConnectWithCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonConnectKeyEncoded)
-        whenever(syncRepository.connectDevice(jsonConnectKeyEncoded)).thenReturn(Success(true))
+        whenever(syncAccountRepository.connectDevice(jsonConnectKeyEncoded)).thenReturn(Success(true))
 
         testee.onPasteCodeClicked(Code.CONNECT_CODE)
 
@@ -104,7 +104,7 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenPastedCodeFailsThenEmitError() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Error(reason = "error"))
+        whenever(syncAccountRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Error(reason = "error"))
 
         testee.onPasteCodeClicked(Code.RECOVERY_CODE)
 
