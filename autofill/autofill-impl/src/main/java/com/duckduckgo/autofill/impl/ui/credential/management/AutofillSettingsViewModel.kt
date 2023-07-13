@@ -25,8 +25,6 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.*
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
@@ -61,6 +59,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.duckaddress.DuckAddressIdentifier
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -464,25 +464,25 @@ class AutofillSettingsViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             when (duckAddressStatusRepository.getActivationStatus(duckAddress)) {
-                Activated -> {
+                ActivationStatusResult.Activated -> {
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Activated(duckAddress)))
                 }
 
-                Deactivated -> {
+                ActivationStatusResult.Deactivated -> {
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = Deactivated(duckAddress)))
                 }
 
-                NotSignedIn -> {
+                ActivationStatusResult.NotSignedIn -> {
                     Timber.d("Not signed into email protection; can't manage %s", duckAddress)
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = DuckAddressStatus.NotSignedIn))
                 }
 
-                Unmanageable -> {
+                ActivationStatusResult.Unmanageable -> {
                     Timber.w("Can't manage %s from this account", duckAddress)
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = NotManageable))
                 }
 
-                GeneralError -> {
+                ActivationStatusResult.GeneralError -> {
                     Timber.w("General error when querying status for %s", duckAddress)
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FailedToObtainStatus))
                 }

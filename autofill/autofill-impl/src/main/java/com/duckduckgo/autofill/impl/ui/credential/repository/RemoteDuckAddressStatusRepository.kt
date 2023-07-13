@@ -19,13 +19,12 @@ package com.duckduckgo.autofill.impl.ui.credential.repository
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.DuckAddressStatusManagementService
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.Activated
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.Deactivated
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.GeneralError
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.NotSignedIn
-import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.Unmanageable
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Activated
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Deactivated
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.GeneralError
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.NotSignedIn
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Unmanageable
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -34,6 +33,36 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
+
+/**
+ * Repository for Duck Address activation status
+ *
+ * Provides ability to get and set activation status for a private duck address
+ */
+interface DuckAddressStatusRepository {
+
+    /**
+     * Get activation status for a private duck address
+     *
+     * @return [ActivationStatusResult] representing the activation status for the private duck address
+     */
+    suspend fun getActivationStatus(privateDuckAddress: String): ActivationStatusResult
+
+    /**
+     * Set activation status for a private duck address
+     *
+     * @return true if the activation status was successfully set, false otherwise
+     */
+    suspend fun setActivationStatus(privateDuckAddress: String, isActivated: Boolean): Boolean
+
+    sealed interface ActivationStatusResult {
+        object NotSignedIn : ActivationStatusResult
+        object Activated : ActivationStatusResult
+        object Deactivated : ActivationStatusResult
+        object Unmanageable : ActivationStatusResult
+        object GeneralError : ActivationStatusResult
+    }
+}
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
