@@ -113,6 +113,8 @@ class AppEmailManager @Inject constructor(
         emailDataStore.lastUsedDate = date
     }
 
+    override fun getToken(): String? = emailDataStore.emailToken
+
     private fun consumeAlias(): String? {
         val alias = emailDataStore.nextAlias
         emailDataStore.clearNextAlias()

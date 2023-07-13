@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -88,7 +88,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val webUrlIdentifier: WebUrlIdentifier,
     private val duckAddressStatusRepository: DuckAddressStatusRepository,
-    private val emailDatastore: EmailDataStore,
+    private val emailManager: EmailManager,
     private val duckAddressIdentifier: DuckAddressIdentifier,
 ) : ViewModel() {
 
@@ -154,7 +154,7 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowEditCredentialMode(credentials))
     }
 
-    // if edit is opened but not from view mode, it means that we should show the credentials view and we need to set hasPopulatedFields to false
+    // if edit is opened but not from view mode, it means that we should show the credentials view, and we need to set hasPopulatedFields to false
     // to force credential view to prefill the fields.
     fun onEditCredentials(credentials: LoginCredentials) {
         addCommand(ShowCredentialMode)
@@ -443,7 +443,7 @@ class AutofillSettingsViewModel @Inject constructor(
         Timber.d("Determining duck address status for %s", username)
 
         viewModelScope.launch(dispatchers.io()) {
-            val mainAddress = emailDatastore.emailUsername
+            val mainAddress = emailManager.getEmailAddress()
             if (!isPrivateDuckAddress(username, mainAddress)) {
                 Timber.d("Not a private duck address: %s", username)
             } else {

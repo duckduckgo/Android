@@ -19,7 +19,7 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository
@@ -65,7 +65,7 @@ class AutofillSettingsViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockStore: AutofillStore = mock()
-    private val emailDataStore: EmailDataStore = mock()
+    private val emailManager: EmailManager = mock()
     private val duckAddressStatusRepository: DuckAddressStatusRepository = mock()
     private val clipboardInteractor: AutofillClipboardInteractor = mock()
     private val pixel: Pixel = mock()
@@ -83,7 +83,7 @@ class AutofillSettingsViewModelTest {
         credentialListFilter = credentialListFilter,
         faviconManager = faviconManager,
         webUrlIdentifier = webUrlIdentifier,
-        emailDatastore = emailDataStore,
+        emailManager = emailManager,
         duckAddressStatusRepository = duckAddressStatusRepository,
         duckAddressIdentifier = duckAddressIdentifier,
     )

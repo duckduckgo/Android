@@ -17,9 +17,9 @@
 package com.duckduckgo.autofill.impl.ui.credential.repository
 
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.DuckAddressStatusManagementService
 import com.duckduckgo.app.email.api.DuckAddressStatusManagementService.DuckAddressGetStatusResponse
-import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.Activated
 import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.Deactivated
 import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult.GeneralError
@@ -45,10 +45,10 @@ class RemoteDuckAddressStatusRepositoryTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val emailDataStore: EmailDataStore = mock()
+    private val emailManager: EmailManager = mock()
     private val service: DuckAddressStatusManagementService = mock()
 
-    private val testee = RemoteDuckAddressStatusRepository(service, emailDataStore, coroutineTestRule.testDispatcherProvider)
+    private val testee = RemoteDuckAddressStatusRepository(service, emailManager, coroutineTestRule.testDispatcherProvider)
 
     @Test
     fun whenNotSignedIntoEmailProtectionThenReturnTypeIsNotSignedIn() = runTest {
@@ -159,6 +159,6 @@ class RemoteDuckAddressStatusRepositoryTest {
         whenever(service.getActivationStatus(any(), any())).thenAnswer { throw IOException() }
     }
 
-    private fun configureEmailProtectionNotSignedIn() = whenever(emailDataStore.emailToken).thenReturn(null)
-    private fun configureEmailProtectionSignedIn() = whenever(emailDataStore.emailToken).thenReturn("abc123")
+    private fun configureEmailProtectionNotSignedIn() = whenever(emailManager.getToken()).thenReturn(null)
+    private fun configureEmailProtectionSignedIn() = whenever(emailManager.getToken()).thenReturn("abc123")
 }

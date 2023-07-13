@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.repository
 
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.DuckAddressStatusManagementService
-import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository
 import com.duckduckgo.autofill.api.duckaddress.DuckAddressStatusRepository.ActivationStatusResult
@@ -39,13 +39,13 @@ import timber.log.Timber
 @SingleInstanceIn(AppScope::class)
 class RemoteDuckAddressStatusRepository @Inject constructor(
     private val service: DuckAddressStatusManagementService,
-    private val emailDatastore: EmailDataStore,
+    private val emailManager: EmailManager,
     private val dispatchers: DispatcherProvider,
 ) : DuckAddressStatusRepository {
 
     override suspend fun getActivationStatus(privateDuckAddress: String): ActivationStatusResult {
         return withContext(dispatchers.io()) {
-            val authToken = emailDatastore.emailToken ?: return@withContext NotSignedIn
+            val authToken = emailManager.getToken() ?: return@withContext NotSignedIn
             val formattedAuthToken = "Bearer $authToken"
             val formattedDuckAddress = privateDuckAddress.removeSuffix(DUCK_ADDRESS_SUFFIX)
 
@@ -82,7 +82,7 @@ class RemoteDuckAddressStatusRepository @Inject constructor(
         isActivated: Boolean,
     ): Boolean {
         return withContext(dispatchers.io()) {
-            val authToken = emailDatastore.emailToken ?: return@withContext false
+            val authToken = emailManager.getToken() ?: return@withContext false
             val formattedAuthToken = "Bearer $authToken"
             val formattedDuckAddress = privateDuckAddress.removeSuffix(DUCK_ADDRESS_SUFFIX)
 
