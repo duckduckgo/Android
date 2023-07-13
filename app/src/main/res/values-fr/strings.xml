@@ -185,9 +185,7 @@
     <string name="brokenSiteCategoryLogin">Je ne peux pas me connecter</string>
     <string name="brokenSiteCategoryUnsupported">Le navigateur est incompatible</string>
     <string name="brokenSiteCategoryOther">Autre</string>
-    <string name="brokenSiteDescriptionTextInputHint">Le fait de partager plus d\'informations peut nous aider à résoudre ce problème</string>
-    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
-    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
+    <string name="brokenSiteDescriptionTextInputHint">Fournir plus de détails (facultatif)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>
