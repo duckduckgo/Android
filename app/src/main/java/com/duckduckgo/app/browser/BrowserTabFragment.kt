@@ -1198,14 +1198,13 @@ class BrowserTabFragment :
 
             emailInjector.injectAddressInEmailField(it, alias, it.url)
 
-            if (autoSaveLogin) {
-                launch(dispatchers.io()) {
-                    autofillCredentialsSelectionResultHandler.processPrivateDuckAddressInjectedEvent(
-                        duckAddress = alias,
-                        tabId = tabId,
-                        originalUrl = originalUrl,
-                    )
-                }
+            launch(dispatchers.io()) {
+                autofillCredentialsSelectionResultHandler.processPrivateDuckAddressInjectedEvent(
+                    duckAddress = alias,
+                    tabId = tabId,
+                    originalUrl = originalUrl,
+                    autoSaveLogin = autoSaveLogin,
+                )
             }
         }
     }

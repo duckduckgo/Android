@@ -195,7 +195,12 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         duckAddress: String,
         tabId: String,
         originalUrl: String,
+        autoSaveLogin: Boolean,
     ) {
+        if (!autoSaveLogin) {
+            return
+        }
+
         // this could be triggered from email autofill, which might happen even if saving passwords is disabled so need to guard here
         if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(originalUrl)) {
             return

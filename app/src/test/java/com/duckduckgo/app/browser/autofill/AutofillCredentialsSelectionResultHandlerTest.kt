@@ -244,10 +244,28 @@ class AutofillCredentialsSelectionResultHandlerTest {
     }
 
     @Test
+    fun whenPrivateDuckAddressSelectedButAutoSaveLoginIsFalseThenNoLoginAutomaticallySaved() = runTest {
+        setupAuthenticatorAlwaysAuth()
+        configureSavingPasswordCapabilityEnabled()
+        testee.processPrivateDuckAddressInjectedEvent(
+            duckAddress = "foo@duck.com",
+            tabId = "abc",
+            originalUrl = "example.com",
+            autoSaveLogin = false,
+        )
+        verifySaveNeverCalled()
+    }
+
+    @Test
     fun whenPrivateDuckAddressSelectedButSavingPasswordsDisabledGeneratedThenNoLoginAutomaticallySaved() = runTest {
         setupAuthenticatorAlwaysAuth()
         configureSavingPasswordCapabilityDisabled()
-        testee.processPrivateDuckAddressInjectedEvent(duckAddress = "foo@duck.com", tabId = "abc", originalUrl = "example.com")
+        testee.processPrivateDuckAddressInjectedEvent(
+            duckAddress = "foo@duck.com",
+            tabId = "abc",
+            originalUrl = "example.com",
+            autoSaveLogin = true,
+        )
         verifySaveNeverCalled()
     }
 
@@ -255,7 +273,12 @@ class AutofillCredentialsSelectionResultHandlerTest {
     fun whenPrivateDuckAddressSelectedAndSavingPasswordsEnabledGeneratedThenLoginAutomaticallySaved() = runTest {
         setupAuthenticatorAlwaysAuth()
         configureSavingPasswordCapabilityEnabled()
-        testee.processPrivateDuckAddressInjectedEvent(duckAddress = "foo@duck.com", tabId = "abc", originalUrl = "example.com")
+        testee.processPrivateDuckAddressInjectedEvent(
+            duckAddress = "foo@duck.com",
+            tabId = "abc",
+            originalUrl = "example.com",
+            autoSaveLogin = true,
+        )
         verify(autofillStore).saveCredentials(any(), any())
     }
 
@@ -264,7 +287,12 @@ class AutofillCredentialsSelectionResultHandlerTest {
         setupAuthenticatorAlwaysAuth()
         configureSavingPasswordCapabilityEnabled()
         configurePreviouslyAutosavedLogin()
-        testee.processPrivateDuckAddressInjectedEvent(duckAddress = "foo", tabId = "abc", originalUrl = "example.com")
+        testee.processPrivateDuckAddressInjectedEvent(
+            duckAddress = "foo",
+            tabId = "abc",
+            originalUrl = "example.com",
+            autoSaveLogin = true,
+        )
         verifySaveNeverCalled()
         verifyUpdateNeverCalled()
     }
@@ -274,7 +302,12 @@ class AutofillCredentialsSelectionResultHandlerTest {
         setupAuthenticatorAlwaysAuth()
         configureSavingPasswordCapabilityEnabled()
         configurePreviouslyAutosavedLogin()
-        testee.processPrivateDuckAddressInjectedEvent(duckAddress = "foo@duck.com", tabId = "abc", originalUrl = "example.com")
+        testee.processPrivateDuckAddressInjectedEvent(
+            duckAddress = "foo@duck.com",
+            tabId = "abc",
+            originalUrl = "example.com",
+            autoSaveLogin = true,
+        )
         verify(autofillStore).updateCredentials(any())
     }
 
