@@ -107,7 +107,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }
         brokenSites.submitButton.setOnClickListener {
             val webViewVersion = webViewVersionProvider.getFullVersion()
-            val description = brokenSites.brokenSiteFormFeedbackInput?.text
+            val description = brokenSites.brokenSiteFormFeedbackInput.text
             viewModel.onSubmitPressed(webViewVersion, description)
         }
     }
