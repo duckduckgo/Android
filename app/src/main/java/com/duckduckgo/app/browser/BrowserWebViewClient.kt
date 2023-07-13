@@ -261,9 +261,7 @@ class BrowserWebViewClient @Inject constructor(
         }
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
-        if (contentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
-        }
+        contentScopeScripts.injectContentScopeScripts(webView)
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 

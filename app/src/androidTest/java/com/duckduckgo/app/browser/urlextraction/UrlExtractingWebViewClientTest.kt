@@ -82,18 +82,9 @@ class UrlExtractingWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledAndContentScopeScriptsIsEnabledThenInjectContentScopeScriptsToDom() = runTest {
-        whenever(contentScopeScripts.isEnabled()).thenReturn(true)
+    fun whenOnPageStartedCalledThenInjectContentScopeScripts() = runTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(contentScopeScripts).getScript()
-    }
-
-    @UiThreadTest
-    @Test
-    fun whenOnPageStartedCalledAndContentScopeScriptsIsDisabledThenDoNotInjectContentScopeScriptsToDom() = runTest {
-        whenever(contentScopeScripts.isEnabled()).thenReturn(false)
-        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(contentScopeScripts, times(0)).getScript()
+        verify(contentScopeScripts).injectContentScopeScripts(mockWebView)
     }
 
     @UiThreadTest

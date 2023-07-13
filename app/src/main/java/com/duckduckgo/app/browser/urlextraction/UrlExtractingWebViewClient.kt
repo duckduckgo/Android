@@ -56,9 +56,7 @@ class UrlExtractingWebViewClient(
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }
-        if (contentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${contentScopeScripts.getScript()}", null)
-        }
+        contentScopeScripts.injectContentScopeScripts(webView)
         Timber.d("AMP link detection: Injecting JS for URL extraction")
         urlExtractor.injectUrlExtractionJS(webView)
     }
