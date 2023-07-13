@@ -22,10 +22,10 @@ import android.webkit.WebView
 interface ContentScopeScripts {
 
     /**
-     * This method returns a [String] which contains the content scope scripts JS code to be injected.
-     * @return a [String] containing the JS content scope code.
+     * This method injects the content scope scripts JS code into the [WebView].
+     * It requires a [WebView] instance.
      */
-    fun getScript(): String
+    fun injectContentScopeScripts(webView: WebView)
 
     /**
      * This method adds the JS interface for Content Scope Scripts to create a bridge between JS and our client.

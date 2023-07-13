@@ -42,9 +42,15 @@ class RealMessagingContentScopeScripts @Inject constructor(
     private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$messageCallback\""
     private fun getInterfaceKeyValuePair() = "\"messageInterface\":\"${messageInterface}\""
 
-    override fun getScript(): String {
+    private fun getScript(): String {
         return coreContentScopeScripts.getScript()
             .replace(messagingParameters, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+    }
+
+    override fun injectContentScopeScripts(webView: WebView) {
+        if (coreContentScopeScripts.isEnabled()) {
+            webView.evaluateJavascript("javascript:${getScript()}", null)
+        }
     }
 
     override fun addJsInterface(webView: WebView) {

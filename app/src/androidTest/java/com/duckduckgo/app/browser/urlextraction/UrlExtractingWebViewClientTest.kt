@@ -34,6 +34,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -81,9 +82,9 @@ class UrlExtractingWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenInjectContentScopeScriptsToDom() = runTest {
+    fun whenOnPageStartedCalledThenInjectContentScopeScripts() = runTest {
         testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
-        verify(contentScopeScripts).getScript()
+        verify(contentScopeScripts).injectContentScopeScripts(mockWebView)
     }
 
     @UiThreadTest
