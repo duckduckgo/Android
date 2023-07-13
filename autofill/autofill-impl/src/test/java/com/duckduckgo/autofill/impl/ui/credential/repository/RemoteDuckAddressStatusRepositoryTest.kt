@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.ui.credential.repository
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.email.api.DuckAddressStatusManagementService
-import com.duckduckgo.app.email.api.DuckAddressStatusManagementService.DuckAddressGetStatusResponse
+import com.duckduckgo.app.email.service.DuckAddressStatusManagementService
+import com.duckduckgo.app.email.service.DuckAddressStatusManagementService.DuckAddressGetStatusResponse
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Activated
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Deactivated
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.GeneralError
