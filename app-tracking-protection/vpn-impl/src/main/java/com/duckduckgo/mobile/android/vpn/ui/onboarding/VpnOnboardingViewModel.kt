@@ -120,10 +120,6 @@ class VpnOnboardingViewModel @Inject constructor(
             command.send(newCommand)
         }
     }
-
-    fun onLaunchedFromNotification(pixelName: String) {
-        deviceShieldPixels.didOpenVpnOnboardingFromNotification(pixelName)
-    }
 }
 
 sealed class Command {

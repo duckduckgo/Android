@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutoriale</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Un pas simplu pentru confidențialitatea aplicației</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Activează App Tracking Protection pentru a bloca tehnologiile de urmărire care se ascund în aplicații, chiar și atunci când nu îți folosești telefonul.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Du-ți confidențialitatea la următorul nivel</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Activează App Tracking Protection pentru a bloca tehnologiile de urmărire care se ascund în aplicații, chiar și atunci când nu îți folosești telefonul.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Ștergerea datelor setată la „manual”</string>
     <string name="clearNotificationDescription">Personalizează DuckDuckGo pentru a șterge automat datele de navigare după fiecare sesiune.</string>

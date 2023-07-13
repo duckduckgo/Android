@@ -39,7 +39,6 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -53,8 +52,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -126,10 +123,6 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockSurveyRepository: SurveyRepository
 
-    private var mockVariantManager: VariantManager = mock()
-
-    private var mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
-
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -154,7 +147,6 @@ class CtaViewModelTest {
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -170,8 +162,6 @@ class CtaViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
-            variantManager = mockVariantManager,
-            vpnFeaturesRegistry = mockVpnFeaturesRegistry,
             surveyRepository = mockSurveyRepository,
         )
     }
@@ -543,44 +533,6 @@ class CtaViewModelTest {
         val site = site(url = "https://duckduckgo.com/email/")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
         assertNull(value)
-    }
-
-    @Test
-    fun whenRefreshCtaAndCanShowDaxCtaEndOfJourneyAndIsDaxDialogMessageEnabledAndVpnNotEnabledThenReturnDaxEndEnableAppTpCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
-        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(false)
-        givenAtLeastOneDaxDialogCtaShown()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-
-        assertTrue(value is DaxBubbleCta.DaxEndEnableAppTpCta)
-    }
-
-    @Test
-    fun whenRefreshCtaAndCanShowDaxCtaEndOfJourneyAndIsDaxDialogMessageEnabledAndVpnEnabledThenReturnAddWidgetInstructions() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zo" })
-        whenever(mockVpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)).thenReturn(true)
-        givenAtLeastOneDaxDialogCtaShown()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-
-        assertTrue(value is DaxBubbleCta.DaxEndCta)
-    }
-
-    @Test
-    fun whenRefreshCtaAndCanShowDaxCtaEndOfJourneyAndIsDaxDialogMessageNotEnabledThenReturnAddWidgetInstructions() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key != "zo" })
-        givenAtLeastOneDaxDialogCtaShown()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-
-        assertTrue(value is DaxBubbleCta.DaxEndCta)
     }
 
     @Test

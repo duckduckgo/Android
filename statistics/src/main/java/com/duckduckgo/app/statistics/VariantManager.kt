@@ -19,13 +19,7 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BlockingTrackersAcrossWebRemoteMessage
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DaxDialogMessage
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NextLevelPrivacyRemoteMessage
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationSchedulingBugFix
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.OneEasyStepForPrivacyRemoteMessage
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.*
@@ -36,12 +30,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object OneEasyStepForPrivacyRemoteMessage : VariantFeature()
-        object BlockingTrackersAcrossWebRemoteMessage : VariantFeature()
-        object NextLevelPrivacyRemoteMessage : VariantFeature()
-        object OneEasyStepForPrivacyNotification : VariantFeature()
-        object NextLevelPrivacyNotification : VariantFeature()
-        object DaxDialogMessage : VariantFeature()
         object NotificationSchedulingBugFix : VariantFeature()
     }
 
@@ -57,15 +45,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-
-            // Experiment: Increase retention through AppTP promotions
-            Variant(key = "ze", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "zh", weight = 0.0, features = listOf(OneEasyStepForPrivacyRemoteMessage), filterBy = { noFilter() }),
-            Variant(key = "zi", weight = 0.0, features = listOf(BlockingTrackersAcrossWebRemoteMessage), filterBy = { noFilter() }),
-            Variant(key = "zl", weight = 0.0, features = listOf(NextLevelPrivacyRemoteMessage), filterBy = { noFilter() }),
-            Variant(key = "zm", weight = 0.0, features = listOf(OneEasyStepForPrivacyNotification), filterBy = { noFilter() }),
-            Variant(key = "zn", weight = 0.0, features = listOf(NextLevelPrivacyNotification), filterBy = { noFilter() }),
-            Variant(key = "zo", weight = 0.0, features = listOf(DaxDialogMessage), filterBy = { noFilter() }),
 
             // Experiment: Increase retention through push notification bug fix
             Variant(key = "zp", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
@@ -200,12 +179,6 @@ class ExperimentationVariantManager(
     }
 }
 
-fun VariantManager.isOneEasyStepForPrivacyRemoteMessageEnabled() = this.getVariant().hasFeature(OneEasyStepForPrivacyRemoteMessage)
-fun VariantManager.isBlockingTrackersAcrossWebRemoteMessageEnabled() = this.getVariant().hasFeature(BlockingTrackersAcrossWebRemoteMessage)
-fun VariantManager.isNextLevelPrivacyRemoteMessageEnabled() = this.getVariant().hasFeature(NextLevelPrivacyRemoteMessage)
-fun VariantManager.isOneEasyStepForPrivacyNotificationEnabled() = this.getVariant().hasFeature(OneEasyStepForPrivacyNotification)
-fun VariantManager.isNextLevelPrivacyNotificationEnabled() = this.getVariant().hasFeature(NextLevelPrivacyNotification)
-fun VariantManager.isDaxDialogMessageEnabled() = this.getVariant().hasFeature(DaxDialogMessage)
 fun VariantManager.isNotificationSchedulingBugFixEnabled() = this.getVariant().hasFeature(NotificationSchedulingBugFix)
 
 /**

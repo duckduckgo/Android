@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Vejledninger</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Et nemt skridt for at få privatliv i apps</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Aktivér App Tracking Protection for at blokere sporingsenheder, der gemmer sig i apps, selv når du ikke bruger telefonen.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Tag dit privatliv til det næste niveau</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Aktivér App Tracking Protection for at blokere sporingsenheder, der gemmer sig i apps, selv når du ikke bruger telefonen.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datarydning indstillet til manuel</string>
     <string name="clearNotificationDescription">Tilpas DuckDuckGo til automatisk at rydde browserdata efter hver session.</string>

@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Školící semináře</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Jeden snadný krok k ochraně soukromí v aplikacích</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Povolením ochrany App Tracking Protection budeš blokovat trackery, které jsou aktivní v aplikacích, i když telefon zrovna nepoužíváš.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Posuň ochranu svého soukromí na vyšší úroveň</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Povolením ochrany App Tracking Protection budeš blokovat trackery, které jsou aktivní v aplikacích, i když telefon zrovna nepoužíváš.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Vymazání dat nastaveno na manuální</string>
     <string name="clearNotificationDescription">Přizpůsobte DuckDuckGo pro automatické vymazání dat prohlížení po každé relaci.</string>

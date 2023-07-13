@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Návody</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Jeden jednoduchý krok na ochranu súkromia v aplikáciách</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Aktivujte si App Tracking Protection s cieľom zablokovania sledovaní, ktoré sú v aplikáciách ukryté, a to dokonca aj vtedy, keď nepoužívate svoj telefón.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Posuňte svoje súkromie na vyššiu úroveň</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Aktivujte si App Tracking Protection s cieľom zablokovania sledovaní, ktoré sú v aplikáciách ukryté, a to dokonca aj vtedy, keď nepoužívate svoj telefón.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Nastavené na manuálne vymazanie údajov</string>
     <string name="clearNotificationDescription">Automatické vymazanie údajov prehliadania s DuckDuckGo po každej relácii.</string>

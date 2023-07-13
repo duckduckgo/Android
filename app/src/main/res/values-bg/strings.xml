@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Указания</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Една лесна стъпка за поверителност в приложенията</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Активирайте App Tracking Protection, за да блокирате скритите в приложенията тракери, дори когато не използвате телефона си.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Издигнете поверителността си на по-високо ниво</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Активирайте App Tracking Protection, за да блокирате скритите в приложенията тракери, дори когато не използвате телефона си.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Ръчно изчистване на данните</string>
     <string name="clearNotificationDescription">Персонализирайте DuckDuckGo да изчиства автоматично данните от сърфирането след всяка сесия.</string>

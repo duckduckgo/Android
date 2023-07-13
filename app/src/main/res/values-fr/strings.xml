@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutoriels</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Un geste simple pour préserver la confidentialité des applications</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Activez App Tracking Protection pour bloquer les traqueurs cachés dans les applications, même lorsque vous n\'utilisez pas votre téléphone.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Renforcez votre confidentialité</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Activez App Tracking Protection pour bloquer les traqueurs cachés dans les applications, même lorsque vous n\'utilisez pas votre téléphone.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Effacement des données configuré sur manuel</string>
     <string name="clearNotificationDescription">Personnalisez DuckDuckGo pour effacer automatiquement les données de navigation après chaque session.</string>

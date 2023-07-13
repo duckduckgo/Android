@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Pamācības</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Viens vienkāršs solis lietotņu privātumam</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Iespējo App Tracking Protection, lai bloķētu lietotnēs paslēptos izsekotājus pat laikā, kad tu tālruni neizmanto.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Pacel savu privātumu nākamajā līmenī</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Iespējo App Tracking Protection, lai bloķētu lietotnēs paslēptos izsekotājus pat laikā, kad tu tālruni neizmanto.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datu notīrīšana ir iestatīta uz manuālu notīrīšanu</string>
     <string name="clearNotificationDescription">Pielāgo DuckDuckGo, lai pēc katras sesijas automātiski notīrītu pārlūkošanas datus.</string>

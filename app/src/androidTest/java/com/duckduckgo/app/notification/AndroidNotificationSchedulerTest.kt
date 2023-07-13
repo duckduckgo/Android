@@ -47,7 +47,6 @@ class AndroidNotificationSchedulerTest {
 
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
-    private val mockEnableAppTpNotification: SchedulableNotification = mock()
     private val mockVariantManager: VariantManager = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -63,7 +62,6 @@ class AndroidNotificationSchedulerTest {
             workManager,
             clearNotification,
             privacyNotification,
-            mockEnableAppTpNotification,
             mockVariantManager,
         )
     }
@@ -80,52 +78,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenEnableAppTpNotificationPrivacyNotificationClearDataCanShowThenEnableAppTpNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun whenEnableAppTpNotificationPrivacyNotificationCanShowButClearDataCannotThenEnableAppTpNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(false)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun whenEnableAppTpNotificationCanShowButPrivacyNotificationCannotThenEnableAppTpNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
-        whenever(privacyNotification.canShow()).thenReturn(false)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun whenEnableAppTpNotificationCanShowButPrivacyNotificationClearDataCannotThenEnableAppTpNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(true)
-        whenever(privacyNotification.canShow()).thenReturn(false)
-        whenever(clearNotification.canShow()).thenReturn(false)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(EnableAppTpNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun whenEnableAppTpNotificationCannotShowAndPrivacyNotificationClearNotificationCanShowThenPrivacyNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
+    fun whenPrivacyNotificationClearDataCanShowThenPrivacyNotificationIsScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
@@ -135,8 +88,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenEnableAppTpNotificationClearNotificationCannotShowAndPrivacyNotificationCanShowThenPrivacyNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
+    fun whenPrivacyNotificationCanShowButClearDataCannotThenPrivacyNotificationIsScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
 
@@ -146,8 +98,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenEnableAppTpNotificationPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearDataNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
+    fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearNotificationIsScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
 
@@ -157,10 +108,9 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationAndClearNotificationAndEnableAppTpNotificationCannotShowThenNoNotificationScheduled() = runTest {
+    fun whenPrivacyNotificationAndClearNotificationCannotShowThenNoNotificationScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
@@ -169,7 +119,6 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun givenControlVariantWhenClearNotificationAndPrivacyNotificationCanShowThenOnlyPrivacyNotificationIsScheduled() = runTest {
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
@@ -182,7 +131,6 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun givenBugFixVariantWhenClearNotificationAndPrivacyNotificationCanShowThenBothNotificationsAreScheduled() = runTest {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zq" })
-        whenever(mockEnableAppTpNotification.canShow()).thenReturn(false)
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 

@@ -2404,7 +2404,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         command.value =
-            if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxEndEnableAppTpCta) HideKeyboard else ShowKeyboard
+            if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2421,7 +2421,6 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
-            is DaxBubbleCta.DaxEndEnableAppTpCta -> LaunchAppTPOnboarding
             else -> return
         }
     }
