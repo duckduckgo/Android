@@ -91,12 +91,6 @@
                 app:answer="@string/netpFaqAnswerNine"
                 app:question="@string/netpFaqQuestionNine" />
 
-            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:answer="@string/netpFaqAnswerTen"
-                app:question="@string/netpFaqQuestionTen" />
-
             <ImageView
                 android:layout_width="@dimen/keyline_6"
                 android:layout_height="@dimen/keyline_6"
