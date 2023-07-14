@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Nie mogę się zalogować</string>
     <string name="brokenSiteCategoryUnsupported">Przeglądarka jest niezgodna</string>
     <string name="brokenSiteCategoryOther">Coś innego</string>
+    <string name="brokenSiteDescriptionTextInputHint">Udostępnij więcej szczegółów (opcjonalnie)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zakładki</string>

@@ -317,6 +317,7 @@
             android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
             android:exported="false"
             android:label="@string/brokenSiteHeading"
+            android:windowSoftInputMode="adjustResize"
             android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"

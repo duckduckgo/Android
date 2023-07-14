@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ne mogu se prijaviti</string>
     <string name="brokenSiteCategoryUnsupported">Preglednik nije kompatibilan</string>
     <string name="brokenSiteCategoryOther">Nešto drugo</string>
+    <string name="brokenSiteDescriptionTextInputHint">Podijelite više pojedinosti (nije obavezno)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Knjižne oznake</string>

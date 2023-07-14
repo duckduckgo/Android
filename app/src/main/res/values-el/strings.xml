@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Δεν μπορώ να συνδεθώ</string>
     <string name="brokenSiteCategoryUnsupported">Το πρόγραμμα περιήγησης είναι ασύμβατο</string>
     <string name="brokenSiteCategoryOther">Κάτι άλλο</string>
+    <string name="brokenSiteDescriptionTextInputHint">Μοιραστείτε περισσότερες λεπτομέρειες (προαιρετικό)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Σελιδοδείκτες</string>

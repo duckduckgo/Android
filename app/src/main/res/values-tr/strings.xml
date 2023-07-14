@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Oturum açamıyorum</string>
     <string name="brokenSiteCategoryUnsupported">Tarayıcı uyumsuz</string>
     <string name="brokenSiteCategoryOther">Başka bir şey</string>
+    <string name="brokenSiteDescriptionTextInputHint">Diğer ayrıntıları paylaşın (isteğe bağlı)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Yer İmleri</string>

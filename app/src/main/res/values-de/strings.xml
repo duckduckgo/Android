@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ich kann mich nicht anmelden</string>
     <string name="brokenSiteCategoryUnsupported">Der Browser ist nicht kompatibel</string>
     <string name="brokenSiteCategoryOther">Etwas anderes</string>
+    <string name="brokenSiteDescriptionTextInputHint">Weitere Details teilen (optional)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Lesezeichen</string>

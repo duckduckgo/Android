@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Nemôžem sa prihlásiť</string>
     <string name="brokenSiteCategoryUnsupported">Prehliadač je nekompatibilný</string>
     <string name="brokenSiteCategoryOther">Niečo iné</string>
+    <string name="brokenSiteDescriptionTextInputHint">Zdieľať ďalšie podrobnosti (voliteľné)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>

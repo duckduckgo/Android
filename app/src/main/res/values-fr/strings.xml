@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Je ne peux pas me connecter</string>
     <string name="brokenSiteCategoryUnsupported">Le navigateur est incompatible</string>
     <string name="brokenSiteCategoryOther">Autre</string>
+    <string name="brokenSiteDescriptionTextInputHint">Fournir plus de détails (facultatif)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>

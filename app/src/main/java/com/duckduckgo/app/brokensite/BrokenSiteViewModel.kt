@@ -114,14 +114,14 @@ class BrokenSiteViewModel @Inject constructor(
         )
     }
 
-    fun onSubmitPressed(webViewVersion: String) {
+    fun onSubmitPressed(webViewVersion: String, description: String?) {
         if (url.isNotEmpty()) {
             val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
 
             val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
-                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion)
+                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion, description)
             } else {
-                getBrokenSite(url, webViewVersion)
+                getBrokenSite(url, webViewVersion, description)
             }
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
@@ -137,10 +137,12 @@ class BrokenSiteViewModel @Inject constructor(
     fun getBrokenSite(
         urlString: String,
         webViewVersion: String,
+        description: String?,
     ): BrokenSite {
         val category = categories[viewValue.indexSelected]
         return BrokenSite(
             category = category.key,
+            description = description,
             siteUrl = urlString,
             upgradeHttps = upgradedHttps,
             blockedTrackers = blockedTrackers,

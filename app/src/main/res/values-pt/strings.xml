@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Não consigo entrar</string>
     <string name="brokenSiteCategoryUnsupported">O navegador é incompatível</string>
     <string name="brokenSiteCategoryOther">Outra coisa</string>
+    <string name="brokenSiteDescriptionTextInputHint">Partilhar mais detalhes (opcional)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>

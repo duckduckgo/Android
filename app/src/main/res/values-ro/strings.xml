@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Nu mă pot conecta</string>
     <string name="brokenSiteCategoryUnsupported">Browserul este incompatibil</string>
     <string name="brokenSiteCategoryOther">Altceva</string>
+    <string name="brokenSiteDescriptionTextInputHint">Distribuie mai multe detalii (opțional)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcaje</string>

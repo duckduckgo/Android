@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ma ei saa sisse logida</string>
     <string name="brokenSiteCategoryUnsupported">Brauser ei ühildu</string>
     <string name="brokenSiteCategoryOther">Midagi muud</string>
+    <string name="brokenSiteDescriptionTextInputHint">Kirjelda üksikasjalikumalt (soovi korral)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Järjehoidjad</string>

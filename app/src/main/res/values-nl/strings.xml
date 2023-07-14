@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ik kan niet inloggen</string>
     <string name="brokenSiteCategoryUnsupported">De browser is niet compatibel</string>
     <string name="brokenSiteCategoryOther">Iets anders</string>
+    <string name="brokenSiteDescriptionTextInputHint">Meer details delen (optioneel)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
