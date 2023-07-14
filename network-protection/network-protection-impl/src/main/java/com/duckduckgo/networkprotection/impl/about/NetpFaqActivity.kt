@@ -16,9 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.about
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -28,6 +27,7 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(NetPFaqsScreenNoParams::class)
 class NetpFaqActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -45,12 +45,5 @@ class NetpFaqActivity : DuckDuckGoActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
-    }
-
-    companion object {
-
-        internal fun intent(context: Context): Intent {
-            return Intent(context, NetpFaqActivity::class.java)
-        }
     }
 }
