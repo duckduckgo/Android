@@ -185,9 +185,7 @@
     <string name="brokenSiteCategoryLogin">Nemôžem sa prihlásiť</string>
     <string name="brokenSiteCategoryUnsupported">Prehliadač je nekompatibilný</string>
     <string name="brokenSiteCategoryOther">Niečo iné</string>
-    <string name="brokenSiteDescriptionTextInputHint">Ak chcete, povedzte nám o probléme, ktorý ste zaznamenali</string>
-    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
-    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
+    <string name="brokenSiteDescriptionTextInputHint">Zdieľať ďalšie podrobnosti (voliteľné)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
