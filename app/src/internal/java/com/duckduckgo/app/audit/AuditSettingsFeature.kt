@@ -18,8 +18,8 @@ package com.duckduckgo.app.audit
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

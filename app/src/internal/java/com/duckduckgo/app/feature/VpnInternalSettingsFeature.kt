@@ -17,8 +17,8 @@
 package com.duckduckgo.app.feature
 
 import android.content.Context
-import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.vpn.internal.feature.LaunchVpnInternalScreenWithEmptyParams
 import com.squareup.anvil.annotations.ContributesMultibinding

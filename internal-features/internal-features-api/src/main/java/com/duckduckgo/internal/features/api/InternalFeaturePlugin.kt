@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings.extension
+package com.duckduckgo.internal.features.api
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
 
-@ContributesPluginPoint(AppScope::class)
 interface InternalFeaturePlugin {
     /** @return the title of the internal feature */
     fun internalFeatureTitle(): String

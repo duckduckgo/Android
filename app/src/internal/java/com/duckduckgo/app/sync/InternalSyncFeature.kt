@@ -3,8 +3,8 @@ package com.duckduckgo.app.sync
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupActivity
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
