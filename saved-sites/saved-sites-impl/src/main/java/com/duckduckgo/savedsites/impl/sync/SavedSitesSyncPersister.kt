@@ -31,7 +31,7 @@ import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.*
+import javax.inject.Inject
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 

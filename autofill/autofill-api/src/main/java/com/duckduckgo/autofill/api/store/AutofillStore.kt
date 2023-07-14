@@ -87,7 +87,9 @@ interface AutofillStore {
      */
     suspend fun getAllCredentials(): Flow<List<LoginCredentials>>
 
-    // missing javadoc
+    /**
+     * Returns all credentials that have been modified since the given timestamp
+     */
     suspend fun getAllCredentialsModifiedSince(modifiedSince: Long): List<LoginCredentials>
 
     /**

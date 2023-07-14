@@ -31,6 +31,8 @@ import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
+import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
+import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -65,7 +67,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Mock
     private lateinit var autofillPrefsStore: AutofillPrefsStore
-    private lateinit var testee: com.duckduckgo.autofill.impl.SecureStoreBackedAutofillStore
+    private lateinit var testee: SecureStoreBackedAutofillStore
     private lateinit var secureStore: FakeSecureStore
 
     private val autofillUrlMatcher: AutofillUrlMatcher = AutofillDomainNameUrlMatcher(TestUrlUnicodeNormalizer())
@@ -475,12 +477,13 @@ class SecureStoreBackedAutofillStoreTest {
         canAccessSecureStorage: Boolean,
     ) {
         secureStore = FakeSecureStore(canAccessSecureStorage)
-        testee = com.duckduckgo.autofill.impl.SecureStoreBackedAutofillStore(
+        testee = SecureStoreBackedAutofillStore(
             secureStorage = secureStore,
             lastUpdatedTimeProvider = lastUpdatedTimeProvider,
             autofillPrefsStore = autofillPrefsStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillUrlMatcher = autofillUrlMatcher,
+            credentialsSyncMetadata = CredentialsSyncMetadata(inMemoryAutofillDatabase().credentialsSyncDao()),
         )
     }
 
@@ -564,6 +567,10 @@ class SecureStoreBackedAutofillStoreTest {
             return flow {
                 emit(credentials)
             }
+        }
+
+        override suspend fun websiteLoginDetailsWithCredentialsModifiedSince(since: Long): List<WebsiteLoginDetailsWithCredentials> {
+            TODO("Not yet implemented")
         }
 
         override suspend fun updateWebsiteLoginDetailsWithCredentials(

@@ -13,8 +13,6 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':sync-api')
-    implementation project(path: ':autofill-sync')
 
     implementation AndroidX.core.ktx
     implementation AndroidX.appCompat
@@ -45,5 +43,15 @@ dependencies {
 }
 
 android {
-  namespace 'com.duckduckgo.autofill.store'
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+    namespace 'com.duckduckgo.autofill.store'
 }

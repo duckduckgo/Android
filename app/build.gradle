@@ -168,7 +168,6 @@ dependencies {
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
     implementation project(':autofill-store')
-    implementation project(':autofill-sync')
     testImplementation project(':autofill-test')
 
     anvil project(':anvil-compiler')

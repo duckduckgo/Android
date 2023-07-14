@@ -23,9 +23,11 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.impl.SecureStoreBackedAutofillStore
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
@@ -34,8 +36,7 @@ import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
-import com.duckduckgo.autofill.sync.LoginCredentialsSyncDao
-import com.duckduckgo.autofill.sync.SyncLoginCredentials
+import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.squareup.anvil.annotations.ContributesTo
@@ -48,7 +49,8 @@ import kotlinx.coroutines.CoroutineScope
 @ContributesTo(AppScope::class)
 class AutofillModule {
 
-    @Provides fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
+    @Provides
+    fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -60,8 +62,8 @@ class AutofillModule {
         return RealAutofillPrefsStore(context, internalTestUserChecker)
     }
 
-    @Provides fun provideAutofillUrlMatcher(unicodeNormalizer: UrlUnicodeNormalizer): AutofillUrlMatcher =
-        AutofillDomainNameUrlMatcher(unicodeNormalizer)
+    @Provides
+    fun provideAutofillUrlMatcher(unicodeNormalizer: UrlUnicodeNormalizer): AutofillUrlMatcher = AutofillDomainNameUrlMatcher(unicodeNormalizer)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -84,9 +86,9 @@ class AutofillModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesLoginCredentialsSyncDao(
+    fun providesCredentialsSyncDao(
         database: AutofillDatabase,
-    ): LoginCredentialsSyncDao {
-        return database.syncLoginCredentialsDao()
+    ): CredentialsSyncMetadataDao {
+        return database.credentialsSyncDao()
     }
 }

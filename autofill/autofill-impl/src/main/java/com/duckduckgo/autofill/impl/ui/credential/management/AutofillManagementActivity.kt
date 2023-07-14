@@ -102,6 +102,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch {
+            viewModel.onViewStarted()
             viewModel.launchDeviceAuth()
         }
     }

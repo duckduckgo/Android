@@ -63,6 +63,8 @@ import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRe
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import javax.inject.Inject
@@ -90,6 +92,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val duckAddressStatusRepository: DuckAddressStatusRepository,
     private val emailManager: EmailManager,
     private val duckAddressIdentifier: DuckAddressIdentifier,
+    private val syncEngine: SyncEngine,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -213,6 +216,12 @@ class AutofillSettingsViewModel @Inject constructor(
             is EditingExisting -> _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
             is EditingNewEntry -> _viewState.value = _viewState.value.copy(credentialMode = credentialMode.copy(saveable = saveable))
             else -> {}
+        }
+    }
+
+    fun onViewStarted() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncEngine.triggerSync(FEATURE_READ)
         }
     }
 

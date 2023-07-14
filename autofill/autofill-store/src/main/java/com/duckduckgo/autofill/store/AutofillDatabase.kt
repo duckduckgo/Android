@@ -20,26 +20,27 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.autofill.sync.LoginCredentialsSync
-import com.duckduckgo.autofill.sync.LoginCredentialsSyncDao
 
 @Database(
     exportSchema = true,
     version = 2,
     entities = [
         AutofillExceptionEntity::class,
-        LoginCredentialsSync::class,
+        CredentialsSyncMetadataEntity::class,
     ],
 )
 abstract class AutofillDatabase : RoomDatabase() {
     abstract fun autofillDao(): AutofillDao
-    abstract fun syncLoginCredentialsDao(): LoginCredentialsSyncDao
+    abstract fun credentialsSyncDao(): CredentialsSyncMetadataDao
 }
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-            "CREATE TABLE IF NOT EXISTS `website_login_credentials_sync_meta` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`syncId`))",
+            "CREATE TABLE IF NOT EXISTS `credentials_sync_meta` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`id`))",
+        )
+        database.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_credentials_sync_meta_syncId` ON `credentials_sync_meta` (`syncId`)",
         )
     }
 }
