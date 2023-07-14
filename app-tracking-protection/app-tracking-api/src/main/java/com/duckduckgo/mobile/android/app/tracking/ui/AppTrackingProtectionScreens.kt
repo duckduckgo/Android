@@ -33,13 +33,3 @@ object AppTrackerActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
  * ```
  */
 object AppTrackerOnboardingActivityWithEmptyParamsParams : GlobalActivityStarter.ActivityParams
-
-/**
- * Use this class to launch the AppTP onboarding screen from the notification
- * ```kotlin
- * globalActivityStarter.start(context, AppTrackerOnboardingActivityWithNotificationParams)
- * ```
- */
-data class AppTrackerOnboardingActivityWithNotificationParams(
-    val pixelName: String,
-) : GlobalActivityStarter.ActivityParams

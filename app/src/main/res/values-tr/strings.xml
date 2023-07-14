@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Öğreticiler</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Uygulama gizliliği için tek bir kolay adım</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Telefonunuzu kullanmadığınız zamanlarda bile uygulamalarda gizlenen izleyicileri engellemek için App Tracking Protection\'ı etkinleştirin.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Gizliliğinizi bir üst seviyeye taşıyın</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Telefonunuzu kullanmadığınız zamanlarda bile uygulamalarda gizlenen izleyicileri engellemek için App Tracking Protection\'ı etkinleştirin.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Veri temizleme manuel olarak ayarlandı</string>
     <string name="clearNotificationDescription">Her oturumdan sonra tarama verilerini otomatik olarak temizlemek için DuckDuckGo\'yu özelleştirin.</string>

@@ -21,7 +21,6 @@ import androidx.annotation.WorkerThread
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.EnableAppTpNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
@@ -42,7 +41,6 @@ class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
-    private val enableAppTpNotification: SchedulableNotification,
     private val variantManager: VariantManager,
 ) : AndroidNotificationScheduler {
 
@@ -62,15 +60,6 @@ class NotificationScheduler(
 
     private suspend fun scheduleUnusedAppNotifications() {
         when {
-            enableAppTpNotification.canShow() -> {
-                scheduleNotification(
-                    OneTimeWorkRequestBuilder<EnableAppTpNotificationWorker>(),
-                    ENABLE_APP_TP_DELAY_DURATION_IN_DAYS,
-                    TimeUnit.DAYS,
-                    UNUSED_APP_WORK_REQUEST_TAG,
-                )
-            }
-
             privacyNotification.canShow() -> {
                 scheduleNotification(
                     OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
@@ -94,14 +83,6 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleUnusedAppNotificationsWithBugFix() {
-        if (enableAppTpNotification.canShow()) {
-            scheduleNotification(
-                OneTimeWorkRequestBuilder<EnableAppTpNotificationWorker>(),
-                ENABLE_APP_TP_DELAY_DURATION_IN_DAYS,
-                TimeUnit.DAYS,
-                UNUSED_APP_WORK_REQUEST_TAG,
-            )
-        }
         if (privacyNotification.canShow()) {
             scheduleNotification(
                 OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
@@ -139,7 +120,6 @@ class NotificationScheduler(
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
         const val CLEAR_DATA_DELAY_DURATION_IN_DAYS = 3L
         const val PRIVACY_DELAY_DURATION_IN_DAYS = 1L
-        const val ENABLE_APP_TP_DELAY_DURATION_IN_DAYS = 2L
     }
 }
 
@@ -179,18 +159,6 @@ class PrivacyNotificationWorker(
 
     @Inject
     override lateinit var notification: PrivacyProtectionNotification
-}
-
-@ContributesWorker(AppScope::class)
-class EnableAppTpNotificationWorker(
-    context: Context,
-    params: WorkerParameters,
-) : SchedulableNotificationWorker<EnableAppTpNotification>(context, params) {
-    @Inject
-    override lateinit var notificationSender: NotificationSender
-
-    @Inject
-    override lateinit var notification: EnableAppTpNotification
 }
 
 abstract class SchedulableNotificationWorker<T : SchedulableNotification>(

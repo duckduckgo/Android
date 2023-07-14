@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Руководства</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Одна простая мера для эффективной защиты данных в приложении</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Функция защиты от слежки блокирует трекеры в других приложениях, даже когда вы не пользуетесь телефоном.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Конфиденциальность качественно нового уровня</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Функция защиты от слежки блокирует трекеры в других приложениях, даже когда вы не пользуетесь телефоном.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Сброс данных вручную</string>
     <string name="clearNotificationDescription">Настройте DuckDuckGo на автоматический сброс данных браузера после каждого сеанса.</string>

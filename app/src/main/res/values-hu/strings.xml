@@ -329,12 +329,6 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Útmutatók</string>
 
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Egyetlen egyszerű lépés az alkalmazások adatvédelméért</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Engedélyezd az App Tracking Protectiont az alkalmazásokba rejtett nyomkövetők blokkolásához, még akkor is, amikor nem használod a telefont.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Magasabb szintű adatvédelem</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Engedélyezd az App Tracking Protectiont az alkalmazásokba rejtett nyomkövetők blokkolásához, még akkor is, amikor nem használod a telefont.</string>
-
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Adattörlés manuálisra állítva</string>
     <string name="clearNotificationDescription">A DuckDuckGo testreszabása a böngészési adatok automatikus törlésére minden munkamenet után.</string>

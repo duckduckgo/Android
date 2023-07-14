@@ -34,8 +34,6 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isDaxDialogMessageEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -44,8 +42,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import dagger.SingleInstanceIn
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -73,8 +69,6 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val appTheme: AppTheme,
-    private val variantManager: VariantManager,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val surveyRepository: SurveyRepository,
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -217,11 +211,7 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
-                if (variantManager.isDaxDialogMessageEnabled() && !vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
-                    DaxBubbleCta.DaxEndEnableAppTpCta(onboardingStore, appInstallStore)
-                } else {
-                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
-                }
+                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions

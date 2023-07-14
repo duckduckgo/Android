@@ -133,7 +133,6 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxEndEnableAppTpCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsFileActions
@@ -3212,7 +3211,6 @@ class BrowserTabFragment :
         ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
-                is DaxEndEnableAppTpCta -> showDaxEndEnableAppTpCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
@@ -3287,24 +3285,6 @@ class BrowserTabFragment :
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxDialogCta.daxCtaContainer)
-            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
-
-            viewModel.onCtaShown()
-        }
-
-        private fun showDaxEndEnableAppTpCta(configuration: DaxEndEnableAppTpCta) {
-            hideHomeBackground()
-            hideHomeCta()
-            configuration.showCta(daxDialogCta.daxCtaContainer)
-
-            daxDialogCta.daxCtaContainer.findViewById<View>(R.id.primaryCtaVariant).setOnClickListener {
-                viewModel.onUserClickCtaOkButton()
-            }
-
-            daxDialogCta.daxCtaContainer.findViewById<View>(R.id.secondaryCtaVariant).setOnClickListener {
-                viewModel.onUserDismissedCta()
-            }
-
             newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
 
             viewModel.onCtaShown()

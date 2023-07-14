@@ -306,14 +306,6 @@ class RealDeviceShieldPixelsTest {
         verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.notificationVariant(bucketSize))
     }
 
-    @Test
-    fun whenReportUnprotectedAppsBucketCalledThenFirePixel() {
-        val pixelName = "pixel_name"
-        deviceShieldPixels.didOpenVpnOnboardingFromNotification(pixelName)
-
-        verify(pixel).fire(pixelName)
-    }
-
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {
         return String.format(Locale.US, pixelName, variant)
     }

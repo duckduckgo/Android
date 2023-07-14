@@ -106,11 +106,8 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_APPTP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -134,7 +131,6 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -393,13 +389,9 @@ class BrowserTabViewModelTest {
 
     private val mockAppTheme: AppTheme = mock()
 
-    private val mockVariantManager: VariantManager = mock()
-
     private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
 
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
-
-    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
 
@@ -444,8 +436,6 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
-            variantManager = mockVariantManager,
-            vpnFeaturesRegistry = mockVpnFeaturesRegistry,
             surveyRepository = mockSurveyRepository,
         )
 
@@ -2163,27 +2153,6 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchAddWidget>()
-    }
-
-    @Test
-    fun whenUserClickedEnableAppTPCtaButtonThenLaunchAppTPOnboardingCommand() {
-        val cta = DaxBubbleCta.DaxEndEnableAppTpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-
-        testee.onUserClickCtaOkButton()
-
-        assertCommandIssued<Command.LaunchAppTPOnboarding>()
-        verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
-    }
-
-    @Test
-    fun whenUserDismissedEnableAppTPCtaThenPixelFired() {
-        val cta = DaxBubbleCta.DaxEndEnableAppTpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-
-        testee.onUserDismissedCta()
-
-        verify(mockPixel).fire(AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(CTA_SHOWN to DAX_APPTP_CTA))
     }
 
     @Test
