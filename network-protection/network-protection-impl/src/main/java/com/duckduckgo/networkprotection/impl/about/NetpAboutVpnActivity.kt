@@ -24,15 +24,22 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpInfoVpnBinding
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class NetpAboutVpnActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var pixels: NetworkProtectionPixels
+
     private val binding: ActivityNetpInfoVpnBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        pixels.reportWhatIsAVpnScreenShown()
     }
 
     override fun onSupportNavigateUp(): Boolean {

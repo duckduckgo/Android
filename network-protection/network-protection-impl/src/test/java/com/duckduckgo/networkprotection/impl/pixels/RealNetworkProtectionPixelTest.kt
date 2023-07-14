@@ -231,4 +231,22 @@ class RealNetworkProtectionPixelTest {
         verify(pixel).fire("m_netp_ev_exclusion_list_launch_breakage_report_d")
         verify(pixel, times(2)).fire("m_netp_ev_exclusion_list_launch_breakage_report_c")
     }
+
+    @Test
+    fun whenReportWhatIsAVpnScreenShownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportWhatIsAVpnScreenShown()
+        testee.reportWhatIsAVpnScreenShown()
+
+        verify(pixel).fire("m_netp_imp_info_vpn_d")
+        verify(pixel, times(2)).fire("m_netp_imp_info_vpn_c")
+    }
+
+    @Test
+    fun whenReportFaqsShownCalledTwiceThenFireDailyPixelOnce() {
+        testee.reportFaqsShown()
+        testee.reportFaqsShown()
+
+        verify(pixel).fire("m_netp_imp_faqs_d")
+        verify(pixel, times(2)).fire("m_netp_imp_faqs_c")
+    }
 }

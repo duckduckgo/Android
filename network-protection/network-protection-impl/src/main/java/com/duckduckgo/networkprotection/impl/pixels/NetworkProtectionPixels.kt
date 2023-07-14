@@ -45,6 +45,10 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SHOWN_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_FAQS_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_FAQS_SHOWN_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_INFO_VPN_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_INFO_VPN_SHOWN_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_LATENCY_REPORT
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED_DAILY
@@ -207,6 +211,20 @@ interface NetworkProtectionPixels {
      * count -> fire a pixel on every call
      */
     fun reportExclusionListLaunchBreakageReport()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportWhatIsAVpnScreenShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportFaqsShown()
 }
 
 @ContributesBinding(AppScope::class)
@@ -327,6 +345,16 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportExclusionListLaunchBreakageReport() {
         tryToFireDailyPixel(NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT_DAILY)
         firePixel(NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT)
+    }
+
+    override fun reportWhatIsAVpnScreenShown() {
+        tryToFireDailyPixel(NETP_INFO_VPN_SHOWN_DAILY)
+        firePixel(NETP_INFO_VPN_SHOWN)
+    }
+
+    override fun reportFaqsShown() {
+        tryToFireDailyPixel(NETP_FAQS_SHOWN_DAILY)
+        firePixel(NETP_FAQS_SHOWN)
     }
 
     private fun firePixel(
