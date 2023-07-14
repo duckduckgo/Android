@@ -185,9 +185,7 @@
     <string name="brokenSiteCategoryLogin">Jeg kan ikke logge ind</string>
     <string name="brokenSiteCategoryUnsupported">Browseren er inkompatibel</string>
     <string name="brokenSiteCategoryOther">Noget andet</string>
-    <string name="brokenSiteDescriptionTextInputHint">Flere detaljer kan hjælpe os med at løse dette problem</string>
-    <string name="brokenSiteDescriptionCounterStarterText" translatable="false">0/2048</string>
-    <string name="brokenSiteDescriptionCounterText" translatable="false">%1$d/2048</string>
+    <string name="brokenSiteDescriptionTextInputHint">Del flere detaljer (valgfrit)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bogmærker</string>
