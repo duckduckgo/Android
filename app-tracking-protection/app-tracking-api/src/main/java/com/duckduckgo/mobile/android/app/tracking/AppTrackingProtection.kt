@@ -37,4 +37,9 @@ interface AppTrackingProtection {
      * @return `true` when NetP is enabled AND the VPN is running, `false` otherwise
      */
     suspend fun isRunning(): Boolean
+
+    /**
+     * This method will restart the App Tracking Protection feature by disabling it and re-enabling back again
+     */
+    fun restart()
 }
