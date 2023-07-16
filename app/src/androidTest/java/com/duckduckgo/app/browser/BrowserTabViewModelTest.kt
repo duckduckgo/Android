@@ -3442,7 +3442,7 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
@@ -3482,10 +3482,10 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         assertCommandIssued<Command.InjectEmailAddress> {
-            assertEquals("alias", this.address)
+            assertEquals("alias", this.duckAddress)
         }
     }
 
@@ -3495,7 +3495,7 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
@@ -3507,7 +3507,7 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenSetNewLastUsedDateCalled() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         verify(mockEmailManager).setNewLastUsedDate()
     }
@@ -3526,10 +3526,10 @@ class BrowserTabViewModelTest {
     fun whenUseAddressThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.useAddress()
+        testee.useAddress("")
 
         assertCommandIssued<Command.InjectEmailAddress> {
-            assertEquals("address", this.address)
+            assertEquals("address", this.duckAddress)
         }
     }
 
@@ -3539,7 +3539,7 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.useAddress()
+        testee.useAddress("")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ADDRESS,
@@ -3551,7 +3551,7 @@ class BrowserTabViewModelTest {
     fun whenUseAddressThenSetNewLastUsedDateCalled() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.useAddress()
+        testee.useAddress("")
 
         verify(mockEmailManager).setNewLastUsedDate()
     }

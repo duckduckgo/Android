@@ -1127,7 +1127,12 @@ class BrowserTabFragment :
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
-            is Command.InjectEmailAddress -> injectEmailAddress(it.address)
+            is Command.InjectEmailAddress -> injectEmailAddress(
+                alias = it.duckAddress,
+                originalUrl = it.originalUrl,
+                autoSaveLogin = it.autoSaveLogin,
+            )
+
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
             is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
             is Command.AcceptGeneratedPassword -> acceptGeneratedPassword(it.url)
@@ -1180,9 +1185,27 @@ class BrowserTabFragment :
         urlExtractingWebView = null
     }
 
-    private fun injectEmailAddress(alias: String) {
+    private fun injectEmailAddress(
+        alias: String,
+        originalUrl: String,
+        autoSaveLogin: Boolean,
+    ) {
         webView?.let {
+            if (it.url != originalUrl) {
+                Timber.w("WebView url has changed since autofill request; bailing")
+                return
+            }
+
             emailInjector.injectAddressInEmailField(it, alias, it.url)
+
+            launch(dispatchers.io()) {
+                autofillCredentialsSelectionResultHandler.processPrivateDuckAddressInjectedEvent(
+                    duckAddress = alias,
+                    tabId = tabId,
+                    originalUrl = originalUrl,
+                    autoSaveLogin = autoSaveLogin,
+                )
+            }
         }
     }
 
@@ -2663,13 +2686,14 @@ class BrowserTabFragment :
 
     private fun showEmailTooltip(address: String) {
         context?.let {
+            val url = webView?.url ?: return
             val isShowing: Boolean? = emailAutofillTooltipDialog?.isShowing
             if (isShowing != true) {
-                emailAutofillTooltipDialog = EmailAutofillTooltipFragment(it, address)
+                emailAutofillTooltipDialog = EmailAutofillTooltipFragment(context = it, address = address)
                 emailAutofillTooltipDialog?.show()
                 emailAutofillTooltipDialog?.setOnCancelListener { viewModel.cancelAutofillTooltip() }
-                emailAutofillTooltipDialog?.useAddress = { viewModel.useAddress() }
-                emailAutofillTooltipDialog?.usePrivateAlias = { viewModel.consumeAlias() }
+                emailAutofillTooltipDialog?.useAddress = { viewModel.useAddress(url) }
+                emailAutofillTooltipDialog?.usePrivateAlias = { viewModel.consumeAlias(url) }
             }
         }
     }

@@ -25,6 +25,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.CompoundButton
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -52,10 +53,21 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsVie
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowEditCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialModeCommand.ShowManualCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Activated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.Deactivated
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FailedToObtainStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.FetchingActivationStatus
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotADuckAddress
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotManageable
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.NotSignedIn
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
@@ -87,6 +99,9 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     @Inject
     lateinit var initialExtractor: InitialExtractor
+
+    @Inject
+    lateinit var duckAddressStatusChangeConfirmer: DuckAddressStatusChangeConfirmer
 
     @Inject
     lateinit var browserNav: BrowserNav
@@ -204,7 +219,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun initialiseToolbar() {
         activity?.findViewById<Toolbar>(com.duckduckgo.mobile.android.R.id.toolbar)?.apply {
-            initialActionBarTitle = title.toString()
+            initialActionBarTitle = title?.toString() ?: ""
             titleMarginStart = resources.getDimensionPixelSize(dimen.keyline_2)
             contentInsetStartWithNavigation = 0
         }
@@ -237,10 +252,12 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     private fun configureUiEventHandlers() {
         binding.usernameEditText.onAction {
-            viewModel.onCopyUsername(binding.usernameEditText.text)
+            val text = binding.usernameEditText.text
+            if (text.isNotEmpty()) viewModel.onCopyUsername(text)
         }
         binding.passwordEditText.onAction {
-            viewModel.onCopyPassword(binding.passwordEditText.text)
+            val text = binding.passwordEditText.text
+            if (text.isNotEmpty()) viewModel.onCopyPassword(text)
         }
     }
 
@@ -311,6 +328,8 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             passwordEditText.isEditable = true
             domainEditText.isEditable = true
             notesEditText.isEditable = true
+
+            hideAllDuckAddressManagementViews()
         }
         initialiseTextWatchers()
     }
@@ -338,6 +357,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                 when (credentialMode) {
                     is Viewing -> {
                         populateFields(credentialMode.credentialsViewed, showLinkButton = credentialMode.showLinkButton)
+                        renderDuckAddressStatus(credentialMode.duckAddressStatus)
                         showViewMode(credentialMode.credentialsViewed)
                         invalidateMenu()
                     }
@@ -355,6 +375,106 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
                     }
                 }
             }.launchIn(lifecycleScope)
+    }
+
+    private val activationStatusChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        val duckAddress = binding.usernameEditText.text
+        val context = binding.usernameEditText.context
+        if (isChecked) {
+            duckAddressStatusChangeConfirmer.showConfirmationToActivate(
+                context = context,
+                duckAddress = duckAddress,
+                onConfirm = {
+                    viewModel.activationStatusChanged(checked = true, duckAddress = duckAddress)
+                },
+                onCancel = {
+                    revertToggleValue(false)
+                },
+            )
+        } else {
+            duckAddressStatusChangeConfirmer.showConfirmationToDeactivate(
+                context = context,
+                duckAddress = duckAddress,
+                onConfirm = {
+                    viewModel.activationStatusChanged(checked = false, duckAddress = duckAddress)
+                },
+                onCancel = {
+                    revertToggleValue(true)
+                },
+            )
+        }
+    }
+
+    private fun revertToggleValue(newCheckedState: Boolean) {
+        binding.duckAddressManagementLabel.quietlySetIsChecked(newCheckedState, activationStatusChangeListener)
+    }
+
+    private fun renderDuckAddressStatus(duckAddressStatus: DuckAddressStatus) = with(binding) {
+        when (duckAddressStatus) {
+            is FetchingActivationStatus -> hideAllDuckAddressManagementViews()
+            is NotADuckAddress -> hideAllDuckAddressManagementViews()
+            is NotManageable -> hideAllDuckAddressManagementViews()
+
+            is Activated -> {
+                duckAddressManagementLabel.quietlySetIsChecked(true, activationStatusChangeListener)
+                duckAddressManagementLabel.setLeadingIcon(R.drawable.ic_email_24)
+                duckAddressManagementLabel.setSecondaryText(getString(R.string.credentialManagementDuckAddressActivatedLabel))
+                duckAddressManagementLabel.show()
+                duckAddressManagementLabel.isEnabled = true
+
+                duckAddressManagementUnavailable.gone()
+                notSignedIntoDuckAddressInfoPanel.gone()
+            }
+
+            is Deactivated -> {
+                duckAddressManagementLabel.quietlySetIsChecked(false, activationStatusChangeListener)
+                duckAddressManagementLabel.setLeadingIcon(R.drawable.ic_email_deactivate_24)
+                duckAddressManagementLabel.setSecondaryText(getString(R.string.credentialManagementDuckAddressDeactivatedLabel))
+                duckAddressManagementLabel.isEnabled = true
+                duckAddressManagementLabel.show()
+
+                duckAddressManagementUnavailable.gone()
+                notSignedIntoDuckAddressInfoPanel.gone()
+            }
+
+            is SettingActivationStatus -> {
+                duckAddressManagementLabel.show()
+                duckAddressManagementLabel.isEnabled = false
+
+                val text = if (duckAddressStatus.activating) {
+                    R.string.credentialManagementDuckAddressActivatingLabel
+                } else {
+                    R.string.credentialManagementDuckAddressDeactivatingLabel
+                }
+                duckAddressManagementLabel.setSecondaryText(getString(text))
+
+                duckAddressManagementUnavailable.gone()
+                notSignedIntoDuckAddressInfoPanel.gone()
+            }
+
+            is NotSignedIn -> {
+                duckAddressManagementLabel.gone()
+                duckAddressManagementUnavailable.gone()
+                val text = getText(R.string.abc)
+                notSignedIntoDuckAddressInfoPanel.setClickableLink(
+                    annotation = "enable_duck_address",
+                    fullText = text,
+                    onClick = {
+                        startActivity(browserNav.openInNewTab(notSignedIntoDuckAddressInfoPanel.context, EMAIL_SIGN_IN_URL))
+                    },
+                )
+                notSignedIntoDuckAddressInfoPanel.show()
+            }
+
+            is FailedToObtainStatus -> {
+                duckAddressManagementLabel.gone()
+                notSignedIntoDuckAddressInfoPanel.gone()
+                duckAddressManagementUnavailable.show()
+                duckAddressManagementUnavailable.setSecondaryText(
+                    getString(R.string.credentialManagementDuckAddressManagementTemporarilyUnavailable),
+                )
+            }
+        }
     }
 
     private fun processCommand(command: CredentialModeCommand) {
@@ -427,6 +547,12 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         }
     }
 
+    private fun hideAllDuckAddressManagementViews() {
+        binding.notSignedIntoDuckAddressInfoPanel.gone()
+        binding.duckAddressManagementLabel.gone()
+        binding.duckAddressManagementUnavailable.gone()
+    }
+
     private suspend fun generateFaviconFromDomain(credentials: LoginCredentials): BitmapDrawable? {
         val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
         val domain = credentials.domain ?: return null
@@ -453,6 +579,8 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
     companion object {
         fun instance() = AutofillManagementCredentialsMode()
+
+        private const val EMAIL_SIGN_IN_URL = "https://duckduckgo.com/email/login"
     }
 }
 
