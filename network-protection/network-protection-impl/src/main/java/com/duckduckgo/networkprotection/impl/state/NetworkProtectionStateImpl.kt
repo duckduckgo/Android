@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.app.tracking
+package com.duckduckgo.networkprotection.impl.state
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class RealAppTrackingProtection @Inject constructor(
-    private val vpnStore: VpnStore,
+class NetworkProtectionStateImpl @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-) : AppTrackingProtection {
-    override fun isOnboarded(): Boolean {
-        return vpnStore.didShowOnboarding()
-    }
-
+    private val coroutineScope: CoroutineScope,
+) : NetworkProtectionState {
     override suspend fun isEnabled(): Boolean {
-        return vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+        return vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)
     }
 
     override suspend fun isRunning(): Boolean {
-        return vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
+        return vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
     }
 }

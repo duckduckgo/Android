@@ -42,11 +42,6 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTING
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.INVALID
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -190,7 +185,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateNetPSettings(it.networkProtectionState, it.networkProtectionWaitlistState)
+                    updateNetPSettings(it.networkProtectionStateEnabled, it.networkProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
                     updateWindowsSettings(it.windowsWaitlistState)
                     updateAutofill(it.showAutofill)
@@ -316,20 +311,18 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateNetPSettings(networkProtectionState: NetPState, networkProtectionWaitlistState: NetPWaitlistState) {
+    private fun updateNetPSettings(networkProtectionState: Boolean, networkProtectionWaitlistState: NetPWaitlistState) {
         with(viewsPrivacy) {
             when (networkProtectionWaitlistState) {
                 NetPWaitlistState.InBeta -> {
                     netpPSetting.show()
                     when (networkProtectionState) {
-                        CONNECTING -> R.string.netpSettingsConnecting
-                        CONNECTED -> R.string.netpSettingsConnected
-                        DISCONNECTED -> R.string.netpSettingsDisconnected
-                        INVALID -> null
-                    }?.run {
+                        true -> R.string.netpSettingsConnected
+                        false -> R.string.netpSettingsDisconnected
+                    }.run {
                         netpPSetting.setSecondaryText(getString(this))
                     }
-                    val netPItemStatus = if (networkProtectionState == CONNECTED) {
+                    val netPItemStatus = if (networkProtectionState) {
                         CheckListItem.CheckItemStatus.ENABLED
                     } else {
                         CheckListItem.CheckItemStatus.WARNING

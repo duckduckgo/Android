@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.app.tracking
+package com.duckduckgo.networkprotection.api
 
-interface AppTrackingProtection {
-
-    /**
-     * This method returns whether the user has gone through AppTP onboarding
-     * @return Returns `true` if user has gone through AppTP onboarding, `false` otherwise
-     */
-    fun isOnboarded(): Boolean
-
+interface NetworkProtectionState {
     /**
      * This is a suspend function because the operation can take time.
      * You DO NOT need to set any dispatcher to call this suspend function
