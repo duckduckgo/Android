@@ -21,6 +21,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 /**
  * Use this model to launch the WebView screen
  */
-data class WebViewActivityWithUrlParam(
+data class WebViewActivityWithParams(
     val url: String,
+    val title: String,
 ) : GlobalActivityStarter.ActivityParams

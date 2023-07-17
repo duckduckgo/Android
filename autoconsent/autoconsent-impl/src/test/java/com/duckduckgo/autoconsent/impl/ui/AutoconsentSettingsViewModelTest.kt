@@ -46,6 +46,15 @@ class AutoconsentSettingsViewModelTest {
     }
 
     @Test
+    fun whenOnLearnMoreSelectedCalledThenLaunchLearnMoreWebPageCommandIsSent() = runTest {
+        viewModel.commands().test {
+            viewModel.onLearnMoreSelected()
+            assertEquals(AutoconsentSettingsViewModel.Command.LaunchLearnMoreWebPage(), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenOnUserToggleAutoconsentToTrueThenAutoconsentEnabledIsTrue() = runTest {
         viewModel.viewState.test {
             assertFalse(awaitItem().autoconsentEnabled)
