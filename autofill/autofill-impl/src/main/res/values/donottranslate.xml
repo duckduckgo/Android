@@ -15,25 +15,5 @@
   -->
 
 <resources>
-    <string name="credentialManagementLinkButtonContentDescription">Open website</string>
 
-
-    <string name="credentialManagementDuckAddressLabel">Duck Address</string>
-
-    <string name="credentialManagementDeactivateDuckAddressDialogTitle">Deactivate Private Duck Address?</string>
-    <string name="credentialManagementDeactivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Emails sent to %1$s will no longer be forwarded to your inbox.</string>
-    <string name="credentialManagementDeactivateDuckAddressPositiveButton">Deactivate</string>
-    <string name="credentialManagementActivateDuckAddressDialogTitle">Reactivate Private Duck Address?</string>
-    <string name="credentialManagementActivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Emails sent to %1$s will again be forwarded to your inbox.</string>
-    <string name="credentialManagementActivateDuckAddressPositiveButton">Reactivate</string>
-
-    <string name="credentialManagementDuckAddressActivatedLabel">Active</string>
-    <string name="credentialManagementDuckAddressActivatingLabel">Activating…</string>
-
-    <string name="credentialManagementDuckAddressDeactivatedLabel">Deactivated</string>
-    <string name="credentialManagementDuckAddressDeactivatingLabel">Deactivating…</string>
-
-    <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable">Management of this address is temporarily unavailable.</string>
-
-    <string name="abc"><annotation type="enable_duck_address">Enable Email Protection</annotation> to manage Duck Addresses on this device.</string>
 </resources>
