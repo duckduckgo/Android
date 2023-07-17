@@ -34,8 +34,8 @@ internal class AboutQAItemView @JvmOverloads constructor(
             attrs,
             R.styleable.AboutQAItemView,
         ).apply {
-            binding.aboutQuestion.text = getString(R.styleable.AboutQAItemView_question)
-            binding.aboutAnswer.text = getString(R.styleable.AboutQAItemView_answer)
+            binding.aboutQuestion.text = getText(R.styleable.AboutQAItemView_question)
+            binding.aboutAnswer.text = getText(R.styleable.AboutQAItemView_answer)
             recycle()
         }
     }
