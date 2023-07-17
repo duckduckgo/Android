@@ -30,8 +30,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -41,6 +40,7 @@ import com.duckduckgo.windows.api.WindowsWaitlistFeature
 import com.duckduckgo.windows.api.WindowsWaitlistState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -68,6 +68,9 @@ class SettingsViewModelTest {
 
     @Mock
     private lateinit var appTrackingProtection: AppTrackingProtection
+
+    @Mock
+    private lateinit var networkProtectionState: NetworkProtectionState
 
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
@@ -99,8 +102,6 @@ class SettingsViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
-
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -119,7 +120,12 @@ class SettingsViewModelTest {
 
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
 
-        vpnFeaturesRegistry = FakeVpnFeaturesRegistry()
+        runBlocking {
+            whenever(networkProtectionState.isRunning()).thenReturn(false)
+            whenever(networkProtectionState.isEnabled()).thenReturn(false)
+            whenever(appTrackingProtection.isRunning()).thenReturn(false)
+            whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        }
 
         testee = SettingsViewModel(
             mockDefaultBrowserDetector,
@@ -128,7 +134,7 @@ class SettingsViewModelTest {
             mockAppBuildConfig,
             mockEmailManager,
             autofillCapabilityChecker,
-            vpnFeaturesRegistry,
+            networkProtectionState,
             windowsWaitlist,
             windowsFeature,
             deviceSyncState,
