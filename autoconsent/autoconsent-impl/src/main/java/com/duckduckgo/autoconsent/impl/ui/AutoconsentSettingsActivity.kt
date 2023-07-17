@@ -32,7 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.autoconsent.api.WebViewActivityWithUrlParam
+import com.duckduckgo.autoconsent.api.WebViewActivityWithParams
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.databinding.ActivityAutoconsentSettingsBinding
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.Command
@@ -98,33 +98,33 @@ class AutoconsentSettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is Command.LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it.url)
+            is Command.LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it)
         }
     }
 
-    private fun launchLearnMoreWebPage(url: String) {
+    private fun launchLearnMoreWebPage(it: Command.LaunchLearnMoreWebPage) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, WebViewActivityWithUrlParam(url), options)
+        globalActivityStarter.start(this, WebViewActivityWithParams(it.url, getString(it.titleId)), options)
     }
 
     private fun configureClickableLink() {
-        val htmlGPCText = getString(R.string.autoconsentDescription).html(this)
-        val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
-        val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)
+        val htmlText = getString(R.string.autoconsentDescription).html(this)
+        val spannableString = SpannableStringBuilder(htmlText)
+        val urlSpans = htmlText.getSpans(0, htmlText.length, URLSpan::class.java)
         urlSpans?.forEach {
-            gpcSpannableString.apply {
+            spannableString.apply {
                 setSpan(
                     clickableSpan,
-                    gpcSpannableString.getSpanStart(it),
-                    gpcSpannableString.getSpanEnd(it),
-                    gpcSpannableString.getSpanFlags(it),
+                    spannableString.getSpanStart(it),
+                    spannableString.getSpanEnd(it),
+                    spannableString.getSpanFlags(it),
                 )
                 removeSpan(it)
                 trim()
             }
         }
         binding.autoconsentDescription.apply {
-            text = gpcSpannableString
+            text = spannableString
             movementMethod = LinkMovementMethod.getInstance()
         }
     }
