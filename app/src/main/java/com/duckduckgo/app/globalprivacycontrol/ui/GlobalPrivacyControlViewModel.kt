@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.globalprivacycontrol.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,7 +44,10 @@ class GlobalPrivacyControlViewModel @Inject constructor(
     )
 
     sealed class Command {
-        class OpenLearnMore(val url: String = LEARN_MORE_URL) : Command()
+        data class OpenLearnMore(
+            val url: String = LEARN_MORE_URL,
+            @StringRes val titleId: Int = R.string.globalPrivacyControlActivityTitle,
+        ) : Command()
     }
 
     private val _viewState: MutableLiveData<ViewState> = MutableLiveData()

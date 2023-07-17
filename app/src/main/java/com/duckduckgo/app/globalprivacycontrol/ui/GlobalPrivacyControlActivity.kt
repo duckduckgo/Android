@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.globalprivacycontrol.ui
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -26,17 +27,22 @@ import android.text.style.URLSpan
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGlobalPrivacyControlBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
+import com.duckduckgo.autoconsent.api.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityGlobalPrivacyControlBinding by viewBinding()
 
@@ -106,16 +112,16 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
             { command ->
                 command?.let {
                     when (it) {
-                        is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it.url)
+                        is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it)
                     }
                 }
             },
         )
     }
 
-    private fun openLearnMoreSite(url: String) {
-        startActivity(BrowserActivity.intent(this, url))
-        finish()
+    private fun openLearnMoreSite(command: GlobalPrivacyControlViewModel.Command.OpenLearnMore) {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        globalActivityStarter.start(this, WebViewActivityWithParams(command.url, getString(command.titleId)), options)
     }
 
     companion object {

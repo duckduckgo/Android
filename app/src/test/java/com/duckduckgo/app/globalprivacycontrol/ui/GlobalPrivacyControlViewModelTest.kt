@@ -19,7 +19,6 @@ package com.duckduckgo.app.globalprivacycontrol.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel.Companion.LEARN_MORE_URL
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -82,9 +81,7 @@ class GlobalPrivacyControlViewModelTest {
         testee.onLearnMoreSelected()
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.lastValue is GlobalPrivacyControlViewModel.Command.OpenLearnMore)
-        val url = (commandCaptor.lastValue as GlobalPrivacyControlViewModel.Command.OpenLearnMore).url
-        assertEquals(LEARN_MORE_URL, url)
+        assertEquals(commandCaptor.lastValue, GlobalPrivacyControlViewModel.Command.OpenLearnMore())
     }
 
     @Test
