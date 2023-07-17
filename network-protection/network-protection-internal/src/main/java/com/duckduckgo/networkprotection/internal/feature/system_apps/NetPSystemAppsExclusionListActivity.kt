@@ -30,14 +30,12 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSystemAppsExclusionBinding
 import com.duckduckgo.networkprotection.internal.network.NetPInternalExclusionListProvider
 import dagger.WrongScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import logcat.logcat
 
 @WrongScope(
@@ -54,7 +52,7 @@ class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.
     lateinit var exclusionListProvider: NetPInternalExclusionListProvider
 
     @Inject
-    lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    lateinit var networkProtectionState: NetworkProtectionState
 
     private var initialExclusionList: Int? = null
 
@@ -97,10 +95,8 @@ class NetPSystemAppsExclusionListActivity : DuckDuckGoActivity(), SystemAppView.
 
     override fun onPause() {
         super.onPause()
-        lifecycleScope.launch {
-            if (initialExclusionList != exclusionListProvider.getExclusionList().hashCode()) {
-                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-            }
+        if (initialExclusionList != exclusionListProvider.getExclusionList().hashCode()) {
+            networkProtectionState.restart()
         }
     }
 

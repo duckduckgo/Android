@@ -23,6 +23,7 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ContributesBinding(AppScope::class)
 class NetworkProtectionStateImpl @Inject constructor(
@@ -35,5 +36,11 @@ class NetworkProtectionStateImpl @Inject constructor(
 
     override suspend fun isRunning(): Boolean {
         return vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
+    }
+
+    override fun restart() {
+        coroutineScope.launch {
+            vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+        }
     }
 }
