@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.sync.api.SyncFeature
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -29,12 +28,12 @@ internal class AppDeviceSyncStateTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
     private val syncFeature: SyncFeature = mock()
-    private val syncRepository: SyncRepository = mock()
-    private val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncRepository)
+    private val syncAccountRepository: SyncAccountRepository = mock()
+    private val appDeviceSyncState = AppDeviceSyncState(appBuildConfig, syncFeature, syncAccountRepository)
 
     @Test
     fun whenUserSignedInThenDeviceSyncEnabled() {
-        whenever(syncRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         assertTrue(appDeviceSyncState.isUserSignedInOnDevice())
     }

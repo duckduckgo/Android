@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Jag kan inte logga in</string>
     <string name="brokenSiteCategoryUnsupported">Webbläsaren är inte kompatibel</string>
     <string name="brokenSiteCategoryOther">Övrigt</string>
+    <string name="brokenSiteDescriptionTextInputHint">Berätta mer (valfritt)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmärken</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Handledningar</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Ett enkelt steg för bättre appintegritet</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Aktivera App Tracking Protection för att blockera spårare som döljer sig i appar, även när du inte använder telefonen.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Ta din integritet till nästa nivå</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Aktivera App Tracking Protection för att blockera spårare som döljer sig i appar, även när du inte använder telefonen.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datarensning inställd på manuell</string>

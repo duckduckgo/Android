@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.api.featureusage.pixel
+package com.duckduckgo.contentscopescripts.impl
 
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 
-enum class FeatureSegmentsPixelName(override val pixelName: String) : Pixel.PixelName {
-    DAILY_USER_EVENT_SEGMENT("m_daily_user_event_segment"),
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "clientContentFeatures",
+)
+
+interface ContentScopeScriptsFeature {
+    @Toggle.DefaultValue(true)
+    fun self(): Toggle
 }

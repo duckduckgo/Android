@@ -169,9 +169,9 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenInjectContentScopeScriptsToDom() = runTest {
+    fun whenOnPageStartedCalledThenInjectContentScopeScripts() = runTest {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(contentScopeScripts).getScript()
+        verify(contentScopeScripts).injectContentScopeScripts(webView)
     }
 
     @UiThreadTest

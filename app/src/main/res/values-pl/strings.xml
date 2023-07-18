@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Nie mogę się zalogować</string>
     <string name="brokenSiteCategoryUnsupported">Przeglądarka jest niezgodna</string>
     <string name="brokenSiteCategoryOther">Coś innego</string>
+    <string name="brokenSiteDescriptionTextInputHint">Udostępnij więcej szczegółów (opcjonalnie)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zakładki</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Samouczki</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Jeden prosty krok do prywatności aplikacji</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Włącz opcję App Tracking Protection, aby blokować skrypty śledzące ukryte w aplikacjach, nawet gdy nie korzystasz z telefonu.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Przenieś prywatność na wyższy poziom</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Włącz opcję App Tracking Protection, aby blokować skrypty śledzące ukryte w aplikacjach, nawet gdy nie korzystasz z telefonu.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Kasowanie danych jest przełączone na tryb ręczny</string>

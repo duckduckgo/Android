@@ -31,6 +31,7 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -51,7 +52,6 @@ class SavedSitesSyncDataObserver @Inject constructor(
     private val dataObserverJob = ConflatedJob()
 
     override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
         syncStateMonitor.syncState()
             .onEach { state ->
                 when (state) {
@@ -67,7 +67,9 @@ class SavedSitesSyncDataObserver @Inject constructor(
         if (!dataObserverJob.isActive) {
             dataObserverJob += coroutineScope.launch(dispatchers.io()) {
                 Timber.d("Sync-Feature: Listening for changes to Saved Sites")
-                savedSitesRepository.lastModified().collect {
+                // we drop the first value emitted because it is the current value of the flow
+                // we are only interested in actual data changes
+                savedSitesRepository.lastModified().drop(1).collect {
                     Timber.d("Sync-Feature: Changes to Saved Sites detected, triggering sync")
                     syncEngine.triggerSync(DATA_CHANGE)
                 }
@@ -76,7 +78,7 @@ class SavedSitesSyncDataObserver @Inject constructor(
     }
 
     private fun cancelSavedSitesChanges() {
-        Timber.d("Sync-Feature: Sync is OFF, not listening to changes to Saved Sites")
+        Timber.d("Sync-Feature: not listening to changes to Saved Sites")
         dataObserverJob.cancel()
     }
 }

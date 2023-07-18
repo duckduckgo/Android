@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ne mogu se prijaviti</string>
     <string name="brokenSiteCategoryUnsupported">Preglednik nije kompatibilan</string>
     <string name="brokenSiteCategoryOther">Nešto drugo</string>
+    <string name="brokenSiteDescriptionTextInputHint">Podijelite više pojedinosti (nije obavezno)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Knjižne oznake</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Vodiči</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Jedan jednostavan korak za privatnost aplikacije</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Omogući App Tracking Protection za blokiranje alata za praćenje koji se skrivaju u aplikacijama, čak i kad ne koristiš svoj telefon.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Podigni svoju privatnost na višu razinu</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Omogući App Tracking Protection za blokiranje alata za praćenje koji se skrivaju u aplikacijama, čak i kad ne koristiš svoj telefon.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Brisanje podataka postavljeno na ručno</string>

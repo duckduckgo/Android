@@ -23,8 +23,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.CONNECTED
-import com.duckduckgo.app.settings.SettingsViewModel.NetPState.DISCONNECTED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
@@ -32,9 +30,7 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -62,7 +58,7 @@ class SettingsViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
     private val windowsWaitlist: WindowsWaitlist,
     private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
@@ -81,16 +77,14 @@ class SettingsViewModel @Inject constructor(
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
         val windowsWaitlistState: WindowsWaitlistState? = null,
-        val networkProtectionState: NetPState = DISCONNECTED,
+        val networkProtectionStateEnabled: Boolean = false,
         val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
         val isAutoconsentEnabled: Boolean = false,
     )
 
     enum class NetPState {
-        CONNECTING,
         CONNECTED,
         DISCONNECTED,
-        INVALID,
     }
 
     sealed class Command {
@@ -134,11 +128,12 @@ class SettingsViewModel @Inject constructor(
                     isAppDefaultBrowser = defaultBrowserAlready,
                     showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
-                    appTrackingProtectionEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN),
+                    appTrackingProtectionEnabled = appTrackingProtection.isRunning(),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
+                    networkProtectionStateEnabled = networkProtectionState.isRunning(),
                     networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
@@ -153,12 +148,12 @@ class SettingsViewModel @Inject constructor(
     fun startPollingVpnState() {
         viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
-                val isDeviceShieldEnabled = vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)
-                val isNetPEnabled = vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)
+                val isDeviceShieldEnabled = appTrackingProtection.isRunning()
+                val isNetPEnabled = networkProtectionState.isRunning()
                 viewState.value = currentViewState().copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    networkProtectionState = if (isNetPEnabled) CONNECTED else DISCONNECTED,
+                    networkProtectionStateEnabled = isNetPEnabled,
                 )
                 delay(1_000)
             }

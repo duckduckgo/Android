@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Jeg kan ikke logge inn</string>
     <string name="brokenSiteCategoryUnsupported">Nettleseren er inkompatibel</string>
     <string name="brokenSiteCategoryOther">Noe annet</string>
+    <string name="brokenSiteDescriptionTextInputHint">Del mer informasjon (valgfritt)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmerker</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Veiledninger</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">En enkel løsning for personvern i apper</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Aktiver App Tracking Protection for å blokkere sporere som er skjult i apper, selv når du ikke bruker telefonen.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Ta personvernet til neste nivå</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Aktiver App Tracking Protection for å blokkere sporere som er skjult i apper, selv når du ikke bruker telefonen.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Sletting av data satt til manuell</string>

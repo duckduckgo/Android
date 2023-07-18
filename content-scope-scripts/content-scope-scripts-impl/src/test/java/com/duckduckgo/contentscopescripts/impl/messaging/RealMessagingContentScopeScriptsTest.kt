@@ -29,6 +29,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class RealMessagingContentScopeScriptsTest {
@@ -45,16 +46,29 @@ class RealMessagingContentScopeScriptsTest {
     }
 
     @Test
-    fun whenGetScriptThenPopulateMessagingParameters() {
+    fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
+        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
         whenever(mockCoreContentScopeScripts.getScript()).thenReturn(coreContentScopeJs)
-        val script = messagingContentScopeScripts.getScript()
-        assertTrue(contentScopeRegex.matches(script))
+        messagingContentScopeScripts.injectContentScopeScripts(mockWebView)
 
-        val matchResult = contentScopeRegex.find(script)
+        val scriptCatcher = argumentCaptor<String>()
+        verify(mockWebView).evaluateJavascript(scriptCatcher.capture(), anyOrNull())
+
+        assertTrue(contentScopeRegex.matches(scriptCatcher.firstValue))
+
+        val matchResult = contentScopeRegex.find(scriptCatcher.firstValue)
         val messageSecret = matchResult!!.groupValues[1]
         val messageCallback = matchResult.groupValues[2]
         val messageInterface = matchResult.groupValues[3]
         assertTrue(messageSecret != messageCallback && messageSecret != messageInterface && messageCallback != messageInterface)
+    }
+
+    @Test
+    fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
+        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(false)
+        messagingContentScopeScripts.injectContentScopeScripts(mockWebView)
+
+        verifyNoInteractions(mockWebView)
     }
 
     @Test
@@ -88,7 +102,7 @@ class RealMessagingContentScopeScriptsTest {
             "\$ANDROID_MESSAGING_PARAMETERS\$})"
 
         val contentScopeRegex = Regex(
-            "^processConfig\\(\\{\"features\":\\{" +
+            "^javascript:processConfig\\(\\{\"features\":\\{" +
                 "\"config1\":\\{\"state\":\"enabled\"\\}," +
                 "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
                 "\"unprotectedTemporary\":\\[" +

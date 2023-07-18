@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Nu mă pot conecta</string>
     <string name="brokenSiteCategoryUnsupported">Browserul este incompatibil</string>
     <string name="brokenSiteCategoryOther">Altceva</string>
+    <string name="brokenSiteDescriptionTextInputHint">Distribuie mai multe detalii (opțional)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcaje</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutoriale</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Un pas simplu pentru confidențialitatea aplicației</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Activează App Tracking Protection pentru a bloca tehnologiile de urmărire care se ascund în aplicații, chiar și atunci când nu îți folosești telefonul.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Du-ți confidențialitatea la următorul nivel</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Activează App Tracking Protection pentru a bloca tehnologiile de urmărire care se ascund în aplicații, chiar și atunci când nu îți folosești telefonul.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Ștergerea datelor setată la „manual”</string>

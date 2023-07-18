@@ -20,7 +20,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -39,7 +38,6 @@ class VpnFeaturesRegistryImplTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider = mock()
-    private val mockFeatureSegmentsManager: FeatureSegmentsManager = mock()
     private lateinit var vpnServiceWrapper: TestVpnServiceWrapper
 
     private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
@@ -56,7 +54,6 @@ class VpnFeaturesRegistryImplTest {
         vpnFeaturesRegistry = VpnFeaturesRegistryImpl(
             vpnServiceWrapper,
             sharedPreferencesProvider,
-            mockFeatureSegmentsManager,
             coroutineTestRule.testDispatcherProvider,
         )
     }

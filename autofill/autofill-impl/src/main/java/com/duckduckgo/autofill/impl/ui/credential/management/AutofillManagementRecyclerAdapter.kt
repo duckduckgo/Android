@@ -197,7 +197,7 @@ class AutofillManagementRecyclerAdapter(
         lifecycleOwner.lifecycleScope.launch {
             val url = credentials.domain.orEmpty()
             val faviconPlaceholderLetter = initialExtractor.extractInitial(credentials)
-            faviconManager.loadToViewFromLocalOrFallback(url = url, view = favicon, placeholder = faviconPlaceholderLetter)
+            faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = favicon, placeholder = faviconPlaceholderLetter)
         }
     }
 

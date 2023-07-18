@@ -23,8 +23,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
@@ -34,7 +32,6 @@ class DefaultBrowserPageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
     private val installStore: AppInstallStore,
-    private val featureSegmentsManager: FeatureSegmentsManager,
 ) : ViewModel() {
 
     sealed class ViewState {
@@ -176,7 +173,6 @@ class DefaultBrowserPageViewModel @Inject constructor(
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue,
             )
             pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
-            featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.SET_AS_DEFAULT)
         } else {
             installStore.defaultBrowser = false
             val params = mapOf(

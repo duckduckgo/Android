@@ -21,6 +21,9 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.FakeAppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
@@ -52,12 +55,14 @@ class NgVpnNetworkStackTest {
     private val appTrackerDetector: AppTrackerDetector = mock()
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository = mock()
 
+    private lateinit var appTpFeatureConfig: AppTpFeatureConfig
     private lateinit var ngVpnNetworkStack: NgVpnNetworkStack
 
     @Before
     fun setup() {
         whenever(vpnNetwork.create()).thenReturn(111)
         whenever(vpnNetwork.mtu()).thenReturn(1500)
+        appTpFeatureConfig = FakeAppTpFeatureConfig()
 
         ngVpnNetworkStack = NgVpnNetworkStack(
             appBuildConfig,
@@ -65,12 +70,14 @@ class NgVpnNetworkStackTest {
             runtime,
             appTrackerDetector,
             trackingProtectionAppsRepository,
+            appTpFeatureConfig,
+            FakeDnsProvider(),
         )
     }
 
     @Test
     fun whenOnCreateVpnNoErrorThenReturnSuccess() {
-        Assert.assertTrue(ngVpnNetworkStack.onCreateVpn().isSuccess)
+        assertTrue(ngVpnNetworkStack.onCreateVpn().isSuccess)
     }
 
     @Test
@@ -102,13 +109,13 @@ class NgVpnNetworkStackTest {
         whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
 
         val configResult = ngVpnNetworkStack.onPrepareVpn()
-        Assert.assertTrue(configResult.isSuccess)
+        assertTrue(configResult.isSuccess)
 
         val config = configResult.getOrThrow()
-        Assert.assertEquals(1500, config.mtu)
-        Assert.assertTrue(config.routes.isEmpty())
-        Assert.assertTrue(config.dns.isEmpty())
-        Assert.assertEquals(
+        assertEquals(1500, config.mtu)
+        assertTrue(config.routes.isEmpty())
+        assertTrue(config.dns.isEmpty())
+        assertEquals(
             mapOf(
                 InetAddress.getByName("10.0.0.2") to 32,
                 InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
@@ -145,7 +152,7 @@ class NgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenIsAddressBlockedAndDomainIsTrackerThenReturnTrue() {
+    fun whenIsAddressBlockedAndDomainIsTrackerThenReturnFalse() { // false because we don't want to block based on IP addresses
         val uid = 1200
         val tracker = AppTrackerDetector.AppTracker(
             "hostname",
@@ -158,7 +165,7 @@ class NgVpnNetworkStackTest {
         whenever(appTrackerDetector.evaluate(TRACKER_HOSTNAME, uid)).thenReturn(tracker)
         ngVpnNetworkStack.onDnsResolved(createDnsRecord(TRACKER_HOSTNAME, "1.1.1.1"))
 
-        Assert.assertTrue(ngVpnNetworkStack.isAddressBlocked(AddressRR("1.1.1.1", uid)))
+        assertFalse(ngVpnNetworkStack.isAddressBlocked(AddressRR("1.1.1.1", uid)))
     }
 
     @Test

@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">No puedo iniciar sesión</string>
     <string name="brokenSiteCategoryUnsupported">El navegador es incompatible</string>
     <string name="brokenSiteCategoryOther">Otro problema</string>
+    <string name="brokenSiteDescriptionTextInputHint">Compartir más detalles (opcional)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutoriales</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Un paso fácil para la privacidad de la aplicación</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Habilita App Tracking Protection para bloquear rastreadores que se ocultan en las aplicaciones, incluso cuando no estás usando el teléfono.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Lleva la privacidad al siguiente nivel</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Habilita App Tracking Protection para bloquear rastreadores que se ocultan en las aplicaciones, incluso cuando no estás usando el teléfono.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">La eliminación de datos está configurada como manual</string>

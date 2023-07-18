@@ -16,10 +16,12 @@
 
 package com.duckduckgo.autoconsent.impl.ui
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -36,7 +38,7 @@ class AutoconsentSettingsViewModel @Inject constructor(private val autoconsent: 
         val autoconsentEnabled: Boolean,
     )
     sealed class Command {
-        class LaunchLearnMoreWebPage(val url: String = LEARN_MORE_URL) : Command()
+        data class LaunchLearnMoreWebPage(val url: String = LEARN_MORE_URL, @StringRes val titleId: Int = R.string.autoconsentTitle) : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)

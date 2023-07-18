@@ -28,14 +28,14 @@ import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.autoconsent.api.WebViewActivityWithUrlParam
+import com.duckduckgo.autoconsent.api.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(WebViewActivityWithUrlParam::class)
+@ContributeToActivityStarter(WebViewActivityWithParams::class)
 class WebViewActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -82,7 +82,8 @@ class WebViewActivity : DuckDuckGoActivity() {
         }
 
         if (url == null) {
-            intent?.getActivityParams(WebViewActivityWithUrlParam::class.java)?.let {
+            intent?.getActivityParams(WebViewActivityWithParams::class.java)?.let {
+                title = it.title
                 binding.simpleWebview.loadUrl(it.url)
             }
         }

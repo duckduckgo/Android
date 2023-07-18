@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Je ne peux pas me connecter</string>
     <string name="brokenSiteCategoryUnsupported">Le navigateur est incompatible</string>
     <string name="brokenSiteCategoryOther">Autre</string>
+    <string name="brokenSiteDescriptionTextInputHint">Fournir plus de détails (facultatif)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutoriels</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Un geste simple pour préserver la confidentialité des applications</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Activez App Tracking Protection pour bloquer les traqueurs cachés dans les applications, même lorsque vous n\'utilisez pas votre téléphone.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Renforcez votre confidentialité</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Activez App Tracking Protection pour bloquer les traqueurs cachés dans les applications, même lorsque vous n\'utilisez pas votre téléphone.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Effacement des données configuré sur manuel</string>

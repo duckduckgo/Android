@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ne morem se prijaviti</string>
     <string name="brokenSiteCategoryUnsupported">Brskalnik ni združljiv</string>
     <string name="brokenSiteCategoryOther">Nekaj drugega</string>
+    <string name="brokenSiteDescriptionTextInputHint">Zaupajte nam več podrobnosti (neobvezno)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zaznamki</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Vadnice</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">En preprost korak za zasebnost aplikacije</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Omogočite zaščito pred sledenjem aplikacij App Tracking Protection in blokirajte sledilnike, ki se skrivajo v aplikacijah tudi, kadar telefona ne uporabljate.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Dvignite svojo zasebnost na naslednjo raven</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Omogočite zaščito pred sledenjem aplikacij App Tracking Protection in blokirajte sledilnike, ki se skrivajo v aplikacijah tudi, kadar telefona ne uporabljate.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Brisanje podatkov je nastavljeno na ročno</string>

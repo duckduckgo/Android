@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(
@@ -50,27 +49,14 @@ class FavoritesAdapter(
         const val FAVORITE_SECTION_TITLE_TYPE = 0
         const val EMPTY_STATE_TYPE = 1
         const val FAVORITE_TYPE = 2
-        private const val FAVICON_REQ_CHANNEL_CONSUMERS = 10
     }
 
     private val favoriteItems = mutableListOf<FavoriteItemTypes>()
-
-    private val faviconRequestsChannel = Channel<String>(capacity = 2000)
 
     interface FavoriteItemTypes
     object Header : FavoriteItemTypes
     object EmptyHint : FavoriteItemTypes
     data class FavoriteItem(val favorite: Favorite) : FavoriteItemTypes
-
-    init {
-        repeat(FAVICON_REQ_CHANNEL_CONSUMERS) {
-            lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
-                for (item in faviconRequestsChannel) {
-                    faviconManager.saveFaviconForUrl(item)
-                }
-            }
-        }
-    }
 
     fun setItems(
         favoriteItems: List<FavoriteItem>,
@@ -83,12 +69,6 @@ class FavoritesAdapter(
 
         if (favoriteItems.isEmpty()) {
             return
-        }
-
-        lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
-            favoriteItems.forEach {
-                faviconRequestsChannel.send(it.favorite.url)
-            }
         }
     }
 

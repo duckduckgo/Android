@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Negaliu prisijungti</string>
     <string name="brokenSiteCategoryUnsupported">Naršyklė nesuderinama</string>
     <string name="brokenSiteCategoryOther">Kažkas kito</string>
+    <string name="brokenSiteDescriptionTextInputHint">Pasidalinkite daugiau informacijos (neprivaloma)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Žymės</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Mokymo priemonės</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Vienas paprastas programos privatumo veiksmas</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Įjunkite „App Tracking Protection“, kad blokuotumėte programėlėse pasislėpusius sekimo įrenginius net tada, kai nesinaudojate telefonu.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Perkelkite savo privatumą į kitą lygį</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Įjunkite „App Tracking Protection“, kad blokuotumėte programėlėse pasislėpusius sekimo įrenginius net tada, kai nesinaudojate telefonu.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Duomenų valymas nustatytas į rankinį</string>

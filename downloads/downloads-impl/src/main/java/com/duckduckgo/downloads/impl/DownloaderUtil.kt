@@ -18,20 +18,43 @@ package com.duckduckgo.downloads.impl
 
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import java.lang.IllegalStateException
-import java.util.*
+import java.io.UnsupportedEncodingException
+import java.net.URLDecoder
+import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.jvm.Throws
 import timber.log.Timber
 
 object DownloaderUtil {
 
+    private const val FILENAME_PATTERN = "\\s*(\"((?:\\\\.|[^\"\\\\])*)\"|[^;]*)\\s*"
+
+    private const val INLINE_ATTACHMENT_PATTERN = "(inline|attachment)\\s*;"
+
     // Slightly different pattern than the one used in URLUtil (also contains `inline`).
     private val CONTENT_DISPOSITION_PATTERN =
         Pattern.compile(
-            "(inline|attachment)\\s*;\\s*filename\\s*=\\s*(\"((?:\\\\.|[^\"\\\\])*)\"|[^;]*)\\s*",
+            "${INLINE_ATTACHMENT_PATTERN}\\s*filename[*]?\\s*=$FILENAME_PATTERN",
             Pattern.CASE_INSENSITIVE,
         )
+
+    private val ENCODED_FILENAME_CONTENT_DISPOSITION_PATTERN = Pattern.compile(
+        "${INLINE_ATTACHMENT_PATTERN}\\s*filename\\*\\s*=\\s*([a-z0-9\\-]+)'\\s*'$FILENAME_PATTERN",
+        Pattern.CASE_INSENSITIVE,
+    )
+
+    private val ENCODED_FILENAME_REGEX =
+        Pattern.compile(
+            "\\s*;?\\s*filename\\*\\s*=\\s*([a-z0-9\\-]+)'\\s*'$FILENAME_PATTERN",
+            Pattern.CASE_INSENSITIVE,
+        ).toRegex()
+
+    private val PLAIN_FILENAME_REGEX =
+        Pattern.compile(
+            "\\s*;?\\s*filename\\s*=\\s*$FILENAME_PATTERN",
+            Pattern.CASE_INSENSITIVE,
+        ).toRegex()
 
     // Generic values for the Content-Type header used to enforce the decision to take the file extension from the URL if possible.
     private val GENERIC_CONTENT_TYPES = setOf(
@@ -140,8 +163,13 @@ object DownloaderUtil {
         return filename
     }
 
-    private fun fileNameFromContentDisposition(contentDisposition: String): String? {
-        val filename = parseContentDisposition(contentDisposition) ?: return null
+    fun fileNameFromContentDisposition(contentDisposition: String): String? {
+        val filename = try {
+            parseEncodedFilenameContentDisposition(removePlainFilename(contentDisposition))
+                ?: parseContentDisposition(contentDisposition) ?: return null
+        } catch (ex: UnsupportedEncodingException) {
+            parseContentDisposition(removeEncodedFilename(contentDisposition)) ?: return null
+        }
 
         return if (!filename.endsWith("/")) {
             filename.substringAfterLast('/')
@@ -150,7 +178,7 @@ object DownloaderUtil {
         }
     }
 
-    fun parseContentDisposition(contentDisposition: String): String? {
+    private fun parseContentDisposition(contentDisposition: String): String? {
         try {
             val m: Matcher = CONTENT_DISPOSITION_PATTERN.matcher(contentDisposition)
             if (m.find()) {
@@ -160,6 +188,28 @@ object DownloaderUtil {
             // This function is defined as returning null when it can't parse the header
         }
         return null
+    }
+
+    @Throws(UnsupportedEncodingException::class)
+    private fun parseEncodedFilenameContentDisposition(contentDisposition: String): String? {
+        try {
+            val m: Matcher = ENCODED_FILENAME_CONTENT_DISPOSITION_PATTERN.matcher(contentDisposition)
+            if (m.find()) {
+                val encoding = m.group(2)
+                return URLDecoder.decode(m.group(3), encoding).replace("\"", "")
+            }
+        } catch (ex: IllegalStateException) {
+            // This function is defined as returning null when it can't parse the header
+        }
+        return null
+    }
+
+    private fun removeEncodedFilename(contentDisposition: String): String {
+        return contentDisposition.replace(ENCODED_FILENAME_REGEX, "")
+    }
+
+    private fun removePlainFilename(contentDisposition: String): String {
+        return contentDisposition.replace(PLAIN_FILENAME_REGEX, "")
     }
 
     private fun String.sanitizeFileName(): String {

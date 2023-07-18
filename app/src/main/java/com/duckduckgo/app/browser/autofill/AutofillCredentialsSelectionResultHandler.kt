@@ -25,9 +25,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
@@ -66,7 +65,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val autofillDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
-    private val featureSegmentsManager: FeatureSegmentsManager,
+    private val autofillCapabilityChecker: AutofillCapabilityChecker,
 ) {
 
     suspend fun processAutofillCredentialSelectionResult(
@@ -192,6 +191,35 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         }
     }
 
+    suspend fun processPrivateDuckAddressInjectedEvent(
+        duckAddress: String,
+        tabId: String,
+        originalUrl: String,
+        autoSaveLogin: Boolean,
+    ) {
+        if (!autoSaveLogin) {
+            return
+        }
+
+        // this could be triggered from email autofill, which might happen even if saving passwords is disabled so need to guard here
+        if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(originalUrl)) {
+            return
+        }
+
+        val autologinId = autoSavedLoginsMonitor.getAutoSavedLoginId(tabId)
+        if (autologinId == null) {
+            saveDuckAddressForCurrentSite(duckAddress = duckAddress, tabId = tabId, url = originalUrl)
+        } else {
+            val existingAutoSavedLogin = autofillStore.getCredentialsWithId(autologinId)
+            if (existingAutoSavedLogin == null) {
+                Timber.w("Can't find saved login with autosavedLoginId: $autologinId")
+                saveDuckAddressForCurrentSite(duckAddress = duckAddress, tabId = tabId, url = originalUrl)
+            } else {
+                updateUsernameIfDifferent(existingAutoSavedLogin, duckAddress)
+            }
+        }
+    }
+
     private suspend fun onUserAcceptedToUseGeneratedPassword(
         result: Bundle,
         tabId: String,
@@ -231,6 +259,18 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
         }
     }
 
+    private suspend fun updateUsernameIfDifferent(
+        autosavedLogin: LoginCredentials,
+        username: String,
+    ) {
+        if (username == autosavedLogin.username) {
+            Timber.i("Generated username matches existing login; nothing to do here")
+        } else {
+            Timber.i("Updating existing login with new username. Login id is: %s", autosavedLogin.id)
+            autofillStore.updateCredentials(autosavedLogin.copy(username = username))
+        }
+    }
+
     private suspend fun saveLoginIfNotAlreadySaved(
         matchType: ContainsCredentialsResult,
         originalUrl: String,
@@ -247,9 +287,20 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
                 )?.id?.let { savedId ->
                     Timber.i("New login saved because no exact matches were found, with ID: $savedId")
                     autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
-                    featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
                 }
             }
+        }
+    }
+
+    private suspend fun saveDuckAddressForCurrentSite(
+        duckAddress: String,
+        tabId: String,
+        url: String,
+    ) {
+        val credentials = LoginCredentials(domain = url, username = duckAddress, password = null)
+        autofillStore.saveCredentials(rawUrl = url, credentials = credentials)?.id?.let { savedId ->
+            Timber.i("New login saved for duck address %s on site %s because no exact matches were found, with ID: %s", duckAddress, url, savedId)
+            autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
         }
     }
 

@@ -47,7 +47,6 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.deviceShieldEnabledOnSearch()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -57,7 +56,6 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.deviceShieldDisabledOnSearch()
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH_DAILY.pixelName)
-        verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_DISABLE_UPON_SEARCH.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
@@ -306,14 +304,6 @@ class RealDeviceShieldPixelsTest {
 
         verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET.notificationVariant(bucketSize))
         verify(pixel).fire(DeviceShieldPixelNames.ATP_REPORT_UNPROTECTED_APPS_BUCKET_DAILY.notificationVariant(bucketSize))
-    }
-
-    @Test
-    fun whenReportUnprotectedAppsBucketCalledThenFirePixel() {
-        val pixelName = "pixel_name"
-        deviceShieldPixels.didOpenVpnOnboardingFromNotification(pixelName)
-
-        verify(pixel).fire(pixelName)
     }
 
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {

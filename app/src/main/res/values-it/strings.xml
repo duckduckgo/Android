@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Non riesco ad accedere</string>
     <string name="brokenSiteCategoryUnsupported">Il browser non è compatibile</string>
     <string name="brokenSiteCategoryOther">Qualcos\'altro</string>
+    <string name="brokenSiteDescriptionTextInputHint">Condividi maggiori dettagli (facoltativo)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Segnalibri</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutorial</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Un passaggio semplice per la privacy delle app</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Attiva App Tracking Protection per bloccare i sistemi di tracciamento nascosti nelle app, anche quando non utilizzi il telefono.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Aumenta il livello di privacy</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Attiva App Tracking Protection per bloccare i sistemi di tracciamento nascosti nelle app, anche quando non utilizzi il telefono.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Eliminazione dati impostata su Manuale</string>

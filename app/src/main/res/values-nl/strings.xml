@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ik kan niet inloggen</string>
     <string name="brokenSiteCategoryUnsupported">De browser is niet compatibel</string>
     <string name="brokenSiteCategoryOther">Iets anders</string>
+    <string name="brokenSiteDescriptionTextInputHint">Meer details delen (optioneel)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Tutorials</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Eén eenvoudige stap voor privacy in apps</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Schakel App Tracking Protection in om trackers te blokkeren die in andere apps verborgen zitten, zelfs als je je telefoon niet gebruikt.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Til je privacy naar een hoger niveau</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Schakel App Tracking Protection in om trackers te blokkeren die in andere apps verborgen zitten, zelfs als je je telefoon niet gebruikt.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Gegevensverwijdering ingesteld op handmatig</string>

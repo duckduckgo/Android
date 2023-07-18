@@ -99,8 +99,6 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentType
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
@@ -192,7 +190,6 @@ class BrowserTabViewModel @Inject constructor(
     private val sitePermissionsManager: SitePermissionsManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
-    private val featureSegmentsManager: FeatureSegmentsManager,
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
 ) : WebViewClientListener,
     EditSavedSiteListener,
@@ -430,7 +427,11 @@ class BrowserTabViewModel @Inject constructor(
         object ChildTabClosed : Command()
 
         class CopyAliasToClipboard(val alias: String) : Command()
-        class InjectEmailAddress(val address: String) : Command()
+        class InjectEmailAddress(
+            val duckAddress: String,
+            val originalUrl: String,
+            val autoSaveLogin: Boolean,
+        ) : Command()
         class ShowEmailTooltip(val address: String) : Command()
         sealed class DaxCommand : Command() {
             object FinishPartialTrackerAnimation : DaxCommand()
@@ -885,7 +886,6 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             searchCountDao.incrementSearchCount()
         }
-        featureSegmentsManager.searchMade()
 
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
@@ -1903,7 +1903,6 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
-                    featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.FAVOURITE_SET)
                     faviconManager.persistCachedFavicon(tabId, url)
                     savedSitesRepository.insertFavorite(title = title, url = url)
                 } else {
@@ -2409,7 +2408,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         command.value =
-            if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxEndEnableAppTpCta) HideKeyboard else ShowKeyboard
+            if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2426,7 +2425,6 @@ class BrowserTabViewModel @Inject constructor(
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
-            is DaxBubbleCta.DaxEndEnableAppTpCta -> LaunchAppTPOnboarding
             else -> return
         }
     }
@@ -2694,9 +2692,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun consumeAlias() {
+    /**
+     * API called after user selected to autofill a private alias into a form
+
+     * Consumes the alias and injects it into the current page
+     * Will also automatically save a login for this site if saving logins is enabled
+     */
+    fun consumeAlias(originalUrl: String) {
         emailManager.getAlias()?.let {
-            command.postValue(InjectEmailAddress(it))
+            command.postValue(InjectEmailAddress(duckAddress = it, originalUrl = originalUrl, autoSaveLogin = true))
             pixel.enqueueFire(
                 AppPixelName.EMAIL_USE_ALIAS,
                 mapOf(
@@ -2708,9 +2712,9 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun useAddress() {
+    fun useAddress(originalUrl: String) {
         emailManager.getEmailAddress()?.let {
-            command.postValue(InjectEmailAddress(it))
+            command.postValue(InjectEmailAddress(duckAddress = it, originalUrl = originalUrl, autoSaveLogin = false))
             pixel.enqueueFire(
                 AppPixelName.EMAIL_USE_ADDRESS,
                 mapOf(
@@ -2802,7 +2806,6 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         credentials: LoginCredentials,
     ): LoginCredentials? {
-        featureSegmentsManager.addUserToFeatureSegment(FeatureSegmentType.LOGIN_SAVED)
         return withContext(appCoroutineScope.coroutineContext) {
             autofillStore.saveCredentials(url, credentials)
         }

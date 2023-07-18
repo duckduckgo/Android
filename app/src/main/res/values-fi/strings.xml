@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">En pysty kirjautumaan sisään</string>
     <string name="brokenSiteCategoryUnsupported">Selain ei ole yhteensopiva</string>
     <string name="brokenSiteCategoryOther">Jotain muuta</string>
+    <string name="brokenSiteDescriptionTextInputHint">Jaa lisää tietoja (valinnainen)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Opetusmateriaalit</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Yksi helppo askel kohti sovellusten tietosuojaa</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Ota käyttöön App Tracking Protection ja estä seurantaohjelmat, jotka piileskelevät sovelluksissa, vaikka et käyttäisi puhelintasi.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Vie tietosuojasi uudelle tasolle</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Ota käyttöön App Tracking Protection ja estä seurantaohjelmat, jotka piileskelevät sovelluksissa, vaikka et käyttäisi puhelintasi.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Tietojen tyhjennys asetettu manuaaliseksi</string>

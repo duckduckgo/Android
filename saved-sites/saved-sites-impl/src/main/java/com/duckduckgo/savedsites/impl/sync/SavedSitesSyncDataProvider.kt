@@ -51,10 +51,6 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return formatUpdates(updates)
     }
 
-    override fun onSyncDisabled() {
-        savedSitesSyncStore.modifiedSince = "0"
-    }
-
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
         Timber.d("Sync-Feature: generating changes since $since")

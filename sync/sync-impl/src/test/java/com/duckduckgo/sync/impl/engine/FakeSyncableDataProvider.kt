@@ -23,8 +23,4 @@ class FakeSyncableDataProvider(private val fakeChanges: SyncChangesRequest) : Sy
     override fun getChanges(): SyncChangesRequest {
         return fakeChanges
     }
-
-    override fun onSyncDisabled() {
-        TODO("Not yet implemented")
-    }
 }

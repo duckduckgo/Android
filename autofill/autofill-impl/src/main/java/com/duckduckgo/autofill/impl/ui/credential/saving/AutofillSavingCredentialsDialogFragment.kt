@@ -196,7 +196,12 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         val placeholder = initialExtractor.extractInitial(credentials)
 
         lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(tabId = getTabId(), url = originalUrl, view = binding.favicon, placeholder = placeholder)
+            faviconManager.loadToViewFromLocalWithPlaceholder(
+                tabId = getTabId(),
+                url = originalUrl,
+                view = binding.favicon,
+                placeholder = placeholder,
+            )
         }
     }
 

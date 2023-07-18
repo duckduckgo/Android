@@ -42,7 +42,8 @@ import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 
-private const val WWW_DUCKDUCKGO_COM = "www.duckduckgo.com"
+// We use an IP address instead of a domain name to skip DNS resolution
+private const val PROBED_ADDRESS = "1.1.1.1"
 
 @ContributesMultibinding(VpnScope::class)
 class NetworkConnectivityHealthHandler @Inject constructor(
@@ -93,8 +94,8 @@ class NetworkConnectivityHealthHandler @Inject constructor(
             var socket: Socket? = null
             try {
                 socket = activeNetwork.socketFactory.createSocket()
-                socket.connect(InetSocketAddress(WWW_DUCKDUCKGO_COM, 443), 5000)
-                logcat { "Validated $activeNetwork VPN network has connectivity to $WWW_DUCKDUCKGO_COM" }
+                socket.connect(InetSocketAddress(PROBED_ADDRESS, 443), 5000)
+                logcat { "Validated $activeNetwork VPN network has connectivity to $PROBED_ADDRESS" }
                 return true
             } catch (t: Throwable) {
                 logcat(LogPriority.ERROR) { t.asLog() }
@@ -114,8 +115,8 @@ class NetworkConnectivityHealthHandler @Inject constructor(
             try {
                 socket = SocketChannel.open().socket()
                 trackerBlockingVpnService.get().protect(socket)
-                socket.connect(InetSocketAddress(WWW_DUCKDUCKGO_COM, 443), 5000)
-                logcat { "Validated $activeNetwork device network has connectivity to $WWW_DUCKDUCKGO_COM" }
+                socket.connect(InetSocketAddress(PROBED_ADDRESS, 443), 5000)
+                logcat { "Validated $activeNetwork device network has connectivity to $PROBED_ADDRESS" }
                 return true
             } catch (t: Throwable) {
                 logcat(LogPriority.ERROR) { t.asLog() }

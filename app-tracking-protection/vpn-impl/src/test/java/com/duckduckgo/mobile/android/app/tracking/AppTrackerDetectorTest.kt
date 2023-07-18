@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.app.tracking
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.AppTrackerRecorder
@@ -24,9 +25,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class AppTrackerDetectorTest {
     private val appTrackerRepository: AppTrackerRepository = mock()
     private val appNameResolver: AppNameResolver = mock()

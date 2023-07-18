@@ -34,6 +34,7 @@ import javax.inject.Inject
 
 interface CoreContentScopeScripts {
     fun getScript(): String
+    fun isEnabled(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -45,6 +46,7 @@ class RealContentScopeScripts @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
+    private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
 ) : CoreContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -90,6 +92,10 @@ class RealContentScopeScripts @Inject constructor(
             cacheContentScopeJS()
         }
         return cachedContentScopeJS
+    }
+
+    override fun isEnabled(): Boolean {
+        return contentScopeScriptsFeature.self().isEnabled()
     }
 
     private fun getPluginParameters(): PluginParameters {

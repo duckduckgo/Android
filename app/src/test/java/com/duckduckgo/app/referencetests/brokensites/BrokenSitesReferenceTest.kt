@@ -80,7 +80,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
-        val encodedParamsList = listOf("siteUrl", "tds", "remoteConfigEtag")
+        val encodedParamsList = listOf("description", "siteUrl", "tds", "remoteConfigEtag")
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val adapter: JsonAdapter<ReferenceTest> = moshi.adapter(ReferenceTest::class.java)
 
@@ -130,6 +130,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
         val brokenSite = BrokenSite(
             category = testCase.category,
+            description = testCase.providedDescription,
             siteUrl = testCase.siteURL,
             upgradeHttps = testCase.wasUpgraded,
             blockedTrackers = testCase.blockedTrackers.joinToString(","),
@@ -172,6 +173,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val siteURL: String,
         val wasUpgraded: Boolean,
         val category: String,
+        val providedDescription: String?,
         val blockedTrackers: List<String>,
         val surrogates: List<String>,
         val atb: String,

@@ -21,20 +21,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.PopupMenu
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyer
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
@@ -51,8 +48,8 @@ import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @Suppress("NoHardcodedCoroutineDispatcher")
@@ -61,11 +58,9 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var netPInternalFeatureToggles: NetPInternalFeatureToggles
 
-    @Inject lateinit var vpnStateMonitor: VpnStateMonitor
-
     @Inject lateinit var netPInternalMtuProvider: NetPInternalMtuProvider
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    @Inject lateinit var networkProtectionState: NetworkProtectionState
 
     @Inject lateinit var serverRepository: NetPServerRepository
 
@@ -74,6 +69,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject lateinit var netPRekeyer: NetPRekeyer
+
+    private val job = ConflatedJob()
 
     private val exportPcapFile = registerForActivityResult(ExportPcapContract()) { data ->
         data?.let { uri ->
@@ -107,11 +104,16 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         setupConfigSection()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
+
     private fun setupUiElementState() {
-        vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
-            .onEach { isEnabled ->
+        job += lifecycleScope.launch {
+            while (isActive) {
+                val isEnabled = networkProtectionState.isEnabled()
+
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
                 binding.dnsLeakProtectionToggle.isEnabled = isEnabled
                 binding.netpPcapRecordingToggle.isEnabled = isEnabled
@@ -142,8 +144,10 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 } else {
                     binding.internalIp.gone()
                 }
+
+                delay(1_000)
             }
-            .launchIn(lifecycleScope)
+        }
     }
 
     private fun setupConfigSection() {
@@ -151,9 +155,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             binding.excludeSystemAppsToggle.setIsChecked(this.isEnabled())
             binding.excludeSystemAppsToggle.setOnCheckedChangeListener { _, isChecked ->
                 this.setEnabled(Toggle.State(enable = isChecked))
-                lifecycleScope.launch {
-                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-                }
+                networkProtectionState.restart()
             }
         }
 
@@ -171,9 +173,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             binding.dnsLeakProtectionToggle.setIsChecked(this.isEnabled())
             binding.dnsLeakProtectionToggle.setOnCheckedChangeListener { _, isChecked ->
                 this.setEnabled(Toggle.State(enable = isChecked))
-                lifecycleScope.launch {
-                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-                }
+                networkProtectionState.restart()
             }
         }
 
@@ -181,9 +181,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             binding.netpPcapRecordingToggle.setIsChecked(this.isEnabled())
             binding.netpPcapRecordingToggle.setOnCheckedChangeListener { _, isChecked ->
                 this.setEnabled(Toggle.State(enable = isChecked))
-                lifecycleScope.launch {
-                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-                }
+                networkProtectionState.restart()
             }
         }
         binding.netpDevSettingHeaderPCAPDeleteItem.setOnClickListener {
@@ -217,9 +215,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 val mtuSize = kotlin.runCatching { menuItem.title.toString().toInt() }.getOrNull()
                 netPInternalMtuProvider.setMtu(mtuSize)
                 binding.overrideMtuSelector.setSecondaryText("MTU size: ${netPInternalMtuProvider.getMtu()}")
-                lifecycleScope.launch(Dispatchers.Default) {
-                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-                }
+                networkProtectionState.restart()
 
                 true
             }
@@ -242,7 +238,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 this@NetPInternalSettingsActivity.lifecycleScope.launch {
                     serverRepository.setSelectedServer(it.serverName())
                     binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
-                    vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+                    networkProtectionState.restart()
                 }
                 true
             }

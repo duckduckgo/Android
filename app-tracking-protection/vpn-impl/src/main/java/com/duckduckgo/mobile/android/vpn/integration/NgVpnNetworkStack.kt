@@ -24,6 +24,9 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.network.DnsProvider
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -57,12 +60,16 @@ class NgVpnNetworkStack @Inject constructor(
     private val runtime: Runtime,
     private val appTrackerDetector: AppTrackerDetector,
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val dnsProvider: DnsProvider,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
     private var jniContext = 0L
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
+    private val isInterceptDnsRequestsEnabled: Boolean
+        get() = appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsRequests)
 
     override val name: String = AppTpVpnFeature.APPTP_VPN.featureName
 
@@ -90,7 +97,12 @@ class NgVpnNetworkStack @Inject constructor(
                 InetAddress.getByName("10.0.0.2") to 32,
                 InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
             ),
-            dns = emptySet(),
+            dns = mutableSetOf<InetAddress>().apply {
+                if (isInterceptDnsRequestsEnabled && dnsProvider.getPrivateDns().isEmpty()) {
+                    logcat { "Adding System defined DNS" }
+                    addAll(dnsProvider.getSystemDns())
+                }
+            }.toSet(),
             routes = emptyMap(),
             appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
         ),
@@ -111,6 +123,7 @@ class NgVpnNetworkStack @Inject constructor(
             synchronized(jniLock) {
                 vpnNetwork.destroy(jniContext)
                 jniContext = 0
+                logcat { "VPN network destroyed" }
             }
         } else {
             logcat { "VPN network already destroyed...noop" }
@@ -156,10 +169,8 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
-        val hostname = addressLookupLruCache[addressRR.address] ?: return false
-        val domainAllowed = shouldAllowDomain(hostname, addressRR.uid)
-        logcat { "isAddressBlocked for $addressRR ($hostname) = ${!domainAllowed}" }
-        return !domainAllowed
+        // never blocked based on address because the different domains can point to the same IP address
+        return false
     }
 
     private fun shouldAllowDomain(

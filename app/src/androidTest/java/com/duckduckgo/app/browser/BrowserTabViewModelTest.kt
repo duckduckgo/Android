@@ -106,12 +106,8 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.api.featureusage.FeatureSegmentsManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_APPTP_CTA
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -135,7 +131,6 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -337,9 +332,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
-    private lateinit var mockFeatureSegmentsManager: FeatureSegmentsManager
-
-    @Mock
     private lateinit var mockSurveyNotificationScheduler: SurveyNotificationScheduler
 
     @Mock
@@ -397,13 +389,9 @@ class BrowserTabViewModelTest {
 
     private val mockAppTheme: AppTheme = mock()
 
-    private val mockVariantManager: VariantManager = mock()
-
     private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
 
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor = mock()
-
-    private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
 
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
 
@@ -448,8 +436,6 @@ class BrowserTabViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             appTheme = mockAppTheme,
-            variantManager = mockVariantManager,
-            vpnFeaturesRegistry = mockVpnFeaturesRegistry,
             surveyRepository = mockSurveyRepository,
         )
 
@@ -517,7 +503,6 @@ class BrowserTabViewModelTest {
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
-            featureSegmentsManager = mockFeatureSegmentsManager,
             surveyNotificationScheduler = mockSurveyNotificationScheduler,
         )
 
@@ -2171,27 +2156,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedEnableAppTPCtaButtonThenLaunchAppTPOnboardingCommand() {
-        val cta = DaxBubbleCta.DaxEndEnableAppTpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-
-        testee.onUserClickCtaOkButton()
-
-        assertCommandIssued<Command.LaunchAppTPOnboarding>()
-        verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
-    }
-
-    @Test
-    fun whenUserDismissedEnableAppTPCtaThenPixelFired() {
-        val cta = DaxBubbleCta.DaxEndEnableAppTpCta(mockOnboardingStore, mockAppInstallStore)
-        setCta(cta)
-
-        testee.onUserDismissedCta()
-
-        verify(mockPixel).fire(AppPixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON, mapOf(CTA_SHOWN to DAX_APPTP_CTA))
-    }
-
-    @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = runTest {
         setBrowserShowing(isBrowsing = false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -3478,7 +3442,7 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
@@ -3518,10 +3482,10 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         assertCommandIssued<Command.InjectEmailAddress> {
-            assertEquals("alias", this.address)
+            assertEquals("alias", this.duckAddress)
         }
     }
 
@@ -3531,7 +3495,7 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
@@ -3543,7 +3507,7 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenSetNewLastUsedDateCalled() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
-        testee.consumeAlias()
+        testee.consumeAlias("")
 
         verify(mockEmailManager).setNewLastUsedDate()
     }
@@ -3562,10 +3526,10 @@ class BrowserTabViewModelTest {
     fun whenUseAddressThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.useAddress()
+        testee.useAddress("")
 
         assertCommandIssued<Command.InjectEmailAddress> {
-            assertEquals("address", this.address)
+            assertEquals("address", this.duckAddress)
         }
     }
 
@@ -3575,7 +3539,7 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.useAddress()
+        testee.useAddress("")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ADDRESS,
@@ -3587,7 +3551,7 @@ class BrowserTabViewModelTest {
     fun whenUseAddressThenSetNewLastUsedDateCalled() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.useAddress()
+        testee.useAddress("")
 
         verify(mockEmailManager).setNewLastUsedDate()
     }

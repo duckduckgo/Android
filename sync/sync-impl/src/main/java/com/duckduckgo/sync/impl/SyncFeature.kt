@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.impl.di
+package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.SyncFeature
+import com.duckduckgo.feature.toggles.api.Toggle
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    boundType = SyncFeature::class,
     featureName = "deviceSync",
 )
-@Suppress("unused")
-private interface UnusedSyncFeatureCodegenTrigger
+interface SyncFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+}

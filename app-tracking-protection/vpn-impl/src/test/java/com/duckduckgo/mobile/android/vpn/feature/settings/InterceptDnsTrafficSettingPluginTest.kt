@@ -25,7 +25,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class NetworkSwitchSettingPluginTest {
+class InterceptDnsTrafficSettingPluginTest {
 
     private lateinit var featureConfig: InterceptDnsTrafficSettingPlugin
     private lateinit var appTpFeatureConfig: AppTpFeatureConfig
@@ -53,7 +53,7 @@ class NetworkSwitchSettingPluginTest {
         val result = featureConfig.store(featureConfig.settingName, jsonEnabled)
 
         assertTrue(result)
-        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic))
+        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsRequests))
     }
 
     @Test
@@ -61,7 +61,7 @@ class NetworkSwitchSettingPluginTest {
         val result = featureConfig.store(featureConfig.settingName, jsonDisabled)
 
         assertTrue(result)
-        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic))
+        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsRequests))
     }
 
     @Test
@@ -70,6 +70,6 @@ class NetworkSwitchSettingPluginTest {
         val result = featureConfig.store(settingName, jsonEnabled)
 
         assertFalse(result)
-        assertFalse(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsTraffic))
+        assertTrue(appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsRequests))
     }
 }

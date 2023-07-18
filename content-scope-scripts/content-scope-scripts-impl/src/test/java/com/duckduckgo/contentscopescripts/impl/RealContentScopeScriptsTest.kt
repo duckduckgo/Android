@@ -20,10 +20,14 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -42,6 +46,7 @@ class RealContentScopeScriptsTest {
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFingerprintProtectionManager: FingerprintProtectionManager = mock()
+    private val mockContentScopeScriptsFeature: ContentScopeScriptsFeature = mock()
 
     lateinit var testee: CoreContentScopeScripts
 
@@ -54,6 +59,7 @@ class RealContentScopeScriptsTest {
             mockAppBuildConfig,
             mockUnprotectedTemporary,
             mockFingerprintProtectionManager,
+            mockContentScopeScriptsFeature,
         )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
@@ -186,6 +192,38 @@ class RealContentScopeScriptsTest {
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions
         verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
+    }
+
+    @Test
+    fun whenContentScopeScriptsIsEnabledThenReturnTrue() {
+        whenever(mockContentScopeScriptsFeature.self()).thenReturn(EnabledToggle())
+        assertTrue(testee.isEnabled())
+    }
+
+    @Test
+    fun whenContentScopeScriptsIsDisabledThenReturnFalse() {
+        whenever(mockContentScopeScriptsFeature.self()).thenReturn(DisabledToggle())
+        assertFalse(testee.isEnabled())
+    }
+
+    class EnabledToggle : Toggle {
+        override fun isEnabled(): Boolean {
+            return true
+        }
+
+        override fun setEnabled(state: State) {
+            // not implemented
+        }
+    }
+
+    class DisabledToggle : Toggle {
+        override fun isEnabled(): Boolean {
+            return false
+        }
+
+        override fun setEnabled(state: State) {
+            // not implemented
+        }
     }
 
     companion object {

@@ -18,14 +18,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/colorPrimaryDark">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/keyline_4"
         android:orientation="vertical"
         android:paddingVertical="@dimen/keyline_5">
+
+        <com.duckduckgo.mobile.android.ui.view.InfoPanel
+            android:id="@+id/notSignedIntoDuckAddressInfoPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_4"
+            app:panelBackground="@drawable/info_panel_tooltip_background"
+            android:visibility="gone"
+            app:panelDrawable="@drawable/ic_info_panel_info"
+            tools:panelText="This is a Tooltip Info Panel, interesting information can be shown here" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/domainTitleEditText"
@@ -33,6 +44,7 @@
             android:layout_height="wrap_content"
             app:type="single_line"
             android:layout_marginBottom="@dimen/keyline_5"
+            android:layout_marginHorizontal="@dimen/keyline_4"
             android:hint="@string/credentialManagementEditLoginTitleHint"
             app:editable="true" />
 
@@ -41,10 +53,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/credentialManagementEditUsernameHint"
+            android:layout_marginHorizontal="@dimen/keyline_4"
             app:editable="false"
             app:type="single_line"
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/duckAddressManagementLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/credentialManagementDuckAddressLabel"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_2"
+            app:leadingIcon="@drawable/ic_email_24"
+            app:leadingIconBackground="circular"
+            app:showSwitch="true"
+            android:visibility="gone" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/duckAddressManagementUnavailable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/credentialManagementDuckAddressLabel"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginEnd="@dimen/keyline_2"
+            app:showSwitch="false"
+            app:leadingIcon="@drawable/ic_warning_color_24"
+            app:leadingIconBackground="circular"
+            android:visibility="gone" />
+
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/passwordEditText"
@@ -52,6 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditPasswordHint"
+            android:layout_marginHorizontal="@dimen/keyline_4"
             app:editable="false"
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
@@ -63,6 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             android:hint="@string/credentialManagementEditWebsiteHint"
+            android:layout_marginHorizontal="@dimen/keyline_4"
             app:type="single_line"
             android:inputType="textUri|textNoSuggestions"
             app:editable="false" />
@@ -73,6 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
             app:type="multi_line"
+            android:layout_marginHorizontal="@dimen/keyline_4"
             android:hint="@string/credentialManagementEditNotesHint"
             app:editable="false" />
 
@@ -81,9 +122,9 @@
             app:typography="caption"
             app:textType="secondary"
             android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/keyline_4"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4" />
 
     </LinearLayout>
-
 </androidx.core.widget.NestedScrollView>

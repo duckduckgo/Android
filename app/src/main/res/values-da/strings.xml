@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Jeg kan ikke logge ind</string>
     <string name="brokenSiteCategoryUnsupported">Browseren er inkompatibel</string>
     <string name="brokenSiteCategoryOther">Noget andet</string>
+    <string name="brokenSiteDescriptionTextInputHint">Del flere detaljer (valgfrit)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bogmærker</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Vejledninger</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Et nemt skridt for at få privatliv i apps</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Aktivér App Tracking Protection for at blokere sporingsenheder, der gemmer sig i apps, selv når du ikke bruger telefonen.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Tag dit privatliv til det næste niveau</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Aktivér App Tracking Protection for at blokere sporingsenheder, der gemmer sig i apps, selv når du ikke bruger telefonen.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Datarydning indstillet til manuel</string>

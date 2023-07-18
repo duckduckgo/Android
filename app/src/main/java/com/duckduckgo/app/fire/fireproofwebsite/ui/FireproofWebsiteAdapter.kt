@@ -213,7 +213,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             image: ImageView,
         ) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = image)
+                faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }
 

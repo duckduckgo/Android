@@ -227,6 +227,7 @@
     <string name="brokenSiteCategoryLogin">Ma ei saa sisse logida</string>
     <string name="brokenSiteCategoryUnsupported">Brauser ei ühildu</string>
     <string name="brokenSiteCategoryOther">Midagi muud</string>
+    <string name="brokenSiteDescriptionTextInputHint">Kirjelda üksikasjalikumalt (soovi korral)</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Järjehoidjad</string>
@@ -328,12 +329,6 @@
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelTutorials">Õpetused</string>
-
-    <!-- AppTP Retention Experiment Notifications-->
-    <string name="enableAppTpNotificationEasyStepTitle">Üks lihtne samm rakenduse privaatsuse tagamiseks</string>
-    <string name="enableAppTpNotificationEasyStepDescription">Lubage App Tracking Protection , et blokeerida rakendustes peidus olevad jälgurid isegi siis, kui te oma telefoni ei kasuta.</string>
-    <string name="enableAppTpNotificationNextLevelTitle">Viige oma privaatsus järgmisele tasemele</string>
-    <string name="enableAppTpNotificationNextLevelDescription">Lubage App Tracking Protection , et blokeerida rakendustes peidus olevad jälgurid isegi siis, kui te oma telefoni ei kasuta.</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Seadistatud on andmete käsitsi kustutamine</string>

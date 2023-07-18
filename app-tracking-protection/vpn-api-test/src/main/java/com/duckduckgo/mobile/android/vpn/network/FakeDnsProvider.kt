@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.sync.api
+package com.duckduckgo.mobile.android.vpn.network
 
-import com.duckduckgo.feature.toggles.api.Toggle
+import java.net.InetAddress
 
-interface SyncFeature {
-    @Toggle.DefaultValue(false)
-    fun self(): Toggle
+class FakeDnsProvider : DnsProvider {
+    val mutableSystemDns = mutableListOf<InetAddress>()
+    val mutablePrivateDns = mutableListOf<InetAddress>()
+    override fun getSystemDns(): List<InetAddress> = mutableSystemDns
+
+    override fun getPrivateDns(): List<InetAddress> = mutablePrivateDns
 }

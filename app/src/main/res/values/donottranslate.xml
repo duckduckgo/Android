@@ -27,7 +27,6 @@
     <!-- Network Protection -->
     <string name="netpSettingsTitle">Network Protection</string>
     <string name="netpSettingsNeverEnabled">Secure your network connection</string>
-    <string name="netpSettingsConnecting">Connecting</string>
     <string name="netpSettingsConnected">Enabled</string>
     <string name="netpSettingsDisconnected">Disabled</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>

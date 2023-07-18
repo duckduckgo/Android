@@ -1,0 +1,28 @@
+appId: com.duckduckgo.mobile.android
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+    text: ".*I'll also upgrade the security of your connection if possible.*"
+- inputText: "https://privacy-test-pages.glitch.me/privacy-protections/query-parameters/"
+- pressKey: Enter
+- assertVisible:
+    text: ".*Got It.*"
+- tapOn:
+    text: "HIDE"
+- assertVisible:
+    text: "HIDE TIPS FOREVER"
+- tapOn:
+    text: "HIDE TIPS FOREVER"
+- assertVisible:
+    text: "Link with utm_source and utm_medium"
+- tapOn:
+    text: "Link with utm_source and utm_medium"
+- assertNotVisible:
+    text: "utm_source=something&utm_medium=somethingelse"
+- assertVisible:
+    text: ""

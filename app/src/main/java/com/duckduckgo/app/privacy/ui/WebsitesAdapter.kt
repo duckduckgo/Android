@@ -176,7 +176,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
             leadingIcon: ImageView,
         ) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = leadingIcon)
+                faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = leadingIcon)
             }
         }
 
