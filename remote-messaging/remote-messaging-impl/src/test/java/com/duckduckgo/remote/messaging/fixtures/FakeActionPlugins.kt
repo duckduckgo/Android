@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.remote.messaging.fixtures
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.remote.messaging.impl.mappers.DefaultBrowserActionMapper
+import com.duckduckgo.remote.messaging.impl.mappers.DismissActionMapper
+import com.duckduckgo.remote.messaging.impl.mappers.PlayStoreActionMapper
+import com.duckduckgo.remote.messaging.impl.mappers.UrlActionMapper
 
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    implementation KotlinX.coroutines.core
-}
-
-android {
-    namespace 'com.duckduckgo.remote.messaging.api'
-}
+val messageActionPlugins = listOf(
+    UrlActionMapper(),
+    DismissActionMapper(),
+    PlayStoreActionMapper(),
+    DefaultBrowserActionMapper(),
+).toSet()

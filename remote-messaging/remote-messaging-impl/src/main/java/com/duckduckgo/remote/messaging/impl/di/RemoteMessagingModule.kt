@@ -25,10 +25,12 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.AttributeMatcherPlugin
+import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
+import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
@@ -83,8 +85,9 @@ object DataSourceModule {
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagesDao: RemoteMessagesDao,
         dispatchers: DispatcherProvider,
+        messageMapper: MessageMapper,
     ): RemoteMessagingRepository {
-        return AppRemoteMessagingRepository(remoteMessagingConfigRepository, remoteMessagesDao, dispatchers)
+        return AppRemoteMessagingRepository(remoteMessagingConfigRepository, remoteMessagesDao, dispatchers, messageMapper)
     }
 
     @Provides
@@ -98,9 +101,10 @@ object DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigJsonMapper(
+        actionMappers: DaggerSet<MessageActionMapperPlugin>,
         appBuildConfig: AppBuildConfig,
     ): RemoteMessagingConfigJsonMapper {
-        return RemoteMessagingConfigJsonMapper(appBuildConfig)
+        return RemoteMessagingConfigJsonMapper(appBuildConfig, actionMappers)
     }
 
     @Provides

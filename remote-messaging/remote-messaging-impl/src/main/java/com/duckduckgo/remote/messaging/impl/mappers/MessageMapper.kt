@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.remote.messaging.impl.mappers
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.squareup.moshi.JsonAdapter
 
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    implementation KotlinX.coroutines.core
-}
+class MessageMapper(
+    private val messageAdapter: JsonAdapter<RemoteMessage>,
+) {
 
-android {
-    namespace 'com.duckduckgo.remote.messaging.api'
+    fun toString(sitePayload: RemoteMessage): String {
+        return messageAdapter.toJson(sitePayload)
+    }
+
+    fun fromMessage(payload: String): RemoteMessage? {
+        return runCatching {
+            messageAdapter.fromJson(payload)
+        }.getOrNull()
+    }
 }

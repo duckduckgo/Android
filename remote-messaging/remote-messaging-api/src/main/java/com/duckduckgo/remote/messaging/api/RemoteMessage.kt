@@ -18,15 +18,15 @@
 
 package com.duckduckgo.remote.messaging.api
 
-import com.duckduckgo.remote.messaging.api.Action.ActionType.APP_TP_ONBOARDING
-import com.duckduckgo.remote.messaging.api.Action.ActionType.DEFAULT_BROWSER
-import com.duckduckgo.remote.messaging.api.Action.ActionType.DISMISS
-import com.duckduckgo.remote.messaging.api.Action.ActionType.PLAYSTORE
-import com.duckduckgo.remote.messaging.api.Action.ActionType.URL
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
 import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
+import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
+import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
+import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
+import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
+import com.duckduckgo.remote.messaging.api.JsonActionType.URL
 
 data class RemoteMessage(
     val id: String,
@@ -78,20 +78,10 @@ sealed class Content(val messageType: MessageType) {
     }
 }
 
-sealed class Action(val actionType: ActionType) {
-    data class Url(val value: String) : Action(URL)
-    data class PlayStore(val value: String) : Action(PLAYSTORE)
-
-    // Using data class instead of Object. Object can't be serialized
-    data class DefaultBrowser(val value: String = "") : Action(DEFAULT_BROWSER)
-    data class Dismiss(val value: String = "") : Action(DISMISS)
-    data class AppTpOnboarding(val value: String = "") : Action(APP_TP_ONBOARDING)
-
-    enum class ActionType {
-        URL,
-        PLAYSTORE,
-        DEFAULT_BROWSER,
-        DISMISS,
-        APP_TP_ONBOARDING,
-    }
+sealed class Action(val actionType: String, open val value: String) {
+    data class Url(override val value: String) : Action(URL.jsonValue, value)
+    data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value)
+    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "")
+    object Dismiss : Action(DISMISS.jsonValue, "")
+    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "")
 }

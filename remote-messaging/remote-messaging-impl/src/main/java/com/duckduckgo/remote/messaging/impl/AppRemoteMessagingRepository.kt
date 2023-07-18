@@ -17,30 +17,14 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.api.Action.ActionType
-import com.duckduckgo.remote.messaging.api.Action.AppTpOnboarding
-import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
-import com.duckduckgo.remote.messaging.api.Action.Dismiss
-import com.duckduckgo.remote.messaging.api.Action.PlayStore
-import com.duckduckgo.remote.messaging.api.Action.Url
-import com.duckduckgo.remote.messaging.api.Content
-import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
-import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
-import com.duckduckgo.remote.messaging.api.Content.Medium
-import com.duckduckgo.remote.messaging.api.Content.MessageType
-import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status.SCHEDULED
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -50,9 +34,8 @@ class AppRemoteMessagingRepository(
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
     private val remoteMessagesDao: RemoteMessagesDao,
     private val dispatchers: DispatcherProvider,
+    private val messageMapper: MessageMapper,
 ) : RemoteMessagingRepository {
-
-    private val messageMapper = MessageMapper()
 
     override fun activeMessage(message: RemoteMessage?) {
         if (message == null) {
@@ -93,40 +76,5 @@ class AppRemoteMessagingRepository(
 
     override fun dismissedMessages(): List<String> {
         return remoteMessagesDao.dismissedMessages().map { it.id }.toList()
-    }
-
-    private class MessageMapper {
-
-        fun toString(sitePayload: RemoteMessage): String {
-            return messageAdapter.toJson(sitePayload)
-        }
-
-        fun fromMessage(payload: String): RemoteMessage? {
-            return runCatching {
-                messageAdapter.fromJson(payload)
-            }.getOrNull()
-        }
-
-        companion object {
-            private val moshi = Moshi.Builder()
-                .add(
-                    PolymorphicJsonAdapterFactory.of(Content::class.java, "messageType")
-                        .withSubtype(Small::class.java, MessageType.SMALL.name)
-                        .withSubtype(Medium::class.java, MessageType.MEDIUM.name)
-                        .withSubtype(BigSingleAction::class.java, MessageType.BIG_SINGLE_ACTION.name)
-                        .withSubtype(BigTwoActions::class.java, MessageType.BIG_TWO_ACTION.name),
-                )
-                .add(
-                    PolymorphicJsonAdapterFactory.of(Action::class.java, "actionType")
-                        .withSubtype(PlayStore::class.java, ActionType.PLAYSTORE.name)
-                        .withSubtype(Url::class.java, ActionType.URL.name)
-                        .withSubtype(Dismiss::class.java, ActionType.DISMISS.name)
-                        .withSubtype(DefaultBrowser::class.java, ActionType.DEFAULT_BROWSER.name)
-                        .withSubtype(AppTpOnboarding::class.java, ActionType.APP_TP_ONBOARDING.name),
-                )
-                .add(KotlinJsonAdapterFactory())
-                .build()
-            val messageAdapter: JsonAdapter<RemoteMessage> = moshi.adapter(RemoteMessage::class.java)
-        }
     }
 }

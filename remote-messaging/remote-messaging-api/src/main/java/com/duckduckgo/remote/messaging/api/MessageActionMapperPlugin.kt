@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+package com.duckduckgo.remote.messaging.api
+
+interface MessageActionMapperPlugin {
+    fun evaluate(jsonMessageAction: JsonMessageAction): Action?
 }
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+data class JsonMessageAction(
+    val type: String,
+    val value: String,
+)
 
-dependencies {
-    implementation Kotlin.stdlib.jdk7
-    implementation KotlinX.coroutines.core
-}
-
-android {
-    namespace 'com.duckduckgo.remote.messaging.api'
+sealed class JsonActionType(val jsonValue: String) {
+    object URL : JsonActionType("url")
+    object PLAYSTORE : JsonActionType("playstore")
+    object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
+    object DISMISS : JsonActionType("dismiss")
+    object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
 }
