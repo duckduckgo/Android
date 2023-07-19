@@ -74,6 +74,8 @@ class NetpCohortPixelInterceptor @Inject constructor(
             "m_netp_ev_wireguard_error",
             "m_netp_imp_vpn_conflict_dialog",
             "m_netp_imp_always_on_conflict_dialog",
+            "m_netp_imp_info_vpn",
+            "m_netp_imp_faqs",
         )
     }
 }
