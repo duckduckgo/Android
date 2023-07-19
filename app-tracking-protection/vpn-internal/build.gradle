@@ -32,18 +32,19 @@ android {
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
 
-    implementation project(path: ':vpn-impl')
-    implementation project(path: ':vpn-store')
-    implementation project(path: ':vpn-api')
-    implementation project(path: ':app-tracking-api')
-    implementation project(path: ':di')
-    implementation project(path: ':common')
-    implementation project(path: ':common-ui')
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':feature-toggles-api')
+    implementation project(':vpn-impl')
+    implementation project(':vpn-store')
+    implementation project(':vpn-api')
+    implementation project(':app-tracking-api')
+    implementation project(':di')
+    implementation project(':common')
+    implementation project(':common-ui')
+    implementation project(':app-build-config-api')
+    implementation project(':feature-toggles-api')
+    implementation project(':internal-features-api')
     implementation project(':navigation-api')
 
     implementation Kotlin.stdlib.jdk7

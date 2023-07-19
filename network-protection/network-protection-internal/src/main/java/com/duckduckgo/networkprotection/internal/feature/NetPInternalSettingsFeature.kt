@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feature
+package com.duckduckgo.networkprotection.internal.feature
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.vpn.internal.feature.LaunchVpnInternalScreenWithEmptyParams
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class VpnInternalSettingsFeature @Inject constructor(
-    private val globalActivityStarter: GlobalActivityStarter,
-) : InternalFeaturePlugin {
+class NetPInternalSettingsFeature @Inject constructor() : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return "AppTP dev settings"
+        return "NetP dev settings"
     }
 
     override fun internalFeatureSubtitle(): String {
-        return "AppTP dev settings for internal users"
+        return "NetP dev settings for internal users"
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
-        globalActivityStarter.start(activityContext, LaunchVpnInternalScreenWithEmptyParams)
+        activityContext.startActivity(NetPInternalSettingsActivity.intent(activityContext))
     }
 }

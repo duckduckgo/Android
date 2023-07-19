@@ -45,6 +45,7 @@ dependencies {
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
     implementation project(':vpn-api')
+    implementation project(':internal-features-api')
 
     implementation Square.moshi
 
