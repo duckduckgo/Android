@@ -16,33 +16,12 @@
 
 package com.duckduckgo.httpsupgrade.impl.di
 
-import android.content.Context
-import androidx.room.Room
-import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
-import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
-import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.httpsupgrade.impl.EmptyHttpsEmbeddedDataPersister
-import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactory
-import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactoryImpl
-import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
-import com.duckduckgo.httpsupgrade.impl.HttpsUpgradeDataDownloaderImpl
-import com.duckduckgo.httpsupgrade.impl.HttpsUpgradeService
-import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
-import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
-import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase.Companion.ALL_MIGRATIONS
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
-import javax.inject.Qualifier
-
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-private annotation class InternalApi
 
 @Module
 @ContributesTo(AppScope::class)
@@ -51,57 +30,5 @@ object HttpsPersisterModule {
     @Provides
     fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {
         return EmptyHttpsEmbeddedDataPersister()
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideAppDatabase(
-        context: Context,
-    ): HttpsUpgradeDatabase {
-        return Room.databaseBuilder(context, HttpsUpgradeDatabase::class.java, "httpsupgrade.db")
-            .addMigrations(*ALL_MIGRATIONS.toTypedArray())
-            .fallbackToDestructiveMigration()
-            .build()
-    }
-
-    @Provides
-    fun providesHttpsFalsePositivesDao(database: HttpsUpgradeDatabase): HttpsFalsePositivesDao = database.httpsFalsePositivesDao()
-
-    @Provides
-    fun provideHttpsBloomFilterSpecDao(database: HttpsUpgradeDatabase): HttpsBloomFilterSpecDao = database.httpsBloomFilterSpecDao()
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideHttpsBloomFilterFactory(
-        dao: HttpsBloomFilterSpecDao,
-        binaryDataStore: BinaryDataStore,
-        httpsEmbeddedDataPersister: HttpsEmbeddedDataPersister,
-        @InternalApi httpsDataPersister: HttpsDataPersister,
-        pixel: Pixel,
-        context: Context,
-    ): HttpsBloomFilterFactory {
-        return HttpsBloomFilterFactoryImpl(dao, binaryDataStore, httpsEmbeddedDataPersister, httpsDataPersister, pixel, context)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideHttpsUpgradeDataDownloader(
-        service: HttpsUpgradeService,
-        httpsUpgrader: HttpsUpgrader,
-        @InternalApi dataPersister: HttpsDataPersister,
-        bloomFalsePositivesDao: HttpsFalsePositivesDao,
-    ): HttpsUpgradeDataDownloader {
-        return HttpsUpgradeDataDownloaderImpl(service, httpsUpgrader, dataPersister, bloomFalsePositivesDao)
-    }
-
-    @Provides
-    @InternalApi
-    fun provideHttpsDataPersister(
-        binaryDataStore: BinaryDataStore,
-        httpsBloomSpecDao: HttpsBloomFilterSpecDao,
-        httpsFalsePositivesDao: HttpsFalsePositivesDao,
-        httpsUpgradeDatabase: HttpsUpgradeDatabase,
-    ): HttpsDataPersister {
-        return HttpsDataPersister(binaryDataStore, httpsBloomSpecDao, httpsFalsePositivesDao, httpsUpgradeDatabase)
     }
 }
