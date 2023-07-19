@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,25 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-dependencies {
-    implementation project(':di')
-    implementation project(':common-utils')
-    api project(':feature-toggles-api')
-
-    anvil project(':anvil-compiler')
-    implementation project(':anvil-annotations')
-
-    implementation Google.dagger
-    implementation AndroidX.core.ktx
-}
-
 android {
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
-    namespace 'com.duckduckgo.contentscopescripts.api'
+    namespace 'com.duckduckgo.common.ui.internal'
+}
+
+dependencies {
+    implementation project(':common-ui')
+    implementation project(':di')
+    implementation project(':internal-features-api')
+
+    implementation Kotlin.stdlib.jdk7
+
+    // Dagger
+    implementation Google.dagger
+
+    implementation "com.squareup.logcat:logcat:_"
 }

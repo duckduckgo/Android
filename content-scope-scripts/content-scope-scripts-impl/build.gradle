@@ -24,7 +24,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(':di')
-implementation project(path: ':common-utils')
+    implementation project(':common-utils')
     implementation project(':content-scope-scripts-api')
     implementation project(':app-store')
     implementation project(':privacy-config-api')

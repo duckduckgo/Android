@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feature
+package com.duckduckgo.common.ui.internal
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope

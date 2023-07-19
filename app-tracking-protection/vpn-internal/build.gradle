@@ -40,7 +40,7 @@ dependencies {
     implementation project(':vpn-api')
     implementation project(':app-tracking-api')
     implementation project(':di')
-implementation project(path: ':common-utils')
+    implementation project(':common-utils')
     implementation project(':common-ui')
     implementation project(':app-build-config-api')
     implementation project(':feature-toggles-api')
