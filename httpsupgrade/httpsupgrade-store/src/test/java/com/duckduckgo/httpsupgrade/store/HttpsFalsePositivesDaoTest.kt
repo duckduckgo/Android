@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,41 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.store
+package com.duckduckgo.httpsupgrade.store
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.httpsupgrade.store.HttpsFalsePositiveDomain
-import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
-import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
+import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class HttpsFalsePositivesDaoTest {
+
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var db: HttpsUpgradeDatabase
     private lateinit var dao: HttpsFalsePositivesDao
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, HttpsUpgradeDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, HttpsUpgradeDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
         dao = db.httpsFalsePositivesDao()
     }
 
@@ -43,43 +58,43 @@ class HttpsFalsePositivesDaoTest {
     }
 
     @Test
-    fun whenModelIsEmptyThenCountIsZero() {
+    fun whenModelIsEmptyThenCountIsZero() = runTest {
         assertEquals(0, dao.count())
     }
 
     @Test
-    fun whenModelIsEmptyThenContainsDomainIsFalse() {
+    fun whenModelIsEmptyThenContainsDomainIsFalse() = runTest {
         assertFalse(dao.contains(domain))
     }
 
     @Test
-    fun whenDomainInsertedThenContainsDomainIsTrue() {
+    fun whenDomainInsertedThenContainsDomainIsTrue() = runTest {
         dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         assertTrue(dao.contains(domain))
     }
 
     @Test
-    fun whenDomainInsertedThenCountIsOne() {
+    fun whenDomainInsertedThenCountIsOne() = runTest {
         dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         assertEquals(1, dao.count())
     }
 
     @Test
-    fun whenSecondUniqueDomainInsertedThenCountIsTwo() {
+    fun whenSecondUniqueDomainInsertedThenCountIsTwo() = runTest {
         dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         dao.insertAll(listOf(HttpsFalsePositiveDomain(anotherDomain)))
         assertEquals(2, dao.count())
     }
 
     @Test
-    fun whenSecondDuplicateDomainInsertedThenCountIsOne() {
+    fun whenSecondDuplicateDomainInsertedThenCountIsOne() = runTest {
         dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         assertEquals(1, dao.count())
     }
 
     @Test
-    fun whenAllUpdatedThenPreviousValuesAreReplaced() {
+    fun whenAllUpdatedThenPreviousValuesAreReplaced() = runTest {
         dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         dao.updateAll(listOf(HttpsFalsePositiveDomain(anotherDomain)))
         assertEquals(1, dao.count())
@@ -87,7 +102,7 @@ class HttpsFalsePositivesDaoTest {
     }
 
     @Test
-    fun whenAllDeletedThenContainsDomainIsFalse() {
+    fun whenAllDeletedThenContainsDomainIsFalse() = runTest {
         dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         dao.deleteAll()
         assertFalse(dao.contains(domain))

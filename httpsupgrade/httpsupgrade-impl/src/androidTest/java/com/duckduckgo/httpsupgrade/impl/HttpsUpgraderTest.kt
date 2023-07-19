@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade
+package com.duckduckgo.httpsupgrade.impl
 
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
-import com.duckduckgo.httpsupgrade.impl.BloomFilter
-import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactory
-import com.duckduckgo.httpsupgrade.impl.HttpsUpgraderImpl
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName

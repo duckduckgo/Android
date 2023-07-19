@@ -33,10 +33,14 @@ dependencies {
     implementation AndroidX.room.ktx
     implementation Square.retrofit2.converter.moshi
     kapt AndroidX.room.compiler
+    testImplementation AndroidX.room.testing
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.archCore.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.robolectric
 }
 
 android {
