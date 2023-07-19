@@ -26,7 +26,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':anrs-api')
     implementation project(':anrs-store')
-    implementation project(':common')
+implementation project(path: ':common-utils')
     implementation project(':di')
     implementation project(':browser-api')
     implementation project(':statistics')

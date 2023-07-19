@@ -32,14 +32,14 @@ android {
 }
 
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
+    anvil project(':anvil-compiler')
+    implementation project(':anvil-annotations')
 
     implementation project(':network-protection-impl')
     implementation project(':network-protection-api')
     implementation project(':network-protection-store')
     implementation project(':di')
-    implementation project(':common')
+    implementation project(':common-utils')
     implementation project(':common-ui')
     implementation project(':app-build-config-api')
     implementation project(':privacy-config-api')

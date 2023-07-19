@@ -34,7 +34,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':fingerprint-protection-api')
     implementation project(path: ':di')
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
     implementation project(path: ':statistics')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')

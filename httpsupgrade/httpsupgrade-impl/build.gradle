@@ -29,7 +29,7 @@ dependencies {
     implementation project(':library-loader-api')
     implementation project(':privacy-config-api')
     implementation project(':feature-toggles-api')
-    implementation project(':common')
+    implementation project(':common-utils')
     implementation project(':di')
     implementation project(':statistics')
     implementation project(':httpsupgrade-api')

@@ -44,7 +44,7 @@ android {
 
 dependencies {
 
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
     implementation project(path: ':vpn-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')

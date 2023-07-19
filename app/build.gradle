@@ -176,7 +176,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
     implementation project(':statistics')
-    implementation project(':common')
+implementation project(path: ':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
     implementation project(':di')
