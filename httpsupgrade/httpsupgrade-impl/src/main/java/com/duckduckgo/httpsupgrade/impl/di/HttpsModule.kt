@@ -36,11 +36,6 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import javax.inject.Qualifier
-
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-private annotation class InternalApi
 
 @Module
 @ContributesTo(AppScope::class)
@@ -69,7 +64,7 @@ object HttpsModule {
         dao: HttpsBloomFilterSpecDao,
         binaryDataStore: BinaryDataStore,
         httpsEmbeddedDataPersister: HttpsEmbeddedDataPersister,
-        @InternalApi httpsDataPersister: HttpsDataPersister,
+        httpsDataPersister: HttpsDataPersister,
         pixel: Pixel,
         context: Context,
     ): HttpsBloomFilterFactory {
@@ -81,14 +76,13 @@ object HttpsModule {
     fun provideHttpsUpgradeDataDownloader(
         service: HttpsUpgradeService,
         httpsUpgrader: HttpsUpgrader,
-        @InternalApi dataPersister: HttpsDataPersister,
+        dataPersister: HttpsDataPersister,
         bloomFalsePositivesDao: HttpsFalsePositivesDao,
     ): HttpsUpgradeDataDownloader {
         return HttpsUpgradeDataDownloaderImpl(service, httpsUpgrader, dataPersister, bloomFalsePositivesDao)
     }
 
     @Provides
-    @InternalApi
     fun provideHttpsDataPersister(
         binaryDataStore: BinaryDataStore,
         httpsBloomSpecDao: HttpsBloomFilterSpecDao,
