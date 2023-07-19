@@ -19,15 +19,15 @@ package com.duckduckgo.app.integration
 import android.net.Uri
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactoryImpl
-import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
-import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
-import com.duckduckgo.httpsupgrade.api.HttpsUpgraderImpl
+import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactoryImpl
+import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
+import com.duckduckgo.httpsupgrade.impl.HttpsFalsePositivesJsonAdapter
+import com.duckduckgo.httpsupgrade.impl.HttpsUpgraderImpl
+import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -44,7 +44,7 @@ import org.mockito.kotlin.whenever
 class HttpsEmbeddedDataIntegrationTest {
 
     private lateinit var httpsUpgrader: HttpsUpgrader
-    private lateinit var db: AppDatabase
+    private lateinit var db: HttpsUpgradeDatabase
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private var moshi = Moshi.Builder().add(HttpsFalsePositivesJsonAdapter()).build()
@@ -56,7 +56,7 @@ class HttpsEmbeddedDataIntegrationTest {
     fun before() {
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value)).thenReturn(true)
 
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(context, HttpsUpgradeDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 

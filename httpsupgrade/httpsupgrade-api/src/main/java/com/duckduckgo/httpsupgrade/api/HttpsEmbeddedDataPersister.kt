@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.httpsupgrade.impl
+package com.duckduckgo.httpsupgrade.api
 
-import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
-import logcat.logcat
+interface HttpsEmbeddedDataPersister {
 
-internal class EmptyHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
+    fun shouldPersistEmbeddedData(): Boolean
 
-    override fun shouldPersistEmbeddedData(): Boolean {
-        logcat { "Ignoring, empty persister does not use embedded data" }
-        return false
-    }
-
-    override fun persistEmbeddedData() {
-        logcat { "Ignoring, empty persister does not use embedded data" }
-    }
+    fun persistEmbeddedData()
 }

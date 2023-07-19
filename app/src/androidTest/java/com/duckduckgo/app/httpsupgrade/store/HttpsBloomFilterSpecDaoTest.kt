@@ -18,8 +18,9 @@ package com.duckduckgo.app.httpsupgrade.store
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
+import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -27,12 +28,12 @@ import org.junit.Test
 
 class HttpsBloomFilterSpecDaoTest {
 
-    private lateinit var db: AppDatabase
+    private lateinit var db: HttpsUpgradeDatabase
     private lateinit var dao: HttpsBloomFilterSpecDao
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, HttpsUpgradeDatabase::class.java).build()
         dao = db.httpsBloomFilterSpecDao()
     }
 

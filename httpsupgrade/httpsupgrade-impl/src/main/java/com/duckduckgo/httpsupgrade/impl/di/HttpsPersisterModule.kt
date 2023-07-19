@@ -21,13 +21,13 @@ import androidx.room.Room
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.httpsupgrade.impl.EmptyHttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactory
 import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactoryImpl
 import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
-import com.duckduckgo.httpsupgrade.impl.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.impl.HttpsUpgradeDataDownloaderImpl
 import com.duckduckgo.httpsupgrade.impl.HttpsUpgradeService
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
@@ -90,7 +90,7 @@ object HttpsPersisterModule {
         httpsUpgrader: HttpsUpgrader,
         @InternalApi dataPersister: HttpsDataPersister,
         bloomFalsePositivesDao: HttpsFalsePositivesDao,
-    ) : HttpsUpgradeDataDownloader {
+    ): HttpsUpgradeDataDownloader {
         return HttpsUpgradeDataDownloaderImpl(service, httpsUpgrader, dataPersister, bloomFalsePositivesDao)
     }
 
@@ -101,7 +101,7 @@ object HttpsPersisterModule {
         httpsBloomSpecDao: HttpsBloomFilterSpecDao,
         httpsFalsePositivesDao: HttpsFalsePositivesDao,
         httpsUpgradeDatabase: HttpsUpgradeDatabase,
-    ) : HttpsDataPersister {
+    ): HttpsDataPersister {
         return HttpsDataPersister(binaryDataStore, httpsBloomSpecDao, httpsFalsePositivesDao, httpsUpgradeDatabase)
     }
 }

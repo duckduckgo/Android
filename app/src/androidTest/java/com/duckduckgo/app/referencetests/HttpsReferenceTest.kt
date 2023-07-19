@@ -28,11 +28,11 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactory
 import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactoryImpl
 import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
-import com.duckduckgo.httpsupgrade.impl.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.impl.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.httpsupgrade.impl.HttpsUpgraderImpl
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec

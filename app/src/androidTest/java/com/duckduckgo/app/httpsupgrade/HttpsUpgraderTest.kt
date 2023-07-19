@@ -18,8 +18,12 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
+import com.duckduckgo.httpsupgrade.impl.BloomFilter
+import com.duckduckgo.httpsupgrade.impl.HttpsBloomFilterFactory
+import com.duckduckgo.httpsupgrade.impl.HttpsUpgraderImpl
+import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import org.junit.Assert.assertFalse

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
 import org.junit.Test
