@@ -56,19 +56,25 @@ class AndroidDefaultBrowserDetector @Inject constructor(
         return defaultAlready
     }
 
-    override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != ANDROID_PACKAGE
+    override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != null
 
-    private fun defaultBrowserPackage(): String {
+    private fun defaultBrowserPackage(): String? {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))
-        val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        return resolutionInfo?.activityInfo?.packageName ?: ANDROID_PACKAGE
+        val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivityCompat(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        return resolutionInfo?.activityInfo?.packageName
     }
 
     override fun featureState(): Pair<Boolean, String> {
         return Pair(isDefaultBrowser(), PixelParameter.DEFAULT_BROWSER)
     }
 
-    companion object {
-        const val ANDROID_PACKAGE = "android"
+    @Suppress("NewApi") // we use appBuildConfig
+    private fun PackageManager.resolveActivityCompat(intent: Intent, flag: Int): ResolveInfo? {
+        return if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            resolveActivity(intent, PackageManager.ResolveInfoFlags.of(flag.toLong()))
+        } else {
+            @Suppress("DEPRECATION")
+            resolveActivity(intent, flag)
+        }
     }
 }
