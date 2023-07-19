@@ -26,6 +26,7 @@ import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
@@ -53,7 +54,7 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class DeviceShieldReminderNotificationSchedulerTest {
+class AppTPReminderNotificationSchedulerTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -62,11 +63,12 @@ class DeviceShieldReminderNotificationSchedulerTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var workManager: WorkManager
     private lateinit var notificationManager: NotificationManagerCompat
-    private lateinit var testee: DeviceShieldReminderNotificationScheduler
+    private lateinit var testee: AppTPReminderNotificationScheduler
     private val vpnFeatureRemover: VpnFeatureRemover = mock()
     private val mockVpnReminderReceiverManager: VpnReminderReceiverManager = mock()
     private val mockPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin> = mock()
     private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder = mock()
+    private val appTrackingProtection: AppTrackingProtection = mock()
 
     @Before
     fun before() {
@@ -74,7 +76,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
         initializeWorkManager()
         notificationManager = NotificationManagerCompat.from(context)
         testee =
-            DeviceShieldReminderNotificationScheduler(
+            AppTPReminderNotificationScheduler(
                 context,
                 workManager,
                 notificationManager,
@@ -83,6 +85,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
                 TestScope(),
                 vpnReminderNotificationBuilder,
                 mockPluginPoint,
+                appTrackingProtection,
             )
     }
 
