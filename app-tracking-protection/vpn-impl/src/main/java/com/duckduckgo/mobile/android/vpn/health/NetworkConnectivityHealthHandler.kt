@@ -17,12 +17,12 @@
 package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
-import android.net.ConnectivityManager
 import android.os.PowerManager
 import com.duckduckgo.app.global.extensions.isAirplaneModeOn
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -52,7 +52,6 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
     private val vpnConnectivityLossListenerPluginPoint: PluginPoint<VpnConnectivityLossListenerPlugin>,
 ) : VpnServiceCallbacks {
-    private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val powerManager = context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
     private val job = ConflatedJob()
 
@@ -90,7 +89,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     }
 
     private fun hasVpnConnectivity(): Boolean {
-        connectivityManager.activeNetwork?.let { activeNetwork ->
+        context.getActiveNetwork()?.let { activeNetwork ->
             var socket: Socket? = null
             try {
                 socket = activeNetwork.socketFactory.createSocket()
@@ -110,7 +109,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     }
 
     private fun hasDeviceConnectivity(): Boolean {
-        connectivityManager.activeNetwork?.let { activeNetwork ->
+        context.getActiveNetwork()?.let { activeNetwork ->
             var socket: Socket? = null
             try {
                 socket = SocketChannel.open().socket()
