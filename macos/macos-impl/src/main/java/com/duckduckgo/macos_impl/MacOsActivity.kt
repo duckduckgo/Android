@@ -21,7 +21,6 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,14 +31,11 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.macos_impl.MacOsViewModel.Command
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsWaitlistClientSettings
 import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
-import com.duckduckgo.macos_impl.MacOsViewModel.ViewState
 import com.duckduckgo.macos_impl.databinding.ActivityMacosBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
-import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -60,18 +56,12 @@ class MacOsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }
-            .launchIn(lifecycleScope)
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }
             .launchIn(lifecycleScope)
 
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureUiEventHandlers()
-    }
-
-    private fun render(viewState: ViewState) {
-        binding.lookingForWindowsVersionButton.isVisible = viewState.windowsFeatureEnabled
     }
 
     private fun configureUiEventHandlers() {
@@ -87,14 +77,8 @@ class MacOsActivity : DuckDuckGoActivity() {
     private fun executeCommand(command: Command) {
         when (command) {
             is ShareLink -> launchSharePageChooser()
-            is GoToWindowsWaitlistClientSettings -> launchWindowsWaitlistClientSettings()
             is GoToWindowsClientSettings -> launchWindowsClientSettings()
         }
-    }
-
-    private fun launchWindowsWaitlistClientSettings() {
-        globalActivityStarter.start(this, WindowsWaitlistScreenWithEmptyParams)
-        finish()
     }
 
     private fun launchWindowsClientSettings() {

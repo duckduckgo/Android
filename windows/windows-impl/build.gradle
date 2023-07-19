@@ -29,7 +29,6 @@ dependencies {
     implementation project(':common')
     implementation project(':common-ui')
     implementation project(':windows-api')
-    implementation project(':windows-store')
     implementation project(':browser-api')
     implementation project(':statistics')
     implementation project(':macos-api')

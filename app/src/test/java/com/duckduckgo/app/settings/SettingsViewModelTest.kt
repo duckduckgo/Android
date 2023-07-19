@@ -28,16 +28,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
-import com.duckduckgo.windows.api.WindowsWaitlist
-import com.duckduckgo.windows.api.WindowsWaitlistFeature
-import com.duckduckgo.windows.api.WindowsWaitlistState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -82,19 +77,10 @@ class SettingsViewModelTest {
     private lateinit var autofillCapabilityChecker: AutofillCapabilityChecker
 
     @Mock
-    private lateinit var windowsWaitlist: WindowsWaitlist
-
-    @Mock
-    private lateinit var windowsFeatureToggle: Toggle
-
-    @Mock
     private lateinit var deviceSyncState: DeviceSyncState
 
     @Mock
     private lateinit var mockNetPWaitlistRepository: NetPWaitlistRepository
-
-    @Mock
-    private lateinit var mockWindowsDownloadLinkToggle: Toggle
 
     @Mock
     private lateinit var mockAutoconsent: Autoconsent
@@ -106,17 +92,8 @@ class SettingsViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        val windowsFeature: WindowsWaitlistFeature = mock()
-        whenever(windowsFeatureToggle.isEnabled()).thenReturn(false)
-        whenever(windowsFeature.self()).thenReturn(windowsFeatureToggle)
-
-        val mockWindowsDownloadLinkFeature: WindowsDownloadLinkFeature = mock()
-        whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(false)
-        whenever(mockWindowsDownloadLinkFeature.self()).thenReturn(mockWindowsDownloadLinkToggle)
-
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
-        whenever(windowsWaitlist.getWaitlistState()).thenReturn(WindowsWaitlistState.NotJoinedQueue)
 
         whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
 
@@ -135,11 +112,8 @@ class SettingsViewModelTest {
             mockEmailManager,
             autofillCapabilityChecker,
             networkProtectionState,
-            windowsWaitlist,
-            windowsFeature,
             deviceSyncState,
             mockNetPWaitlistRepository,
-            mockWindowsDownloadLinkFeature,
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
         )
@@ -331,28 +305,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenWindowsSettingClickedAndWindowsFeatureEnabledThenEmitCommandLaunchWindowsAndPixelFired() = runTest {
-        whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(true)
-
+    fun whenWindowsSettingClickedThenEmitCommandLaunchWindows() = runTest {
         testee.commands().test {
             testee.windowsSettingClicked()
 
             assertEquals(Command.LaunchWindows, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_WINDOWS_APP_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenWindowsSettingClickedAndWindowsFeatureDisabledThenEmitCommandLaunchWindowsWaitlistAndPixelFired() = runTest {
-        whenever(mockWindowsDownloadLinkToggle.isEnabled()).thenReturn(false)
-
-        testee.commands().test {
-            testee.windowsSettingClicked()
-
-            assertEquals(Command.LaunchWindowsWaitlist, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_WINDOWS_APP_PRESSED)
 
             cancelAndConsumeRemainingEvents()
         }

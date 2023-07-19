@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">Aplicación DuckDuckGo para Windows</string>
+    <string name="windows_title">¡Consigue DuckDuckGo para Windows!</string>
+    <string name="windows_description">DuckDuckGo para Windows tiene todo lo que necesitas para navegar con más privacidad: búsqueda privada, bloqueo de rastreadores, encriptación forzada y bloqueo de ventanas emergentes de cookies, además de más protecciones de primer nivel que están por llegar.\n\nEn tu ordenador con Windows, ve a:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Compartir enlace</string>
+    <string name="windows_share_text">¿Todo listo para empezar a navegar de forma privada en Windows?\n\nVisita esta URL en tu ordenador con Windows para la descarga:\nhttps://duckkgogo.com/windows</string>
+    <string name="windows_mac_link">¿Buscas la versión para Mac?</string>
+</resources>
