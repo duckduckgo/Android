@@ -4335,6 +4335,39 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenMultipleTabsAndViewModelIsForActiveTabThenActiveTabReturnsTrue() {
+        val tabId = "abc123"
+        selectedTabLiveData.value = aTabEntity(id = tabId)
+        loadTabWithId("foo")
+        loadTabWithId("bar")
+        loadTabWithId(tabId)
+        assertTrue(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenMultipleTabsAndViewModelIsForInactiveTabThenActiveTabReturnsFalse() {
+        val tabId = "abc123"
+        selectedTabLiveData.value = aTabEntity(id = tabId)
+        loadTabWithId(tabId)
+        loadTabWithId("foo")
+        loadTabWithId("bar")
+        assertFalse(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenSingleTabThenActiveTabReturnsTrue() {
+        val tabId = "abc123"
+        selectedTabLiveData.value = aTabEntity(id = tabId)
+        loadTabWithId(tabId)
+        assertTrue(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenNoTabsThenActiveTabReturnsFalse() {
+        assertFalse(testee.isActiveTab())
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -4514,6 +4547,14 @@ class BrowserTabViewModelTest {
 
     private suspend fun givenRemoteMessage(remoteMessage: RemoteMessage) {
         remoteMessageFlow.send(remoteMessage)
+    }
+
+    private fun aTabEntity(id: String): TabEntity {
+        return TabEntity(tabId = id, position = 0)
+    }
+
+    private fun loadTabWithId(tabId: String) {
+        testee.loadData(tabId, initialUrl = null, skipHome = false, favoritesOnboarding = false)
     }
 
     private fun loadUrl(

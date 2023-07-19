@@ -2833,6 +2833,14 @@ class BrowserTabViewModel @Inject constructor(
         return isLinkOpenedInNewTab
     }
 
+    override fun isActiveTab(): Boolean {
+        liveSelectedTab.value?.let {
+            return it.tabId == tabId
+        }
+
+        return false
+    }
+
     fun onAutofillMenuSelected() {
         command.value = LaunchAutofillSettings
     }

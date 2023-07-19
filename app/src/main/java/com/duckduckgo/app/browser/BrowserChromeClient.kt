@@ -154,6 +154,64 @@ class BrowserChromeClient @Inject constructor(
         webViewClientListener?.closeCurrentTab()
     }
 
+    /**
+     * Called when a site's javascript tries to create a javascript alert dialog
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    override fun onJsAlert(
+        view: WebView?,
+        url: String,
+        message: String,
+        result: JsResult,
+    ): Boolean {
+        if (webViewClientListener?.isActiveTab() == true) {
+            return false
+        }
+
+        Timber.v("onJsAlert called but is not the active tab; suppressing dialog")
+        result.cancel()
+        return true
+    }
+
+    /**
+     * Called when a site's javascript tries to create a javascript prompt dialog
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    override fun onJsPrompt(
+        view: WebView?,
+        url: String?,
+        message: String?,
+        defaultValue: String?,
+        result: JsPromptResult,
+    ): Boolean {
+        if (webViewClientListener?.isActiveTab() == true) {
+            return false
+        }
+
+        Timber.v("onJsPrompt called but is not the active tab; suppressing dialog")
+        result.cancel()
+        return true
+    }
+
+    /**
+     * Called when a site's javascript tries to create a javascript confirmation dialog
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    override fun onJsConfirm(
+        view: WebView?,
+        url: String?,
+        message: String?,
+        result: JsResult,
+    ): Boolean {
+        if (webViewClientListener?.isActiveTab() == true) {
+            return false
+        }
+
+        Timber.v("onJsConfirm called but is not the active tab; suppressing dialog")
+        result.cancel()
+        return true
+    }
+
     override fun onGeolocationPermissionsShowPrompt(
         origin: String,
         callback: GeolocationPermissions.Callback,
