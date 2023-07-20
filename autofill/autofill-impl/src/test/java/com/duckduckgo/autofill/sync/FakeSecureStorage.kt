@@ -27,7 +27,9 @@ internal class FakeSecureStorage : SecureStorage {
 
     override fun canAccessSecureStorage(): Boolean = true
 
-    override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): WebsiteLoginDetailsWithCredentials? {
+    override suspend fun addWebsiteLoginDetailsWithCredentials(
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
+    ): WebsiteLoginDetailsWithCredentials? {
         val newLogin = if (websiteLoginDetailsWithCredentials.details.id == null) {
             websiteLoginDetailsWithCredentials.copy(
                 details = websiteLoginDetailsWithCredentials.details.copy(
@@ -67,7 +69,9 @@ internal class FakeSecureStorage : SecureStorage {
         return entities.filter { (it.details.lastUpdatedMillis ?: 0) > since }
     }
 
-    override suspend fun updateWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials): WebsiteLoginDetailsWithCredentials? {
+    override suspend fun updateWebsiteLoginDetailsWithCredentials(
+        websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
+    ): WebsiteLoginDetailsWithCredentials? {
         entities.find { it.details.id == websiteLoginDetailsWithCredentials.details.id }?.let {
             entities.remove(it)
             entities.add(websiteLoginDetailsWithCredentials)

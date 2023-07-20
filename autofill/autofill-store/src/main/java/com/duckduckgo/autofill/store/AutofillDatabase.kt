@@ -37,7 +37,8 @@ abstract class AutofillDatabase : RoomDatabase() {
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-            "CREATE TABLE IF NOT EXISTS `credentials_sync_meta` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`id`))",
+            "CREATE TABLE IF NOT EXISTS `credentials_sync_meta` " +
+                "(`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, PRIMARY KEY(`id`))",
         )
         database.execSQL(
             "CREATE UNIQUE INDEX IF NOT EXISTS `index_credentials_sync_meta_syncId` ON `credentials_sync_meta` (`syncId`)",
