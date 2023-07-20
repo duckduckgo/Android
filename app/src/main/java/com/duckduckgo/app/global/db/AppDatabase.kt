@@ -608,7 +608,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    private val MIGRATION_48_TO_49: Migration = object : Migration(47, 48) {
+    private val MIGRATION_48_TO_49: Migration = object : Migration(48, 49) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("DROP TABLE `https_bloom_filter_spec`")
             database.execSQL("DROP TABLE `https_false_positive_domain`")
