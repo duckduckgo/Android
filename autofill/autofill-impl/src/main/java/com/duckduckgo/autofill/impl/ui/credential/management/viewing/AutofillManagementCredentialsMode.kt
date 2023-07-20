@@ -455,7 +455,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
             is NotSignedIn -> {
                 duckAddressManagementLabel.gone()
                 duckAddressManagementUnavailable.gone()
-                val text = getText(R.string.abc)
+                val text = getText(R.string.credentialManagementEnableEmailProtectionPrompt)
                 notSignedIntoDuckAddressInfoPanel.setClickableLink(
                     annotation = "enable_duck_address",
                     fullText = text,
