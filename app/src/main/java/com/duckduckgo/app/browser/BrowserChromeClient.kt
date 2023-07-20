@@ -163,15 +163,7 @@ class BrowserChromeClient @Inject constructor(
         url: String,
         message: String,
         result: JsResult,
-    ): Boolean {
-        if (webViewClientListener?.isActiveTab() == true) {
-            return false
-        }
-
-        Timber.v("onJsAlert called but is not the active tab; suppressing dialog")
-        result.cancel()
-        return true
-    }
+    ): Boolean = shouldSuppressJavascriptDialog(result)
 
     /**
      * Called when a site's javascript tries to create a javascript prompt dialog
@@ -183,15 +175,7 @@ class BrowserChromeClient @Inject constructor(
         message: String?,
         defaultValue: String?,
         result: JsPromptResult,
-    ): Boolean {
-        if (webViewClientListener?.isActiveTab() == true) {
-            return false
-        }
-
-        Timber.v("onJsPrompt called but is not the active tab; suppressing dialog")
-        result.cancel()
-        return true
-    }
+    ): Boolean = shouldSuppressJavascriptDialog(result)
 
     /**
      * Called when a site's javascript tries to create a javascript confirmation dialog
@@ -202,12 +186,20 @@ class BrowserChromeClient @Inject constructor(
         url: String?,
         message: String?,
         result: JsResult,
-    ): Boolean {
+    ): Boolean = shouldSuppressJavascriptDialog(result)
+
+    /**
+     * Determines if we should allow or suppress a javascript dialog from being shown
+     *
+     * If suppressing it, we also cancel the pending javascript result so JS execution can continue
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    private fun shouldSuppressJavascriptDialog(result: JsResult): Boolean {
         if (webViewClientListener?.isActiveTab() == true) {
             return false
         }
 
-        Timber.v("onJsConfirm called but is not the active tab; suppressing dialog")
+        Timber.v("javascript dialog attempting to show but is not the active tab; suppressing dialog")
         result.cancel()
         return true
     }
