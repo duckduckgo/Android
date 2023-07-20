@@ -34,10 +34,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventTypeConverter
 import com.duckduckgo.app.global.events.db.UserEventsDao
-import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
-import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
-import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -70,15 +66,13 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 48,
+    version = 49,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
         TdsCnameEntity::class,
         UserWhitelistedDomain::class,
-        HttpsBloomFilterSpec::class,
-        HttpsFalsePositiveDomain::class,
         NetworkLeaderboardEntry::class,
         SitesVisitedEntity::class,
         TabEntity::class,
@@ -127,8 +121,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
     abstract fun tdsCnameEntityDao(): TdsCnameEntityDao
     abstract fun userWhitelistDao(): UserWhitelistDao
-    abstract fun httpsFalsePositivesDao(): HttpsFalsePositivesDao
-    abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao
@@ -616,6 +608,13 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_48_TO_49: Migration = object : Migration(47, 48) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `https_bloom_filter_spec`")
+            database.execSQL("DROP TABLE `https_false_positive_domain`")
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -689,6 +688,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_45_TO_46,
             MIGRATION_46_TO_47,
             MIGRATION_47_TO_48,
+            MIGRATION_48_TO_49,
         )
 
     @Deprecated(

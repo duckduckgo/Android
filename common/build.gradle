@@ -56,6 +56,7 @@ dependencies {
     implementation JakeWharton.timber
 
     implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.retrofit
 
     // Room
     implementation AndroidX.room.runtime

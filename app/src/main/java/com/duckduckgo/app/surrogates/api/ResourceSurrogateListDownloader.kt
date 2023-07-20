@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.surrogates.api
 
-import com.duckduckgo.app.global.api.isCached
+import com.duckduckgo.app.global.extensions.isCached
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import io.reactivex.Completable
