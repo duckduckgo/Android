@@ -224,19 +224,47 @@ class AppTPReminderNotificationSchedulerTest {
     fun whenVpnRevokedAndNoContentPluginForRevokedThenNoImmediateNotificationShouldBeShown() = runTest {
         whenever(vpnFeatureRemover.isFeatureRemoved()).thenReturn(false)
         whenever(mockPluginPoint.getHighestPriorityPluginForType(Type.REVOKED)).thenReturn(null)
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
 
+        testee.onVpnStarted(TestScope())
         testee.onVpnStopped(TestScope(), REVOKED)
 
         verifyNoInteractions(vpnReminderNotificationBuilder)
     }
 
     @Test
-    fun whenVpnRevokedAndWithContentPluginForRevokedThenImmediateNotificationShouldBeShown() = runTest {
+    fun whenAppTPEnabledAndOnboardedVpnRevokedAndWithContentPluginForRevokedThenImmediateNotificationShouldBeShown() = runTest {
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(fakeRevokedPlugin, fakeDisabledPlugin))
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(appTrackingProtection.isOnboarded()).thenReturn(true)
 
+        testee.onVpnStarted(TestScope())
         testee.onVpnStopped(TestScope(), REVOKED)
 
         verify(vpnReminderNotificationBuilder).buildReminderNotification(fakeRevokedPlugin.getContent())
+    }
+
+    @Test
+    fun whenAppTPDisabledVpnRevokedAndWithContentPluginForRevokedThenNoImmediateNotificationShouldBeShown() = runTest {
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(fakeRevokedPlugin, fakeDisabledPlugin))
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(appTrackingProtection.isOnboarded()).thenReturn(true)
+
+        testee.onVpnStarted(TestScope())
+        testee.onVpnStopped(TestScope(), REVOKED)
+
+        verifyNoInteractions(vpnReminderNotificationBuilder)
+    }
+    @Test
+    fun whenAppTPNotOnboardedVpnRevokedAndWithContentPluginForRevokedThenNoImmediateNotificationShouldBeShown() = runTest {
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(fakeRevokedPlugin, fakeDisabledPlugin))
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
+
+        testee.onVpnStarted(TestScope())
+        testee.onVpnStopped(TestScope(), REVOKED)
+
+        verifyNoInteractions(vpnReminderNotificationBuilder)
     }
 
     @Test
