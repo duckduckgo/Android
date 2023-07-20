@@ -20,7 +20,7 @@ interface SitePermissionsDialogLauncher {
      * This method should be called if website requests site permissions (audio or video). It will launch dialogs flow for asking the user.
      *
      * @param activity where this method is called from
-     * @param url unmodified URL taken from the URL bar (containing subdomains, query params etc...)
+     * @param url URL taken from the permissions request object
      * @param tabId id from the tab where this method is called from
      * @param permissionsRequested array of permissions that need to be asked filtered by user permissions settings. *Note: This could
      * be different from `request.getResources()`
