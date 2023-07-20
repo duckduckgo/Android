@@ -12,7 +12,6 @@ ext {
 }
 
 android {
-    ndkVersion '21.4.7075529'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
         minSdk min_sdk
@@ -58,8 +57,11 @@ android {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
     }
     signingConfigs {
         release
@@ -100,12 +102,6 @@ android {
         if (names.contains("fdroid") && variant.buildType.name == "debug") {
             // We don't need fdroidDebug build type
             setIgnore(true)
-        }
-    }
-    externalNativeBuild {
-
-        cmake {
-            path "CMakeLists.txt"
         }
     }
     lint {
@@ -258,6 +254,10 @@ dependencies {
 
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
+
+    implementation project(':httpsupgrade-api')
+    implementation project(':httpsupgrade-impl')
+    implementation project(':httpsupgrade-store')
 
     implementation project(':sync-api')
     implementation project(':sync-impl')

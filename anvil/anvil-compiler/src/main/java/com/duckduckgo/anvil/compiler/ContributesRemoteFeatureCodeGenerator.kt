@@ -866,7 +866,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         return argumentAt("toggleStore", 5)?.value()
     }
 
-    private fun ClassReference.declaredFunctions(): List<FunctionReference> {
+    private fun ClassReference.declaredFunctions(): List<MemberFunctionReference> {
         return functions
             .filter { it.name != "equals" }
             .filter { it.name != "hashCode" }
