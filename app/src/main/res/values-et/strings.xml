@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Sirvi privaatselt meie Windowsi rakendusega</string>
     <string name="windows_settings_description_ready">Saadaval on allalaadimine</string>
     <string name="windows_settings_description_list">Oled nimekirjas!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Lohista ülevalt alla ja puuduta nuppu Tagasi, et täisekraanvaatest väljuda</string>
 </resources>
