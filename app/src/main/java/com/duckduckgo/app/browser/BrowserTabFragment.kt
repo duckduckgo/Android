@@ -1299,6 +1299,11 @@ class BrowserTabFragment :
     }
 
     private fun askSiteLocationPermission(domain: String) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
 
         val title = domain.websiteFromGeoLocationsApiOrigin()
@@ -1531,6 +1536,11 @@ class BrowserTabFragment :
         activities: List<ResolveInfo>,
         useFirstActivityFound: Boolean,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         if (activities.size == 1 || useFirstActivityFound) {
             val activity = activities.first()
             val appTitle = activity.loadLabel(pm)
@@ -1547,6 +1557,11 @@ class BrowserTabFragment :
         context: Context,
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val isShowing = loginDetectionDialog?.isShowing()
 
         if (isShowing != true) {
@@ -1578,6 +1593,11 @@ class BrowserTabFragment :
         context: Context,
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val isShowing = automaticFireproofDialog?.isShowing()
 
         if (isShowing != true) {
@@ -1699,6 +1719,11 @@ class BrowserTabFragment :
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val authDialogBinding = HttpAuthenticationBinding.inflate(layoutInflater)
         authDialogBinding.httpAuthInformationText.text = getString(R.string.authenticationDialogMessage, request.site)
         CustomAlertDialogBuilder(requireActivity())
@@ -3450,6 +3475,11 @@ class BrowserTabFragment :
         permissionsToRequest: Array<String>,
         request: PermissionRequest,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         activity?.let {
             sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), tabId, permissionsToRequest, request, this)
         }

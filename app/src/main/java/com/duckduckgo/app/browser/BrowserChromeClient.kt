@@ -154,6 +154,56 @@ class BrowserChromeClient @Inject constructor(
         webViewClientListener?.closeCurrentTab()
     }
 
+    /**
+     * Called when a site's javascript tries to create a javascript alert dialog
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    override fun onJsAlert(
+        view: WebView?,
+        url: String,
+        message: String,
+        result: JsResult,
+    ): Boolean = shouldSuppressJavascriptDialog(result)
+
+    /**
+     * Called when a site's javascript tries to create a javascript prompt dialog
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    override fun onJsPrompt(
+        view: WebView?,
+        url: String?,
+        message: String?,
+        defaultValue: String?,
+        result: JsPromptResult,
+    ): Boolean = shouldSuppressJavascriptDialog(result)
+
+    /**
+     * Called when a site's javascript tries to create a javascript confirmation dialog
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    override fun onJsConfirm(
+        view: WebView?,
+        url: String?,
+        message: String?,
+        result: JsResult,
+    ): Boolean = shouldSuppressJavascriptDialog(result)
+
+    /**
+     * Determines if we should allow or suppress a javascript dialog from being shown
+     *
+     * If suppressing it, we also cancel the pending javascript result so JS execution can continue
+     * @return false to allow it to happen as normal; return true to suppress it from being shown
+     */
+    private fun shouldSuppressJavascriptDialog(result: JsResult): Boolean {
+        if (webViewClientListener?.isActiveTab() == true) {
+            return false
+        }
+
+        Timber.v("javascript dialog attempting to show but is not the active tab; suppressing dialog")
+        result.cancel()
+        return true
+    }
+
     override fun onGeolocationPermissionsShowPrompt(
         origin: String,
         callback: GeolocationPermissions.Callback,
