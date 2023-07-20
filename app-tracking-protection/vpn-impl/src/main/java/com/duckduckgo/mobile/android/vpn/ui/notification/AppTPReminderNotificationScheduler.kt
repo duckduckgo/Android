@@ -92,7 +92,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
                 logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
             } else {
                 withContext(dispatchers.main()) {
-                    if (shouldShowImmediateReminderNotification()) {
+                    if (shouldShowImmediateNotification()) {
                         logcat { "VPN Manually stopped, showing disabled notification for AppTP" }
                         showImmediateReminderNotification()
                         isAppTPEnabled.set(false)
@@ -104,7 +104,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         }
     }
 
-    private fun shouldShowImmediateReminderNotification(): Boolean {
+    private fun shouldShowImmediateNotification(): Boolean {
         // When VPN is stopped and if AppTP has been enabled AND user has been onboarded, then we show the disabled notif
         return isAppTPEnabled.get() && appTrackingProtection.isOnboarded()
     }
@@ -122,8 +122,11 @@ class AppTPReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNRevoked() {
-        logcat { "VPN Revoked, showing revoke notification" }
-        showImmediateRevokedNotification()
+        if (shouldShowImmediateNotification()) {
+            logcat { "VPN has been revoked, showing revoked notification for AppTP" }
+            showImmediateRevokedNotification()
+            isAppTPEnabled.set(false)
+        }
         cancelUndesiredStopReminderAlarm()
         scheduleReminderForTomorrow()
     }
