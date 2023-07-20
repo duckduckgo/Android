@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Privát böngészés windowsos alkalmazásunkkal</string>
     <string name="windows_settings_description_ready">Letöltés elérhető</string>
     <string name="windows_settings_description_list">Rajta vagy a listán!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">A teljes képernyőről való kilépéshez végezz felülről lefelé húzást, és koppints a vissza gombra</string>
 </resources>
