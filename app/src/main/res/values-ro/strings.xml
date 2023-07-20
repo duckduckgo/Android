@@ -760,4 +760,7 @@
     <string name="windows_settings_description">Navighează în mod privat cu aplicația noastră pentru Windows</string>
     <string name="windows_settings_description_ready">Descărcare disponibilă</string>
     <string name="windows_settings_description_list">Ești pe listă!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Trage în jos din partea superioară și atinge butonul înapoi pentru a ieși din ecranul complet</string>
 </resources>
