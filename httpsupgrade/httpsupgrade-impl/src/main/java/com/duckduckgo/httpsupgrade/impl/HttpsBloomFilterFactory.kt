@@ -24,6 +24,7 @@ import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.impl.BloomFilter.Config.PathConfig
 import com.duckduckgo.httpsupgrade.impl.HttpsUpgradePixelName.CREATE_BLOOM_FILTER_ERROR
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -33,7 +34,7 @@ interface HttpsBloomFilterFactory {
 }
 
 class HttpsBloomFilterFactoryImpl constructor(
-    private val dao: com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao,
+    private val dao: HttpsBloomFilterSpecDao,
     private val binaryDataStore: BinaryDataStore,
     private val httpsEmbeddedDataPersister: HttpsEmbeddedDataPersister,
     private val httpsDataPersister: HttpsDataPersister,
