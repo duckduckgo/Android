@@ -89,6 +89,8 @@ class VpnActiveNetworkManager @Inject constructor(
     }
 
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
+        // Making sure we unregister the callbacks not to reach the callback limit that will throw the ConnectivityManager$TooManyRequestsException
+        unregisterNetworkCallbacks()
         // both when VPN is first started and reconfigured we check if we need to handle network changes
         onVpnStarted(coroutineScope)
     }
@@ -97,6 +99,10 @@ class VpnActiveNetworkManager @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
+        unregisterNetworkCallbacks()
+    }
+
+    private fun unregisterNetworkCallbacks() {
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
             it.safeUnregisterNetworkCallback(wifiNetworkCallback)
             it.safeUnregisterNetworkCallback(cellularNetworkCallback)
