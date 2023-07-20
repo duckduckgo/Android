@@ -17,8 +17,6 @@
 package com.duckduckgo.httpsupgrade.impl
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PACKAGE_PRIVATE
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -34,7 +32,6 @@ interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
-@VisibleForTesting(otherwise = PACKAGE_PRIVATE)
 class HttpsBloomFilterFactoryImpl constructor(
     private val dao: com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao,
     private val binaryDataStore: BinaryDataStore,
