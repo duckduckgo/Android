@@ -764,4 +764,7 @@
     <string name="windows_settings_description">Przeglądaj prywatnie za pomocą naszej aplikacji dla systemu Windows</string>
     <string name="windows_settings_description_ready">Możliwość pobrania</string>
     <string name="windows_settings_description_list">Jesteś na liście!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Przeciągnij w dół od góry i naciśnij przycisk Wstecz, aby zamknąć tryb pełnoekranowy.</string>
 </resources>
