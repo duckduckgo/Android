@@ -61,5 +61,14 @@
             android:label="@string/netpTermsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
+        <receiver
+            android:name=".notification.NetPEnableReceiver"
+            android:enabled="false"
+            android:exported="false"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="com.duckduckgo.networkprotection.notification.disabled.restart" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.service
+package com.duckduckgo.networkprotection.impl.notification
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -34,10 +33,7 @@ import logcat.LogPriority
 import logcat.logcat
 
 @InjectWith(ReceiverScope::class)
-class VpnReminderReceiver : BroadcastReceiver() {
-
-    @Inject
-    lateinit var deviceShieldPixels: DeviceShieldPixels
+class NetPEnableReceiver : BroadcastReceiver() {
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
@@ -47,23 +43,22 @@ class VpnReminderReceiver : BroadcastReceiver() {
     ) {
         AndroidInjection.inject(this, context)
 
-        logcat { "VpnReminderReceiver onReceive ${intent.action}" }
+        logcat { "NetPEnableReceiver onReceive ${intent.action}" }
         val pendingResult = goAsync()
 
-        if (intent.action == ACTION_VPN_REMINDER_RESTART) {
-            logcat { "Vpn will restart because the user asked it" }
-            deviceShieldPixels.enableFromReminderNotification()
+        if (intent.action == ACTION_NETP_DISABLED_RESTART) {
+            logcat { "NetP will restart because the user asked it" }
             goAsync(pendingResult) {
-                vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
+                vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
             }
         } else {
-            logcat(LogPriority.WARN) { "VpnReminderReceiver: unknown action" }
+            logcat(LogPriority.WARN) { "NetPEnableReceiver: unknown action" }
             pendingResult?.finish()
         }
     }
 
     companion object {
-        internal const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
+        internal const val ACTION_NETP_DISABLED_RESTART = "com.duckduckgo.networkprotection.notification.disabled.restart"
     }
 }
 

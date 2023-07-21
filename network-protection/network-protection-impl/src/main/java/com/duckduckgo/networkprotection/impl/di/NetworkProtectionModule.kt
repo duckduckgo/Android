@@ -73,7 +73,7 @@ class DataModule {
 }
 
 @Module
-@ContributesTo(ActivityScope::class)
+@ContributesTo(AppScope::class)
 object NetPBreakageCategoriesModule {
     @Provides
     @NetpBreakageCategories

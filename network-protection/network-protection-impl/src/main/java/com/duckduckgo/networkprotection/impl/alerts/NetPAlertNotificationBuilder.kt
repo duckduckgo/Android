@@ -106,7 +106,7 @@ class RealNetPAlertNotiticationBuilder @Inject constructor(
 
     companion object {
         const val NETP_ALERTS_CHANNEL_ID = "com.duckduckgo.networkprotection.impl.alerts"
-        private const val NETP_ALERTS_CHANNEL_NAME = "Network Protection Alerts"
-        private const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from Network Protection"
+        const val NETP_ALERTS_CHANNEL_NAME = "Network Protection Alerts"
+        const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from Network Protection"
     }
 }

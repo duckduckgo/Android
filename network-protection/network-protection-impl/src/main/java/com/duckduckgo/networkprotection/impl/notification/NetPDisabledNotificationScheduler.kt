@@ -16,6 +16,10 @@
 
 package com.duckduckgo.networkprotection.impl.notification
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -30,6 +34,9 @@ import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
 class NetPDisabledNotificationScheduler @Inject constructor(
+    private val context: Context,
+    private val notificationManager: NotificationManagerCompat,
+    private val netPDisabledNotificationBuilder: NetPDisabledNotificationBuilder,
     private val networkProtectionState: NetworkProtectionState,
 ) : VpnServiceCallbacks {
 
@@ -39,6 +46,14 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         runBlocking {
             isNetPEnabled.set(networkProtectionState.isEnabled())
         }
+        if (isNetPEnabled.get()) {
+            cancelDisabledNotification()
+        }
+        enableReminderReceiver()
+    }
+
+    private fun cancelDisabledNotification() {
+        notificationManager.cancel(NETP_REMINDER_NOTIFICATION_ID)
     }
 
     override fun onVpnStopped(
@@ -63,7 +78,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private suspend fun onVPNManuallyStopped() {
         if (shouldShowImmediateNotification()) {
             logcat { "VPN Manually stopped, showing disabled notification for NetP" }
-            // TODO: Show NetP disabled notifications
+            showDisabledNotification()
             isNetPEnabled.set(false)
         }
     }
@@ -74,15 +89,49 @@ class NetPDisabledNotificationScheduler @Inject constructor(
             if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState) {
                 if (!reconfiguredNetPState) {
                     logcat { "VPN has been reconfigured, showing disabled notification for NetP" }
-                    // TODO: Show NetP disabled notifications
+                    showDisabledNotification()
+                } else {
+                    cancelDisabledNotification()
                 }
             }
         }
     }
+
+    private fun showDisabledNotification() {
+        logcat { "Showing disabled notification for NetP" }
+        notificationManager.notify(
+            NETP_REMINDER_NOTIFICATION_ID,
+            netPDisabledNotificationBuilder.buildDisabledNotification(context),
+        )
+    }
+
     private suspend fun onVPNRevoked() {
         if (shouldShowImmediateNotification()) {
             logcat { "VPN has been revoked, showing revoked notification for NetP" }
+            showRevokedNotification()
             isNetPEnabled.set(false)
         }
+    }
+
+    private fun showRevokedNotification() {
+        logcat { "Showing disabled by vpn notification for NetP" }
+        notificationManager.notify(
+            NETP_REMINDER_NOTIFICATION_ID,
+            netPDisabledNotificationBuilder.buildDisabledByVpnNotification(context),
+        )
+    }
+
+    private fun enableReminderReceiver() {
+        val receiver = ComponentName(context, NetPEnableReceiver::class.java)
+
+        context.packageManager.setComponentEnabledSetting(
+            receiver,
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+            PackageManager.DONT_KILL_APP,
+        )
+    }
+
+    companion object {
+        const val NETP_REMINDER_NOTIFICATION_ID = 444
     }
 }
