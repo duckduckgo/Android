@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feature
+package com.duckduckgo.sync.internal
 
 import android.content.Context
+import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.mobile.android.themepreview.ui.AppComponentsActivity
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupActivity
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class ThemesPreviewInternalFeature @Inject constructor() : InternalFeaturePlugin {
+class InternalSyncFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return "App Components Design Preview"
+        return context.getString(R.string.syncSettingsTitle)
     }
 
     override fun internalFeatureSubtitle(): String {
-        return "Set of components designed following our Design System"
+        return context.getString(R.string.syncSettingsSubtitle)
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
-        activityContext.startActivity(AppComponentsActivity.intent(activityContext))
+        activityContext.startActivity(Intent(activityContext, SyncInitialSetupActivity::class.java))
     }
 }

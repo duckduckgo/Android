@@ -44,7 +44,7 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
 
     kapt AndroidX.room.compiler
 

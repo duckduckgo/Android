@@ -14,29 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.feature
+package com.duckduckgo.common.ui.internal
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
-import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.vpn.internal.feature.LaunchVpnInternalScreenWithEmptyParams
+import com.duckduckgo.mobile.android.themepreview.ui.AppComponentsActivity
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class VpnInternalSettingsFeature @Inject constructor(
-    private val globalActivityStarter: GlobalActivityStarter,
-) : InternalFeaturePlugin {
+class ThemesPreviewInternalFeature @Inject constructor() : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return "AppTP dev settings"
+        return "App Components Design Preview"
     }
 
     override fun internalFeatureSubtitle(): String {
-        return "AppTP dev settings for internal users"
+        return "Set of components designed following our Design System"
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
-        globalActivityStarter.start(activityContext, LaunchVpnInternalScreenWithEmptyParams)
+        activityContext.startActivity(AppComponentsActivity.intent(activityContext))
     }
 }

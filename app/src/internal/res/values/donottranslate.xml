@@ -76,8 +76,4 @@
     <string name="surrogatesSubtitle">Main frame and iFrame should be green.</string>
     <string name="surrogatesDisabledTitle">Surrogates Disabled</string>
     <string name="surrogatesDisabledSubtitle">Main frame and iFrame should be red.</string>
-
-    <!-- sync dev settings -->
-    <string name="syncSettingsTitle">Sync Dev Settings</string>
-    <string name="syncSettingsSubtitle">Sync Dev Internal Test</string>
 </resources>

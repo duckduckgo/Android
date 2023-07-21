@@ -176,9 +176,10 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
     implementation project(':statistics')
-    implementation project(':common')
+    implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
+    internalImplementation project(':common-ui-internal')
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
@@ -261,6 +262,7 @@ dependencies {
 
     implementation project(':sync-api')
     implementation project(':sync-impl')
+    implementation project(':sync-internal')
     implementation project(':sync-store')
     implementation project(':sync-lib')
 

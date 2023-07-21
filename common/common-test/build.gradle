@@ -8,7 +8,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
 
     // Dependencies for this Module
-    implementation project(path: ':common')
+    implementation project(path: ':common-utils')
 
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
