@@ -262,6 +262,7 @@ dependencies {
 
     implementation project(':sync-api')
     implementation project(':sync-impl')
+    implementation project(':sync-internal')
     implementation project(':sync-store')
     implementation project(':sync-lib')
 
