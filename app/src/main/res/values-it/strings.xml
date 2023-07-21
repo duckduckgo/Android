@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Naviga privatamente con la nostra app per Windows</string>
     <string name="windows_settings_description_ready">Download disponibile</string>
     <string name="windows_settings_description_list">Sei sulla lista.</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Trascina verso il basso dall\'alto e tocca il pulsante Indietro per uscire dall\'intero schermo</string>
 </resources>
