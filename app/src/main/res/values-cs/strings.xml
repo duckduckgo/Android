@@ -764,4 +764,7 @@
     <string name="windows_settings_description">Zajisti si soukromí na webu – v naší aplikaci pro Windows</string>
     <string name="windows_settings_description_ready">Ke stažení</string>
     <string name="windows_settings_description_list">Jsi na seznamu!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Přetažením dolů z horní části a klepnutím na tlačítko zpět ukončíš zobrazení na celou obrazovku</string>
 </resources>
