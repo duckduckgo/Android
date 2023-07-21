@@ -17,23 +17,51 @@
 package com.duckduckgo.app.audit
 
 import android.content.Context
+import android.widget.Toast
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import timber.log.Timber
+import timber.log.Timber.Forest
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class AuditSettingsFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
+class AuditSettingsFeature @Inject constructor(
+    private val context: Context,
+    private val testFeature: AitorTestFeature,
+) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String {
-        return context.getString(R.string.auditSettingsTitle)
+        return "Test Incremental FF"
     }
 
     override fun internalFeatureSubtitle(): String {
-        return context.getString(R.string.auditSettingsSubtitle)
+        return "Tap to check FF value"
     }
 
     override fun onInternalFeatureClicked(activityContext: Context) {
-        activityContext.startActivity(AuditSettingsActivity.intent(activityContext))
+        val rolloutState = testFeature.rollout().getRawStoredState()
+        Timber.e(
+            """
+                "aitor" is ${testFeature.self().isEnabled()}
+                "rollout" is ${testFeature.rollout().isEnabled()}
+                "rollout" raw state is $rolloutState
+            """.trimIndent(),
+        )
     }
+}
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "aitor",
+)
+interface AitorTestFeature {
+
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun rollout(): Toggle
 }
