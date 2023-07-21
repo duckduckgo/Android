@@ -190,4 +190,9 @@
     <string name="netpTermQuestionThree">3. User Obligations</string>
     <string name="netpTermAnswerThree">3.1 User agrees to use the VPN Service in compliance with all applicable laws and regulations. \n\n3.2 User agrees not to use the VPN Service for any illegal, harmful, or unauthorized purposes, including but not limited to: accessing or sharing copyrighted content, engaging in fraudulent activities, transmitting viruses or malware, or infringing upon the rights of others. \n\n3.3 User acknowledges that the VPN Service is not a guarantee of complete privacy and agrees not to hold Provider liable for any unauthorized access, data breaches, or loss of data.</string>
 
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Enable Network Protection</string>
+    <string name="netpNotificationCTAReportIssue">Having problems with an app?</string>
+    <string name="netpNotificationDisabled">Network Protection Protection disabled. Tap to re-enable.</string>
+    <string name="netpNotificationDisabledByVpn">A VPN app on your device disabled Network Protection. Tap to re-enable.</string>
 </resources>
