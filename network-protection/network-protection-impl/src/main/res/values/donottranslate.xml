@@ -208,4 +208,9 @@
     <string name="netpTermQuestionTwelve">If you need support</string>
     <string name="netpTermAnswerTwelve">• If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\n• We will permanently delete all personal information you provided to us (email, contact information), 30 days after closing a support case.</string>
 
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Enable Network Protection</string>
+    <string name="netpNotificationCTAReportIssue">Having problems with an app?</string>
+    <string name="netpNotificationDisabled">Network Protection Protection disabled. Tap to re-enable.</string>
+    <string name="netpNotificationDisabledByVpn">A VPN app on your device disabled Network Protection. Tap to re-enable.</string>
 </resources>
