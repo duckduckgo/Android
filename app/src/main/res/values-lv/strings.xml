@@ -760,4 +760,7 @@
     <string name="windows_settings_description">Pārlūko privāti ar mūsu Windows lietotni</string>
     <string name="windows_settings_description_ready">Pieejama lejupielāde</string>
     <string name="windows_settings_description_list">Tu esi sarakstā!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Velciet no augšas uz leju un pieskarieties pogai Atpakaļ, lai izietu no pilnekrāna režīma</string>
 </resources>
