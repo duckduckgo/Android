@@ -32,7 +32,10 @@ class CredentialsRemoteWinsStrategy constructor(
     private val credentialsSyncMapper: CredentialsSyncMapper,
     private val dispatchers: DispatcherProvider,
 ) : CredentialsMergeStrategy {
-    override fun processEntries(credentials: CrendentialsSyncEntries): SyncMergeResult<Boolean> {
+    override fun processEntries(
+        credentials: CrendentialsSyncEntries,
+        changesTimeStamp: String
+    ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING REMOTEWINS =======")
         return kotlin.runCatching {
             credentials.entries.forEach { entry ->
@@ -45,13 +48,13 @@ class CredentialsRemoteWinsStrategy constructor(
                             credentialsSync.deleteCredential(localId)
                             return@runBlocking
                         }
-                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, localId, credentials.last_modified)
+                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, localId, credentials.lastModified)
                         credentialsSync.updateCredentials(updatedCredentials, entry.id)
                     } else {
                         if (entry.isDeleted()) return@runBlocking
                         val updatedCredentials = credentialsSyncMapper.toLoginCredential(
                             remoteEntry = entry,
-                            lastModified = credentials.last_modified,
+                            lastModified = credentials.lastModified,
                         )
                         Timber.d("Sync-autofill-Persist: >>> save remote $updatedCredentials")
                         credentialsSync.saveCredential(updatedCredentials, entry.id)

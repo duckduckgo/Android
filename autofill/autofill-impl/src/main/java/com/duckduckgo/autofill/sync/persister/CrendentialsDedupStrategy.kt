@@ -33,7 +33,10 @@ class CrendentialsDedupStrategy constructor(
     private val credentialsSyncMapper: CredentialsSyncMapper,
     private val dispatchers: DispatcherProvider,
 ) : CredentialsMergeStrategy {
-    override fun processEntries(credentials: CrendentialsSyncEntries): SyncMergeResult<Boolean> {
+    override fun processEntries(
+        credentials: CrendentialsSyncEntries,
+        changesTimeStamp: String
+    ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING DEDUPLICATION =======")
 
         return kotlin.runCatching {
@@ -43,7 +46,7 @@ class CrendentialsDedupStrategy constructor(
                 runBlocking(dispatchers.io()) {
                     val remoteLoginCredential: LoginCredentials = credentialsSyncMapper.toLoginCredential(
                         remoteEntry,
-                        lastModified = credentials.last_modified, // remoteEntry.last_modified is always null
+                        lastModified = credentials.lastModified, // remoteEntry.last_modified is always null
                     )
                     val localMatchesForDomain = credentialsSync.getCredentialsForDomain(remoteLoginCredential.domain)
                     if (localMatchesForDomain.isNullOrEmpty()) {

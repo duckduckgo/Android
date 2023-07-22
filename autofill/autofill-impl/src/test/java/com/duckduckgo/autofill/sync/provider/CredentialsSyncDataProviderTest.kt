@@ -54,8 +54,8 @@ internal class CredentialsSyncDataProviderTest {
     private val secureStorage = FakeSecureStorage()
     private val autofillStore = FakeAutofillStore(secureStorage)
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val autofillSyncStore = FakeCredentialsSyncStore()
-    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSyncStore = FakeCredentialsSyncStore()
+    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
     private val appBuildConfig = mock<AppBuildConfig>().apply {
         whenever(this.flavor).thenReturn(BuildFlavor.PLAY)
     }
@@ -65,7 +65,7 @@ internal class CredentialsSyncDataProviderTest {
     }
 
     private val testee = CredentialsSyncDataProvider(
-        credentialsSyncStore = autofillSyncStore,
+        credentialsSyncStore = credentialsSyncStore,
         credentialsSync = credentialsSync,
         dispatchers = coroutineRule.testDispatcherProvider,
         appBuildConfig = appBuildConfig,
@@ -93,8 +93,9 @@ internal class CredentialsSyncDataProviderTest {
     }
 
     @Test
-    fun whenModifiedSinceExistsThenSendChanges() = runTest {
-        autofillSyncStore.modifiedSince = "2022-08-30T00:00:00Z"
+    fun whenModifiedSinceExistsThenSendChangesWithServerTimeSince() = runTest {
+        credentialsSyncStore.clientModifiedSince = "2022-01-01T00:00:00Z"
+        credentialsSyncStore.serverModifiedSince = "2022-08-30T00:00:00Z"
 
         givenLocalCredentials(
             CredentialsFixtures.twitterCredentials,
@@ -109,8 +110,21 @@ internal class CredentialsSyncDataProviderTest {
     }
 
     @Test
+    fun whenSendingDataThenStartTimeUpdated() = runTest {
+        credentialsSyncStore.startTimeStamp = "0"
+        givenLocalCredentials(
+            CredentialsFixtures.twitterCredentials,
+            CredentialsFixtures.spotifyCredentials,
+        )
+
+        testee.getChanges()
+
+        assertTrue(credentialsSyncStore.startTimeStamp != "0")
+    }
+
+    @Test
     fun whenNullPropertyThenIncludeNullInJson() = runTest {
-        autofillSyncStore.modifiedSince = "0"
+        credentialsSyncStore.serverModifiedSince = "0"
 
         givenLocalCredentials(
             CredentialsFixtures.twitterCredentials.copy(domainTitle = null),

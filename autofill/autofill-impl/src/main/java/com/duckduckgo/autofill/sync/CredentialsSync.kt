@@ -23,21 +23,25 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
+import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.sync.api.SyncCrypto
 import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 class CredentialsSync @Inject constructor(
     private val autofillStore: AutofillStore,
     private val secureStorage: SecureStorage,
+    private val credentialsSyncStore: CredentialsSyncStore,
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val syncCrypto: SyncCrypto,
 ) {
     suspend fun getUpdatesSince(since: String): List<LoginCredentialEntry> {
+        credentialsSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
         return if (since == "0") {
             allContentAsUpdates()
         } else {
@@ -48,13 +52,13 @@ class CredentialsSync @Inject constructor(
     suspend fun getCredentialWithSyncId(syncId: String): LoginCredentials? {
         val localId = credentialsSyncMetadata.getLocalId(syncId)
         Timber.d("Sync-autofill-Persist: >>> $localId found for syncId $syncId")
-        val localCredential = localId?.let { autofillStore.getCredentialsWithId(localId) }
+        val localCredential = localId?.let { secureStorage.getWebsiteLoginDetailsWithCredentials(localId)?.toLoginCredentials() }
         Timber.d("Sync-autofill-Persist: >>> localCredential $localCredential found")
         return localCredential
     }
 
     suspend fun getCredentialWithId(localId: Long): LoginCredentials? {
-        return autofillStore.getCredentialsWithId(localId)
+        return secureStorage.getWebsiteLoginDetailsWithCredentials(localId)?.toLoginCredentials()
     }
 
     suspend fun getCredentialsForDomain(domain: String?): List<LoginCredentials> {
@@ -67,10 +71,20 @@ class CredentialsSync @Inject constructor(
         loginCredential: LoginCredentials,
         remoteId: String,
     ) {
-        autofillStore.saveCredentials(
-            rawUrl = loginCredential.domain ?: "",
-            credentials = loginCredential,
-        )?.id?.also { autofillId ->
+        val loginDetails = WebsiteLoginDetails(
+            id = loginCredential.id,
+            domain = loginCredential.domain,
+            username = loginCredential.username,
+            domainTitle = loginCredential.domainTitle,
+            lastUpdatedMillis = loginCredential.lastUpdatedMillis,
+        )
+        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
+            details = loginDetails,
+            password = loginCredential.password,
+            notes = loginCredential.notes,
+        )
+
+        secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.details?.id?.let { autofillId ->
             credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(syncId = remoteId, id = autofillId))
         }
     }
@@ -79,7 +93,19 @@ class CredentialsSync @Inject constructor(
         loginCredential: LoginCredentials,
         remoteId: String,
     ) {
-        autofillStore.updateCredentials(loginCredential)?.id?.also { autofillId ->
+        val loginDetails = WebsiteLoginDetails(
+            id = loginCredential.id,
+            domain = loginCredential.domain,
+            username = loginCredential.username,
+            domainTitle = loginCredential.domainTitle,
+            lastUpdatedMillis = loginCredential.lastUpdatedMillis,
+        )
+        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
+            details = loginDetails,
+            password = loginCredential.password,
+            notes = loginCredential.notes,
+        )
+        secureStorage.updateWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.details?.id?.let { autofillId ->
             credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(syncId = remoteId, id = autofillId))
         }
     }
@@ -89,16 +115,13 @@ class CredentialsSync @Inject constructor(
         credentialsSyncMetadata.removeEntityWithLocalId(localId)
     }
 
-    private suspend fun allContentAsUpdates() = autofillStore.getAllCredentials().firstOrNull().mapToLoginCredentialEntry()
+    private suspend fun allContentAsUpdates() = secureStorage.websiteLoginDetailsWithCredentials().firstOrNull().mapToLoginCredentialEntry()
 
     private suspend fun changesSince(since: String): List<LoginCredentialEntry> {
         Timber.d("Sync-autofill: generating changes since $since")
 
         val modifiedSinceInMillis = DatabaseDateFormatter.parseIso8601ToMillis(since)
-
-        val values = autofillStore
-            .getAllCredentialsModifiedSince(modifiedSinceInMillis)
-            .mapToLoginCredentialEntry()
+        val values = secureStorage.websiteLoginDetailsWithCredentialsModifiedSince(modifiedSinceInMillis)
 
         val removedItems = credentialsSyncMetadata.getRemovedEntitiesSince(since).map {
             LoginCredentialEntry(id = it.syncId, deleted = "1", client_last_modified = it.deleted_at)
@@ -106,7 +129,7 @@ class CredentialsSync @Inject constructor(
 
         Timber.d("Sync-autofill: modifiedSince: $values")
         Timber.d("Sync-autofill: modifiedSince removed: $removedItems")
-        return values + removedItems
+        return values.mapToLoginCredentialEntry() + removedItems
     }
 
     private fun String?.encrypt(): String? {
@@ -115,17 +138,17 @@ class CredentialsSync @Inject constructor(
         return syncCrypto.encrypt(this)
     }
 
-    private fun List<LoginCredentials>?.mapToLoginCredentialEntry(): List<LoginCredentialEntry> {
+    private fun List<WebsiteLoginDetailsWithCredentials>?.mapToLoginCredentialEntry(): List<LoginCredentialEntry> {
         return this?.map {
-            val loginId = it.id ?: return@map null
-            val lastUpdatedMillis = it.lastUpdatedMillis ?: 0L
+            val loginId = it.details.id ?: return@map null
+            val lastUpdatedMillis = it.details.lastUpdatedMillis ?: 0L
             val syncId = credentialsSyncMetadata.getSyncId(loginId) ?: credentialsSyncMetadata.createSyncId(loginId)
             LoginCredentialEntry(
                 id = syncId,
                 client_last_modified = DatabaseDateFormatter.parseMillisIso8601(lastUpdatedMillis),
-                domain = it.domain.encrypt(),
-                title = it.domainTitle.encrypt(),
-                username = it.username.encrypt(),
+                domain = it.details.domain.encrypt(),
+                title = it.details.domainTitle.encrypt(),
+                username = it.details.username.encrypt(),
                 password = it.password.encrypt(),
                 notes = it.notes.encrypt(),
             )

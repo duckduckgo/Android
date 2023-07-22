@@ -65,7 +65,7 @@ class AppSyncApiClient @Inject constructor(
 
             is Result.Success -> {
                 if (result.data == null) {
-                    Result.Success(SyncChangesResponse.empty())
+                    Result.Success(SyncChangesResponse.empty(changes.type))
                 } else {
                     val remoteChanges = mapResponse(changes.type, result.data)
                     Result.Success(remoteChanges)
@@ -99,7 +99,7 @@ class AppSyncApiClient @Inject constructor(
         return when (val result = syncApi.getBookmarks(token, since)) {
             is Result.Error -> {
                 if (result.code == API_CODE.NOT_MODIFIED.code) {
-                    Result.Success(SyncChangesResponse.empty())
+                    Result.Success(SyncChangesResponse.empty(type))
                 } else {
                     Result.Error(result.code, result.reason)
                 }
@@ -120,7 +120,7 @@ class AppSyncApiClient @Inject constructor(
         return when (val result = syncApi.getCredentials(token, since)) {
             is Result.Error -> {
                 if (result.code == API_CODE.NOT_MODIFIED.code) {
-                    Result.Success(SyncChangesResponse.empty())
+                    Result.Success(SyncChangesResponse.empty(type))
                 } else {
                     Result.Error(result.code, result.reason)
                 }

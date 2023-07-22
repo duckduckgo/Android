@@ -322,7 +322,7 @@ internal class SyncEngineTest {
     private fun givenGetSuccess() {
         whenever(syncApiClient.get(any(), any())).thenReturn(
             Success(
-                SyncChangesResponse.empty(),
+                SyncChangesResponse.empty(BOOKMARKS),
             ),
         )
     }
@@ -336,7 +336,7 @@ internal class SyncEngineTest {
     private fun givenPatchSuccess() {
         whenever(syncApiClient.patch(any())).thenReturn(
             Success(
-                SyncChangesResponse.empty(),
+                SyncChangesResponse.empty(BOOKMARKS),
             ),
         )
     }

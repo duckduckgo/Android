@@ -30,6 +30,7 @@ import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
 import com.duckduckgo.autofill.sync.FakeAutofillStore
+import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
@@ -56,8 +57,9 @@ internal class CredentialsLocalWinsStrategyTest {
     private val db = inMemoryAutofillDatabase()
     private val secureStorage = FakeSecureStorage()
     private val autofillStore = FakeAutofillStore(secureStorage)
+    private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
 
     @After fun after() = runBlocking {
         db.close()
@@ -80,20 +82,20 @@ internal class CredentialsLocalWinsStrategyTest {
             last_modified = "2022-08-30T00:00:00Z",
         )
 
-        val result = testee.processEntries(remoteCredentials)
+        val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
         val storedValues = autofillStore.getAllCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == twitterCredentials.id)
-        assertTrue(credentialsSyncMetadata.getLocalId("2") == CredentialsFixtures.spotifyCredentials.id)
+        assertTrue(credentialsSyncMetadata.getLocalId("2") == spotifyCredentials.id)
     }
 
     @Test
     fun whenRemoteAreMoreRecentThenLocalWins() = runTest {
         givenLocalCredentials(
             twitterCredentials,
-            CredentialsFixtures.spotifyCredentials,
+            spotifyCredentials,
         )
 
         val remoteCredentials = CrendentialsSyncEntries(
@@ -103,7 +105,7 @@ internal class CredentialsLocalWinsStrategyTest {
             ),
             last_modified = "2022-08-30T00:00:00Z",
         )
-        val result = testee.processEntries(remoteCredentials)
+        val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
         val storedValues = autofillStore.getAllCredentials().first()
@@ -118,7 +120,7 @@ internal class CredentialsLocalWinsStrategyTest {
     fun whenLocalIsMoreRecentThenLocalWins() = runTest {
         givenLocalCredentials(
             twitterCredentials.copy(lastUpdatedMillis = 1689592358516),
-            CredentialsFixtures.spotifyCredentials.copy(lastUpdatedMillis = 1689592358516),
+            spotifyCredentials.copy(lastUpdatedMillis = 1689592358516),
         )
 
         val remoteCredentials = CrendentialsSyncEntries(
@@ -128,7 +130,7 @@ internal class CredentialsLocalWinsStrategyTest {
             ),
             last_modified = "2022-08-30T00:00:00Z",
         )
-        val result = testee.processEntries(remoteCredentials)
+        val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
         val storedValues = autofillStore.getAllCredentials().first()
@@ -143,7 +145,7 @@ internal class CredentialsLocalWinsStrategyTest {
     fun whenLocalHasMoreCredentialsThenNoChanges() = runTest {
         givenLocalCredentials(
             twitterCredentials,
-            CredentialsFixtures.spotifyCredentials,
+            spotifyCredentials,
             CredentialsFixtures.amazonCredentials,
         )
 
@@ -154,7 +156,7 @@ internal class CredentialsLocalWinsStrategyTest {
             ),
             last_modified = "2022-08-30T00:00:00Z",
         )
-        val result = testee.processEntries(remoteCredentials)
+        val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
         val storedValues = autofillStore.getAllCredentials().first()
@@ -179,7 +181,7 @@ internal class CredentialsLocalWinsStrategyTest {
             last_modified = "2022-08-30T00:00:00Z",
         )
 
-        val result = testee.processEntries(remoteCredentials)
+        val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
         val storedValues = autofillStore.getAllCredentials().first()
@@ -200,7 +202,7 @@ internal class CredentialsLocalWinsStrategyTest {
             last_modified = "2022-08-30T00:00:00Z",
         )
 
-        val result = testee.processEntries(remoteCredentials)
+        val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
         val storedValues = autofillStore.getAllCredentials().first()
@@ -223,7 +225,7 @@ internal class CredentialsLocalWinsStrategyTest {
             last_modified = "2022-08-30T00:00:00Z",
         )
 
-        val result = testee.processEntries(remoteCredentials)
+        val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
         val storedValues = autofillStore.getAllCredentials().first()

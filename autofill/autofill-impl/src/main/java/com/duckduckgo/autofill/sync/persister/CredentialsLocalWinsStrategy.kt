@@ -31,14 +31,17 @@ class CredentialsLocalWinsStrategy constructor(
     private val credentialsSyncMapper: CredentialsSyncMapper,
     private val dispatchers: DispatcherProvider,
 ) : CredentialsMergeStrategy {
-    override fun processEntries(credentials: CrendentialsSyncEntries): SyncMergeResult<Boolean> {
+    override fun processEntries(
+        credentials: CrendentialsSyncEntries,
+        changesTimeStamp: String
+    ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING LOCALWINS =======")
         return kotlin.runCatching {
             credentials.entries.forEach { entry ->
                 runBlocking(dispatchers.io()) {
                     val localCredentials = credentialsSync.getCredentialWithSyncId(entry.id)
                     if (localCredentials == null) {
-                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null, credentials.last_modified)
+                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null, credentials.lastModified)
                         Timber.d("Sync-autofill-Persist: >>> no local, save remote $updatedCredentials")
                         credentialsSync.saveCredential(updatedCredentials, entry.id)
                     }

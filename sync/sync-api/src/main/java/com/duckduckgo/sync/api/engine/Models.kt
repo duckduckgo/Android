@@ -34,8 +34,8 @@ data class SyncChangesRequest(val type: SyncableType, val jsonString: String, va
 data class SyncChangesResponse(val type: SyncableType, val jsonString: String) {
 
     companion object {
-        fun empty(): SyncChangesResponse {
-            return SyncChangesResponse(BOOKMARKS, "")
+        fun empty(type: SyncableType): SyncChangesResponse {
+            return SyncChangesResponse(type, "")
         }
     }
 }

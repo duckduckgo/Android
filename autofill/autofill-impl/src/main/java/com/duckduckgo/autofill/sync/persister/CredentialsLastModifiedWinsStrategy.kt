@@ -17,6 +17,8 @@
 package com.duckduckgo.autofill.sync.persister
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter.Companion
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
@@ -32,7 +34,10 @@ class CredentialsLastModifiedWinsStrategy constructor(
     private val credentialsSyncMapper: CredentialsSyncMapper,
     private val dispatchers: DispatcherProvider,
 ) : CredentialsMergeStrategy {
-    override fun processEntries(credentials: CrendentialsSyncEntries): SyncMergeResult<Boolean> {
+    override fun processEntries(
+        credentials: CrendentialsSyncEntries,
+        changesTimeStamp: String,
+    ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING TIMESTAMP =======")
         return kotlin.runCatching {
             credentials.entries.forEach { entry ->
@@ -42,7 +47,7 @@ class CredentialsLastModifiedWinsStrategy constructor(
                         if (entry.isDeleted()) return@runBlocking
                         val newCredential = credentialsSyncMapper.toLoginCredential(
                             remoteEntry = entry,
-                            lastModified = credentials.last_modified,
+                            lastModified = changesTimeStamp,
                         )
                         Timber.d("Sync-autofill-Persist: >>> save remote $newCredential")
                         credentialsSync.saveCredential(newCredential, remoteId = entry.id)
@@ -56,9 +61,10 @@ class CredentialsLastModifiedWinsStrategy constructor(
                         val remoteCredentials = credentialsSyncMapper.toLoginCredential(
                             remoteEntry = entry,
                             localId = localId,
-                            lastModified = credentials.last_modified,
+                            lastModified = changesTimeStamp,
                         )
-                        if ((remoteCredentials.lastUpdatedMillis ?: 0L) > (localCredential.lastUpdatedMillis ?: 0L)) {
+                        val hasDataChangedWhileSyncing = (localCredential.lastUpdatedMillis ?:0) >= DatabaseDateFormatter.parseIso8601ToMillis(changesTimeStamp)
+                        if (!hasDataChangedWhileSyncing) {
                             Timber.d("Sync-autofill-Persist: >>> update with remote $remoteCredentials")
                             credentialsSync.updateCredentials(remoteCredentials, entry.id)
                         }

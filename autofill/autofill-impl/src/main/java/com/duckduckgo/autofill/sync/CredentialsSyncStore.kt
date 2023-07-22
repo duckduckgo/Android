@@ -21,17 +21,27 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface CredentialsSyncStore {
-    var modifiedSince: String
+    var serverModifiedSince: String
+    var startTimeStamp: String
+    var clientModifiedSince: String
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealCredentialsSyncStore @Inject constructor(private val context: Context) : CredentialsSyncStore {
-    override var modifiedSince: String
+    override var serverModifiedSince: String
         get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_MODIFIED_SINCE, value) }
+    override var startTimeStamp: String
+        get() = preferences.getString(KEY_START_TIMESTAMP, "0") ?: "0"
+        set(value) = preferences.edit(true) { putString(KEY_START_TIMESTAMP, value) }
+    override var clientModifiedSince: String
+        get() = preferences.getString(KEY_END_TIMESTAMP, "0") ?: "0"
+        set(value) = preferences.edit(true) { putString(KEY_END_TIMESTAMP, value) }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -39,5 +49,7 @@ class RealCredentialsSyncStore @Inject constructor(private val context: Context)
     companion object {
         const val FILENAME = "com.duckduckgo.credentials.sync.store"
         private const val KEY_MODIFIED_SINCE = "KEY_MODIFIED_SINCE"
+        private const val KEY_START_TIMESTAMP = "KEY_START_TIMESTAMP"
+        private const val KEY_END_TIMESTAMP = "KEY_END_TIMESTAMP"
     }
 }

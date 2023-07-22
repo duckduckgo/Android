@@ -21,8 +21,11 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
+import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
+import com.duckduckgo.securestorage.api.WebsiteLoginDetails
+import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -40,8 +43,9 @@ internal class CredentialsSyncTest {
     private val db = inMemoryAutofillDatabase()
     private val secureStorage = FakeSecureStorage()
     private val autofillStore = FakeAutofillStore(secureStorage)
+    private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
 
     @After fun after() = runBlocking {
         db.close()
@@ -165,7 +169,7 @@ internal class CredentialsSyncTest {
     fun whenSaveCredentialsThenSaveCredentialAndSyncId() = runTest {
         credentialsSync.saveCredential(twitterCredentials, "123")
 
-        autofillStore.getCredentialsWithId(twitterCredentials.id!!).let {
+        secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials().let {
             assertEquals(twitterCredentials, it)
         }
         credentialsSyncMetadata.getSyncId(twitterCredentials.id!!).let {
@@ -179,7 +183,7 @@ internal class CredentialsSyncTest {
 
         credentialsSync.saveCredential(twitterCredentials, "123")
 
-        autofillStore.getCredentialsWithId(twitterCredentials.id!!).let {
+        secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials().let {
             assertEquals(twitterCredentials, it)
         }
         credentialsSyncMetadata.getSyncId(twitterCredentials.id!!).let {
@@ -197,7 +201,7 @@ internal class CredentialsSyncTest {
 
         credentialsSync.updateCredentials(twitterCredentials.copy(username = "new-username"), "123")
 
-        autofillStore.getCredentialsWithId(twitterCredentials.id!!).let {
+        secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials().let {
             assertEquals(twitterCredentials.copy(username = "new-username"), it)
         }
         credentialsSyncMetadata.getSyncId(twitterCredentials.id!!).let {
@@ -214,10 +218,8 @@ internal class CredentialsSyncTest {
 
         credentialsSync.deleteCredential(twitterCredentials.id!!)
 
-        assertNull(autofillStore.getCredentialsWithId(twitterCredentials.id!!))
-        credentialsSyncMetadata.getSyncId(twitterCredentials.id!!).let {
-            assertNull(it)
-        }
+        assertNull(secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!))
+        assertNull(credentialsSyncMetadata.getSyncId(twitterCredentials.id!!))
     }
 
     private fun assertUpdates(
@@ -247,12 +249,23 @@ internal class CredentialsSyncTest {
     }
 
     private suspend fun givenLocalCredentials(vararg credentials: LoginCredentials) {
-        credentials.forEach {
-            autofillStore.saveCredentials(
-                it.domain.orEmpty(),
-                it,
+        credentials.forEach { credential ->
+            val loginDetails = WebsiteLoginDetails(
+                domain = credential.domain,
+                username = credential.username,
+                domainTitle = credential.domainTitle,
+                lastUpdatedMillis = credential.lastUpdatedMillis,
             )
-            credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(it.id!!.toString(), it.id!!))
+            val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(
+                details = loginDetails,
+                password = credential.password,
+                notes = credential.notes,
+            )
+
+            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
+            with(credential.id!!) {
+                credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(this.toString(), this))
+            }
         }
     }
 

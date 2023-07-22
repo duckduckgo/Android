@@ -45,7 +45,7 @@ class CredentialsSyncDataProvider @Inject constructor(
     override fun getChanges(): SyncChangesRequest {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
         return runBlocking(dispatchers.io()) {
-            val since = credentialsSyncStore.modifiedSince
+            val since = credentialsSyncStore.clientModifiedSince
             val updates = credentialsSync.getUpdatesSince(since)
             val request = formatUpdates(updates)
             return@runBlocking request
@@ -54,18 +54,18 @@ class CredentialsSyncDataProvider @Inject constructor(
 
     private fun formatUpdates(updates: List<LoginCredentialEntry>): SyncChangesRequest {
         return if (updates.isEmpty()) {
-            SyncChangesRequest(CREDENTIALS, "", credentialsSyncStore.modifiedSince)
+            SyncChangesRequest(CREDENTIALS, "", credentialsSyncStore.serverModifiedSince)
         } else {
             val credentialsUpdates = SyncCredentialsUpdates(
                 updates = updates,
-                modified_since = credentialsSyncStore.modifiedSince,
+                modified_since = credentialsSyncStore.serverModifiedSince,
             )
             val patch = SyncCredentialsRequest(
                 credentials = credentialsUpdates,
                 client_timestamp = DatabaseDateFormatter.iso8601(),
             )
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
-            SyncChangesRequest(CREDENTIALS, allDataJSON, credentialsSyncStore.modifiedSince)
+            SyncChangesRequest(CREDENTIALS, allDataJSON, credentialsSyncStore.serverModifiedSince)
         }
     }
 

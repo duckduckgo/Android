@@ -17,5 +17,7 @@
 package com.duckduckgo.autofill.sync
 
 class FakeCredentialsSyncStore : CredentialsSyncStore {
-    override var modifiedSince: String = "0"
+    override var serverModifiedSince: String = "0"
+    override var startTimeStamp: String = "0"
+    override var clientModifiedSince: String = "0"
 }

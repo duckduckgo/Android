@@ -33,6 +33,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 import javax.inject.*
 import timber.log.Timber
 
@@ -65,6 +68,11 @@ class CredentialsSyncDataPersister @Inject constructor(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
+        if (changes.jsonString.isEmpty()) {
+            Timber.d("Sync-autofill-Persist: merging completed, no entries to merge")
+            return Success(false)
+        }
+
         val response = kotlin.runCatching {
             updatesAdapter.fromJson(changes.jsonString)!!
         }.getOrElse {
@@ -75,7 +83,7 @@ class CredentialsSyncDataPersister @Inject constructor(
         val result = processEntries(response.credentials, conflictResolution)
 
         if (result is Success) {
-            pruneDeletedObjects(response.credentials.last_modified)
+            pruneDeletedObjects(credentialsSyncStore.startTimeStamp)
         }
 
         return result
@@ -85,16 +93,18 @@ class CredentialsSyncDataPersister @Inject constructor(
         crendentials: CrendentialsSyncEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-        Timber.d("Sync-autofill-Persist: updating credentials last_modified to ${crendentials.last_modified}")
         if (conflictResolution != SyncConflictResolution.DEDUPLICATION) {
-            credentialsSyncStore.modifiedSince = crendentials.last_modified
+            credentialsSyncStore.serverModifiedSince = crendentials.lastModified
+            credentialsSyncStore.clientModifiedSince = credentialsSyncStore.startTimeStamp
+            Timber.d("Sync-autofill-Persist: updating credentials server last_modified to ${credentialsSyncStore.serverModifiedSince}")
+            Timber.d("Sync-autofill-Persist: updating credentials client last_modified to ${credentialsSyncStore.clientModifiedSince}")
         }
 
         return if (crendentials.entries.isEmpty()) {
             Timber.d("Sync-autofill-Persist: merging completed, no entries to merge")
             Success(false)
         } else {
-            return strategies[conflictResolution]?.processEntries(crendentials) ?: SyncMergeResult.Error(reason = "Merge Strategy not found")
+            return strategies[conflictResolution]?.processEntries(crendentials, credentialsSyncStore.clientModifiedSince) ?: SyncMergeResult.Error(reason = "Merge Strategy not found")
         }
     }
 
@@ -103,7 +113,14 @@ class CredentialsSyncDataPersister @Inject constructor(
     }
 
     override fun onSyncDisabled() {
-        credentialsSyncStore.modifiedSince = "0"
+        credentialsSyncStore.serverModifiedSince = "0"
+        credentialsSyncStore.startTimeStamp = "0"
+        credentialsSyncStore.clientModifiedSince = "0"
+    }
+
+    private fun getUtcIsoLocalDateTime(): String {
+        // returns YYYY-MM-ddTHH:mm:ss.SSSZ
+        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
     }
 
     private class Adapters {
@@ -122,8 +139,17 @@ data class CredentialsSyncRemoteUpdates(
 
 data class CrendentialsSyncEntries(
     val entries: List<CredentialsSyncEntryResponse>,
-    val last_modified: String,
-)
+    private val last_modified: String,
+) {
+
+    //val lastModified: String by lazy { getLastModifiedWithMillis() }
+    val lastModified: String = last_modified
+    private fun getLastModifiedWithMillis(): String {
+        val instant = Instant.parse(last_modified)
+        val ofPattern = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC)
+        return ofPattern.format(instant)
+    }
+}
 
 data class CredentialsSyncEntryResponse(
     val id: String,
