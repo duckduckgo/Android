@@ -33,6 +33,7 @@ class MessageCta : FrameLayout {
     }
     private var onPrimaryButtonClicked: () -> Unit = {}
     private var onSecondaryButtonClicked: () -> Unit = {}
+    private var onActionButtonClicked: () -> Unit = {}
 
     constructor(context: Context) : this(context, null)
 
@@ -64,10 +65,14 @@ class MessageCta : FrameLayout {
         binding.secondaryActionButton.setOnClickListener {
             onSecondaryButtonClicked.invoke()
         }
+
+        binding.actionButton.setOnClickListener {
+            onActionButtonClicked.invoke()
+        }
     }
 
     fun setMessage(message: Message) {
-        when{
+        when {
             message.topIllustration != null -> {
                 binding.middleIllustration.gone()
                 binding.topIllustration.show()
@@ -88,6 +93,13 @@ class MessageCta : FrameLayout {
 
         binding.messageTitle.text = message.title
         binding.messageSubtitle.text = message.subtitle
+
+        if (message.singleAction.isEmpty()) {
+            binding.actionButton.gone()
+        } else {
+            binding.actionButton.text = message.singleAction
+            binding.actionButton.show()
+        }
 
         if (message.action2.isEmpty()) {
             binding.secondaryActionButton.gone()
@@ -112,16 +124,21 @@ class MessageCta : FrameLayout {
         this.onSecondaryButtonClicked = onSecondaryButtonClicked
     }
 
+    fun onActionClicked(onActionClicked: () -> Unit) {
+        this.onActionButtonClicked = onActionClicked
+    }
+
     fun onCloseButtonClicked(onDismiss: () -> Unit) {
         this.onCloseButton = onDismiss
     }
 
     data class Message(
         @DrawableRes val topIllustration: Int? = null,
+        @DrawableRes val middleIllustration: Int? = null,
         val title: String = "",
         val subtitle: String = "",
         val action: String = "",
         val action2: String = "",
-        @DrawableRes val middleIllustration: Int? = null,
+        val singleAction: String = "",
     )
 }

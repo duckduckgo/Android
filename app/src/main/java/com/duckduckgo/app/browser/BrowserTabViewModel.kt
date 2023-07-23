@@ -2470,6 +2470,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onMessageActionButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
+            command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
+        }
+    }
+
     fun onUserHideDaxDialog() {
         val cta = currentCtaViewState().cta ?: return
         command.value = DaxCommand.HideDaxDialog(cta)

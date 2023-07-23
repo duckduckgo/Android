@@ -41,6 +41,8 @@ data class JsonContent(
     val primaryAction: JsonMessageAction? = null,
     val secondaryActionText: String = "",
     val secondaryAction: JsonMessageAction? = null,
+    val actionText: String = "",
+    val action: JsonMessageAction? = null,
 )
 
 data class JsonContentTranslations(
@@ -49,6 +51,7 @@ data class JsonContentTranslations(
     val descriptionText: String = "",
     val primaryActionText: String = "",
     val secondaryActionText: String = "",
+    val actionText: String = "",
 )
 
 data class JsonMatchingRule(
@@ -69,4 +72,5 @@ sealed class JsonMessageType(val jsonValue: String) {
     object MEDIUM : JsonMessageType("medium")
     object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
     object BIG_TWO_ACTION : JsonMessageType("big_two_action")
+    object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
 }

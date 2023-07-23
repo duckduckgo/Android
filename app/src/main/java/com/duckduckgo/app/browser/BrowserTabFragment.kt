@@ -3251,6 +3251,9 @@ class BrowserTabFragment :
                 newBrowserTab.messageCta.onSecondaryActionClicked {
                     viewModel.onMessageSecondaryButtonClicked()
                 }
+                newBrowserTab.messageCta.onActionClicked {
+                    viewModel.onMessageActionButtonClicked()
+                }
             }
         }
 

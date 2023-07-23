@@ -27,6 +27,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
+import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
@@ -37,42 +38,42 @@ fun RemoteMessage.asMessage(): Message {
             subtitle = content.descriptionText,
         )
         is BigSingleAction -> Message(
-            topIllustration = content.placeholder.topDrawable(),
+            topIllustration = content.placeholder.drawable(),
+            middleIllustration = null,
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
-            middleIllustration = content.placeholder.middleDrawable(),
         )
         is BigTwoActions -> Message(
-            topIllustration = content.placeholder.topDrawable(),
+            topIllustration = content.placeholder.drawable(),
+            middleIllustration = null,
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
             action2 = content.secondaryActionText,
-            middleIllustration = content.placeholder.middleDrawable(),
         )
         is Medium -> Message(
-            topIllustration = content.placeholder.topDrawable(),
+            topIllustration = content.placeholder.drawable(),
+            middleIllustration = null,
             title = content.titleText,
             subtitle = content.descriptionText,
-            middleIllustration = content.placeholder.middleDrawable(),
+        )
+        is PromoSingleAction -> Message(
+            topIllustration = null,
+            middleIllustration = content.placeholder.drawable(),
+            title = content.titleText,
+            subtitle = content.descriptionText,
+            singleAction = content.actionText,
         )
     }
 }
 
-private fun Placeholder.topDrawable(): Int? {
+private fun Placeholder.drawable(): Int {
     return when (this) {
         ANNOUNCE -> R.drawable.ic_announce
         DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
         CRITICAL_UPDATE -> R.drawable.ic_critical_update
         APP_UPDATE -> R.drawable.ic_app_update
-        MAC_AND_WINDOWS -> null
-    }
-}
-
-private fun Placeholder.middleDrawable(): Int? {
-    return when (this) {
-        ANNOUNCE, DDG_ANNOUNCE, CRITICAL_UPDATE, APP_UPDATE -> null
         MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
     }
 }

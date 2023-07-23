@@ -21,6 +21,7 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
+import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
 import com.duckduckgo.remote.messaging.api.JsonActionType.URL
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
@@ -73,6 +74,19 @@ class DefaultBrowserActionMapper @Inject constructor() : MessageActionMapperPlug
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == DEFAULT_BROWSER.jsonValue) {
             Action.DefaultBrowser
+        } else {
+            null
+        }
+    }
+}
+
+@ContributesMultibinding(
+    AppScope::class,
+)
+class ShareActionMapper @Inject constructor() : MessageActionMapperPlugin {
+    override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
+        return if (jsonMessageAction.type == SHARE.jsonValue) {
+            Action.Share(jsonMessageAction.value)
         } else {
             null
         }

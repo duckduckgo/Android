@@ -23,6 +23,7 @@ interface MessageActionMapperPlugin {
 data class JsonMessageAction(
     val type: String,
     val value: String,
+    // TODO add new "additionalParameters" var
 )
 
 sealed class JsonActionType(val jsonValue: String) {
@@ -31,4 +32,5 @@ sealed class JsonActionType(val jsonValue: String) {
     object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
     object DISMISS : JsonActionType("dismiss")
     object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
+    object SHARE : JsonActionType("share")
 }

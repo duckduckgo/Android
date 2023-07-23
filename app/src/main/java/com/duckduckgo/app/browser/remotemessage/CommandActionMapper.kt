@@ -30,5 +30,6 @@ fun Action.asBrowserTabCommand(): Command? {
         is Url -> SubmitUrl(this.value)
         is DefaultBrowser -> LaunchDefaultBrowser
         is AppTpOnboarding -> LaunchAppTPOnboarding
+        is Share -> ShareLink(this.value) // TODO Change for correct action
     }
 }

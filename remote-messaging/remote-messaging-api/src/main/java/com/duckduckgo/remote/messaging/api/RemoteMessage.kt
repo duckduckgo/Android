@@ -21,11 +21,13 @@ package com.duckduckgo.remote.messaging.api
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
+import com.duckduckgo.remote.messaging.api.Content.MessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
+import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
 import com.duckduckgo.remote.messaging.api.JsonActionType.URL
 
 data class RemoteMessage(
@@ -56,11 +58,20 @@ sealed class Content(val messageType: MessageType) {
         val secondaryAction: Action,
     ) : Content(BIG_TWO_ACTION)
 
+    data class PromoSingleAction(
+        val titleText: String,
+        val descriptionText: String,
+        val placeholder: Placeholder,
+        val actionText: String,
+        val action: Action,
+    ) : Content(PROMO_SINGLE_ACTION)
+
     enum class MessageType {
         SMALL,
         MEDIUM,
         BIG_SINGLE_ACTION,
         BIG_TWO_ACTION,
+        PROMO_SINGLE_ACTION,
     }
 
     enum class Placeholder(val jsonValue: String) {
@@ -85,4 +96,5 @@ sealed class Action(val actionType: String, open val value: String) {
     object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "")
     object Dismiss : Action(DISMISS.jsonValue, "")
     object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "")
+    data class Share(override val value: String) : Action(SHARE.jsonValue, "")
 }
