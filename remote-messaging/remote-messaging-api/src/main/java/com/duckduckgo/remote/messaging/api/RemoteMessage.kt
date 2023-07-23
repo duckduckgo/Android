@@ -68,6 +68,7 @@ sealed class Content(val messageType: MessageType) {
         DDG_ANNOUNCE("DDGAnnounce"),
         CRITICAL_UPDATE("CriticalUpdate"),
         APP_UPDATE("AppUpdate"),
+        MAC_AND_WINDOWS("NewForMacAndWindows"),
         ;
 
         companion object {

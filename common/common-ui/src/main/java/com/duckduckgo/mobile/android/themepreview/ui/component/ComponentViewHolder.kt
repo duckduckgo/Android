@@ -68,13 +68,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         override fun bind(component: Component) {
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
-                illustration = R.drawable.ic_announce,
+                topIllustration = R.drawable.ic_announce,
                 title = "Big Single  Message",
                 subtitle = "Body text goes here. This component has one button",
                 action = "Primary",
             )
             val bigTwoActionsMessage = Message(
-                illustration = R.drawable.ic_ddg_announce,
+                topIllustration = R.drawable.ic_ddg_announce,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons",
                 action = "Primary",
@@ -82,7 +82,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val bigTwoActionsUpdateMessage = Message(
-                illustration = R.drawable.ic_app_update,
+                topIllustration = R.drawable.ic_app_update,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons and showcases and app update",
                 action = "Primary",
@@ -90,7 +90,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val mediumMessage = Message(
-                illustration = R.drawable.ic_critical_update,
+                topIllustration = R.drawable.ic_critical_update,
                 title = "Big Single  Message",
                 subtitle = "Body text goes here. This component has one button",
             )

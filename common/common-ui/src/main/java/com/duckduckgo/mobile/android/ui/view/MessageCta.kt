@@ -67,12 +67,23 @@ class MessageCta : FrameLayout {
     }
 
     fun setMessage(message: Message) {
-        if (message.illustration == -1) {
-            binding.illustration.gone()
-        } else {
-            val drawable = AppCompatResources.getDrawable(context, message.illustration)
-            binding.illustration.setImageDrawable(drawable)
-            binding.illustration.show()
+        when{
+            message.topIllustration != null -> {
+                binding.middleIllustration.gone()
+                binding.topIllustration.show()
+                val drawable = AppCompatResources.getDrawable(context, message.topIllustration)
+                binding.topIllustration.setImageDrawable(drawable)
+            }
+            message.middleIllustration != null -> {
+                binding.topIllustration.gone()
+                binding.middleIllustration.show()
+                val drawable = AppCompatResources.getDrawable(context, message.middleIllustration)
+                binding.middleIllustration.setImageDrawable(drawable)
+            }
+            else -> {
+                binding.topIllustration.gone()
+                binding.middleIllustration.gone()
+            }
         }
 
         binding.messageTitle.text = message.title
@@ -106,10 +117,11 @@ class MessageCta : FrameLayout {
     }
 
     data class Message(
-        @DrawableRes val illustration: Int = -1,
+        @DrawableRes val topIllustration: Int? = null,
         val title: String = "",
         val subtitle: String = "",
         val action: String = "",
         val action2: String = "",
+        @DrawableRes val middleIllustration: Int? = null,
     )
 }
