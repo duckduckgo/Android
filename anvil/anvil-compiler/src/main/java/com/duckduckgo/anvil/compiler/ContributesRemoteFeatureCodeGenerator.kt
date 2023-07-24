@@ -599,10 +599,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .addModifiers(KModifier.DATA)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
-                    .addParameter("percent", Int::class.asClassName())
+                    .addParameter("percent", Double::class.asClassName())
                     .build(),
             )
-            .addProperty(PropertySpec.builder("percent", Int::class.asClassName()).initializer("percent").build())
+            .addProperty(PropertySpec.builder("percent", Double::class.asClassName()).initializer("percent").build())
             .build()
     }
 

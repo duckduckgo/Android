@@ -298,7 +298,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                     "rollout": {
                         "steps": [
                             {
-                                "percent": 1
+                                "percent": 0.5
+                            },                    
+                            {
+                                "percent": 1.5
                             },                    
                             {
                                 "percent": 2
@@ -319,7 +322,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(privacyPlugin.store("testFeature", jsonFeature))
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        assertEquals(3, testFeature.fooFeature().rolloutStep())
+        assertEquals(4, testFeature.fooFeature().rolloutStep())
     }
 
     @Test
@@ -720,7 +723,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": 10
+                                            "percent": 10.0
                                         },
                                         {
                                             "percent": 20
@@ -764,9 +767,6 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                             "percent": 30
                                         },
                                         {
-                                            "percent": 50
-                                        },
-                                        {
                                             "percent": 100
                                         }
                                     ]
@@ -784,7 +784,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
         } else {
             assertNotEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
-            assertEquals(5, testFeature.fooFeature().rolloutStep())
+            assertEquals(4, testFeature.fooFeature().rolloutStep())
         }
 
         // remove steps
@@ -811,7 +811,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
         } else {
             assertNotEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
-            assertEquals(5, testFeature.fooFeature().rolloutStep())
+            assertEquals(4, testFeature.fooFeature().rolloutStep())
         }
     }
 

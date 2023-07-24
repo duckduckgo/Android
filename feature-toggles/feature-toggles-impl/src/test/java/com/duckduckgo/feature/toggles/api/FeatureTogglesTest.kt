@@ -136,13 +136,13 @@ class FeatureTogglesTest {
         feature.self().setEnabled(state.copy(rolloutStep = 2))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(1, 2)))
+        feature.self().setEnabled(state.copy(rollout = listOf(1.0, 2.0)))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(1, 2), rolloutStep = 0))
+        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 2.0), rolloutStep = 0))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(1, 100), rolloutStep = 1))
+        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 100.0), rolloutStep = 1))
         assertTrue(feature.self().isEnabled())
     }
 
@@ -150,7 +150,7 @@ class FeatureTogglesTest {
     fun whenEnabledAndValidRolloutThenReturnKeepRolloutStep() {
         val state = Toggle.State(
             enable = true,
-            rollout = listOf(100),
+            rollout = listOf(100.0),
             rolloutStep = null,
         )
         val expected = state.copy(remoteEnableState = state.enable)
@@ -163,7 +163,7 @@ class FeatureTogglesTest {
     fun whenDisabledAndValidRolloutThenDetermineRolloutValue() {
         val state = Toggle.State(
             enable = false,
-            rollout = listOf(100),
+            rollout = listOf(100.0),
             rolloutStep = null,
         )
         feature.self().setEnabled(state)
@@ -178,7 +178,7 @@ class FeatureTogglesTest {
     fun whenDisabledAndValidRolloutWithMultipleStepsThenDetermineRolloutValue() {
         val state = Toggle.State(
             enable = false,
-            rollout = listOf(1, 10, 20, 40, 100),
+            rollout = listOf(1.0, 10.0, 20.0, 40.0, 100.0),
             rolloutStep = null,
         )
         feature.self().setEnabled(state)
@@ -193,7 +193,7 @@ class FeatureTogglesTest {
     fun whenDisabledWithPreviousStepsAndValidRolloutWithMultipleStepsThenDetermineRolloutValue() {
         val state = Toggle.State(
             enable = false,
-            rollout = listOf(1, 10, 20, 40, 50, 60, 70, 80, 90, 100),
+            rollout = listOf(1.0, 10.0, 20.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0),
             rolloutStep = 2,
         )
         feature.self().setEnabled(state)
@@ -209,7 +209,7 @@ class FeatureTogglesTest {
         versionProvider.version = 10
         val state = Toggle.State(
             enable = false,
-            rollout = listOf(1, 10, 20, 40, 50, 60, 70, 80, 90, 100),
+            rollout = listOf(1.0, 10.0, 20.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0),
             rolloutStep = 2,
             minSupportedVersion = 11,
         )
@@ -253,7 +253,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = false,
             enable = true,
-            rollout = listOf(100),
+            rollout = listOf(100.0),
             rolloutStep = null,
         )
         feature.self().setEnabled(state)
@@ -266,7 +266,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = true,
             enable = true,
-            rollout = listOf(100),
+            rollout = listOf(100.0),
             rolloutStep = null,
         )
         feature.self().setEnabled(state)
@@ -279,10 +279,10 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             remoteEnableState = true,
             enable = false,
-            rollout = listOf(100),
+            rollout = listOf(100.0),
             rolloutStep = null,
         )
-        val expected = state.copy(enable = true, rollout = listOf(100), rolloutStep = 1)
+        val expected = state.copy(enable = true, rollout = listOf(100.0), rolloutStep = 1)
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
         assertEquals(expected, toggleStore.get("test"))

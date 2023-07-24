@@ -137,7 +137,7 @@ interface Toggle {
         val enable: Boolean = false,
         val minSupportedVersion: Int? = null,
         val enabledOverrideValue: Boolean? = null,
-        val rollout: List<Int>? = null,
+        val rollout: List<Double>? = null,
         val rolloutStep: Int? = null,
     )
 
@@ -208,7 +208,7 @@ internal class ToggleImpl constructor(
         // there is no rollout, return whatever the previous state was
         if (state.rollout.isNullOrEmpty()) return state
 
-        val sortedRollout = state.rollout.sorted().filter { it in 1..100 }
+        val sortedRollout = state.rollout.sorted().filter { it in 0.0..100.0 }
         if (sortedRollout.isEmpty()) return state
 
         when (rolloutStep) {
