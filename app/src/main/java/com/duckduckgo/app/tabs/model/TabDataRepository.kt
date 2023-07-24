@@ -34,6 +34,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -70,6 +71,8 @@ class TabDataRepository @Inject constructor(
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
+
+    private var purgeDeletableTabsJob: Job? = null
 
     override suspend fun add(
         url: String?,
@@ -232,9 +235,11 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        appCoroutineScope.launch {
+        purgeDeletableTabsJob?.cancel()
+        purgeDeletableTabsJob = appCoroutineScope.launch {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
-        }.join()
+        }
+        purgeDeletableTabsJob?.join() ?: Unit
     }
 
     override suspend fun deleteTabAndSelectSource(tabId: String) {
