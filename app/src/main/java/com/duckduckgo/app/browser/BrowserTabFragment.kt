@@ -1714,8 +1714,8 @@ class BrowserTabFragment :
         pendingUploadTask?.onReceiveValue(uris)
     }
 
-    private fun showToast(@StringRes messageId: Int) {
-        Toast.makeText(context?.applicationContext, messageId, Toast.LENGTH_LONG).show()
+    private fun showToast(@StringRes messageId: Int, length: Int = Toast.LENGTH_LONG) {
+        Toast.makeText(context?.applicationContext, messageId, length).show()
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
@@ -3442,6 +3442,7 @@ class BrowserTabFragment :
             Timber.i("Entering full screen")
             binding.webViewFullScreenContainer.show()
             activity?.toggleFullScreen()
+            showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
         private fun exitFullScreen() {

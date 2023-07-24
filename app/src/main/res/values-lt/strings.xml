@@ -764,4 +764,7 @@
     <string name="windows_settings_description">Naršykite privačiai naudodami mūsų programą, skirtą „Windows“</string>
     <string name="windows_settings_description_ready">Galima atsisiųsti</string>
     <string name="windows_settings_description_list">Jūs jau sąraše!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Vilkite žemyn iš viršaus ir bakstelėkite grįžties mygtuką, kad išeitumėte iš viso ekrano režimo</string>
 </resources>

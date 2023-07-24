@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Navegue em privado com a nossa aplicação para Windows</string>
     <string name="windows_settings_description_ready">Transferência disponível</string>
     <string name="windows_settings_description_list">Já está na lista!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Arraste para baixo a partir da parte superior e toque no botão de retrocesso para sair do ecrã completo</string>
 </resources>

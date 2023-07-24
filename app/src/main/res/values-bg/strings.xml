@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Сърфирайте поверително с нашето приложение за Windows</string>
     <string name="windows_settings_description_ready">Налично за изтегляне</string>
     <string name="windows_settings_description_list">Вече сте в списъка!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Плъзнете надолу от горния край и натиснете бутона за връщане, за да излезете от цял екран</string>
 </resources>

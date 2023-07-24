@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Naviguez incognito avec notre application pour Windows</string>
     <string name="windows_settings_description_ready">Téléchargement disponible</string>
     <string name="windows_settings_description_list">Vous êtes sur la liste !</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Faites glisser de haut en bas et appuyez sur le bouton Retour pour quitter le mode plein écran</string>
 </resources>

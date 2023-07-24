@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Surfa privat med vår app för Windows</string>
     <string name="windows_settings_description_ready">Nedladdning tillgänglig</string>
     <string name="windows_settings_description_list">Du står på listan!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Dra nedåt från toppen och tryck på bakåtknappen för att lämna helskärmsläget</string>
 </resources>

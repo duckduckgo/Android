@@ -764,4 +764,7 @@
     <string name="windows_settings_description">Полная конфиденциальность в Интернете, благодаря нашему приложению для Windows</string>
     <string name="windows_settings_description_ready">Готово к загрузке</string>
     <string name="windows_settings_description_list">Теперь вы в списке!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Чтобы выйти из полноэкранного режима, потяните верхний край экрана вниз и нажмите кнопку «Назад».</string>
 </resources>

@@ -757,4 +757,7 @@
     <string name="windows_settings_description">Browse privately with our app for Windows</string>
     <string name="windows_settings_description_ready">Download available</string>
     <string name="windows_settings_description_list">You\'re on the list!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Drag down from the top and tap the back button to exit full screen</string>
 </resources>

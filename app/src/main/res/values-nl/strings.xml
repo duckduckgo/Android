@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Browse privé met onze app voor Windows</string>
     <string name="windows_settings_description_ready">Download beschikbaar</string>
     <string name="windows_settings_description_list">Je staat op de lijst!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Sleep van boven naar beneden en tik op de knop \'Terug\' om het volledige scherm af te sluiten</string>
 </resources>
