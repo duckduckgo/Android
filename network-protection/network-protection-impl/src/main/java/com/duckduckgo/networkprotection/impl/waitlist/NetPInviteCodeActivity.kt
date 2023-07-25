@@ -19,52 +19,69 @@ package com.duckduckgo.networkprotection.impl.waitlist
 import android.os.Bundle
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.networkprotection.api.NetPInviteCodeScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpWaitlistBinding
+import com.duckduckgo.networkprotection.impl.about.NetPTermsScreenNoParams
+import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpInviteCodeBinding
+import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeActivity.Companion.NetPInviteCodeScreenWithOriginPixels
+import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command
+import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command.EnterInviteCode
+import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command.OpenNetP
+import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command.OpenTermsScreen
+import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeActivity.Launch.NetPWaitlistRedeemCodeScreenNoParams
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command.EnterInviteCode
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.ViewState
+import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(NetPWaitlistScreenNoParams::class)
-class NetPWaitlistActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(NetPInviteCodeScreenNoParams::class)
+@ContributeToActivityStarter(NetPInviteCodeScreenWithOriginPixels::class)
+class NetPInviteCodeActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
-    @Inject lateinit var appBuildConfig: AppBuildConfig
+    @Inject lateinit var netPWaitlistRepository: NetPWaitlistRepository
 
-    private val viewModel: NetPWaitlistViewModel by bindViewModel()
-    private val binding: ActivityNetpWaitlistBinding by viewBinding()
+    @Inject lateinit var pixel: Pixel
+
+    private val viewModel: NetPInviteCodeViewModel by bindViewModel()
+    private val binding: ActivityNetpInviteCodeBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        viewModel.onCodeRedeemed(result.resultCode)
+        if (result.resultCode == RESULT_OK) {
+            renderJoinedBeta()
+        }
+    }
+
+    private val startTermsForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            netPWaitlistRepository.acceptWaitlistTerms()
+            viewModel.onTermsAccepted()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,45 +95,47 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
         configureUiEventHandlers()
+
+        // fire pixels
+        intent?.getActivityParams(NetPInviteCodeScreenWithOriginPixels::class.java)?.pixelNames?.forEach { pixelName ->
+            pixel.fire(pixelName)
+        }
     }
 
     private fun configureUiEventHandlers() {
-        binding.joinWaitlistButton.setOnClickListener { viewModel.onJoinWaitlistClicked() }
-        binding.enterInviteCode.setOnClickListener {
-            // this button should only be visible in internal builds
-            openRedeemCode()
+        binding.enterCodeButton.setOnClickListener { viewModel.haveAnInviteCode() }
+        binding.getStartedButton.setOnClickListener {
+            viewModel.getStarted()
         }
     }
 
     private fun render(viewState: ViewState) {
         when (viewState.waitlist) {
             is NotUnlocked, PendingInviteCode -> renderNotJoinedQueue() // Should not happen
-            is JoinedWaitlist -> renderJoinedWaitlist()
-            is InBeta -> openInviteCode()
+            is JoinedWaitlist -> {}
+            is InBeta -> renderJoinedBeta()
         }
     }
-
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(R.drawable.ic_lock)
-        binding.waitlistDescriptionItems.show()
-        binding.joinWaitlistButton.show()
-        binding.enterInviteCode.isVisible = appBuildConfig.isInternalBuild()
-        binding.waitlistNotifyMeContainer.gone()
+        binding.getStartedButton.gone()
+        binding.waitlistDescriptionItems.gone()
+        binding.enterCodeButton.show()
     }
 
-    private fun renderJoinedWaitlist() {
-        binding.statusTitle.text = getString(R.string.netpWaitlistJoined)
-        binding.waitlistDescription.text = getString(R.string.netpWaitlistJoinedNotificationsEnabled)
-        binding.headerImage.setImageResource(R.drawable.ic_news)
-        binding.waitlistDescriptionItems.gone()
-        binding.joinWaitlistButton.gone()
-        binding.enterInviteCode.gone()
-        binding.waitlistNotifyMeContainer.show()
+    private fun renderJoinedBeta() {
+        binding.statusTitle.text = getString(R.string.netpWaitlistRedeemedCodeStatus)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_donations_large)
+        binding.getStartedButton.show()
+        binding.waitlistDescriptionItems.show()
+        binding.enterCodeButton.gone()
     }
 
     private fun executeCommand(command: Command) {
         when (command) {
             is EnterInviteCode -> openRedeemCode()
+            is OpenTermsScreen -> openTermsScreen()
+            is OpenNetP -> openNetP()
         }
     }
 
@@ -124,9 +143,19 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
         startForResult.launch(globalActivityStarter.startIntent(this, NetPWaitlistRedeemCodeScreenNoParams))
     }
 
-    private fun openInviteCode() {
-        globalActivityStarter.start(this, NetPInviteCodeScreenNoParams)
+    private fun openTermsScreen() {
+        startTermsForResult.launch(globalActivityStarter.startIntent(this, NetPTermsScreenNoParams))
+    }
+
+    private fun openNetP() {
+        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams)
         finish()
     }
+
+    companion object {
+        /**
+         * Use this model to launch the NetP invite code screen and fire impression pixels
+         */
+        internal data class NetPInviteCodeScreenWithOriginPixels(val pixelNames: List<String>) : ActivityParams
+    }
 }
-internal object NetPWaitlistScreenNoParams : ActivityParams

@@ -16,13 +16,13 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist
 
-import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.CodeRedeemed
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState.NotUnlocked
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistViewModel.Command
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
+import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -34,59 +34,44 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class NetPWaitlistViewModelTest {
+class NetPInviteCodeViewModelTest {
 
     @Mock
     private lateinit var mockNetPWaitlistManager: NetPWaitlistManager
 
-    private lateinit var testee: NetPWaitlistViewModel
+    private lateinit var viewModel: NetPInviteCodeViewModel
+
+    private val flow = MutableStateFlow<NetPWaitlistState>(NotUnlocked)
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockNetPWaitlistManager.getState()).thenReturn(NotUnlocked)
+        whenever(mockNetPWaitlistManager.getState()).thenReturn(flow)
 
-        testee = NetPWaitlistViewModel(mockNetPWaitlistManager)
+        viewModel = NetPInviteCodeViewModel(mockNetPWaitlistManager)
     }
 
     @Test
     fun whenViewModelCreatedThenEmitWaitlistState() = runTest {
-        testee.viewState.test {
+        viewModel.viewState.test {
             assert(awaitItem().waitlist is NotUnlocked)
         }
     }
 
     @Test
     fun whenHaveInviteClickedThenEmitCommandRedeemCode() = runTest {
-        testee.commands.test {
-            testee.haveAnInviteCode()
+        viewModel.commands.test {
+            viewModel.haveAnInviteCode()
             Assert.assertEquals(Command.EnterInviteCode, awaitItem())
         }
     }
 
     @Test
-    fun whenCodeRedeemFailedThenEmitNotJoinedState() = runTest {
-        testee.viewState.test {
-            testee.onCodeRedeemed(Activity.RESULT_CANCELED)
-            assert(awaitItem().waitlist is NotUnlocked)
-        }
-    }
-
-    @Test
-    fun whenCodeRedeemSucceedsThenEmitRedeemedState() = runTest {
-        testee.viewState.test {
-            assert(awaitItem().waitlist is NotUnlocked)
-            testee.onCodeRedeemed(Activity.RESULT_OK)
-            assert(awaitItem().waitlist is CodeRedeemed)
-        }
-    }
-
-    @Test
     fun whenGetStartedClickedThenEmitCommandOpenNetP() = runTest {
-        testee.commands.test {
-            testee.getStarted()
-            Assert.assertEquals(Command.OpenNetP, awaitItem())
+        viewModel.commands.test {
+            viewModel.getStarted()
+            Assert.assertEquals(Command.OpenTermsScreen, awaitItem())
         }
     }
 }

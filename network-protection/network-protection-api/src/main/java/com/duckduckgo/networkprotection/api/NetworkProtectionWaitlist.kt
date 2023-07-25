@@ -18,17 +18,25 @@ package com.duckduckgo.networkprotection.api
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-/**
- * Use this model to launch the NetworkProtectionManagement screen
- */
-object NetworkProtectionManagementScreenNoParams : ActivityParams
+interface NetworkProtectionWaitlist {
 
-/**
- * Use this model to launch the NetPWaitlist screen
- */
-object NetPInviteCodeScreenNoParams : ActivityParams
+    /**
+     * Returns the state of the NetP waitlist
+     */
+    fun getState(): NetPWaitlistState
 
-/**
- * Use this model to launch the NetP app exclusion list screen
- */
-object NetPAppExclusionListNoParams : ActivityParams
+    /**
+     * Call this method to get the [ActivityParams] corresponding to the activity to launch for the current
+     * state of the waitlist beta
+     *
+     * @return the [ActivityParams] for the activity to launch that corresponds to the current waitlist beta
+     */
+    fun getScreenForCurrentState(): ActivityParams
+
+    sealed class NetPWaitlistState {
+        object NotUnlocked : NetPWaitlistState()
+        object JoinedWaitlist : NetPWaitlistState()
+        object PendingInviteCode : NetPWaitlistState()
+        object InBeta : NetPWaitlistState()
+    }
+}

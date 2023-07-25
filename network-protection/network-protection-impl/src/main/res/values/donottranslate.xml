@@ -60,9 +60,14 @@
     <string name="netpBannerAlwaysOnLockDownEnabled"><b>Action required!</b> To avoid app issues, you need to change your Android settings. <annotation type="open_settings_link">Change settings</annotation></string>
 
     <!-- Waitlist -->
+    <string name="netpNotificationChannel">Network Protection</string>
+    <string name="netpNotificationTitle">Network Protection BETA is Available!</string>
+    <string name="netpNotificationByline">Your time in the waiting list is over.</string>
     <string name="netpWaitlistActivityLabel">Beta Feature</string>
+    <string name="netpBetaFeature">Network Protection Beta</string>
+    <string name="netpBetaFeatureByline">Secure your internet traffic and keep your browsing history private with Network Protection, a VPN by DuckDuckGo</string>
     <string name="netpWaitlistTitle">You\'re invited to test a beta feature!</string>
-    <string name="netpJoinWaitlist">Join the Private Waitlist</string>
+    <string name="netpJoinWaitlist">Join the Waitlist</string>
     <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
     <string name="netpEnterCode">I Have an Invite Code</string>
     <string name="netpWaitlistFooter">DuckDuckGo Network Protection is currently in closed, invite-only beta.</string>
@@ -71,8 +76,8 @@
     <string name="netpWaitlistOnTheListTitle">You\'re on the list!</string>
     <string name="netpWaitlistOnTheListNotificationEnabled">We\'ll send you a notification when Network Protection is ready for you.</string>
     <string name="netpWaitlistOnTheListNotificationDisabled">Your invite to try Network Protection will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
-    <string name="netpWaitlistNotifyMeTitle">Know the instant you’re invited</string>
-    <string name="netpWaitlistNotifyMeSubtitle">Get a notification when Network Protection is ready for you.</string>
+    <string name="netpWaitlistNotifyMeTitle">Know the instant you\'re invited</string>
+    <string name="netpWaitlistNotifyMeByline">Get a notification when your copy of DuckDuckGo for Windows is ready for download.</string>
 
     <string name="netpWaitlistRedeemCodeActivityLabel">Enter Your Invite Code</string>
     <string name="netpWaitlistRedeemCodeTitle">Almost there…</string>
@@ -82,10 +87,12 @@
     <string name="netpWaitlistRedeemCodeGeneralError">Error redeeming code, please try again later</string>
     <string name="netpWaitlistCodeInvite">Invite Code</string>
 
-    <string name="netpWaitlistRedeemedCodeStatus">Success! You\'re in.</string>
+    <string name="netpWaitlistRedeemedCodeStatus">You\'re invited to try Network Protection Beta!</string>
+    <string name="netpWaitlistJoined">You\'re on the list!</string>
+    <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first server basis.\n\nWe\'ll notify you when your invite is ready.</string>
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
-    <string name="netpWaitlistInBetaDescription">You\'ll need an invite code to fully unlock this feature.</string>
+    <string name="netpWaitlistInBetaDescription">Network Protection is a VPN. Enable to secure all your internet traffic on this device and keep your browsing history private.</string>
 
     <!--Breakage reporting -->
     <string name="netpReportBreakageCategoryCrashes">App freezes or crashes</string>
@@ -156,4 +163,15 @@
     <string name="netpFaqAnswerEight">Yes, both Network Protection and App Tracking Protection can be on at the same time. No other VPNs are compatible with DuckDuckGo App Tracking Protection.</string>
     <string name="netpFaqQuestionNine">Is Network Protection free to use?</string>
     <string name="netpFaqAnswerNine">Network Protection is free to use while in beta. Eventually it will be offered as a paid service.</string>
+
+    <!-- Terms -->
+    <string name="netpTermsAgreeAndClose">Agree and Close</string>
+    <string name="netpTermsTitle">Terms and Privacy Policy</string>
+    <string name="netpTermQuestionOne">1. Definitions</string>
+    <string name="netpTermAnswerOne">1.1 "VPN Service" refers to the software and associated services provided by XYZ Corp. ("Provider") to facilitate secure and private internet connectivity.\n\n1.2 "User" refers to any individual or entity who accesses or uses the VPN Service.</string>
+    <string name="netpTermQuestionTwo">2. Definitions</string>
+    <string name="netpTermAnswerTwo">2.1 Subject to the terms and conditions of this Agreement, Provider grants User a non-exclusive, non-transferable license to use the VPN Service for personal or internal business purposes. \n\n2.2 User may not distribute, modify, reverse engineer, decompile, disassemble, or create derivative works based on the VPN Service.</string>
+    <string name="netpTermQuestionThree">3. User Obligations</string>
+    <string name="netpTermAnswerThree">3.1 User agrees to use the VPN Service in compliance with all applicable laws and regulations. \n\n3.2 User agrees not to use the VPN Service for any illegal, harmful, or unauthorized purposes, including but not limited to: accessing or sharing copyrighted content, engaging in fraudulent activities, transmitting viruses or malware, or infringing upon the rights of others. \n\n3.3 User acknowledges that the VPN Service is not a guarantee of complete privacy and agrees not to hold Provider liable for any unauthorized access, data breaches, or loss of data.</string>
+
 </resources>

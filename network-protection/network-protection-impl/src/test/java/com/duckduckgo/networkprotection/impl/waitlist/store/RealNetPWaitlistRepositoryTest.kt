@@ -16,15 +16,19 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealNetPWaitlistRepositoryTest {
+
+    private val coroutineRule = CoroutineTestRule()
 
     private val fakeNetPWaitlistDataStore = FakeNetPWaitlistDataStore()
 
@@ -36,30 +40,7 @@ class RealNetPWaitlistRepositoryTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        testee = RealNetPWaitlistRepository(fakeNetPWaitlistDataStore)
-    }
-
-    @Test
-    fun whenStartingInternalStateIsPendingInviteCode() {
-        assertEquals(NetPWaitlistState.PendingInviteCode, testee.getState(true))
-    }
-
-    @Test
-    fun whenStartingInternalAndAuthTokenStateIsInBeta() {
-        testee.setAuthenticationToken(fakeToken)
-        assertEquals(NetPWaitlistState.InBeta, testee.getState(true))
-    }
-
-    @Test
-    fun whenStartingNonInternalStateIsLocked() {
-        assertEquals(NetPWaitlistState.NotUnlocked, testee.getState(false))
-    }
-
-    @Test
-    fun whenAuthTokenSetStateIsInBeta() {
-        testee.setAuthenticationToken(fakeToken)
-        assertEquals(NetPWaitlistState.InBeta, testee.getState(true))
-        assertEquals(NetPWaitlistState.InBeta, testee.getState(false))
+        testee = RealNetPWaitlistRepository(fakeNetPWaitlistDataStore, coroutineRule.testDispatcherProvider)
     }
 
     @Test
