@@ -21,7 +21,9 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.text.HtmlCompat
 import com.duckduckgo.mobile.android.databinding.ViewMessageCtaBinding
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.H2
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class MessageCta : FrameLayout {
@@ -91,8 +93,11 @@ class MessageCta : FrameLayout {
             }
         }
 
+        if (message.titleSize == TitleSize.LARGE) {
+            binding.messageTitle.setTypography(H2)
+        }
         binding.messageTitle.text = message.title
-        binding.messageSubtitle.text = message.subtitle
+        binding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
 
         if (message.singleAction.isEmpty()) {
             binding.actionButton.gone()
@@ -136,9 +141,14 @@ class MessageCta : FrameLayout {
         @DrawableRes val topIllustration: Int? = null,
         @DrawableRes val middleIllustration: Int? = null,
         val title: String = "",
+        val titleSize: TitleSize = TitleSize.SMALL,
         val subtitle: String = "",
         val action: String = "",
         val action2: String = "",
         val singleAction: String = "",
     )
+
+    enum class TitleSize {
+        SMALL, LARGE
+    }
 }

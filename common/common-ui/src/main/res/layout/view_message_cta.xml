@@ -65,8 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/messageTitle"
-        tools:src="@drawable/desktop_promo_artwork"
-        tools:visibility="visible" />
+        tools:src="@drawable/desktop_promo_artwork" />
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/messageSubtitle"
@@ -76,13 +75,19 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="@dimen/keyline_4"
         android:gravity="center"
-        app:layout_constraintBottom_toTopOf="@id/primaryActionButton"
+        app:layout_constraintBottom_toTopOf="@id/barrierButtons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/middleIllustration"
-        app:layout_goneMarginBottom="18dp"
         app:typography="body2"
         tools:text="Body text goes here. This component can be used with one or two buttons." />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrierButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="primaryActionButton, secondaryActionButton, actionButton" />
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/primaryActionButton"
@@ -90,7 +95,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_1"
         android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/secondaryActionButton"
@@ -104,7 +108,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_1"
-        android:layout_marginBottom="@dimen/keyline_4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/primaryActionButton"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -115,14 +118,14 @@
         android:id="@+id/actionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_1"
-        android:layout_marginBottom="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_2"
         android:visibility="gone"
+        app:icon="@drawable/ic_share_android_16"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/messageSubtitle"
+        app:layout_goneMarginStart="0dp"
         tools:text="action button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
