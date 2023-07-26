@@ -42,4 +42,8 @@ class ConflatedJob {
     fun start() {
         job?.start()
     }
+
+    suspend fun join() {
+        job?.join()
+    }
 }

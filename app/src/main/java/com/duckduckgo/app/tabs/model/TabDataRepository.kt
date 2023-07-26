@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
@@ -70,6 +71,8 @@ class TabDataRepository @Inject constructor(
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
+
+    private var purgeDeletableTabsJob = ConflatedJob()
 
     override suspend fun add(
         url: String?,
@@ -232,9 +235,10 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun purgeDeletableTabs() = withContext(dispatchers.io()) {
-        appCoroutineScope.launch {
+        purgeDeletableTabsJob += appCoroutineScope.launch {
             tabsDao.purgeDeletableTabsAndUpdateSelection()
-        }.join()
+        }
+        purgeDeletableTabsJob.join()
     }
 
     override suspend fun deleteTabAndSelectSource(tabId: String) {
