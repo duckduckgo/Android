@@ -29,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -36,6 +37,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.R.string
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
@@ -46,7 +48,7 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
@@ -76,6 +78,9 @@ class TrackingProtectionExclusionListActivity :
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
@@ -299,7 +304,13 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun launchFaq() {
-        startActivity(DeviceShieldFAQActivity.intent(this))
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = FAQ_WEBSITE,
+                screenTitle = getString(string.atp_FAQActivityTitle),
+            ),
+        )
     }
 
     private fun getAppsFilterOrDefault(): AppsFilter {
@@ -310,6 +321,7 @@ class TrackingProtectionExclusionListActivity :
         const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         const val LEARN_WHY_ANNOTATION = "learn_why_link"
         private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
+        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
 
         enum class AppsFilter {
             ALL,

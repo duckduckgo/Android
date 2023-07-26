@@ -27,13 +27,6 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity"
-            android:exported="false"
-            android:label="@string/atp_FAQActivityTitle"
-            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:exported="false"
             android:label="@string/atp_ActivityTitle"
