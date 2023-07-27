@@ -13,7 +13,11 @@ ext {
 
 android {
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+        if (project.hasProperty('internal-testing')) {
+            applicationId "com.quackquackgo.mobile"
+        } else {
+            applicationId "com.duckduckgo.mobile.android"
+        }
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
@@ -68,7 +72,9 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            if (!project.hasProperty('internal-testing')) {
+                applicationIdSuffix ".debug"
+            }
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",
@@ -285,6 +291,11 @@ dependencies {
 
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
+
+    if (project.hasProperty('internal-testing')) {
+        implementation project(':subscriptions-impl')
+        internalImplementation project(':subscriptions-internal')
+    }
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
