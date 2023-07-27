@@ -76,7 +76,7 @@ class RemoteMessagingModel @Inject constructor(
     }
 
     fun onActionClicked(remoteMessage: RemoteMessage): Action? {
-        pixel.fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, remoteMessage.asPixelParams()) // TODO Noelia add pixel for new button
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, remoteMessage.asPixelParams())
         return remoteMessage.content.getAction()
     }
 
@@ -110,5 +110,5 @@ class RemoteMessagingModel @Inject constructor(
         }
     }
 
-    private fun RemoteMessage.asPixelParams(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to this.id) // TODO Noelia change pixel parameter name
+    private fun RemoteMessage.asPixelParams(): Map<String, String> = mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to this.id)
 }
