@@ -121,6 +121,7 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
+import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver.Companion.EXTRA_MESSAGE_ID
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -2372,7 +2373,9 @@ class BrowserTabFragment :
         val pi = PendingIntent.getBroadcast(
             requireContext(),
             0,
-            Intent(requireContext(), SharePromoLinkRMFBroadCastReceiver::class.java),
+            Intent(requireContext(), SharePromoLinkRMFBroadCastReceiver::class.java).apply {
+                putExtra(EXTRA_MESSAGE_ID, viewModel.remoteMessageId())
+            },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         try {
