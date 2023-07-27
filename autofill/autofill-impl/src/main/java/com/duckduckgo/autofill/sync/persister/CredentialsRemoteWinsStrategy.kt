@@ -34,7 +34,7 @@ class CredentialsRemoteWinsStrategy constructor(
 ) : CredentialsMergeStrategy {
     override fun processEntries(
         credentials: CrendentialsSyncEntries,
-        changesTimeStamp: String
+        clientModifiedSince: String,
     ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING REMOTEWINS =======")
         return kotlin.runCatching {
@@ -44,19 +44,19 @@ class CredentialsRemoteWinsStrategy constructor(
                     if (localCredential != null) {
                         val localId = localCredential.id!!
                         if (entry.isDeleted()) {
-                            Timber.d("Sync-autofill-Persist: >>> delete local $localId")
+                            Timber.d("Sync-autofill-Persist-Strategy: >>> delete local $localId")
                             credentialsSync.deleteCredential(localId)
                             return@runBlocking
                         }
-                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, localId, credentials.lastModified)
+                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, localId, credentials.last_modified)
                         credentialsSync.updateCredentials(updatedCredentials, entry.id)
                     } else {
                         if (entry.isDeleted()) return@runBlocking
                         val updatedCredentials = credentialsSyncMapper.toLoginCredential(
                             remoteEntry = entry,
-                            lastModified = credentials.lastModified,
+                            lastModified = credentials.last_modified,
                         )
-                        Timber.d("Sync-autofill-Persist: >>> save remote $updatedCredentials")
+                        Timber.d("Sync-autofill-Persist-Strategy: >>> save remote $updatedCredentials")
                         credentialsSync.saveCredential(updatedCredentials, entry.id)
                     }
                 }

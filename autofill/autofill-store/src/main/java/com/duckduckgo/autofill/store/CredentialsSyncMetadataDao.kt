@@ -21,15 +21,28 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CredentialsSyncMetadataDao {
 
     @Query("select * from credentials_sync_meta where id = :id")
-    fun getSyncId(id: Long): CredentialsSyncMetadataEntity?
+    fun getSyncMetadata(id: Long): CredentialsSyncMetadataEntity?
+
+    @Query("select * from credentials_sync_meta where syncId = :syncId")
+    fun getSyncMetadata(syncId: String): CredentialsSyncMetadataEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: CredentialsSyncMetadataEntity): Long
+
+    @Transaction
+    fun initialize(entities: List<CredentialsSyncMetadataEntity>) {
+        removeAll()
+        entities.forEach {
+            insert(it)
+        }
+    }
 
     @Query("select * from credentials_sync_meta where deleted_at >= :since")
     fun getRemovedIdsSince(since: String): List<CredentialsSyncMetadataEntity>
@@ -48,4 +61,16 @@ interface CredentialsSyncMetadataDao {
 
     @Query("Delete from credentials_sync_meta where syncId = :syncId")
     fun removeEntityWithSyncId(syncId: String)
+
+    @Query("select * from credentials_sync_meta where modified_at > :since")
+    fun getChangesSince(since: String): List<CredentialsSyncMetadataEntity>
+
+    @Query("select * from credentials_sync_meta")
+    fun getAllObservable(): Flow<List<CredentialsSyncMetadataEntity>>
+
+    @Query("select * from credentials_sync_meta")
+    fun getAll(): List<CredentialsSyncMetadataEntity>
+
+    @Query("Delete from credentials_sync_meta")
+    fun removeAll()
 }

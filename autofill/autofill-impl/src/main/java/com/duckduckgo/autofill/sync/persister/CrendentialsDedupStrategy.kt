@@ -35,7 +35,7 @@ class CrendentialsDedupStrategy constructor(
 ) : CredentialsMergeStrategy {
     override fun processEntries(
         credentials: CrendentialsSyncEntries,
-        changesTimeStamp: String
+        clientModifiedSince: String,
     ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING DEDUPLICATION =======")
 
@@ -46,11 +46,11 @@ class CrendentialsDedupStrategy constructor(
                 runBlocking(dispatchers.io()) {
                     val remoteLoginCredential: LoginCredentials = credentialsSyncMapper.toLoginCredential(
                         remoteEntry,
-                        lastModified = credentials.lastModified, // remoteEntry.last_modified is always null
+                        lastModified = credentials.last_modified, // remoteEntry.last_modified is always null
                     )
                     val localMatchesForDomain = credentialsSync.getCredentialsForDomain(remoteLoginCredential.domain)
                     if (localMatchesForDomain.isNullOrEmpty()) {
-                        Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
+                        Timber.d("Sync-autofill-Persist-Strategy: >>> no duplicate found, save remote $remoteLoginCredential")
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
                     } else {
                         var duplicateFound = false
@@ -59,14 +59,14 @@ class CrendentialsDedupStrategy constructor(
                             when {
                                 result == null -> {}
                                 result <= 0 -> {
-                                    Timber.d("Sync-autofill-Persist: >>> duplicate found, update remote $remoteLoginCredential")
+                                    Timber.d("Sync-autofill-Persist-Strategy: >>> duplicate found $localMatch, update remote $remoteLoginCredential")
                                     remoteLoginCredential.copy(id = localMatch.id).also {
                                         credentialsSync.updateCredentials(it, remoteId = remoteEntry.id)
                                     }
                                     duplicateFound = true
                                 }
                                 result > 0 -> {
-                                    Timber.d("Sync-autofill-Persist: >>> duplicate found, update local $localMatch")
+                                    Timber.d("Sync-autofill-Persist-Strategy: >>> duplicate found $localMatch, update local $localMatch")
                                     val localCredential = credentialsSync.getCredentialWithId(localMatch.id!!)!!
                                     credentialsSync.updateCredentials(
                                         loginCredential = localCredential,
@@ -78,7 +78,7 @@ class CrendentialsDedupStrategy constructor(
                         }
                         if (duplicateFound) return@runBlocking
 
-                        Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
+                        Timber.d("Sync-autofill-Persist-Strategy: >>> no duplicate found, save remote $remoteLoginCredential")
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
                     }
                 }
@@ -96,15 +96,18 @@ class CrendentialsDedupStrategy constructor(
         localCredential: LoginCredentials,
         loginCredential: LoginCredentials,
     ): Int? {
+        Timber.i("Duplicate: compareCredentials local $localCredential vs remote $loginCredential")
         val isDuplicated = with(localCredential) {
             domain.orEmpty() == loginCredential.domain.orEmpty() &&
                 username.orEmpty() == loginCredential.username.orEmpty() &&
                 password.orEmpty() == loginCredential.password.orEmpty() &&
                 notes.orEmpty() == loginCredential.notes.orEmpty()
         }
-        return when (isDuplicated) {
+        val comparison = when (isDuplicated) {
             true -> localCredential.lastUpdatedMillis?.compareTo(loginCredential.lastUpdatedMillis ?: 0) ?: 0
             false -> null
         }
+
+        return comparison
     }
 }

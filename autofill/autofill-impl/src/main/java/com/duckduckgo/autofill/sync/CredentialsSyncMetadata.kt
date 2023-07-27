@@ -22,23 +22,37 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 class CredentialsSyncMetadata @Inject constructor(
     private val dao: CredentialsSyncMetadataDao,
 ) {
+
+    fun initializeDatabase(autofillIds: List<Long>) {
+        val entitiesMetadata = autofillIds.map {
+            CredentialsSyncMetadataEntity(id = it, deleted_at = null, modified_at = SyncDateProvider.now())
+        }
+        dao.initialize(entitiesMetadata)
+    }
+
     fun addOrUpdate(entity: CredentialsSyncMetadataEntity) {
         dao.insert(entity)
     }
 
-    fun getSyncId(id: Long): String? {
-        return dao.getSyncId(id)?.syncId
+    fun getSyncMetadata(id: Long): CredentialsSyncMetadataEntity? {
+        return dao.getSyncMetadata(id)
+    }
+
+    fun getSyncMetadata(syncId: String): CredentialsSyncMetadataEntity? {
+        return dao.getSyncMetadata(syncId)
     }
 
     fun createSyncId(id: Long): String {
-        var syncId = getSyncId(id)
+        var syncId = getSyncMetadata(id)?.syncId
         if (syncId == null) {
-            val entity = CredentialsSyncMetadataEntity(id = id)
+            val entity = CredentialsSyncMetadataEntity(id = id, deleted_at = null, modified_at = null)
             dao.insert(entity)
             syncId = entity.syncId
         }
@@ -53,10 +67,27 @@ class CredentialsSyncMetadata @Inject constructor(
         return dao.getRemovedIdsSince(since)
     }
 
+    fun onEntityChanged(id: Long) {
+        val currentTime = DatabaseDateFormatter.iso8601()
+        val syncId = dao.getSyncMetadata(id)
+        Timber.i("SyncMetadata: onEntityChanged $syncId")
+        if (syncId != null) {
+            syncId.modified_at = currentTime
+            Timber.i("SyncMetadata: onEntityChanged modified_at ${syncId.syncId} and... ${syncId.modified_at}")
+            dao.insert(syncId)
+        } else {
+            val entity = CredentialsSyncMetadataEntity(id = id, deleted_at = null, modified_at = currentTime)
+            dao.insert(entity)
+            Timber.i("SyncMetadata: onEntityChanged modified_at ${entity.syncId} and... ${entity.modified_at}")
+        }
+    }
+
     fun onEntityRemoved(id: Long) {
-        val syncId = dao.getSyncId(id)
+        val syncId = dao.getSyncMetadata(id)
+        Timber.i("SyncMetadata: onEntityRemoved $syncId")
         if (syncId != null) {
             syncId.deleted_at = DatabaseDateFormatter.iso8601()
+            Timber.i("SyncMetadata: updateDeletedAt ${syncId.deleted_at}")
             dao.insert(syncId)
         }
     }
@@ -71,5 +102,20 @@ class CredentialsSyncMetadata @Inject constructor(
 
     fun removeEntityWithSyncId(syncId: String) {
         dao.removeEntityWithSyncId(syncId)
+    }
+
+    fun getChangesSince(since: String): List<CredentialsSyncMetadataEntity> {
+        return dao.getChangesSince(since)
+    }
+
+    fun getAllObservable(): Flow<List<CredentialsSyncMetadataEntity>> {
+        return dao.getAllObservable()
+    }
+    fun getAllCredentials(): List<CredentialsSyncMetadataEntity> {
+        return dao.getAll()
+    }
+
+    fun clearAll() {
+        dao.removeAll()
     }
 }

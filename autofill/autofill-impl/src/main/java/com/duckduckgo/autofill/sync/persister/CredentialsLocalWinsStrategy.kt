@@ -20,6 +20,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
+import com.duckduckgo.autofill.sync.isDeleted
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
@@ -33,7 +34,7 @@ class CredentialsLocalWinsStrategy constructor(
 ) : CredentialsMergeStrategy {
     override fun processEntries(
         credentials: CrendentialsSyncEntries,
-        changesTimeStamp: String
+        clientModifiedSince: String,
     ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING LOCALWINS =======")
         return kotlin.runCatching {
@@ -41,8 +42,9 @@ class CredentialsLocalWinsStrategy constructor(
                 runBlocking(dispatchers.io()) {
                     val localCredentials = credentialsSync.getCredentialWithSyncId(entry.id)
                     if (localCredentials == null) {
-                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null, credentials.lastModified)
-                        Timber.d("Sync-autofill-Persist: >>> no local, save remote $updatedCredentials")
+                        if (entry.isDeleted()) return@runBlocking
+                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null, credentials.last_modified)
+                        Timber.d("Sync-autofill-Persist-Strategy: >>> no local, save remote $updatedCredentials")
                         credentialsSync.saveCredential(updatedCredentials, entry.id)
                     }
                 }

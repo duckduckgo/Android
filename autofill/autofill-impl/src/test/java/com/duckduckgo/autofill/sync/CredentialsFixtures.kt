@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.sync
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 
 object CredentialsFixtures {
@@ -67,6 +68,19 @@ object CredentialsFixtures {
             domainTitle = details.domainTitle,
             notes = notes,
             lastUpdatedMillis = details.lastUpdatedMillis,
+        )
+    }
+    fun LoginCredentials.toWebsiteLoginCredentials(): WebsiteLoginDetailsWithCredentials {
+        return WebsiteLoginDetailsWithCredentials(
+            details = WebsiteLoginDetails(
+                domain = domain,
+                username = username,
+                id = id,
+                domainTitle = domainTitle,
+                lastUpdatedMillis = lastUpdatedMillis,
+            ),
+            password = password,
+            notes = notes,
         )
     }
 }

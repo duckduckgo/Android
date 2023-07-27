@@ -31,6 +31,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -42,13 +43,42 @@ internal class CredentialsSyncTest {
 
     private val db = inMemoryAutofillDatabase()
     private val secureStorage = FakeSecureStorage()
-    private val autofillStore = FakeAutofillStore(secureStorage)
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
 
     @After fun after() = runBlocking {
         db.close()
+    }
+
+    @Test
+    fun whenInitMetadataThenSetServerModifiedSinceToZero() = runTest {
+        credentialsSync.initMetadata()
+
+        assertEquals("0", credentialsSyncStore.serverModifiedSince)
+        assertEquals("0", credentialsSyncStore.clientModifiedSince)
+    }
+
+    @Test
+    fun whenInitMetadataThenCreateMetadataForAllEntitiesWithModifiedSince() = runTest {
+        givenLocalCredentials(
+            twitterCredentials,
+            spotifyCredentials,
+        )
+        credentialsSyncMetadata.clearAll()
+
+        credentialsSync.initMetadata()
+
+        assertEquals(2, credentialsSyncMetadata.getAllCredentials().size)
+        assertEquals(2, credentialsSyncMetadata.getAllCredentials().size)
+        assertNotNull(credentialsSyncMetadata.getAllCredentials().first().modified_at)
+    }
+
+    @Test
+    fun whenGetUpdatesThenStartTimeUpdates() = runTest {
+        credentialsSync.getUpdatesSince("0")
+
+        assertNotNull(credentialsSyncStore.startTimeStamp)
     }
 
     @Test
@@ -84,6 +114,18 @@ internal class CredentialsSyncTest {
             listOf(spotifyCredentials.asLoginCredentialEntry()),
             updates,
         )
+    }
+
+    @Test
+    fun whenGetUpdatesSinceDateThenEntitiesWithModifiedAtNullNotReturned() = runTest {
+        givenLocalCredentials(
+            twitterCredentials,
+            spotifyCredentials,
+        )
+
+        val updates = credentialsSync.getUpdatesSince("2022-08-30T00:00:00Z")
+
+        assertTrue(updates.isEmpty())
     }
 
     @Test
@@ -166,34 +208,36 @@ internal class CredentialsSyncTest {
     }
 
     @Test
-    fun whenSaveCredentialsThenSaveCredentialAndSyncId() = runTest {
+    fun whenSaveCredentialsThenSaveCredentialAndSyncMetadata() = runTest {
         credentialsSync.saveCredential(twitterCredentials, "123")
 
         secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials().let {
             assertEquals(twitterCredentials, it)
         }
-        credentialsSyncMetadata.getSyncId(twitterCredentials.id!!).let {
-            assertEquals("123", it)
+        credentialsSyncMetadata.getSyncMetadata(twitterCredentials.id!!).let { metadata ->
+            assertEquals("123", metadata?.syncId)
+            assertNull(metadata?.modified_at)
         }
     }
 
     @Test
     fun whenSaveCredentialsToExistingSyncIdThenSaveToAutofillStoreAndOverrideSyncId() = runTest {
-        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("321", twitterCredentials.id!!))
+        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("321", twitterCredentials.id!!, null, null))
 
         credentialsSync.saveCredential(twitterCredentials, "123")
 
         secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials().let {
             assertEquals(twitterCredentials, it)
         }
-        credentialsSyncMetadata.getSyncId(twitterCredentials.id!!).let {
-            assertEquals("123", it)
+        credentialsSyncMetadata.getSyncMetadata(twitterCredentials.id!!).let { metadata ->
+            assertEquals("123", metadata?.syncId)
+            assertNull(metadata?.modified_at)
         }
         assertNull(credentialsSyncMetadata.getLocalId("321"))
     }
 
     @Test
-    fun whenUpdateCredentialsThenUpdateAndSyncId() = runTest {
+    fun whenUpdateCredentialsThenUpdateAndSyncMetadata() = runTest {
         givenLocalCredentials(
             twitterCredentials,
             spotifyCredentials,
@@ -204,13 +248,14 @@ internal class CredentialsSyncTest {
         secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!)!!.toLoginCredentials().let {
             assertEquals(twitterCredentials.copy(username = "new-username"), it)
         }
-        credentialsSyncMetadata.getSyncId(twitterCredentials.id!!).let {
-            assertEquals("123", it)
+        credentialsSyncMetadata.getSyncMetadata(twitterCredentials.id!!).let { metadata ->
+            assertEquals("123", metadata?.syncId)
+            assertNull(metadata?.modified_at)
         }
     }
 
     @Test
-    fun whenDeleteCredentialThenDeleteFromAutofillStoreAndSyncId() = runTest {
+    fun whenDeleteCredentialThenDeleteFromAutofillStoreAndSyncMetadata() = runTest {
         givenLocalCredentials(
             twitterCredentials,
             spotifyCredentials,
@@ -219,7 +264,7 @@ internal class CredentialsSyncTest {
         credentialsSync.deleteCredential(twitterCredentials.id!!)
 
         assertNull(secureStorage.getWebsiteLoginDetailsWithCredentials(twitterCredentials.id!!))
-        assertNull(credentialsSyncMetadata.getSyncId(twitterCredentials.id!!))
+        assertNull(credentialsSyncMetadata.getSyncMetadata(twitterCredentials.id!!))
     }
 
     private fun assertUpdates(
@@ -264,7 +309,15 @@ internal class CredentialsSyncTest {
 
             secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
             with(credential.id!!) {
-                credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(this.toString(), this))
+                val lastUpdatedIso = credential.lastUpdatedMillis?.let { DatabaseDateFormatter.parseMillisIso8601(it) }
+                credentialsSyncMetadata.addOrUpdate(
+                    CredentialsSyncMetadataEntity(
+                        syncId = this.toString(),
+                        id = this,
+                        deleted_at = null,
+                        modified_at = lastUpdatedIso,
+                    ),
+                )
             }
         }
     }

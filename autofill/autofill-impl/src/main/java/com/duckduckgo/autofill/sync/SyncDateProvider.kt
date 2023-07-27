@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync.persister
+package com.duckduckgo.autofill.sync
 
-import androidx.annotation.WorkerThread
-import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
-import com.duckduckgo.sync.api.engine.SyncMergeResult
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.format.DateTimeFormatter
 
-interface CredentialsMergeStrategy {
-    @WorkerThread
-    fun processEntries(credentials: CrendentialsSyncEntries, clientModifiedSince: String): SyncMergeResult<Boolean>
+class SyncDateProvider {
+    companion object {
+        fun now(): String = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+    }
 }

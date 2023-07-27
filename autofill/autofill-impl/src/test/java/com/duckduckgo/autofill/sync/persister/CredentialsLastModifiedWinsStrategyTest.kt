@@ -19,18 +19,17 @@ package com.duckduckgo.autofill.sync.persister
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter.Companion
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures.amazonCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentialEntryResponse
+import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
-import com.duckduckgo.autofill.sync.FakeAutofillStore
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
@@ -57,10 +56,9 @@ internal class CredentialsLastModifiedWinsStrategyTest {
 
     private val db = inMemoryAutofillDatabase()
     private val secureStorage = FakeSecureStorage()
-    private val autofillStore = FakeAutofillStore(secureStorage)
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
 
     @After fun after() = runBlocking {
         db.close()
@@ -85,7 +83,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == twitterCredentials.id)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == spotifyCredentials.id)
@@ -107,12 +105,12 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") != null)
         assertTrue(credentialsSyncMetadata.getLocalId("2") != null)
-        assertTrue(autofillStore.getCredentialsWithId(1L)!!.domainTitle == "NewTitle")
-        assertTrue(autofillStore.getCredentialsWithId(2L)!!.domainTitle == "NewTitle")
+        assertTrue(credentialsSync.getCredentialWithSyncId("1")!!.domainTitle == "NewTitle")
+        assertTrue(credentialsSync.getCredentialWithSyncId("2")!!.domainTitle == "NewTitle")
     }
 
     @Test fun whenCredentialUpdatedAfterChangesTimeStampThenLocalWins() = runTest {
@@ -131,12 +129,12 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") != null)
         assertTrue(credentialsSyncMetadata.getLocalId("2") != null)
-        assertTrue(autofillStore.getCredentialsWithId(1L)!!.domainTitle == twitterCredentials.domainTitle)
-        assertTrue(autofillStore.getCredentialsWithId(2L)!!.domainTitle == spotifyCredentials.domainTitle)
+        assertTrue(credentialsSync.getCredentialWithSyncId("1")!!.domainTitle == twitterCredentials.domainTitle)
+        assertTrue(credentialsSync.getCredentialWithSyncId("2")!!.domainTitle == spotifyCredentials.domainTitle)
     }
 
     @Test fun whenLocalIsMoreRecentThenLocalWins() = runTest {
@@ -155,12 +153,12 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") != null)
         assertTrue(credentialsSyncMetadata.getLocalId("2") != null)
-        assertTrue(autofillStore.getCredentialsWithId(1L)!!.domainTitle == twitterCredentials.domainTitle)
-        assertTrue(autofillStore.getCredentialsWithId(2L)!!.domainTitle == spotifyCredentials.domainTitle)
+        assertTrue(credentialsSync.getCredentialWithSyncId("1")!!.domainTitle == twitterCredentials.domainTitle)
+        assertTrue(credentialsSync.getCredentialWithSyncId("2")!!.domainTitle == spotifyCredentials.domainTitle)
     }
 
     @Test fun whenLocalHasMoreCredentialsThenUpdateWithMoreRecentAndKeepOthers() = runTest {
@@ -180,10 +178,10 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(3, storedValues.count())
-        assertTrue(autofillStore.getCredentialsWithId(1L)!!.domainTitle == "NewTitle")
-        assertTrue(autofillStore.getCredentialsWithId(2L)!!.domainTitle == "NewTitle")
+        assertTrue(credentialsSync.getCredentialWithSyncId("1")!!.domainTitle == "NewTitle")
+        assertTrue(credentialsSync.getCredentialWithSyncId("1")!!.domainTitle == "NewTitle")
         assertTrue(credentialsSyncMetadata.getLocalId("3") == 3L)
     }
 
@@ -204,7 +202,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(3, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -224,7 +222,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -246,7 +244,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(0, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == null)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == null)
@@ -254,11 +252,8 @@ internal class CredentialsLastModifiedWinsStrategyTest {
 
     private suspend fun givenLocalCredentials(vararg credentials: LoginCredentials) {
         credentials.forEach {
-            autofillStore.saveCredentials(
-                it.domain.orEmpty(),
-                it,
-            )
-            credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(it.id!!.toString(), it.id!!))
+            secureStorage.addWebsiteLoginDetailsWithCredentials(it.toWebsiteLoginCredentials())
+            credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(it.id!!.toString(), it.id!!, null, null))
         }
     }
 }

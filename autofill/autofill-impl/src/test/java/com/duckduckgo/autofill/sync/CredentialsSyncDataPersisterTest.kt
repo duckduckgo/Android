@@ -135,14 +135,15 @@ internal class CredentialsSyncDataPersisterTest {
 
     @Test
     fun whenPersistFinishesThenPruneLocalDeletedEntities() {
-        dao.insert(CredentialsSyncMetadataEntity("123", 1L, "2022-08-30T00:00:00Z"))
+        autofillStore.startTimeStamp = "2022-08-30T00:01:00Z"
+        dao.insert(CredentialsSyncMetadataEntity("123", 1L, "2022-08-30T00:00:00Z", null))
 
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_first_get.json")
         val validChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
         val result = syncPersister.persist(validChanges, DEDUPLICATION)
 
         assertTrue(result is Success)
-        assertNull(dao.getSyncId(1L))
+        assertNull(dao.getSyncMetadata(1L))
     }
 
     private fun createFakeStrategies(): Map<SyncConflictResolution, CredentialsMergeStrategy> {
@@ -160,7 +161,7 @@ private class FakeCredentialsMergeStrategy : CredentialsMergeStrategy {
 
     override fun processEntries(
         credentials: CrendentialsSyncEntries,
-        changesTimeStamp: String
+        clientModifiedSince: String,
     ): SyncMergeResult<Boolean> {
         return result
     }

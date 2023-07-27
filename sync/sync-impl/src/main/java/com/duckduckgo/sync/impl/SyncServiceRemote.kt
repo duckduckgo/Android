@@ -24,6 +24,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import org.json.JSONObject
 import retrofit2.Response
+import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -231,14 +232,17 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         token: String,
         updates: JSONObject,
     ): Result<JSONObject> {
+        Timber.i("Sync-service: patch request $updates")
         val response = runCatching {
             val patchCall = syncService.patch("Bearer $token", updates)
             patchCall.execute()
         }.getOrElse { throwable ->
+            Timber.i("Sync-service: error ${throwable.localizedMessage}")
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
+            Timber.i("Sync-service: patch response: $it")
             val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
             Result.Success(data)
         }
@@ -269,6 +273,7 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         token: String,
         since: String,
     ): Result<JSONObject> {
+        Timber.i("Sync-service: get credentials since servertime $since")
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()) {
                 syncService.credentialsSince("Bearer $token", since)
@@ -277,10 +282,12 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
             }
             patchCall.execute()
         }.getOrElse { throwable ->
+            Timber.i("Sync-service: patch response: ${throwable.localizedMessage}")
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
+            Timber.i("Sync-service: get credentials response: $it")
             val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
             Result.Success(data)
         }

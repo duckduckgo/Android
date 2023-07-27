@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync.persister
+package com.duckduckgo.autofill.sync
 
-import androidx.annotation.WorkerThread
-import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
-import com.duckduckgo.sync.api.engine.SyncMergeResult
+import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-interface CredentialsMergeStrategy {
-    @WorkerThread
-    fun processEntries(credentials: CrendentialsSyncEntries, clientModifiedSince: String): SyncMergeResult<Boolean>
+@SingleInstanceIn(AppScope::class)
+class SyncCredentialsListener @Inject constructor(
+    private val credentialsSyncMetadata: CredentialsSyncMetadata,
+) {
+
+    fun onCredentialAdded(id: Long) {
+        credentialsSyncMetadata.onEntityChanged(id)
+    }
+
+    fun onCredentialUpdated(id: Long) {
+        credentialsSyncMetadata.onEntityChanged(id)
+    }
+
+    fun onCredentialRemoved(id: Long) {
+        credentialsSyncMetadata.onEntityRemoved(id)
+    }
 }

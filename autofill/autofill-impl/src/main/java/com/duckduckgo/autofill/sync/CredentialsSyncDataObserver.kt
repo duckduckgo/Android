@@ -21,7 +21,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncState.FAILED
 import com.duckduckgo.sync.api.SyncState.IN_PROGRESS
@@ -37,44 +36,52 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
 class CredentialsSyncDataObserver @Inject constructor(
-    private val autofillStore: AutofillStore,
     private val syncEngine: SyncEngine,
     private val syncStateMonitor: SyncStateMonitor,
+    private val syncMetadata: CredentialsSyncMetadata,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
-    private val dataObserverJob = ConflatedJob()
+    private val syncTriggerJob = ConflatedJob()
 
     override fun onCreate(owner: LifecycleOwner) {
         syncStateMonitor.syncState().onEach {
             when (it) {
-                READY -> observeSavedSitesChanges()
-                IN_PROGRESS -> cancelSavedSitesChanges()
-                FAILED -> observeSavedSitesChanges()
-                OFF -> cancelSavedSitesChanges()
+                READY -> {
+                    syncTriggerObserver()
+                }
+                IN_PROGRESS -> {}
+                FAILED -> {
+                    syncTriggerObserver()
+                }
+                OFF -> {
+                    cancelSyncTriggerObserver()
+                }
             }
         }.launchIn(appCoroutineScope)
     }
 
-    private fun observeSavedSitesChanges() {
-        if (!dataObserverJob.isActive) {
-            dataObserverJob += appCoroutineScope.launch(dispatchers.io()) {
+    private fun syncTriggerObserver() {
+        if (!syncTriggerJob.isActive) {
+            syncTriggerJob += appCoroutineScope.launch(dispatchers.io()) {
                 // drop first since we only want to observe changes
-                autofillStore.getAllCredentials().drop(1).collect {
+                syncMetadata.getAllObservable().drop(1).collect {
+                    Timber.i("CredentialsSyncDataObserver: TRIGGER DATA_CHANGE $it")
                     syncEngine.triggerSync(DATA_CHANGE)
                 }
             }
         }
     }
 
-    private fun cancelSavedSitesChanges() {
-        dataObserverJob.cancel()
+    private fun cancelSyncTriggerObserver() {
+        syncTriggerJob.cancel()
     }
 }

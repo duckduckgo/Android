@@ -32,6 +32,7 @@ import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
+import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
@@ -300,6 +301,7 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         val url = "example.com"
         val credentials = LoginCredentials(
+            id = 1L,
             domain = url,
             username = "username1",
             password = "password",
@@ -483,7 +485,7 @@ class SecureStoreBackedAutofillStoreTest {
             autofillPrefsStore = autofillPrefsStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillUrlMatcher = autofillUrlMatcher,
-            credentialsSyncMetadata = CredentialsSyncMetadata(inMemoryAutofillDatabase().credentialsSyncDao()),
+            syncCredentialsListener = SyncCredentialsListener(CredentialsSyncMetadata(inMemoryAutofillDatabase().credentialsSyncDao())),
         )
     }
 
@@ -527,8 +529,12 @@ class SecureStoreBackedAutofillStoreTest {
         override suspend fun addWebsiteLoginDetailsWithCredentials(
             websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
         ): WebsiteLoginDetailsWithCredentials {
-            credentials.add(websiteLoginDetailsWithCredentials)
-            return websiteLoginDetailsWithCredentials
+            val id = websiteLoginDetailsWithCredentials.details.id ?: (credentials.size.toLong() + 1)
+            val credentialWithId: WebsiteLoginDetailsWithCredentials = websiteLoginDetailsWithCredentials.copy(
+                details = websiteLoginDetailsWithCredentials.details.copy(id = id),
+            )
+            credentials.add(credentialWithId)
+            return credentialWithId
         }
 
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {

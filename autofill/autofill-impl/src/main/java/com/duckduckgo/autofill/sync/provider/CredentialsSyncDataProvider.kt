@@ -45,6 +45,9 @@ class CredentialsSyncDataProvider @Inject constructor(
     override fun getChanges(): SyncChangesRequest {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
         return runBlocking(dispatchers.io()) {
+            if (credentialsSyncStore.serverModifiedSince == "0") {
+                credentialsSync.initMetadata()
+            }
             val since = credentialsSyncStore.clientModifiedSince
             val updates = credentialsSync.getUpdatesSince(since)
             val request = formatUpdates(updates)

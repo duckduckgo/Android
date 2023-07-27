@@ -29,8 +29,7 @@ import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
-import com.duckduckgo.autofill.sync.SyncLoginCredentials
+import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -51,7 +50,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     private val autofillPrefsStore: AutofillPrefsStore,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
     private val autofillUrlMatcher: AutofillUrlMatcher,
-    private val credentialsSyncMetadata: CredentialsSyncMetadata,
+    private val syncCredentialsListener: SyncCredentialsListener,
 ) : AutofillStore {
 
     override val autofillAvailable: Boolean
@@ -129,7 +128,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         )
 
         return withContext(dispatcherProvider.io()) {
-            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials()
+            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
+                syncCredentialsListener.onCredentialAdded(it?.id!!)
+            }
         }
     }
 
@@ -159,7 +160,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         matchingCredentials.forEach {
             val modifiedDetails = it.details.copy(username = credentials.username, lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis())
             val modified = it.copy(password = credentials.password, details = modifiedDetails)
-            updatedCredentials = secureStorage.updateWebsiteLoginDetailsWithCredentials(modified)
+            updatedCredentials = secureStorage.updateWebsiteLoginDetailsWithCredentials(modified)?.also {
+                syncCredentialsListener.onCredentialUpdated(it.details.id!!)
+            }
         }
 
         return updatedCredentials?.toLoginCredentials()
@@ -191,9 +194,10 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     }
 
     override suspend fun deleteCredentials(id: Long): LoginCredentials? {
+        Timber.i("CRIS: Deleting login credentials with id %d", id)
         val existingCredential = secureStorage.getWebsiteLoginDetailsWithCredentials(id)
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
-        credentialsSyncMetadata.onEntityRemoved(id)
+        syncCredentialsListener.onCredentialRemoved(id)
         return existingCredential?.toLoginCredentials()
     }
 
@@ -205,7 +209,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return secureStorage.updateWebsiteLoginDetailsWithCredentials(
             credentials.copy(lastUpdatedMillis = lastUpdatedTimeProvider.getInMillis(), domain = cleanedDomain)
                 .toWebsiteLoginCredentials(),
-        )?.toLoginCredentials()
+        )?.toLoginCredentials()?.also {
+            syncCredentialsListener.onCredentialUpdated(it.id!!)
+        }
     }
 
     override suspend fun containsCredentials(
@@ -265,8 +271,8 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         )
 
         withContext(dispatcherProvider.io()) {
-            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials).also {
-                Timber.d("Reinserted login. %s", it)
+            secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.also {
+                syncCredentialsListener.onCredentialAdded(it.details.id!!)
             }
         }
     }

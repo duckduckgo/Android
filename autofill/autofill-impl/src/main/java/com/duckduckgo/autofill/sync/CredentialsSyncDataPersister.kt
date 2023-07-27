@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.sync
 import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsSyncDataPersister.Adapters.Companion.updatesAdapter
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
 import com.duckduckgo.di.DaggerMap
@@ -33,9 +34,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset
-import org.threeten.bp.format.DateTimeFormatter
 import javax.inject.*
 import timber.log.Timber
 
@@ -59,7 +57,6 @@ class CredentialsSyncDataPersister @Inject constructor(
             Timber.d("Sync-autofill-Persist: merging credentials finished with $result")
             return result
         } else {
-            Timber.d("Sync-autofill-Persist: no credentials to merge")
             Success(false)
         }
     }
@@ -93,18 +90,29 @@ class CredentialsSyncDataPersister @Inject constructor(
         crendentials: CrendentialsSyncEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-        if (conflictResolution != SyncConflictResolution.DEDUPLICATION) {
-            credentialsSyncStore.serverModifiedSince = crendentials.lastModified
-            credentialsSyncStore.clientModifiedSince = credentialsSyncStore.startTimeStamp
-            Timber.d("Sync-autofill-Persist: updating credentials server last_modified to ${credentialsSyncStore.serverModifiedSince}")
-            Timber.d("Sync-autofill-Persist: updating credentials client last_modified to ${credentialsSyncStore.clientModifiedSince}")
-        }
+        credentialsSyncStore.serverModifiedSince = crendentials.last_modified
+        credentialsSyncStore.clientModifiedSince = credentialsSyncStore.startTimeStamp
+        Timber.d("Sync-autofill-Persist: updating credentials server last_modified to ${credentialsSyncStore.serverModifiedSince}")
+        Timber.d("Sync-autofill-Persist: updating credentials client last_modified to ${credentialsSyncStore.clientModifiedSince}")
 
         return if (crendentials.entries.isEmpty()) {
             Timber.d("Sync-autofill-Persist: merging completed, no entries to merge")
             Success(false)
         } else {
-            return strategies[conflictResolution]?.processEntries(crendentials, credentialsSyncStore.clientModifiedSince) ?: SyncMergeResult.Error(reason = "Merge Strategy not found")
+            val result = strategies[conflictResolution]?.processEntries(crendentials, credentialsSyncStore.clientModifiedSince)
+                ?: SyncMergeResult.Error(
+                    reason = "Merge Strategy not found",
+                )
+
+            if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
+                credentialsSyncMetadata.getAllCredentials().filter { it.modified_at != null }.forEach {
+                    Timber.i("CRIS: post-dedup adding to syncmetadata localId ${it.id}")
+                    credentialsSyncMetadata.addOrUpdate(
+                        CredentialsSyncMetadataEntity(id = it.id, modified_at = SyncDateProvider.now(), deleted_at = null),
+                    )
+                }
+            }
+            return result
         }
     }
 
@@ -116,11 +124,6 @@ class CredentialsSyncDataPersister @Inject constructor(
         credentialsSyncStore.serverModifiedSince = "0"
         credentialsSyncStore.startTimeStamp = "0"
         credentialsSyncStore.clientModifiedSince = "0"
-    }
-
-    private fun getUtcIsoLocalDateTime(): String {
-        // returns YYYY-MM-ddTHH:mm:ss.SSSZ
-        return Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
     }
 
     private class Adapters {
@@ -139,17 +142,8 @@ data class CredentialsSyncRemoteUpdates(
 
 data class CrendentialsSyncEntries(
     val entries: List<CredentialsSyncEntryResponse>,
-    private val last_modified: String,
-) {
-
-    //val lastModified: String by lazy { getLastModifiedWithMillis() }
-    val lastModified: String = last_modified
-    private fun getLastModifiedWithMillis(): String {
-        val instant = Instant.parse(last_modified)
-        val ofPattern = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC)
-        return ofPattern.format(instant)
-    }
-}
+    val last_modified: String,
+)
 
 data class CredentialsSyncEntryResponse(
     val id: String,

@@ -40,7 +40,6 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
@@ -96,6 +95,7 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Feature: sending ${it.type} local data $it")
             patchLocalChanges(it, REMOTE_WINS)
         }
+        syncStateRepository.updateSyncState(SUCCESS)
     }
 
     private fun mergeRemoteData() {
@@ -111,13 +111,14 @@ class RealSyncEngine @Inject constructor(
         getChanges().forEach {
             if (it.isEmpty()) {
                 Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
-                syncStateRepository.updateSyncState(SUCCESS)
+                // syncStateRepository.updateSyncState(SUCCESS)
                 return
             } else {
                 Timber.d("Sync-Feature: ${it.type}  sending local data $it")
                 patchLocalChanges(it, LOCAL_WINS)
             }
         }
+        syncStateRepository.updateSyncState(SUCCESS)
     }
 
     private fun performSync(trigger: SyncTrigger) {
@@ -137,6 +138,7 @@ class RealSyncEngine @Inject constructor(
                     patchLocalChanges(it, TIMESTAMP)
                 }
             }
+            syncStateRepository.updateSyncState(SUCCESS)
         }
     }
 
@@ -147,7 +149,7 @@ class RealSyncEngine @Inject constructor(
             if (currentSync.state == IN_PROGRESS) {
                 val syncTimestamp = OffsetDateTime.parse(currentSync.timestamp)
                 val now = OffsetDateTime.now()
-                Duration.between(syncTimestamp, now).toMinutes() > 10
+                Duration.between(syncTimestamp, now).toMinutes() < 10
             } else {
                 false
             }
@@ -163,13 +165,13 @@ class RealSyncEngine @Inject constructor(
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 Timber.d("Sync-Feature: patch failed ${result.reason}")
-                syncStateRepository.updateSyncState(FAIL)
+                // syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
                 Timber.d("Sync-Feature: patch success")
                 persistChanges(result.data, conflictResolution)
-                syncStateRepository.updateSyncState(SUCCESS)
+                // syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }
@@ -182,13 +184,13 @@ class RealSyncEngine @Inject constructor(
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
-                syncStateRepository.updateSyncState(FAIL)
+                // syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
                 Timber.d("Sync-Feature: get success")
                 persistChanges(result.data, conflictResolution)
-                syncStateRepository.updateSyncState(SUCCESS)
+                // syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }

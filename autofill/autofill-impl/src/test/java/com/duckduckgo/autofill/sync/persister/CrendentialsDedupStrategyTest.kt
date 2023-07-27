@@ -23,12 +23,12 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures.amazonCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentialEntryResponse
+import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
-import com.duckduckgo.autofill.sync.FakeAutofillStore
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
@@ -55,10 +55,9 @@ internal class CrendentialsDedupStrategyTest {
 
     private val db = inMemoryAutofillDatabase()
     private val secureStorage = FakeSecureStorage()
-    private val autofillStore = FakeAutofillStore(secureStorage)
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
 
     @After fun after() = runBlocking {
         db.close()
@@ -84,7 +83,7 @@ internal class CrendentialsDedupStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is SyncMergeResult.Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == twitterCredentials.id)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == spotifyCredentials.id)
@@ -107,7 +106,7 @@ internal class CrendentialsDedupStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is SyncMergeResult.Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
 
         assertTrue(credentialsSyncMetadata.getLocalId("1") == null)
@@ -133,7 +132,7 @@ internal class CrendentialsDedupStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is SyncMergeResult.Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
 
         assertTrue(credentialsSyncMetadata.getLocalId("1") == null)
@@ -151,9 +150,9 @@ internal class CrendentialsDedupStrategyTest {
             spotifyCredentials,
             amazonCredentials,
         )
-        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("1", twitterCredentials.id!!))
-        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("2", spotifyCredentials.id!!))
-        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("3", amazonCredentials.id!!))
+        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("1", twitterCredentials.id!!, null, null))
+        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("2", spotifyCredentials.id!!, null, null))
+        credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("3", amazonCredentials.id!!, null, null))
 
         val remoteCredentials = CrendentialsSyncEntries(
             entries = listOf(
@@ -166,7 +165,7 @@ internal class CrendentialsDedupStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is SyncMergeResult.Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(3, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -191,7 +190,7 @@ internal class CrendentialsDedupStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is SyncMergeResult.Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(3, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -212,7 +211,7 @@ internal class CrendentialsDedupStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is SyncMergeResult.Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -220,11 +219,8 @@ internal class CrendentialsDedupStrategyTest {
 
     private suspend fun givenLocalCredentials(vararg credentials: LoginCredentials) {
         credentials.forEach {
-            autofillStore.saveCredentials(
-                it.domain.orEmpty(),
-                it,
-            )
-            credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(it.id!!.toString(), it.id!!))
+            secureStorage.addWebsiteLoginDetailsWithCredentials(it.toWebsiteLoginCredentials())
+            credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(it.id!!.toString(), it.id!!, null, null))
         }
     }
 }

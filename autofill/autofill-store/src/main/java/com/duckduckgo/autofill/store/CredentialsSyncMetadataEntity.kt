@@ -28,5 +28,6 @@ import java.util.*
 data class CredentialsSyncMetadataEntity(
     val syncId: String = UUID.randomUUID().toString(),
     @PrimaryKey val id: Long,
-    var deleted_at: String? = null,
+    var deleted_at: String?,
+    var modified_at: String?,
 )

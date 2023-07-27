@@ -23,12 +23,12 @@ import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures.amazonCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toLoginCredentialEntryResponse
+import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
-import com.duckduckgo.autofill.sync.FakeAutofillStore
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
@@ -55,10 +55,9 @@ internal class CredentialsRemoteWinsStrategyTest {
 
     private val db = inMemoryAutofillDatabase()
     private val secureStorage = FakeSecureStorage()
-    private val autofillStore = FakeAutofillStore(secureStorage)
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(autofillStore, secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
 
     @After fun after() = runBlocking {
         db.close()
@@ -84,7 +83,7 @@ internal class CredentialsRemoteWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == twitterCredentials.id)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == spotifyCredentials.id)
@@ -107,12 +106,12 @@ internal class CredentialsRemoteWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") != null)
         assertTrue(credentialsSyncMetadata.getLocalId("2") != null)
-        assertTrue(autofillStore.getCredentialsWithId(1L)!!.domainTitle == "NewTitle")
-        assertTrue(autofillStore.getCredentialsWithId(2L)!!.domainTitle == "NewTitle")
+        assertTrue(secureStorage.getWebsiteLoginDetailsWithCredentials(1L)!!.details.domainTitle == "NewTitle")
+        assertTrue(secureStorage.getWebsiteLoginDetailsWithCredentials(2L)!!.details.domainTitle == "NewTitle")
     }
 
     @Test
@@ -132,12 +131,12 @@ internal class CredentialsRemoteWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") != null)
         assertTrue(credentialsSyncMetadata.getLocalId("2") != null)
-        assertTrue(autofillStore.getCredentialsWithId(1L)!!.domainTitle == "NewTitle")
-        assertTrue(autofillStore.getCredentialsWithId(2L)!!.domainTitle == "NewTitle")
+        assertTrue(secureStorage.getWebsiteLoginDetailsWithCredentials(1L)!!.details.domainTitle == "NewTitle")
+        assertTrue(secureStorage.getWebsiteLoginDetailsWithCredentials(2L)!!.details.domainTitle == "NewTitle")
     }
 
     @Test
@@ -158,7 +157,7 @@ internal class CredentialsRemoteWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(3, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -183,7 +182,7 @@ internal class CredentialsRemoteWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(3, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -204,7 +203,7 @@ internal class CredentialsRemoteWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(2, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == 1L)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == 2L)
@@ -227,7 +226,7 @@ internal class CredentialsRemoteWinsStrategyTest {
         val result = testee.processEntries(remoteCredentials, "2022-08-30T00:00:00Z")
 
         assertTrue(result is Success)
-        val storedValues = autofillStore.getAllCredentials().first()
+        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()
         assertEquals(0, storedValues.count())
         assertTrue(credentialsSyncMetadata.getLocalId("1") == null)
         assertTrue(credentialsSyncMetadata.getLocalId("2") == null)
@@ -235,11 +234,8 @@ internal class CredentialsRemoteWinsStrategyTest {
 
     private suspend fun givenLocalCredentials(vararg credentials: LoginCredentials) {
         credentials.forEach {
-            autofillStore.saveCredentials(
-                it.domain.orEmpty(),
-                it,
-            )
-            credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(it.id!!.toString(), it.id!!))
+            secureStorage.addWebsiteLoginDetailsWithCredentials(it.toWebsiteLoginCredentials())
+            credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity(it.id!!.toString(), it.id!!, null, null))
         }
     }
 }
