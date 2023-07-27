@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
@@ -86,6 +87,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryI
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -395,6 +397,8 @@ class BrowserTabViewModelTest {
 
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
 
+    private val mockDeviceInfo: DeviceInfo = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -504,6 +508,7 @@ class BrowserTabViewModelTest {
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
             surveyNotificationScheduler = mockSurveyNotificationScheduler,
+            device = mockDeviceInfo,
         )
 
         testee.loadData("abc", null, false, false)
@@ -3639,15 +3644,38 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsToPrintPageThenPrintLinkCommandSent() {
+    fun whenUserSelectsToPrintPageAndCountryFromLetterFormatDefinedSetThenPrintLinkCommandSentWithLetter() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().value as Command.PrintLink
         assertEquals("foo.com", command.url)
+        assertEquals(PrintAttributes.MediaSize.NA_LETTER, command.mediaSize)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndCountryNotFromLetterFormatDefinedSetThenPrintLinkCommandSentWithA4() {
+        whenever(mockDeviceInfo.country).thenReturn("FR")
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        val command = captureCommands().value as Command.PrintLink
+        assertEquals("foo.com", command.url)
+        assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndCountryIsEmptyThenPrintLinkCommandSentWithA4() {
+        whenever(mockDeviceInfo.country).thenReturn("")
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        val command = captureCommands().value as Command.PrintLink
+        assertEquals("foo.com", command.url)
+        assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
     @Test
     fun whenUserSelectsToPrintPageThenPixelIsSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
