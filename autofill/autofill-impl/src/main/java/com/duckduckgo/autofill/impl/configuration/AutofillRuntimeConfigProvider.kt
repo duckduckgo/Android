@@ -18,8 +18,10 @@ package com.duckduckgo.autofill.impl.configuration
 
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
+import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -38,6 +40,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val autofillStore: AutofillStore,
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val shareableCredentials: ShareableCredentials,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
@@ -76,10 +79,14 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         return if (url == null || !autofillCapabilityChecker.canInjectCredentialsToWebView(url)) {
             AvailableInputTypeCredentials(username = false, password = false)
         } else {
-            val savedCredentials = autofillStore.getCredentials(url)
+            val matches = mutableListOf<LoginCredentials>()
+            val directMatches = autofillStore.getCredentials(url)
+            val shareableMatches = shareableCredentials.shareableCredentials(url)
+            matches.addAll(directMatches)
+            matches.addAll(shareableMatches)
 
-            val usernameSearch = savedCredentials.find { !it.username.isNullOrEmpty() }
-            val passwordSearch = savedCredentials.find { !it.password.isNullOrEmpty() }
+            val usernameSearch = matches.find { !it.username.isNullOrEmpty() }
+            val passwordSearch = matches.find { !it.password.isNullOrEmpty() }
 
             AvailableInputTypeCredentials(username = usernameSearch != null, password = passwordSearch != null)
         }

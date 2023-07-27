@@ -33,6 +33,7 @@ interface AutofillSelectCredentialsGrouper {
     data class Groups(
         val perfectMatches: List<LoginCredentials>,
         val partialMatches: Map<String, List<LoginCredentials>>,
+        val otherGroups: Map<String, List<LoginCredentials>>,
     )
 }
 
@@ -59,11 +60,13 @@ class RealAutofillSelectCredentialsGrouper @Inject constructor(
     ): Groups {
         val perfectMatches = mutableListOf<LoginCredentials>()
         val partialMatchGroups = mutableMapOf<String, MutableList<LoginCredentials>>()
+        val otherGroups = mutableMapOf<String, MutableList<LoginCredentials>>()
         val visitedSiteParts = autofillUrlMatcher.extractUrlPartsForAutofill(originalUrl)
 
         unsortedCredentials.forEach { savedCredential ->
             val savedSiteParts = autofillUrlMatcher.extractUrlPartsForAutofill(savedCredential.domain)
             if (!autofillUrlMatcher.matchingForAutofill(visitedSiteParts, savedSiteParts)) {
+                otherGroups.getOrPut(savedCredential.domain.toString()) { mutableListOf() }.add(savedCredential)
                 return@forEach
             }
 
@@ -73,12 +76,13 @@ class RealAutofillSelectCredentialsGrouper @Inject constructor(
                 partialMatchGroups.getOrPut(savedCredential.domain.toString()) { mutableListOf() }.add(savedCredential)
             }
         }
-        return Groups(perfectMatches, partialMatchGroups)
+        return Groups(perfectMatches, partialMatchGroups, otherGroups)
     }
 
     private fun sort(groups: Groups): Groups {
         // sort group headings for all the partial matches using usual domain sorting rules
         val sortedPartialMatches = groups.partialMatches.toSortedMap(sorter.comparator())
+        val sortedOtherMatches = groups.otherGroups.toSortedMap(sorter.comparator())
 
         // sort inside each group, where most recently updated is first
         val sortedPerfectMatches = groups.perfectMatches.sortedByDescending { it.lastUpdatedMillis }
@@ -87,6 +91,12 @@ class RealAutofillSelectCredentialsGrouper @Inject constructor(
             sortedPartialMatches[key] = sorted
         }
 
-        return Groups(sortedPerfectMatches, sortedPartialMatches)
+        // sort inside each group, where most recently updated is first
+        sortedOtherMatches.forEach { (key, value) ->
+            val sorted = value.sortedByDescending { it.lastUpdatedMillis }
+            sortedOtherMatches[key] = sorted
+        }
+
+        return Groups(sortedPerfectMatches, sortedPartialMatches, sortedOtherMatches)
     }
 }
