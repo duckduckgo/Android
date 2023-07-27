@@ -63,7 +63,7 @@ fun RemoteMessage.asMessage(): Message {
             topIllustration = null,
             middleIllustration = content.placeholder.drawable(),
             title = content.titleText,
-            titleSize= TitleSize.LARGE,
+            titleSize = TitleSize.LARGE,
             subtitle = content.descriptionText,
             singleAction = content.actionText,
         )
