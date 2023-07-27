@@ -4067,6 +4067,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRemoteMessageActionButtonClickedThenFirePixelAndDontDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageActionButtonClicked()
+
+        verify(mockRemoteMessagingRepository, never()).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, mapOf("cta" to "id1"))
+    }
+
+    @Test
     fun whenConfigurationChangesThenForceRenderingMenu() {
         val oldForceRenderingTicker = browserViewState().forceRenderingTicker
 

@@ -10,7 +10,7 @@
     <path
         android:pathData="M0,61.47C0,53.8 0,49.96 1.54,47.05C2.78,44.7 4.7,42.78 7.05,41.54C9.96,40 13.8,40 21.47,40H234.53C242.2,40 246.04,40 248.95,41.54C251.29,42.78 253.22,44.7 254.46,47.05C256,49.96 256,53.8 256,61.47V98.53C256,106.2 256,110.04 254.46,112.95C253.22,115.29 251.29,117.22 248.95,118.46C246.04,120 242.2,120 234.53,120H21.47C13.8,120 9.96,120 7.05,118.46C4.7,117.22 2.78,115.29 1.54,112.95C0,110.04 0,106.2 0,98.53V61.47Z">
       <aapt:attr name="android:fillColor">
-        <gradient 
+        <gradient
             android:startX="141.67"
             android:startY="129.6"
             android:endX="234.15"
@@ -64,7 +64,7 @@
         android:strokeWidth="0.774194"
         android:fillColor="#00000000">
       <aapt:attr name="android:strokeColor">
-        <gradient 
+        <gradient
             android:startX="103.61"
             android:startY="117.55"
             android:endX="188.39"
