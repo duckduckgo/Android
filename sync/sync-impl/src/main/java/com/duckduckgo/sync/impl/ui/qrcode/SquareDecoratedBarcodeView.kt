@@ -45,12 +45,12 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Comman
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.RequestPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 /**
  * Encapsulates DecoratedBarcodeView forcing a 1:1 aspect ratio, and adds custom frame to the scanner
@@ -108,7 +108,6 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         binding.barcodeView.resume()
     }
 
-
     fun pause() {
         binding.barcodeView.pause()
     }
@@ -129,7 +128,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     private fun render(viewState: ViewState) {
-        when(viewState) {
+        when (viewState) {
             is ViewState.CameraUnavailable -> showCameraUnavailable()
             is ViewState.PermissionsNotGranted -> showPermissionDenied()
             is ViewState.PermissionsGranted -> showPermissionsGranted()

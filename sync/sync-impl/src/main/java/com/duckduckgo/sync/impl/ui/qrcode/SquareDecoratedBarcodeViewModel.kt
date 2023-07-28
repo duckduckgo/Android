@@ -26,6 +26,7 @@ import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Comman
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState.PermissionsGranted
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState.PermissionsNotGranted
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState.Unknown
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +34,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Wrapper for whether permission has already been denied
@@ -104,7 +104,7 @@ class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: Permi
     }
 
     fun handleCameraAvailability(cameraAvailable: Boolean) {
-        if(cameraAvailable) {
+        if (cameraAvailable) {
             sendCommand(CheckPermissions)
         } else {
             viewModelScope.launch {
