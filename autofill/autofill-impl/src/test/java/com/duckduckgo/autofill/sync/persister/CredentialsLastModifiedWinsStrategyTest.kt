@@ -29,7 +29,7 @@ import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
-import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
+import com.duckduckgo.autofill.sync.credentialsSyncEntries
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
@@ -72,7 +72,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
 
     @Test fun whenNoLocalEntitiesThenAllRemoteEntitiesStored() = runTest {
         givenLocalCredentials()
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse(),
                 spotifyCredentials.toLoginCredentialEntryResponse(),
@@ -95,7 +95,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
             spotifyCredentials,
         )
 
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
                 spotifyCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
@@ -119,7 +119,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
             spotifyCredentials.copy(lastUpdatedMillis = DatabaseDateFormatter.parseIso8601ToMillis("2022-08-30T00:01:00Z")),
         )
 
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
                 spotifyCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
@@ -143,7 +143,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
             spotifyCredentials.copy(lastUpdatedMillis = 1689592358516),
         )
 
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
                 spotifyCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
@@ -168,7 +168,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
             amazonCredentials,
         )
 
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
                 spotifyCredentials.toLoginCredentialEntryResponse().copy(title = "NewTitle"),
@@ -190,7 +190,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
             twitterCredentials,
             spotifyCredentials,
         )
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse(),
                 spotifyCredentials.toLoginCredentialEntryResponse(),
@@ -214,7 +214,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
             twitterCredentials,
             spotifyCredentials,
         )
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = emptyList(),
             last_modified = "2022-08-30T00:00:00Z",
         )
@@ -233,7 +233,7 @@ internal class CredentialsLastModifiedWinsStrategyTest {
             twitterCredentials,
             spotifyCredentials,
         )
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse().copy(deleted = "1"),
                 spotifyCredentials.toLoginCredentialEntryResponse().copy(deleted = "1"),

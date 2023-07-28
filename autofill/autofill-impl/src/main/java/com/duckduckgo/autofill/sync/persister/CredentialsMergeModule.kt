@@ -41,7 +41,7 @@ object CredentialsMergeModule {
         credentialsSync: CredentialsSync,
         credentialsSyncMapper: CredentialsSyncMapper,
         dispatchers: DispatcherProvider,
-    ): CredentialsMergeStrategy = CrendentialsDedupStrategy(
+    ): CredentialsMergeStrategy = credentialsDedupStrategy(
         credentialsSync,
         credentialsSyncMapper,
         dispatchers,

@@ -88,11 +88,6 @@ interface AutofillStore {
     suspend fun getAllCredentials(): Flow<List<LoginCredentials>>
 
     /**
-     * Returns all credentials that have been modified since the given timestamp
-     */
-    suspend fun getAllCredentialsModifiedSince(modifiedSince: Long): List<LoginCredentials>
-
-    /**
      * Returns a count of how many credentials are stored
      */
     suspend fun getCredentialCount(): Flow<Int>

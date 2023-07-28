@@ -160,7 +160,7 @@ private class FakeCredentialsMergeStrategy : CredentialsMergeStrategy {
     var result: SyncMergeResult<Boolean> = Success(true)
 
     override fun processEntries(
-        credentials: CrendentialsSyncEntries,
+        credentials: credentialsSyncEntries,
         clientModifiedSince: String,
     ): SyncMergeResult<Boolean> {
         return result

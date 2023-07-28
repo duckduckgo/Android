@@ -28,7 +28,7 @@ import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
-import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
+import com.duckduckgo.autofill.sync.credentialsSyncEntries
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
@@ -47,7 +47,7 @@ import org.junit.runner.RunWith
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-internal class CrendentialsDedupStrategyTest {
+internal class credentialsDedupStrategyTest {
 
     @get:Rule
     @Suppress("unused")
@@ -63,7 +63,7 @@ internal class CrendentialsDedupStrategyTest {
         db.close()
     }
 
-    private val testee = CrendentialsDedupStrategy(
+    private val testee = credentialsDedupStrategy(
         credentialsSync = credentialsSync,
         credentialsSyncMapper = CredentialsSyncMapper(FakeCrypto()),
         dispatchers = coroutineRule.testDispatcherProvider,
@@ -72,7 +72,7 @@ internal class CrendentialsDedupStrategyTest {
     @Test
     fun whenNoLocalEntitiesThenAllRemoteEntitiesStored() = runTest {
         givenLocalCredentials()
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse(),
                 spotifyCredentials.toLoginCredentialEntryResponse(),
@@ -96,7 +96,7 @@ internal class CrendentialsDedupStrategyTest {
             spotifyCredentials,
         )
 
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse().copy(id = "1a"),
                 spotifyCredentials.toLoginCredentialEntryResponse().copy(id = "2a"),
@@ -122,7 +122,7 @@ internal class CrendentialsDedupStrategyTest {
             spotifyCredentials.copy(lastUpdatedMillis = 1689592358516),
         )
 
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse().copy(id = "1a", title = "newTitle"),
                 spotifyCredentials.toLoginCredentialEntryResponse().copy(id = "2a", title = "newTitle"),
@@ -154,7 +154,7 @@ internal class CrendentialsDedupStrategyTest {
         credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("2", spotifyCredentials.id!!, null, null))
         credentialsSyncMetadata.addOrUpdate(CredentialsSyncMetadataEntity("3", amazonCredentials.id!!, null, null))
 
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse(),
                 spotifyCredentials.toLoginCredentialEntryResponse(),
@@ -178,7 +178,7 @@ internal class CrendentialsDedupStrategyTest {
             twitterCredentials,
             spotifyCredentials,
         )
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = listOf(
                 twitterCredentials.toLoginCredentialEntryResponse(),
                 spotifyCredentials.toLoginCredentialEntryResponse(),
@@ -203,7 +203,7 @@ internal class CrendentialsDedupStrategyTest {
             twitterCredentials,
             spotifyCredentials,
         )
-        val remoteCredentials = CrendentialsSyncEntries(
+        val remoteCredentials = credentialsSyncEntries(
             entries = emptyList(),
             last_modified = "2022-08-30T00:00:00Z",
         )

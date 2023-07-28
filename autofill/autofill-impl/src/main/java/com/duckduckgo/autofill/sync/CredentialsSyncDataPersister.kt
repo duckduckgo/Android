@@ -87,19 +87,19 @@ class CredentialsSyncDataPersister @Inject constructor(
     }
 
     private fun processEntries(
-        crendentials: CrendentialsSyncEntries,
+        credentials: credentialsSyncEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult<Boolean> {
-        credentialsSyncStore.serverModifiedSince = crendentials.last_modified
+        credentialsSyncStore.serverModifiedSince = credentials.last_modified
         credentialsSyncStore.clientModifiedSince = credentialsSyncStore.startTimeStamp
         Timber.d("Sync-autofill-Persist: updating credentials server last_modified to ${credentialsSyncStore.serverModifiedSince}")
         Timber.d("Sync-autofill-Persist: updating credentials client last_modified to ${credentialsSyncStore.clientModifiedSince}")
 
-        return if (crendentials.entries.isEmpty()) {
+        return if (credentials.entries.isEmpty()) {
             Timber.d("Sync-autofill-Persist: merging completed, no entries to merge")
             Success(false)
         } else {
-            val result = strategies[conflictResolution]?.processEntries(crendentials, credentialsSyncStore.clientModifiedSince)
+            val result = strategies[conflictResolution]?.processEntries(credentials, credentialsSyncStore.clientModifiedSince)
                 ?: SyncMergeResult.Error(
                     reason = "Merge Strategy not found",
                 )
@@ -137,10 +137,10 @@ class CredentialsSyncDataPersister @Inject constructor(
 }
 
 data class CredentialsSyncRemoteUpdates(
-    val credentials: CrendentialsSyncEntries,
+    val credentials: credentialsSyncEntries,
 )
 
-data class CrendentialsSyncEntries(
+data class credentialsSyncEntries(
     val entries: List<CredentialsSyncEntryResponse>,
     val last_modified: String,
 )

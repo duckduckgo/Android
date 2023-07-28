@@ -19,7 +19,7 @@ package com.duckduckgo.autofill.sync.persister
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
-import com.duckduckgo.autofill.sync.CrendentialsSyncEntries
+import com.duckduckgo.autofill.sync.credentialsSyncEntries
 import com.duckduckgo.autofill.sync.isDeleted
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
@@ -33,7 +33,7 @@ class CredentialsRemoteWinsStrategy constructor(
     private val dispatchers: DispatcherProvider,
 ) : CredentialsMergeStrategy {
     override fun processEntries(
-        credentials: CrendentialsSyncEntries,
+        credentials: credentialsSyncEntries,
         clientModifiedSince: String,
     ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING REMOTEWINS =======")
