@@ -90,11 +90,11 @@ sealed class Content(val messageType: MessageType) {
     }
 }
 
-sealed class Action(val actionType: String, open val value: String) {
+sealed class Action(val actionType: String, open val value: String = "", open val additionalParameters: JsonAdditionalParameters? = null) {
     data class Url(override val value: String) : Action(URL.jsonValue, value)
     data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value)
-    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "")
-    object Dismiss : Action(DISMISS.jsonValue, "")
-    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "")
-    data class Share(override val value: String) : Action(SHARE.jsonValue, "")
+    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue)
+    object Dismiss : Action(DISMISS.jsonValue)
+    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue)
+    data class Share(override val value: String, override val additionalParameters: JsonAdditionalParameters?) : Action(SHARE.jsonValue, value)
 }

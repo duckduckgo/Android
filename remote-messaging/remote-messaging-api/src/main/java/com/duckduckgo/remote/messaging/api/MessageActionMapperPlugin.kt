@@ -23,7 +23,11 @@ interface MessageActionMapperPlugin {
 data class JsonMessageAction(
     val type: String,
     val value: String,
-    // TODO add new "additionalParameters" var
+    val additionalParameters: JsonAdditionalParameters?,
+)
+
+data class JsonAdditionalParameters(
+    val title: String,
 )
 
 sealed class JsonActionType(val jsonValue: String) {

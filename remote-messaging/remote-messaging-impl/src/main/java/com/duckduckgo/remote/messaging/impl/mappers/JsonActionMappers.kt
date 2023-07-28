@@ -86,7 +86,7 @@ class DefaultBrowserActionMapper @Inject constructor() : MessageActionMapperPlug
 class ShareActionMapper @Inject constructor() : MessageActionMapperPlugin {
     override fun evaluate(jsonMessageAction: JsonMessageAction): Action? {
         return if (jsonMessageAction.type == SHARE.jsonValue) {
-            Action.Share(jsonMessageAction.value)
+            Action.Share(jsonMessageAction.value, jsonMessageAction.additionalParameters)
         } else {
             null
         }

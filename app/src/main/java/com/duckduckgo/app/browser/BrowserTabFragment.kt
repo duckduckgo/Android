@@ -1065,7 +1065,7 @@ class BrowserTabFragment :
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url)
-            is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url)
+            is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
@@ -2364,10 +2364,12 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchSharePromoRMFPageChooser(url: String) {
-        val share = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
+    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+        val share = Intent().apply {
+            action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, url)
+            putExtra(Intent.EXTRA_TITLE, shareTitle)
+            type = "text/plain"
         }
 
         val pi = PendingIntent.getBroadcast(
@@ -2379,7 +2381,7 @@ class BrowserTabFragment :
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         try {
-            startActivity(Intent.createChooser(share, getString(com.duckduckgo.macos_impl.R.string.macos_share_title), pi.intentSender))
+            startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }
