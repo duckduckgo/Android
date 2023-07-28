@@ -36,7 +36,7 @@
         android:id="@+id/cameraStatusContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#222222"
+        android:background="@color/almostBlackDark"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -67,7 +67,7 @@
             app:layout_constraintVertical_chainStyle="packed"
             app:srcCompat="@drawable/camera_permission" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/cameraStatusTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,12 +77,12 @@
             android:gravity="center"
             android:text="@string/sync_camera_permission_required"
             android:textColor="@color/gray30"
-            android:textSize="20sp"
+            app:typography="h2"
             app:layout_constraintBottom_toTopOf="@+id/cameraStatusDescription"
             app:layout_constraintTop_toBottomOf="@+id/cameraStatusIcon"
             tools:layout_editor_absoluteX="20dp" />
 
-        <TextView
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/cameraStatusDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
             android:gravity="center"
             android:text="@string/sync_camera_permission_required_description"
             android:textColor="@color/gray30"
-            android:textSize="16sp"
+            app:typography="body1"
             app:layout_constraintBottom_toTopOf="@+id/goToSettingsButton"
             app:layout_constraintTop_toBottomOf="@+id/cameraStatusTitle"
             tools:layout_editor_absoluteX="20dp" />

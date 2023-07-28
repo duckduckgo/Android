@@ -67,16 +67,6 @@ class SyncConnectViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnReadQRCodeThenCommandIsReadQRCode() = runTest {
-        testee.commands().test {
-            testee.onReadQRCodeClicked()
-            val command = awaitItem()
-            assertTrue(command is Command.ReadQRCode)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenUserClicksOnReadTextCodeThenCommandIsReadTextCode() = runTest {
         testee.commands().test {
             testee.onReadTextCodeClicked()

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.ui.qrcode
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -43,6 +44,7 @@ class PermissionDeniedWrapper @Inject constructor() {
     var permissionAlreadyDenied = false
 }
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: PermissionDeniedWrapper) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
