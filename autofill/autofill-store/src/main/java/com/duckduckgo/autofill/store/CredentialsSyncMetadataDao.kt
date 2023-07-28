@@ -27,8 +27,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CredentialsSyncMetadataDao {
 
-    @Query("select * from credentials_sync_meta where id = :id")
-    fun getSyncMetadata(id: Long): CredentialsSyncMetadataEntity?
+    @Query("select * from credentials_sync_meta where localId = :localId")
+    fun getSyncMetadata(localId: Long): CredentialsSyncMetadataEntity?
 
     @Query("select * from credentials_sync_meta where syncId = :syncId")
     fun getSyncMetadata(syncId: String): CredentialsSyncMetadataEntity?
@@ -50,14 +50,14 @@ interface CredentialsSyncMetadataDao {
     @Delete
     fun delete(entity: CredentialsSyncMetadataEntity)
 
-    @Query("select id from credentials_sync_meta where syncId = :syncId")
+    @Query("select localId from credentials_sync_meta where syncId = :syncId")
     fun getLocalId(syncId: String): Long?
 
     @Query("Delete from credentials_sync_meta where deleted_at <= :before")
     fun removeDeletedEntities(before: String)
 
-    @Query("Delete from credentials_sync_meta where id = :id")
-    fun removeEntityWithLocalId(id: Long)
+    @Query("Delete from credentials_sync_meta where localId = :localId")
+    fun removeEntityWithLocalId(localId: Long)
 
     @Query("Delete from credentials_sync_meta where syncId = :syncId")
     fun removeEntityWithSyncId(syncId: String)

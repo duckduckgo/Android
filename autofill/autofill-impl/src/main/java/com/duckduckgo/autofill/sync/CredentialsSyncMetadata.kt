@@ -32,7 +32,7 @@ class CredentialsSyncMetadata @Inject constructor(
 
     fun initializeDatabase(autofillIds: List<Long>) {
         val entitiesMetadata = autofillIds.map {
-            CredentialsSyncMetadataEntity(id = it, deleted_at = null, modified_at = SyncDateProvider.now())
+            CredentialsSyncMetadataEntity(localId = it, deleted_at = null, modified_at = SyncDateProvider.now())
         }
         dao.initialize(entitiesMetadata)
     }
@@ -41,18 +41,18 @@ class CredentialsSyncMetadata @Inject constructor(
         dao.insert(entity)
     }
 
-    fun getSyncMetadata(id: Long): CredentialsSyncMetadataEntity? {
-        return dao.getSyncMetadata(id)
+    fun getSyncMetadata(localId: Long): CredentialsSyncMetadataEntity? {
+        return dao.getSyncMetadata(localId)
     }
 
     fun getSyncMetadata(syncId: String): CredentialsSyncMetadataEntity? {
         return dao.getSyncMetadata(syncId)
     }
 
-    fun createSyncId(id: Long): String {
-        var syncId = getSyncMetadata(id)?.syncId
+    fun createSyncId(localId: Long): String {
+        var syncId = getSyncMetadata(localId)?.syncId
         if (syncId == null) {
-            val entity = CredentialsSyncMetadataEntity(id = id, deleted_at = null, modified_at = null)
+            val entity = CredentialsSyncMetadataEntity(localId = localId, deleted_at = null, modified_at = null)
             dao.insert(entity)
             syncId = entity.syncId
         }
@@ -67,23 +67,23 @@ class CredentialsSyncMetadata @Inject constructor(
         return dao.getRemovedIdsSince(since)
     }
 
-    fun onEntityChanged(id: Long) {
+    fun onEntityChanged(localId: Long) {
         val currentTime = DatabaseDateFormatter.iso8601()
-        val syncId = dao.getSyncMetadata(id)
+        val syncId = dao.getSyncMetadata(localId)
         Timber.i("SyncMetadata: onEntityChanged $syncId")
         if (syncId != null) {
             syncId.modified_at = currentTime
             Timber.i("SyncMetadata: onEntityChanged modified_at ${syncId.syncId} and... ${syncId.modified_at}")
             dao.insert(syncId)
         } else {
-            val entity = CredentialsSyncMetadataEntity(id = id, deleted_at = null, modified_at = currentTime)
+            val entity = CredentialsSyncMetadataEntity(localId = localId, deleted_at = null, modified_at = currentTime)
             dao.insert(entity)
             Timber.i("SyncMetadata: onEntityChanged modified_at ${entity.syncId} and... ${entity.modified_at}")
         }
     }
 
-    fun onEntityRemoved(id: Long) {
-        val syncId = dao.getSyncMetadata(id)
+    fun onEntityRemoved(localId: Long) {
+        val syncId = dao.getSyncMetadata(localId)
         Timber.i("SyncMetadata: onEntityRemoved $syncId")
         if (syncId != null) {
             syncId.deleted_at = DatabaseDateFormatter.iso8601()
@@ -96,11 +96,11 @@ class CredentialsSyncMetadata @Inject constructor(
         dao.removeDeletedEntities(before)
     }
 
-    fun removeEntityWithLocalId(id: Long) {
-        dao.removeEntityWithLocalId(id)
+    fun removeEntityWith(localId: Long) {
+        dao.removeEntityWithLocalId(localId)
     }
 
-    fun removeEntityWithSyncId(syncId: String) {
+    fun removeEntityWith(syncId: String) {
         dao.removeEntityWithSyncId(syncId)
     }
 

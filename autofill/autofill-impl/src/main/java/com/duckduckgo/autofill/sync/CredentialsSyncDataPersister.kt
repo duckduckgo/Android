@@ -106,9 +106,9 @@ class CredentialsSyncDataPersister @Inject constructor(
 
             if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
                 credentialsSyncMetadata.getAllCredentials().filter { it.modified_at != null }.forEach {
-                    Timber.i("CRIS: post-dedup adding to syncmetadata localId ${it.id}")
+                    Timber.i("CRIS: post-dedup adding to syncmetadata localId ${it.localId}")
                     credentialsSyncMetadata.addOrUpdate(
-                        CredentialsSyncMetadataEntity(id = it.id, modified_at = SyncDateProvider.now(), deleted_at = null),
+                        CredentialsSyncMetadataEntity(localId = it.localId, modified_at = SyncDateProvider.now(), deleted_at = null),
                     )
                 }
             }

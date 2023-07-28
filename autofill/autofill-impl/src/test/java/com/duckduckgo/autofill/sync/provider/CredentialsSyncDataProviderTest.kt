@@ -148,7 +148,7 @@ internal class CredentialsSyncDataProviderTest {
             credentialsSyncMetadata.addOrUpdate(
                 CredentialsSyncMetadataEntity(
                     syncId = credential.id!!.toString(),
-                    id = credential.id!!,
+                    localId = credential.id!!,
                     deleted_at = null,
                     modified_at = lastUpdatedIso,
                 ),

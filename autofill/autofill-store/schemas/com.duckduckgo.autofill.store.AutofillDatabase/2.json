@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "9c4994ac3b3a5af8b1b895253571b71a",
+    "identityHash": "025eaf40dbcd2c5d766b24582f9babdb",
     "entities": [
       {
         "tableName": "autofill_exceptions",
@@ -32,7 +32,7 @@
       },
       {
         "tableName": "credentials_sync_meta",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`syncId` TEXT NOT NULL, `id` INTEGER NOT NULL, `deleted_at` TEXT, `modified_at` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`syncId` TEXT NOT NULL, `localId` INTEGER NOT NULL, `deleted_at` TEXT, `modified_at` TEXT, PRIMARY KEY(`localId`))",
         "fields": [
           {
             "fieldPath": "syncId",
@@ -41,8 +41,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "localId",
+            "columnName": "localId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -62,7 +62,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id"
+            "localId"
           ]
         },
         "indices": [
@@ -82,7 +82,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9c4994ac3b3a5af8b1b895253571b71a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '025eaf40dbcd2c5d766b24582f9babdb')"
     ]
   }
 }

@@ -313,7 +313,7 @@ internal class CredentialsSyncTest {
                 credentialsSyncMetadata.addOrUpdate(
                     CredentialsSyncMetadataEntity(
                         syncId = this.toString(),
-                        id = this,
+                        localId = this,
                         deleted_at = null,
                         modified_at = lastUpdatedIso,
                     ),

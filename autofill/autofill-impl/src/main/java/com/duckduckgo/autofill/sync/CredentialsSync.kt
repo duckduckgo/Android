@@ -94,7 +94,7 @@ class CredentialsSync @Inject constructor(
 
         secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.details?.id?.let { autofillId ->
             credentialsSyncMetadata.addOrUpdate(
-                CredentialsSyncMetadataEntity(syncId = remoteId, id = autofillId, deleted_at = null, modified_at = null),
+                CredentialsSyncMetadataEntity(syncId = remoteId, localId = autofillId, deleted_at = null, modified_at = null),
             )
         }
     }
@@ -117,14 +117,14 @@ class CredentialsSync @Inject constructor(
         )
         secureStorage.updateWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.details?.id?.let { autofillId ->
             credentialsSyncMetadata.addOrUpdate(
-                CredentialsSyncMetadataEntity(syncId = remoteId, id = autofillId, deleted_at = null, modified_at = null),
+                CredentialsSyncMetadataEntity(syncId = remoteId, localId = autofillId, deleted_at = null, modified_at = null),
             )
         }
     }
 
     suspend fun deleteCredential(localId: Long) {
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(localId)
-        credentialsSyncMetadata.removeEntityWithLocalId(localId)
+        credentialsSyncMetadata.removeEntityWith(localId)
     }
 
     suspend fun updateModifiedAt(syncId: String, modifiedAt: String?) {
@@ -142,7 +142,7 @@ class CredentialsSync @Inject constructor(
         }
 
         val values2 = credentialsSyncMetadata.getChangesSince(since).map {
-            secureStorage.getWebsiteLoginDetailsWithCredentials(it.id)
+            secureStorage.getWebsiteLoginDetailsWithCredentials(it.localId)
         }.filterNotNull()
 
         val removedItems = credentialsSyncMetadata.getRemovedEntitiesSince(since).map {
