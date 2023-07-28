@@ -32,6 +32,8 @@
         android:layout_margin="@dimen/keyline_4"
         android:text="@string/sync_login_device_hint"/>
 
+    <!-- TODO: (cbarreiro) barcode scanner goes here -->
+
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/readQRCode"
         android:layout_width="match_parent"

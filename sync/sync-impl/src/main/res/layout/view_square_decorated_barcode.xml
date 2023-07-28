@@ -14,21 +14,100 @@
   ~ limitations under the License.
   -->
 
-<merge
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.journeyapps.barcodescanner.BarcodeView
         android:id="@+id/barcodeView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/frame"
+        android:importantForAccessibility="no"
+        android:padding="40dp"
         android:scaleType="fitXY"
-        android:padding="40dp"/>
+        app:srcCompat="@drawable/frame" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cameraStatusContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#222222"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/permissionsGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/listItemTrailingIconWidth"
+            android:visibility="gone"
+            app:constraint_referenced_ids="cameraStatusIcon,cameraStatusTitle,cameraStatusDescription,goToSettingsButton,cameraStatusContainer" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/cameraUnavailableGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/listItemTrailingIconWidth"
+            android:visibility="gone"
+            app:constraint_referenced_ids="cameraStatusIcon,cameraStatusTitle,cameraStatusContainer" />
+
+        <ImageView
+            android:id="@+id/cameraStatusIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toTopOf="@+id/cameraStatusTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:srcCompat="@drawable/camera_permission" />
+
+        <TextView
+            android:id="@+id/cameraStatusTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/sync_camera_permission_required"
+            android:textColor="@color/gray30"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/cameraStatusDescription"
+            app:layout_constraintTop_toBottomOf="@+id/cameraStatusIcon"
+            tools:layout_editor_absoluteX="20dp" />
+
+        <TextView
+            android:id="@+id/cameraStatusDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:gravity="center"
+            android:text="@string/sync_camera_permission_required_description"
+            android:textColor="@color/gray30"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/goToSettingsButton"
+            app:layout_constraintTop_toBottomOf="@+id/cameraStatusTitle"
+            tools:layout_editor_absoluteX="20dp" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/goToSettingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@string/sync_go_to_settings"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cameraStatusDescription" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </merge>

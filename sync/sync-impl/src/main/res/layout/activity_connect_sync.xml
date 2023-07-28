@@ -34,20 +34,17 @@
         android:visibility="gone"
         tools:ignore="ContentDescription"/>
 
+    <com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeView
+        android:id="@+id/qrCodeReader"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:zxing_preview_scaling_strategy="centerCrop"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         android:text="@string/sync_connect_scan_qr_hint"/>
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/readQRCode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="Read QR code"
-        app:leadingIcon="@drawable/ic_qr_24"
-        app:leadingIconBackground="circular"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/readTextCode"
