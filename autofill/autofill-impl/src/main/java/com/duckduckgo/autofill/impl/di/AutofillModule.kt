@@ -22,20 +22,19 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.AutofillDatabase
+import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.InternalTestUserStore
+import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
-import com.duckduckgo.autofill.store.SecureStoreBackedAutofillStore
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.securestorage.api.SecureStorage
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -49,20 +48,14 @@ class AutofillModule {
     @Provides
     fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
 
-    @Provides
     @SingleInstanceIn(AppScope::class)
-    fun autofillStore(
-        secureStorage: SecureStorage,
-        context: Context,
-        internalTestUserChecker: InternalTestUserChecker,
-        autofillUrlMatcher: AutofillUrlMatcher,
-    ): AutofillStore {
-        return SecureStoreBackedAutofillStore(
-            secureStorage = secureStorage,
-            lastUpdatedTimeProvider = RealLastUpdatedTimeProvider(),
-            autofillPrefsStore = RealAutofillPrefsStore(context, internalTestUserChecker),
-            autofillUrlMatcher = autofillUrlMatcher,
-        )
+    @Provides
+    fun provide(): LastUpdatedTimeProvider = RealLastUpdatedTimeProvider()
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideAutofillPrefsStore(context: Context, internalTestUserChecker: InternalTestUserChecker): AutofillPrefsStore {
+        return RealAutofillPrefsStore(context, internalTestUserChecker)
     }
 
     @Provides

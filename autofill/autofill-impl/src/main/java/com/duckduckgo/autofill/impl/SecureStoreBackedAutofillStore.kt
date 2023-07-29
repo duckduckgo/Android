@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.store
+package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
@@ -26,16 +26,24 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class SecureStoreBackedAutofillStore(
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class SecureStoreBackedAutofillStore @Inject constructor(
     private val secureStorage: SecureStorage,
     private val lastUpdatedTimeProvider: LastUpdatedTimeProvider,
     private val autofillPrefsStore: AutofillPrefsStore,
