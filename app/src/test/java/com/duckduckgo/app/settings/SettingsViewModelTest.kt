@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
@@ -402,25 +403,14 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenNetPSettingClickedAndInternalBuildInBetaThenEmitCommandLaunchNetPManagementScreenAndPixelFired() = runTest {
-        whenever(networkProtectionWaitlist.getState()).thenReturn(NetPWaitlistState.InBeta)
+    fun whenNetPSettingClickedThenReturnScreenForCurrentState() = runTest {
+        val testScreen = object : ActivityParams {}
+        whenever(networkProtectionWaitlist.getScreenForCurrentState()).thenReturn(testScreen)
+
         testee.commands().test {
             testee.onNetPSettingClicked()
 
-            assertEquals(Command.LaunchNetPManagementScreen, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_NETP_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNetPSettingClickedAndInternalBuildNotInBetaThenEmitCommandLaunchNetPWaitlistAndPixelFired() = runTest {
-        whenever(networkProtectionWaitlist.getState()).thenReturn(NetPWaitlistState.NotUnlocked)
-        testee.commands().test {
-            testee.onNetPSettingClicked()
-
-            assertEquals(Command.LaunchNetPWaitlist, awaitItem())
+            assertEquals(Command.LaunchNetPWaitlist(testScreen), awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_NETP_PRESSED)
 
             cancelAndConsumeRemainingEvents()

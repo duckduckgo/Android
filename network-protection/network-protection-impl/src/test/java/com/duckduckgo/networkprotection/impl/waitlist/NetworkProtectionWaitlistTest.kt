@@ -57,33 +57,45 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenSubFeatureNotTreatedThenStateIsAlwaysNotUnlocked() = runTest {
+    fun whenSubFeatureNotTreatedAndAuthTokenSetThenInBeta() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
 
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
+        assertEquals(InBeta, networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenSubFeatureNotTreatedAndWaitlistTokenThenNoUnlocked() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
 
         netPWaitlistRepository.setWaitlistToken("fakeToken")
         assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
     }
 
     @Test
-    fun whenFeatureNotTreatedThenStateIsAlwaysNotUnlocked() = runTest {
+    fun whenFeatureNotTreatedAndAuthTokenSetThenInBeta() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
 
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
+        assertEquals(InBeta, networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenFeatureNotTreatedAndWaitlistTokenSetThenNotUnlocked() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
 
         netPWaitlistRepository.setWaitlistToken("fakeToken")
         assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
     }
 
     @Test
-    fun whenFeatureAndSubFeatureNotTreatedAndAuthTokenSetStateNotUnlocked() {
+    fun whenFeatureAndSubFeatureNotTreatedAndAuthTokenSetStateInBeta() {
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
+        assertEquals(InBeta, networkProtectionWaitlist.getState())
     }
 
     @Test
