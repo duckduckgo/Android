@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.autofill.impl.SecureStoreBackedAutofillStore
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.AutofillPrefsStore
@@ -36,9 +35,7 @@ import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
 import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
-import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.securestorage.api.SecureStorage
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides

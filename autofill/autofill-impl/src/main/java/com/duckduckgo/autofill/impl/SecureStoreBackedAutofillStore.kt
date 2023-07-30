@@ -28,8 +28,8 @@ import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
