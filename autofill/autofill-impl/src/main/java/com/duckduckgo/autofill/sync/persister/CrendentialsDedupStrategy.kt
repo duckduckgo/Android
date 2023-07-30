@@ -46,11 +46,11 @@ class credentialsDedupStrategy constructor(
                 runBlocking(dispatchers.io()) {
                     val remoteLoginCredential: LoginCredentials = credentialsSyncMapper.toLoginCredential(
                         remoteEntry,
-                        lastModified = credentials.last_modified, // remoteEntry.last_modified is always null
+                        lastModified = credentials.last_modified,
                     )
                     val localMatchesForDomain = credentialsSync.getCredentialsForDomain(remoteLoginCredential.domain)
                     if (localMatchesForDomain.isNullOrEmpty()) {
-                        Timber.d("Sync-autofill-Persist-Strategy: >>> no duplicate found, save remote $remoteLoginCredential")
+                        Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
                     } else {
                         var duplicateFound = false
@@ -59,14 +59,14 @@ class credentialsDedupStrategy constructor(
                             when {
                                 result == null -> {}
                                 result <= 0 -> {
-                                    Timber.d("Sync-autofill-Persist-Strategy: >>> duplicate found $localMatch, update remote $remoteLoginCredential")
+                                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update remote $remoteLoginCredential")
                                     remoteLoginCredential.copy(id = localMatch.id).also {
                                         credentialsSync.updateCredentials(it, remoteId = remoteEntry.id)
                                     }
                                     duplicateFound = true
                                 }
                                 result > 0 -> {
-                                    Timber.d("Sync-autofill-Persist-Strategy: >>> duplicate found $localMatch, update local $localMatch")
+                                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update local $localMatch")
                                     val localCredential = credentialsSync.getCredentialWithId(localMatch.id!!)!!
                                     credentialsSync.updateCredentials(
                                         loginCredential = localCredential,
@@ -78,7 +78,7 @@ class credentialsDedupStrategy constructor(
                         }
                         if (duplicateFound) return@runBlocking
 
-                        Timber.d("Sync-autofill-Persist-Strategy: >>> no duplicate found, save remote $remoteLoginCredential")
+                        Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
                     }
                 }

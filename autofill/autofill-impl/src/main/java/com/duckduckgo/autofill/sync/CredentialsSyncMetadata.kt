@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.sync
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.di.scopes.AppScope
@@ -45,10 +44,6 @@ class CredentialsSyncMetadata @Inject constructor(
         return dao.getSyncMetadata(localId)
     }
 
-    fun getSyncMetadata(syncId: String): CredentialsSyncMetadataEntity? {
-        return dao.getSyncMetadata(syncId)
-    }
-
     fun createSyncId(localId: Long): String {
         var syncId = getSyncMetadata(localId)?.syncId
         if (syncId == null) {
@@ -68,9 +63,8 @@ class CredentialsSyncMetadata @Inject constructor(
     }
 
     fun onEntityChanged(localId: Long) {
-        val currentTime = DatabaseDateFormatter.iso8601()
+        val currentTime = SyncDateProvider.now()
         val syncId = dao.getSyncMetadata(localId)
-        Timber.i("SyncMetadata: onEntityChanged $syncId")
         if (syncId != null) {
             syncId.modified_at = currentTime
             Timber.i("SyncMetadata: onEntityChanged modified_at ${syncId.syncId} and... ${syncId.modified_at}")
@@ -84,10 +78,9 @@ class CredentialsSyncMetadata @Inject constructor(
 
     fun onEntityRemoved(localId: Long) {
         val syncId = dao.getSyncMetadata(localId)
-        Timber.i("SyncMetadata: onEntityRemoved $syncId")
         if (syncId != null) {
-            syncId.deleted_at = DatabaseDateFormatter.iso8601()
-            Timber.i("SyncMetadata: updateDeletedAt ${syncId.deleted_at}")
+            syncId.deleted_at = SyncDateProvider.now()
+            Timber.i("SyncMetadata: onEntityRemoved -> updateDeletedAt ${syncId.deleted_at}")
             dao.insert(syncId)
         }
     }

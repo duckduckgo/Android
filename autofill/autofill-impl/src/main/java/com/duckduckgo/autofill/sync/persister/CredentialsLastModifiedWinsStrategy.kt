@@ -49,13 +49,13 @@ class CredentialsLastModifiedWinsStrategy constructor(
                             remoteEntry = entry,
                             lastModified = clientModifiedSince,
                         )
-                        Timber.d("Sync-autofill-Persist-Strategy: >>> save remote $newCredential")
+                        Timber.d("Sync-autofill-Persist: >>> save remote $newCredential")
                         credentialsSync.saveCredential(newCredential, remoteId = entry.id)
                         updatedEntities.add(entry.id)
                     } else {
                         val localId = localCredential.id!!
                         if (entry.isDeleted()) {
-                            Timber.d("Sync-autofill-Persist-Strategy: >>> delete local ${localCredential.id}")
+                            Timber.d("Sync-autofill-Persist: >>> delete local ${localCredential.id}")
                             credentialsSync.deleteCredential(localId)
                             return@forEach
                         }
@@ -68,7 +68,7 @@ class CredentialsLastModifiedWinsStrategy constructor(
                             clientModifiedSince,
                         )
                         if (!hasDataChangedWhileSyncing) {
-                            Timber.d("Sync-autofill-Persist-Strategy: >>> update with remote $remoteCredentials")
+                            Timber.d("Sync-autofill-Persist: >>> update with remote $remoteCredentials")
                             credentialsSync.updateCredentials(remoteCredentials, entry.id)
                             updatedEntities.add(entry.id)
                         }

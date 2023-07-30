@@ -44,7 +44,7 @@ class CredentialsLocalWinsStrategy constructor(
                     if (localCredentials == null) {
                         if (entry.isDeleted()) return@runBlocking
                         val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null, credentials.last_modified)
-                        Timber.d("Sync-autofill-Persist-Strategy: >>> no local, save remote $updatedCredentials")
+                        Timber.d("Sync-autofill-Persist: >>> no local, save remote $updatedCredentials")
                         credentialsSync.saveCredential(updatedCredentials, entry.id)
                     }
                 }

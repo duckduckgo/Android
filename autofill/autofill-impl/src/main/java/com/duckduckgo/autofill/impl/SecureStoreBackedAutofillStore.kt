@@ -187,7 +187,6 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     }
 
     override suspend fun deleteCredentials(id: Long): LoginCredentials? {
-        Timber.i("CRIS: Deleting login credentials with id %d", id)
         val existingCredential = secureStorage.getWebsiteLoginDetailsWithCredentials(id)
         secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
         syncCredentialsListener.onCredentialRemoved(id)

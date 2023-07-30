@@ -46,7 +46,7 @@ class CredentialsSync @Inject constructor(
             credentialsSyncMetadata.initializeDatabase(autofillIds)
         }
 
-        Timber.i("Sync-autofill-Persist: initMetadata ${credentialsSyncMetadata.getAllObservable().firstOrNull()}")
+        Timber.i("CredentialsSync: initMetadata ${credentialsSyncMetadata.getAllObservable().firstOrNull()}")
     }
 
     suspend fun getUpdatesSince(since: String): List<LoginCredentialEntry> {
@@ -61,7 +61,7 @@ class CredentialsSync @Inject constructor(
     suspend fun getCredentialWithSyncId(syncId: String): LoginCredentials? {
         val localId = credentialsSyncMetadata.getLocalId(syncId)
         val localCredential = localId?.let { secureStorage.getWebsiteLoginDetailsWithCredentials(localId)?.toLoginCredentials() }
-        Timber.d("Sync-autofill-Persist-Strategy: >>> getCredentialWithSyncId $syncId - credential $localCredential found")
+        Timber.d("CredentialsSync: >>> getCredentialWithSyncId $syncId - credential $localCredential found")
         return localCredential
     }
 
@@ -127,18 +127,12 @@ class CredentialsSync @Inject constructor(
         credentialsSyncMetadata.removeEntityWith(localId)
     }
 
-    suspend fun updateModifiedAt(syncId: String, modifiedAt: String?) {
-        credentialsSyncMetadata.getSyncMetadata(syncId)?.let {
-            credentialsSyncMetadata.addOrUpdate(it.copy(modified_at = modifiedAt))
-        }
-    }
-
     private suspend fun allContentAsUpdates() = secureStorage.websiteLoginDetailsWithCredentials().firstOrNull().mapToLoginCredentialEntry()
 
     private suspend fun changesSince(since: String): List<LoginCredentialEntry> {
-        Timber.d("Sync-autofill: generating changes since $since")
+        Timber.d("CredentialsSync: generating changes since $since")
         credentialsSyncMetadata.getAllCredentials().forEach {
-            Timber.i("Sync-autofill: syncMetadata $it")
+            Timber.i("CredentialsSync: syncMetadata $it")
         }
 
         val values2 = credentialsSyncMetadata.getChangesSince(since).map {
@@ -149,8 +143,8 @@ class CredentialsSync @Inject constructor(
             LoginCredentialEntry(id = it.syncId, deleted = "1", client_last_modified = it.deleted_at)
         }
 
-        Timber.d("Sync-autofill: modifiedSince2: $values2")
-        Timber.d("Sync-autofill: modifiedSince removed: $removedItems")
+        Timber.d("CredentialsSync: modifiedSince2: $values2")
+        Timber.d("CredentialsSync: modifiedSince removed: $removedItems")
 
         return values2.mapToLoginCredentialEntry() + removedItems
     }

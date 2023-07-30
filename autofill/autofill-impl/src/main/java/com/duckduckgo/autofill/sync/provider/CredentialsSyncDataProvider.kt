@@ -17,12 +17,12 @@
 package com.duckduckgo.autofill.sync.provider
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncStore
+import com.duckduckgo.autofill.sync.SyncDateProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableDataProvider
@@ -65,7 +65,7 @@ class CredentialsSyncDataProvider @Inject constructor(
             )
             val patch = SyncCredentialsRequest(
                 credentials = credentialsUpdates,
-                client_timestamp = DatabaseDateFormatter.iso8601(),
+                client_timestamp = SyncDateProvider.now(),
             )
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
             SyncChangesRequest(CREDENTIALS, allDataJSON, credentialsSyncStore.serverModifiedSince)

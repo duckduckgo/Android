@@ -65,10 +65,6 @@ internal class FakeSecureStorage : SecureStorage {
         return flowOf(entities)
     }
 
-    override suspend fun websiteLoginDetailsWithCredentialsModifiedSince(since: Long): List<WebsiteLoginDetailsWithCredentials> {
-        return entities.filter { (it.details.lastUpdatedMillis ?: 0) > since }
-    }
-
     override suspend fun updateWebsiteLoginDetailsWithCredentials(
         websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
     ): WebsiteLoginDetailsWithCredentials? {

@@ -575,10 +575,6 @@ class SecureStoreBackedAutofillStoreTest {
             }
         }
 
-        override suspend fun websiteLoginDetailsWithCredentialsModifiedSince(since: Long): List<WebsiteLoginDetailsWithCredentials> {
-            TODO("Not yet implemented")
-        }
-
         override suspend fun updateWebsiteLoginDetailsWithCredentials(
             websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
         ): WebsiteLoginDetailsWithCredentials {

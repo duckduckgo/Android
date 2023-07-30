@@ -44,7 +44,7 @@ class CredentialsRemoteWinsStrategy constructor(
                     if (localCredential != null) {
                         val localId = localCredential.id!!
                         if (entry.isDeleted()) {
-                            Timber.d("Sync-autofill-Persist-Strategy: >>> delete local $localId")
+                            Timber.d("Sync-autofill-Persist: >>> delete local $localId")
                             credentialsSync.deleteCredential(localId)
                             return@runBlocking
                         }
@@ -56,7 +56,7 @@ class CredentialsRemoteWinsStrategy constructor(
                             remoteEntry = entry,
                             lastModified = credentials.last_modified,
                         )
-                        Timber.d("Sync-autofill-Persist-Strategy: >>> save remote $updatedCredentials")
+                        Timber.d("Sync-autofill-Persist: >>> save remote $updatedCredentials")
                         credentialsSync.saveCredential(updatedCredentials, entry.id)
                     }
                 }
