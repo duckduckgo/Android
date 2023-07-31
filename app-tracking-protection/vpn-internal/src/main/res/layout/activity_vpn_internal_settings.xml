@@ -60,13 +60,6 @@
                     app:showSwitch="true"/>
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/vpn_intercept_dns_traffic_toggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="Intercept DNS"
-                    app:showSwitch="true"/>
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                     android:id="@+id/vpnAlwaysSetDNSToggle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
