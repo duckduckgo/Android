@@ -67,19 +67,19 @@ In the built output you will see these dramatic differences in the bundled code 
 
 ### Features scope injection utilities
 
-To handle the difference in scope injection we expose multiple utilities which behave differently per browser in src/utils.js and src/wrapper-utils.js. for Firefox the code exposed handles [xrays correctly](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts) without needing the features to be authored differently.
+To handle the difference in scope injection we expose multiple utilities which behave differently per browser in src/utils.js and `ContentFeature` base class. for Firefox the code exposed handles [xrays correctly](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts) without needing the features to be authored differently.
 
-- defineProperty()
+- `ContentFeature.defineProperty()`
     - defineProperty(object, propertyName, descriptor) behaves the same as Object.defineProperty(object, propertyName, descriptor)
     - The difference is for Firefox we export the relevant functions so it can go across the xray
-- wrapProperty(object, propertyName, descriptor)
+- `ContentFeature.wrapProperty(object, propertyName, descriptor)`
     - a simple wrapper around defineProperty() that ignores non-existing properties and retains unspecified descriptor keys.
-    - Example usage: `wrapProperty('Navigator.prototype.userAgent', { get: () => 'fakeUA' })`
-- wrapMethod(object, propertyName, wrapperFn)
+    - Example usage: `this.wrapProperty('Navigator.prototype.userAgent', { get: () => 'fakeUA' })`
+- `ContentFeature.wrapMethod(object, propertyName, wrapperFn)`
     - overrides a native method. wrapperFn() will be called in place of the original method. The original method will be passed as the first argument.
     - Example usage:
     ```
-    wrapMethod(Permissions.prototype, 'query', async function (originalFn, queryObject) {
+    this.wrapMethod(Permissions.prototype, 'query', async function (originalFn, queryObject) {
         if (queryObject.name === 'blocked-permission') {
             return {
                 name: queryObject.name,
@@ -88,16 +88,6 @@ To handle the difference in scope injection we expose multiple utilities which b
             }
         }
         return await nativeImpl.call(this, queryObject)
-    })
-    ```
-
-- wrapConstructor(object, propertyName, wrapperFn)
-    - overrides a constructor. It works similar to `wrapMethod()`, but handles extra constructor-specific details
-    - Example usage:
-    ```
-    wrapConstructor(window, 'Date', function (originalConstructor, ...args) {
-        // always return the same date
-        return new originalConstructor(1995, 11, 17)
     })
     ```
 
@@ -110,7 +100,7 @@ To handle the difference in scope injection we expose multiple utilities which b
 
 ### Testing Locally
 
-Depending on what you are changing, you may need to run the build processes locally, or individual tests. 
+Depending on what you are changing, you may need to run the build processes locally, or individual tests.
 The following all run within GitHub Actions when you create a pull request, but you can run them locally as well.
 
 - eslint
