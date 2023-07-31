@@ -66,9 +66,13 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 
     private lateinit var coroutineScope: CoroutineScope
 
-    private var cameraBlockedDrawable = ContextCompat.getDrawable(context, R.drawable.camera_blocked)
+    private val cameraBlockedDrawable by lazy {
+        ContextCompat.getDrawable(context, R.drawable.camera_blocked)
+    }
 
-    private var cameraPermissionDeniedDrawable = ContextCompat.getDrawable(context, R.drawable.camera_permission)
+    private val cameraPermissionDeniedDrawable by lazy {
+        ContextCompat.getDrawable(context, R.drawable.camera_permission)
+    }
 
     private val binding = ViewSquareDecoratedBarcodeBinding.inflate(LayoutInflater.from(context), this)
 

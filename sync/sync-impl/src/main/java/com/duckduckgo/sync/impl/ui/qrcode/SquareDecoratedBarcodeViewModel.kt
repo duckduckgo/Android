@@ -16,12 +16,11 @@
 
 package com.duckduckgo.sync.impl.ui.qrcode
 
-import android.annotation.SuppressLint
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.CheckPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.RequestPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.ViewState.PermissionsGranted
@@ -44,8 +43,7 @@ class PermissionDeniedWrapper @Inject constructor() {
     var permissionAlreadyDenied = false
 }
 
-@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: PermissionDeniedWrapper) : ViewModel(), DefaultLifecycleObserver {
+class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: PermissionDeniedWrapper) : ViewModel(), MainProcessLifecycleObserver {
 
     sealed class Command {
         object CheckCameraAvailable : Command()
