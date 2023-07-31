@@ -21,19 +21,15 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="8dp">
+    android:background="?attr/selectableItemBackground"
+    android:minHeight="@dimen/twoLineItemHeight">
 
     <ImageView
         android:id="@+id/deviceShieldAppEntryIcon"
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_1"
+        android:layout_marginStart="@dimen/keyline_4"
         android:importantForAccessibility="no"
-        android:paddingBottom="@dimen/keyline_1"
         android:src="@drawable/ic_globe_gray_16dp"
         app:layout_constraintBottom_toBottomOf="@id/deviceShieldAppExclusionReason"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +55,7 @@
         app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintTop_toBottomOf="@+id/deviceShieldAppEntryName"
         app:textType="secondary"
-        app:typography="caption"
+        app:typography="body2"
         tools:text="App issues may occur if enabled" />
 
     <com.duckduckgo.mobile.android.ui.view.SwitchView
@@ -67,6 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginEnd="@dimen/keyline_4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -89,7 +86,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.541"
         app:layout_constraintVertical_chainStyle="packed"
-        app:typography="body1"
+        app:typography="h4"
         tools:text="Facebook" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
