@@ -84,6 +84,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
+                    updateSelectedFireAnimation(it.selectedFireAnimation)
                 }
             }.launchIn(lifecycleScope)
 
@@ -102,6 +103,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
         binding.automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
+    }
+
+    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
+        val subtitle = getString(fireAnimation.nameResId)
+        binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
     }
 
     private fun processCommand(it: Command) {
