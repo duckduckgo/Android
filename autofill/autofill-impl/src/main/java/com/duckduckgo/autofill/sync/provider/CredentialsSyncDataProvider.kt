@@ -24,8 +24,7 @@ import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncStore
 import com.duckduckgo.autofill.sync.SyncDateProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChangesRequest
-import com.duckduckgo.sync.api.engine.SyncableDataProvider
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -56,8 +55,14 @@ class CredentialsSyncDataProvider @Inject constructor(
     }
 
     private fun formatUpdates(updates: List<LoginCredentialEntry>): SyncChangesRequest {
+        val modifiedSince = if (credentialsSyncStore.serverModifiedSince == "0") {
+            ModifiedSince.FirstSync
+        } else {
+            ModifiedSince.Timestamp(credentialsSyncStore.serverModifiedSince)
+        }
+
         return if (updates.isEmpty()) {
-            SyncChangesRequest(CREDENTIALS, "", credentialsSyncStore.serverModifiedSince)
+            SyncChangesRequest(CREDENTIALS, "", modifiedSince)
         } else {
             val credentialsUpdates = SyncCredentialsUpdates(
                 updates = updates,
@@ -68,7 +73,7 @@ class CredentialsSyncDataProvider @Inject constructor(
                 client_timestamp = SyncDateProvider.now(),
             )
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
-            SyncChangesRequest(CREDENTIALS, allDataJSON, credentialsSyncStore.serverModifiedSince)
+            SyncChangesRequest(CREDENTIALS, allDataJSON, modifiedSince)
         }
     }
 

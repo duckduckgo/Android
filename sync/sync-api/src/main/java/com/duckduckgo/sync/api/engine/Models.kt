@@ -18,15 +18,25 @@ package com.duckduckgo.sync.api.engine
 
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 
+sealed class ModifiedSince(open val value: String) {
+    object FirstSync : ModifiedSince(value = "0")
+    data class Timestamp(override val value: String) : ModifiedSince(value)
+}
+
 // TODO: https://app.asana.com/0/0/1204958251694095/f
-data class SyncChangesRequest(val type: SyncableType, val jsonString: String, val modifiedSince: String) {
+data class SyncChangesRequest(val type: SyncableType, val jsonString: String, val modifiedSince: ModifiedSince) {
 
     fun isEmpty(): Boolean {
         return this.jsonString.isEmpty()
     }
+
+    fun isFirstSync(): Boolean {
+        return this.modifiedSince is ModifiedSince.FirstSync
+    }
+
     companion object {
         fun empty(): SyncChangesRequest {
-            return SyncChangesRequest(BOOKMARKS, "", "")
+            return SyncChangesRequest(BOOKMARKS, "", ModifiedSince.FirstSync)
         }
     }
 }
