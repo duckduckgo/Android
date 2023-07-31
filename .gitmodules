@@ -1,6 +1,3 @@
-[submodule "app/src/main/cpp/third-party/bloom_cpp"]
-	path = httpsupgrade/httpsupgrade-impl/src/main/cpp/bloom_cpp
-	url = https://github.com/duckduckgo/bloom_cpp.git
 [submodule "submodules/privacy-grade"]
 	path = submodules/privacy-grade
 	url = https://github.com/duckduckgo/privacy-grade
