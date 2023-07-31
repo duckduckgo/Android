@@ -36,7 +36,7 @@
         android:id="@+id/cameraStatusContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/almostBlackDark"
+        android:background="?daxColorSurface"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -76,7 +76,6 @@
             android:layout_marginBottom="8dp"
             android:gravity="center"
             android:text="@string/sync_camera_permission_required"
-            android:textColor="@color/gray30"
             app:typography="h2"
             app:layout_constraintBottom_toTopOf="@+id/cameraStatusDescription"
             app:layout_constraintTop_toBottomOf="@+id/cameraStatusIcon"
@@ -89,7 +88,6 @@
             android:layout_marginHorizontal="20dp"
             android:gravity="center"
             android:text="@string/sync_camera_permission_required_description"
-            android:textColor="@color/gray30"
             app:typography="body1"
             app:layout_constraintBottom_toTopOf="@+id/goToSettingsButton"
             app:layout_constraintTop_toBottomOf="@+id/cameraStatusTitle"
