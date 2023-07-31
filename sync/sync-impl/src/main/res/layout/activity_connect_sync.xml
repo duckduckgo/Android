@@ -37,8 +37,7 @@
     <com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeView
         android:id="@+id/qrCodeReader"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:zxing_preview_scaling_strategy="centerCrop"/>
+        android:layout_height="0dp"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:layout_width="match_parent"
