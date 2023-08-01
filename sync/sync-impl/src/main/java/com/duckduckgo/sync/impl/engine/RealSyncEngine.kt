@@ -111,7 +111,6 @@ class RealSyncEngine @Inject constructor(
         getChanges().forEach {
             if (it.isEmpty()) {
                 Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
-                // syncStateRepository.updateSyncState(SUCCESS)
             } else {
                 Timber.d("Sync-Feature: ${it.type}  sending local data $it")
                 patchLocalChanges(it, LOCAL_WINS)
@@ -164,13 +163,11 @@ class RealSyncEngine @Inject constructor(
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 Timber.d("Sync-Feature: patch failed ${result.reason}")
-                // syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
                 Timber.d("Sync-Feature: patch success")
                 persistChanges(result.data, conflictResolution)
-                // syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }
@@ -183,13 +180,11 @@ class RealSyncEngine @Inject constructor(
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
-                // syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
                 Timber.d("Sync-Feature: get success")
                 persistChanges(result.data, conflictResolution)
-                // syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }
