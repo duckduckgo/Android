@@ -47,7 +47,7 @@ class RealCredentialsSyncStore @Inject constructor(private val context: Context)
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     companion object {
-        const val FILENAME = "com.duckduckgo.credentials.sync.store"
+        const val FILENAME = "com.duckduckgo.autofill.sync"
         private const val KEY_MODIFIED_SINCE = "KEY_MODIFIED_SINCE"
         private const val KEY_START_TIMESTAMP = "KEY_START_TIMESTAMP"
         private const val KEY_END_TIMESTAMP = "KEY_END_TIMESTAMP"
