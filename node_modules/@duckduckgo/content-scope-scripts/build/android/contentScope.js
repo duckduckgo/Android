@@ -7099,6 +7099,9 @@
             if (this.getFeatureSettingEnabled('safariObject')) {
                 this.safariObjectFix();
             }
+            if (this.getFeatureSettingEnabled('messageHandlers')) {
+                this.messageHandlersFix();
+            }
         }
 
         /**
@@ -7187,6 +7190,48 @@
                 const settings = this.getFeatureSettingEnabled('permissions');
                 permissionsFix(settings);
             }
+        }
+
+        /**
+         * Support for proxying `window.webkit.messageHandlers`
+         */
+        messageHandlersFix () {
+            const settings = this.getFeatureSetting('messageHandlers');
+
+            // Do nothing if `messageHandlers` is absent
+            if (!globalThis.webkit?.messageHandlers) return
+
+            const proxy = new Proxy(globalThis.webkit.messageHandlers, {
+                get (target, messageName, receiver) {
+                    const handlerName = String(messageName);
+
+                    // handle known message names, such as DDG webkit messaging
+                    if (settings.handlerStrategies.reflect.includes(handlerName)) {
+                        return Reflect.get(target, messageName, receiver)
+                    }
+
+                    if (settings.handlerStrategies.undefined.includes(handlerName)) {
+                        return undefined
+                    }
+
+                    if (settings.handlerStrategies.polyfill.includes('*') ||
+                        settings.handlerStrategies.polyfill.includes(handlerName)
+                    ) {
+                        return {
+                            postMessage () {
+                                return Promise.resolve({})
+                            }
+                        }
+                    }
+                    // if we get here, we couldn't handle the message handler name, so we opt for doing nothing.
+                    // It's unlikely we'll ever reach here, since `["*"]' should be present
+                }
+            });
+
+            globalThis.webkit = {
+                ...globalThis.webkit,
+                messageHandlers: proxy
+            };
         }
     }
 
