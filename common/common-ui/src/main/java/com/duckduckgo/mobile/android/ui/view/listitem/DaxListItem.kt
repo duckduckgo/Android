@@ -30,7 +30,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.SwitchView
-import com.duckduckgo.mobile.android.ui.view.button.Size
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
@@ -41,7 +40,7 @@ import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 abstract class DaxListItem(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int
+    defStyleAttr: Int,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     internal abstract val primaryText: DaxTextView
@@ -76,7 +75,7 @@ abstract class DaxListItem(
 
     /** Sets primary text truncation */
     fun setPrimaryTextTruncation(truncated: Boolean) {
-        if (truncated){
+        if (truncated) {
             primaryText.maxLines = 1
             primaryText.ellipsize = TruncateAt.END
         } else {
@@ -117,8 +116,8 @@ abstract class DaxListItem(
     }
 
     /** Sets the leading icon image visibility */
-    fun setLeadingIconVisibility(visible: Boolean){
-        if (visible){
+    fun setLeadingIconVisibility(visible: Boolean) {
+        if (visible) {
             leadingIconContainer.show()
         } else {
             leadingIconContainer.gone()
@@ -138,7 +137,6 @@ abstract class DaxListItem(
         }
         setLeadingIconVisibility(true)
     }
-
 
     /** Sets the leading icon background image type */
     fun setLeadingIconSize(imageSize: LeadingIconSize) {
@@ -255,6 +253,4 @@ abstract class DaxListItem(
             }
         }
     }
-
-
 }

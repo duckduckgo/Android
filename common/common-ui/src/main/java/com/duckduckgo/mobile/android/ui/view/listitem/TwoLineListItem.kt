@@ -19,25 +19,13 @@
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
-import androidx.core.view.children
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.SwitchView
-import com.duckduckgo.mobile.android.ui.view.button.Size
-import com.duckduckgo.mobile.android.ui.view.button.Size.Small
 import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.listitem.DaxListItem.LeadingIconSize.Medium
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -129,5 +117,4 @@ class TwoLineListItem @JvmOverloads constructor(
             recycle()
         }
     }
-
 }

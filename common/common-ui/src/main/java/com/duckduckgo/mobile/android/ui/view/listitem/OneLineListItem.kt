@@ -103,7 +103,4 @@ class OneLineListItem @JvmOverloads constructor(
             recycle()
         }
     }
-
-
-
 }
