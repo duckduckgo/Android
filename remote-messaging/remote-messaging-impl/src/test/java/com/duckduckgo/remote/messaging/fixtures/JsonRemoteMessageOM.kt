@@ -89,6 +89,21 @@ object JsonRemoteMessageOM {
         secondaryAction = secondaryAction,
     )
 
+    fun promoSingleActionJsonContent(
+        titleText: String = "title",
+        descriptionText: String = "description",
+        placeholder: String = "NewForMacAndWindows",
+        actionText: String = "Action",
+        action: JsonMessageAction = jsonMessageAction(),
+    ) = JsonContent(
+        messageType = "promo_single_action",
+        titleText = titleText,
+        descriptionText = descriptionText,
+        placeholder = placeholder,
+        actionText = actionText,
+        action = action,
+    )
+
     fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)
 
     fun aJsonMessage(
