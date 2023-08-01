@@ -30,6 +30,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.SwitchView
+import com.duckduckgo.mobile.android.ui.view.button.Size
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
@@ -138,6 +139,14 @@ abstract class DaxListItem(
         setLeadingIconVisibility(true)
     }
 
+
+    /** Sets the leading icon background image type */
+    fun setLeadingIconSize(imageSize: LeadingIconSize) {
+        val size = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+        leadingIcon.layoutParams.width = size
+        leadingIcon.layoutParams.height = size
+    }
+
     /** Returns the binding of the leading icon */
     fun leadingIcon() = leadingIcon
 
@@ -218,6 +227,33 @@ abstract class DaxListItem(
         setEnabledOpacity(enabled)
         recursiveEnable(enabled)
         super.setEnabled(enabled)
+    }
+
+    enum class LeadingIconSize {
+        Small,
+        Medium,
+        Large,
+        ;
+
+        companion object {
+            fun from(size: Int): LeadingIconSize {
+                // same order as attrs-lists.xml
+                return when (size) {
+                    0 -> Small
+                    1 -> Medium
+                    2 -> Large
+                    else -> Medium
+                }
+            }
+
+            fun dimension(size: LeadingIconSize): Int {
+                return when (size) {
+                    Small -> R.dimen.listItemImageSmallSize
+                    Medium -> R.dimen.listItemImageMediumSize
+                    Large -> R.dimen.listItemImageLargeSize
+                }
+            }
+        }
     }
 
 

@@ -31,7 +31,10 @@ import androidx.core.view.children
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.SwitchView
+import com.duckduckgo.mobile.android.ui.view.button.Size
+import com.duckduckgo.mobile.android.ui.view.button.Size.Small
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.listitem.DaxListItem.LeadingIconSize.Medium
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.ui.view.show
@@ -96,6 +99,15 @@ class TwoLineListItem @JvmOverloads constructor(
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
                 setLeadingIconBackgroundType(getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0))
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
+                val imageSize = LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
+                setLeadingIconSize(imageSize)
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
+                setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
             setPillVisible(getBoolean(R.styleable.TwoLineListItem_showBetaPill, false))

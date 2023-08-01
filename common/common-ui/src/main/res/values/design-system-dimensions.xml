@@ -50,7 +50,9 @@
 
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
-    <dimen name="listItemImageSize">24dp</dimen>
+    <dimen name="listItemImageSmallSize">16dp</dimen>
+    <dimen name="listItemImageMediumSize">24dp</dimen>
+    <dimen name="listItemImageLargeSize">40dp</dimen>
     <dimen name="listItemTrailingIconWidth">52dp</dimen>
     <dimen name="oneLineItemHeight">44dp</dimen>
     <dimen name="twoLineItemHeight">64dp</dimen>
