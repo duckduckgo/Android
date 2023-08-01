@@ -18,7 +18,7 @@ package com.duckduckgo.sync.api.engine
 
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 
-// TODO: document api
+// TODO: https://app.asana.com/0/0/1204958251694095/f
 data class SyncChangesRequest(val type: SyncableType, val jsonString: String, val modifiedSince: String) {
 
     fun isEmpty(): Boolean {
@@ -40,13 +40,12 @@ data class SyncChangesResponse(val type: SyncableType, val jsonString: String) {
     }
 }
 
-// TODO: document api
 enum class SyncableType(val field: String) {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),
 }
 
-// TODO: document api, when is it expected each case?
+// TODO: document api, when is it expected each case? https://app.asana.com/0/0/1204958251694095/f
 sealed class SyncMergeResult<out R> {
 
     data class Success<out T>(val data: T) : SyncMergeResult<T>()
