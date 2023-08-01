@@ -31,7 +31,7 @@
     <string name="netpManagementConnectionDetailsIp">IP Address</string>
 
     <!-- NetP enabled notification -->
-    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">Network Protection is enabled and routing all device traffic through %1$s.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">Network Protection is enabled and routing all device traffic through &lt;b>%1$s&lt;/b>.</string>
 
     <!-- Reconnect -->
     <string name="netpMessageReconnecting">Network Protection interrupted. Attempting to reconnect now…</string>

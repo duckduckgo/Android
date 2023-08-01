@@ -24,9 +24,8 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
@@ -34,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.notification.NotificationActionReportIssue
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -47,14 +47,15 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     private val context: Context,
     private val resources: Resources,
     private val repository: AppTrackerBlockingStatsRepository,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val appTrackingProtection: AppTrackingProtection,
+    private val networkProtectionState: NetworkProtectionState,
     appTpEnabledNotificationIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
 
     private val notificationPendingIntent by lazy { appTpEnabledNotificationIntentProvider.getOnPressNotificationIntent() }
 
     override fun getInitialContent(): VpnEnabledNotificationContent? {
-        return if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) }) {
+        return if (runBlocking { appTrackingProtection.isEnabled() }) {
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 message = SpannableStringBuilder(),
@@ -74,7 +75,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
         return repository.getVpnTrackers({ dateOfLastHour() })
             .map { trackersBlocked ->
                 val trackingApps = trackersBlocked.trackingApps()
-                val isEnabled = vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
+                val isEnabled = appTrackingProtection.isEnabled()
                 val notificationText = if (!isEnabled) {
                     ""
                 } else if (trackersBlocked.isEmpty() || trackingApps.isEmpty()) {
@@ -96,7 +97,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
     }
 
     override fun isActive(): Boolean {
-        return runBlocking { vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN) }
+        return runBlocking { appTrackingProtection.isEnabled() && !networkProtectionState.isEnabled() }
     }
 
     // This fun interface is provided just for testing purposes

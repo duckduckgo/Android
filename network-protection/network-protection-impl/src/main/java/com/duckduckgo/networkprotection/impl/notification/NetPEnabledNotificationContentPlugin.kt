@@ -21,14 +21,16 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
+import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationPriority
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -43,17 +45,20 @@ import kotlinx.coroutines.runBlocking
 @SingleInstanceIn(VpnScope::class)
 class NetPEnabledNotificationContentPlugin @Inject constructor(
     private val resources: Resources,
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val netpRepository: NetworkProtectionRepository,
+    private val networkProtectionState: NetworkProtectionState,
+    private val appTrackingProtection: AppTrackingProtection,
     netPIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
     override fun getInitialContent(): VpnEnabledNotificationContent? {
-        return if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
+        return if (runBlocking { networkProtectionState.isEnabled() }) {
             val serverLocation = netpRepository.serverDetails?.location ?: "Unknown"
             return VpnEnabledNotificationContent(
-                title = SpannableStringBuilder(resources.getString(R.string.netpEnabledNotificationTitle, serverLocation)),
+                title = SpannableStringBuilder(
+                    HtmlCompat.fromHtml(resources.getString(R.string.netpEnabledNotificationTitle, serverLocation), FROM_HTML_MODE_LEGACY),
+                ),
                 message = SpannableStringBuilder(),
                 onNotificationPressIntent = onPressIntent,
                 notificationAction = null,
@@ -73,7 +78,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
     }
 
     override fun isActive(): Boolean {
-        return runBlocking { vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN) }
+        return runBlocking { networkProtectionState.isEnabled() && !appTrackingProtection.isEnabled() }
     }
 
     // This fun interface is provided just for testing purposes
