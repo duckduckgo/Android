@@ -58,8 +58,8 @@ class CredentialsSyncMetadata @Inject constructor(
         return dao.getLocalId(syncId)
     }
 
-    fun getRemovedEntitiesSince(since: String): List<CredentialsSyncMetadataEntity> {
-        return dao.getRemovedIdsSince(since)
+    fun getRemovedEntitiesSince(sinceIso8601: String): List<CredentialsSyncMetadataEntity> {
+        return dao.getRemovedIdsSince(sinceIso8601)
     }
 
     fun onEntityChanged(localId: Long) {
@@ -85,8 +85,8 @@ class CredentialsSyncMetadata @Inject constructor(
         }
     }
 
-    fun removeDeletedEntities(before: String) {
-        dao.removeDeletedEntities(before)
+    fun removeDeletedEntities(beforeIso8601: String) {
+        dao.removeDeletedEntities(beforeIso8601)
     }
 
     fun removeEntityWith(localId: Long) {
@@ -97,8 +97,8 @@ class CredentialsSyncMetadata @Inject constructor(
         dao.removeEntityWithSyncId(syncId)
     }
 
-    fun getChangesSince(since: String): List<CredentialsSyncMetadataEntity> {
-        return dao.getChangesSince(since)
+    fun getChangesSince(sinceIso8601: String): List<CredentialsSyncMetadataEntity> {
+        return dao.getChangesSince(sinceIso8601)
     }
 
     fun getAllObservable(): Flow<List<CredentialsSyncMetadataEntity>> {
