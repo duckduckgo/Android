@@ -28,7 +28,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
-class credentialsDedupStrategy constructor(
+class CredentialsDedupStrategy constructor(
     private val credentialsSync: CredentialsSync,
     private val credentialsSyncMapper: CredentialsSyncMapper,
     private val dispatchers: DispatcherProvider,

@@ -47,7 +47,7 @@ import org.junit.runner.RunWith
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-internal class credentialsDedupStrategyTest {
+internal class CredentialsDedupStrategyTest {
 
     @get:Rule
     @Suppress("unused")
@@ -63,7 +63,7 @@ internal class credentialsDedupStrategyTest {
         db.close()
     }
 
-    private val testee = credentialsDedupStrategy(
+    private val testee = CredentialsDedupStrategy(
         credentialsSync = credentialsSync,
         credentialsSyncMapper = CredentialsSyncMapper(FakeCrypto()),
         dispatchers = coroutineRule.testDispatcherProvider,
