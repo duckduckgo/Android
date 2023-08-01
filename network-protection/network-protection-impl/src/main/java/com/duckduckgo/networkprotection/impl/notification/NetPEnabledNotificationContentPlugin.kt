@@ -30,6 +30,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -43,14 +44,16 @@ import kotlinx.coroutines.runBlocking
 class NetPEnabledNotificationContentPlugin @Inject constructor(
     private val resources: Resources,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val netpRepository: NetworkProtectionRepository,
     netPIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
     override fun getInitialContent(): VpnEnabledNotificationContent? {
         return if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
+            val serverLocation = netpRepository.serverDetails?.location ?: "Unknown"
             return VpnEnabledNotificationContent(
-                title = SpannableStringBuilder(resources.getString(R.string.netpEnabledNotificationTitle)),
+                title = SpannableStringBuilder(resources.getString(R.string.netpEnabledNotificationTitle, serverLocation)),
                 message = SpannableStringBuilder(),
                 onNotificationPressIntent = onPressIntent,
                 notificationAction = null,
