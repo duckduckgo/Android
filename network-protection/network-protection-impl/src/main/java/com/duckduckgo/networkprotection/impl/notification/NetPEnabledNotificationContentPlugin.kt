@@ -32,7 +32,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -45,7 +44,6 @@ import kotlinx.coroutines.runBlocking
 @SingleInstanceIn(VpnScope::class)
 class NetPEnabledNotificationContentPlugin @Inject constructor(
     private val resources: Resources,
-    private val netpRepository: NetworkProtectionRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val appTrackingProtection: AppTrackingProtection,
     netPIntentProvider: IntentProvider,
@@ -53,12 +51,13 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
     override fun getInitialContent(): VpnEnabledNotificationContent? {
-        return if (runBlocking { networkProtectionState.isEnabled() }) {
-            val serverLocation = netpRepository.serverDetails?.location ?: "Unknown"
+        return if (isActive()) {
+            val title = networkProtectionState.serverLocation()?.run {
+                HtmlCompat.fromHtml(resources.getString(R.string.netpEnabledNotificationTitle, this), FROM_HTML_MODE_LEGACY)
+            } ?: resources.getString(R.string.netpEnabledNotificationInitialTitle)
+
             return VpnEnabledNotificationContent(
-                title = SpannableStringBuilder(
-                    HtmlCompat.fromHtml(resources.getString(R.string.netpEnabledNotificationTitle, serverLocation), FROM_HTML_MODE_LEGACY),
-                ),
+                title = SpannableStringBuilder(title),
                 message = SpannableStringBuilder(),
                 onNotificationPressIntent = onPressIntent,
                 notificationAction = null,
