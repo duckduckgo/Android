@@ -48,8 +48,7 @@ class ActionAdapter constructor(
             OldActionType.DISMISS.toString() -> JsonActionType.DISMISS.jsonValue
             OldActionType.APP_TP_ONBOARDING.toString() -> JsonActionType.APP_TP_ONBOARDING.jsonValue
             OldActionType.PLAYSTORE.toString() -> JsonActionType.PLAYSTORE.jsonValue
-            OldActionType.URL.toString() -> JsonActionType.SHARE.jsonValue
-            OldActionType.SHARE.toString() -> JsonActionType.URL.jsonValue
+            OldActionType.URL.toString() -> JsonActionType.URL.jsonValue
             else -> actionType
         }
     }
@@ -66,6 +65,5 @@ class ActionAdapter constructor(
         DEFAULT_BROWSER,
         DISMISS,
         APP_TP_ONBOARDING,
-        SHARE,
     }
 }

@@ -52,7 +52,10 @@ class SharePromoLinkRMFBroadCastReceiver : BroadcastReceiver() {
     private fun onPromoLinkSharedSuccessfully(messageId: String) {
         coroutineScope.launch {
             remoteMessagingRepository.dismissMessage(messageId)
-            val pixelsParams: Map<String, String> = mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to messageId, Pixel.PixelParameter.SUCCESS to "true")
+            val pixelsParams: Map<String, String> = mapOf(
+                Pixel.PixelParameter.MESSAGE_SHOWN to messageId,
+                Pixel.PixelParameter.ACTION_SUCCESS to "true",
+            )
             pixel.fire(AppPixelName.REMOTE_MESSAGE_SHARED, pixelsParams)
         }
     }
