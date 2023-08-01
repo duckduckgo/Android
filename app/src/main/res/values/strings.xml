@@ -760,4 +760,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Drag down from the top and tap the back button to exit full screen</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Close all tabs?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Are you sure you want to close all tabs?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Cancel</string>
+    <string name="closeAppTabsConfirmationDialogClose">Close</string>
 </resources>
