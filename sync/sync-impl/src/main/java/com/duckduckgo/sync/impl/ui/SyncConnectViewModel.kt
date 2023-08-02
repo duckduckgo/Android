@@ -25,7 +25,6 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ShowQRCode
 import javax.inject.*
@@ -65,17 +64,10 @@ class SyncConnectViewModel @Inject constructor(
     }
 
     sealed class Command {
-        object ReadQRCode : Command()
         object ShowQRCode : Command()
         object ReadTextCode : Command()
         object LoginSucess : Command()
         object Error : Command()
-    }
-
-    fun onReadQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(ReadQRCode)
-        }
     }
 
     fun onReadTextCodeClicked() {

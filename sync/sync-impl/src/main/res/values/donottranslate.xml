@@ -95,5 +95,9 @@
     <string name="sync_show_code_copy">Copy Code</string>
     <string name="sync_show_code_copy_hint">Use this code after choosing "Manually Enter Code" during sync setup on a second device</string>
     <string name="sync_code_copied_message">Recovery Code Copied</string>
+    <string name="sync_camera_permission_required">Camera Permission is Required</string>
+    <string name="sync_camera_unavailable">Camera Unavailable</string>
+    <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
+    <string name="sync_go_to_settings">Go to Settings</string>
 
 </resources>
