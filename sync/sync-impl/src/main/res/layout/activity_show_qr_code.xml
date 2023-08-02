@@ -73,7 +73,6 @@
         app:layout_constraintTop_toBottomOf="@id/qrCodeContainer"
         app:typography="body1"
         android:layout_margin="@dimen/keyline_4"
-        android:gravity="center"
         android:text="@string/sync_connect_scan_qr_hint"/>
 
 
