@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            app:typography="caption"
+            app:typography="body1"
             app:textType="secondary"
             android:text="@string/sync_enter_code_hint"/>
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -107,7 +107,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/hintBarrier"
-        app:icon="@drawable/ic_copy"
+        app:icon="@drawable/ic_paste"
         android:gravity="center"
         app:buttonSize="small"
         android:layout_margin="@dimen/keyline_4"
