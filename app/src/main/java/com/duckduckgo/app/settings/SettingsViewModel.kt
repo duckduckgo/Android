@@ -226,9 +226,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onNetPSettingClicked() {
-        val screen = networkProtectionWaitlist.getScreenForCurrentState()
-        viewModelScope.launch { command.send(Command.LaunchNetPWaitlist(screen)) }
-        pixel.fire(SETTINGS_NETP_PRESSED)
+        viewModelScope.launch {
+            val screen = networkProtectionWaitlist.getScreenForCurrentState()
+            command.send(Command.LaunchNetPWaitlist(screen))
+            pixel.fire(SETTINGS_NETP_PRESSED)
+        }
     }
 
     private fun currentViewState(): ViewState {

@@ -34,7 +34,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetPInviteCodeScreenNoParams
+import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
@@ -125,7 +125,7 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun openInviteCode() {
-        globalActivityStarter.start(this, NetPInviteCodeScreenNoParams)
+        globalActivityStarter.start(this, NetPWaitlistInvitedScreenNoParams)
         finish()
     }
 }

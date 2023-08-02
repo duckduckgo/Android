@@ -3,8 +3,9 @@ package com.duckduckgo.networkprotection.impl.waitlist
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.networkprotection.api.NetPInviteCodeScreenNoParams
+import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
@@ -28,13 +29,14 @@ class NetworkProtectionWaitlistTest {
     private lateinit var netPWaitlistRepository: NetPWaitlistRepository
     private lateinit var netPRemoteFeature: NetPRemoteFeature
     private lateinit var networkProtectionWaitlist: NetworkProtectionWaitlist
+    private val networkProtectionState: NetworkProtectionState = mock()
 
     @Before
     fun setup() {
         netPWaitlistRepository = FakeNetPWaitlistRepository()
         netPRemoteFeature = FakeNetPRemoteFeatureFactory.create()
 
-        networkProtectionWaitlist = NetworkProtectionWaitlistImpl(netPRemoteFeature, appBuildConfig, netPWaitlistRepository)
+        networkProtectionWaitlist = NetworkProtectionWaitlistImpl(netPRemoteFeature, appBuildConfig, netPWaitlistRepository, networkProtectionState)
     }
 
     @Test
@@ -135,7 +137,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenGetScreenForStateAndNotTreatedThenReturnWaitlistScreen() {
+    fun whenGetScreenForStateAndNotTreatedThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
 
@@ -143,7 +145,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenGetScreenForStateNotTreatedAndInternalThenReturnWaitlistScreen() {
+    fun whenGetScreenForStateNotTreatedAndInternalThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
@@ -152,7 +154,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenGetScreenForStateSubFeatureDisabledAndInternalThenReturnWaitlistScreen() {
+    fun whenGetScreenForStateSubFeatureDisabledAndInternalThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
@@ -161,7 +163,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenGetScreenForStateFeatureDisabledAndInternalThenReturnWaitlistScreen() {
+    fun whenGetScreenForStateFeatureDisabledAndInternalThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
@@ -170,7 +172,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenGetScreenForStateAndTreatedThenReturnWaitlistScreen() {
+    fun whenGetScreenForStateAndTreatedThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
 
@@ -178,16 +180,43 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsNotAcceptedThenReturnInviteCodeScreen() {
+    fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsNotAcceptedAndOnboardedThenReturnInviteCodeScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
         netPWaitlistRepository.setAuthenticationToken("token")
 
-        assertEquals(NetPInviteCodeScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+        assertEquals(NetworkProtectionManagementScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
     }
 
     @Test
-    fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsAcceptedThenReturnNetPManagementScreen() {
+    fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsNotAcceptedAndNotOnboardedThenReturnInviteCodeScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPWaitlistRepository.setAuthenticationToken("token")
+
+        assertEquals(NetPWaitlistInvitedScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
+    fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsAcceptedAndOnboardedThenReturnNetPManagementScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPWaitlistRepository.setAuthenticationToken("token")
+        netPWaitlistRepository.acceptWaitlistTerms()
+
+        assertEquals(NetworkProtectionManagementScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
+    fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsAcceptedAndNotOnboardedThenReturnNetPManagementScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
         netPWaitlistRepository.setAuthenticationToken("token")

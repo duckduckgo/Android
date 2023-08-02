@@ -33,7 +33,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.networkprotection.api.NetPInviteCodeScreenNoParams
+import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
@@ -41,13 +41,13 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.about.NetPTermsScreenNoParams
-import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpInviteCodeBinding
-import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeActivity.Companion.NetPInviteCodeScreenWithOriginPixels
+import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpWaitlistInvitedBinding
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command.EnterInviteCode
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command.OpenNetP
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command.OpenTermsScreen
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.ViewState
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistInvitedActivity.Companion.NetPWaitlistInvitedScreenWithOriginPixels
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeActivity.Launch.NetPWaitlistRedeemCodeScreenNoParams
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import javax.inject.Inject
@@ -55,9 +55,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(NetPInviteCodeScreenNoParams::class)
-@ContributeToActivityStarter(NetPInviteCodeScreenWithOriginPixels::class)
-class NetPInviteCodeActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(NetPWaitlistInvitedScreenNoParams::class)
+@ContributeToActivityStarter(NetPWaitlistInvitedScreenWithOriginPixels::class)
+class NetPWaitlistInvitedActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -66,7 +66,7 @@ class NetPInviteCodeActivity : DuckDuckGoActivity() {
     @Inject lateinit var pixel: Pixel
 
     private val viewModel: NetPInviteCodeViewModel by bindViewModel()
-    private val binding: ActivityNetpInviteCodeBinding by viewBinding()
+    private val binding: ActivityNetpWaitlistInvitedBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -97,7 +97,7 @@ class NetPInviteCodeActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
 
         // fire pixels
-        intent?.getActivityParams(NetPInviteCodeScreenWithOriginPixels::class.java)?.pixelNames?.forEach { pixelName ->
+        intent?.getActivityParams(NetPWaitlistInvitedScreenWithOriginPixels::class.java)?.pixelNames?.forEach { pixelName ->
             pixel.fire(pixelName)
         }
     }
@@ -156,6 +156,6 @@ class NetPInviteCodeActivity : DuckDuckGoActivity() {
         /**
          * Use this model to launch the NetP invite code screen and fire impression pixels
          */
-        internal data class NetPInviteCodeScreenWithOriginPixels(val pixelNames: List<String>) : ActivityParams
+        internal data class NetPWaitlistInvitedScreenWithOriginPixels(val pixelNames: List<String>) : ActivityParams
     }
 }

@@ -31,7 +31,7 @@ interface NetworkProtectionWaitlist {
      *
      * @return the [ActivityParams] for the activity to launch that corresponds to the current waitlist beta
      */
-    fun getScreenForCurrentState(): ActivityParams
+    suspend fun getScreenForCurrentState(): ActivityParams
 
     sealed class NetPWaitlistState {
         object NotUnlocked : NetPWaitlistState()

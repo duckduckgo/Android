@@ -20,8 +20,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetPInviteCodeScreenNoParams
+import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
@@ -38,6 +39,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
     private val netPRemoteFeature: NetPRemoteFeature,
     private val appBuildConfig: AppBuildConfig,
     private val netPWaitlistRepository: NetPWaitlistRepository,
+    private val networkProtectionState: NetworkProtectionState,
 ) : NetworkProtectionWaitlist {
     override fun getState(): NetPWaitlistState {
         if (isTreated()) {
@@ -53,13 +55,13 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
         return NotUnlocked
     }
 
-    override fun getScreenForCurrentState(): ActivityParams {
+    override suspend fun getScreenForCurrentState(): ActivityParams {
         return when (getState()) {
             InBeta -> {
-                if (netPWaitlistRepository.didAcceptWaitlistTerms()) {
+                if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams
                 } else {
-                    NetPInviteCodeScreenNoParams
+                    NetPWaitlistInvitedScreenNoParams
                 }
             }
             JoinedWaitlist, NotUnlocked, PendingInviteCode -> NetPWaitlistScreenNoParams

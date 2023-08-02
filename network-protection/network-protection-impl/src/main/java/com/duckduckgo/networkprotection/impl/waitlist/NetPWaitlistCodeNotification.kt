@@ -28,12 +28,13 @@ import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WAITLIST_NOTIFICATION_LAUNCHED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WAITLIST_NOTIFICATION_LAUNCHED_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeActivity.Companion.NetPInviteCodeScreenWithOriginPixels
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistInvitedActivity.Companion.NetPWaitlistInvitedScreenWithOriginPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
@@ -45,11 +46,12 @@ class NetPWaitlistCodeNotification @Inject constructor(
     private val netPWaitlistManager: NetPWaitlistManager,
     private val notificationSender: Provider<NotificationSender>,
     private val coroutineScope: CoroutineScope,
+    private val networkProtectionState: NetworkProtectionState,
 ) : SchedulableNotification {
     override val id: String = "com.duckduckgo.netp.waitlist"
 
     override suspend fun canShow(): Boolean {
-        return netPWaitlistManager.getStateSync() == InBeta
+        return netPWaitlistManager.getStateSync() == InBeta && !networkProtectionState.isOnboarded()
     }
 
     override suspend fun buildSpecification(): NotificationSpec {
@@ -112,7 +114,7 @@ class NetPWaitlistNotificationPlugin @Inject constructor(
     override fun getLaunchIntent(): PendingIntent? {
         val intent = globalActivityStarter.startIntent(
             context,
-            NetPInviteCodeScreenWithOriginPixels(
+            NetPWaitlistInvitedScreenWithOriginPixels(
                 listOf(NETP_WAITLIST_NOTIFICATION_LAUNCHED_DAILY.pixelName, NETP_WAITLIST_NOTIFICATION_LAUNCHED.pixelName),
             ),
         )
