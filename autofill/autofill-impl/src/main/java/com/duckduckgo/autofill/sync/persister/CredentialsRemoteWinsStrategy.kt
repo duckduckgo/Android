@@ -37,8 +37,8 @@ class CredentialsRemoteWinsStrategy constructor(
     ): SyncMergeResult<Boolean> {
         Timber.d("Sync-autofill-Persist: ======= MERGING REMOTEWINS =======")
         return kotlin.runCatching {
-            credentials.entries.forEach { entry ->
-                runBlocking(dispatchers.io()) {
+            runBlocking(dispatchers.io()) {
+                credentials.entries.forEach { entry ->
                     val localCredential = credentialsSync.getCredentialWithSyncId(entry.id)
                     if (localCredential != null) {
                         processExistingEntry(localCredential, entry, credentials.last_modified)

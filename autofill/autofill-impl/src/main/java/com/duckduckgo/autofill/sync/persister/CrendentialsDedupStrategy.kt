@@ -18,9 +18,7 @@ package com.duckduckgo.autofill.sync.persister
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.sync.CredentialsSync
-import com.duckduckgo.autofill.sync.CredentialsSyncMapper
-import com.duckduckgo.autofill.sync.credentialsSyncEntries
+import com.duckduckgo.autofill.sync.*
 import com.duckduckgo.autofill.sync.isDeleted
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
@@ -28,7 +26,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
-class CredentialsDedupStrategy constructor(
+class CredentialsDedupStrategy(
     private val credentialsSync: CredentialsSync,
     private val credentialsSyncMapper: CredentialsSyncMapper,
     private val dispatchers: DispatcherProvider,
@@ -40,43 +38,19 @@ class CredentialsDedupStrategy constructor(
         Timber.d("Sync-autofill-Persist: ======= MERGING DEDUPLICATION =======")
 
         return kotlin.runCatching {
-            credentials.entries.forEach { remoteEntry ->
-                if (remoteEntry.isDeleted()) return@forEach
+            runBlocking(dispatchers.io()) {
+                credentials.entries.forEach { remoteEntry ->
+                    if (remoteEntry.isDeleted()) return@forEach
 
-                runBlocking(dispatchers.io()) {
-                    val remoteLoginCredential: LoginCredentials = credentialsSyncMapper.toLoginCredential(
-                        remoteEntry,
-                        lastModified = credentials.last_modified,
-                    )
+                    val remoteLoginCredential = mapRemoteToLocalLoginCredential(remoteEntry, credentials.last_modified)
+
                     val localMatchesForDomain = credentialsSync.getCredentialsForDomain(remoteLoginCredential.domain)
-                    if (localMatchesForDomain.isNullOrEmpty()) {
+                    if (localMatchesForDomain.isEmpty()) {
                         Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
                     } else {
-                        var duplicateFound = false
-                        localMatchesForDomain.forEach { localMatch ->
-                            val result = compareCredentials(localMatch, remoteLoginCredential)
-                            when {
-                                result == null -> {}
-                                result <= 0 -> {
-                                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update remote $remoteLoginCredential")
-                                    remoteLoginCredential.copy(id = localMatch.id).also {
-                                        credentialsSync.updateCredentials(it, remoteId = remoteEntry.id)
-                                    }
-                                    duplicateFound = true
-                                }
-                                result > 0 -> {
-                                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update local $localMatch")
-                                    val localCredential = credentialsSync.getCredentialWithId(localMatch.id!!)!!
-                                    credentialsSync.updateCredentials(
-                                        loginCredential = localCredential,
-                                        remoteId = remoteEntry.id,
-                                    )
-                                    duplicateFound = true
-                                }
-                            }
-                        }
-                        if (duplicateFound) return@runBlocking
+                        val duplicateFound = findDuplicates(localMatchesForDomain, remoteLoginCredential, remoteEntry.id)
+                        if (duplicateFound) return@forEach
 
                         Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
@@ -90,6 +64,37 @@ class CredentialsDedupStrategy constructor(
             Timber.d("Sync-autofill-Persist: merging completed")
             Success(true)
         }
+    }
+
+    private suspend fun findDuplicates(
+        localMatchesForDomain: List<LoginCredentials>,
+        remoteLoginCredential: LoginCredentials,
+        remoteId: String,
+    ): Boolean {
+        var duplicateFound = false
+        localMatchesForDomain.forEach { localMatch ->
+            val result = compareCredentials(localMatch, remoteLoginCredential)
+            when {
+                result == null -> {}
+                result <= 0 -> {
+                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update remote $remoteLoginCredential")
+                    remoteLoginCredential.copy(id = localMatch.id).also {
+                        credentialsSync.updateCredentials(it, remoteId = remoteId)
+                    }
+                    duplicateFound = true
+                }
+                result > 0 -> {
+                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update local $localMatch")
+                    val localCredential = credentialsSync.getCredentialWithId(localMatch.id!!)!!
+                    credentialsSync.updateCredentials(
+                        loginCredential = localCredential,
+                        remoteId = remoteId,
+                    )
+                    duplicateFound = true
+                }
+            }
+        }
+        return duplicateFound
     }
 
     private fun compareCredentials(
@@ -109,5 +114,15 @@ class CredentialsDedupStrategy constructor(
         }
 
         return comparison
+    }
+    private fun mapRemoteToLocalLoginCredential(
+        remoteEntry: CredentialsSyncEntryResponse,
+        clientModifiedSince: String,
+    ): LoginCredentials {
+        return credentialsSyncMapper.toLoginCredential(
+            remoteEntry = remoteEntry,
+            localId = null,
+            lastModified = clientModifiedSince,
+        )
     }
 }

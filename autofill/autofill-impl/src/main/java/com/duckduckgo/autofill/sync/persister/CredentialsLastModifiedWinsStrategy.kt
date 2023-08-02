@@ -88,7 +88,11 @@ class CredentialsLastModifiedWinsStrategy(
         }
     }
 
-    private fun mapRemoteToLocalLoginCredential(remoteEntry: CredentialsSyncEntryResponse, localId: Long, clientModifiedSince: String): LoginCredentials {
+    private fun mapRemoteToLocalLoginCredential(
+        remoteEntry: CredentialsSyncEntryResponse,
+        localId: Long,
+        clientModifiedSince: String,
+    ): LoginCredentials {
         return credentialsSyncMapper.toLoginCredential(
             remoteEntry = remoteEntry,
             localId = localId,
