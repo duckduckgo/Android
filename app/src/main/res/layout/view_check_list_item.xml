@@ -22,9 +22,9 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:paddingStart="@dimen/keyline_4"
-    android:paddingTop="@dimen/twoLineItemVerticalPadding"
+    android:paddingTop="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/twoLineItemVerticalPadding"
+    android:paddingBottom="@dimen/keyline_2"
     android:minHeight="@dimen/twoLineItemHeight">
 
     <ImageView
