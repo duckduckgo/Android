@@ -29,7 +29,8 @@
     <ScrollView
         android:fillViewport="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
                 android:layout_width="match_parent"
@@ -77,20 +78,20 @@
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Everyday protection for everything you do online"
-                        app:secondaryText="Network Protection uses the WireGuard protocol to secure all your network activity across your device, protecting your browsing, app activity and beyond."/>
+                        app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_1"
+                        app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_1"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Fast, reliable and easy to use"
-                        app:secondaryText="Network Protection comes built-in to the DuckDuckGo browser. Connect to the nearest with one click."/>
+                        app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_2"
+                        app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_2"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="No logging y default"
-                        app:secondaryText="Unlike other VPNs, we do not store logs of your data. It's in our Privacy Policy."/>
+                        app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_3"
+                        app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_3"/>
 
             </LinearLayout>
 
@@ -115,6 +116,18 @@
         </LinearLayout>
 
     </ScrollView>
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/disclaimerFooter"
+            app:typography="caption"
+            app:textType="secondary"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingBottom="@dimen/keyline_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:text="@string/netpBetaDisclaimerFooter"
+    />
 </LinearLayout>
 
 

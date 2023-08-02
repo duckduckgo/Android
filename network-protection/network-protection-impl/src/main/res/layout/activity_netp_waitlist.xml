@@ -29,7 +29,8 @@
     <ScrollView
         android:fillViewport="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
                 android:layout_width="match_parent"
@@ -81,20 +82,20 @@
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Join the waitlist"
-                        app:secondaryText="Beta access is limited for now."/>
+                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_1"
+                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_1"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Wait your turn"
-                        app:secondaryText="We send invites every few days."/>
+                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_2"
+                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_2"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Get your invite"
-                        app:secondaryText="We can notify you when its your turn."/>
+                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_3"
+                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_3"/>
 
             </LinearLayout>
 
@@ -138,6 +139,18 @@
         </LinearLayout>
 
     </ScrollView>
+    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/disclaimerFooter"
+            app:typography="caption"
+            app:textType="secondary"
+            android:paddingTop="@dimen/keyline_2"
+            android:paddingBottom="@dimen/keyline_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:text="@string/netpBetaDisclaimerFooter"
+    />
 </LinearLayout>
 
 
