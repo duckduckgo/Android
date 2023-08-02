@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Ziehe von oben nach unten und tippe auf die Zurück-Schaltfläche, um den Vollbildmodus zu verlassen</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Alle Tabs schließen?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Bist du sicher, dass du alle Tabs schließen möchtest?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Abbrechen</string>
+    <string name="closeAppTabsConfirmationDialogClose">Schließen</string>
 </resources>
