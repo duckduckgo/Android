@@ -469,7 +469,7 @@
         <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
+        <item quantity="one"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
         <item quantity="other"><![CDATA[ essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Lors de votre navigation, je bloque les traqueurs indésirables.<br/><br/>Continuez à naviguer en toute tranquillité !]]></string>
@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Faites glisser de haut en bas et appuyez sur le bouton Retour pour quitter le mode plein écran</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fermer tous les onglets ?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Voulez-vous vraiment fermer tous les onglets ?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Annuler</string>
+    <string name="closeAppTabsConfirmationDialogClose">Fermer</string>
 </resources>
