@@ -66,7 +66,11 @@ class CredentialsRemoteWinsStrategy constructor(
         credentialsSync.saveCredential(updatedCredentials, remoteEntry.id)
     }
 
-    private suspend fun processExistingEntry(localCredential: LoginCredentials, remoteEntry: CredentialsSyncEntryResponse, clientModifiedSince: String) {
+    private suspend fun processExistingEntry(
+        localCredential: LoginCredentials,
+        remoteEntry: CredentialsSyncEntryResponse,
+        clientModifiedSince: String,
+    ) {
         val localId = localCredential.id!!
         if (remoteEntry.isDeleted()) {
             Timber.d("Sync-autofill-Persist: >>> delete local $localId")

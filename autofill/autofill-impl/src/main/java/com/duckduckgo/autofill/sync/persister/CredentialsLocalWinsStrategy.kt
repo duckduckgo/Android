@@ -25,7 +25,7 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
-class CredentialsLocalWinsStrategy (
+class CredentialsLocalWinsStrategy(
     private val credentialsSync: CredentialsSync,
     private val credentialsSyncMapper: CredentialsSyncMapper,
     private val dispatchers: DispatcherProvider,
@@ -55,7 +55,7 @@ class CredentialsLocalWinsStrategy (
 
     private suspend fun processNewEntry(entry: CredentialsSyncEntryResponse, clientModifiedSince: String) {
         if (entry.isDeleted()) return
-        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null,clientModifiedSince)
+        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, null, clientModifiedSince)
         Timber.d("Sync-autofill-Persist: >>> no local, save remote $updatedCredentials")
         credentialsSync.saveCredential(updatedCredentials, entry.id)
     }
