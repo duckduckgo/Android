@@ -42,9 +42,11 @@ class CredentialsSync @Inject constructor(
         credentialsSyncStore.serverModifiedSince = "0"
         credentialsSyncStore.clientModifiedSince = "0"
 
-        secureStorage.websiteLoginDetailsWithCredentials().firstOrNull()?.map { it.details.id }?.filterNotNull()?.let { autofillIds ->
-            credentialsSyncMetadata.initializeDatabase(autofillIds)
-        }
+        secureStorage.websiteLoginDetailsWithCredentials().firstOrNull()
+            ?.mapNotNull { it.details.id }
+            ?.let { autofillIds ->
+                credentialsSyncMetadata.initializeDatabase(autofillIds)
+            }
 
         Timber.i("CredentialsSync: initMetadata ${credentialsSyncMetadata.getAllObservable().firstOrNull()}")
     }
