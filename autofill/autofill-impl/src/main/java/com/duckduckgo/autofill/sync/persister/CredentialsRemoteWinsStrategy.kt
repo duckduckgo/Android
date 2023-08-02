@@ -17,9 +17,8 @@
 package com.duckduckgo.autofill.sync.persister
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.autofill.sync.CredentialsSync
-import com.duckduckgo.autofill.sync.CredentialsSyncMapper
-import com.duckduckgo.autofill.sync.credentialsSyncEntries
+import com.duckduckgo.autofill.api.domain.app.*
+import com.duckduckgo.autofill.sync.*
 import com.duckduckgo.autofill.sync.isDeleted
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
@@ -42,22 +41,9 @@ class CredentialsRemoteWinsStrategy constructor(
                 runBlocking(dispatchers.io()) {
                     val localCredential = credentialsSync.getCredentialWithSyncId(entry.id)
                     if (localCredential != null) {
-                        val localId = localCredential.id!!
-                        if (entry.isDeleted()) {
-                            Timber.d("Sync-autofill-Persist: >>> delete local $localId")
-                            credentialsSync.deleteCredential(localId)
-                            return@runBlocking
-                        }
-                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(entry, localId, credentials.last_modified)
-                        credentialsSync.updateCredentials(updatedCredentials, entry.id)
+                        processExistingEntry(localCredential, entry, credentials.last_modified)
                     } else {
-                        if (entry.isDeleted()) return@runBlocking
-                        val updatedCredentials = credentialsSyncMapper.toLoginCredential(
-                            remoteEntry = entry,
-                            lastModified = credentials.last_modified,
-                        )
-                        Timber.d("Sync-autofill-Persist: >>> save remote $updatedCredentials")
-                        credentialsSync.saveCredential(updatedCredentials, entry.id)
+                        processNewEntry(entry, credentials.last_modified)
                     }
                 }
             }
@@ -68,5 +54,26 @@ class CredentialsRemoteWinsStrategy constructor(
             Timber.d("Sync-autofill-Persist: merging completed")
             Success(true)
         }
+    }
+
+    private suspend fun processNewEntry(remoteEntry: CredentialsSyncEntryResponse, clientModifiedSince: String) {
+        if (remoteEntry.isDeleted()) return
+        val updatedCredentials = credentialsSyncMapper.toLoginCredential(
+            remoteEntry = remoteEntry,
+            lastModified = clientModifiedSince,
+        )
+        Timber.d("Sync-autofill-Persist: >>> save remote $updatedCredentials")
+        credentialsSync.saveCredential(updatedCredentials, remoteEntry.id)
+    }
+
+    private suspend fun processExistingEntry(localCredential: LoginCredentials, remoteEntry: CredentialsSyncEntryResponse, clientModifiedSince: String) {
+        val localId = localCredential.id!!
+        if (remoteEntry.isDeleted()) {
+            Timber.d("Sync-autofill-Persist: >>> delete local $localId")
+            credentialsSync.deleteCredential(localId)
+            return
+        }
+        val updatedCredentials = credentialsSyncMapper.toLoginCredential(remoteEntry, localId, clientModifiedSince)
+        credentialsSync.updateCredentials(updatedCredentials, remoteEntry.id)
     }
 }
