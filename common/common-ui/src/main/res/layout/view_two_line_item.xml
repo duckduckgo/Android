@@ -21,6 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
+    android:paddingTop="@dimen/twoLineItemVerticalPadding"
+    android:paddingBottom="@dimen/twoLineItemVerticalPadding"
     android:minHeight="@dimen/twoLineItemHeight">
 
     <FrameLayout
@@ -47,8 +49,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="@dimen/twoLineItemVerticalPadding"
-        android:layout_marginEnd="@dimen/keyline_2"
         android:breakStrategy="balanced"
         app:layout_constraintEnd_toStartOf="@id/betaPill"
         app:layout_constraintHorizontal_bias="0.0"
@@ -64,6 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_beta_pill"
+        android:layout_marginStart="@dimen/keyline_2"
         app:layout_constraintBottom_toBottomOf="@id/primaryText"
         app:layout_constraintEnd_toStartOf="@id/trailingBarrier"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -75,7 +76,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/twoLineItemVerticalPadding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/trailingBarrier"
         app:layout_constraintStart_toStartOf="@id/primaryText"

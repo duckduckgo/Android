@@ -55,7 +55,7 @@
         app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintTop_toBottomOf="@+id/deviceShieldAppEntryName"
         app:textType="secondary"
-        app:typography="body2"
+        app:typography="caption"
         tools:text="App issues may occur if enabled" />
 
     <com.duckduckgo.mobile.android.ui.view.SwitchView
