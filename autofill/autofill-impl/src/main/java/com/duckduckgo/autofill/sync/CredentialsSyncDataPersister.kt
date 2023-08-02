@@ -80,6 +80,14 @@ class CredentialsSyncDataPersister @Inject constructor(
         val result = processEntries(response.credentials, conflictResolution)
 
         if (result is Success) {
+            if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
+                credentialsSyncMetadata.getAllCredentials().filter { it.modified_at != null }.forEach {
+                    Timber.i("Sync-autofill-Persist: post-dedup adding to syncmetadata localId ${it.localId}")
+                    credentialsSyncMetadata.addOrUpdate(
+                        CredentialsSyncMetadataEntity(localId = it.localId, modified_at = SyncDateProvider.now(), deleted_at = null),
+                    )
+                }
+            }
             pruneDeletedObjects(credentialsSyncStore.startTimeStamp)
         }
 
@@ -99,20 +107,10 @@ class CredentialsSyncDataPersister @Inject constructor(
             Timber.d("Sync-autofill-Persist: merging completed, no entries to merge")
             Success(false)
         } else {
-            val result = strategies[conflictResolution]?.processEntries(credentials, credentialsSyncStore.clientModifiedSince)
+            strategies[conflictResolution]?.processEntries(credentials, credentialsSyncStore.clientModifiedSince)
                 ?: SyncMergeResult.Error(
                     reason = "Merge Strategy not found",
                 )
-
-            if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
-                credentialsSyncMetadata.getAllCredentials().filter { it.modified_at != null }.forEach {
-                    Timber.i("Sync-autofill-Persist: post-dedup adding to syncmetadata localId ${it.localId}")
-                    credentialsSyncMetadata.addOrUpdate(
-                        CredentialsSyncMetadataEntity(localId = it.localId, modified_at = SyncDateProvider.now(), deleted_at = null),
-                    )
-                }
-            }
-            return result
         }
     }
 

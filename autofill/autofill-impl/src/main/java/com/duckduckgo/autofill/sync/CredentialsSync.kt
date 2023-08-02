@@ -30,6 +30,8 @@ import javax.inject.*
 import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber
 
+typealias Iso8601String = String
+
 @SingleInstanceIn(AppScope::class)
 class CredentialsSync @Inject constructor(
     private val secureStorage: SecureStorage,
@@ -51,7 +53,7 @@ class CredentialsSync @Inject constructor(
         Timber.i("CredentialsSync: initMetadata ${credentialsSyncMetadata.getAllObservable().firstOrNull()}")
     }
 
-    suspend fun getUpdatesSince(since: String): List<LoginCredentialEntry> {
+    suspend fun getUpdatesSince(since: Iso8601String): List<LoginCredentialEntry> {
         credentialsSyncStore.startTimeStamp = SyncDateProvider.now()
         return if (since == "0") {
             allContentAsUpdates()
@@ -131,13 +133,13 @@ class CredentialsSync @Inject constructor(
 
     private suspend fun allContentAsUpdates() = secureStorage.websiteLoginDetailsWithCredentials().firstOrNull().mapToLoginCredentialEntry()
 
-    private suspend fun changesSince(since: String): List<LoginCredentialEntry> {
+    private suspend fun changesSince(since: Iso8601String): List<LoginCredentialEntry> {
         Timber.d("CredentialsSync: generating changes since $since")
         credentialsSyncMetadata.getAllCredentials().forEach {
             Timber.i("CredentialsSync: syncMetadata $it")
         }
 
-        val values2 = credentialsSyncMetadata.getChangesSince(since).map {
+        val changes = credentialsSyncMetadata.getChangesSince(since).map {
             secureStorage.getWebsiteLoginDetailsWithCredentials(it.localId)
         }.filterNotNull()
 
@@ -145,10 +147,10 @@ class CredentialsSync @Inject constructor(
             LoginCredentialEntry(id = it.syncId, deleted = "1", client_last_modified = it.deleted_at)
         }
 
-        Timber.d("CredentialsSync: modifiedSince2: $values2")
+        Timber.d("CredentialsSync: modifiedSince changes: $changes")
         Timber.d("CredentialsSync: modifiedSince removed: $removedItems")
 
-        return values2.mapToLoginCredentialEntry() + removedItems
+        return changes.mapToLoginCredentialEntry() + removedItems
     }
 
     private fun String?.encrypt(): String? {
