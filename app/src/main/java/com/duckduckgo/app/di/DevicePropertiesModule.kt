@@ -32,6 +32,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -69,6 +70,7 @@ object DevicePropertiesModule {
         searchCountDao: SearchCountDao,
         appDaysUsedRepository: AppDaysUsedRepository,
         appTrackingProtection: AppTrackingProtection,
+        networkProtectionState: NetworkProtectionState,
     ): UserBrowserProperties {
         return AndroidUserBrowserProperties(
             themingDataStore,
@@ -79,6 +81,7 @@ object DevicePropertiesModule {
             searchCountDao,
             appDaysUsedRepository,
             appTrackingProtection,
+            networkProtectionState,
         )
     }
 }

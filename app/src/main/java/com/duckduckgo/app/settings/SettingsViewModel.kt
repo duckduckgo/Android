@@ -217,12 +217,14 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAppTPSettingClicked() {
-        if (appTrackingProtection.isOnboarded()) {
-            viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
-        } else {
-            viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+        viewModelScope.launch {
+            if (appTrackingProtection.isOnboarded()) {
+                command.send(Command.LaunchAppTPTrackersScreen)
+            } else {
+                command.send(Command.LaunchAppTPOnboarding)
+            }
+            pixel.fire(SETTINGS_APPTP_PRESSED)
         }
-        pixel.fire(SETTINGS_APPTP_PRESSED)
     }
 
     fun onNetPSettingClicked() {

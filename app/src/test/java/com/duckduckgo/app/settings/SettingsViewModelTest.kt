@@ -96,6 +96,7 @@ class SettingsViewModelTest {
             whenever(networkProtectionState.isEnabled()).thenReturn(false)
             whenever(appTrackingProtection.isRunning()).thenReturn(false)
             whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+            whenever(appTrackingProtection.isOnboarded()).thenReturn(false)
         }
 
         testee = SettingsViewModel(
