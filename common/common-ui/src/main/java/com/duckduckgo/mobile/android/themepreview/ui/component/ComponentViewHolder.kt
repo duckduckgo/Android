@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
+import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -95,6 +96,14 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 subtitle = "Body text goes here. This component has one button",
             )
 
+            val promoSingleMessage = Message(
+                middleIllustration = R.drawable.desktop_promo_artwork,
+                title = "Promo Single Action Message",
+                subtitle = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
+                promoAction = "Promo Link",
+                messageType = REMOTE_PROMO_MESSAGE,
+            )
+
             view.findViewById<MessageCta>(R.id.small_remote_message).apply {
                 setMessage(smallMessage)
             }
@@ -113,6 +122,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.big_two_actions_update_remote_message).apply {
                 setMessage(bigTwoActionsUpdateMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
+                setMessage(promoSingleMessage)
             }
         }
     }

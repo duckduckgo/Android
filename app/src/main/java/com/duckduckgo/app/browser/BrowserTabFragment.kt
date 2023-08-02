@@ -3272,7 +3272,7 @@ class BrowserTabFragment :
                 newBrowserTab.messageCta.onSecondaryActionClicked {
                     viewModel.onMessageSecondaryButtonClicked()
                 }
-                newBrowserTab.messageCta.onActionClicked {
+                newBrowserTab.messageCta.onPromoActionClicked {
                     viewModel.onMessageActionButtonClicked()
                 }
             }

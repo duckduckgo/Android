@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,22 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.mobile.android.databinding.ViewMessageCtaBinding
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.H2
+import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
+import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class MessageCta : FrameLayout {
 
     private val binding: ViewMessageCtaBinding by viewBinding()
+    private val remoteMessageBinding = binding.remoteMessage
+    private val promoMessageBinding = binding.promoRemoteMessage
 
     private var onCloseButton: () -> Unit = {
         this.gone()
     }
     private var onPrimaryButtonClicked: () -> Unit = {}
     private var onSecondaryButtonClicked: () -> Unit = {}
-    private var onActionButtonClicked: () -> Unit = {}
+    private var onPromoActionButtonClicked: () -> Unit = {}
 
     constructor(context: Context) : this(context, null)
 
@@ -55,69 +58,79 @@ class MessageCta : FrameLayout {
     ) : super(context, attrs, defStyle) {
 
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-
-        binding.close.setOnClickListener {
-            onCloseButton.invoke()
-        }
-
-        binding.primaryActionButton.setOnClickListener {
-            onPrimaryButtonClicked.invoke()
-        }
-
-        binding.secondaryActionButton.setOnClickListener {
-            onSecondaryButtonClicked.invoke()
-        }
-
-        binding.actionButton.setOnClickListener {
-            onActionButtonClicked.invoke()
-        }
     }
 
     fun setMessage(message: Message) {
-        when {
-            message.topIllustration != null -> {
-                binding.middleIllustration.gone()
-                binding.topIllustration.show()
-                val drawable = AppCompatResources.getDrawable(context, message.topIllustration)
-                binding.topIllustration.setImageDrawable(drawable)
-            }
-            message.middleIllustration != null -> {
-                binding.topIllustration.gone()
-                binding.middleIllustration.show()
-                val drawable = AppCompatResources.getDrawable(context, message.middleIllustration)
-                binding.middleIllustration.setImageDrawable(drawable)
-            }
-            else -> {
-                binding.topIllustration.gone()
-                binding.middleIllustration.gone()
-            }
+        when (message.messageType) {
+            REMOTE_MESSAGE -> setRemoteMessage(message)
+            REMOTE_PROMO_MESSAGE -> setPromoMessage(message)
         }
+    }
 
-        if (message.titleSize == TitleSize.LARGE) {
-            binding.messageTitle.setTypography(H2)
-        }
-        binding.messageTitle.text = message.title
-        binding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
+    private fun setRemoteMessage(message: Message) {
+        binding.remoteMessage.root.show()
+        binding.promoRemoteMessage.root.gone()
 
-        if (message.singleAction.isEmpty()) {
-            binding.actionButton.gone()
+        if (message.topIllustration == null) {
+            remoteMessageBinding.topIllustration.gone()
         } else {
-            binding.actionButton.text = message.singleAction
-            binding.actionButton.show()
+            val drawable = AppCompatResources.getDrawable(context, message.topIllustration)
+            remoteMessageBinding.topIllustration.setImageDrawable(drawable)
+            remoteMessageBinding.topIllustration.show()
         }
+
+        remoteMessageBinding.messageTitle.text = message.title
+        remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
 
         if (message.action2.isEmpty()) {
-            binding.secondaryActionButton.gone()
+            remoteMessageBinding.secondaryActionButton.gone()
         } else {
-            binding.secondaryActionButton.text = message.action2
-            binding.secondaryActionButton.show()
+            remoteMessageBinding.secondaryActionButton.text = message.action2
+            remoteMessageBinding.secondaryActionButton.show()
         }
 
         if (message.action.isEmpty()) {
-            binding.primaryActionButton.gone()
+            remoteMessageBinding.primaryActionButton.gone()
         } else {
-            binding.primaryActionButton.text = message.action
-            binding.primaryActionButton.show()
+            remoteMessageBinding.primaryActionButton.text = message.action
+            remoteMessageBinding.primaryActionButton.show()
+        }
+
+        remoteMessageBinding.close.setOnClickListener {
+            onCloseButton.invoke()
+        }
+
+        remoteMessageBinding.primaryActionButton.setOnClickListener {
+            onPrimaryButtonClicked.invoke()
+        }
+
+        remoteMessageBinding.secondaryActionButton.setOnClickListener {
+            onSecondaryButtonClicked.invoke()
+        }
+    }
+
+    private fun setPromoMessage(message: Message) {
+        binding.promoRemoteMessage.root.show()
+        binding.remoteMessage.root.gone()
+
+        promoMessageBinding.messageTitle.text = message.title
+        promoMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
+        promoMessageBinding.actionButton.text = message.promoAction
+
+        if (message.middleIllustration == null) {
+            promoMessageBinding.illustration.gone()
+        } else {
+            val drawable = AppCompatResources.getDrawable(context, message.middleIllustration)
+            promoMessageBinding.illustration.setImageDrawable(drawable)
+            promoMessageBinding.illustration.show()
+        }
+
+        promoMessageBinding.close.setOnClickListener {
+            onCloseButton.invoke()
+        }
+
+        promoMessageBinding.actionButton.setOnClickListener {
+            onPromoActionButtonClicked.invoke()
         }
     }
 
@@ -129,8 +142,8 @@ class MessageCta : FrameLayout {
         this.onSecondaryButtonClicked = onSecondaryButtonClicked
     }
 
-    fun onActionClicked(onActionClicked: () -> Unit) {
-        this.onActionButtonClicked = onActionClicked
+    fun onPromoActionClicked(onActionClicked: () -> Unit) {
+        this.onPromoActionButtonClicked = onActionClicked
     }
 
     fun onCloseButtonClicked(onDismiss: () -> Unit) {
@@ -141,14 +154,15 @@ class MessageCta : FrameLayout {
         @DrawableRes val topIllustration: Int? = null,
         @DrawableRes val middleIllustration: Int? = null,
         val title: String = "",
-        val titleSize: TitleSize = TitleSize.SMALL,
         val subtitle: String = "",
         val action: String = "",
         val action2: String = "",
-        val singleAction: String = "",
+        val promoAction: String = "",
+        val messageType: MessageType = REMOTE_MESSAGE,
     )
 
-    enum class TitleSize {
-        SMALL, LARGE
+    enum class MessageType {
+        REMOTE_MESSAGE,
+        REMOTE_PROMO_MESSAGE,
     }
 }

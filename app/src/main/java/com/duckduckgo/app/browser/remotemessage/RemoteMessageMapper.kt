@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.remotemessage
 
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
-import com.duckduckgo.mobile.android.ui.view.MessageCta.TitleSize
+import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
@@ -37,6 +37,7 @@ fun RemoteMessage.asMessage(): Message {
         is Small -> Message(
             title = content.titleText,
             subtitle = content.descriptionText,
+            messageType = MessageType.REMOTE_MESSAGE,
         )
         is BigSingleAction -> Message(
             topIllustration = content.placeholder.drawable(),
@@ -44,6 +45,7 @@ fun RemoteMessage.asMessage(): Message {
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
+            messageType = MessageType.REMOTE_MESSAGE,
         )
         is BigTwoActions -> Message(
             topIllustration = content.placeholder.drawable(),
@@ -52,20 +54,22 @@ fun RemoteMessage.asMessage(): Message {
             subtitle = content.descriptionText,
             action = content.primaryActionText,
             action2 = content.secondaryActionText,
+            messageType = MessageType.REMOTE_MESSAGE,
         )
         is Medium -> Message(
             topIllustration = content.placeholder.drawable(),
             middleIllustration = null,
             title = content.titleText,
             subtitle = content.descriptionText,
+            messageType = MessageType.REMOTE_MESSAGE,
         )
         is PromoSingleAction -> Message(
             topIllustration = null,
             middleIllustration = content.placeholder.drawable(),
             title = content.titleText,
-            titleSize = TitleSize.LARGE,
             subtitle = content.descriptionText,
-            singleAction = content.actionText,
+            promoAction = content.actionText,
+            messageType = MessageType.REMOTE_PROMO_MESSAGE,
         )
     }
 }
