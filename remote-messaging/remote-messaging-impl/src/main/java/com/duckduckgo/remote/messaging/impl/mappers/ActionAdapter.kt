@@ -18,7 +18,6 @@ package com.duckduckgo.remote.messaging.impl.mappers
 
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.JsonActionType
-import com.duckduckgo.remote.messaging.api.JsonAdditionalParameters
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.squareup.moshi.FromJson
@@ -56,7 +55,7 @@ class ActionAdapter constructor(
     class ActionJson(
         val actionType: String,
         val value: String,
-        val additionalParameters: JsonAdditionalParameters? = null,
+        val additionalParameters: Map<String, String>? = null,
     )
 
     private enum class OldActionType {

@@ -23,11 +23,7 @@ interface MessageActionMapperPlugin {
 data class JsonMessageAction(
     val type: String,
     val value: String,
-    val additionalParameters: JsonAdditionalParameters?,
-)
-
-data class JsonAdditionalParameters(
-    val title: String,
+    val additionalParameters: Map<String, String>?,
 )
 
 sealed class JsonActionType(val jsonValue: String) {

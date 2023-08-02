@@ -30,6 +30,6 @@ fun Action.asBrowserTabCommand(): Command? {
         is Url -> SubmitUrl(this.value)
         is DefaultBrowser -> LaunchDefaultBrowser
         is AppTpOnboarding -> LaunchAppTPOnboarding
-        is Share -> SharePromoLinkRMF(this.value, this.additionalParameters?.title.orEmpty())
+        is Share -> SharePromoLinkRMF(this.value, this.additionalParameters?.get(AdditionalParameter.TITLE.key).orEmpty())
     }
 }

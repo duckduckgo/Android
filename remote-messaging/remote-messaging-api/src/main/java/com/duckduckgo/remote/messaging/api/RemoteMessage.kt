@@ -90,11 +90,18 @@ sealed class Content(val messageType: MessageType) {
     }
 }
 
-sealed class Action(val actionType: String, open val value: String = "", open val additionalParameters: JsonAdditionalParameters? = null) {
-    data class Url(override val value: String) : Action(URL.jsonValue, value)
-    data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value)
-    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue)
-    object Dismiss : Action(DISMISS.jsonValue)
-    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue)
-    data class Share(override val value: String, override val additionalParameters: JsonAdditionalParameters?) : Action(SHARE.jsonValue, value)
+sealed class Action(val actionType: String, open val value: String, open val additionalParameters: Map<String, String>?) {
+    data class Url(override val value: String) : Action(URL.jsonValue, value, null)
+    data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value, null)
+    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "", null)
+    object Dismiss : Action(DISMISS.jsonValue, "", null)
+    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "", null)
+    data class Share(
+        override val value: String,
+        override val additionalParameters: Map<String, String>?,
+    ) : Action(SHARE.jsonValue, value, additionalParameters)
+
+    enum class AdditionalParameter(val key: String) {
+        TITLE("title"),
+    }
 }

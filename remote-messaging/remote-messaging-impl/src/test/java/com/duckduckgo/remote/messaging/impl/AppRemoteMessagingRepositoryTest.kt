@@ -22,7 +22,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.api.Action.Dismiss
 import com.duckduckgo.remote.messaging.api.Action.Share
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
@@ -31,7 +30,6 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
-import com.duckduckgo.remote.messaging.api.JsonAdditionalParameters
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.fixtures.getMessageMapper
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
@@ -234,7 +232,7 @@ class AppRemoteMessagingRepositoryTest {
                     titleText = "titleText",
                     descriptionText = "descriptionText",
                     placeholder = MAC_AND_WINDOWS,
-                    action = Share(value = "com.duckduckgo.com", additionalParameters = JsonAdditionalParameters("share title")),
+                    action = Share(value = "com.duckduckgo.com", additionalParameters = mapOf("title" to "share title")),
                     actionText = "actionText",
                 ),
                 matchingRules = emptyList(),
@@ -252,7 +250,7 @@ class AppRemoteMessagingRepositoryTest {
                         titleText = "titleText",
                         descriptionText = "descriptionText",
                         placeholder = MAC_AND_WINDOWS,
-                        action = Share(value = "com.duckduckgo.com", additionalParameters = JsonAdditionalParameters("share title")),
+                        action = Share(value = "com.duckduckgo.com", additionalParameters = mapOf("title" to "share title")),
                         actionText = "actionText",
                     ),
                     matchingRules = emptyList(),

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
-import com.duckduckgo.remote.messaging.api.JsonAdditionalParameters
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
@@ -28,7 +27,7 @@ object JsonRemoteMessageOM {
     private fun jsonMessageAction(
         type: String = "url",
         value: String = "http://example.com",
-        additionalParameters: JsonAdditionalParameters? = null,
+        additionalParameters: Map<String, String>? = null,
     ) = JsonMessageAction(
         type = type,
         value = value,
