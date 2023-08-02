@@ -27,6 +27,8 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 @InjectWith(ReceiverScope::class)
@@ -45,22 +47,20 @@ class SharePromoLinkRMFBroadCastReceiver : BroadcastReceiver() {
         intent: Intent,
     ) {
         AndroidInjection.inject(this, context)
-        val messageId = intent.getStringExtra(EXTRA_MESSAGE_ID).orEmpty()
-        onPromoLinkSharedSuccessfully(messageId)
+        onPromoLinkSharedSuccessfully()
     }
 
-    private fun onPromoLinkSharedSuccessfully(messageId: String) {
+    private fun onPromoLinkSharedSuccessfully() {
         coroutineScope.launch {
-            remoteMessagingRepository.dismissMessage(messageId)
-            val pixelsParams: Map<String, String> = mapOf(
-                Pixel.PixelParameter.MESSAGE_SHOWN to messageId,
-                Pixel.PixelParameter.ACTION_SUCCESS to "true",
-            )
-            pixel.fire(AppPixelName.REMOTE_MESSAGE_SHARED, pixelsParams)
+            remoteMessagingRepository.messageFlow().map { it?.id }.take(1).collect {
+                val messageId = it.orEmpty()
+                remoteMessagingRepository.dismissMessage(messageId)
+                val pixelsParams: Map<String, String> = mapOf(
+                    Pixel.PixelParameter.MESSAGE_SHOWN to messageId,
+                    Pixel.PixelParameter.ACTION_SUCCESS to "true",
+                )
+                pixel.fire(AppPixelName.REMOTE_MESSAGE_SHARED, pixelsParams)
+            }
         }
-    }
-
-    companion object {
-        const val EXTRA_MESSAGE_ID = "MESSAGE_ID"
     }
 }

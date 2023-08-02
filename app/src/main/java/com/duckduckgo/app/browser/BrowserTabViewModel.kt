@@ -2445,10 +2445,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun remoteMessageId(): String {
-        return currentCtaViewState().message?.id.orEmpty()
-    }
-
     fun onMessageCloseButtonClicked() {
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
