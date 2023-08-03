@@ -226,7 +226,7 @@
     <!-- Dialogs -->
     <style name="Widget.DuckDuckGo.Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.DialogCorners</item>
-        <item name="android:background">?attr/daxColorSurface</item>
+        <item name="backgroundColor">?attr/daxColorSurface</item>
     </style>
 
     <style name="Widget.DuckDuckGo.LegacyDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
