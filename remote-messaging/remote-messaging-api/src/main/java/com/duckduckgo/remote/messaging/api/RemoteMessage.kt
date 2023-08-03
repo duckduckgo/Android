@@ -21,11 +21,13 @@ package com.duckduckgo.remote.messaging.api
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
+import com.duckduckgo.remote.messaging.api.Content.MessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
 import com.duckduckgo.remote.messaging.api.JsonActionType.APP_TP_ONBOARDING
 import com.duckduckgo.remote.messaging.api.JsonActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.JsonActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.JsonActionType.PLAYSTORE
+import com.duckduckgo.remote.messaging.api.JsonActionType.SHARE
 import com.duckduckgo.remote.messaging.api.JsonActionType.URL
 
 data class RemoteMessage(
@@ -56,11 +58,20 @@ sealed class Content(val messageType: MessageType) {
         val secondaryAction: Action,
     ) : Content(BIG_TWO_ACTION)
 
+    data class PromoSingleAction(
+        val titleText: String,
+        val descriptionText: String,
+        val placeholder: Placeholder,
+        val actionText: String,
+        val action: Action,
+    ) : Content(PROMO_SINGLE_ACTION)
+
     enum class MessageType {
         SMALL,
         MEDIUM,
         BIG_SINGLE_ACTION,
         BIG_TWO_ACTION,
+        PROMO_SINGLE_ACTION,
     }
 
     enum class Placeholder(val jsonValue: String) {
@@ -68,6 +79,7 @@ sealed class Content(val messageType: MessageType) {
         DDG_ANNOUNCE("DDGAnnounce"),
         CRITICAL_UPDATE("CriticalUpdate"),
         APP_UPDATE("AppUpdate"),
+        MAC_AND_WINDOWS("NewForMacAndWindows"),
         ;
 
         companion object {
@@ -78,10 +90,21 @@ sealed class Content(val messageType: MessageType) {
     }
 }
 
-sealed class Action(val actionType: String, open val value: String) {
-    data class Url(override val value: String) : Action(URL.jsonValue, value)
-    data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value)
-    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "")
-    object Dismiss : Action(DISMISS.jsonValue, "")
-    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "")
+sealed class Action(val actionType: String, open val value: String, open val additionalParameters: Map<String, String>?) {
+    data class Url(override val value: String) : Action(URL.jsonValue, value, null)
+    data class PlayStore(override val value: String) : Action(PLAYSTORE.jsonValue, value, null)
+    object DefaultBrowser : Action(DEFAULT_BROWSER.jsonValue, "", null)
+    object Dismiss : Action(DISMISS.jsonValue, "", null)
+    object AppTpOnboarding : Action(APP_TP_ONBOARDING.jsonValue, "", null)
+    data class Share(
+        override val value: String,
+        override val additionalParameters: Map<String, String>?,
+    ) : Action(SHARE.jsonValue, value, additionalParameters) {
+        val title: String
+            get() = additionalParameters?.get(AdditionalParameter.TITLE.key).orEmpty()
+
+        private enum class AdditionalParameter(val key: String) {
+            TITLE("title"),
+        }
+    }
 }

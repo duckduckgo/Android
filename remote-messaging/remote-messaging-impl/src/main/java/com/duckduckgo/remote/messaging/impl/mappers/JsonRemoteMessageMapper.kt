@@ -22,6 +22,7 @@ import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
+import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
@@ -30,6 +31,7 @@ import com.duckduckgo.remote.messaging.impl.models.*
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import java.util.Locale
@@ -72,12 +74,23 @@ private val bigMessageTwoActionMapper: (JsonContent, Set<MessageActionMapperPlug
     )
 }
 
+private val promoSingleActionMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
+    PromoSingleAction(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        descriptionText = jsonContent.descriptionText.failIfEmpty(),
+        placeholder = jsonContent.placeholder.asPlaceholder(),
+        actionText = jsonContent.actionText.failIfEmpty(),
+        action = jsonContent.action!!.toAction(actionMappers),
+    )
+}
+
 // plugin point?
 private val messageMappers = mapOf(
     Pair(SMALL.jsonValue, smallMapper),
     Pair(MEDIUM.jsonValue, mediumMapper),
     Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleActionMapper),
     Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper),
+    Pair(PROMO_SINGLE_ACTION.jsonValue, promoSingleActionMapper),
 )
 
 fun List<JsonRemoteMessage>.mapToRemoteMessage(
@@ -154,6 +167,11 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
         is Small -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+        )
+        is PromoSingleAction -> this.copy(
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+            actionText = translations.actionText.takeUnless { it.isEmpty() } ?: this.actionText,
         )
     }
 }

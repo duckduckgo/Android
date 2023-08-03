@@ -356,6 +356,7 @@ class BrowserTabViewModel @Inject constructor(
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
+        class SharePromoLinkRMF(val url: String, val shareTitle: String) : Command()
         class PrintLink(val url: String, val mediaSize: PrintAttributes.MediaSize) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -2465,6 +2466,15 @@ class BrowserTabViewModel @Inject constructor(
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
+        }
+    }
+
+    fun onMessageActionButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
         }

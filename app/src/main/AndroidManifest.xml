@@ -512,6 +512,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".remotemessage.SharePromoLinkRMFBroadCastReceiver"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -57,6 +57,8 @@ interface Pixel {
         const val OS_VERSION = "os_version"
         const val DEFAULT_BROWSER = "default_browser"
         const val EMAIL = "email"
+        const val MESSAGE_SHOWN = "message"
+        const val ACTION_SUCCESS = "success"
     }
 
     object PixelValues {

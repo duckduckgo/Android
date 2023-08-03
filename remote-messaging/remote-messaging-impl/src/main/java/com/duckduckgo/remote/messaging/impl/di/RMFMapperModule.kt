@@ -23,6 +23,7 @@ import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.MessageType
+import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
@@ -60,7 +61,8 @@ object RMFMapperModule {
                     .withSubtype(Small::class.java, MessageType.SMALL.name)
                     .withSubtype(Medium::class.java, MessageType.MEDIUM.name)
                     .withSubtype(BigSingleAction::class.java, MessageType.BIG_SINGLE_ACTION.name)
-                    .withSubtype(BigTwoActions::class.java, MessageType.BIG_TWO_ACTION.name),
+                    .withSubtype(BigTwoActions::class.java, MessageType.BIG_TWO_ACTION.name)
+                    .withSubtype(PromoSingleAction::class.java, MessageType.PROMO_SINGLE_ACTION.name),
             )
             .add(ActionAdapter(actionMappers))
             .add(KotlinJsonAdapterFactory())
