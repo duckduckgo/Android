@@ -55,7 +55,10 @@
     <dimen name="listItemImageLargeSize">40dp</dimen>
     <dimen name="listItemTrailingIconWidth">52dp</dimen>
     <dimen name="oneLineItemHeight">48dp</dimen>
+    <dimen name="oneLineItemWithLargeImageHeight">64dp</dimen>
+    <dimen name="oneLineItemVerticalPadding">8dp</dimen>
     <dimen name="twoLineItemHeight">56dp</dimen>
+    <dimen name="twoLineItemWithLargeImageHeight">64dp</dimen>
     <dimen name="twoLineItemVerticalPadding">12dp</dimen>
     <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
     <dimen name="sectionHeaderListItemHeight">44dp</dimen>

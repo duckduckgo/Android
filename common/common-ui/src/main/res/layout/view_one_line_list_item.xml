@@ -20,6 +20,8 @@
     android:id="@+id/item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="@dimen/oneLineItemVerticalPadding"
+    android:paddingBottom="@dimen/oneLineItemVerticalPadding"
     android:background="?attr/selectableItemBackground"
     android:minHeight="@dimen/oneLineItemHeight">
 
@@ -28,8 +30,6 @@
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
         android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

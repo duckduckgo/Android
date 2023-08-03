@@ -14,11 +14,10 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/exclusion_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="@dimen/keyline_2"
     app:leadingIconSize="large"
     app:showSwitch="true" />

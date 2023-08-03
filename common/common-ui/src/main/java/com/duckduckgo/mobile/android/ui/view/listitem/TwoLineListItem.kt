@@ -106,12 +106,11 @@ class TwoLineListItem @JvmOverloads constructor(
             when {
                 showSwitch -> showSwitch()
                 showTrailingIcon -> {
-                    binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
+                    setTrailingIconDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon)!!)
                     showTrailingIcon()
                 }
                 else -> {
-                    binding.trailingIconContainer.gone()
-                    binding.trailingSwitch.gone()
+                    hideTrailingItems()
                 }
             }
 
