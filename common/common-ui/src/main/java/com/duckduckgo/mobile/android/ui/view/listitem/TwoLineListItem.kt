@@ -58,6 +58,9 @@ class TwoLineListItem @JvmOverloads constructor(
     override val itemContainer: View
         get() = binding.itemContainer
 
+    override val verticalPadding: Int
+        get() = R.dimen.twoLineItemVerticalPadding
+
     init {
         context.obtainStyledAttributes(
             attrs,

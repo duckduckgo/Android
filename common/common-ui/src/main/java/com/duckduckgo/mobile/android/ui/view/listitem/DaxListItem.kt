@@ -25,6 +25,7 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
 import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -52,6 +53,7 @@ abstract class DaxListItem(
     internal abstract val trailingSwitch: SwitchView
     internal abstract val betaPill: ImageView?
     internal abstract val itemContainer: View
+    internal abstract val verticalPadding: Int
 
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
@@ -118,12 +120,17 @@ abstract class DaxListItem(
     /** Sets the leading icon image visibility */
     fun setLeadingIconVisibility(visible: Boolean) {
         if (visible) {
-            val padding = resources.getDimensionPixelSize(R.dimen.twoLineItemVerticalPadding)
+            val padding = resources.getDimensionPixelSize(verticalPadding)
             itemContainer.setPadding(0, padding, 0, padding)
             leadingIconContainer.show()
         } else {
             leadingIconContainer.gone()
         }
+    }
+
+    fun setVerticalPadding(@DimenRes dimen: Int){
+        val padding = resources.getDimensionPixelSize(dimen)
+        itemContainer.setPadding(0, padding, 0, padding)
     }
 
     /** Sets the leading icon background image type */

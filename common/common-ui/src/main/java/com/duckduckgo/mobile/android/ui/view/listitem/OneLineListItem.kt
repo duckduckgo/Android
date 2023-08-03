@@ -58,6 +58,9 @@ class OneLineListItem @JvmOverloads constructor(
     override val itemContainer: View
         get() = binding.itemContainer
 
+    override val verticalPadding: Int
+        get() = R.dimen.oneLineItemVerticalPadding
+
     init {
         context.obtainStyledAttributes(
             attrs,
@@ -90,7 +93,7 @@ class OneLineListItem @JvmOverloads constructor(
                 val imageSize = LeadingIconSize.from(getInt(R.styleable.OneLineListItem_leadingIconSize, 1))
                 setLeadingIconSize(imageSize)
                 if (imageSize == Large){
-                    minHeight = resources.getDimensionPixelSize(R.dimen.oneLineItemWithLargeImageHeight)
+                    // minHeight = resources.getDimensionPixelSize(R.dimen.oneLineItemWithLargeImageHeight)
                 }
             }
 
