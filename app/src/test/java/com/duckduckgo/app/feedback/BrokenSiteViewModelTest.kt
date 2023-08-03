@@ -77,26 +77,14 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenInitializedThenCannotSubmit() {
-        assertFalse(viewState.submitAllowed)
-    }
-
-    @Test
-    fun whenCategorySelectedThenCanSubmit() {
-        selectAndAcceptCategory()
+    fun whenInitializedThenCanSubmit() {
         assertTrue(viewState.submitAllowed)
     }
 
     @Test
-    fun whenCategoryChangedButNotSelectedThenCannotSubmit() {
-        testee.onCategoryIndexChanged(0)
-        assertFalse(viewState.submitAllowed)
-    }
-
-    @Test
-    fun whenNoCategorySelectedThenCannotSubmit() {
+    fun whenNoCategorySelectedThenCanSubmit() {
         selectAndAcceptCategory(-1)
-        assertFalse(viewState.submitAllowed)
+        assertTrue(viewState.submitAllowed)
     }
 
     @Test
