@@ -60,6 +60,7 @@
     <dimen name="twoLineItemHeight">56dp</dimen>
     <dimen name="twoLineItemWithLargeImageHeight">64dp</dimen>
     <dimen name="twoLineItemVerticalPadding">12dp</dimen>
+    <dimen name="twoLineItemVerticalBigPadding">14dp</dimen>
     <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
     <dimen name="sectionHeaderListItemHeight">44dp</dimen>
     <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>

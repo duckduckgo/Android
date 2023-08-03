@@ -118,6 +118,8 @@ abstract class DaxListItem(
     /** Sets the leading icon image visibility */
     fun setLeadingIconVisibility(visible: Boolean) {
         if (visible) {
+            val padding = resources.getDimensionPixelSize(R.dimen.twoLineItemVerticalPadding)
+            itemContainer.setPadding(0, padding, 0, padding)
             leadingIconContainer.show()
         } else {
             leadingIconContainer.gone()
@@ -183,6 +185,13 @@ abstract class DaxListItem(
     fun hideTrailingItems() {
         trailingIconContainer.gone()
         trailingSwitch.gone()
+    }
+
+    /** Hides all leading items */
+    fun hideLeadingItems() {
+        leadingIconContainer.gone()
+        val padding = resources.getDimensionPixelSize(R.dimen.twoLineItemVerticalBigPadding)
+        itemContainer.setPadding(0, padding, 0, padding)
     }
 
     /** Sets the trailing image content description */

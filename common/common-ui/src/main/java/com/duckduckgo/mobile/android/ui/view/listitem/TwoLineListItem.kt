@@ -82,7 +82,7 @@ class TwoLineListItem @JvmOverloads constructor(
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
                 setLeadingIconDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon)!!)
             } else {
-                binding.leadingIconBackground.gone()
+                hideLeadingItems()
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
