@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class NetPInviteCodeViewModel @Inject constructor(
     waitlistManager: NetPWaitlistManager,
+    private val waitlistNotification: NetPWaitlistCodeNotification,
 ) : ViewModel() {
 
     val viewState: Flow<ViewState> = waitlistManager.getState().map { ViewState(it) }.distinctUntilChanged()
@@ -56,6 +57,7 @@ class NetPInviteCodeViewModel @Inject constructor(
 
     fun onTermsAccepted() {
         viewModelScope.launch {
+            waitlistNotification.cancelNotification()
             commandChannel.send(Command.OpenNetP)
         }
     }

@@ -30,6 +30,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -49,7 +50,7 @@ class NetPInviteCodeViewModelTest {
 
         whenever(mockNetPWaitlistManager.getState()).thenReturn(flow)
 
-        viewModel = NetPInviteCodeViewModel(mockNetPWaitlistManager)
+        viewModel = NetPInviteCodeViewModel(mockNetPWaitlistManager, mock<NetPWaitlistCodeNotification>())
     }
 
     @Test

@@ -41,12 +41,14 @@ import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class NetPWaitlistCodeNotification @Inject constructor(
+// FIXME open class just to avoid busy work for testing. This class is temporary anyways and will be removed when waitlist is closed
+open class NetPWaitlistCodeNotification @Inject constructor(
     private val context: Context,
     private val netPWaitlistManager: NetPWaitlistManager,
     private val notificationSender: Provider<NotificationSender>,
     private val coroutineScope: CoroutineScope,
     private val networkProtectionState: NetworkProtectionState,
+    private val notificationManager: NotificationManagerCompat,
 ) : SchedulableNotification {
     override val id: String = "com.duckduckgo.netp.waitlist"
 
@@ -56,6 +58,12 @@ class NetPWaitlistCodeNotification @Inject constructor(
 
     override suspend fun buildSpecification(): NotificationSpec {
         return NetPWaitlistCodeNotificationSpec(context)
+    }
+
+    internal fun cancelNotification() {
+        coroutineScope.launch {
+            notificationManager.cancel(buildSpecification().systemId)
+        }
     }
 
     internal fun sendNotification() {
