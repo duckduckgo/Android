@@ -16,5 +16,5 @@
 
 <resources>
     <!-- Dialogs -->
-    <dimen name="dialogRadioGroupHeightMax">376dp</dimen>
+    <dimen name="dialogRadioGroupHeightMax">328dp</dimen>
 </resources>
