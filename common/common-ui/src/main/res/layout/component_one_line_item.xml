@@ -39,15 +39,40 @@
         app:primaryText="This is a simple item " />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/oneLineListItemWithImage"
+        android:id="@+id/oneLineListItemWithSmallImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/oneLineListItem"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
-        app:primaryText="Item with Leading Image" />
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Small Leading Image " />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithMediumImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithSmallImage"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Medium Leading Image " />
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/oneLineListItemWithLargeImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:leadingIconSize="large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithMediumImage"
+        app:leadingIcon="@drawable/ic_dax_icon"
+        app:primaryText="Item with Large Leading Image " />
 
     <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithTrailingIcon"
@@ -56,7 +81,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithImage"
+        app:layout_constraintTop_toBottomOf="@id/oneLineListItemWithLargeImage"
         app:primaryText="Item With Trailing Icon"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
 

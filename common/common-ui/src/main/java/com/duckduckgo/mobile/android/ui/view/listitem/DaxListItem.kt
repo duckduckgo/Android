@@ -239,8 +239,8 @@ abstract class DaxListItem(
             fun background(type: ImageBackground): Int {
                 return when (type) {
                     None -> android.R.color.transparent
-                    Circular -> R.dimen.listItemImageMediumSize
-                    Rounded -> R.dimen.listItemImageLargeSize
+                    Circular -> R.drawable.list_item_image_circular_background
+                    Rounded -> R.drawable.list_item_image_round_background
                 }
             }
         }
