@@ -82,6 +82,14 @@ interface SyncService {
 
     @GET("https://dev-sync-use.duckduckgo.com/sync/bookmarks")
     fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/credentials")
+    fun credentials(
+        @Header("Authorization") token: String,
+    ): Call<JSONObject>
+
+    @GET("https://dev-sync-use.duckduckgo.com/sync/credentials")
+    fun credentialsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
 }
 
 data class Login(

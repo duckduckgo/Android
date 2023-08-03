@@ -584,4 +584,4 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     }
 }
 
-fun LoginCredentials.extractTitle(): String? = this.domainTitle ?: this.domain
+fun LoginCredentials.extractTitle(): String? = if (this.domainTitle.isNullOrEmpty()) this.domain else this.domainTitle

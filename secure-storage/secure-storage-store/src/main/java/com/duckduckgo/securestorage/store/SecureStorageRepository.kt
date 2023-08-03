@@ -49,8 +49,13 @@ class RealSecureStorageRepository constructor(
         return websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(newCredentialId)
     }
 
-    override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> =
-        websiteLoginCredentialsDao.websiteLoginCredentialsByDomain(domain)
+    override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> {
+        return if (domain.isEmpty()) {
+            websiteLoginCredentialsDao.websiteLoginCredentialsWithoutDomain()
+        } else {
+            websiteLoginCredentialsDao.websiteLoginCredentialsByDomain(domain)
+        }
+    }
 
     override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>> =
         websiteLoginCredentialsDao.websiteLoginCredentials()

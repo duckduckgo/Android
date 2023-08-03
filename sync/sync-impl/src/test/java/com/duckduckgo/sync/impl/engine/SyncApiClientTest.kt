@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.sync.TestSyncFixtures
+import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.duckduckgo.sync.api.engine.SyncChangesRequest
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.impl.Result
@@ -67,7 +68,7 @@ internal class SyncApiClientTest {
     @Test
     fun whenPatchAndBookmarkChangesThenApiIsSuccessful() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
-        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(Result.Success(JSONObject()))
 
@@ -78,7 +79,7 @@ internal class SyncApiClientTest {
     @Test
     fun whenPatchAndBookmarkChangesThenApiFails() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
-        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "0")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         whenever(syncStore.token).thenReturn(TestSyncFixtures.token)
         whenever(syncApi.patch(any(), any())).thenReturn(patchAllError)
 
@@ -89,7 +90,7 @@ internal class SyncApiClientTest {
     @Test
     fun whenMappingChangesThenGeneratedObjectIsCorrect() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "data_sync_sent_bookmarks.json")
-        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, "0")
+        val bookmarksChanges = SyncChangesRequest(BOOKMARKS, updatesJSON, FirstSync)
         val changes = apiClient.mapRequest(listOf(bookmarksChanges))
         assertTrue(changes.get("client_timestamp") != null)
         assertTrue(changes.get("bookmarks") != null)

@@ -26,6 +26,7 @@ import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
@@ -78,5 +79,13 @@ class AutofillModule {
         dispatcherProvider: DispatcherProvider,
     ): AutofillFeatureRepository {
         return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesCredentialsSyncDao(
+        database: AutofillDatabase,
+    ): CredentialsSyncMetadataDao {
+        return database.credentialsSyncDao()
     }
 }
