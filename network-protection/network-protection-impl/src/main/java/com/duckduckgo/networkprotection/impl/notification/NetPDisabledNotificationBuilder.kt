@@ -70,7 +70,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
         registerChannel(context)
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_netp_notification_logo)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled))
@@ -86,7 +86,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
         registerChannel(context)
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_netp_notification_logo)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled_by_vpn))
