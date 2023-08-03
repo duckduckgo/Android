@@ -86,7 +86,8 @@ class TwoLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
-                setLeadingIconBackgroundType(getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0))
+                val type = ImageBackground.from(getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0))
+                setLeadingIconBackgroundType(type)
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
@@ -94,7 +95,7 @@ class TwoLineListItem @JvmOverloads constructor(
                 setLeadingIconSize(imageSize)
             }
 
-            if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
+            if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
                 setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 

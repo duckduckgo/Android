@@ -79,7 +79,8 @@ class OneLineListItem @JvmOverloads constructor(
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
-                setLeadingIconBackgroundType(getInt(R.styleable.OneLineListItem_leadingIconBackground, 0))
+                val type = ImageBackground.from(getInt(R.styleable.OneLineListItem_leadingIconBackground, 0))
+                setLeadingIconBackgroundType(type)
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIconSize)) {

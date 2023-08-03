@@ -125,16 +125,8 @@ abstract class DaxListItem(
     }
 
     /** Sets the leading icon background image type */
-    fun setLeadingIconBackgroundType(value: Int) {
-        if (value == 0) {
-            leadingIconContainer.setBackgroundResource(android.R.color.transparent)
-        }
-        if (value == 1) {
-            leadingIconContainer.setBackgroundResource(R.drawable.list_item_image_circular_background)
-        }
-        if (value == 2) {
-            leadingIconContainer.setBackgroundResource(R.drawable.list_item_image_round_background)
-        }
+    fun setLeadingIconBackgroundType(type: ImageBackground) {
+        leadingIconContainer.setBackgroundResource(ImageBackground.background(type))
         setLeadingIconVisibility(true)
     }
 
@@ -225,6 +217,33 @@ abstract class DaxListItem(
         setEnabledOpacity(enabled)
         recursiveEnable(enabled)
         super.setEnabled(enabled)
+    }
+
+    enum class ImageBackground {
+        None,
+        Circular,
+        Rounded,
+        ;
+
+        companion object {
+            fun from(value: Int): ImageBackground {
+                // same order as attrs-lists.xml
+                return when (value) {
+                    0 -> None
+                    1 -> Circular
+                    2 -> Rounded
+                    else -> None
+                }
+            }
+
+            fun background(type: ImageBackground): Int {
+                return when (type) {
+                    None -> android.R.color.transparent
+                    Circular -> R.dimen.listItemImageMediumSize
+                    Rounded -> R.dimen.listItemImageLargeSize
+                }
+            }
+        }
     }
 
     enum class LeadingIconSize {
