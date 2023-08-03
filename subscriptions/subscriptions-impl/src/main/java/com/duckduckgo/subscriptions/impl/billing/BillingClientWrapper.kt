@@ -63,7 +63,7 @@ interface BillingClientWrapper {
 @ContributesBinding(AppScope::class, boundType = BillingClientWrapper::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = MainProcessLifecycleObserver::class)
 class RealBillingClientWrapper @Inject constructor(
-    val context: Context,
+    private val context: Context,
     val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope val coroutineScope: CoroutineScope,
 ) : BillingClientWrapper, MainProcessLifecycleObserver {
@@ -236,7 +236,7 @@ class RealBillingClientWrapper @Inject constructor(
             QueryPurchasesParams.newBuilder().setProductType(ProductType.SUBS).build(),
         ) { billingResult, purchaseList ->
             if (billingResult.responseCode == BillingResponseCode.OK) {
-                if (!purchaseList.isNullOrEmpty()) {
+                if (purchaseList.isNotEmpty()) {
                     _purchases.value = purchaseList.filter { it.purchaseState == PurchaseState.PURCHASED }
                 } else {
                     _purchases.value = emptyList()
@@ -251,5 +251,11 @@ class RealBillingClientWrapper @Inject constructor(
         // List of subscriptions
         const val BASIC_SUBSCRIPTION = "bundle_1"
         private val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
+
+        // List of plans
+        const val YEARLY_PLAN = "test-bundle-1-plan"
+        const val MONTHLY_PLAN = "test-bundle-2-plan"
+        const val UK_PLAN = "test-bundle-uk-plan"
+        const val NETHERLANDS_PLAN = "test-bundle-ne-plan"
     }
 }

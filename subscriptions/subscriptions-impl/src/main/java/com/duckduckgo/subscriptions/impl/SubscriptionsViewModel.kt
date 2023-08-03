@@ -20,10 +20,14 @@ import android.app.Activity
 import androidx.lifecycle.ViewModel
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
+import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.MONTHLY_PLAN
+import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.NETHERLANDS_PLAN
+import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.UK_PLAN
+import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
@@ -37,23 +41,29 @@ class SubscriptionsViewModel @Inject constructor(
     data class ViewState(
         val hasSubscription: Boolean? = false,
         val subscriptionDetails: ProductDetails? = null,
-        val purchases: List<Purchase>? = null,
+        val yearlySubscription: SubscriptionOfferDetails? = null,
+        val monthlySubscription: SubscriptionOfferDetails? = null,
+        val ukSubscription: SubscriptionOfferDetails? = null,
+        val netherlandsSubscription: SubscriptionOfferDetails? = null,
     )
 
     val subscriptionsFlow = combine(
-        subscriptionsRepository.purchases,
         subscriptionsRepository.subscriptionDetails,
+        subscriptionsRepository.offerDetails,
         subscriptionsRepository.hasSubscription,
-    ) { purchases, subscriptionDetails, hasSubscription ->
+    ) { subscriptionDetails, offerDetails, hasSubscription ->
         ViewState(
             hasSubscription = hasSubscription,
             subscriptionDetails = subscriptionDetails,
-            purchases = purchases,
+            yearlySubscription = offerDetails[YEARLY_PLAN],
+            monthlySubscription = offerDetails[MONTHLY_PLAN],
+            ukSubscription = offerDetails[UK_PLAN],
+            netherlandsSubscription = offerDetails[NETHERLANDS_PLAN],
         )
     }
 
-    fun buySubscription(activity: Activity, productDetails: ProductDetails) {
-        val billingParams = billingFlowParamsBuilder(productDetails = productDetails).build()
+    fun buySubscription(activity: Activity, productDetails: ProductDetails, offerToken: String) {
+        val billingParams = billingFlowParamsBuilder(productDetails = productDetails, offerToken = offerToken).build()
         billingClientWrapper.launchBillingFlow(activity, billingParams)
     }
 
