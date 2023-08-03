@@ -47,6 +47,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     private val brokenSites
         get() = binding.contentBrokenSites
 
+    private var submitted = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -106,9 +108,12 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 .show()
         }
         brokenSites.submitButton.setOnClickListener {
-            val webViewVersion = webViewVersionProvider.getFullVersion()
-            val description = brokenSites.brokenSiteFormFeedbackInput.text
-            viewModel.onSubmitPressed(webViewVersion, description)
+            if (!submitted) {
+                val webViewVersion = webViewVersionProvider.getFullVersion()
+                val description = brokenSites.brokenSiteFormFeedbackInput.text
+                viewModel.onSubmitPressed(webViewVersion, description)
+                submitted = true
+            }
         }
     }
 
