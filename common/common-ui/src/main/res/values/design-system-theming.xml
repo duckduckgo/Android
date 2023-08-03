@@ -159,6 +159,7 @@
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/white12</item>
+        <item name="daxLogoTitleText">@color/white</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -230,6 +231,7 @@
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorRipple">@color/black6</item>
+        <item name="daxLogoTitleText">@color/gray85</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->
