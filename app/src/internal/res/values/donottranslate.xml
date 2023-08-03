@@ -38,7 +38,7 @@
     <string name="devSettingsScreenUserAgentSelectorTitle">UserAgent</string>
     <string name="devSettingsScreenUserAgentNoAppId">Omit DuckDuckGo AppId</string>
     <string name="devSettingsScreenUserAgentNoVersion">Omit Webview Version</string>
-    <string name="devSettingsScreenUserAgentChrome">Chrome</string>
+    <string name="devSettingsScreenUserAgentChrome">Chrome (no appId and no Version)</string>
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
     <string name="devSettingsScreenUserAgentDuckDuckGo">DDG Default</string>
     <string name="devSettingsScreenUserAgentWebView">UA WebView</string>
