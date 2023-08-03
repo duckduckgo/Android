@@ -25,7 +25,6 @@ import android.widget.ImageView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.view.SwitchView
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 

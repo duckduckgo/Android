@@ -17,15 +17,12 @@
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
-import android.media.Image
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.view.SwitchView
-import com.duckduckgo.mobile.android.ui.view.button.Size
-import com.duckduckgo.mobile.android.ui.view.listitem.DaxListItem.LeadingIconSize.Large
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -92,9 +89,6 @@ class OneLineListItem @JvmOverloads constructor(
             if (hasValue(R.styleable.OneLineListItem_leadingIconSize)) {
                 val imageSize = LeadingIconSize.from(getInt(R.styleable.OneLineListItem_leadingIconSize, 1))
                 setLeadingIconSize(imageSize)
-                if (imageSize == Large){
-                    // minHeight = resources.getDimensionPixelSize(R.dimen.oneLineItemWithLargeImageHeight)
-                }
             }
 
             val showTrailingIcon = hasValue(R.styleable.OneLineListItem_trailingIcon)

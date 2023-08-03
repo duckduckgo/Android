@@ -25,7 +25,6 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
 import androidx.annotation.ColorRes
-import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -126,11 +125,6 @@ abstract class DaxListItem(
         } else {
             leadingIconContainer.gone()
         }
-    }
-
-    fun setVerticalPadding(@DimenRes dimen: Int){
-        val padding = resources.getDimensionPixelSize(dimen)
-        itemContainer.setPadding(0, padding, 0, padding)
     }
 
     /** Sets the leading icon background image type */
