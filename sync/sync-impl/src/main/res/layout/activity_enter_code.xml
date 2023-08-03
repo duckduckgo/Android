@@ -20,99 +20,109 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="?attr/daxColorSurface">
+              android:layout_height="match_parent">
 
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar"/>
 
-    <FrameLayout
-        android:id="@+id/enterCodeContainer"
-        android:layout_width="310dp"
-        android:layout_height="214dp"
-        app:layout_constraintTop_toBottomOf="@+id/includeToolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="@dimen/keyline_6"
-        android:layout_marginBottom="@dimen/keyline_6"
-        app:layout_constraintEnd_toEndOf="parent">
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-            android:id="@+id/enterCodeHint"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            app:typography="body1"
-            app:textType="secondary"
-            android:text="@string/sync_enter_code_hint"/>
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-            android:id="@+id/pastedCode"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:typography="body1"/>
-    </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/loadingIndicatorContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/enterCodeContainer"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="invisible">
+        android:id="@+id/qrCodeContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:background="?attr/daxColorSurface">
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/loadingIndicator"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:id="@+id/enterCodeContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/loadingIndicatorContainer"
+            android:layout_margin="@dimen/keyline_6"
+            app:layout_constraintEnd_toEndOf="parent">
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/enterCodeHint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                app:typography="body1"
+                app:textType="secondary"
+                android:text="@string/sync_enter_code_hint"/>
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/pastedCode"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:typography="body1"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/loadingIndicatorContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:indicatorSize="16dp"
-            app:trackThickness="1dp"
-            style="@style/Widget.App.CircularProgressIndicator"
-            android:indeterminate="true" />
+            app:layout_constraintBottom_toTopOf="@id/pasteCodeButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"
+            android:layout_margin="@dimen/keyline_4"
+            android:orientation="horizontal"
+            android:visibility="invisible">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/loadingIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:indicatorSize="16dp"
+                app:trackThickness="1dp"
+                style="@style/Widget.App.CircularProgressIndicator"
+                android:indeterminate="true" />
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/verifyingAuthStateHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:typography="caption"
+                app:textType="secondary"
+                android:text="@string/sync_enter_code_verifying"/>
+        </LinearLayout>
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-            android:id="@+id/verifyingAuthStateHint"
-            android:layout_width="wrap_content"
+            android:id="@+id/errorAuthStateHint"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/pasteCodeButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:gravity="center"
             app:typography="caption"
             app:textType="secondary"
-            android:text="@string/sync_enter_code_verifying"/>
-    </LinearLayout>
+            android:layout_margin="@dimen/keyline_4"
+            android:visibility="invisible"
+            android:text="@string/sync_enter_code_invalid"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-        android:id="@+id/errorAuthStateHint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/enterCodeContainer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
-        app:typography="caption"
-        app:textType="secondary"
-        android:visibility="invisible"
-        android:text="@string/sync_enter_code_invalid"/>
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/pasteCodeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:icon="@drawable/ic_paste"
+            android:gravity="center"
+            app:buttonSize="small"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginBottom="@dimen/keyline_6"
+            android:layout_gravity="center"
+            android:text="@string/sync_enter_code_paste"/>
 
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/hintBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="errorAuthStateHint,loadingIndicatorContainer" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-        android:id="@+id/pasteCodeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hintBarrier"
-        app:icon="@drawable/ic_paste"
-        android:gravity="center"
-        app:buttonSize="small"
-        android:layout_margin="@dimen/keyline_4"
-        android:layout_gravity="center"
-        android:text="@string/sync_enter_code_paste"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
