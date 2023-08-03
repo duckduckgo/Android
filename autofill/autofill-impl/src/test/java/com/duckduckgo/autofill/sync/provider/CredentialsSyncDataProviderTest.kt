@@ -31,7 +31,7 @@ import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -89,7 +89,7 @@ internal class CredentialsSyncDataProviderTest {
 
         assertTrue(result.type == SyncableType.CREDENTIALS)
         assertTrue(result.jsonString.findOccurrences("id") == 2)
-        assertTrue(result.modifiedSince == "0")
+        assertTrue(result.modifiedSince is ModifiedSince.FirstSync)
     }
 
     @Test
@@ -106,7 +106,7 @@ internal class CredentialsSyncDataProviderTest {
 
         assertTrue(result.type == SyncableType.CREDENTIALS)
         assertTrue(result.jsonString.findOccurrences("id") == 1)
-        assertTrue(result.modifiedSince == "2022-08-30T00:00:00Z")
+        assertTrue(result.modifiedSince == ModifiedSince.Timestamp("2022-08-30T00:00:00Z"))
     }
 
     @Test
