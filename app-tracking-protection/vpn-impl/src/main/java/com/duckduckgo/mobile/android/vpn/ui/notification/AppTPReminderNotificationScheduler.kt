@@ -25,7 +25,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
@@ -46,7 +45,6 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
@@ -56,7 +54,6 @@ class AppTPReminderNotificationScheduler @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder,
     private val vpnReminderNotificationContentPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin>,
     private val appTrackingProtection: AppTrackingProtection,
@@ -64,37 +61,37 @@ class AppTPReminderNotificationScheduler @Inject constructor(
     private var isAppTPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        runBlocking {
+        coroutineScope.launch {
             isAppTPEnabled.set(appTrackingProtection.isEnabled())
+            if (isAppTPEnabled.get()) {
+                // These are all relevant for when AppTP has been enabled.
+                scheduleUndesiredStopReminderAlarm()
+                cancelReminderForTomorrow()
+                hideReminderNotification()
+            }
+            enableReminderReceiver()
         }
-        if (isAppTPEnabled.get()) {
-            // These are all relevant for when AppTP has been enabled.
-            scheduleUndesiredStopReminderAlarm()
-            cancelReminderForTomorrow()
-            hideReminderNotification()
-        }
-        enableReminderReceiver()
     }
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        when (vpnStopReason) {
-            VpnStopReason.RESTART -> {} // no-op
-            VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
-            VpnStopReason.REVOKED -> onVPNRevoked()
-            else -> onVPNUndesiredStop()
+        coroutineScope.launch {
+            when (vpnStopReason) {
+                VpnStopReason.RESTART -> {} // no-op
+                VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
+                VpnStopReason.REVOKED -> onVPNRevoked()
+                else -> onVPNUndesiredStop()
+            }
         }
     }
 
-    private fun onVPNManuallyStopped() {
-        appCoroutineScope.launch(dispatchers.io()) {
-            if (vpnFeatureRemover.isFeatureRemoved()) {
-                logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
-            } else {
-                handleNotifForDisabledAppTP()
-            }
+    private suspend fun onVPNManuallyStopped() {
+        if (vpnFeatureRemover.isFeatureRemoved()) {
+            logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
+        } else {
+            handleNotifForDisabledAppTP()
         }
     }
 
