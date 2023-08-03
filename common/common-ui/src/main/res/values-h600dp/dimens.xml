@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2019 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,8 +15,6 @@
   -->
 
 <resources>
-    <dimen name="homeTabDdgLogoTopMargin">80dp</dimen>
-
     <!-- Dialogs -->
-    <dimen name="dialogRadioGroupHeightMax">176dp</dimen>
+    <dimen name="dialogRadioGroupHeightMax">376dp</dimen>
 </resources>
