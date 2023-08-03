@@ -80,7 +80,7 @@ class MessageCta : FrameLayout {
         }
 
         remoteMessageBinding.messageTitle.text = message.title
-        remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
+        remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         if (message.action2.isEmpty()) {
             remoteMessageBinding.secondaryActionButton.gone()

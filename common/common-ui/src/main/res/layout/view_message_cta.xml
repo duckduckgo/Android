@@ -14,12 +14,15 @@
   ~ limitations under the License.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <include
         android:id="@+id/remoteMessage"
-        layout="@layout/view_remote_message_cta" />
+        layout="@layout/view_remote_message_cta"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <include
         android:id="@+id/promoRemoteMessage"

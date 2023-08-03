@@ -41,7 +41,6 @@ fun RemoteMessage.asMessage(): Message {
         )
         is BigSingleAction -> Message(
             topIllustration = content.placeholder.drawable(),
-            middleIllustration = null,
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
@@ -49,7 +48,6 @@ fun RemoteMessage.asMessage(): Message {
         )
         is BigTwoActions -> Message(
             topIllustration = content.placeholder.drawable(),
-            middleIllustration = null,
             title = content.titleText,
             subtitle = content.descriptionText,
             action = content.primaryActionText,
@@ -58,13 +56,11 @@ fun RemoteMessage.asMessage(): Message {
         )
         is Medium -> Message(
             topIllustration = content.placeholder.drawable(),
-            middleIllustration = null,
             title = content.titleText,
             subtitle = content.descriptionText,
             messageType = MessageType.REMOTE_MESSAGE,
         )
         is PromoSingleAction -> Message(
-            topIllustration = null,
             middleIllustration = content.placeholder.drawable(),
             title = content.titleText,
             subtitle = content.descriptionText,

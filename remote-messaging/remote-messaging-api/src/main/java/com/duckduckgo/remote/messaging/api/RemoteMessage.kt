@@ -99,9 +99,12 @@ sealed class Action(val actionType: String, open val value: String, open val add
     data class Share(
         override val value: String,
         override val additionalParameters: Map<String, String>?,
-    ) : Action(SHARE.jsonValue, value, additionalParameters)
+    ) : Action(SHARE.jsonValue, value, additionalParameters) {
+        val title: String
+            get() = additionalParameters?.get(AdditionalParameter.TITLE.key).orEmpty()
 
-    enum class AdditionalParameter(val key: String) {
-        TITLE("title"),
+        private enum class AdditionalParameter(val key: String) {
+            TITLE("title"),
+        }
     }
 }
