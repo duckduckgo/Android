@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
@@ -43,13 +42,13 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        runBlocking {
+        coroutineScope.launch {
             isNetPEnabled.set(networkProtectionState.isEnabled())
+            if (isNetPEnabled.get()) {
+                cancelDisabledNotification()
+            }
+            enableReminderReceiver()
         }
-        if (isNetPEnabled.get()) {
-            cancelDisabledNotification()
-        }
-        enableReminderReceiver()
     }
 
     private fun cancelDisabledNotification() {
@@ -84,7 +83,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
-        runBlocking {
+        coroutineScope.launch {
             val reconfiguredNetPState = networkProtectionState.isEnabled()
             if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState) {
                 if (!reconfiguredNetPState) {
