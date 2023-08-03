@@ -12,7 +12,6 @@ ext {
 }
 
 android {
-    ndkVersion '21.4.7075529'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
         minSdk min_sdk
@@ -58,8 +57,11 @@ android {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
     }
     signingConfigs {
         release
@@ -100,12 +102,6 @@ android {
         if (names.contains("fdroid") && variant.buildType.name == "debug") {
             // We don't need fdroidDebug build type
             setIgnore(true)
-        }
-    }
-    externalNativeBuild {
-
-        cmake {
-            path "CMakeLists.txt"
         }
     }
     lint {
@@ -180,9 +176,10 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':browser-api')
     implementation project(':statistics')
-    implementation project(':common')
+    implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
+    internalImplementation project(':common-ui-internal')
     implementation project(':di')
     implementation project(':app-tracking-api')
     implementation project(':vpn-impl')
@@ -259,8 +256,13 @@ dependencies {
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
 
+    implementation project(':httpsupgrade-api')
+    implementation project(':httpsupgrade-impl')
+    implementation project(':httpsupgrade-store')
+
     implementation project(':sync-api')
     implementation project(':sync-impl')
+    internalImplementation project(':sync-internal')
     implementation project(':sync-store')
     implementation project(':sync-lib')
 
@@ -270,8 +272,6 @@ dependencies {
 
     implementation project(':windows-api')
     implementation project(':windows-impl')
-    implementation project(':windows-store')
-
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
     implementation project(':saved-sites-store')
@@ -280,6 +280,8 @@ dependencies {
     implementation project(':runtime-checks-store')
 
     implementation project(':installation-impl')
+
+    implementation project(':internal-features-api')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

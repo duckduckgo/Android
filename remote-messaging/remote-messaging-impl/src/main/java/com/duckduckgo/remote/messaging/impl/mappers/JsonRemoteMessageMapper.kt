@@ -22,30 +22,29 @@ import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder
+import com.duckduckgo.remote.messaging.api.Content.PromoSingleAction
 import com.duckduckgo.remote.messaging.api.Content.Small
+import com.duckduckgo.remote.messaging.api.JsonMessageAction
+import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.*
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.APP_TP_ONBOARDING
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DEFAULT_BROWSER
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DISMISS
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.PLAYSTORE
-import com.duckduckgo.remote.messaging.impl.models.JsonActionType.URL
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.PROMO_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import java.util.Locale
 import timber.log.Timber
 
-private val smallMapper: (JsonContent) -> Content = { jsonContent ->
+private val smallMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, _ ->
     Small(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
     )
 }
 
-private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
+private val mediumMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, _ ->
     Medium(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
@@ -53,25 +52,35 @@ private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
     )
 }
 
-private val bigMessageSingleActionMapper: (JsonContent) -> Content = { jsonContent ->
+private val bigMessageSingleActionMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
     BigSingleAction(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
-        primaryAction = jsonContent.primaryAction!!.toAction(),
+        primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
     )
 }
 
-private val bigMessageTwoActionMapper: (JsonContent) -> Content = { jsonContent ->
+private val bigMessageTwoActionMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
     BigTwoActions(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
         placeholder = jsonContent.placeholder.asPlaceholder(),
         primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
-        primaryAction = jsonContent.primaryAction!!.toAction(),
+        primaryAction = jsonContent.primaryAction!!.toAction(actionMappers),
         secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
-        secondaryAction = jsonContent.secondaryAction!!.toAction(),
+        secondaryAction = jsonContent.secondaryAction!!.toAction(actionMappers),
+    )
+}
+
+private val promoSingleActionMapper: (JsonContent, Set<MessageActionMapperPlugin>) -> Content = { jsonContent, actionMappers ->
+    PromoSingleAction(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        descriptionText = jsonContent.descriptionText.failIfEmpty(),
+        placeholder = jsonContent.placeholder.asPlaceholder(),
+        actionText = jsonContent.actionText.failIfEmpty(),
+        action = jsonContent.action!!.toAction(actionMappers),
     )
 }
 
@@ -81,44 +90,22 @@ private val messageMappers = mapOf(
     Pair(MEDIUM.jsonValue, mediumMapper),
     Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleActionMapper),
     Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper),
+    Pair(PROMO_SINGLE_ACTION.jsonValue, promoSingleActionMapper),
 )
 
-private val urlActionMapper: (JsonMessageAction) -> Action = {
-    Action.Url(it.value)
-}
+fun List<JsonRemoteMessage>.mapToRemoteMessage(
+    locale: Locale,
+    actionMappers: Set<MessageActionMapperPlugin>,
+): List<RemoteMessage> = this.mapNotNull { it.map(locale, actionMappers) }
 
-private val dismissActionMapper: (JsonMessageAction) -> Action = {
-    Action.Dismiss()
-}
-
-private val playStoreActionMapper: (JsonMessageAction) -> Action = {
-    Action.PlayStore(it.value)
-}
-
-private val defaultBrowserActionMapper: (JsonMessageAction) -> Action = {
-    Action.DefaultBrowser()
-}
-
-private val appTpOnboardingActionMapper: (JsonMessageAction) -> Action = {
-    Action.AppTpOnboarding()
-}
-
-// plugin point?
-private val actionMappers = mapOf(
-    Pair(URL.jsonValue, urlActionMapper),
-    Pair(DISMISS.jsonValue, dismissActionMapper),
-    Pair(PLAYSTORE.jsonValue, playStoreActionMapper),
-    Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper),
-    Pair(APP_TP_ONBOARDING.jsonValue, appTpOnboardingActionMapper),
-)
-
-fun List<JsonRemoteMessage>.mapToRemoteMessage(locale: Locale): List<RemoteMessage> = this.mapNotNull { it.map(locale) }
-
-private fun JsonRemoteMessage.map(locale: Locale): RemoteMessage? {
+private fun JsonRemoteMessage.map(
+    locale: Locale,
+    actionMappers: Set<MessageActionMapperPlugin>,
+): RemoteMessage? {
     return runCatching {
         val remoteMessage = RemoteMessage(
             id = this.id.failIfEmpty(),
-            content = this.content!!.mapToContent(this.content.messageType),
+            content = this.content!!.mapToContent(this.content.messageType, actionMappers),
             matchingRules = this.matchingRules.orEmpty(),
             exclusionRules = this.exclusionRules.orEmpty(),
         )
@@ -140,12 +127,20 @@ private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentT
     }
 }
 
-private fun JsonContent.mapToContent(messageType: String): Content {
-    return messageMappers[messageType]?.invoke(this) ?: throw IllegalArgumentException("Message type not found")
+private fun JsonContent.mapToContent(
+    messageType: String,
+    actionMappers: Set<MessageActionMapperPlugin>,
+): Content {
+    return messageMappers[messageType]?.invoke(this, actionMappers) ?: throw IllegalArgumentException("Message type not found")
 }
 
-private fun JsonMessageAction.toAction(): Action {
-    return actionMappers[this.type]?.invoke(this) ?: throw IllegalArgumentException("Unknown Action Type")
+private fun JsonMessageAction.toAction(actionMappers: Set<MessageActionMapperPlugin>): Action {
+    actionMappers.forEach {
+        val result = it.evaluate(this)
+        if (result != null) return result
+    }
+
+    throw IllegalArgumentException("Unknown Action Type")
 }
 
 private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
@@ -172,6 +167,11 @@ private fun Content.localize(translations: JsonContentTranslations): Content {
         is Small -> this.copy(
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+        )
+        is PromoSingleAction -> this.copy(
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+            actionText = translations.actionText.takeUnless { it.isEmpty() } ?: this.actionText,
         )
     }
 }

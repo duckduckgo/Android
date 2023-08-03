@@ -16,6 +16,8 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
+import com.duckduckgo.remote.messaging.api.JsonMessageAction
+
 data class JsonRemoteMessagingConfig(
     val version: Long,
     val messages: List<JsonRemoteMessage>,
@@ -39,6 +41,8 @@ data class JsonContent(
     val primaryAction: JsonMessageAction? = null,
     val secondaryActionText: String = "",
     val secondaryAction: JsonMessageAction? = null,
+    val actionText: String = "",
+    val action: JsonMessageAction? = null,
 )
 
 data class JsonContentTranslations(
@@ -47,6 +51,7 @@ data class JsonContentTranslations(
     val descriptionText: String = "",
     val primaryActionText: String = "",
     val secondaryActionText: String = "",
+    val actionText: String = "",
 )
 
 data class JsonMatchingRule(
@@ -62,22 +67,10 @@ data class JsonMatchingAttribute(
     val fallback: Boolean? = null,
 )
 
-data class JsonMessageAction(
-    val type: String,
-    val value: String,
-)
-
-sealed class JsonActionType(val jsonValue: String) {
-    object URL : JsonActionType("url")
-    object PLAYSTORE : JsonActionType("playstore")
-    object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
-    object DISMISS : JsonActionType("dismiss")
-    object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
-}
-
 sealed class JsonMessageType(val jsonValue: String) {
     object SMALL : JsonMessageType("small")
     object MEDIUM : JsonMessageType("medium")
     object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
     object BIG_TWO_ACTION : JsonMessageType("big_two_action")
+    object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
 }

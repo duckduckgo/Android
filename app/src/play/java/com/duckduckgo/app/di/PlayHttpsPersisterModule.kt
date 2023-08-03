@@ -18,10 +18,11 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
+import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
+import com.duckduckgo.httpsupgrade.impl.di.HttpsPersisterModule
+import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi

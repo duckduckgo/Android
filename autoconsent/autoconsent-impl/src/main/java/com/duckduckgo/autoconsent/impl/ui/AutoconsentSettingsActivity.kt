@@ -32,11 +32,11 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.autoconsent.api.WebViewActivityWithParams
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.databinding.ActivityAutoconsentSettingsBinding
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.Command
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsViewModel.ViewState
+import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter

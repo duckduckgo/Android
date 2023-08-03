@@ -20,6 +20,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
+import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -119,6 +120,7 @@ import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelp
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -197,9 +199,6 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
-import com.duckduckgo.mobile.android.ui.view.DaxDialog
-import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
-import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
@@ -1062,6 +1061,7 @@ class BrowserTabFragment :
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url)
+            is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
@@ -1150,7 +1150,7 @@ class BrowserTabFragment :
                 notifyEmailSignEvent()
             }
 
-            is Command.PrintLink -> launchPrint(it.url)
+            is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation -> showAuthenticationSavedOrUpdatedSnackbar(
@@ -1299,6 +1299,11 @@ class BrowserTabFragment :
     }
 
     private fun askSiteLocationPermission(domain: String) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
 
         val title = domain.websiteFromGeoLocationsApiOrigin()
@@ -1531,6 +1536,11 @@ class BrowserTabFragment :
         activities: List<ResolveInfo>,
         useFirstActivityFound: Boolean,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         if (activities.size == 1 || useFirstActivityFound) {
             val activity = activities.first()
             val appTitle = activity.loadLabel(pm)
@@ -1547,6 +1557,11 @@ class BrowserTabFragment :
         context: Context,
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val isShowing = loginDetectionDialog?.isShowing()
 
         if (isShowing != true) {
@@ -1578,6 +1593,11 @@ class BrowserTabFragment :
         context: Context,
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val isShowing = automaticFireproofDialog?.isShowing()
 
         if (isShowing != true) {
@@ -1694,11 +1714,16 @@ class BrowserTabFragment :
         pendingUploadTask?.onReceiveValue(uris)
     }
 
-    private fun showToast(@StringRes messageId: Int) {
-        Toast.makeText(context?.applicationContext, messageId, Toast.LENGTH_LONG).show()
+    private fun showToast(@StringRes messageId: Int, length: Int = Toast.LENGTH_LONG) {
+        Toast.makeText(context?.applicationContext, messageId, length).show()
     }
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         val authDialogBinding = HttpAuthenticationBinding.inflate(layoutInflater)
         authDialogBinding.httpAuthInformationText.text = getString(R.string.authenticationDialogMessage, request.site)
         CustomAlertDialogBuilder(requireActivity())
@@ -2330,6 +2355,27 @@ class BrowserTabFragment :
         }
         try {
             startActivity(Intent.createChooser(intent, null))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
+    }
+
+    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+        val share = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, url)
+            putExtra(Intent.EXTRA_TITLE, shareTitle)
+            type = "text/plain"
+        }
+
+        val pi = PendingIntent.getBroadcast(
+            requireContext(),
+            0,
+            Intent(requireContext(), SharePromoLinkRMFBroadCastReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        try {
+            startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }
@@ -3226,6 +3272,9 @@ class BrowserTabFragment :
                 newBrowserTab.messageCta.onSecondaryActionClicked {
                     viewModel.onMessageSecondaryButtonClicked()
                 }
+                newBrowserTab.messageCta.onPromoActionClicked {
+                    viewModel.onMessageActionButtonClicked()
+                }
             }
         }
 
@@ -3417,6 +3466,7 @@ class BrowserTabFragment :
             Timber.i("Entering full screen")
             binding.webViewFullScreenContainer.show()
             activity?.toggleFullScreen()
+            showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
         private fun exitFullScreen() {
@@ -3434,13 +3484,13 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibar.omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    private fun launchPrint(url: String) {
+    private fun launchPrint(url: String, defaultMediaSize: PrintAttributes.MediaSize) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
                 printManager.print(
                     url,
                     printAdapter,
-                    PrintAttributes.Builder().build(),
+                    PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
                 )
             }
         }
@@ -3450,8 +3500,13 @@ class BrowserTabFragment :
         permissionsToRequest: Array<String>,
         request: PermissionRequest,
     ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
         activity?.let {
-            sitePermissionsDialogLauncher.askForSitePermission(it, webView?.url.orEmpty(), tabId, permissionsToRequest, request, this)
+            sitePermissionsDialogLauncher.askForSitePermission(it, request.origin.toString(), tabId, permissionsToRequest, request, this)
         }
     }
 

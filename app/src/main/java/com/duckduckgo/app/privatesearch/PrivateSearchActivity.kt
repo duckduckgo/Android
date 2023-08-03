@@ -25,17 +25,22 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPrivateSearchBinding
-import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.privatesearch.PrivateSearchViewModel.Command
+import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PrivateSearchScreenNoParams::class)
 class PrivateSearchActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: PrivateSearchViewModel by bindViewModel()
     private val binding: ActivityPrivateSearchBinding by viewBinding()
@@ -84,10 +89,10 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchCustomizeSearchWebPage() {
-        startActivity(
-            WebViewActivity.intent(
-                this@PrivateSearchActivity,
-                DUCKDUCKGO_SETTINGS_WEB_LINK,
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = DUCKDUCKGO_SETTINGS_WEB_LINK,
                 getString(R.string.privateSearchMoreSearchSettingsTitle),
             ),
         )

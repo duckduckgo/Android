@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.print.PrintAttributes
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
@@ -86,6 +87,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryI
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -395,6 +397,8 @@ class BrowserTabViewModelTest {
 
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
 
+    private val mockDeviceInfo: DeviceInfo = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -504,6 +508,7 @@ class BrowserTabViewModelTest {
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
             surveyNotificationScheduler = mockSurveyNotificationScheduler,
+            device = mockDeviceInfo,
         )
 
         testee.loadData("abc", null, false, false)
@@ -3639,15 +3644,38 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsToPrintPageThenPrintLinkCommandSent() {
+    fun whenUserSelectsToPrintPageAndCountryFromLetterFormatDefinedSetThenPrintLinkCommandSentWithLetter() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
         val command = captureCommands().value as Command.PrintLink
         assertEquals("foo.com", command.url)
+        assertEquals(PrintAttributes.MediaSize.NA_LETTER, command.mediaSize)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndCountryNotFromLetterFormatDefinedSetThenPrintLinkCommandSentWithA4() {
+        whenever(mockDeviceInfo.country).thenReturn("FR")
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        val command = captureCommands().value as Command.PrintLink
+        assertEquals("foo.com", command.url)
+        assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageAndCountryIsEmptyThenPrintLinkCommandSentWithA4() {
+        whenever(mockDeviceInfo.country).thenReturn("")
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        val command = captureCommands().value as Command.PrintLink
+        assertEquals("foo.com", command.url)
+        assertEquals(PrintAttributes.MediaSize.ISO_A4, command.mediaSize)
     }
 
     @Test
     fun whenUserSelectsToPrintPageThenPixelIsSent() {
+        whenever(mockDeviceInfo.country).thenReturn("US")
         loadUrl("foo.com")
         testee.onPrintSelected()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
@@ -3998,8 +4026,8 @@ class BrowserTabViewModelTest {
         testee.onMessageShown()
 
         verify(mockRemoteMessagingRepository).markAsShown(remoteMessage)
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("cta" to "id1"))
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("message" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4011,7 +4039,7 @@ class BrowserTabViewModelTest {
         testee.onMessageCloseButtonClicked()
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4023,7 +4051,7 @@ class BrowserTabViewModelTest {
         testee.onMessagePrimaryButtonClicked()
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4035,7 +4063,19 @@ class BrowserTabViewModelTest {
         testee.onMessageSecondaryButtonClicked()
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("message" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessageActionButtonClickedThenFirePixelAndDontDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageActionButtonClicked()
+
+        verify(mockRemoteMessagingRepository, never()).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4335,6 +4375,39 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenMultipleTabsAndViewModelIsForActiveTabThenActiveTabReturnsTrue() {
+        val tabId = "abc123"
+        selectedTabLiveData.value = aTabEntity(id = tabId)
+        loadTabWithId("foo")
+        loadTabWithId("bar")
+        loadTabWithId(tabId)
+        assertTrue(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenMultipleTabsAndViewModelIsForInactiveTabThenActiveTabReturnsFalse() {
+        val tabId = "abc123"
+        selectedTabLiveData.value = aTabEntity(id = tabId)
+        loadTabWithId(tabId)
+        loadTabWithId("foo")
+        loadTabWithId("bar")
+        assertFalse(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenSingleTabThenActiveTabReturnsTrue() {
+        val tabId = "abc123"
+        selectedTabLiveData.value = aTabEntity(id = tabId)
+        loadTabWithId(tabId)
+        assertTrue(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenNoTabsThenActiveTabReturnsFalse() {
+        assertFalse(testee.isActiveTab())
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -4514,6 +4587,14 @@ class BrowserTabViewModelTest {
 
     private suspend fun givenRemoteMessage(remoteMessage: RemoteMessage) {
         remoteMessageFlow.send(remoteMessage)
+    }
+
+    private fun aTabEntity(id: String): TabEntity {
+        return TabEntity(tabId = id, position = 0)
+    }
+
+    private fun loadTabWithId(tabId: String) {
+        testee.loadData(tabId, initialUrl = null, skipHome = false, favoritesOnboarding = false)
     }
 
     private fun loadUrl(

@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Privat browsen mit unserer App für Windows</string>
     <string name="windows_settings_description_ready">Download verfügbar</string>
     <string name="windows_settings_description_list">Du stehst jetzt auf der Warteliste!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Ziehe von oben nach unten und tippe auf die Zurück-Schaltfläche, um den Vollbildmodus zu verlassen</string>
 </resources>

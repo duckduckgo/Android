@@ -21,6 +21,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Message
+import android.print.PrintAttributes
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -83,6 +84,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
@@ -191,6 +193,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
+    private val device: DeviceInfo,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     UrlExtractionListener,
@@ -353,7 +356,8 @@ class BrowserTabViewModel @Inject constructor(
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
-        class PrintLink(val url: String) : Command()
+        class SharePromoLinkRMF(val url: String, val shareTitle: String) : Command()
+        class PrintLink(val url: String, val mediaSize: PrintAttributes.MediaSize) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
@@ -1225,7 +1229,6 @@ class BrowserTabViewModel @Inject constructor(
             canSaveSite = domain != null,
             addFavorite = addFavorite,
             addToHomeEnabled = domain != null,
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = domain != null,
             showPrivacyShield = true,
             canReportSite = domain != null,
@@ -1414,7 +1417,6 @@ class BrowserTabViewModel @Inject constructor(
             canSaveSite = false,
             addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
-            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
             showPrivacyShield = false,
             canReportSite = false,
@@ -2469,6 +2471,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onMessageActionButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
+            command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
+        }
+    }
+
     fun onUserHideDaxDialog() {
         val cta = currentCtaViewState().cta ?: return
         command.value = DaxCommand.HideDaxDialog(cta)
@@ -2559,7 +2570,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onPrintSelected() {
         url?.let {
             pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
-            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it))
+            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it), defaultMediaSize())
         }
     }
 
@@ -2835,6 +2846,14 @@ class BrowserTabViewModel @Inject constructor(
         return isLinkOpenedInNewTab
     }
 
+    override fun isActiveTab(): Boolean {
+        liveSelectedTab.value?.let {
+            return it.tabId == tabId
+        }
+
+        return false
+    }
+
     fun onAutofillMenuSelected() {
         command.value = LaunchAutofillSettings
     }
@@ -2880,6 +2899,15 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(RejectGeneratedPassword(originalUrl))
     }
 
+    private fun defaultMediaSize(): PrintAttributes.MediaSize {
+        val country = device.country.uppercase(Locale.getDefault())
+        return if (PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2.contains(country)) {
+            PrintAttributes.MediaSize.NA_LETTER
+        } else {
+            PrintAttributes.MediaSize.ISO_A4
+        }
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
@@ -2888,5 +2916,12 @@ class BrowserTabViewModel @Inject constructor(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
+
+        // https://www.iso.org/iso-3166-country-codes.html
+        private val PRINT_LETTER_FORMAT_COUNTRIES_ISO3166_2 = setOf(
+            Locale.US.country,
+            Locale.CANADA.country,
+            "MX", // Mexico
+        )
     }
 }

@@ -16,10 +16,10 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
+import com.duckduckgo.remote.messaging.api.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
-import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 
@@ -27,9 +27,11 @@ object JsonRemoteMessageOM {
     private fun jsonMessageAction(
         type: String = "url",
         value: String = "http://example.com",
+        additionalParameters: Map<String, String>? = null,
     ) = JsonMessageAction(
         type = type,
         value = value,
+        additionalParameters = additionalParameters,
     )
 
     fun smallJsonContent(
@@ -84,6 +86,21 @@ object JsonRemoteMessageOM {
         primaryAction = primaryAction,
         secondaryActionText = secondaryActionText,
         secondaryAction = secondaryAction,
+    )
+
+    fun promoSingleActionJsonContent(
+        titleText: String = "title",
+        descriptionText: String = "description",
+        placeholder: String = "NewForMacAndWindows",
+        actionText: String = "Action",
+        action: JsonMessageAction = jsonMessageAction(),
+    ) = JsonContent(
+        messageType = "promo_single_action",
+        titleText = titleText,
+        descriptionText = descriptionText,
+        placeholder = placeholder,
+        actionText = actionText,
+        action = action,
     )
 
     fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)

@@ -3,16 +3,17 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.7.10'
-        spotless = "6.1.2"
-        anvil_version = "2.4.1"
-        gradle_plugin = "7.2.2" // When updating, also update lint_version
-        lint_version = "30.2.2" // This value must always be gradle_plugin + 23
+        kotlin_version = '1.8.10'
+        spotless = '6.1.2'
+        anvil_version = '2.4.4'
+        gradle_plugin = '7.4.2' // When updating, also update lint_version
+        lint_version = '30.4.2' // This value must always be gradle_plugin + 23
         min_sdk = 23
         target_sdk = 33
         compile_sdk = 33
-        fladle_version = "0.17.4"
-        kotlinter_version = "3.12.0"
+        fladle_version = '0.17.4'
+        kotlinter_version = '3.12.0'
+        dokka_version = '1.8.20'
     }
 
     repositories {
@@ -32,6 +33,7 @@ buildscript {
 }
 
 plugins {
+    id 'org.jetbrains.dokka' version "$dokka_version"
     id 'com.osacky.fulladle' version "$fladle_version"
     id 'org.jmailen.kotlinter' version "$kotlinter_version" apply false
 }
@@ -48,7 +50,11 @@ allprojects {
 
 subprojects {
 
-    String[] allowAndroidTestsIn = ["app", "sync-lib"]
+    if (project.name.endsWith("api")) {
+        apply plugin: 'org.jetbrains.dokka'
+    }
+
+    String[] allowAndroidTestsIn = ["app", "sync-lib", "httpsupgrade-impl"]
     if (!allowAndroidTestsIn.contains(project.name)) {
         project.projectDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
             if (parent.name == "src") {
@@ -77,17 +83,21 @@ subprojects {
     }
 
     def projectPath = path
-    configurations.all {
+    configurations.configureEach {
         if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {
             incoming.beforeResolve {
                 for (dependency in dependencies) {
                     if (dependency instanceof ProjectDependency) {
                         def dependencyPath = dependency.dependencyProject.path
                         if (dependencyPath == projectPath) continue
-                        // vpn-internal is part of vpn-impl
-                        if (projectPath.endsWith(':vpn-internal') && dependencyPath.endsWith(':vpn-impl')) continue
-                        // network-protection-internal is part of network-protection-impl
-                        if (projectPath.endsWith(':network-protection-internal') && dependencyPath.endsWith(':network-protection-impl')) continue
+                        // internal modules have to use internalImplementation
+                        // when a non internal configuration is built (i.e. PlayDebug) no internal dependencies should be found
+                        if (dependencyPath.endsWith('internal') && !name.toLowerCase().contains("internal")) {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "'internal' modules must use internalImplementation")
+                        }
+                        // internal modules can depend on impl
+                        if (projectPath.endsWith('internal') && dependencyPath.endsWith('impl')) continue
                         if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")

@@ -469,7 +469,7 @@
         <item quantity="other"><![CDATA[ e<b>%1$doutros</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ estava a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ estava a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
         <item quantity="other"><![CDATA[ estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>
@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Navegue em privado com a nossa aplicação para Windows</string>
     <string name="windows_settings_description_ready">Transferência disponível</string>
     <string name="windows_settings_description_list">Já está na lista!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Arraste para baixo a partir da parte superior e toque no botão de retrocesso para sair do ecrã completo</string>
 </resources>

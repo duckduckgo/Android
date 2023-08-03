@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Surf privat med vår app for Windows</string>
     <string name="windows_settings_description_ready">Nedlasting tilgjengelig</string>
     <string name="windows_settings_description_list">Du er satt på listen!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Dra ovenfra og nedover og trykk på tilbake-knappen for å gå ut av fullskjerm</string>
 </resources>

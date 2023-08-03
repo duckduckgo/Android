@@ -31,6 +31,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
@@ -38,6 +39,7 @@ import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.R.string
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -47,6 +49,7 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermiss
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -65,6 +68,9 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val viewModel: VpnOnboardingViewModel by bindViewModel()
     private val binding: ActivityVpnOnboardingBinding by viewBinding()
@@ -110,7 +116,13 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFAQ() {
-        startActivity(DeviceShieldFAQActivity.intent(this))
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = FAQ_WEBSITE,
+                screenTitle = getString(string.atp_FAQActivityTitle),
+            ),
+        )
     }
 
     private fun showOnboardingPage(position: Int) {
@@ -298,5 +310,6 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
+        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
     }
 }

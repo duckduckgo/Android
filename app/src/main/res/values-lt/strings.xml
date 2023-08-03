@@ -471,7 +471,7 @@
         <item quantity="other"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="few"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="many"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="other"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
@@ -764,4 +764,7 @@
     <string name="windows_settings_description">Naršykite privačiai naudodami mūsų programą, skirtą „Windows“</string>
     <string name="windows_settings_description_ready">Galima atsisiųsti</string>
     <string name="windows_settings_description_list">Jūs jau sąraše!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Vilkite žemyn iš viršaus ir bakstelėkite grįžties mygtuką, kad išeitumėte iš viso ekrano režimo</string>
 </resources>

@@ -653,7 +653,8 @@
       "optOut": [
         {
           "hide": [
-            "#html-body #notice-cookie-block"
+            "#html-body #notice-cookie-block",
+            "#notice-cookie"
           ]
         }
       ]
@@ -1131,6 +1132,66 @@
       "test": [
         {
           "eval": "document.cookie.indexOf('cookielawinfo-checkbox-non-necessary=yes') === -1"
+        }
+      ]
+    },
+    {
+      "name": "cookie-manager-popup",
+      "cosmetic": false,
+      "runContext": {
+        "main": true,
+        "frame": false
+      },
+      "intermediate": false,
+      "detectCmp": [
+        {
+          "exists": "#notice-cookie-block #allow-functional-cookies, #notice-cookie-block #btn-cookie-settings"
+        }
+      ],
+      "detectPopup": [
+        {
+          "visible": "#notice-cookie-block"
+        }
+      ],
+      "optIn": [
+        {
+          "click": "#btn-cookie-allow"
+        }
+      ],
+      "optOut": [
+        {
+          "if": {
+            "exists": "#allow-functional-cookies"
+          },
+          "then": [
+            {
+              "click": "#allow-functional-cookies"
+            }
+          ],
+          "else": [
+            {
+              "waitForThenClick": "#btn-cookie-settings"
+            },
+            {
+              "waitForVisible": ".modal-body"
+            },
+            {
+              "click": ".modal-body input:checked, .switch[data-switch=\"on\"]",
+              "all": true,
+              "optional": true
+            },
+            {
+              "click": "[role=\"dialog\"] .modal-footer button"
+            }
+          ]
+        }
+      ],
+      "prehideSelectors": [
+        "#btn-cookie-settings"
+      ],
+      "test": [
+        {
+          "eval": "JSON.parse(document.cookie.split(';').find(c => c.trim().startsWith('CookieLevel')).split('=')[1]).social === false"
         }
       ]
     },
@@ -4265,6 +4326,80 @@
       ]
     },
     {
+      "name": "ubuntu.com",
+      "prehideSelectors": [
+        "dialog.cookie-policy"
+      ],
+      "detectCmp": [
+        {
+          "any": [
+            {
+              "exists": "dialog.cookie-policy header"
+            },
+            {
+              "exists": "xpath///*[@id=\"modal\"]/div/header"
+            }
+          ]
+        }
+      ],
+      "detectPopup": [
+        {
+          "any": [
+            {
+              "visible": "dialog header"
+            },
+            {
+              "visible": "xpath///*[@id=\"modal\"]/div/header"
+            }
+          ]
+        }
+      ],
+      "optIn": [
+        {
+          "any": [
+            {
+              "waitForThenClick": "#cookie-policy-button-accept"
+            },
+            {
+              "waitForThenClick": "xpath///*[@id=\"cookie-policy-button-accept\"]"
+            }
+          ]
+        }
+      ],
+      "optOut": [
+        {
+          "any": [
+            {
+              "waitForThenClick": "button.p-button"
+            },
+            {
+              "waitForThenClick": "xpath///*[@id=\"cookie-policy-content\"]/p[4]/button[2]"
+            }
+          ]
+        },
+        {
+          "waitForThenClick": ".p-switch__input:checked",
+          "optional": true,
+          "all": true
+        },
+        {
+          "any": [
+            {
+              "waitForThenClick": "div > button"
+            },
+            {
+              "waitForThenClick": "xpath///*[@id=\"modal\"]/div/button"
+            }
+          ]
+        }
+      ],
+      "test": [
+        {
+          "eval": "document.cookie === '_cookies_accepted=essential'"
+        }
+      ]
+    },
+    {
       "name": "UK Cookie Consent",
       "prehideSelectors": [
         "#catapult-cookie-bar"
@@ -4337,6 +4472,12 @@
       "detectPopup": [
         {
           "eval": "typeof UC_UI === 'object'"
+        },
+        {
+          "exists": [
+            "#usercentrics-root",
+            "[data-testid=uc-container]"
+          ]
         }
       ],
       "optIn": [

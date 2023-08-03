@@ -42,7 +42,6 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
-import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -50,6 +49,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -62,13 +62,7 @@ import com.duckduckgo.networkprotection.api.NetPWaitlistScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.duckduckgo.windows.api.WindowsWaitlistState
-import com.duckduckgo.windows.api.WindowsWaitlistState.FeatureEnabled
-import com.duckduckgo.windows.api.WindowsWaitlistState.InBeta
-import com.duckduckgo.windows.api.WindowsWaitlistState.JoinedWaitlist
-import com.duckduckgo.windows.api.WindowsWaitlistState.NotJoinedQueue
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
-import com.duckduckgo.windows.api.ui.WindowsWaitlistScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -187,7 +181,6 @@ class SettingsActivity : DuckDuckGoActivity() {
                     )
                     updateNetPSettings(it.networkProtectionStateEnabled, it.networkProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
-                    updateWindowsSettings(it.windowsWaitlistState)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
@@ -205,19 +198,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             View.VISIBLE
         } else {
             View.GONE
-        }
-    }
-
-    private fun updateWindowsSettings(waitlistState: WindowsWaitlistState?) {
-        viewsMore.windowsSetting.isVisible = waitlistState != null
-
-        with(viewsMore) {
-            when (waitlistState) {
-                is InBeta -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_ready))
-                is JoinedWaitlist -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description_list))
-                is NotJoinedQueue, FeatureEnabled -> windowsSetting.setSecondaryText(getString(R.string.windows_settings_description))
-                null -> {}
-            }
         }
     }
 
@@ -260,7 +240,6 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             is Command.LaunchMacOs -> launchMacOsScreen()
-            is Command.LaunchWindowsWaitlist -> launchWindowsWaitlistScreen()
             is Command.LaunchWindows -> launchWindowsScreen()
             is Command.LaunchSyncSettings -> launchSyncSettings()
             is Command.LaunchPrivateSearchWebPage -> launchPrivateSearchScreen()
@@ -372,11 +351,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchMacOsScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, MacOsScreenWithEmptyParams, options)
-    }
-
-    private fun launchWindowsWaitlistScreen() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, WindowsWaitlistScreenWithEmptyParams, options)
     }
 
     private fun launchWindowsScreen() {

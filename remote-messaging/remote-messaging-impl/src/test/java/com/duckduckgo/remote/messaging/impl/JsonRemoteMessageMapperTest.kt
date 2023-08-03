@@ -22,15 +22,19 @@ import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigSingleAct
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigTwoActionJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.emptyJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.mediumJsonContent
+import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.promoSingleActionJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.smallJsonContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigSingleActionMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigTwoActionsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aPromoSingleActionMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigTwoActionsContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.mediumContent
+import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.promoSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.smallContent
+import com.duckduckgo.remote.messaging.fixtures.messageActionPlugins
 import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
@@ -45,7 +49,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
 
     @Test
     fun whenJsonMessageThenReturnMessage() {
-        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage(Locale.FRANCE)
+        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage(Locale.FRANCE, messageActionPlugins)
 
         assertEquals(testCase.expectedMessages, remoteMessages)
     }
@@ -60,12 +64,14 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aJsonMessage(id = "id2", content = mediumJsonContent()),
                     aJsonMessage(id = "id3", content = bigSingleActionJsonContent()),
                     aJsonMessage(id = "id4", content = bigTwoActionJsonContent()),
+                    aJsonMessage(id = "id5", content = promoSingleActionJsonContent()),
                 ),
                 listOf(
                     aSmallMessage(id = "id1"),
                     aMediumMessage(id = "id2"),
                     aBigSingleActionMessage(id = "id3"),
                     aBigTwoActionsMessage(id = "id4"),
+                    aPromoSingleActionMessage(id = "id5"),
                 ),
             ),
             TestCase(
@@ -75,12 +81,14 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aJsonMessage(id = "id3", content = mediumJsonContent()),
                     aJsonMessage(id = "id4", content = bigSingleActionJsonContent()),
                     aJsonMessage(id = "id5", content = bigTwoActionJsonContent()),
+                    aJsonMessage(id = "id6", content = promoSingleActionJsonContent()),
                 ),
                 listOf(
                     aSmallMessage(id = "id2"),
                     aMediumMessage(id = "id3"),
                     aBigSingleActionMessage(id = "id4"),
                     aBigTwoActionsMessage(id = "id5"),
+                    aPromoSingleActionMessage(id = "id6"),
                 ),
             ),
             TestCase(
@@ -121,6 +129,11 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                         content = bigTwoActionJsonContent(),
                         translations = mapOf("fr" to frenchTranslations()),
                     ),
+                    aJsonMessage(
+                        id = "id5",
+                        content = promoSingleActionJsonContent(),
+                        translations = mapOf("fr" to frenchTranslations()),
+                    ),
                 ),
                 listOf(
                     aSmallMessage(
@@ -151,6 +164,14 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                             secondaryActionText = frenchTranslations().secondaryActionText,
                         ),
                     ),
+                    aPromoSingleActionMessage(
+                        id = "id5",
+                        promoSingleActionContent(
+                            titleText = frenchTranslations().titleText,
+                            descriptionText = frenchTranslations().descriptionText,
+                            actionText = frenchTranslations().actionText,
+                        ),
+                    ),
                 ),
             ),
         )
@@ -160,6 +181,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
             descriptionText = "la description",
             primaryActionText = "action principale",
             secondaryActionText = "action secondaire",
+            actionText = "action principale",
         )
     }
 

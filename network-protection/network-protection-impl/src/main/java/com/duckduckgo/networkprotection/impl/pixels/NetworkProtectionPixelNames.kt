@@ -63,7 +63,6 @@ enum class NetworkProtectionPixelNames(
     NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS_DAILY("m_netp_ev_open_settings_from_always_on_lockdown_dialog_d"),
     NETP_EXCLUSION_LIST_SHOWN("m_netp_imp_exclusion_list_c"),
     NETP_EXCLUSION_LIST_SHOWN_DAILY("m_netp_imp_exclusion_list_d"),
-    NETP_EXCLUSION_LIST_SHOWN_UNIQUE("m_netp_imp_exclusion_list_u"),
     NETP_EXCLUSION_LIST_APP_ADDED("m_netp_ev_exclusion_list_app_added_c"),
     NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING("m_netp_ev_skip_report_after_excluding_app_c"),
     NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING_DAILY("m_netp_ev_skip_report_after_excluding_app_d"),
@@ -72,4 +71,8 @@ enum class NetworkProtectionPixelNames(
     NETP_EXCLUSION_LIST_RESTORE_DEFAULTS_DAILY("m_netp_ev_exclusion_list_restore_defaults_d"),
     NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT("m_netp_ev_exclusion_list_launch_breakage_report_c"),
     NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT_DAILY("m_netp_ev_exclusion_list_launch_breakage_report_d"),
+    NETP_INFO_VPN_SHOWN("m_netp_imp_info_vpn_c"),
+    NETP_INFO_VPN_SHOWN_DAILY("m_netp_imp_info_vpn_d"),
+    NETP_FAQS_SHOWN("m_netp_imp_faqs_c"),
+    NETP_FAQS_SHOWN_DAILY("m_netp_imp_faqs_d"),
 }

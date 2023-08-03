@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Browse privat med vores app til Windows</string>
     <string name="windows_settings_description_ready">Download tilgængelig</string>
     <string name="windows_settings_description_list">Du er på listen!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Træk ned fra toppen og tryk på tilbage-knappen for at forlade fuld skærm</string>
 </resources>

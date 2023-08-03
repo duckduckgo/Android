@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser.webview
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebSettings
@@ -28,7 +26,7 @@ import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.autoconsent.api.WebViewActivityWithParams
+import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.getActivityParams
@@ -56,8 +54,9 @@ class WebViewActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(toolbar)
 
-        val url = intent.getStringExtra(URL_EXTRA)
-        title = intent.getStringExtra(TITLE_EXTRA)
+        val params = intent.getActivityParams(WebViewActivityWithParams::class.java)
+        val url = params?.url
+        title = params?.screenTitle.orEmpty()
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
@@ -80,13 +79,6 @@ class WebViewActivity : DuckDuckGoActivity() {
         url?.let {
             binding.simpleWebview.loadUrl(it)
         }
-
-        if (url == null) {
-            intent?.getActivityParams(WebViewActivityWithParams::class.java)?.let {
-                title = it.title
-                binding.simpleWebview.loadUrl(it.url)
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -104,22 +96,6 @@ class WebViewActivity : DuckDuckGoActivity() {
             binding.simpleWebview.goBack()
         } else {
             super.onBackPressed()
-        }
-    }
-
-    companion object {
-        const val URL_EXTRA = "URL_EXTRA"
-        const val TITLE_EXTRA = "TITLE_EXTRA"
-
-        fun intent(
-            context: Context,
-            urlExtra: String,
-            titleExtra: String,
-        ): Intent {
-            val intent = Intent(context, WebViewActivity::class.java)
-            intent.putExtra(URL_EXTRA, urlExtra)
-            intent.putExtra(TITLE_EXTRA, titleExtra)
-            return intent
         }
     }
 }

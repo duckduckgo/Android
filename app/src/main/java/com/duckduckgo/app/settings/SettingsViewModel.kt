@@ -34,11 +34,6 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.duckduckgo.windows.api.WindowsDownloadLinkFeature
-import com.duckduckgo.windows.api.WindowsWaitlist
-import com.duckduckgo.windows.api.WindowsWaitlistFeature
-import com.duckduckgo.windows.api.WindowsWaitlistState
-import com.duckduckgo.windows.api.WindowsWaitlistState.FeatureEnabled
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -59,11 +54,8 @@ class SettingsViewModel @Inject constructor(
     private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val networkProtectionState: NetworkProtectionState,
-    private val windowsWaitlist: WindowsWaitlist,
-    private val windowsFeature: WindowsWaitlistFeature,
     private val deviceSyncState: DeviceSyncState,
     private val netpWaitlistRepository: NetPWaitlistRepository,
-    private val windowsDownloadLinkFeature: WindowsDownloadLinkFeature,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
 ) : ViewModel() {
@@ -76,16 +68,10 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
-        val windowsWaitlistState: WindowsWaitlistState? = null,
         val networkProtectionStateEnabled: Boolean = false,
         val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
         val isAutoconsentEnabled: Boolean = false,
     )
-
-    enum class NetPState {
-        CONNECTED,
-        DISCONNECTED,
-    }
 
     sealed class Command {
         object LaunchDefaultBrowser : Command()
@@ -99,7 +85,6 @@ class SettingsViewModel @Inject constructor(
         object LaunchNetPWaitlist : Command()
         object LaunchAppTPOnboarding : Command()
         object LaunchMacOs : Command()
-        object LaunchWindowsWaitlist : Command()
         object LaunchWindows : Command()
         object LaunchSyncSettings : Command()
         object LaunchPrivateSearchWebPage : Command()
@@ -131,7 +116,6 @@ class SettingsViewModel @Inject constructor(
                     appTrackingProtectionEnabled = appTrackingProtection.isRunning(),
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
-                    windowsWaitlistState = windowsSettingState(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     networkProtectionStateEnabled = networkProtectionState.isRunning(),
                     networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
@@ -230,11 +214,7 @@ class SettingsViewModel @Inject constructor(
 
     fun windowsSettingClicked() {
         viewModelScope.launch {
-            if (windowsDownloadLinkFeature.self().isEnabled()) {
-                command.send(Command.LaunchWindows)
-            } else {
-                command.send(Command.LaunchWindowsWaitlist)
-            }
+            command.send(Command.LaunchWindows)
         }
         pixel.fire(SETTINGS_WINDOWS_APP_PRESSED)
     }
@@ -255,14 +235,6 @@ class SettingsViewModel @Inject constructor(
             viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
         }
         pixel.fire(SETTINGS_NETP_PRESSED)
-    }
-
-    private fun windowsSettingState(): WindowsWaitlistState? {
-        if (windowsDownloadLinkFeature.self().isEnabled()) {
-            return FeatureEnabled
-        }
-        if (!windowsFeature.self().isEnabled()) return null
-        return windowsWaitlist.getWaitlistState()
     }
 
     private fun currentViewState(): ViewState {

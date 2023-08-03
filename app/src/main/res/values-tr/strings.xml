@@ -756,4 +756,7 @@
     <string name="windows_settings_description">Windows uygulamamızla gizliliğinizi koruyarak gezinin</string>
     <string name="windows_settings_description_ready">İndirme mevcut</string>
     <string name="windows_settings_description_list">Listedesiniz!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Tam ekrandan çıkmak için yukarıdan aşağı sürükleyin ve geri düğmesine dokunun</string>
 </resources>

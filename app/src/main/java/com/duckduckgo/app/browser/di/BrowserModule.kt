@@ -55,7 +55,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -78,6 +77,7 @@ import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.FileDownloadCallback
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters

@@ -133,6 +133,30 @@ class NetpCohortPixelInterceptorTest {
         assertEquals(null, result.body)
     }
 
+    @Test
+    fun whenCohortLocalDateIsNotSetThenSendExemptedInfoVpnPixelUrl() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_imp_info_vpn_c")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
+    }
+
+    @Test
+    fun whenCohortLocalDateIsNotSetThenSendExemptedFaqsPixelUrl() {
+        whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
+        val pixelUrl = String.format(PIXEL_TEMPLATE, "m_netp_imp_faqs_d")
+
+        val result = testee.intercept(FakeChain(pixelUrl))
+
+        assertEquals(pixelUrl, result.request.url.toString())
+        assertEquals("", result.message)
+        assertEquals(null, result.body)
+    }
+
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?appVersion=5.135.0&test=1"
     }

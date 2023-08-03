@@ -43,6 +43,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetPAppExclusionListNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.about.NetPAboutVPNScreenNoParams
+import com.duckduckgo.networkprotection.impl.about.NetPFaqsScreenNoParams
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpManagementBinding
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.None
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.AlertState.ShowAlwaysOnLockdownEnabled
@@ -107,6 +109,14 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
         binding.settings.settingsExclusion.setClickListener {
             globalActivityStarter.start(this, NetPAppExclusionListNoParams)
+        }
+
+        binding.about.aboutVpn.setClickListener {
+            globalActivityStarter.start(this, NetPAboutVPNScreenNoParams)
+        }
+
+        binding.about.aboutFaq.setClickListener {
+            globalActivityStarter.start(this, NetPFaqsScreenNoParams)
         }
     }
 

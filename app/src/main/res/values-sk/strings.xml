@@ -764,4 +764,7 @@
     <string name="windows_settings_description">Prehliadajte súkromne s našou aplikáciou pre Windows</string>
     <string name="windows_settings_description_ready">K dispozícii na stiahnutie</string>
     <string name="windows_settings_description_list">Ste na zozname!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Potiahnutím nadol z hora a ťuknutím na tlačidlo späť opustíte zobrazenie na celú obrazovku</string>
 </resources>

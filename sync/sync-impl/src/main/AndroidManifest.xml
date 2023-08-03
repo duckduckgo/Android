@@ -42,14 +42,16 @@
             android:exported="false"
             android:label="@string/login_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"/>
+            android:parentActivityName=".ui.setup.SetupAccountActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".ui.SyncConnectActivity"
             android:exported="false"
             android:label="@string/connect_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"/>
+            android:parentActivityName=".ui.setup.SetupAccountActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".ui.ShowQRCodeActivity"

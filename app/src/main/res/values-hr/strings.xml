@@ -471,7 +471,7 @@
         <item quantity="other"><![CDATA[ i <b>%1$d drugih</b> pokušalo te ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
         <item quantity="few"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
         <item quantity="many"><![CDATA[ te pokušalo pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
         <item quantity="other"><![CDATA[ te pokušalo pratiti ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
@@ -764,4 +764,7 @@
     <string name="windows_settings_description">Privatno pregledavanje s našom aplikacijom za Windows</string>
     <string name="windows_settings_description_ready">Preuzimanje je dostupno</string>
     <string name="windows_settings_description_list">Na popisu si!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Povucite prema dolje s vrha i dodirnite gumb za natrag kako biste izašli iz prikaza preko cijelog zaslona</string>
 </resources>

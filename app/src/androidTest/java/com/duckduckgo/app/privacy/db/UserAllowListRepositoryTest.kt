@@ -55,7 +55,7 @@ class UserAllowListRepositoryTest {
             .allowMainThreadQueries()
             .build()
         dao = db.userWhitelistDao()
-        repository = RealUserAllowListRepository(db, TestScope(), coroutineRule.testDispatcherProvider)
+        repository = RealUserAllowListRepository(dao, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @After

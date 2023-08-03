@@ -306,6 +306,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addFunction(createParseJsonFun(module))
                     .addFunction(createParseExceptions(module))
                     .addFunction(createInvokeMethod(boundType))
+                    .addType(createJsonRolloutDataClass(generatedPackage, module))
+                    .addType(createJsonRolloutStepDataClass(generatedPackage, module))
                     .addType(createJsonToggleDataClass(generatedPackage, module))
                     .addType(createJsonFeatureDataClass(generatedPackage, module))
                     .addType(createJsonExceptionDataClass(generatedPackage, module))
@@ -408,16 +410,31 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     exceptionStore.insertAll(exceptions)
         
                     val isEnabled = (feature.state == "enabled") || (appBuildConfig.flavor == %T && feature.state == "internal")
-                    this.feature.get().invokeMethod("self").setEnabled(Toggle.State(isEnabled, feature.minSupportedVersion))
+                    this.feature.get().invokeMethod("self").setEnabled(
+                        Toggle.State(
+                            remoteEnableState = isEnabled,
+                            enable = isEnabled,
+                            minSupportedVersion = feature.minSupportedVersion,
+                        )
+                    )
         
                     // Handle sub-features
                     feature.features?.forEach { subfeature ->
-                        subfeature.value.let { jsonObject ->
-                            val jsonToggle = JsonToggle(jsonObject)
+                        subfeature.value.let { jsonToggle ->
+                            val previousState = this.feature.get().invokeMethod(subfeature.key).getRawStoredState()
+                            // we try to honour the previous state
+                            // else we resort to compute it using isEnabled()
+                            val previousStateValue = previousState?.enable ?: this.feature.get().invokeMethod(subfeature.key).isEnabled()
+                            
+                            val previousRolloutStep = previousState?.rolloutStep 
+                            val newStateValue = (jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"))
                             this.feature.get().invokeMethod(subfeature.key).setEnabled(
                                 Toggle.State(
-                                    enable = jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"),
+                                    remoteEnableState = newStateValue,
+                                    enable = previousStateValue,
                                     minSupportedVersion = jsonToggle.minSupportedVersion?.toInt(),
+                                    rollout = jsonToggle?.rollout?.steps?.map { it.percent },
+                                    rolloutStep = previousRolloutStep,
                                 ),
                             )
                         }
@@ -548,6 +565,47 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
+    private fun createJsonRolloutDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
+        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleRollout").asClassName(module))
+            .addModifiers(KModifier.PRIVATE)
+            .addModifiers(KModifier.DATA)
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter(
+                        "steps",
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleRolloutStep").asClassName(module)),
+                    )
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec.builder(
+                    "steps",
+                    List::class.asClassName().parameterizedBy(FqName("JsonToggleRolloutStep").asClassName(module)),
+                ).initializer("steps")
+                    .build(),
+            )
+            .build()
+    }
+
+    private fun createJsonRolloutStepDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
+        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleRolloutStep").asClassName(module))
+            .addModifiers(KModifier.PRIVATE)
+            .addModifiers(KModifier.DATA)
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("percent", Double::class.asClassName())
+                    .build(),
+            )
+            .addProperty(PropertySpec.builder("percent", Double::class.asClassName()).initializer("percent").build())
+            .build()
+    }
+
     private fun createJsonToggleDataClass(
         generatedPackage: String,
         module: ModuleDescriptor,
@@ -558,41 +616,35 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameter(
-                        "map",
-                        Map::class.asClassName().parameterizedBy(String::class.asClassName(), Any::class.asClassName().copy(nullable = true)),
+                        "state",
+                        String::class.asClassName().copy(nullable = true),
                     )
-                    .build(),
-            )
-            // Property map that matches params to generate data class
-            .addProperty(
-                PropertySpec
-                    .builder(
-                        "map",
-                        Map::class.asClassName().parameterizedBy(String::class.asClassName(), Any::class.asClassName().copy(nullable = true)),
+                    .addParameter(
+                        "minSupportedVersion",
+                        Double::class.asClassName().copy(nullable = true),
                     )
-                    .initializer("map")
-                    .build(),
-            )
-            .addProperty(
-                PropertySpec
-                    .builder(
-                        "attributes",
-                        Map::class.asClassName().parameterizedBy(String::class.asClassName(), Any::class.asClassName().copy(nullable = true)),
+                    .addParameter(
+                        "rollout",
+                        FqName("JsonToggleRollout").asClassName(module).copy(nullable = true),
                     )
-                    .addModifiers(KModifier.PRIVATE)
-                    .initializer(CodeBlock.of("map.withDefault { null }"))
                     .build(),
             )
             .addProperty(
                 PropertySpec
                     .builder("state", String::class.asClassName().copy(nullable = true))
-                    .delegate("attributes")
+                    .initializer("state")
                     .build(),
             )
             .addProperty(
                 PropertySpec
                     .builder("minSupportedVersion", Double::class.asClassName().copy(nullable = true))
-                    .delegate("attributes")
+                    .initializer("minSupportedVersion")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("rollout", FqName("JsonToggleRollout").asClassName(module).copy(nullable = true))
+                    .initializer("rollout")
                     .build(),
             )
             .build()
@@ -625,10 +677,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 "features",
                                 Map::class.asClassName().parameterizedBy(
                                     String::class.asClassName(),
-                                    Map::class.asClassName().parameterizedBy(
-                                        String::class.asClassName(),
-                                        Any::class.asClassName().copy(nullable = true),
-                                    ),
+                                    FqName("JsonToggle").asClassName(module),
                                 ).copy(nullable = true),
                             )
                             .build(),
@@ -661,7 +710,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         "features",
                         Map::class.asClassName().parameterizedBy(
                             String::class.asClassName(),
-                            Map::class.asClassName().parameterizedBy(String::class.asClassName(), Any::class.asClassName().copy(nullable = true)),
+                            FqName("JsonToggle").asClassName(module),
                         ).copy(nullable = true),
                     )
                     .initializer("features")
@@ -866,7 +915,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         return argumentAt("toggleStore", 5)?.value()
     }
 
-    private fun ClassReference.declaredFunctions(): List<FunctionReference> {
+    private fun ClassReference.declaredFunctions(): List<MemberFunctionReference> {
         return functions
             .filter { it.name != "equals" }
             .filter { it.name != "hashCode" }

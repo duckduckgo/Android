@@ -35,7 +35,6 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import javax.inject.Named
 import javax.inject.Provider
-import kotlinx.coroutines.runBlocking
 
 /**
  * Example Default User Agent (From Chrome):
@@ -110,12 +109,10 @@ class UserAgentProvider constructor(
     }
 
     private fun isHostInUserAllowedList(host: String?): Boolean {
-        return runBlocking(dispatcher.io()) {
-            if (host == null) {
-                false
-            } else {
-                userAllowListRepository.isDomainInUserAllowList(host)
-            }
+        return if (host == null) {
+            false
+        } else {
+            userAllowListRepository.isDomainInUserAllowList(host)
         }
     }
 

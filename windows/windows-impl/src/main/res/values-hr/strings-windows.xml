@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="windows_app">Aplikacija DuckDuckGo za Windows</string>
+    <string name="windows_title">Nabavi DuckDuckGo za Windows!</string>
+    <string name="windows_description">DuckDuckGo za Windows ima sve što ti je potrebno za pregledavanje s više privatnosti - privatno pretraživanje, blokiranje praćenja, prisilno šifriranje i blokiranje skočnih prozora kolačića, a u skoroj budućnosti dodat ćemo još vrhunskih značajki zaštite.\n\nNa računalu sa sustavom Windows idi na:</string>
+    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_share_title">Podijeli poveznicu</string>
+    <string name="windows_share_text">Jesi li spreman za privatno pregledavanje u sustavu Windows?\n\nPosjeti ovaj URL na svom Windows računalu za preuzimanje:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_mac_link">Tražiš verziju za Mac?</string>
+</resources>
