@@ -102,6 +102,32 @@ interface CredentialUpdateExistingCredentialsDialog {
     }
 }
 
+interface EmailProtectionChooserDialog {
+
+    @Parcelize
+    sealed interface UseEmailResultType : Parcelable {
+
+        @Parcelize
+        object UsePersonalEmailAddress : UseEmailResultType
+
+        @Parcelize
+        object UsePrivateAliasAddress : UseEmailResultType
+
+        @Parcelize
+        object DoNotUseEmailProtection : UseEmailResultType
+    }
+
+    companion object {
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+        const val TAG = "EmailProtectionChooserDialog"
+        const val KEY_TAB_ID = "tabId"
+        const val KEY_URL = "url"
+        const val KEY_ADDRESS = "address"
+        const val KEY_RESULT = "result"
+    }
+}
+
 /**
  * Factory used to get instances of the various autofill dialogs
  */
@@ -136,6 +162,12 @@ interface CredentialAutofillDialogFactory {
         url: String,
         username: String?,
         generatedPassword: String,
+        tabId: String,
+    ): DialogFragment
+
+    fun autofillEmailProtectionEmailChooserDialog(
+        url: String,
+        personalDuckAddress: String,
         tabId: String,
     ): DialogFragment
 }
