@@ -417,7 +417,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
             is Activated -> {
                 duckAddressManagementLabel.quietlySetIsChecked(true, activationStatusChangeListener)
-                duckAddressManagementLabel.setLeadingIcon(R.drawable.ic_email_24)
+                duckAddressManagementLabel.setLeadingIconResource(R.drawable.ic_email_24)
                 duckAddressManagementLabel.setSecondaryText(getString(R.string.credentialManagementDuckAddressActivatedLabel))
                 duckAddressManagementLabel.show()
                 duckAddressManagementLabel.isEnabled = true
@@ -428,7 +428,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
 
             is Deactivated -> {
                 duckAddressManagementLabel.quietlySetIsChecked(false, activationStatusChangeListener)
-                duckAddressManagementLabel.setLeadingIcon(R.drawable.ic_email_deactivate_24)
+                duckAddressManagementLabel.setLeadingIconResource(R.drawable.ic_email_deactivate_24)
                 duckAddressManagementLabel.setSecondaryText(getString(R.string.credentialManagementDuckAddressDeactivatedLabel))
                 duckAddressManagementLabel.isEnabled = true
                 duckAddressManagementLabel.show()
