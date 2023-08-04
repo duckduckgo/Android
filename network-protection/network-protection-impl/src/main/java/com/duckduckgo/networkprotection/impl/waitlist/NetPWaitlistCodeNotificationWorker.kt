@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.db
+package com.duckduckgo.networkprotection.impl.waitlist
 
-import com.duckduckgo.app.notification.NotificationRepository
+import android.content.Context
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class RealNotificationRepository @Inject constructor(val notificationDao: NotificationDao) : NotificationRepository {
-    override suspend fun exists(id: String): Boolean {
-        return notificationDao.exists(id)
+@ContributesWorker(AppScope::class)
+class NetPWaitlistCodeNotificationWorker(
+    context: Context,
+    params: WorkerParameters,
+) : CoroutineWorker(context, params) {
+
+    @Inject
+    lateinit var waitlistChecker: NetPWaitlistChecker
+
+    override suspend fun doWork(): Result {
+        waitlistChecker.checkAndUpdateState()
+        return Result.success()
     }
 }

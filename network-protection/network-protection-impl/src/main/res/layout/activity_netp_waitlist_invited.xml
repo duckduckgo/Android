@@ -35,11 +35,8 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/keyline_5"
                 android:orientation="vertical"
-                android:paddingEnd="@dimen/keyline_5"
-                android:paddingStart="@dimen/keyline_5"
-                android:paddingTop="@dimen/keyline_5"
-                android:paddingBottom="@dimen/keyline_5"
         >
 
             <ImageView
@@ -55,8 +52,8 @@
                 app:typography="h1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
-                android:text="@string/netpBetaFeature"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/netpWaitlistTitle"
                 android:textAlignment="center"
             />
 
@@ -67,72 +64,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:text="@string/netpBetaFeatureByline"
+                android:text="@string/netpWaitlistInBetaDescription"
                 android:textAlignment="center"
             />
 
             <LinearLayout
-                    android:id="@+id/waitlistDescriptionItems"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:paddingTop="@dimen/keyline_2"
+                android:id="@+id/waitlistDescriptionItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/keyline_5"
             >
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_1"
-                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_1"/>
+                        app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_1"
+                        app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_1"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_2"
-                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_2"/>
+                        app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_2"
+                        app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_2"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_3"
-                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_3"/>
+                        app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_3"
+                        app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_3"/>
 
             </LinearLayout>
 
-            <FrameLayout
-                    android:id="@+id/waitlistNotifyMeContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_5"
-                    android:visibility="gone">
-
-                <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
-                        android:id="@+id/waitlistNotifyMe"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="@string/netpWaitlistNotifyMeTitle"
-                        app:secondaryText="@string/netpWaitlistNotifyMeByline"
-                        app:dismissIcon="false"
-                        app:contentOrientation="center"
-                        app:sharedPrefsKeyForDismiss="key_component_dismissed_in_windows_waitlist" />
-            </FrameLayout>
-
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                android:id="@+id/joinWaitlistButton"
+                android:id="@+id/getStartedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_6"
-                android:text="@string/netpJoinWaitlist"
+                android:text="@string/netpWaitlistGetStartedCta"
                 app:buttonSize="large"
             />
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
-                android:id="@+id/enterInviteCode"
+                android:id="@+id/enterCodeButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginTop="@dimen/keyline_6"
                 android:text="@string/netpEnterCode"
-                android:visibility="gone"
                 app:buttonSize="large"
             />
 

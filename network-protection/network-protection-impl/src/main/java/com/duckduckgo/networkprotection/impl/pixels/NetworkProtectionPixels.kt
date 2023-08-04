@@ -52,12 +52,20 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_LATENCY_REPORT
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_TERMS_ACCEPTED
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_TERMS_ACCEPTED_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_TERMS_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_TERMS_SHOWN_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONFLICT_SHOWN
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONFLICT_SHOWN_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WAITLIST_NOTIFICATION_CANCELLED
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WAITLIST_NOTIFICATION_CANCELLED_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WAITLIST_NOTIFICATION_SHOWN
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WAITLIST_NOTIFICATION_SHOWN_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_CANT_START_WG_BACKEND
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_CANT_START_WG_BACKEND_DAILY
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY
@@ -225,6 +233,34 @@ interface NetworkProtectionPixels {
      * count -> fire a pixel on every call
      */
     fun reportFaqsShown()
+
+    /**
+     * This fun will fire two pixels when the NetP Terms and Conditions screen is shown
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportTermsShown()
+
+    /**
+     * This fun will fire two pixels when the NetP Terms and Conditions screen are accepted
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportTermsAccepted()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun waitlistNotificationShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun waitlistNotificationCancelled()
 }
 
 @ContributesBinding(AppScope::class)
@@ -355,6 +391,26 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportFaqsShown() {
         tryToFireDailyPixel(NETP_FAQS_SHOWN_DAILY)
         firePixel(NETP_FAQS_SHOWN)
+    }
+
+    override fun reportTermsShown() {
+        tryToFireDailyPixel(NETP_TERMS_SHOWN_DAILY)
+        firePixel(NETP_TERMS_SHOWN)
+    }
+
+    override fun reportTermsAccepted() {
+        tryToFireDailyPixel(NETP_TERMS_ACCEPTED_DAILY)
+        firePixel(NETP_TERMS_ACCEPTED)
+    }
+
+    override fun waitlistNotificationShown() {
+        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_SHOWN_DAILY)
+        firePixel(NETP_WAITLIST_NOTIFICATION_SHOWN)
+    }
+
+    override fun waitlistNotificationCancelled() {
+        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_CANCELLED_DAILY)
+        firePixel(NETP_WAITLIST_NOTIFICATION_CANCELLED)
     }
 
     private fun firePixel(

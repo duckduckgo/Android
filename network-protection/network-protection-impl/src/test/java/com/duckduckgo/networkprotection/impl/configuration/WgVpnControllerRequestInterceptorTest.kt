@@ -1,11 +1,13 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.FakeChain
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -13,15 +15,17 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class WgVpnControllerRequestInterceptorTest {
 
+    private val coroutineRule = CoroutineTestRule()
     private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var netPWaitlistRepository: NetPWaitlistRepository
     private lateinit var interceptor: WgVpnControllerRequestInterceptor
 
     @Before
     fun setup() {
-        netPWaitlistRepository = RealNetPWaitlistRepository(FakeNetPWaitlistDataStore())
+        netPWaitlistRepository = RealNetPWaitlistRepository(FakeNetPWaitlistDataStore(), coroutineRule.testDispatcherProvider)
 
         interceptor = WgVpnControllerRequestInterceptor(
             netPWaitlistRepository,

@@ -16,10 +16,21 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist
 
-/** Public data class for Network Protection waitlist */
-sealed class NetPWaitlistState {
-    object NotUnlocked : NetPWaitlistState()
-    object PendingInviteCode : NetPWaitlistState()
-    object InBeta : NetPWaitlistState()
-    object CodeRedeemed : NetPWaitlistState()
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "networkProtection",
+)
+interface NetPRemoteFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+
+    /**
+     * Incrementally rolled out
+     */
+    @Toggle.DefaultValue(false)
+    fun waitlist(): Toggle
 }

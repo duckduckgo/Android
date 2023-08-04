@@ -18,6 +18,13 @@ package com.duckduckgo.networkprotection.api
 
 interface NetworkProtectionState {
     /**
+     * This is a suspend function because the operation has I/O.
+     * You DO NOT need to set any dispatcher to call this suspend function
+     * @return `true` when NetP was onboarded (enabled at least once in the past), `false` otherwise
+     */
+    suspend fun isOnboarded(): Boolean
+
+    /**
      * This is a suspend function because the operation can take time.
      * You DO NOT need to set any dispatcher to call this suspend function
      * @return `true` when NetP is enabled

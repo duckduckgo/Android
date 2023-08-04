@@ -24,8 +24,14 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".waitlist.NetPWaitlistActivity"
+            android:name=".waitlist.NetPWaitlistInvitedActivity"
             android:label="@string/netpWaitlistActivityLabel"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".waitlist.NetPWaitlistActivity"
+            android:label="@string/netpBetaFeature"
             android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
@@ -33,7 +39,7 @@
             android:name=".waitlist.NetPWaitlistRedeemCodeActivity"
             android:label="@string/netpWaitlistRedeemCodeActivityLabel"
             android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.settings.NetPWaitlistActivity"
+            android:parentActivityName=".waitlist.NetPWaitlistActivity"
             android:exported="false" />
         <activity
             android:name=".exclusion.ui.NetpAppExclusionListActivity"
@@ -48,6 +54,11 @@
         <activity
             android:name=".about.NetpFaqActivity"
             android:label="@string/netpFaqTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".about.NetPTermsActivity"
+            android:label="@string/netpTermsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
     </application>

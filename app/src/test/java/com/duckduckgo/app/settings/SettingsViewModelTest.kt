@@ -25,13 +25,13 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,9 +68,6 @@ class SettingsViewModelTest {
     private lateinit var networkProtectionState: NetworkProtectionState
 
     @Mock
-    private lateinit var mockAppBuildConfig: AppBuildConfig
-
-    @Mock
     private lateinit var mockEmailManager: EmailManager
 
     @Mock
@@ -80,7 +77,7 @@ class SettingsViewModelTest {
     private lateinit var deviceSyncState: DeviceSyncState
 
     @Mock
-    private lateinit var mockNetPWaitlistRepository: NetPWaitlistRepository
+    private lateinit var networkProtectionWaitlist: NetworkProtectionWaitlist
 
     @Mock
     private lateinit var mockAutoconsent: Autoconsent
@@ -92,10 +89,7 @@ class SettingsViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockAppBuildConfig.versionName).thenReturn("name")
-        whenever(mockAppBuildConfig.versionCode).thenReturn(1)
-
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(NetPWaitlistState.NotUnlocked)
 
         runBlocking {
             whenever(networkProtectionState.isRunning()).thenReturn(false)
@@ -108,12 +102,11 @@ class SettingsViewModelTest {
             mockDefaultBrowserDetector,
             appTrackingProtection,
             mockPixel,
-            mockAppBuildConfig,
             mockEmailManager,
             autofillCapabilityChecker,
             networkProtectionState,
             deviceSyncState,
-            mockNetPWaitlistRepository,
+            networkProtectionWaitlist,
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
         )
@@ -410,25 +403,14 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenNetPSettingClickedAndInternalBuildInBetaThenEmitCommandLaunchNetPManagementScreenAndPixelFired() = runTest {
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.InBeta)
+    fun whenNetPSettingClickedThenReturnScreenForCurrentState() = runTest {
+        val testScreen = object : ActivityParams {}
+        whenever(networkProtectionWaitlist.getScreenForCurrentState()).thenReturn(testScreen)
+
         testee.commands().test {
             testee.onNetPSettingClicked()
 
-            assertEquals(Command.LaunchNetPManagementScreen, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_NETP_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNetPSettingClickedAndInternalBuildNotInBetaThenEmitCommandLaunchNetPWaitlistAndPixelFired() = runTest {
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
-        testee.commands().test {
-            testee.onNetPSettingClicked()
-
-            assertEquals(Command.LaunchNetPWaitlist, awaitItem())
+            assertEquals(Command.LaunchNetPWaitlist(testScreen), awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_NETP_PRESSED)
 
             cancelAndConsumeRemainingEvents()

@@ -31,9 +31,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class NetPWaitlistViewModel @Inject constructor(
+class NetPInviteCodeViewModel @Inject constructor(
     waitlistManager: NetPWaitlistManager,
-    private val netPWaitlistManager: NetPWaitlistManager,
+    private val waitlistNotification: NetPWaitlistCodeNotification,
 ) : ViewModel() {
 
     val viewState: Flow<ViewState> = waitlistManager.getState().map { ViewState(it) }.distinctUntilChanged()
@@ -43,16 +43,28 @@ class NetPWaitlistViewModel @Inject constructor(
 
     sealed class Command {
         object EnterInviteCode : Command()
+        object OpenTermsScreen : Command()
+        object OpenNetP : Command()
     }
 
     data class ViewState(val waitlist: NetPWaitlistState)
 
-    fun onJoinWaitlistClicked() {
+    fun haveAnInviteCode() {
         viewModelScope.launch {
-            netPWaitlistManager.joinWaitlist()
+            commandChannel.send(Command.EnterInviteCode)
         }
     }
 
-    fun onCodeRedeemed(resultCode: Int) {
+    fun onTermsAccepted() {
+        viewModelScope.launch {
+            waitlistNotification.cancelNotification()
+            commandChannel.send(Command.OpenNetP)
+        }
+    }
+
+    fun getStarted() {
+        viewModelScope.launch {
+            commandChannel.send(Command.OpenTermsScreen)
+        }
     }
 }
