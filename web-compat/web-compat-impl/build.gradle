@@ -42,22 +42,6 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
 
-    implementation AndroidX.core.ktx
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.commonJava8
-    implementation AndroidX.lifecycle.liveDataKtx
-
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
-
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
@@ -77,16 +61,9 @@ dependencies {
 
     implementation JakeWharton.timber
 
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
-
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
-    testImplementation 'app.cash.turbine:turbine:_'
-    testImplementation Testing.robolectric
 
     testImplementation project(path: ':common-test')
 }

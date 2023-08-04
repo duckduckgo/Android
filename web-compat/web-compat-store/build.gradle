@@ -22,10 +22,13 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    namespace 'com.duckduckgo.webcompat.store'
+}
+
 dependencies {
     implementation project(path: ':common-utils')
     implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.core.ktx
 
     implementation KotlinX.coroutines.core
     testImplementation(KotlinX.coroutines.test) {
@@ -43,15 +46,8 @@ dependencies {
     kapt AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
-
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
-    testImplementation 'app.cash.turbine:turbine:_'
-    testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
 }
