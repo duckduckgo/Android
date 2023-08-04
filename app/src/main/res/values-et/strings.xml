@@ -625,10 +625,6 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Uus aadress kopeeriti teie lõikelauale</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Kasutage %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blokeerib e-posti jälgijad</string>
-    <string name="autofillTooltipGenerateAddress">Loo privaatne Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blokeerib e-posti jälgijad ja peidab teie aadressi</string>
     <string name="newEmailAliasMenuTitle">Loo Duck Address</string>
 
     <!-- Autofill -->

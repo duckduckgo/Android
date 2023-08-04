@@ -419,6 +419,7 @@ class AutofillCredentialsSelectionResultHandlerTest {
             existingCredentialMatchDetector = existingCredentialMatchDetector,
             dispatchers = coroutineTestRule.testDispatcherProvider,
             autofillCapabilityChecker = autofillCapabilityChecker,
+            appBuildConfig = mock(),
         )
     }
 

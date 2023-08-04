@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui
 
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -72,5 +73,17 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
         tabId: String,
     ): DialogFragment {
         return AutofillUseGeneratedPasswordDialogFragment.instance(url, username, generatedPassword, tabId)
+    }
+
+    override fun autofillEmailProtectionEmailChooserDialog(
+        url: String,
+        personalDuckAddress: String,
+        tabId: String,
+    ): DialogFragment {
+        return EmailAutofillTooltipFragment.instance(
+            personalDuckAddress = personalDuckAddress,
+            url = url,
+            tabId = tabId,
+        )
     }
 }
