@@ -74,7 +74,10 @@ class BrokenSiteViewModel @Inject constructor(
     private var consentOptOutFailed: Boolean = false
     private var consentSelfTestFailed: Boolean = false
 
+    var shuffledCategories = mutableListOf<BrokenSiteCategory>()
+
     init {
+        shuffledCategories = setCategories(categories)
         viewState.value = ViewState()
     }
 
@@ -96,6 +99,13 @@ class BrokenSiteViewModel @Inject constructor(
         this.consentManaged = consentManaged
         this.consentOptOutFailed = consentOptOutFailed
         this.consentSelfTestFailed = consentSelfTestFailed
+    }
+
+    fun setCategories(categoryList: List<BrokenSiteCategory>): MutableList<BrokenSiteCategory> {
+        val categories = categoryList.map { it }.toMutableList()
+        val shuffledCategories = categories.slice(0..7).shuffled().toMutableList()
+        shuffledCategories.add(categories[8])
+        return shuffledCategories
     }
 
     fun onCategoryIndexChanged(newIndex: Int) {

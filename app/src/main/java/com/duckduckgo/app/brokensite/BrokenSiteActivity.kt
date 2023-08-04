@@ -82,7 +82,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
+        val categories = viewModel.shuffledCategories.map { getString(it.category) }.toTypedArray()
 
         brokenSites.categoriesSelection.onAction {
             RadioListAlertDialogBuilder(this)
