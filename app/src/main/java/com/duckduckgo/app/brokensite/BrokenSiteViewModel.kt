@@ -141,7 +141,7 @@ class BrokenSiteViewModel @Inject constructor(
     ): BrokenSite {
         val category = categories.elementAtOrNull(viewValue.indexSelected)
         return BrokenSite(
-            category = category?.key ?: "",
+            category = category?.key,
             description = description,
             siteUrl = urlString,
             upgradeHttps = upgradedHttps,
