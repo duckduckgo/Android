@@ -625,10 +625,6 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nueva dirección copiada en el portapapeles</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Usar %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Bloquea los rastreadores de correo electrónico</string>
-    <string name="autofillTooltipGenerateAddress">Generar Duck Address privada</string>
-    <string name="autofillTooltipGenerateAddressDescription">Bloquea los rastreadores de correo electrónico y oculta tu dirección</string>
     <string name="newEmailAliasMenuTitle">Generar Duck Address</string>
 
     <!-- Autofill -->

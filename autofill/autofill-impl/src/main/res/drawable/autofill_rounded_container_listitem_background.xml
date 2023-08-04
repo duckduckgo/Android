@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2023 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="autofill_email_protection_choose_email_dialog_title">Select email address</string>
-    <string name="autofillTooltipUseYourAliasDescription">Block email trackers</string>
-    <string name="autofillTooltipGenerateAddress" instruction="'Duck Address' is the feature name, and should not be translated.">Generate Private Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription" instruction="'hide address' refers to using an alias so your real email address is not used">Block email trackers &amp; hide address</string>
-</resources>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:radius="@dimen/smallShapeCornerRadius"/>
+    <solid android:color="?attr/daxColorContainer" />
+</shape>

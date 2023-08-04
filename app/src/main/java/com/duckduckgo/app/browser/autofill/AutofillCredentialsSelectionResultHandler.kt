@@ -16,7 +16,9 @@
 
 package com.duckduckgo.app.browser.autofill
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -26,11 +28,17 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
+import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType
+import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.DoNotUseEmailProtection
+import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.UsePersonalEmailAddress
+import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.UsePrivateAliasAddress
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -66,6 +74,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     private val autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
+    private val appBuildConfig: AppBuildConfig,
 ) {
 
     suspend fun processAutofillCredentialSelectionResult(
@@ -316,6 +325,26 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
 
     fun processSaveOrUpdatePromptShown() {
         autofillDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
+    }
+
+    @SuppressLint("NewApi")
+    fun processEmailProtectionSelectEmailChoice(
+        result: Bundle,
+        viewModel: BrowserTabViewModel,
+        tabId: String,
+    ) {
+        val userSelection: UseEmailResultType = if (appBuildConfig.sdkInt >= VERSION_CODES.TIRAMISU) {
+            result.getParcelable(EmailProtectionChooserDialog.KEY_RESULT, UseEmailResultType::class.java)!!
+        } else {
+            result.getParcelable(EmailProtectionChooserDialog.KEY_RESULT)!!
+        }
+        val originalUrl = result.getString(EmailProtectionChooserDialog.KEY_URL)!!
+
+        when (userSelection) {
+            UsePersonalEmailAddress -> viewModel.useAddress(originalUrl)
+            UsePrivateAliasAddress -> viewModel.consumeAlias(originalUrl)
+            DoNotUseEmailProtection -> viewModel.cancelAutofillTooltip()
+        }
     }
 
     interface CredentialInjector {
