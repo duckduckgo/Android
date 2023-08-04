@@ -118,19 +118,43 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun givenControlVariantWhenClearNotificationAndPrivacyNotificationCanShowThenOnlyPrivacyNotificationIsScheduled() = runTest {
+    fun givenControlVariantWhenClearNotificationAndPrivacyNotificationCanShowThenBothNotificationsAreScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-        assertNotificationNotScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
     }
 
     @Test
-    fun givenBugFixVariantWhenClearNotificationAndPrivacyNotificationCanShowThenBothNotificationsAreScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zq" })
+    fun givenAudienceLeverVariantThenBothNotificationsAreScheduled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zs" })
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
+    }
+
+    @Test
+    fun givenTimingLeverVariantThenBothNotificationsAreScheduled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zt" })
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
+    }
+
+    @Test
+    fun givenCadenceLeverVariantThenBothNotificationsAreScheduled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zu" })
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
