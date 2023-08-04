@@ -283,6 +283,9 @@ dependencies {
 
     implementation project(':internal-features-api')
 
+    implementation project(':web-compat-impl')
+    implementation project(':web-compat-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
