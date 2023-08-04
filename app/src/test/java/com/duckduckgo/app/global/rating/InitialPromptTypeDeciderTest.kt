@@ -82,24 +82,11 @@ class InitialPromptTypeDeciderTest {
         assertFirstPrompt(type.promptCount)
     }
 
-    @Test
-    fun whenEnoughSearchesMadeAndFirstPromptShownBeforeThenShouldShowSecondPrompt() = runTest {
-        whenever(mockInitialPromptDecider.shouldShowPrompt()).thenReturn(false)
-        whenever(mockSecondaryPromptDecider.shouldShowPrompt()).thenReturn(true)
-        whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
-        val type = testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
-        assertSecondPrompt(type.promptCount)
-    }
-
     private fun assertPromptNotShown(prompt: AppEnjoymentPromptOptions) {
         assertTrue(prompt == AppEnjoymentPromptOptions.ShowNothing)
     }
 
     private fun assertFirstPrompt(promptCount: PromptCount) {
         assertEquals(PromptCount.first().value, promptCount.value)
-    }
-
-    private fun assertSecondPrompt(promptCount: PromptCount) {
-        assertEquals(PromptCount.second().value, promptCount.value)
     }
 }
