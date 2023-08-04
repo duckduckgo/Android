@@ -24,13 +24,13 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -87,7 +87,7 @@ class AlwaysOnLockDownDetector @Inject constructor(
 
     private suspend fun showNotification() {
         val title = SpannableStringBuilder(getNotificationText())
-        val intent = getNotifIntent()
+        val intent = getNotificationIntent()
 
         val notification = DeviceShieldNotificationFactory.DeviceShieldNotification(title = title)
         deviceShieldAlertNotificationBuilder.buildAlwaysOnLockdownNotification(
@@ -111,11 +111,13 @@ class AlwaysOnLockDownDetector @Inject constructor(
         }
     }
 
-    private suspend fun getNotifIntent(): Intent {
+    private suspend fun getNotificationIntent(): Intent {
         val isNetPEnabled = networkProtectionState.isEnabled()
         return when {
-            isNetPEnabled -> globalActivityStarter.startIntent(context, NetworkProtectionManagementScreenNoParams)!!
-            else -> DeviceShieldTrackerActivity.intent(context = context)
+            isNetPEnabled -> NetworkProtectionManagementScreenNoParams
+            else -> AppTrackerActivityWithEmptyParams
+        }.run {
+            globalActivityStarter.startIntent(context, this)!!
         }
     }
 
