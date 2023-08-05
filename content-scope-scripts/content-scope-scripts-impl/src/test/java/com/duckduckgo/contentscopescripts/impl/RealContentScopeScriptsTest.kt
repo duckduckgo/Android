@@ -214,6 +214,8 @@ class RealContentScopeScriptsTest {
         override fun setEnabled(state: State) {
             // not implemented
         }
+
+        override fun getRawStoredState(): State? = null
     }
 
     class DisabledToggle : Toggle {
@@ -224,6 +226,8 @@ class RealContentScopeScriptsTest {
         override fun setEnabled(state: State) {
             // not implemented
         }
+
+        override fun getRawStoredState(): State? = null
     }
 
     companion object {
