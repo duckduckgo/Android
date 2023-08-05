@@ -287,6 +287,23 @@ class FeatureTogglesTest {
         assertTrue(feature.self().isEnabled())
         assertEquals(expected, toggleStore.get("test"))
     }
+
+    @Test
+    fun whenAppUpdateThenEvaluatePreviousState() {
+        // when remoteEnableState is null it means app update
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertTrue(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
 }
 
 interface TestFeature {

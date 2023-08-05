@@ -161,10 +161,14 @@ internal class ToggleImpl constructor(
     private val appVersionProvider: () -> Int,
 ) : Toggle {
     override fun isEnabled(): Boolean {
+        fun evaluateLocalEnable(state: State): Boolean {
+            return state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+        }
+
         return store.get(key)?.let { state ->
             state.remoteEnableState?.let { remoteState ->
-                remoteState && state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
-            } ?: defaultValue
+                remoteState && evaluateLocalEnable(state)
+            } ?: evaluateLocalEnable(state)
         } ?: return defaultValue
     }
 
