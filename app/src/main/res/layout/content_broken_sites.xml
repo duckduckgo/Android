@@ -63,6 +63,7 @@
             android:layout_marginEnd="@dimen/keyline_5"
             android:hint="@string/brokenSitesCategoriesHint"
             app:editable="false"
+            app:clickable="true"
             app:endIcon="@drawable/ic_chevron_down_24_small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

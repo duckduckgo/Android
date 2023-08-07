@@ -51,6 +51,7 @@ interface TextInput {
     var text: String
     var hint: String
     var isEditable: Boolean
+    var canClick: Boolean
 
     fun addTextChangedListener(textWatcher: TextWatcher)
     fun removeTextChangedListener(textWatcher: TextWatcher)
@@ -94,6 +95,7 @@ class DaxTextInput @JvmOverloads constructor(
 
             // This needs to be done after we know that the view has the end icon set
             isEditable = getBoolean(R.styleable.DaxTextInput_editable, true)
+            canClick = getBoolean(R.styleable.DaxTextInput_clickable, false)
             binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.DaxTextInput_android_hint))
 
             val inputType = getInputType()
@@ -109,6 +111,9 @@ class DaxTextInput @JvmOverloads constructor(
                 if (hasFocus) {
                     if (isPassword) {
                         showPassword()
+                    }
+                    if (canClick) {
+                        performClick()
                     }
                     binding.internalEditText.showKeyboard()
                 } else {
@@ -142,6 +147,12 @@ class DaxTextInput @JvmOverloads constructor(
         set(value) {
             binding.internalEditText.isEnabled = value
             handleIsEditableChangeForEndIcon(value)
+        }
+
+    override var canClick: Boolean
+        get() = binding.internalEditText.isClickable
+        set(value) {
+            binding.internalEditText.isClickable = value
         }
 
     fun showKeyboardDelayed() {
@@ -192,6 +203,9 @@ class DaxTextInput @JvmOverloads constructor(
     }
 
     override fun onAction(actionHandler: (Action) -> Unit) {
+        if (canClick) {
+            binding.internalEditText.setOnClickListener { actionHandler(PerformEndAction) }
+        }
         binding.internalInputLayout.setEndIconOnClickListener {
             actionHandler(PerformEndAction)
         }
