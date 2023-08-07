@@ -124,7 +124,7 @@ internal class WebTrackingProtectionViewModelTest {
             testee.onManageWhitelistSelected()
 
             assertEquals(Command.LaunchWhitelist, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_MANAGE_WHITELIST)
+            verify(mockPixel).fire(AppPixelName.SETTINGS_MANAGE_ALLOWLIST)
 
             cancelAndConsumeRemainingEvents()
         }

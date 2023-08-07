@@ -2061,7 +2061,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun addToAllowList(domain: String) {
-        pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
+        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
         withContext(dispatchers.io()) {
             userAllowListDao.insert(domain)
         }
@@ -2072,7 +2072,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun removeFromAllowList(domain: String) {
-        pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
         withContext(dispatchers.io()) {
             userAllowListDao.delete(domain)
         }

@@ -40,8 +40,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_onboarding_dax_cta_cancel"),
 
-    BROWSER_MENU_WHITELIST_ADD("mb_wla"),
-    BROWSER_MENU_WHITELIST_REMOVE("mb_wlr"),
+    BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
+    BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
 
     DEFAULT_BROWSER_SET("m_db_s"),
     DEFAULT_BROWSER_NOT_SET("m_db_ns"),
@@ -96,7 +96,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
     SETTINGS_THEME_TOGGLED_DARK("ms_td"),
     SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT("ms_tsd"),
-    SETTINGS_MANAGE_WHITELIST("ms_mw"),
+    SETTINGS_MANAGE_ALLOWLIST("ms_mw"),
     SETTINGS_DO_NOT_SELL_SHOWN("ms_dns"),
     SETTINGS_DO_NOT_SELL_ON("ms_dns_on"),
     SETTINGS_DO_NOT_SELL_OFF("ms_dns_off"),

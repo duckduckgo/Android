@@ -79,7 +79,7 @@ class WebTrackingProtectionViewModel @Inject constructor(
 
     fun onManageWhitelistSelected() {
         viewModelScope.launch { command.send(Command.LaunchWhitelist) }
-        pixel.fire(AppPixelName.SETTINGS_MANAGE_WHITELIST)
+        pixel.fire(AppPixelName.SETTINGS_MANAGE_ALLOWLIST)
     }
 
     companion object {

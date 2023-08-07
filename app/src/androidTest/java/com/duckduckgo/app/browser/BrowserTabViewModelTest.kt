@@ -1641,7 +1641,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListDao).insert(UserAllowListedDomain("www.example.com"))
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
@@ -1661,7 +1661,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListDao).delete(UserAllowListedDomain("www.example.com"))
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
