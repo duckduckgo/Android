@@ -8598,14 +8598,14 @@ class InterfacePrototype {
       newIdentities.push({
         id: 'personalAddress',
         emailAddress: personalAddress,
-        title: 'Blocks email trackers'
+        title: 'Block email trackers'
       });
     }
 
     newIdentities.push({
       id: 'privateAddress',
       emailAddress: privateAddress,
-      title: 'Blocks email trackers and hides your address'
+      title: 'Block email trackers & hide address'
     });
     return [...identities, ...newIdentities];
   }
@@ -16051,7 +16051,7 @@ class EmailHTMLTooltip extends _HTMLTooltip.default {
   render(device) {
     this.device = device;
     this.addresses = device.getLocalAddresses();
-    this.shadow.innerHTML = "\n".concat(this.options.css, "\n<div class=\"wrapper wrapper--email\" hidden>\n    <div class=\"tooltip tooltip--email\">\n        <button class=\"tooltip__button tooltip__button--email js-use-personal\">\n            <span class=\"tooltip__button--email__primary-text\">\n                Use <span class=\"js-address\">").concat((0, _autofillUtils.formatDuckAddress)((0, _autofillUtils.escapeXML)(this.addresses.personalAddress)), "</span>\n            </span>\n            <span class=\"tooltip__button--email__secondary-text\">Blocks email trackers</span>\n        </button>\n        <button class=\"tooltip__button tooltip__button--email js-use-private\">\n            <span class=\"tooltip__button--email__primary-text\">Generate a Private Duck Address</span>\n            <span class=\"tooltip__button--email__secondary-text\">Blocks email trackers and hides your address</span>\n        </button>\n    </div>\n    <div class=\"tooltip--email__caret\"></div>\n</div>");
+    this.shadow.innerHTML = "\n".concat(this.options.css, "\n<div class=\"wrapper wrapper--email\" hidden>\n    <div class=\"tooltip tooltip--email\">\n        <button class=\"tooltip__button tooltip__button--email js-use-personal\">\n            <span class=\"tooltip__button--email__primary-text\">\n                Use <span class=\"js-address\">").concat((0, _autofillUtils.formatDuckAddress)((0, _autofillUtils.escapeXML)(this.addresses.personalAddress)), "</span>\n            </span>\n            <span class=\"tooltip__button--email__secondary-text\">Block email trackers</span>\n        </button>\n        <button class=\"tooltip__button tooltip__button--email js-use-private\">\n            <span class=\"tooltip__button--email__primary-text\">Generate a Private Duck Address</span>\n            <span class=\"tooltip__button--email__secondary-text\">Block email trackers & hide address</span>\n        </button>\n    </div>\n    <div class=\"tooltip--email__caret\"></div>\n</div>");
     this.wrapper = this.shadow.querySelector('.wrapper');
     this.tooltip = this.shadow.querySelector('.tooltip');
     this.usePersonalButton = this.shadow.querySelector('.js-use-personal');
