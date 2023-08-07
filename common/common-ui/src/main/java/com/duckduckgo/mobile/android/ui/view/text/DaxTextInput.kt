@@ -38,6 +38,7 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_CLICKABLE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
@@ -110,6 +111,7 @@ class DaxTextInput @JvmOverloads constructor(
                     if (isPassword) {
                         showPassword()
                     }
+
                     binding.internalEditText.showKeyboard()
                 } else {
                     if (isPassword) {
@@ -195,6 +197,14 @@ class DaxTextInput @JvmOverloads constructor(
         binding.internalInputLayout.setEndIconOnClickListener {
             actionHandler(PerformEndAction)
         }
+
+        binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                actionHandler(PerformEndAction)
+                view.clearFocus()
+            }
+
+        }
     }
 
     private fun setupEndIconDrawable(
@@ -262,6 +272,13 @@ class DaxTextInput @JvmOverloads constructor(
         } else {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
         }
+
+        if (inputType == INPUT_TYPE_CLICKABLE){
+            binding.internalInputLayout.isEndIconVisible = true
+            binding.internalPasswordIcon.updateLayoutParams<LayoutParams> {
+                this.marginEnd = context.resources.getDimensionPixelSize(R.dimen.outlinedTextPasswordEndMarginWithoutEndIcon)
+            }
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -309,6 +326,7 @@ class DaxTextInput @JvmOverloads constructor(
         INPUT_TYPE_MULTI_LINE(0),
         INPUT_TYPE_SINGLE_LINE(1),
         INPUT_TYPE_PASSWORD(2),
+        INPUT_TYPE_CLICKABLE(3),
     }
 
     companion object {
