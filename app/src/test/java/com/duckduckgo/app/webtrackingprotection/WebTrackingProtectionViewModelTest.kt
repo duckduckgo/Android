@@ -121,9 +121,9 @@ internal class WebTrackingProtectionViewModelTest {
     @Test
     fun whenOnManageWhitelistSelectedThenEmitCommandLaunchWhitelistAndSendPixel() = runTest {
         testee.commands().test {
-            testee.onManageWhitelistSelected()
+            testee.onManageAllowListSelected()
 
-            assertEquals(Command.LaunchWhitelist, awaitItem())
+            assertEquals(Command.LaunchAllowList, awaitItem())
             verify(mockPixel).fire(AppPixelName.SETTINGS_MANAGE_ALLOWLIST)
 
             cancelAndConsumeRemainingEvents()

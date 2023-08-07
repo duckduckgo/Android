@@ -72,7 +72,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.globalPrivacyControlSetting.setClickListener { viewModel.onGlobalPrivacyControlClicked() }
-        binding.whitelist.setClickListener { viewModel.onManageWhitelistSelected() }
+        binding.whitelist.setClickListener { viewModel.onManageAllowListSelected() }
     }
 
     private fun configureClickableLink() {
@@ -123,7 +123,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
         when (it) {
             is Command.LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it.url)
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
-            is Command.LaunchWhitelist -> launchWhitelist()
+            is Command.LaunchAllowList -> launchWhitelist()
         }
     }
 
