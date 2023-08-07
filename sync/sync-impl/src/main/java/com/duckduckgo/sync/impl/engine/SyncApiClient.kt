@@ -52,6 +52,8 @@ class AppSyncApiClient @Inject constructor(
             syncStore.token.takeUnless { it.isNullOrEmpty() }
                 ?: return Result.Error(reason = "Token Empty")
 
+        Timber.d("Sync-Feature: token =  $token")
+
         if (changes.isEmpty()) {
             return Result.Error(reason = "Changes Empty")
         }

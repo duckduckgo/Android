@@ -1,0 +1,38 @@
+{
+  "credentials": {
+    "updates": [
+      {
+        "id": "e143f668-93b5-44d3-8154-86ba375380c3",
+        "deleted": null,
+        "client_last_modified": "2023-08-04T12:29:32.464Z",
+        "domain": "5BbasDyHKTsorBlR4MNWG2sbk1hDD+dW2UJOyz+WAH7oYQmHNHr\/7kHVmzR29hla8fEVOWtK",
+        "title": "mQG+LaMZr3DEN2L579aUaUCYeFpRgu7vMnGr2RVuTS2uBbotz4\/+nP7g\/ILBzhvlzQ==",
+        "username": "mpJn8jiCobBcby9e+x7+69q3eDv6nxgLucnhR+W5FN6WLSqyOGygQLX+OPFf\/L\/ePyE=",
+        "password": "T7mgSYaWr4tmYFCK7fbMZ6KwBo0DsfZA8Cghv+COc12O21Pegs4\/tCnPmIKJEw==",
+        "notes": null
+      },
+      {
+        "id": "dac5687a-2ee3-4f94-96c3-2b3e4b10f64e",
+        "deleted": null,
+        "client_last_modified": "2023-08-04T12:30:05.433Z",
+        "domain": "2ISTviVbMVg3czMDtu7lIgSKxHdUvEYwSyA8guiXRKjytSFVp+gEOQuZ1+Ptpaywmzo=",
+        "title": "qDdxNdVtRQUcgK4quetMnBTR3gUBgT60q+kSh1mU6wgjQruBPmKkefHjJpIHqQ==",
+        "username": "DCxiTYT\/AapTIqQrI\/c\/SX7r7OxOOfdkYfIYV\/SPPdXXESMRgwc4Atd00od+cUD4\/gsW5Wvp",
+        "password": "Lo6kMFCig6+aoEDX7ri9f7J+LJ82oQoFBlhzPuw3cyHEYCIxN1gOn57O27ovgw==",
+        "notes": null
+      },
+      {
+        "id": "3d0d49de-1b33-44d7-8e41-c1407c5658c6",
+        "deleted": null,
+        "client_last_modified": "2023-08-04T12:54:14.663Z",
+        "domain": "CJt\/0RHduQrL3h05xeRDgcZaMVltYzZK4TtTPwQttRpPJ2Ww1IIyxGNf7wJEAAvDBSa6JQZ7TiM8",
+        "title": "Y86GIn1+J1BFFeXL8+t4jmX0nvGyfXTs5zSEicO6Yg6LD4FF9tWnzSmsMikT2Gxm\/LdD\/TE=",
+        "username": "HHu0Ny+3lcmvsM1Fahj763mpIXTU63WgXbWzZ5P4xbShtZeQ2LTkBy72OVbtiy8=",
+        "password": "8RkDNnAObgzStUdVrkU44UxaQ9gBGMKNLpxv5tYDj2Eq2VMD4\/wBwZnYRAJiAUg=",
+        "notes": null
+      }
+    ],
+    "modified_since": "0"
+  },
+  "client_timestamp": "2023-08-04T14:24:14.723Z"
+}

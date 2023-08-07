@@ -21,6 +21,7 @@ import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
+import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -30,6 +31,7 @@ class RealSyncCrypto @Inject constructor(
 ) : SyncCrypto {
     override fun encrypt(text: String): String {
         val encryptResult = nativeLib.encryptData(text, syncStore.secretKey.orEmpty())
+        Timber.d("Sync-Feature: secretKey =  ${syncStore.secretKey.orEmpty()}")
         return if (encryptResult.result != 0L) "" else encryptResult.encryptedData
     }
 

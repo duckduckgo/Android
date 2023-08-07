@@ -44,6 +44,10 @@ class RealSyncStateMonitor @Inject constructor(
 ) : SyncStateMonitor {
 
     override fun syncState(): Flow<SyncState> {
+        Timber.d("Sync-Feature: token ${syncStore.token}")
+        Timber.d("Sync-Feature: primaryKey ${syncStore.primaryKey}")
+        Timber.d("Sync-Feature: secretKey ${syncStore.secretKey}")
+        syncStore
         return syncStateRepository.state()
             .combine(syncStore.isSignedInFlow()) { attempt, signedIn ->
                 mapState(attempt, signedIn)
