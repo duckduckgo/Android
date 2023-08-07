@@ -97,7 +97,7 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun renderNotJoinedQueue() {
-        binding.headerImage.setImageResource(R.drawable.ic_lock)
+        binding.headerImage.setImageResource(R.drawable.ilustration_network_protetion_vpn)
         binding.waitlistDescriptionItems.show()
         binding.joinWaitlistButton.show()
         binding.enterInviteCode.isVisible = appBuildConfig.isInternalBuild()
@@ -107,7 +107,7 @@ class NetPWaitlistActivity : DuckDuckGoActivity() {
     private fun renderJoinedWaitlist() {
         binding.statusTitle.text = getString(R.string.netpWaitlistJoined)
         binding.waitlistDescription.text = getString(R.string.netpWaitlistJoinedNotificationsEnabled)
-        binding.headerImage.setImageResource(R.drawable.ic_news)
+        binding.headerImage.setImageResource(R.drawable.ilustration_success)
         binding.waitlistDescriptionItems.gone()
         binding.joinWaitlistButton.gone()
         binding.enterInviteCode.gone()

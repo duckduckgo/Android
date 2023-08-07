@@ -78,18 +78,21 @@
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:leadingIcon="@drawable/ic_shield_24"
                         app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_1"
                         app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_1"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:leadingIcon="@drawable/ic_rocket_24"
                         app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_2"
                         app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_2"/>
 
                 <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:leadingIcon="@drawable/ic_card_24"
                         app:primaryText="@string/netpWaitlistInvitedDescriptionItemTitle_3"
                         app:secondaryText="@string/netpWaitlistInvitedDescriptionItemByline_3"/>
 

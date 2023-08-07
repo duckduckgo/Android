@@ -65,7 +65,7 @@
     <string name="netpNotificationByline">Your time in the waiting list is over.</string>
     <string name="netpWaitlistActivityLabel">Beta Feature</string>
     <string name="netpBetaFeature">Network Protection Beta</string>
-    <string name="netpBetaFeatureByline">Secure your internet traffic and keep your browsing history private with Network Protection, a VPN by DuckDuckGo</string>
+    <string name="netpBetaFeatureByline">Secure your network connection and keep your online activity private with Network Protection, a VPN from DuckDuckGo.</string>
     <string name="netpWaitlistTitle">You\'re invited to test a beta feature!</string>
     <string name="netpJoinWaitlist">Join the Waitlist</string>
     <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
@@ -92,21 +92,21 @@
     <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first server basis.\n\nWe\'ll notify you when your invite is ready.</string>
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
-    <string name="netpWaitlistInBetaDescription">Network Protection is a VPN. Enable to secure all your internet traffic on this device and keep your browsing history private.</string>
+    <string name="netpWaitlistInBetaDescription">Network Protection is a VPN. Enable to secure your network connection and keep your online activity private.</string>
 
     <string name="netpWaitlistDescriptionItemTitle_1">Join the waitlist</string>
-    <string name="netpWaitlistDescriptionItemByline_1">Join the waitlist</string>
+    <string name="netpWaitlistDescriptionItemByline_1">Beta access is limited for now.</string>
     <string name="netpWaitlistDescriptionItemTitle_2">Wait your turn</string>
     <string name="netpWaitlistDescriptionItemByline_2">We send invites every few days.</string>
     <string name="netpWaitlistDescriptionItemTitle_3">Get your invite</string>
     <string name="netpWaitlistDescriptionItemByline_3">We can notify you when its your turn.</string>
 
-    <string name="netpWaitlistInvitedDescriptionItemTitle_1">Everyday protection for everything you do online</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_1">Network Protection uses the WireGuard protocol to secure all your network activity across your device, protecting your browsing, app activity and beyond.</string>
-    <string name="netpWaitlistInvitedDescriptionItemTitle_2">Fast, reliable and easy to use</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_2">Network Protection comes built-in to the DuckDuckGo browser. Connect to the nearest with one click.</string>
-    <string name="netpWaitlistInvitedDescriptionItemTitle_3">No logging y default</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_3">Unlike other VPNs, we do not store logs of your data. It\'s in our Privacy Policy.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_1">Secure all traffic to and from your device</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_1">We use the WireGuard protocol to encrypt all your online traffic across your browsers and apps.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_2">Fast, reliable, and easy to use</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_2">Connect with one click to route all your browsing and app activity through the nearest VPN server.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_3">A VPN you can trust</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_3">Unlike some VPNs, we do not log or save any data that can connect you to your online activity.</string>
 
     <!--Breakage reporting -->
     <string name="netpReportBreakageCategoryCrashes">App freezes or crashes</string>

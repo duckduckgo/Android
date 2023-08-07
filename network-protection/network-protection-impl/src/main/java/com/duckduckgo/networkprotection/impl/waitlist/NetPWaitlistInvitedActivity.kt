@@ -125,7 +125,7 @@ class NetPWaitlistInvitedActivity : DuckDuckGoActivity() {
 
     private fun renderJoinedBeta() {
         binding.statusTitle.text = getString(R.string.netpWaitlistRedeemedCodeStatus)
-        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_donations_large)
+        binding.headerImage.setImageResource(R.drawable.ic_gift_large)
         binding.getStartedButton.show()
         binding.waitlistDescriptionItems.show()
         binding.enterCodeButton.gone()
