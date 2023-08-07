@@ -529,13 +529,13 @@
     <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Viac možností pre nezabezpečené webové stránky %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt; z nezabezpečených webových stránok?</string>
-    <string name="whitelistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
-    <string name="whitelistNoEntries">Ochrana súkromia je zapnutá pre všetky webové stránky</string>
+    <string name="allowlistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
+    <string name="allowlistNoEntries">Ochrana súkromia je zapnutá pre všetky webové stránky</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Zadajte doménu, napríklad <b>example.com</b>, a skúste to znova</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Nezabezpečené webové stránky</string>
+    <string name="settingsPrivacyProtectionAllowlist">Nezabezpečené webové stránky</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zabezpečené stránky</string>

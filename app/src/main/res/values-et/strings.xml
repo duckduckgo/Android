@@ -525,13 +525,13 @@
     <string name="disablePrivacyProtection">Keela privaatsuse kaitse</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Oled kindel, et soovid eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
-    <string name="whitelistExplanation">Nendele saitidele ei laiene privaatsuse kaitse.</string>
-    <string name="whitelistNoEntries">Privaatsuse kaitse on lubatud kõigil saitidel</string>
+    <string name="allowlistExplanation">Nendele saitidele ei laiene privaatsuse kaitse.</string>
+    <string name="allowlistNoEntries">Privaatsuse kaitse on lubatud kõigil saitidel</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Sisesta domeen <b>example.com</b> kujul ja proovi uuesti</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Kaitseta saidid</string>
+    <string name="settingsPrivacyProtectionAllowlist">Kaitseta saidid</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tulekindlad veebisaidid</string>

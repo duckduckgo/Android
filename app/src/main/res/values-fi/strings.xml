@@ -525,13 +525,13 @@
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Haluatko varmasti poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; suojaamattomista sivustoista?</string>
-    <string name="whitelistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
-    <string name="whitelistNoEntries">Tietosuoja on käytössä kaikilla sivustoilla</string>
+    <string name="allowlistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
+    <string name="allowlistNoEntries">Tietosuoja on käytössä kaikilla sivustoilla</string>
     <string name="whitelistDomainHint">www.esimerkki.com</string>
     <string name="allowlistFormatError">Anna verkkotunnus, kuten <b>esimerkki.com</b> ja kokeile uudelleen</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Suojaamattomat sivustot</string>
+    <string name="settingsPrivacyProtectionAllowlist">Suojaamattomat sivustot</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tee sivustoista palonkestäviä</string>

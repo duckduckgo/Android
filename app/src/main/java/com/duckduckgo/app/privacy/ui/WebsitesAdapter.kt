@@ -95,17 +95,17 @@ class WebsitesAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): WebsiteViewHolder {
-        Timber.d("Whitelist: onCreateViewHolder $viewType ")
+        Timber.d("AllowList: onCreateViewHolder $viewType ")
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
                 val binding = ViewListItemDescriptionBinding.inflate(inflater, parent, false)
-                binding.websiteDescription.setText(R.string.whitelistExplanation)
+                binding.websiteDescription.setText(R.string.allowlistExplanation)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewSectionHeaderBinding.inflate(inflater, parent, false)
-                binding.sectionHeader.setText(R.string.settingsPrivacyProtectionWhitelist)
+                binding.sectionHeader.setText(R.string.settingsPrivacyProtectionAllowlist)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             SITE_ENTRY -> {
@@ -120,7 +120,7 @@ class WebsitesAdapter(
             }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewListItemEmptyHintBinding.inflate(inflater, parent, false)
-                binding.listItemEmptyHintTitle.setText(R.string.whitelistNoEntries)
+                binding.listItemEmptyHintTitle.setText(R.string.allowlistNoEntries)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             else -> throw IllegalArgumentException("viewType not found")

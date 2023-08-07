@@ -529,13 +529,13 @@
     <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Jesi li siguran/na da želiš ukloniti &lt;b&gt;%1$s&lt;/b&gt; iz nezaštićenih web-mjesta?</string>
-    <string name="whitelistExplanation">Zaštita privatnosti neće poboljšati ova mrežna mjesta.</string>
-    <string name="whitelistNoEntries">Zaštita privatnosti omogućena za sva web-mjesta</string>
+    <string name="allowlistExplanation">Zaštita privatnosti neće poboljšati ova mrežna mjesta.</string>
+    <string name="allowlistNoEntries">Zaštita privatnosti omogućena za sva web-mjesta</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Unesite domenu kao <b>example.com</b> i pokušajte ponovo</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Nezaštićena web-mjesta</string>
+    <string name="settingsPrivacyProtectionAllowlist">Nezaštićena web-mjesta</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zaštićena web-mjesta</string>

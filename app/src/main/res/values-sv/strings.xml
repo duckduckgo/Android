@@ -525,13 +525,13 @@
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Fler alternativ för den oskyddade webbplatsen %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt; från de oskyddade webbplatserna?</string>
-    <string name="whitelistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
-    <string name="whitelistNoEntries">Integritetsskydd aktiverat för alla webbplatser</string>
+    <string name="allowlistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
+    <string name="allowlistNoEntries">Integritetsskydd aktiverat för alla webbplatser</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Ange en domän som <b>example.com</b> och försök igen</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Oskyddade webbplatser</string>
+    <string name="settingsPrivacyProtectionAllowlist">Oskyddade webbplatser</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>

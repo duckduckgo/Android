@@ -525,13 +525,13 @@
     <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Biztosan eltávolítod az &lt;b&gt;%1$s&lt;/b&gt; elemet a védelem nélküli weboldalak közül?</string>
-    <string name="whitelistExplanation">Ezeket az oldalakat nem erősíti adatvédelem.</string>
-    <string name="whitelistNoEntries">Adatvédelem engedélyezve minden weboldalhoz</string>
+    <string name="allowlistExplanation">Ezeket az oldalakat nem erősíti adatvédelem.</string>
+    <string name="allowlistNoEntries">Adatvédelem engedélyezve minden weboldalhoz</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Írj be egy tartománynevet, például <b>example.com</b>, és próbáld újra.</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Védelem nélküli weboldalak</string>
+    <string name="settingsPrivacyProtectionAllowlist">Védelem nélküli weboldalak</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tűzálló weboldalak</string>

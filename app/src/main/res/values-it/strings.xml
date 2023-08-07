@@ -525,13 +525,13 @@
     <string name="disablePrivacyProtection">Disattiva la tutela della privacy</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Altre opzioni per il sito non protetto %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Confermi di voler rimuovere &lt;b&gt;%1$s&lt;/b&gt; dai siti non protetti?</string>
-    <string name="whitelistExplanation">Questi siti non saranno ottimizzati dalla tutela della privacy.</string>
-    <string name="whitelistNoEntries">Tutela della privacy attivata per tutti i siti</string>
+    <string name="allowlistExplanation">Questi siti non saranno ottimizzati dalla tutela della privacy.</string>
+    <string name="allowlistNoEntries">Tutela della privacy attivata per tutti i siti</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Digita un dominio, come <b>esempio.com</b>, quindi riprova.</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Siti non protetti</string>
+    <string name="settingsPrivacyProtectionAllowlist">Siti non protetti</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Siti protetti</string>

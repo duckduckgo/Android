@@ -88,7 +88,7 @@
                 android:id="@+id/whitelist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/settingsPrivacyProtectionWhitelist" />
+                app:primaryText="@string/settingsPrivacyProtectionAllowlist" />
 
         </LinearLayout>
     </ScrollView>

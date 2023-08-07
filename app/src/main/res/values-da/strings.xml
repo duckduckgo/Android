@@ -525,13 +525,13 @@
     <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede websteder?</string>
-    <string name="whitelistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
-    <string name="whitelistNoEntries">Databeskyttelse aktiveret for alle websteder</string>
+    <string name="allowlistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
+    <string name="allowlistNoEntries">Databeskyttelse aktiveret for alle websteder</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Indtast et domæne såsom <b>eksempel.dk</b> og prøv igen</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Ubeskyttede websteder</string>
+    <string name="settingsPrivacyProtectionAllowlist">Ubeskyttede websteder</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsikre websteder</string>

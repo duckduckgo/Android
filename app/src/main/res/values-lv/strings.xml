@@ -527,13 +527,13 @@
     <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas neaizsargātai vietnei %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
-    <string name="whitelistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
-    <string name="whitelistNoEntries">Privātuma aizsardzība ir iespējota visām vietnēm</string>
+    <string name="allowlistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
+    <string name="allowlistNoEntries">Privātuma aizsardzība ir iespējota visām vietnēm</string>
     <string name="whitelistDomainHint">www.piemērs.com</string>
     <string name="allowlistFormatError">Lūdzu, ievadi tādu domēnu kā, piemēram, <b>example.com</b>, un mēģini vēlreiz</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Neaizsargātas vietnes</string>
+    <string name="settingsPrivacyProtectionAllowlist">Neaizsargātas vietnes</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ugunsdrošas vietnes</string>
