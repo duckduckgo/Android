@@ -611,7 +611,6 @@ class DeviceShieldTrackerActivity :
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         vpnCachedState?.let { vpnState ->
             deviceShieldSwitch.quietlySetIsChecked(vpnState.state == VpnRunningState.ENABLED, enableAppTPSwitchListener)
-            vpnCachedState = null
         }
 
         return super.onPrepareOptionsMenu(menu)
