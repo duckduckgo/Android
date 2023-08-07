@@ -85,7 +85,7 @@ class TrackerDetectorImpl @Inject constructor(
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
         val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrl)
-        val isDocumentInAllowedList = userAllowListDao.isDocumentWhitelisted(documentUrl)
+        val isDocumentInAllowedList = userAllowListDao.isDocumentAllowListed(documentUrl)
         val isInAdClickAllowList = adClickManager.isExemption(documentUrl, url)
         val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, url)
         val isATrackerAllowed = result.isATracker && !result.matches
@@ -132,7 +132,7 @@ class TrackerDetectorImpl @Inject constructor(
         get() = clients.count()
 }
 
-private fun UserAllowListDao.isDocumentWhitelisted(document: String?): Boolean {
+private fun UserAllowListDao.isDocumentAllowListed(document: String?): Boolean {
     document?.toUri()?.host?.let {
         return contains(it)
     }
