@@ -53,6 +53,30 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
+    fun whenOnlyPastAttemptsThenDailyStatsHasCorrectData(){
+        val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.DAYS))
+        val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
+
+        whenever(syncStateRepository.attempts()).thenReturn(listOf(lastSync))
+
+        val stats = repository.getDailyStats()
+
+        assertTrue(stats.attempts == 0)
+    }
+
+    @Test
+    fun whenOnlyTodayAttemptsThenDailyStatsHasCorrectData(){
+        val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
+        val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
+
+        whenever(syncStateRepository.attempts()).thenReturn(listOf(lastSync))
+
+        val stats = repository.getDailyStats()
+
+        assertTrue(stats.attempts == 0)
+    }
+
+    @Test
     fun whenOnlySuccessfulAttemptsThenDailyStatsHasCorrectData(){
         val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)

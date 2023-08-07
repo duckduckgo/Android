@@ -18,10 +18,12 @@ package com.duckduckgo.app.global.formatters.time
 
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
+import java.sql.Timestamp
 
 class DatabaseDateFormatter {
 
@@ -42,6 +44,10 @@ class DatabaseDateFormatter {
 
         fun iso8601(date: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)): String {
             return date.format(DateTimeFormatter.ISO_INSTANT)
+        }
+
+        fun iso8601Date(timestamp: String): LocalDate {
+            return OffsetDateTime.parse(timestamp).toLocalDate()
         }
 
         fun millisIso8601(date: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)): Long {

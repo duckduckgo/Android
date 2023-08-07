@@ -16,11 +16,15 @@
 
 package com.duckduckgo.sync.impl.stats
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
+import org.threeten.bp.LocalDate
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -28,18 +32,22 @@ import javax.inject.Inject
 interface SyncStatsRepository {
 
     fun getDailyStats(): DailyStats
-
 }
 
-data class DailyStats(val attempts: Int, val successRate: Double)
+data class DailyStats(
+    val attempts: Int,
+    val successRate: Double
+)
 
-class RealSyncStatsRepository @Inject constructor(private val syncStateRepository: SyncStateRepository): SyncStatsRepository {
+class RealSyncStatsRepository @Inject constructor(private val syncStateRepository: SyncStateRepository) : SyncStatsRepository {
     override fun getDailyStats(): DailyStats {
-        val attempts = syncStateRepository.attempts()
+        val attempts = syncStateRepository.attempts().filter {
+            DatabaseDateFormatter.iso8601Date(it.timestamp).isEqual(LocalDate.now(ZoneOffset.UTC))
+        }
         val successfulAttempts = attempts.filter { it.state == SUCCESS }.size
         val totalAttempts = attempts.size
 
-        val successRate = if (totalAttempts > 0 ){
+        val successRate = if (totalAttempts > 0) {
             successfulAttempts.toDouble() / totalAttempts.toDouble() * 100
         } else {
             0.0
