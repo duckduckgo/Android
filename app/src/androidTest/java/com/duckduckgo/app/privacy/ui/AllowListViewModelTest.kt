@@ -67,7 +67,7 @@ class AllowListViewModelTest {
     }
 
     @Test
-    fun whenWhitelistUpdatedWithDataThenViewStateIsUpdatedAndWhitelistDisplayed() {
+    fun whenAllowListUpdatedWithDataThenViewStateIsUpdatedAndAllowListDisplayed() {
         val list = listOf(UserAllowListedDomain(DOMAIN), UserAllowListedDomain(NEW_DOMAIN))
         liveData.postValue(list)
         val viewState = testee.viewState.value!!
@@ -76,7 +76,7 @@ class AllowListViewModelTest {
     }
 
     @Test
-    fun whenWhitelistUpdatedWithEmptyListThenViewStateIsUpdatedAndWhitelistNotDisplayed() {
+    fun whenAllowListUpdatedWithEmptyListThenViewStateIsUpdatedAndAllowListNotDisplayed() {
         liveData.postValue(emptyList())
         val viewState = testee.viewState.value!!
         assertTrue(viewState.allowList.isEmpty())
