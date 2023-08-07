@@ -23,6 +23,7 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface SharedCredentialJsonReader {
     suspend fun read(): String?
@@ -42,8 +43,16 @@ class AppleSharedCredentialsJsonReader @Inject constructor(
     }
 
     private fun loadJson(): String? {
-        val reader = javaClass.classLoader?.getResource(JSON_FILENAME)?.openStream()?.bufferedReader()
-        return reader.use { it?.readText() }
+        val json = runCatching {
+            val reader = javaClass.classLoader?.getResource(JSON_FILENAME)?.openStream()?.bufferedReader()
+            reader.use { it?.readText() }
+        }.getOrNull()
+
+        if (json == null) {
+            Timber.e("Failed to load shared credentials json")
+        }
+
+        return json
     }
 
     private companion object {

@@ -63,13 +63,19 @@ class AppleSharedCredentialsParser @Inject constructor(
 
     override suspend fun read(): SharedCredentialConfig {
         return withContext(dispatchers.io()) {
-            val json = jsonReader.read()
-            convertJsonToRules(json)
+            runCatching {
+                val json = jsonReader.read()
+                convertJsonToRules(json)
+            }
+                .getOrElse {
+                    Timber.e(it, "Failed to parse shared credentials json")
+                    CONFIG_WHEN_ERROR_HAPPENED
+                }
         }
     }
 
     private fun convertJsonToRules(json: String?): SharedCredentialConfig {
-        if (json == null) return SharedCredentialConfig(emptyList(), emptyList())
+        if (json == null) return CONFIG_WHEN_ERROR_HAPPENED
 
         val adapter = moshi.adapter<List<Rule>>(Types.newParameterizedType(List::class.java, Rule::class.java))
 

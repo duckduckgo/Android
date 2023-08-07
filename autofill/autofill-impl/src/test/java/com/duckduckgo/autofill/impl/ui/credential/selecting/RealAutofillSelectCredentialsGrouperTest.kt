@@ -126,8 +126,25 @@ class RealAutofillSelectCredentialsGrouperTest {
         assertEquals(100L, group?.get(2)?.lastUpdatedMillis)
     }
 
+    @Test
+    fun whenThereShareableCredentialsThenTheyAreGroupedByDomainLikePartialMatches() {
+        val creds = listOf(
+            creds(domain = "fill.dev"), // sharable credential
+            creds(domain = "fill.dev"), // sharable credential in the same group as the above
+            creds(domain = "duckduckgo.com"), // sharable credential in another group
+        )
+        val grouped = testee.group("example.com", creds)
+        grouped.assertNumberOfPerfectMatches(0)
+        grouped.assertNumberOfPartialMatchGroups(0)
+        grouped.assertNumberOfShareableCredentialsGroups(2)
+    }
+
     private fun Groups.assertNumberOfPartialMatchGroups(expectedSize: Int) {
         assertEquals(expectedSize, partialMatches.size)
+    }
+
+    private fun Groups.assertNumberOfShareableCredentialsGroups(expectedSize: Int) {
+        assertEquals(expectedSize, shareableCredentials.size)
     }
 
     private fun Groups.assertNoPerfectMatches() {

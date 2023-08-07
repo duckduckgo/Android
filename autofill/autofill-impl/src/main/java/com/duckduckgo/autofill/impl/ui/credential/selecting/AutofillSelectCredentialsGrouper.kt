@@ -33,7 +33,7 @@ interface AutofillSelectCredentialsGrouper {
     data class Groups(
         val perfectMatches: List<LoginCredentials>,
         val partialMatches: Map<String, List<LoginCredentials>>,
-        val otherGroups: Map<String, List<LoginCredentials>>,
+        val shareableCredentials: Map<String, List<LoginCredentials>>,
     )
 }
 
@@ -47,7 +47,7 @@ class RealAutofillSelectCredentialsGrouper @Inject constructor(
         originalUrl: String,
         unsortedCredentials: List<LoginCredentials>,
     ): Groups {
-        // build the groups: one group for perfect matches, then each partial match can be its own group
+        // build the groups: one group for perfect matches, then each partial match can be its own group, then any shareable credentials
         val unsortedGroups = buildGroups(originalUrl, unsortedCredentials)
 
         // sort the partial match groups, by usual domain sorting rules
@@ -82,7 +82,7 @@ class RealAutofillSelectCredentialsGrouper @Inject constructor(
     private fun sort(groups: Groups): Groups {
         // sort group headings for all the partial matches using usual domain sorting rules
         val sortedPartialMatches = groups.partialMatches.toSortedMap(sorter.comparator())
-        val sortedOtherMatches = groups.otherGroups.toSortedMap(sorter.comparator())
+        val sortedOtherMatches = groups.shareableCredentials.toSortedMap(sorter.comparator())
 
         // sort inside each group, where most recently updated is first
         val sortedPerfectMatches = groups.perfectMatches.sortedByDescending { it.lastUpdatedMillis }
