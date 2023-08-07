@@ -24,7 +24,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
+import com.duckduckgo.app.browser.databinding.ActivityAllowlistBinding
 import com.duckduckgo.app.browser.databinding.DialogEditWhitelistBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -39,13 +39,13 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-class WhitelistActivity : DuckDuckGoActivity() {
+class AllowListActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
 
     private lateinit var adapter: WebsitesAdapter
-    private val binding: ActivityWhitelistBinding by viewBinding()
+    private val binding: ActivityAllowlistBinding by viewBinding()
     private val viewModel: WhitelistViewModel by bindViewModel()
 
     private val toolbar
@@ -164,7 +164,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
 
     companion object {
         fun intent(context: Context): Intent {
-            return Intent(context, WhitelistActivity::class.java)
+            return Intent(context, AllowListActivity::class.java)
         }
     }
 }
