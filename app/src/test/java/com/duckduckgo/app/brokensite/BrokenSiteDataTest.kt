@@ -35,7 +35,7 @@ import org.mockito.kotlin.mock
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteDataTest {
 
-    private val mockWhitelistDao: UserAllowListDao = mock()
+    private val mockAllowlistDao: UserAllowListDao = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
 
@@ -190,7 +190,7 @@ class BrokenSiteDataTest {
         url: String,
         httpsUpgraded: Boolean = false,
     ): Site {
-        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded, mockWhitelistDao, mockContentBlocking, TestScope())
+        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded, mockAllowlistDao, mockContentBlocking, TestScope())
     }
 
     companion object {
