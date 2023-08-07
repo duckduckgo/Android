@@ -93,6 +93,15 @@ android {
                     appIconRound: "@mipmap/ic_launcher_red_round"
             ]
         }
+        benchmark {
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
+            debuggable false
+                    manifestPlaceholders = [
+                    appIcon     : "@mipmap/ic_launcher_green",
+                    appIconRound: "@mipmap/ic_launcher_green_round"
+            ]
+        }
     }
     flavorDimensions "store"
     productFlavors {
