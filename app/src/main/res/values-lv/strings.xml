@@ -763,4 +763,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Velciet no augšas uz leju un pieskarieties pogai Atpakaļ, lai izietu no pilnekrāna režīma</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Aizvērt visas cilnes?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Vai tiešām vēlies aizvērt visas cilnes?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Atcelt</string>
+    <string name="closeAppTabsConfirmationDialogClose">Aizvērt</string>
 </resources>

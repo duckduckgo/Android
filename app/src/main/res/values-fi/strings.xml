@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Vedä yläreunasta alaspäin ja poistu koko näytöstä painamalla takaisin-painiketta</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Sulje kaikki välilehdet?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Haluatko varmasti sulkea kaikki välilehdet?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Peruuta</string>
+    <string name="closeAppTabsConfirmationDialogClose">Sulje</string>
 </resources>

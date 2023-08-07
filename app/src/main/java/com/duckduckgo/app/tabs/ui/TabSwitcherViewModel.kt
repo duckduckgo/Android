@@ -28,6 +28,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class TabSwitcherViewModel @Inject constructor(
@@ -44,6 +45,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     sealed class Command {
         object Close : Command()
+        object CloseAllTabsRequest : Command()
     }
 
     suspend fun onNewTabRequested() {
@@ -73,5 +75,17 @@ class TabSwitcherViewModel @Inject constructor(
 
     suspend fun purgeDeletableTabs() {
         tabRepository.purgeDeletableTabs()
+    }
+
+    fun onCloseAllTabsRequested() {
+        command.value = Command.CloseAllTabsRequest
+    }
+
+    fun onCloseAllTabsConfirmed() {
+        viewModelScope.launch {
+            tabs.value?.forEach {
+                onTabDeleted(it)
+            }
+        }
     }
 }

@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Σύρετε προς τα κάτω από την κορυφή και πατήστε το κουμπί επιστροφής για να εξέλθετε από την πλήρη οθόνη</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Κλείσιμο όλων των καρτελών;</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Ακύρωση</string>
+    <string name="closeAppTabsConfirmationDialogClose">Κλείσιμο</string>
 </resources>

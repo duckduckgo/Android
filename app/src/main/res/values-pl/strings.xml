@@ -767,4 +767,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Przeciągnij w dół od góry i naciśnij przycisk Wstecz, aby zamknąć tryb pełnoekranowy.</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Zamknąć wszystkie karty?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Czy na pewno chcesz zamknąć wszystkie karty?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Anuluj</string>
+    <string name="closeAppTabsConfirmationDialogClose">Zamknij</string>
 </resources>

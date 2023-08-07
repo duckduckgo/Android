@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Træk ned fra toppen og tryk på tilbage-knappen for at forlade fuld skærm</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Luk alle faner?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Er du sikker på, at du vil lukke alle faner?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Annuller</string>
+    <string name="closeAppTabsConfirmationDialogClose">Luk</string>
 </resources>

@@ -767,4 +767,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Povucite prema dolje s vrha i dodirnite gumb za natrag kako biste izašli iz prikaza preko cijelog zaslona</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Želiš li zatvoriti sve kartice?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Jesi li siguran da želiš zatvoriti sve kartice?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Odustani</string>
+    <string name="closeAppTabsConfirmationDialogClose">Zatvori</string>
 </resources>

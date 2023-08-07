@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Arrastra hacia abajo desde la parte superior y pulsa el botón Atrás para salir de la pantalla completa</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">¿Cerrar todas las pestañas?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">¿Seguro que deseas cerrar todas las pestañas?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
+    <string name="closeAppTabsConfirmationDialogClose">Cerrar</string>
 </resources>
