@@ -116,7 +116,7 @@ class NetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             assertNotNull(item)
-            item!!.assertTitleEquals("Network Protection is enabled and routing all device traffic through Stockholm, SE.")
+            item!!.assertTitleEquals("Network Protection is enabled and routing device traffic through Stockholm, SE.")
             item.assertMessageEquals("")
 
             cancelAndIgnoreRemainingEvents()
