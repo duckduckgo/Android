@@ -109,7 +109,7 @@ class SiteMonitor(
     init {
         // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
         appCoroutineScope.launch {
-            domain?.let { userAllowList = isWhitelisted(it) }
+            domain?.let { userAllowList = isAllowListed(it) }
         }
     }
 
@@ -138,7 +138,7 @@ class SiteMonitor(
     }
 
     override fun privacyProtection(): PrivacyShield {
-        userAllowList = domain?.let { isWhitelisted(it) } ?: false
+        userAllowList = domain?.let { isAllowListed(it) } ?: false
         if (userAllowList || !isHttps) return UNPROTECTED
 
         if (!fullSiteDetailsAvailable) {
@@ -152,7 +152,7 @@ class SiteMonitor(
     }
 
     @WorkerThread
-    private fun isWhitelisted(domain: String): Boolean {
+    private fun isAllowListed(domain: String): Boolean {
         return userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
     }
 
