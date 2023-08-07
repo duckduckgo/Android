@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">L\'app potrebbe chiudersi per applicare le modifiche. Torna dopo aver ammirato la tua bella nuova icona.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Siti non protetti</string>
+    <string name="manageAllowlist">Siti non protetti</string>
     <string name="reportBrokenSite">Segnala sito danneggiato</string>
 
     <!-- Dialogs -->

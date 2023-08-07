@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Η εφαρμογή μπορεί να κλείσει για να εφαρμοστούν οι αλλαγές. Επιστρέψτε αφού θαυμάσετε το νέο σας όμορφο εικονίδιο.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Μη προστατευόμενοι ιστότοποι</string>
+    <string name="manageAllowlist">Μη προστατευόμενοι ιστότοποι</string>
     <string name="reportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
 
     <!-- Dialogs -->

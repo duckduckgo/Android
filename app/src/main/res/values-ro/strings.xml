@@ -513,7 +513,7 @@
     <string name="changeIconDialogMessage">Închide aplicația pentru a aplica modificările. Revino după ce ai admirat noua pictogramă aleasă de tine.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Site-uri neprotejate</string>
+    <string name="manageAllowlist">Site-uri neprotejate</string>
     <string name="reportBrokenSite">Raportează Site-ul Defect</string>
 
     <!-- Dialogs -->

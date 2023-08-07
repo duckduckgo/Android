@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Aplikacija se može zatvoriti radi primjene promjena. Vrati se nakon što si se divio/la svojoj lijepoj novoj ikoni.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Nezaštićena web-mjesta</string>
+    <string name="manageAllowlist">Nezaštićena web-mjesta</string>
     <string name="reportBrokenSite">Prijavi neispravno web-mjesto</string>
 
     <!-- Dialogs -->

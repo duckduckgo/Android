@@ -512,7 +512,7 @@
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Unprotected Sites</string>
+    <string name="manageAllowlist">Unprotected Sites</string>
     <string name="reportBrokenSite">Report Broken Site</string>
 
     <!-- Dialogs -->

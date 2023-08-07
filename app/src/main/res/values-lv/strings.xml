@@ -513,7 +513,7 @@
     <string name="changeIconDialogMessage">Lietotne var aizvērties, lai piemērotu jaunās izmaiņas. Atgriezies pēc tam, kad būsi apbrīnojis savu jauno, glīto ikonu.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Neaizsargātas vietnes</string>
+    <string name="manageAllowlist">Neaizsargātas vietnes</string>
     <string name="reportBrokenSite">Ziņot par bojātu vietni</string>
 
     <!-- Dialogs -->

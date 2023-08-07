@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Приложение может закрыться, чтобы применить изменения. Возвращайтесь, когда налюбуетесь своим новым значком.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Незащищенные сайты</string>
+    <string name="manageAllowlist">Незащищенные сайты</string>
     <string name="reportBrokenSite">Сообщить о неработающем сайте</string>
 
     <!-- Dialogs -->

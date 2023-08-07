@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Aplikacija se bo mogoče zaprla, da izvede spremembe. Vrnite se na aplikacijo potem, ko se vam prikaže vaša privlačna nova ikona.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Nezaščitene strani</string>
+    <string name="manageAllowlist">Nezaščitene strani</string>
     <string name="reportBrokenSite">Prijavite poškodovano spletno mesto</string>
 
     <!-- Dialogs -->

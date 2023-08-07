@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Aplikace se může zavřít, aby aplikovala změny. Až se pokocháte svou krásnou novou ikonou, vraťte se zpátky.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Nechráněné stránky</string>
+    <string name="manageAllowlist">Nechráněné stránky</string>
     <string name="reportBrokenSite">Nahlásit nefunkční webové stránky</string>
 
     <!-- Dialogs -->
