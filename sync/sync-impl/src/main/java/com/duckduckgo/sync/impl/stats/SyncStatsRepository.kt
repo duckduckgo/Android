@@ -17,12 +17,16 @@
 package com.duckduckgo.sync.impl.stats
 
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.LocalDate
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -30,8 +34,15 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import javax.inject.Inject
 
+/**
+ * The Repository that fetches all stats related to [SyncAttempt]
+ */
 interface SyncStatsRepository {
 
+    /**
+     * Returns yesterday's [DailyStats]
+     * @return [DailyStats]
+     */
     fun getDailyStats(): DailyStats
 }
 
