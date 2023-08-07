@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Opslaan</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Onbeschermde sites</string>
+    <string name="allowlistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Meer opties voor onbeschermde site %1$s</string>

@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Запази</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Незащитени сайтове</string>
+    <string name="allowlistActivityTitle">Незащитени сайтове</string>
     <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
     <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Още опции за незащитен сайт %1$s</string>

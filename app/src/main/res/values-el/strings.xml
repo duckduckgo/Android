@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Αποθήκευση</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
+    <string name="allowlistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>

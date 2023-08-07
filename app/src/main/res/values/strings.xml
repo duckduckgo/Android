@@ -521,7 +521,7 @@
     <string name="dialogSaveAction">Save</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Unprotected Sites</string>
+    <string name="allowlistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>

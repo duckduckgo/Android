@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Speichern</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Ungeschützte Websites</string>
+    <string name="allowlistActivityTitle">Ungeschützte Websites</string>
     <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
     <string name="disablePrivacyProtection">Datenschutz deaktivieren</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Weitere Optionen für die ungeschützte Website %1$s</string>

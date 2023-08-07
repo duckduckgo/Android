@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Mentés</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Védelem nélküli weboldalak</string>
+    <string name="allowlistActivityTitle">Védelem nélküli weboldalak</string>
     <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
     <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>

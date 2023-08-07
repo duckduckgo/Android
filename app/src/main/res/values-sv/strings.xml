@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Spara</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Oskyddade webbplatser</string>
+    <string name="allowlistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Fler alternativ för den oskyddade webbplatsen %1$s</string>

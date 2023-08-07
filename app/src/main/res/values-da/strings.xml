@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Gem</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Ubeskyttede websteder</string>
+    <string name="allowlistActivityTitle">Ubeskyttede websteder</string>
     <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
     <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>

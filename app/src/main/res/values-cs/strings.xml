@@ -524,7 +524,7 @@
     <string name="dialogSaveAction">Uložit</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Nechráněné stránky</string>
+    <string name="allowlistActivityTitle">Nechráněné stránky</string>
     <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
     <string name="disablePrivacyProtection">Zakázat ochranu soukromí</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Další možnosti pro nechráněný web %1$s</string>

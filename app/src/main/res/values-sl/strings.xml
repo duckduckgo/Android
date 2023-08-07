@@ -524,7 +524,7 @@
     <string name="dialogSaveAction">Shrani</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Nezaščitene strani</string>
+    <string name="allowlistActivityTitle">Nezaščitene strani</string>
     <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>
     <string name="disablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Več možnosti za nezaščiteno stran %1$s</string>

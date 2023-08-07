@@ -522,7 +522,7 @@
     <string name="dialogSaveAction">Salvează</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Site-uri neprotejate</string>
+    <string name="allowlistActivityTitle">Site-uri neprotejate</string>
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
     <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>

@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Lagre</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Ubeskyttede nettsteder</string>
+    <string name="allowlistActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
     <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere alternativer for det ubeskyttede nettstedet %1$s</string>

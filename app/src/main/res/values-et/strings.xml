@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Salvesta</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Kaitseta saidid</string>
+    <string name="allowlistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>
     <string name="disablePrivacyProtection">Keela privaatsuse kaitse</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>

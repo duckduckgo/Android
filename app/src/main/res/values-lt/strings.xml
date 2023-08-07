@@ -524,7 +524,7 @@
     <string name="dialogSaveAction">Išsaugoti</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
+    <string name="allowlistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>

@@ -524,7 +524,7 @@
     <string name="dialogSaveAction">Spremi</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Nezaštićena web-mjesta</string>
+    <string name="allowlistActivityTitle">Nezaštićena web-mjesta</string>
     <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
     <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>

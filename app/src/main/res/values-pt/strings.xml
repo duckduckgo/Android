@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Guardar</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Sites desprotegidos</string>
+    <string name="allowlistActivityTitle">Sites desprotegidos</string>
     <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>
     <string name="disablePrivacyProtection">Desativar Proteção de Privacidade</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Mais opções para o site desprotegido %1$s</string>

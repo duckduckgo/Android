@@ -524,7 +524,7 @@
     <string name="dialogSaveAction">Zapisz</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Niezabezpieczone witryny</string>
+    <string name="allowlistActivityTitle">Niezabezpieczone witryny</string>
     <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
     <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Więcej opcji dla niezabezpieczonej witryny %1$s</string>

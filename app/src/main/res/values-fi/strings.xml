@@ -520,7 +520,7 @@
     <string name="dialogSaveAction">Tallenna</string>
 
     <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Suojaamattomat sivustot</string>
+    <string name="allowlistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
