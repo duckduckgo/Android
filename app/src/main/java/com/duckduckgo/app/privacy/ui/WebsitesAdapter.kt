@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class WebsitesAdapter(
-    private val viewModel: WhitelistViewModel,
+    private val viewModel: AllowListViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
 ) : RecyclerView.Adapter<WebsiteViewHolder>() {
@@ -146,7 +146,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
     class WebsiteItemViewHolder(
         private val layoutInflater: LayoutInflater,
         private val binding: RowOneLineListItemBinding,
-        private val viewModel: WhitelistViewModel,
+        private val viewModel: AllowListViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
     ) : WebsiteViewHolder(binding.root) {

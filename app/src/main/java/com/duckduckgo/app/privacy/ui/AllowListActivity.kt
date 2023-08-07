@@ -30,7 +30,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.privacy.model.UserAllowListedDomain
-import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
+import com.duckduckgo.app.privacy.ui.AllowListViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
@@ -46,7 +46,7 @@ class AllowListActivity : DuckDuckGoActivity() {
 
     private lateinit var adapter: WebsitesAdapter
     private val binding: ActivityAllowlistBinding by viewBinding()
-    private val viewModel: WhitelistViewModel by bindViewModel()
+    private val viewModel: AllowListViewModel by bindViewModel()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -89,19 +89,19 @@ class AllowListActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderViewState(viewState: WhitelistViewModel.ViewState) {
-        adapter.entries = viewState.whitelist
-        if (viewState.showWhitelist) {
+    private fun renderViewState(viewState: AllowListViewModel.ViewState) {
+        adapter.entries = viewState.allowList
+        if (viewState.showAllowList) {
             invalidateOptionsMenu()
         }
     }
 
-    private fun processCommand(command: WhitelistViewModel.Command) {
+    private fun processCommand(command: AllowListViewModel.Command) {
         when (command) {
             is ShowAdd -> showAddDialog()
             is ShowEdit -> showEditDialog(command.entry)
             is ConfirmDelete -> showDeleteDialog(command.entry)
-            is ShowWhitelistFormatError -> showWhitelistFormatError()
+            is ShowAllowListFormatError -> showWhitelistFormatError()
         }
     }
 

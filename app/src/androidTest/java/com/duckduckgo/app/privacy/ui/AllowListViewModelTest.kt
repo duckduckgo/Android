@@ -22,9 +22,9 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.model.UserAllowListedDomain
-import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command
-import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowAdd
-import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowWhitelistFormatError
+import com.duckduckgo.app.privacy.ui.AllowListViewModel.Command
+import com.duckduckgo.app.privacy.ui.AllowListViewModel.Command.ShowAdd
+import com.duckduckgo.app.privacy.ui.AllowListViewModel.Command.ShowAllowListFormatError
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -36,7 +36,7 @@ import org.junit.Test
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
-class WhitelistViewModelTest {
+class AllowListViewModelTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -52,7 +52,7 @@ class WhitelistViewModelTest {
     private val mockCommandObserver: Observer<Command> = mock()
     private var commandCaptor: KArgumentCaptor<Command> = argumentCaptor()
 
-    private val testee by lazy { WhitelistViewModel(mockDao, TestScope(), coroutineRule.testDispatcherProvider) }
+    private val testee by lazy { AllowListViewModel(mockDao, TestScope(), coroutineRule.testDispatcherProvider) }
 
     @Before
     fun before() = runTest {
@@ -71,16 +71,16 @@ class WhitelistViewModelTest {
         val list = listOf(UserAllowListedDomain(DOMAIN), UserAllowListedDomain(NEW_DOMAIN))
         liveData.postValue(list)
         val viewState = testee.viewState.value!!
-        assertEquals(list, viewState.whitelist)
-        assertTrue(viewState.showWhitelist)
+        assertEquals(list, viewState.allowList)
+        assertTrue(viewState.showAllowList)
     }
 
     @Test
     fun whenWhitelistUpdatedWithEmptyListThenViewStateIsUpdatedAndWhitelistNotDisplayed() {
         liveData.postValue(emptyList())
         val viewState = testee.viewState.value!!
-        assertTrue(viewState.whitelist.isEmpty())
-        assertFalse(viewState.showWhitelist)
+        assertTrue(viewState.allowList.isEmpty())
+        assertFalse(viewState.showAllowList)
     }
 
     @Test
@@ -100,7 +100,7 @@ class WhitelistViewModelTest {
     fun whenInvalidEntryAddedThenErrorShownAndDaoNotUpdated() {
         val entry = UserAllowListedDomain(INVALID_DOMAIN)
         testee.onEntryAdded(entry)
-        verify(mockCommandObserver).onChanged(ShowWhitelistFormatError)
+        verify(mockCommandObserver).onChanged(ShowAllowListFormatError)
         verify(mockDao, never()).insert(entry)
     }
 
@@ -127,7 +127,7 @@ class WhitelistViewModelTest {
         val old = UserAllowListedDomain(DOMAIN)
         val new = UserAllowListedDomain(INVALID_DOMAIN)
         testee.onEntryEdited(old, new)
-        verify(mockCommandObserver).onChanged(ShowWhitelistFormatError)
+        verify(mockCommandObserver).onChanged(ShowAllowListFormatError)
         verify(mockDao, never()).delete(old)
         verify(mockDao, never()).insert(new)
     }
