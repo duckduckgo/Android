@@ -98,7 +98,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -152,7 +152,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
-    private val userWhitelistDao: UserWhitelistDao,
+    private val userAllowListDao: UserAllowListDao,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val savedSitesRepository: SavedSitesRepository,
@@ -1319,7 +1319,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun isWhitelisted(domain: String): Boolean {
         return withContext(dispatchers.io()) {
-            userWhitelistDao.contains(domain) || contentBlocking.isAnException(domain)
+            userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
         }
     }
 
@@ -2063,7 +2063,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun addToWhitelist(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         withContext(dispatchers.io()) {
-            userWhitelistDao.insert(domain)
+            userAllowListDao.insert(domain)
         }
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
@@ -2074,7 +2074,7 @@ class BrowserTabViewModel @Inject constructor(
     private suspend fun removeFromWhitelist(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         withContext(dispatchers.io()) {
-            userWhitelistDao.delete(domain)
+            userAllowListDao.delete(domain)
         }
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
@@ -2084,7 +2084,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onDisablePrivacyProtectionSnackbarUndoClicked(domain: String) {
         viewModelScope.launch(dispatchers.io()) {
-            userWhitelistDao.insert(domain)
+            userAllowListDao.insert(domain)
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
                 command.value = NavigationCommand.Refresh
@@ -2094,7 +2094,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onEnablePrivacyProtectionSnackbarUndoClicked(domain: String) {
         viewModelScope.launch(dispatchers.io()) {
-            userWhitelistDao.delete(domain)
+            userAllowListDao.delete(domain)
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
                 command.value = NavigationCommand.Refresh

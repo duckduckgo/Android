@@ -22,7 +22,7 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class UserWhitelistDao {
+abstract class UserAllowListDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(domain: UserWhitelistedDomain)

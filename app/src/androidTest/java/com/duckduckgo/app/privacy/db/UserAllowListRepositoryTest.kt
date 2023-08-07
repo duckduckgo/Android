@@ -44,7 +44,7 @@ class UserAllowListRepositoryTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
-    private lateinit var dao: UserWhitelistDao
+    private lateinit var dao: UserAllowListDao
     private lateinit var repository: UserAllowListRepository
 
     @ExperimentalCoroutinesApi

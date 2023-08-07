@@ -25,7 +25,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
@@ -36,7 +36,7 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class WhitelistViewModel @Inject constructor(
-    private val dao: UserWhitelistDao,
+    private val dao: UserAllowListDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {

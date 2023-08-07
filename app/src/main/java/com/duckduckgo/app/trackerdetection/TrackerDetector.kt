@@ -20,7 +20,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
@@ -50,7 +50,7 @@ interface TrackerDetector {
 @SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
-    private val userWhitelistDao: UserWhitelistDao,
+    private val userAllowListDao: UserAllowListDao,
     private val contentBlocking: ContentBlocking,
     private val trackerAllowlist: TrackerAllowlist,
     private val webTrackersBlockedDao: WebTrackersBlockedDao,
@@ -85,7 +85,7 @@ class TrackerDetectorImpl @Inject constructor(
         val sameEntity = sameNetworkName(url, documentUrl)
         val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else entityLookup.entityForUrl(url)
         val isSiteAContentBlockingException = contentBlocking.isAnException(documentUrl)
-        val isDocumentInAllowedList = userWhitelistDao.isDocumentWhitelisted(documentUrl)
+        val isDocumentInAllowedList = userAllowListDao.isDocumentWhitelisted(documentUrl)
         val isInAdClickAllowList = adClickManager.isExemption(documentUrl, url)
         val isInTrackerAllowList = trackerAllowlist.isAnException(documentUrl, url)
         val isATrackerAllowed = result.isATracker && !result.matches
@@ -132,7 +132,7 @@ class TrackerDetectorImpl @Inject constructor(
         get() = clients.count()
 }
 
-private fun UserWhitelistDao.isDocumentWhitelisted(document: String?): Boolean {
+private fun UserAllowListDao.isDocumentWhitelisted(document: String?): Boolean {
     document?.toUri()?.host?.let {
         return contains(it)
     }

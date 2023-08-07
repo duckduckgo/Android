@@ -120,7 +120,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
     abstract fun tdsCnameEntityDao(): TdsCnameEntityDao
-    abstract fun userWhitelistDao(): UserWhitelistDao
+    abstract fun userWhitelistDao(): UserAllowListDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
     abstract fun bookmarksDao(): BookmarksDao

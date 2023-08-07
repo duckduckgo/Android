@@ -20,7 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowAdd
@@ -46,7 +46,7 @@ class WhitelistViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val mockDao: UserWhitelistDao = mock()
+    private val mockDao: UserAllowListDao = mock()
     private val liveData = MutableLiveData<List<UserWhitelistedDomain>>()
 
     private val mockCommandObserver: Observer<Command> = mock()

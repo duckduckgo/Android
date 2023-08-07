@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class AuditSettingsViewModel @Inject constructor(
-    private val userAllowListDao: UserWhitelistDao,
+    private val userAllowListDao: UserAllowListDao,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 

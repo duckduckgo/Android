@@ -104,7 +104,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -265,7 +265,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserStageStore: UserStageStore
 
     @Mock
-    private lateinit var mockUserWhitelistDao: UserWhitelistDao
+    private lateinit var mockUserAllowListDao: UserAllowListDao
 
     @Mock
     private lateinit var mockContentBlocking: ContentBlocking
@@ -432,7 +432,7 @@ class BrowserTabViewModelTest {
             surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
-            userWhitelistDao = mockUserWhitelistDao,
+            userAllowListDao = mockUserAllowListDao,
             settingsDataStore = mockSettingsStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
@@ -443,7 +443,7 @@ class BrowserTabViewModelTest {
             surveyRepository = mockSurveyRepository,
         )
 
-        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
+        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserAllowListDao, mockContentBlocking, TestScope())
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
@@ -453,7 +453,7 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(mockUserAllowListDao.contains(anyString())).thenReturn(false)
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
@@ -463,7 +463,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             siteFactory = siteFactory,
             tabRepository = mockTabRepository,
-            userWhitelistDao = mockUserWhitelistDao,
+            userAllowListDao = mockUserAllowListDao,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
@@ -1637,17 +1637,17 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
+        verify(mockUserAllowListDao).insert(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
     fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
@@ -1657,17 +1657,17 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
+        verify(mockUserAllowListDao).delete(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
     fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
