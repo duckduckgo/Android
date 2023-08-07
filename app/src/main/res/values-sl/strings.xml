@@ -528,11 +528,11 @@
     <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>
     <string name="disablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Več možnosti za nezaščiteno stran %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ali ste prepričani​, da želite odstraniti &lt;b&gt;%1$s&lt;/b&gt; z nezaščitenih spletnih strani?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ali ste prepričani​, da želite odstraniti &lt;b&gt;%1$s&lt;/b&gt; z nezaščitenih spletnih strani?</string>
     <string name="whitelistExplanation">Varnost teh strani se z zaščito zasebnosti ne bo izboljšala.</string>
     <string name="whitelistNoEntries">Zaščita zasebnosti omogočena za vsa spletna mesta</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Vnesite domeno, kot je <b>primer.com </b> in poskusite znova</string>
+    <string name="allowlistFormatError">Vnesite domeno, kot je <b>primer.com </b> in poskusite znova</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Nezaščitene strani</string>

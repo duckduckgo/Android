@@ -524,11 +524,11 @@
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
     <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Plus d\'options pour le site non protégé %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Voulez-vous vraiment retirer &lt;b&gt;%1$s&lt;/b&gt; des sites non protégés ?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Voulez-vous vraiment retirer &lt;b&gt;%1$s&lt;/b&gt; des sites non protégés ?</string>
     <string name="whitelistExplanation">Les sites suivants ne bénéficient pas de la protection de la confidentialité.</string>
     <string name="whitelistNoEntries">La protection de la confidentialité est activée pour tous les sites</string>
     <string name="whitelistDomainHint">www.exemple.com</string>
-    <string name="whitelistFormatError">Veuillez saisir un domaine comme <b>exemple.com</b> et réessayer</string>
+    <string name="allowlistFormatError">Veuillez saisir un domaine comme <b>exemple.com</b> et réessayer</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Sites non protégés</string>

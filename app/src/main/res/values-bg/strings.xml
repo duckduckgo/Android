@@ -524,11 +524,11 @@
     <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
     <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Още опции за незащитен сайт %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Сигурни ли сте, че искате да премахнете &lt;b&gt;%1$s&lt;/b&gt; от незащитените сайтове?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Сигурни ли сте, че искате да премахнете &lt;b&gt;%1$s&lt;/b&gt; от незащитените сайтове?</string>
     <string name="whitelistExplanation">Към тези сайтове няма да бъде приложена защита на поверителността.</string>
     <string name="whitelistNoEntries">Защитата на поверителността е активирана за всички сайтове</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Моля, въведете домейн, като например <b>example.com</b>, и опитайте отново</string>
+    <string name="allowlistFormatError">Моля, въведете домейн, като например <b>example.com</b>, и опитайте отново</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Незащитени сайтове</string>

@@ -524,11 +524,11 @@
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
     <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere alternativer for det ubeskyttede nettstedet %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede nettsteder?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede nettsteder?</string>
     <string name="whitelistExplanation">Disse nettstedene blir ikke dekket av personvernbeskyttelse.</string>
     <string name="whitelistNoEntries">Personvernbeskyttelse aktivert for alle nettsteder</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Oppgi et domene som <b>eksempel.no</b> og prøv på nytt</string>
+    <string name="allowlistFormatError">Oppgi et domene som <b>eksempel.no</b> og prøv på nytt</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Ubeskyttede nettsteder</string>

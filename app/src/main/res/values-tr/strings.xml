@@ -524,11 +524,11 @@
     <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Korumasız %1$s sitesi için diğer seçenekler</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
     <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanmayacaktır.</string>
     <string name="whitelistNoEntries">Gizlilik Koruması tüm siteler için etkin</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Lütfen <b>example.com</b> gibi bir alan adı girip tekrar deneyin</string>
+    <string name="allowlistFormatError">Lütfen <b>example.com</b> gibi bir alan adı girip tekrar deneyin</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Korumasız Siteler</string>

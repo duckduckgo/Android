@@ -528,11 +528,11 @@
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
     <string name="whitelistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
     <string name="whitelistNoEntries">Privatumo apsauga įjungta visose svetainėse</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Įveskite domeną, pavyzdžiui, <b>example.com</b>, ir bandykite dar kartą</string>
+    <string name="allowlistFormatError">Įveskite domeną, pavyzdžiui, <b>example.com</b>, ir bandykite dar kartą</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Neapsaugotos svetainės</string>

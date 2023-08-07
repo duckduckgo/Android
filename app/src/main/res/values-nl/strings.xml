@@ -524,11 +524,11 @@
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Meer opties voor onbeschermde site %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
     <string name="whitelistExplanation">Deze sites worden niet beschermd met Privacybescherming.</string>
     <string name="whitelistNoEntries">Privacybescherming ingeschakeld voor alle sites</string>
     <string name="whitelistDomainHint">www.voorbeeld.com</string>
-    <string name="whitelistFormatError">Voer een domein in zoals <b>voorbeeld.com</b> en probeer het opnieuw</string>
+    <string name="allowlistFormatError">Voer een domein in zoals <b>voorbeeld.com</b> en probeer het opnieuw</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Onbeschermde sites</string>

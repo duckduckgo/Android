@@ -526,11 +526,11 @@
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
     <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
     <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Sigur dorești să elimini &lt;b&gt;%1$s&lt;/b&gt; din site-urile neprotejate?</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Sigur dorești să elimini &lt;b&gt;%1$s&lt;/b&gt; din site-urile neprotejate?</string>
     <string name="whitelistExplanation">Aceste site-uri nu vor fi îmbunătățite de protecția confidențialității.</string>
     <string name="whitelistNoEntries">Protecția confidențialității este activată pentru toate site-urile</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Introdu un domeniu precum <b>example.com</b> și încearcă din nou</string>
+    <string name="allowlistFormatError">Introdu un domeniu precum <b>example.com</b> și încearcă din nou</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Site-uri neprotejate</string>
