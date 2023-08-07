@@ -1304,20 +1304,20 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
-        val isWhitelisted = isWhitelisted(domain)
+        val isAllowListed = isAllowListed(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !isWhitelisted)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !isAllowListed)
         }
     }
 
     private suspend fun updatePrivacyProtectionState(domain: String) {
-        val isWhitelisted = isWhitelisted(domain)
+        val isAllowListed = isAllowListed(domain)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = isWhitelisted)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = isAllowListed)
         }
     }
 
-    private suspend fun isWhitelisted(domain: String): Boolean {
+    private suspend fun isAllowListed(domain: String): Boolean {
         return withContext(dispatchers.io()) {
             userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
         }
@@ -2051,16 +2051,16 @@ class BrowserTabViewModel @Inject constructor(
     fun onPrivacyProtectionMenuClicked() {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
-            if (isWhitelisted(domain)) {
-                removeFromWhitelist(domain)
+            if (isAllowListed(domain)) {
+                removeFromAllowList(domain)
             } else {
-                addToWhitelist(domain)
+                addToAllowList(domain)
             }
             command.postValue(NavigationCommand.Refresh)
         }
     }
 
-    private suspend fun addToWhitelist(domain: String) {
+    private suspend fun addToAllowList(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         withContext(dispatchers.io()) {
             userAllowListDao.insert(domain)
@@ -2071,7 +2071,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun removeFromWhitelist(domain: String) {
+    private suspend fun removeFromAllowList(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         withContext(dispatchers.io()) {
             userAllowListDao.delete(domain)
