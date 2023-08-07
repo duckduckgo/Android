@@ -30,24 +30,31 @@ interface SyncPixels {
 @ContributesBinding(AppScope::class)
 class RealSyncPixels @Inject constructor(
     private val pixel: Pixel,
-    private val context: Context,
     private val statsRepository: SyncStatsRepository
 ) : SyncPixels {
     override fun fireStatsPixel() {
-
-
-
+        val dailyStats = statsRepository.getDailyStats()
+        pixel.fire(
+            SyncPixelName.SYNC_SUCCESS_RATE,
+            mapOf(
+                SyncPixelParameters.RATE to dailyStats.successRate.toString(),
+            ),
+        )
+        pixel.fire(
+            SyncPixelName.SYNC_DAILY_ATTEMPTS,
+            mapOf(
+                SyncPixelParameters.ATTEMPTS to dailyStats.attempts.toString(),
+            ),
+        )
     }
 }
 
-enum class SyncPixelName(override val pixelName: String): Pixel.PixelName {
-
-}
-
-object SyncPixelValues {
-
+enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
+    SYNC_SUCCESS_RATE("m_sync_daily_success_rate"),
+    SYNC_DAILY_ATTEMPTS("m_sync_daily_attempts"),
 }
 
 object SyncPixelParameters {
-
+    const val ATTEMPTS = "attempts"
+    const val RATE = "rate"
 }
