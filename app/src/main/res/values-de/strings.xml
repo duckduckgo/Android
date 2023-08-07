@@ -527,7 +527,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Möchtest du &lt;b&gt;%1$s&lt;/b&gt; wirklich von den ungeschützten Websites entfernen?</string>
     <string name="allowlistExplanation">Für diese Websites ist der Datenschutz nicht aktiviert.</string>
     <string name="allowlistNoEntries">Datenschutz für alle Websites aktiviert</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Bitte gib eine Domain wie <b>beispiel.com</b> ein und versuche es erneut</string>
 
     <!-- Settings -->

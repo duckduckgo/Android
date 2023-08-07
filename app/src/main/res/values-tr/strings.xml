@@ -527,7 +527,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
     <string name="allowlistExplanation">Bu siteler için Gizlilik Koruması uygulanmayacaktır.</string>
     <string name="allowlistNoEntries">Gizlilik Koruması tüm siteler için etkin</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Lütfen <b>example.com</b> gibi bir alan adı girip tekrar deneyin</string>
 
     <!-- Settings -->

@@ -527,7 +527,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede websteder?</string>
     <string name="allowlistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
     <string name="allowlistNoEntries">Databeskyttelse aktiveret for alle websteder</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Indtast et domæne såsom <b>eksempel.dk</b> og prøv igen</string>
 
     <!-- Settings -->

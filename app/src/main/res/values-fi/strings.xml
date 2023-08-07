@@ -527,7 +527,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Haluatko varmasti poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; suojaamattomista sivustoista?</string>
     <string name="allowlistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
     <string name="allowlistNoEntries">Tietosuoja on käytössä kaikilla sivustoilla</string>
-    <string name="whitelistDomainHint">www.esimerkki.com</string>
+    <string name="allowlistDomainHint">www.esimerkki.com</string>
     <string name="allowlistFormatError">Anna verkkotunnus, kuten <b>esimerkki.com</b> ja kokeile uudelleen</string>
 
     <!-- Settings -->

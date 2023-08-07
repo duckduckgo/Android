@@ -527,7 +527,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Biztosan eltávolítod az &lt;b&gt;%1$s&lt;/b&gt; elemet a védelem nélküli weboldalak közül?</string>
     <string name="allowlistExplanation">Ezeket az oldalakat nem erősíti adatvédelem.</string>
     <string name="allowlistNoEntries">Adatvédelem engedélyezve minden weboldalhoz</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Írj be egy tartománynevet, például <b>example.com</b>, és próbáld újra.</string>
 
     <!-- Settings -->

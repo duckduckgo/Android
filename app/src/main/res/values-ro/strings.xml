@@ -529,7 +529,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Sigur dorești să elimini &lt;b&gt;%1$s&lt;/b&gt; din site-urile neprotejate?</string>
     <string name="allowlistExplanation">Aceste site-uri nu vor fi îmbunătățite de protecția confidențialității.</string>
     <string name="allowlistNoEntries">Protecția confidențialității este activată pentru toate site-urile</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Introdu un domeniu precum <b>example.com</b> și încearcă din nou</string>
 
     <!-- Settings -->

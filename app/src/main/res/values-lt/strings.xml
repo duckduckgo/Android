@@ -531,7 +531,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
     <string name="allowlistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
     <string name="allowlistNoEntries">Privatumo apsauga įjungta visose svetainėse</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Įveskite domeną, pavyzdžiui, <b>example.com</b>, ir bandykite dar kartą</string>
 
     <!-- Settings -->

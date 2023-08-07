@@ -527,7 +527,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
     <string name="allowlistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
     <string name="allowlistNoEntries">Η προστασία προσωπικών δεδομένων είναι ενεργοποιημένη για όλους τους ιστότοπους</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Εισαγάγετε ένα πεδίο τομέα όπως το <b>example.com</b> και προσπαθήστε ξανά</string>
 
     <!-- Settings -->

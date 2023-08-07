@@ -531,7 +531,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ali ste prepričani​, da želite odstraniti &lt;b&gt;%1$s&lt;/b&gt; z nezaščitenih spletnih strani?</string>
     <string name="allowlistExplanation">Varnost teh strani se z zaščito zasebnosti ne bo izboljšala.</string>
     <string name="allowlistNoEntries">Zaščita zasebnosti omogočena za vsa spletna mesta</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Vnesite domeno, kot je <b>primer.com </b> in poskusite znova</string>
 
     <!-- Settings -->

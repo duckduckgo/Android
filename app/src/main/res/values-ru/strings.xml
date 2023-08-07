@@ -531,7 +531,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Вы точно хотите удалить &lt;b&gt;%1$s&lt;/b&gt; из списка незащищенных сайтов?</string>
     <string name="allowlistExplanation">Сайты без защиты конфиденциальности.</string>
     <string name="allowlistNoEntries">Защита конфиденциальности включена на всех сайтах</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="allowlistDomainHint">www.example.com</string>
     <string name="allowlistFormatError">Введите доменное имя, например, <b>example.com</b> и повторите попытку</string>
 
     <!-- Settings -->

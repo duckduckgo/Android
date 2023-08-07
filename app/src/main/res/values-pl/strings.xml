@@ -531,7 +531,7 @@
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Na pewno usunąć &lt;b&gt;%1$s&lt;/b&gt; z niezabezpieczonych witryn?</string>
     <string name="allowlistExplanation">Te witryny nie będą ulepszane przez ochronę prywatności.</string>
     <string name="allowlistNoEntries">Ochrona prywatności włączona dla wszystkich witryn</string>
-    <string name="whitelistDomainHint">www.domena.pl</string>
+    <string name="allowlistDomainHint">www.domena.pl</string>
     <string name="allowlistFormatError">Wprowadź domenę, na przykład <b>domena.pl</b>, i spróbuj ponownie</string>
 
     <!-- Settings -->
