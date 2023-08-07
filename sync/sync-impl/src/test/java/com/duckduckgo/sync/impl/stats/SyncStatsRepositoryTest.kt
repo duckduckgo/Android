@@ -43,7 +43,7 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenNoAttemptsThenDailyStatsIsEmpty(){
+    fun whenNoAttemptsThenDailyStatsIsEmpty() {
         whenever(syncStateRepository.attempts()).thenReturn(emptyList())
 
         val stats = repository.getDailyStats()
@@ -53,7 +53,7 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenOnlyPastAttemptsThenDailyStatsHasCorrectData(){
+    fun whenOnlyPastAttemptsThenDailyStatsHasCorrectData() {
         val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.DAYS))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
 
@@ -65,7 +65,7 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenOnlyTodayAttemptsThenDailyStatsHasCorrectData(){
+    fun whenOnlyTodayAttemptsThenDailyStatsHasCorrectData() {
         val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
 
@@ -77,7 +77,7 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenOnlySuccessfulAttemptsThenDailyStatsHasCorrectData(){
+    fun whenOnlySuccessfulAttemptsThenDailyStatsHasCorrectData() {
         val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
 
@@ -90,7 +90,7 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenOnlyFailedAttemptsThenDailyStatsHasCorrectData(){
+    fun whenOnlyFailedAttemptsThenDailyStatsHasCorrectData() {
         val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = FAIL)
 
@@ -107,7 +107,7 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenFewAttemptsThenDailyStatsHasCorrectData(){
+    fun whenFewAttemptsThenDailyStatsHasCorrectData() {
         val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
         val first = SyncAttempt(timestamp = lastSyncTimestamp, state = FAIL)
         val second = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
@@ -123,5 +123,4 @@ class SyncStatsRepositoryTest {
         assertTrue(stats.attempts == 6)
         assertTrue(stats.successRate == 66.67)
     }
-
 }

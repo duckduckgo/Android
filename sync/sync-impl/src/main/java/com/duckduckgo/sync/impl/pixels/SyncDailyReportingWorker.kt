@@ -29,16 +29,16 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.HOURS
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesWorker(AppScope::class)
 class SyncDailyReportingWorker(
     context: Context,
-    workerParameters: WorkerParameters
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(context, workerParameters) {
 
     @Inject
@@ -77,4 +77,3 @@ class SyncDailyReportingWorkerScheduler @Inject constructor(
         private const val DAILY_REPORTING_SYNC_WORKER_TAG = "DAILY_REPORTING_SYNC_WORKER_TAG"
     }
 }
-

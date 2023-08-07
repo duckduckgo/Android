@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.impl.pixels
 
-import android.content.Context
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
@@ -30,7 +29,7 @@ interface SyncPixels {
 @ContributesBinding(AppScope::class)
 class RealSyncPixels @Inject constructor(
     private val pixel: Pixel,
-    private val statsRepository: SyncStatsRepository
+    private val statsRepository: SyncStatsRepository,
 ) : SyncPixels {
     override fun fireStatsPixel() {
         val dailyStats = statsRepository.getDailyStats()

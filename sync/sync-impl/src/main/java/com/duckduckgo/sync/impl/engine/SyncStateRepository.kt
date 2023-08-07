@@ -65,6 +65,5 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
 
     override fun attempts(): List<SyncAttempt> {
         return syncAttemptDao.allAttempts()
-
     }
 }
