@@ -49,7 +49,7 @@ class UserAllowListDaoTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        dao = db.userWhitelistDao()
+        dao = db.userAllowListDao()
     }
 
     @After

@@ -54,7 +54,7 @@ class UserAllowListRepositoryTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        dao = db.userWhitelistDao()
+        dao = db.userAllowListDao()
         repository = RealUserAllowListRepository(dao, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
