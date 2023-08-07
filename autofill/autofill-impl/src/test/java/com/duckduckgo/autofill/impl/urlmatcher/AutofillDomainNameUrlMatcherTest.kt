@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.store.urlmatcher
+package com.duckduckgo.autofill.impl.urlmatcher
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer

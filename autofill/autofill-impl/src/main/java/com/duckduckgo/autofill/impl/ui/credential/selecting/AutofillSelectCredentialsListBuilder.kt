@@ -56,6 +56,11 @@ class RealAutofillSelectCredentialsListBuilder @Inject constructor(
             }
         }
 
+        // we don't want to show primary button for shareable credentials as we have no way of knowing which is best
+        sortedGroups.shareableCredentials.forEach { (key, value) ->
+            processPartialMatches(flattenedList, key, value, usePrimaryButtonType = false)
+        }
+
         return flattenedList
     }
 

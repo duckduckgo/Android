@@ -28,9 +28,9 @@ import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
 import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
-import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase

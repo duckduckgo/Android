@@ -204,14 +204,15 @@ class AutofillManagementRecyclerAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun updateLogins(
         unsortedCredentials: List<LoginCredentials>,
-        unsortedSuggestions: List<LoginCredentials>,
+        unsortedDirectSuggestions: List<LoginCredentials>,
+        unsortedSharableSuggestions: List<LoginCredentials>,
     ) {
         val newList = mutableListOf<ListItem>()
 
-        val suggestionsListItems = suggestionListBuilder.build(unsortedSuggestions)
-        val groupedCredentials = grouper.group(unsortedCredentials)
+        val directSuggestionsListItems = suggestionListBuilder.build(unsortedDirectSuggestions, unsortedSharableSuggestions)
+        newList.addAll(directSuggestionsListItems)
 
-        newList.addAll(suggestionsListItems)
+        val groupedCredentials = grouper.group(unsortedCredentials)
         newList.addAll(groupedCredentials)
 
         listItems = newList
