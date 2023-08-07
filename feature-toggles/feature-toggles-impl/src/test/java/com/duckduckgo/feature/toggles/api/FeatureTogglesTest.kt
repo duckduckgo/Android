@@ -63,7 +63,7 @@ class FeatureTogglesTest {
     @Test
     fun whenEnabledByDefaultAndSetDisabledThenReturnDisabled() {
         feature.enabledByDefault().setEnabled(Toggle.State(enable = false))
-        assertFalse(feature.disableByDefault().isEnabled())
+        assertFalse(feature.enabledByDefault().isEnabled())
     }
 
     @Test(expected = IllegalStateException::class)

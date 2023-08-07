@@ -109,6 +109,50 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `fresh install and later update returns correct feature values`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+
+        // update remote config
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "enabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
     fun `the disable state of the feature always wins`() {
         val feature = generatedFeatureNewInstance()
 
