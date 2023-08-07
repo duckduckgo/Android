@@ -767,4 +767,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Чтобы выйти из полноэкранного режима, потяните верхний край экрана вниз и нажмите кнопку «Назад».</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Закрыть все вкладки?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Вы точно хотите закрыть все вкладки?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Отменить</string>
+    <string name="closeAppTabsConfirmationDialogClose">Закрыть</string>
 </resources>

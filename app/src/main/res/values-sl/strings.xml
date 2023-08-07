@@ -767,4 +767,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Če želite zapustiti celozaslonski prikaz, z vrha zaslona povlecite navzdol in tapnite gumb za nazaj.</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Želite zapreti vse zavihke?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Ali ste prepričani, da želite zapreti vse zavihke?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Prekliči</string>
+    <string name="closeAppTabsConfirmationDialogClose">Zapri</string>
 </resources>

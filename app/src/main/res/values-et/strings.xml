@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Lohista ülevalt alla ja puuduta nuppu Tagasi, et täisekraanvaatest väljuda</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Kas sulgeda kõik vahekaardid?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Kas soovite kindlasti kõik vahekaardid sulgeda?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Loobu</string>
+    <string name="closeAppTabsConfirmationDialogClose">Sulge</string>
 </resources>
