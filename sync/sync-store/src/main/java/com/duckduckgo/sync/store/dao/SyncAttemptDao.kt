@@ -36,4 +36,7 @@ interface SyncAttemptDao {
 
     @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
     fun attempts(): Flow<SyncAttempt?>
+
+    @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
+    fun allAttempts(): List<SyncAttempt>
 }

@@ -34,6 +34,8 @@ interface SyncStateRepository {
     fun updateSyncState(state: SyncAttemptState)
 
     fun clearAll()
+
+    fun attempts(): List<SyncAttempt>
 }
 
 class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: SyncAttemptDao) : SyncStateRepository {
@@ -59,5 +61,10 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
 
     override fun clearAll() {
         syncAttemptDao.clear()
+    }
+
+    override fun attempts(): List<SyncAttempt> {
+        return syncAttemptDao.allAttempts()
+
     }
 }
