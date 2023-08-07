@@ -64,7 +64,7 @@ class UserAllowListRepositoryTest {
     }
 
     @Test
-    fun whenDbContainsUserWhiteListedDomainsThenUpdateUserWhiteList() {
+    fun whenDbContainsUserAllowListedDomainsThenUpdateUserAllowList() {
         assertEquals(0, repository.domainsInUserAllowList().size)
         dao.insert("example.com")
         assertEquals(1, repository.domainsInUserAllowList().size)
@@ -72,13 +72,13 @@ class UserAllowListRepositoryTest {
     }
 
     @Test
-    fun whenDbContainsUserWhiteListedDomainThenIsUrlInAllowListReturnsTrue() {
+    fun whenDbContainsUserAllowListedDomainThenIsUrlInAllowListReturnsTrue() {
         dao.insert("example.com")
         assertTrue(repository.isUrlInUserAllowList("https://example.com"))
     }
 
     @Test
-    fun whenDbDoesNotContainUserWhiteListedDomainThenIsUrlInAllowListReturnsFalse() {
+    fun whenDbDoesNotContainUserAllowListedDomainThenIsUrlInAllowListReturnsFalse() {
         dao.insert("example.com")
         assertFalse(repository.isUrlInUserAllowList("https://foo.com"))
     }
