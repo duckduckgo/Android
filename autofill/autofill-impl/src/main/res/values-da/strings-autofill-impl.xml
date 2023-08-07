@@ -111,5 +111,8 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Aktiver e-mailbeskyttelse</annotation> for at administrere Duck Addresses på denne enhed.</string>
 
-
+    <string name="autofill_email_protection_choose_email_dialog_title">Vælg e-mailadresse</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokerer e-mailtrackere</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Opret privat Duck-adresse</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloker e-mailtrackere og skjul adresse</string>
 </resources>
