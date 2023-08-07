@@ -28,7 +28,6 @@
             <enum name="multi_line" value="0"/>
             <enum name="single_line" value="1"/>
             <enum name="password" value="2"/>
-            <enum name="clickable" value="3"/>
         </attr>
 
     </declare-styleable>

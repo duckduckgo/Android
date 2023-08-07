@@ -54,7 +54,6 @@ interface TextInput {
     var text: String
     var hint: String
     var isEditable: Boolean
-    var canClick: Boolean
 
     fun addTextChangedListener(textWatcher: TextWatcher)
     fun removeTextChangedListener(textWatcher: TextWatcher)
@@ -83,6 +82,7 @@ class DaxTextInput @JvmOverloads constructor(
     }
     private var isPassword: Boolean = false
     private var isPasswordShown: Boolean = false
+    private var isClickable: Boolean = false
 
     init {
         context.obtainStyledAttributes(
@@ -98,7 +98,7 @@ class DaxTextInput @JvmOverloads constructor(
 
             // This needs to be done after we know that the view has the end icon set
             isEditable = getBoolean(R.styleable.DaxTextInput_editable, true)
-            canClick = getBoolean(R.styleable.DaxTextInput_clickable, false)
+            isClickable = getBoolean(R.styleable.DaxTextInput_clickable, false)
             binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.DaxTextInput_android_hint))
 
             val inputType = getInputType()
@@ -110,25 +110,33 @@ class DaxTextInput @JvmOverloads constructor(
                 setupTextMode(inputType)
             }
 
-            binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    if (isPassword) {
-                        showPassword()
-                    }
-                    binding.internalEditText.showKeyboard()
-                } else {
-                    if (isPassword) {
-                        hidePassword()
+            if (isClickable){
+                binding.internalInputLayout.isEndIconVisible = true
+                binding.internalPasswordIcon.updateLayoutParams<LayoutParams> {
+                    this.marginEnd = context.resources.getDimensionPixelSize(R.dimen.outlinedTextPasswordEndMarginWithoutEndIcon)
+                }
+            } else {
+                binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+                    if (hasFocus) {
+                        if (isPassword) {
+                            showPassword()
+                        }
+                        binding.internalEditText.showKeyboard()
+                    } else {
+                        if (isPassword) {
+                            hidePassword()
+                        }
                     }
                 }
             }
+
 
             val minLines = getInt(R.styleable.DaxTextInput_android_minLines, 1)
             binding.internalEditText.minLines = minLines
 
             if (inputType == INPUT_TYPE_SINGLE_LINE) {
                 binding.internalEditText.ellipsize = TruncateAt.END
-                }
+            }
 
             recycle()
         }
@@ -141,7 +149,7 @@ class DaxTextInput @JvmOverloads constructor(
         }
 
     override var hint: String
-        get() = binding.internalEditText.text.toString()
+        get() = binding.internalEditText.hint.toString()
         set(value) {
             binding.internalInputLayout.setHintWithoutAnimation(value)
         }
@@ -205,12 +213,13 @@ class DaxTextInput @JvmOverloads constructor(
             actionHandler(PerformEndAction)
         }
 
-        binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
-            if (hasFocus) {
-                actionHandler(PerformEndAction)
-                view.clearFocus()
+        if (isClickable){
+            binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+                if (hasFocus) {
+                    actionHandler(PerformEndAction)
+                    view.clearFocus()
+                }
             }
-
         }
     }
 
@@ -278,13 +287,6 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
         } else {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
-        }
-
-        if (inputType == INPUT_TYPE_CLICKABLE){
-            binding.internalInputLayout.isEndIconVisible = true
-            binding.internalPasswordIcon.updateLayoutParams<LayoutParams> {
-                this.marginEnd = context.resources.getDimensionPixelSize(R.dimen.outlinedTextPasswordEndMarginWithoutEndIcon)
-            }
         }
     }
 

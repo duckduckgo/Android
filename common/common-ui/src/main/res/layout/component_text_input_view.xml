@@ -59,8 +59,9 @@
             android:hint="Non-editable text full click listener"
             android:text="Non-editable text full click listener."
             app:editable="true"
+            app:clickable="true"
             app:endIcon="@drawable/ic_copy"
-            app:type="clickable" />
+            app:type="single_line" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext4"
