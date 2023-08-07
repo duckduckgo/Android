@@ -19,6 +19,8 @@ package com.duckduckgo.sync.store.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import org.threeten.bp.LocalDate
+import org.threeten.bp.ZoneOffset
 
 @Entity(
     tableName = "sync_attempts",
@@ -28,7 +30,11 @@ data class SyncAttempt(
     val timestamp: String = DatabaseDateFormatter.iso8601(),
     val state: SyncAttemptState,
     val meta: String = "",
-)
+) {
+    fun today(): Boolean {
+        return DatabaseDateFormatter.iso8601Date(this.timestamp).isEqual(LocalDate.now(ZoneOffset.UTC))
+    }
+}
 
 enum class SyncAttemptState {
     IN_PROGRESS,

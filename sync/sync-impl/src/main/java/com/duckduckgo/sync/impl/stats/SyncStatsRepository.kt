@@ -20,6 +20,7 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.dao.SyncAttemptDao
+import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import org.threeten.bp.LocalDate
@@ -42,7 +43,7 @@ data class DailyStats(
 class RealSyncStatsRepository @Inject constructor(private val syncStateRepository: SyncStateRepository) : SyncStatsRepository {
     override fun getDailyStats(): DailyStats {
         val attempts = syncStateRepository.attempts().filter {
-            DatabaseDateFormatter.iso8601Date(it.timestamp).isEqual(LocalDate.now(ZoneOffset.UTC))
+            it.today()
         }
         val successfulAttempts = attempts.filter { it.state == SUCCESS }.size
         val totalAttempts = attempts.size

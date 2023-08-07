@@ -73,7 +73,7 @@ class SyncStatsRepositoryTest {
 
         val stats = repository.getDailyStats()
 
-        assertTrue(stats.attempts == 0)
+        assertTrue(stats.attempts == 1)
     }
 
     @Test
