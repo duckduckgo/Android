@@ -525,7 +525,7 @@
     <string name="allowlistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
     <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas neaizsargātai vietnei %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas neaizsargātai vietnei %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
     <string name="allowlistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
     <string name="allowlistNoEntries">Privātuma aizsardzība ir iespējota visām vietnēm</string>

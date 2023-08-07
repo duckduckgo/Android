@@ -524,7 +524,7 @@
     <string name="allowlistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Are you sure you want to remove &lt;b>%1$s&lt;/b> from Unprotected Sites?</string>
     <string name="allowlistExplanation">These sites will not be enhanced by Privacy Protection.</string>
     <string name="allowlistNoEntries">Privacy Protection enabled for all sites</string>

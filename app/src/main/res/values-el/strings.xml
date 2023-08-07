@@ -523,7 +523,7 @@
     <string name="allowlistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
     <string name="allowlistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
     <string name="allowlistNoEntries">Η προστασία προσωπικών δεδομένων είναι ενεργοποιημένη για όλους τους ιστότοπους</string>

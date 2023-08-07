@@ -523,7 +523,7 @@
     <string name="allowlistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Haluatko varmasti poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; suojaamattomista sivustoista?</string>
     <string name="allowlistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
     <string name="allowlistNoEntries">Tietosuoja on käytössä kaikilla sivustoilla</string>

@@ -523,7 +523,7 @@
     <string name="allowlistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Meer opties voor onbeschermde site %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Meer opties voor onbeschermde site %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
     <string name="allowlistExplanation">Deze sites worden niet beschermd met Privacybescherming.</string>
     <string name="allowlistNoEntries">Privacybescherming ingeschakeld voor alle sites</string>

@@ -523,7 +523,7 @@
     <string name="allowlistActivityTitle">Sitios no protegidos</string>
     <string name="enablePrivacyProtection">Activar la protección de privacidad</string>
     <string name="disablePrivacyProtection">Desactivar la protección de privacidad</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Más opciones para el sitio no protegido %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Más opciones para el sitio no protegido %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">¿Seguro que quieres eliminar &lt;b&gt;%1$s&lt;/b&gt; de los sitios desprotegidos?</string>
     <string name="allowlistExplanation">La protección de privacidad está deshabilitada para estos sitios.</string>
     <string name="allowlistNoEntries">Protección de privacidad habilitada para todos los sitios</string>

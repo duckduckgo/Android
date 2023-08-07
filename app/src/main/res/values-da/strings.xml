@@ -523,7 +523,7 @@
     <string name="allowlistActivityTitle">Ubeskyttede websteder</string>
     <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
     <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede websteder?</string>
     <string name="allowlistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
     <string name="allowlistNoEntries">Databeskyttelse aktiveret for alle websteder</string>

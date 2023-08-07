@@ -4096,8 +4096,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.whitelistEntryOverflowContentDescription` appears to be unused"
-        errorLine1="    &lt;string name=&quot;whitelistEntryOverflowContentDescription&quot; instruction=&quot;Placeholder is a website&quot;>More options for unprotected site %1$s&lt;/string>"
+        message="The resource `R.string.allowlistEntryOverflowContentDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;allowlistEntryOverflowContentDescription&quot; instruction=&quot;Placeholder is a website&quot;>More options for unprotected site %1$s&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"

@@ -523,7 +523,7 @@
     <string name="allowlistActivityTitle">Védelem nélküli weboldalak</string>
     <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
     <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Biztosan eltávolítod az &lt;b&gt;%1$s&lt;/b&gt; elemet a védelem nélküli weboldalak közül?</string>
     <string name="allowlistExplanation">Ezeket az oldalakat nem erősíti adatvédelem.</string>
     <string name="allowlistNoEntries">Adatvédelem engedélyezve minden weboldalhoz</string>

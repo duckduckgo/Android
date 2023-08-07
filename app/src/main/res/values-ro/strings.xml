@@ -525,7 +525,7 @@
     <string name="allowlistActivityTitle">Site-uri neprotejate</string>
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
     <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>
     <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Sigur dorești să elimini &lt;b&gt;%1$s&lt;/b&gt; din site-urile neprotejate?</string>
     <string name="allowlistExplanation">Aceste site-uri nu vor fi îmbunătățite de protecția confidențialității.</string>
     <string name="allowlistNoEntries">Protecția confidențialității este activată pentru toate site-urile</string>
