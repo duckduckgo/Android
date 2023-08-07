@@ -31,14 +31,21 @@ class SuggestionListBuilder @Inject constructor(
     private val sorter: CredentialListSorter,
 ) {
 
-    fun build(unsortedSuggestions: List<LoginCredentials>): List<ListItem> {
+    fun build(
+        unsortedDirectSuggestions: List<LoginCredentials>,
+        unsortedSharableSuggestions: List<LoginCredentials>,
+    ): List<ListItem> {
         val list = mutableListOf<ListItem>()
 
-        if (unsortedSuggestions.isNotEmpty()) {
-            val sortedSuggestions = sorter.sort(unsortedSuggestions)
-
+        if (unsortedDirectSuggestions.isNotEmpty() || unsortedSharableSuggestions.isNotEmpty()) {
             list.add(GroupHeading(context.getString(string.credentialManagementSuggestionsLabel)))
-            list.addAll(sortedSuggestions.map { SuggestedCredential(it) })
+
+            val sortedDirectSuggestions = sorter.sort(unsortedDirectSuggestions)
+            val sortedSharableSuggestions = sorter.sort(unsortedSharableSuggestions)
+
+            val allSuggestions = sortedDirectSuggestions + sortedSharableSuggestions
+            list.addAll(allSuggestions.map { SuggestedCredential(it) })
+
             list.add(Divider)
         }
 

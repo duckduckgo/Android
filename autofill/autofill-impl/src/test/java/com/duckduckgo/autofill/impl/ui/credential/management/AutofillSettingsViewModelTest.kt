@@ -86,6 +86,7 @@ class AutofillSettingsViewModelTest {
         emailManager = emailManager,
         duckAddressStatusRepository = duckAddressStatusRepository,
         duckAddressIdentifier = duckAddressIdentifier,
+        syncEngine = mock(),
     )
 
     @Before

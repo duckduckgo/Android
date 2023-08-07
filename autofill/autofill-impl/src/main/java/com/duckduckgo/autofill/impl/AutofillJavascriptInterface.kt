@@ -40,6 +40,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerTyp
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.AUTOPROMPT
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
+import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.DeleteAutoLogin
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.DiscardAutoLoginId
@@ -82,6 +83,7 @@ interface AutofillJavascriptInterface {
 class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val requestParser: AutofillRequestParser,
     private val autofillStore: AutofillStore,
+    private val shareableCredentials: ShareableCredentials,
     private val autofillMessagePoster: AutofillMessagePoster,
     private val autofillResponseWriter: AutofillResponseWriter,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -146,8 +148,14 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         request: AutofillDataRequest,
         triggerType: LoginTriggerType,
     ) {
-        val allCredentials = autofillStore.getCredentials(url)
-        val credentials = filterRequestedSubtypes(request, allCredentials)
+        val matches = mutableListOf<LoginCredentials>()
+        val directMatches = autofillStore.getCredentials(url)
+        val shareableMatches = shareableCredentials.shareableCredentials(url)
+        Timber.v("Direct matches: %d, shareable matches: %d for %s", directMatches.size, shareableMatches.size, url)
+        matches.addAll(directMatches)
+        matches.addAll(shareableMatches)
+
+        val credentials = filterRequestedSubtypes(request, matches)
 
         if (credentials.isEmpty()) {
             callback?.noCredentialsAvailable(url)

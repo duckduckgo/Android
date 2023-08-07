@@ -34,7 +34,7 @@ class AppNotificationSender(
 ) : NotificationSender {
 
     override suspend fun sendNotification(notification: SchedulableNotification) {
-        if (!notification.canShow()) {
+        if (!notification.canShow() || notificationDao.exists(notification.id)) {
             Timber.v("Notification should not be shown")
             return
         }

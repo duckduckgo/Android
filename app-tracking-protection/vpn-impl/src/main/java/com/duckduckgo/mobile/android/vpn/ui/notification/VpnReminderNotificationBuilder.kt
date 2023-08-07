@@ -63,7 +63,7 @@ class RealVpnReminderNotificationBuilder @Inject constructor(
         val notificationLayout = RemoteViews(context.packageName, vpnNotification.customViewLayout)
 
         val builder = NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(vpnNotification.onNotificationPressIntent)
             .setCustomContentView(notificationLayout)

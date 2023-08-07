@@ -58,7 +58,6 @@ class AppTpFeatureConfigImplTest {
     fun whenDbTablesAreEmptyThenReturnToggleDefaultValue() {
         AppTpSetting.values().forEach { setting ->
             when (setting) {
-                AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
@@ -132,12 +131,8 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
-
         assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
         assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
-        assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 
     @Test
@@ -150,11 +145,7 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
-
         assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
         assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
-        assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 }

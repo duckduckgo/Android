@@ -58,9 +58,8 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetPWaitlistScreenNoParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
@@ -233,8 +232,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchAutofillSettings -> launchAutofillSettings()
             is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
-            is Command.LaunchNetPManagementScreen -> launchNetpManagementScreen()
-            is Command.LaunchNetPWaitlist -> launchNetpWaitlist()
+            is Command.LaunchNetPWaitlist -> launchNetpWaitlist(it.screen)
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
             is Command.LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
@@ -309,7 +307,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     netpPSetting.setItemStatus(netPItemStatus)
                 }
                 NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
-                NetPWaitlistState.CodeRedeemed, NetPWaitlistState.PendingInviteCode -> {
+                NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> {
                     netpPSetting.show()
                     netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
                     netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
@@ -368,14 +366,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams, options)
     }
 
-    private fun launchNetpManagementScreen() {
+    private fun launchNetpWaitlist(screen: ActivityParams) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams, options)
-    }
-
-    private fun launchNetpWaitlist() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, NetPWaitlistScreenNoParams, options)
+        globalActivityStarter.start(this, screen, options)
     }
 
     private fun launchAppTPOnboardingScreen() {

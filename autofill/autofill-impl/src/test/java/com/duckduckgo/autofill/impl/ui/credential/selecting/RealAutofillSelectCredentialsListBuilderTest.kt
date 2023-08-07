@@ -39,6 +39,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
         val sortedGroup = Groups(
             perfectMatches = listOf(),
             partialMatches = mapOf(),
+            shareableCredentials = emptyMap(),
         )
         assertTrue(testee.buildFlatList(sortedGroup).isEmpty())
     }
@@ -48,6 +49,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
         val sortedGroup = Groups(
             perfectMatches = listOf(creds()),
             partialMatches = mapOf(),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[0].assertIsVerticalSpacing()
@@ -58,6 +60,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
         val sortedGroup = Groups(
             perfectMatches = listOf(creds()),
             partialMatches = mapOf(),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[1].assertIsPrimaryButton()
@@ -68,6 +71,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
         val sortedGroup = Groups(
             perfectMatches = listOf(creds(), creds(), creds()),
             partialMatches = mapOf(),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[1].assertIsPrimaryButton()
@@ -82,6 +86,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
             partialMatches = mapOf(
                 Pair("foo.example.com", listOf(creds())),
             ),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[0].assertIsDomainGroupHeading("foo.example.com")
@@ -94,6 +99,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
             partialMatches = mapOf(
                 Pair("foo.example.com", listOf(creds())),
             ),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[1].assertIsPrimaryButton()
@@ -106,6 +112,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
             partialMatches = mapOf(
                 Pair("foo.example.com", listOf(creds(), creds())),
             ),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[1].assertIsPrimaryButton()
@@ -120,6 +127,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
                 Pair("foo.example.com", listOf(creds())),
                 Pair("bar.example.com", listOf(creds())),
             ),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[0].assertIsFromThisWebsiteGroupHeading()
@@ -132,6 +140,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
             partialMatches = mapOf(
                 Pair("foo.example.com", listOf(creds())),
             ),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[3].assertIsSecondaryButton()
@@ -145,6 +154,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
                 Pair("foo.example.com", listOf(creds(), creds())),
                 Pair("bar.example.com", listOf(creds(), creds())),
             ),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[1].assertIsPrimaryButton()
@@ -162,6 +172,7 @@ class RealAutofillSelectCredentialsListBuilderTest {
                 Pair("foo.example.com", listOf(creds())),
                 Pair("foo.example.com", listOf(creds())),
             ),
+            shareableCredentials = emptyMap(),
         )
         val list = testee.buildFlatList(sortedGroup)
         list[0].assertIsFromThisWebsiteGroupHeading()

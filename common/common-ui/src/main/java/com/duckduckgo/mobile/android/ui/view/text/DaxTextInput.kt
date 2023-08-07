@@ -39,6 +39,7 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_CLICKABLE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_SINGLE_LINE
@@ -114,9 +115,6 @@ class DaxTextInput @JvmOverloads constructor(
                     if (isPassword) {
                         showPassword()
                     }
-                    if (canClick) {
-                        performClick()
-                    }
                     binding.internalEditText.showKeyboard()
                 } else {
                     if (isPassword) {
@@ -153,12 +151,6 @@ class DaxTextInput @JvmOverloads constructor(
         set(value) {
             binding.internalEditText.isEnabled = value
             handleIsEditableChangeForEndIcon(value)
-        }
-
-    override var canClick: Boolean
-        get() = binding.internalEditText.isClickable
-        set(value) {
-            binding.internalEditText.isClickable = value
         }
 
     fun showKeyboardDelayed() {
@@ -209,11 +201,16 @@ class DaxTextInput @JvmOverloads constructor(
     }
 
     override fun onAction(actionHandler: (Action) -> Unit) {
-        if (canClick) {
-            binding.internalEditText.setOnClickListener { actionHandler(PerformEndAction) }
-        }
         binding.internalInputLayout.setEndIconOnClickListener {
             actionHandler(PerformEndAction)
+        }
+
+        binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                actionHandler(PerformEndAction)
+                view.clearFocus()
+            }
+
         }
     }
 
@@ -282,6 +279,13 @@ class DaxTextInput @JvmOverloads constructor(
         } else {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
         }
+
+        if (inputType == INPUT_TYPE_CLICKABLE){
+            binding.internalInputLayout.isEndIconVisible = true
+            binding.internalPasswordIcon.updateLayoutParams<LayoutParams> {
+                this.marginEnd = context.resources.getDimensionPixelSize(R.dimen.outlinedTextPasswordEndMarginWithoutEndIcon)
+            }
+        }
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -329,6 +333,7 @@ class DaxTextInput @JvmOverloads constructor(
         INPUT_TYPE_MULTI_LINE(0),
         INPUT_TYPE_SINGLE_LINE(1),
         INPUT_TYPE_PASSWORD(2),
+        INPUT_TYPE_CLICKABLE(3),
     }
 
     companion object {

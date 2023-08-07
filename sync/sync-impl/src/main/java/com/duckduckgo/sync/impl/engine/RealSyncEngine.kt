@@ -18,9 +18,7 @@ package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChangesRequest
-import com.duckduckgo.sync.api.engine.SyncChangesResponse
-import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
@@ -28,19 +26,16 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
-import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.store.model.SyncAttempt
-import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
@@ -66,7 +61,7 @@ class RealSyncEngine @Inject constructor(
             FEATURE_READ -> performSync(trigger)
             DATA_CHANGE -> performSync(trigger)
             ACCOUNT_CREATION -> sendLocalData()
-            ACCOUNT_LOGIN -> mergeRemoteData()
+            ACCOUNT_LOGIN -> performSync(trigger)
         }
     }
 
@@ -96,28 +91,7 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Feature: sending ${it.type} local data $it")
             patchLocalChanges(it, REMOTE_WINS)
         }
-    }
-
-    private fun mergeRemoteData() {
-        Timber.d("Sync-Feature: fetching remote data")
-        syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Login"))
-
-        // get remote changes and deduplicate them locally
-        getChanges().forEach {
-            getRemoteChanges(it, DEDUPLICATION)
-        }
-
-        // there might be changes locally that need to be patched
-        getChanges().forEach {
-            if (it.isEmpty()) {
-                Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
-                syncStateRepository.updateSyncState(SUCCESS)
-                return
-            } else {
-                Timber.d("Sync-Feature: ${it.type}  sending local data $it")
-                patchLocalChanges(it, LOCAL_WINS)
-            }
-        }
+        syncStateRepository.updateSyncState(SUCCESS)
     }
 
     private fun performSync(trigger: SyncTrigger) {
@@ -127,15 +101,42 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Feature: starting to sync")
             syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
-            // TODO: Is this good enough? Should we make the calls in parallel?
-            getChanges().forEach {
-                if (it.isEmpty()) {
-                    Timber.d("Sync-Feature: no changes to sync for $it, asking for remote changes")
-                    getRemoteChanges(it, TIMESTAMP)
-                } else {
-                    Timber.d("Sync-Feature: $it changes to update $it")
-                    patchLocalChanges(it, TIMESTAMP)
-                }
+            val changes = getChanges()
+            performFirstSync(changes.filter { it.isFirstSync() })
+            performRegularSync(changes.filter { !it.isFirstSync() })
+
+            Timber.d("Sync-Feature: Sync finished")
+            syncStateRepository.updateSyncState(SUCCESS)
+        }
+    }
+
+    private fun performRegularSync(regularSyncChanges: List<SyncChangesRequest>) {
+        regularSyncChanges.forEach { changes ->
+            if (changes.isEmpty()) {
+                Timber.d("Sync-Feature: no changes to sync for $changes, asking for remote changes")
+                getRemoteChanges(changes, TIMESTAMP)
+            } else {
+                Timber.d("Sync-Feature: $changes changes to update $changes")
+                patchLocalChanges(changes, TIMESTAMP)
+            }
+        }
+    }
+
+    private fun performFirstSync(firstSyncChanges: List<SyncChangesRequest>) {
+        val types = firstSyncChanges.map { it.type }
+
+        firstSyncChanges.forEach { changes ->
+            Timber.d("Sync-Feature: first sync for ${changes.type}, asking for remote changes")
+            getRemoteChanges(changes, DEDUPLICATION)
+        }
+
+        // give a chance to send changes after dedup
+        getChanges().filter { it.type in types }.forEach { changes ->
+            if (changes.isEmpty()) {
+                Timber.d("Sync-Feature: no changes to sync for $changes")
+            } else {
+                Timber.d("Sync-Feature: $changes changes to update $changes")
+                patchLocalChanges(changes, LOCAL_WINS)
             }
         }
     }
@@ -147,7 +148,7 @@ class RealSyncEngine @Inject constructor(
             if (currentSync.state == IN_PROGRESS) {
                 val syncTimestamp = OffsetDateTime.parse(currentSync.timestamp)
                 val now = OffsetDateTime.now()
-                Duration.between(syncTimestamp, now).toMinutes() > 10
+                Duration.between(syncTimestamp, now).toMinutes() < 10
             } else {
                 false
             }
@@ -163,13 +164,11 @@ class RealSyncEngine @Inject constructor(
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 Timber.d("Sync-Feature: patch failed ${result.reason}")
-                syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
                 Timber.d("Sync-Feature: patch success")
                 persistChanges(result.data, conflictResolution)
-                syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }
@@ -179,16 +178,14 @@ class RealSyncEngine @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ) {
         Timber.d("Sync-Feature: receive remote change $changes")
-        when (val result = syncApiClient.get(changes.type, changes.modifiedSince)) {
+        when (val result = syncApiClient.get(changes.type, changes.modifiedSince.value)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
-                syncStateRepository.updateSyncState(FAIL)
             }
 
             is Success -> {
                 Timber.d("Sync-Feature: get success")
                 persistChanges(result.data, conflictResolution)
-                syncStateRepository.updateSyncState(SUCCESS)
             }
         }
     }

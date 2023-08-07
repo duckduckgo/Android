@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">A teljes képernyőről való kilépéshez végezz felülről lefelé húzást, és koppints a vissza gombra</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Összes lap bezárása?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Biztosan bezárod az összes lapot?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Mégsem</string>
+    <string name="closeAppTabsConfirmationDialogClose">Bezárás</string>
 </resources>

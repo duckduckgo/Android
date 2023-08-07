@@ -763,4 +763,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Trage în jos din partea superioară și atinge butonul înapoi pentru a ieși din ecranul complet</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Dorești să închizi toate filele?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Sigur dorești să închizi toate filele?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Anulare</string>
+    <string name="closeAppTabsConfirmationDialogClose">Închidere</string>
 </resources>

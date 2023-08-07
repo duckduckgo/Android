@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.about
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -23,10 +24,10 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -38,14 +39,14 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class AboutDuckDuckGoViewModel @Inject constructor(
-    private val netpWaitlistRepository: NetPWaitlistRepository,
+    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val appBuildConfig: AppBuildConfig,
     private val variantManager: VariantManager,
     private val pixel: Pixel,
 ) : ViewModel() {
 
     data class ViewState(
-        val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
+        val networkProtectionWaitlistState: NetPWaitlistState = NotUnlocked,
         val version: String = "",
     )
 
@@ -68,7 +69,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
+                    networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
                     version = obtainVersion(variant.key),
                 ),
             )
@@ -116,6 +117,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     // This is used for testing only to check the `netPEasterEggCounter` is reset without
     // exposing it.
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     internal fun hasResetNetPEasterEggCounter() = netPEasterEggCounter == 0
 
     private fun currentViewState(): ViewState {

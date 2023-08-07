@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.feature
 
 enum class AppTpSetting(override val value: String, override val defaultValue: Boolean = false) : SettingName {
-    PrivateDnsSupport("privateDnsSupport"),
     AlwaysSetDNS("alwaysSetDNS"),
     CPUMonitoring("cpuMonitoring"),
     ProtectGames("protectGames"),
