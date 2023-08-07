@@ -64,7 +64,7 @@
 }
 :not(.top-autofill) .tooltip--email {
     top: calc(100% + 6px);
-    right: calc(100% - 46px);
+    right: calc(100% - 48px);
     padding: 8px;
     border: 1px solid #D0D0D0;
     border-radius: 10px;
@@ -89,7 +89,7 @@
     display: block;
     border-bottom: 8px solid #D0D0D0;
     position: absolute;
-    right: -26px;
+    right: -28px;
 }
 .tooltip--email__caret::before {
     border-bottom-color: #D0D0D0;
