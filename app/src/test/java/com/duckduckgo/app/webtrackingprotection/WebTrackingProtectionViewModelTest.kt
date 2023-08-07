@@ -119,7 +119,7 @@ internal class WebTrackingProtectionViewModelTest {
     }
 
     @Test
-    fun whenOnManageWhitelistSelectedThenEmitCommandLaunchWhitelistAndSendPixel() = runTest {
+    fun whenOnManageAllowListSelectedThenEmitCommandLaunchAllowListAndSendPixel() = runTest {
         testee.commands().test {
             testee.onManageAllowListSelected()
 
