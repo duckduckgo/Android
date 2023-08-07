@@ -181,7 +181,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         job += lifecycleScope.launch {
             while (isActive) {
                 val isEnabled = appTrackingProtection.isEnabled()
-                binding.privateDnsToggle.isEnabled = isEnabled
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
@@ -235,17 +234,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
-        with(AppTpSetting.PrivateDnsSupport) {
-            binding.privateDnsToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
-        }
-
         with(AppTpSetting.AlwaysSetDNS) {
             binding.vpnAlwaysSetDNSToggle.setIsChecked(appTpConfig.isEnabled(this))
             binding.vpnAlwaysSetDNSToggle.setOnCheckedChangeListener { _, isChecked ->
