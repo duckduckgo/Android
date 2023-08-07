@@ -24,6 +24,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -113,7 +114,6 @@ class FeatureTogglesTest {
         val enabledState = Toggle.State(
             remoteEnableState = true,
             rollout = null,
-            rolloutStep = null,
         )
         feature.internal().setEnabled(enabledState)
         provider.flavorName = BuildFlavor.PLAY.name
@@ -201,7 +201,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             enable = true,
             rollout = null,
-            rolloutStep = null,
+            rolloutThreshold = null,
         )
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
@@ -209,16 +209,16 @@ class FeatureTogglesTest {
         feature.self().setEnabled(state.copy(rollout = emptyList()))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rolloutStep = 2))
+        feature.self().setEnabled(state.copy(rolloutThreshold = 20.0))
         assertTrue(feature.self().isEnabled())
 
         feature.self().setEnabled(state.copy(rollout = listOf(1.0, 2.0)))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 2.0), rolloutStep = 0))
+        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 2.0), rolloutThreshold = 0.0))
         assertTrue(feature.self().isEnabled())
 
-        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 100.0), rolloutStep = 1))
+        feature.self().setEnabled(state.copy(rollout = listOf(0.5, 100.0), rolloutThreshold = 10.0))
         assertTrue(feature.self().isEnabled())
     }
 
@@ -227,7 +227,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             enable = true,
             rollout = listOf(100.0),
-            rolloutStep = null,
+            rolloutThreshold = null,
         )
         val expected = state.copy(remoteEnableState = state.enable)
         feature.self().setEnabled(state)
@@ -240,13 +240,12 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             enable = false,
             rollout = listOf(100.0),
-            rolloutStep = null,
+            rolloutThreshold = null,
         )
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
 
         val updatedState = toggleStore.get("test")
-        assertEquals(1, updatedState?.rolloutStep)
         assertTrue(updatedState!!.enable)
     }
 
@@ -255,13 +254,37 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             enable = false,
             rollout = listOf(1.0, 10.0, 20.0, 40.0, 100.0),
-            rolloutStep = null,
+            rolloutThreshold = null,
         )
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
 
         val updatedState = toggleStore.get("test")
-        assertEquals(5, updatedState?.rolloutStep)
+        assertTrue(updatedState!!.enable)
+    }
+
+    @Test
+    fun whenIncrementalRolloutThresholdIsSetOnlyOnce() {
+        var state = Toggle.State(
+            enable = false,
+            rollout = listOf(0.0),
+            rolloutThreshold = null,
+        )
+        feature.self().setEnabled(state)
+        val threshold = feature.self().rolloutThreshold()
+        var loop = 1.0
+        do {
+            loop *= 2
+            assertTrue(feature.self().rolloutThreshold() > state.rollout())
+            assertEquals(threshold, feature.self().rolloutThreshold(), 0.00001)
+            state = state.copy(
+                rolloutThreshold = feature.self().rolloutThreshold(),
+                rollout = state.rollout!!.toMutableList().apply { add(loop.coerceAtMost(100.0)) },
+            )
+            feature.self().setEnabled(state)
+        } while (feature.self().rolloutThreshold() > state.rollout())
+
+        val updatedState = toggleStore.get("test")
         assertTrue(updatedState!!.enable)
     }
 
@@ -270,13 +293,12 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             enable = false,
             rollout = listOf(1.0, 10.0, 20.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0),
-            rolloutStep = 2,
+            rolloutThreshold = 2.0,
         )
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
 
         val updatedState = toggleStore.get("test")
-        assertTrue(updatedState?.rolloutStep!! <= state.rollout!!.size && updatedState.rolloutStep!! > 2)
         assertTrue(updatedState!!.enable)
     }
 
@@ -286,7 +308,7 @@ class FeatureTogglesTest {
         val state = Toggle.State(
             enable = false,
             rollout = listOf(1.0, 10.0, 20.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0),
-            rolloutStep = 2,
+            rolloutThreshold = 2.0,
             minSupportedVersion = 11,
         )
         feature.self().setEnabled(state)
@@ -295,7 +317,7 @@ class FeatureTogglesTest {
         assertFalse(feature.self().isEnabled())
         val updatedState = toggleStore.get("test")!!
         assertEquals(true, updatedState.enable)
-        assertNotEquals(2, updatedState.rolloutStep)
+        assertNotEquals(2, updatedState.rolloutThreshold)
         assertEquals(state.minSupportedVersion, updatedState.minSupportedVersion)
         assertEquals(state.rollout, updatedState.rollout)
     }
@@ -309,7 +331,7 @@ class FeatureTogglesTest {
         val updatedState = toggleStore.get("test")!!
         assertEquals(false, updatedState.enable)
         assertEquals(false, updatedState.remoteEnableState)
-        assertNull(updatedState.rolloutStep)
+        assertNotNull(updatedState.rolloutThreshold)
         assertNull(updatedState.rollout)
     }
 
@@ -330,7 +352,7 @@ class FeatureTogglesTest {
             remoteEnableState = false,
             enable = true,
             rollout = listOf(100.0),
-            rolloutStep = null,
+            rolloutThreshold = null,
         )
         feature.self().setEnabled(state)
         assertFalse(feature.self().isEnabled())
@@ -343,7 +365,7 @@ class FeatureTogglesTest {
             remoteEnableState = true,
             enable = true,
             rollout = listOf(100.0),
-            rolloutStep = null,
+            rolloutThreshold = null,
         )
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
@@ -356,11 +378,11 @@ class FeatureTogglesTest {
             remoteEnableState = true,
             enable = false,
             rollout = listOf(100.0),
-            rolloutStep = null,
+            rolloutThreshold = null,
         )
-        val expected = state.copy(enable = true, rollout = listOf(100.0), rolloutStep = 1)
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
+        val expected = state.copy(enable = true, rollout = listOf(100.0), rolloutThreshold = toggleStore.get("test")?.rolloutThreshold)
         assertEquals(expected, toggleStore.get("test"))
     }
 
@@ -516,6 +538,14 @@ interface TestFeature {
     @Toggle.DefaultValue(true)
     @Toggle.Experiment
     fun experimentEnabledByDefault(): Toggle
+}
+
+private fun Toggle.rolloutThreshold(): Double {
+    return getRawStoredState()?.rolloutThreshold!!
+}
+
+private fun Toggle.State.rollout(): Double {
+    return this.rollout?.last()!!
 }
 
 private class FakeProvider {

@@ -34,7 +34,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -51,13 +50,15 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     private lateinit var testFeature: TestTriggerFeature
     private val appBuildConfig: AppBuildConfig = mock()
     private lateinit var variantManager: FakeVariantManager
+    private lateinit var toggleStore: FakeToggleStore
 
     @Before
     fun setup() {
         variantManager = FakeVariantManager()
+        toggleStore = FakeToggleStore()
         whenever(appBuildConfig.flavor).thenReturn(PLAY)
         testFeature = FeatureToggles.Builder(
-            FakeToggleStore(),
+            toggleStore,
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
@@ -526,7 +527,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(privacyPlugin.store("testFeature", jsonFeature))
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertNull(testFeature.fooFeature().rolloutStep())
+        assertNull(testFeature.fooFeature().rolloutThreshold())
     }
 
     @Test
@@ -564,7 +565,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(privacyPlugin.store("testFeature", jsonFeature))
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        assertEquals(4, testFeature.fooFeature().rolloutStep())
+        assertTrue(testFeature.fooFeature().rolloutThreshold()!! < testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
     }
 
     @Test
@@ -599,7 +600,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        assertEquals(1, testFeature.fooFeature().rolloutStep())
+        assertTrue(testFeature.fooFeature().rolloutThreshold()!! < testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
     }
 
     @Test
@@ -645,12 +646,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        assertEquals(1, testFeature.fooFeature().rolloutStep())
+        assertTrue(testFeature.fooFeature().rolloutThreshold()!! < testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
 
         assertTrue(privacyPlugin.store("testFeature", jsonDisabled))
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertEquals(1, testFeature.fooFeature().rolloutStep())
+        assertTrue(testFeature.fooFeature().rolloutThreshold()!! < testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
     }
 
     @Test
@@ -709,7 +710,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertEquals(1, testFeature.fooFeature().rolloutStep())
+        assertTrue(testFeature.fooFeature().rolloutThreshold()!! < testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
 
         // re-enable the incremental rollout
         assertTrue(
@@ -736,7 +737,132 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        assertEquals(1, testFeature.fooFeature().rolloutStep())
+        assertTrue(testFeature.fooFeature().rolloutThreshold()!! < testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
+    }
+
+    @Test
+    // see https://app.asana.com/0/488551667048375/1206413338208929
+    fun `backwards compatibility test - feature was enabled remains enabled and rollout threshold not set`() {
+        whenever(appBuildConfig.versionCode).thenReturn(1)
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        // set up initial state, incremental rollout and enabled
+        toggleStore.set(
+            "testFeature_fooFeature",
+            Toggle.State(
+                remoteEnableState = true,
+                enable = true,
+                rollout = listOf(50.0),
+            ),
+        )
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "rollout": {
+                                    "steps": [
+                                        {
+                                            "percent": 50
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertNull(testFeature.fooFeature().rolloutThreshold())
+    }
+
+    @Test
+    // see https://app.asana.com/0/488551667048375/1206413338208929
+    fun `backwards compatibility test - feature was disabled set rollout threshold`() {
+        whenever(appBuildConfig.versionCode).thenReturn(1)
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        // set up initial state, incremental rollout and enabled
+        toggleStore.set(
+            "testFeature_fooFeature",
+            Toggle.State(
+                remoteEnableState = true,
+                enable = false,
+                rollout = listOf(50.0),
+            ),
+        )
+        val step = 50.0
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "rollout": {
+                                    "steps": [
+                                        {
+                                            "percent": $step
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        val threshold = testFeature.fooFeature().rolloutThreshold()
+        assertNotNull(threshold)
+        assertEquals(step >= threshold!!, testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    // see https://app.asana.com/0/488551667048375/1206413338208929
+    fun `backwards compatibility test - feature was null set rollout threshold`() {
+        whenever(appBuildConfig.versionCode).thenReturn(1)
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        // set up initial state, incremental rollout and enabled
+        val step = 50.0
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "rollout": {
+                                    "steps": [
+                                        {
+                                            "percent": $step
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        val threshold = testFeature.fooFeature().rolloutThreshold()
+        assertNotNull(threshold)
+        assertEquals(step >= threshold!!, testFeature.fooFeature().isEnabled())
     }
 
     @Test
@@ -765,7 +891,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertFalse(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertNull(testFeature.fooFeature().rolloutStep())
+        assertNull(testFeature.fooFeature().rolloutThreshold())
 
         // enable parent feature
         assertTrue(
@@ -783,6 +909,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 """.trimIndent(),
             ),
         )
+        assertNull(testFeature.fooFeature().rolloutThreshold())
 
         // add rollout information to sub-feature, still disabled
         assertTrue(
@@ -810,7 +937,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertNull(testFeature.fooFeature().rolloutStep())
+        assertNull(testFeature.fooFeature().rolloutThreshold())
 
         // add more rollout information to sub-feature, still disabled
         assertTrue(
@@ -844,7 +971,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertNull(testFeature.fooFeature().rolloutStep())
+        assertNull(testFeature.fooFeature().rolloutThreshold())
 
         // enable rollout
         assertTrue(
@@ -876,10 +1003,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
+        val rolloutThreshold = testFeature.fooFeature().rolloutThreshold()
         assertTrue(testFeature.self().isEnabled())
         // cache rollout
-        val rolloutStep = testFeature.fooFeature().rolloutStep()
+        assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
         val wasEnabled = testFeature.fooFeature().isEnabled()
+        val wasEnabledRolloutValue = testFeature.fooFeature().getRawStoredState()!!.rollout!!.last()
 
         // halt rollout
         assertTrue(
@@ -913,7 +1042,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
+        assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
 
         // resume rollout just of certain app versions
         assertTrue(
@@ -948,7 +1077,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
+        assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
 
         // resume rollout and update app version
         whenever(appBuildConfig.versionCode).thenReturn(2)
@@ -984,7 +1113,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertEquals(wasEnabled, testFeature.fooFeature().isEnabled())
-        assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
+        assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
 
         // finish rollout
         assertTrue(
@@ -1022,11 +1151,11 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
         if (wasEnabled) {
-            assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
+            assertTrue(testFeature.fooFeature().rolloutThreshold()!! <= wasEnabledRolloutValue)
         } else {
-            assertNotEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
-            assertEquals(4, testFeature.fooFeature().rolloutStep())
+            assertTrue(testFeature.fooFeature().rolloutThreshold()!! <= testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
         }
 
         // remove steps
@@ -1049,12 +1178,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        if (wasEnabled) {
-            assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
-        } else {
-            assertNotEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
-            assertEquals(4, testFeature.fooFeature().rolloutStep())
-        }
+        // if (wasEnabled) {
+        //     assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
+        // } else {
+        //     assertNotEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
+        //     assertEquals(4, testFeature.fooFeature().rolloutStep())
+        // }
     }
 
     @Test
@@ -1441,8 +1570,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             )
     }
 
-    private fun Toggle.rolloutStep(): Int? {
-        return getRawStoredState()?.rolloutStep
+    private fun Toggle.rolloutThreshold(): Double? {
+        return getRawStoredState()?.rolloutThreshold
     }
 }
 
