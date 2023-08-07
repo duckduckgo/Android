@@ -17,6 +17,9 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncState.FAILED
@@ -29,6 +32,7 @@ import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -36,12 +40,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 
-@ContributesBinding(AppScope::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
+@ContributesBinding(scope = AppScope::class, boundType = SyncStateMonitor::class)
 class RealSyncStateMonitor @Inject constructor(
     private val syncStore: SyncStore,
     private val syncStateRepository: SyncStateRepository,
     private val dispatcherProvider: DispatcherProvider,
-) : SyncStateMonitor {
+) : SyncStateMonitor, BrowserFeatureStateReporterPlugin {
 
     override fun syncState(): Flow<SyncState> {
         return syncStateRepository.state()
@@ -71,5 +76,9 @@ class RealSyncStateMonitor @Inject constructor(
             Timber.d("Sync-Feature: Sync Monitor not signed in, OFF state")
             return OFF
         }
+    }
+
+    override fun featureState(): Pair<Boolean, String> {
+        return Pair(syncStore.isSignedIn(), PixelParameter.SYNC)
     }
 }

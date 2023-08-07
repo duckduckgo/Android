@@ -59,6 +59,7 @@ interface Pixel {
         const val EMAIL = "email"
         const val MESSAGE_SHOWN = "message"
         const val ACTION_SUCCESS = "success"
+        const val SYNC = "sync"
     }
 
     object PixelValues {
