@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Muokkaa</string>
     <string name="dialogSaveAction">Tallenna</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>

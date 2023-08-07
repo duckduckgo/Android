@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Rediger</string>
     <string name="dialogSaveAction">Lagre</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
     <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>

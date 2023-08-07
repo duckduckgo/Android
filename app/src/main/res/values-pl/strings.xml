@@ -523,7 +523,7 @@
     <string name="dialogEditTitle">Edytuj</string>
     <string name="dialogSaveAction">Zapisz</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Niezabezpieczone witryny</string>
     <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
     <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>

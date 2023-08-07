@@ -521,7 +521,7 @@
     <string name="dialogEditTitle">Editează</string>
     <string name="dialogSaveAction">Salvează</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Site-uri neprotejate</string>
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
     <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>

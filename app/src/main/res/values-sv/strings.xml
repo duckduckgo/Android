@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Redigera</string>
     <string name="dialogSaveAction">Spara</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>

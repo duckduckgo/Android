@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Szerkesztés</string>
     <string name="dialogSaveAction">Mentés</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Védelem nélküli weboldalak</string>
     <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
     <string name="disablePrivacyProtection">Adatvédelem letiltása</string>

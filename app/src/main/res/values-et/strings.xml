@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Redigeeri</string>
     <string name="dialogSaveAction">Salvesta</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>
     <string name="disablePrivacyProtection">Keela privaatsuse kaitse</string>

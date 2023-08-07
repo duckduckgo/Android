@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Bearbeiten</string>
     <string name="dialogSaveAction">Speichern</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Ungeschützte Websites</string>
     <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
     <string name="disablePrivacyProtection">Datenschutz deaktivieren</string>

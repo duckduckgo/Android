@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Bewerken</string>
     <string name="dialogSaveAction">Opslaan</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>

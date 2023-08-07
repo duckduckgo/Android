@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Редактиране</string>
     <string name="dialogSaveAction">Запази</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Незащитени сайтове</string>
     <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
     <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>

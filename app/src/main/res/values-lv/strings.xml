@@ -521,7 +521,7 @@
     <string name="dialogEditTitle">Rediģēt</string>
     <string name="dialogSaveAction">Saglabāt</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
     <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>

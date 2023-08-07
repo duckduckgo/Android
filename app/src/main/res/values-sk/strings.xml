@@ -523,7 +523,7 @@
     <string name="dialogEditTitle">Upraviť</string>
     <string name="dialogSaveAction">Uložiť</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Nezabezpečené webové stránky</string>
     <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
     <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>

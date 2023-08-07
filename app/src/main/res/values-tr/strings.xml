@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Düzenle</string>
     <string name="dialogSaveAction">Kaydet</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Korumasız Siteler</string>
     <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>

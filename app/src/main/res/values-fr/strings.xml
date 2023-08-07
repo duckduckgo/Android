@@ -519,7 +519,7 @@
     <string name="dialogEditTitle">Modifier</string>
     <string name="dialogSaveAction">Enregistrer</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
     <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>

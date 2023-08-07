@@ -520,7 +520,7 @@
     <string name="dialogEditTitle">Edit</string>
     <string name="dialogSaveAction">Save</string>
 
-    <!-- Whitelist -->
+    <!-- Allowlist -->
     <string name="allowlistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
