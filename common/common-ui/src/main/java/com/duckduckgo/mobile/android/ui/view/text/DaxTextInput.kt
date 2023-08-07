@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.ClassLoaderCreator
+import android.text.TextUtils.TruncateAt
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
@@ -40,6 +41,7 @@ import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_SINGLE_LINE
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -125,6 +127,10 @@ class DaxTextInput @JvmOverloads constructor(
 
             val minLines = getInt(R.styleable.DaxTextInput_android_minLines, 1)
             binding.internalEditText.minLines = minLines
+
+            if (inputType == INPUT_TYPE_SINGLE_LINE) {
+                binding.internalEditText.ellipsize = TruncateAt.END
+                }
 
             recycle()
         }
