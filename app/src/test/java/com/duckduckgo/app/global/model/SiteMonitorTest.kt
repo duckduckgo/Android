@@ -60,7 +60,7 @@ class SiteMonitorTest {
         private val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
     }
 
-    private val mockWhitelistDao: UserAllowListDao = mock()
+    private val mockAllowListDao: UserAllowListDao = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
 
@@ -69,7 +69,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -81,7 +81,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpDocument,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -93,7 +93,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = httpsDocument,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -106,7 +106,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = malformedDocument,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -118,7 +118,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -130,7 +130,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -142,7 +142,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -187,7 +187,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -232,7 +232,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -277,7 +277,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -300,7 +300,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -323,7 +323,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -357,7 +357,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -369,7 +369,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -381,7 +381,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -394,7 +394,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -439,7 +439,7 @@ class SiteMonitorTest {
         val testee = SiteMonitor(
             url = document,
             title = null,
-            userAllowListDao = mockWhitelistDao,
+            userAllowListDao = mockAllowListDao,
             contentBlocking = mockContentBlocking,
             appCoroutineScope = TestScope(),
         )
@@ -515,7 +515,7 @@ class SiteMonitorTest {
     @Test
     fun whenSiteBelongsToUserAllowListThenPrivacyShieldIsUnprotected() {
         val testee = givenASiteMonitor(url = document)
-        whenever(mockWhitelistDao.contains(document)).thenReturn(true)
+        whenever(mockAllowListDao.contains(document)).thenReturn(true)
 
         assertEquals(UNPROTECTED, testee.privacyProtection())
     }
@@ -560,7 +560,7 @@ class SiteMonitorTest {
         url = url,
         title = title,
         upgradedHttps = upgradedHttps,
-        userAllowListDao = mockWhitelistDao,
+        userAllowListDao = mockAllowListDao,
         contentBlocking = mockContentBlocking,
         appCoroutineScope = TestScope(),
     )
