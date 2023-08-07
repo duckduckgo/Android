@@ -29,7 +29,7 @@ import com.duckduckgo.app.browser.databinding.DialogEditWhitelistBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
@@ -116,14 +116,14 @@ class WhitelistActivity : DuckDuckGoActivity() {
                 object : CustomAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         val newText = inputBinding.customDialogTextInput.text
-                        viewModel.onEntryAdded(UserWhitelistedDomain(newText))
+                        viewModel.onEntryAdded(UserAllowListedDomain(newText))
                     }
                 },
             )
             .show()
     }
 
-    private fun showEditDialog(entry: UserWhitelistedDomain) {
+    private fun showEditDialog(entry: UserAllowListedDomain) {
         val inputBinding = DialogEditWhitelistBinding.inflate(layoutInflater)
         inputBinding.customDialogTextInput.text = entry.domain
         CustomAlertDialogBuilder(this)
@@ -135,14 +135,14 @@ class WhitelistActivity : DuckDuckGoActivity() {
                 object : CustomAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         val newText = inputBinding.customDialogTextInput.text
-                        viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
+                        viewModel.onEntryEdited(entry, UserAllowListedDomain(newText))
                     }
                 },
             )
             .show()
     }
 
-    private fun showDeleteDialog(entry: UserWhitelistedDomain) {
+    private fun showDeleteDialog(entry: UserAllowListedDomain) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.dialogConfirmTitle)
             .setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this))

@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewListItemDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewListItemEmptyHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
@@ -59,7 +59,7 @@ class WebsitesAdapter(
 
     private fun getWebsiteItemPosition(position: Int) = position - itemsOnTopOfList()
 
-    var entries: List<UserWhitelistedDomain> = emptyList()
+    var entries: List<UserAllowListedDomain> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -152,9 +152,9 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
     ) : WebsiteViewHolder(binding.root) {
 
         private val context: Context = binding.root.context
-        private lateinit var entity: UserWhitelistedDomain
+        private lateinit var entity: UserAllowListedDomain
 
-        fun bind(entity: UserWhitelistedDomain) {
+        fun bind(entity: UserAllowListedDomain) {
             val listItem = binding.root
             this.entity = entity
 
@@ -182,7 +182,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
 
         private fun showOverFlowMenu(
             anchor: View,
-            entity: UserWhitelistedDomain,
+            entity: UserAllowListedDomain,
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView

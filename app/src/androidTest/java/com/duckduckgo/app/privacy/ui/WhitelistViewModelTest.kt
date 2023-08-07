@@ -21,7 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.privacy.db.UserAllowListDao
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowAdd
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowWhitelistFormatError
@@ -47,7 +47,7 @@ class WhitelistViewModelTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val mockDao: UserAllowListDao = mock()
-    private val liveData = MutableLiveData<List<UserWhitelistedDomain>>()
+    private val liveData = MutableLiveData<List<UserAllowListedDomain>>()
 
     private val mockCommandObserver: Observer<Command> = mock()
     private var commandCaptor: KArgumentCaptor<Command> = argumentCaptor()
@@ -68,7 +68,7 @@ class WhitelistViewModelTest {
 
     @Test
     fun whenWhitelistUpdatedWithDataThenViewStateIsUpdatedAndWhitelistDisplayed() {
-        val list = listOf(UserWhitelistedDomain(DOMAIN), UserWhitelistedDomain(NEW_DOMAIN))
+        val list = listOf(UserAllowListedDomain(DOMAIN), UserAllowListedDomain(NEW_DOMAIN))
         liveData.postValue(list)
         val viewState = testee.viewState.value!!
         assertEquals(list, viewState.whitelist)
@@ -91,14 +91,14 @@ class WhitelistViewModelTest {
 
     @Test
     fun whenValidEntryAddedThenDaoUpdated() {
-        val entry = UserWhitelistedDomain(NEW_DOMAIN)
+        val entry = UserAllowListedDomain(NEW_DOMAIN)
         testee.onEntryAdded(entry)
         verify(mockDao).insert(entry)
     }
 
     @Test
     fun whenInvalidEntryAddedThenErrorShownAndDaoNotUpdated() {
-        val entry = UserWhitelistedDomain(INVALID_DOMAIN)
+        val entry = UserAllowListedDomain(INVALID_DOMAIN)
         testee.onEntryAdded(entry)
         verify(mockCommandObserver).onChanged(ShowWhitelistFormatError)
         verify(mockDao, never()).insert(entry)
@@ -106,7 +106,7 @@ class WhitelistViewModelTest {
 
     @Test
     fun whenEditRequestedThenEditShown() {
-        val entry = UserWhitelistedDomain(DOMAIN)
+        val entry = UserAllowListedDomain(DOMAIN)
         testee.onEditRequested(entry)
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         val lastValue = commandCaptor.lastValue as Command.ShowEdit
@@ -115,8 +115,8 @@ class WhitelistViewModelTest {
 
     @Test
     fun whenValidEditSubmittedThenDaoUpdated() {
-        val old = UserWhitelistedDomain(DOMAIN)
-        val new = UserWhitelistedDomain(NEW_DOMAIN)
+        val old = UserAllowListedDomain(DOMAIN)
+        val new = UserAllowListedDomain(NEW_DOMAIN)
         testee.onEntryEdited(old, new)
         verify(mockDao).delete(old)
         verify(mockDao).insert(new)
@@ -124,8 +124,8 @@ class WhitelistViewModelTest {
 
     @Test
     fun whenValidEditSubmittedThenErrorShownAndDaoNotUpdated() {
-        val old = UserWhitelistedDomain(DOMAIN)
-        val new = UserWhitelistedDomain(INVALID_DOMAIN)
+        val old = UserAllowListedDomain(DOMAIN)
+        val new = UserAllowListedDomain(INVALID_DOMAIN)
         testee.onEntryEdited(old, new)
         verify(mockCommandObserver).onChanged(ShowWhitelistFormatError)
         verify(mockDao, never()).delete(old)
@@ -134,7 +134,7 @@ class WhitelistViewModelTest {
 
     @Test
     fun whenDeleteRequestedThenDeletionConfirmed() {
-        val entry = UserWhitelistedDomain(DOMAIN)
+        val entry = UserAllowListedDomain(DOMAIN)
         testee.onDeleteRequested(entry)
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         val lastValue = commandCaptor.lastValue as Command.ConfirmDelete
@@ -143,7 +143,7 @@ class WhitelistViewModelTest {
 
     @Test
     fun whenDeletedThenDaoUpdated() {
-        val entry = UserWhitelistedDomain(DOMAIN)
+        val entry = UserAllowListedDomain(DOMAIN)
         testee.onEntryDeleted(entry)
         verify(mockDao).delete(entry)
     }

@@ -106,7 +106,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -1640,7 +1640,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserAllowListDao).insert(UserWhitelistedDomain("www.example.com"))
+        verify(mockUserAllowListDao).insert(UserAllowListedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
@@ -1660,7 +1660,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserAllowListDao).delete(UserWhitelistedDomain("www.example.com"))
+        verify(mockUserAllowListDao).delete(UserAllowListedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }

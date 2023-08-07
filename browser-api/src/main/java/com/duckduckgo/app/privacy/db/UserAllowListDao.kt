@@ -18,28 +18,28 @@ package com.duckduckgo.app.privacy.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class UserAllowListDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(domain: UserWhitelistedDomain)
+    abstract fun insert(domain: UserAllowListedDomain)
 
     fun insert(domain: String) {
-        insert(UserWhitelistedDomain(domain))
+        insert(UserAllowListedDomain(domain))
     }
 
     @Delete
-    abstract fun delete(domain: UserWhitelistedDomain)
+    abstract fun delete(domain: UserAllowListedDomain)
 
     fun delete(domain: String) {
-        delete(UserWhitelistedDomain(domain))
+        delete(UserAllowListedDomain(domain))
     }
 
     @Query("select * from user_whitelist")
-    abstract fun all(): LiveData<List<UserWhitelistedDomain>>
+    abstract fun all(): LiveData<List<UserAllowListedDomain>>
 
     @Query("select domain from user_whitelist")
     abstract fun allDomainsFlow(): Flow<List<String>>

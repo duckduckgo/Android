@@ -26,7 +26,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.privacy.db.UserAllowListDao
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -43,21 +43,21 @@ class WhitelistViewModel @Inject constructor(
 
     data class ViewState(
         val showWhitelist: Boolean = true,
-        val whitelist: List<UserWhitelistedDomain> = emptyList(),
+        val whitelist: List<UserAllowListedDomain> = emptyList(),
     )
 
     sealed class Command {
         object ShowAdd : Command()
-        class ShowEdit(val entry: UserWhitelistedDomain) : Command()
-        class ConfirmDelete(val entry: UserWhitelistedDomain) : Command()
+        class ShowEdit(val entry: UserAllowListedDomain) : Command()
+        class ConfirmDelete(val entry: UserAllowListedDomain) : Command()
         object ShowWhitelistFormatError : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val entries: LiveData<List<UserWhitelistedDomain>> = dao.all()
-    private val observer = Observer<List<UserWhitelistedDomain>> { onUserWhitelistChanged(it!!) }
+    private val entries: LiveData<List<UserAllowListedDomain>> = dao.all()
+    private val observer = Observer<List<UserAllowListedDomain>> { onUserWhitelistChanged(it!!) }
 
     init {
         viewState.value = ViewState()
@@ -69,7 +69,7 @@ class WhitelistViewModel @Inject constructor(
         entries.removeObserver(observer)
     }
 
-    private fun onUserWhitelistChanged(entries: List<UserWhitelistedDomain>) {
+    private fun onUserWhitelistChanged(entries: List<UserAllowListedDomain>) {
         viewState.value = viewState.value?.copy(
             showWhitelist = entries.isNotEmpty(),
             whitelist = entries,
@@ -80,7 +80,7 @@ class WhitelistViewModel @Inject constructor(
         command.value = ShowAdd
     }
 
-    fun onEntryAdded(entry: UserWhitelistedDomain) {
+    fun onEntryAdded(entry: UserAllowListedDomain) {
         if (!UriString.isValidDomain(entry.domain)) {
             command.value = ShowWhitelistFormatError
             return
@@ -90,13 +90,13 @@ class WhitelistViewModel @Inject constructor(
         }
     }
 
-    fun onEditRequested(entry: UserWhitelistedDomain) {
+    fun onEditRequested(entry: UserAllowListedDomain) {
         command.value = ShowEdit(entry)
     }
 
     fun onEntryEdited(
-        old: UserWhitelistedDomain,
-        new: UserWhitelistedDomain,
+        old: UserAllowListedDomain,
+        new: UserAllowListedDomain,
     ) {
         if (!UriString.isValidDomain(new.domain)) {
             command.value = ShowWhitelistFormatError
@@ -108,21 +108,21 @@ class WhitelistViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteRequested(entry: UserWhitelistedDomain) {
+    fun onDeleteRequested(entry: UserAllowListedDomain) {
         command.value = ConfirmDelete(entry)
     }
 
-    fun onEntryDeleted(entry: UserWhitelistedDomain) {
+    fun onEntryDeleted(entry: UserAllowListedDomain) {
         appCoroutineScope.launch(dispatchers.io()) {
             deleteEntryFromDatabase(entry)
         }
     }
 
-    private suspend fun addEntryToDatabase(entry: UserWhitelistedDomain) {
+    private suspend fun addEntryToDatabase(entry: UserAllowListedDomain) {
         withContext(dispatchers.io()) { dao.insert(entry) }
     }
 
-    private suspend fun deleteEntryFromDatabase(entry: UserWhitelistedDomain) {
+    private suspend fun deleteEntryFromDatabase(entry: UserAllowListedDomain) {
         withContext(dispatchers.io()) { dao.delete(entry) }
     }
 }

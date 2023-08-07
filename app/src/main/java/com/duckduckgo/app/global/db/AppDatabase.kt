@@ -41,7 +41,7 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
 import com.duckduckgo.app.statistics.model.PixelEntity
@@ -72,7 +72,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         TdsEntity::class,
         TdsDomainEntity::class,
         TdsCnameEntity::class,
-        UserWhitelistedDomain::class,
+        UserAllowListedDomain::class,
         NetworkLeaderboardEntry::class,
         SitesVisitedEntity::class,
         TabEntity::class,
