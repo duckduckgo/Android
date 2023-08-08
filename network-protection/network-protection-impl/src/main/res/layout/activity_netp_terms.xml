@@ -55,6 +55,60 @@
                 app:answer="@string/netpTermAnswerThree"
                 app:question="@string/netpFaqQuestionThree" />
 
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerFour"
+                app:question="@string/netpTermQuestionFour" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerFive"
+                app:question="@string/netpTermQuestionFive" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerSix"
+                app:question="@string/netpTermQuestionSix" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerSeven"
+                app:question="@string/netpTermQuestionSeven" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerEight"
+                app:question="@string/netpTermQuestionEight" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerNine"
+                app:question="@string/netpTermQuestionNine" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerTen"
+                app:question="@string/netpTermQuestionTen" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerEleven"
+                app:question="@string/netpTermQuestionEleven" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:answer="@string/netpTermAnswerTwelve"
+                app:question="@string/netpTermQuestionTwelve" />
+
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
                     android:id="@+id/termsAgreeAndClose"
                     android:layout_width="match_parent"
