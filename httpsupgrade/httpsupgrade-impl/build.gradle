@@ -68,9 +68,6 @@ android {
             path "CMakeLists.txt"
         }
     }
-    lintOptions {
-        baseline file("lint-baseline.xml")
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
