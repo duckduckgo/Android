@@ -65,7 +65,7 @@
     <string name="netpNotificationByline">Your time in the waiting list is over.</string>
     <string name="netpWaitlistActivityLabel">Beta Feature</string>
     <string name="netpBetaFeature">Network Protection Beta</string>
-    <string name="netpBetaFeatureByline">Secure your internet traffic and keep your browsing history private with Network Protection, a VPN by DuckDuckGo</string>
+    <string name="netpBetaFeatureByline">Secure your network connection and keep your online activity private with Network Protection, a VPN from DuckDuckGo.</string>
     <string name="netpWaitlistTitle">You\'re invited to test a beta feature!</string>
     <string name="netpJoinWaitlist">Join the Waitlist</string>
     <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
@@ -92,21 +92,21 @@
     <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first server basis.\n\nWe\'ll notify you when your invite is ready.</string>
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
-    <string name="netpWaitlistInBetaDescription">Network Protection is a VPN. Enable to secure all your internet traffic on this device and keep your browsing history private.</string>
+    <string name="netpWaitlistInBetaDescription">Network Protection is a VPN. Enable to secure your network connection and keep your online activity private.</string>
 
     <string name="netpWaitlistDescriptionItemTitle_1">Join the waitlist</string>
-    <string name="netpWaitlistDescriptionItemByline_1">Join the waitlist</string>
+    <string name="netpWaitlistDescriptionItemByline_1">Beta access is limited for now.</string>
     <string name="netpWaitlistDescriptionItemTitle_2">Wait your turn</string>
     <string name="netpWaitlistDescriptionItemByline_2">We send invites every few days.</string>
     <string name="netpWaitlistDescriptionItemTitle_3">Get your invite</string>
     <string name="netpWaitlistDescriptionItemByline_3">We can notify you when its your turn.</string>
 
-    <string name="netpWaitlistInvitedDescriptionItemTitle_1">Everyday protection for everything you do online</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_1">Network Protection uses the WireGuard protocol to secure all your network activity across your device, protecting your browsing, app activity and beyond.</string>
-    <string name="netpWaitlistInvitedDescriptionItemTitle_2">Fast, reliable and easy to use</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_2">Network Protection comes built-in to the DuckDuckGo browser. Connect to the nearest with one click.</string>
-    <string name="netpWaitlistInvitedDescriptionItemTitle_3">No logging y default</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_3">Unlike other VPNs, we do not store logs of your data. It\'s in our Privacy Policy.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_1">Secure all traffic to and from your device</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_1">We use the WireGuard protocol to encrypt all your online traffic across your browsers and apps.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_2">Fast, reliable, and easy to use</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_2">Connect with one click to route all your browsing and app activity through the nearest VPN server.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_3">A VPN you can trust</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_3">Unlike some VPNs, we do not log or save any data that can connect you to your online activity.</string>
 
     <!--Breakage reporting -->
     <string name="netpReportBreakageCategoryCrashes">App freezes or crashes</string>
@@ -183,11 +183,29 @@
     <!-- Terms -->
     <string name="netpTermsAgreeAndClose">Agree and Close</string>
     <string name="netpTermsTitle">Terms and Privacy Policy</string>
-    <string name="netpTermQuestionOne">1. Definitions</string>
-    <string name="netpTermAnswerOne">1.1 "VPN Service" refers to the software and associated services provided by XYZ Corp. ("Provider") to facilitate secure and private internet connectivity.\n\n1.2 "User" refers to any individual or entity who accesses or uses the VPN Service.</string>
-    <string name="netpTermQuestionTwo">2. Definitions</string>
-    <string name="netpTermAnswerTwo">2.1 Subject to the terms and conditions of this Agreement, Provider grants User a non-exclusive, non-transferable license to use the VPN Service for personal or internal business purposes. \n\n2.2 User may not distribute, modify, reverse engineer, decompile, disassemble, or create derivative works based on the VPN Service.</string>
-    <string name="netpTermQuestionThree">3. User Obligations</string>
-    <string name="netpTermAnswerThree">3.1 User agrees to use the VPN Service in compliance with all applicable laws and regulations. \n\n3.2 User agrees not to use the VPN Service for any illegal, harmful, or unauthorized purposes, including but not limited to: accessing or sharing copyrighted content, engaging in fraudulent activities, transmitting viruses or malware, or infringing upon the rights of others. \n\n3.3 User acknowledges that the VPN Service is not a guarantee of complete privacy and agrees not to hold Provider liable for any unauthorized access, data breaches, or loss of data.</string>
+    <string name="netpTermQuestionOne">The service is for limited and personal use only.</string>
+    <string name="netpTermAnswerOne">• This service is provided for your personal use only.\n\n• You are responsible for all activity in the service that occurs on or through your device.\n\n• This service may only be used through the DuckDuckGo app on the device on which you are given access. If you delete the DuckDuckGo app, you will lose access to the service.</string>
+    <string name="netpTermQuestionTwo">You agree to comply with all applicable laws, rules, and regulations.</string>
+    <string name="netpTermAnswerTwo">• You agree that you will not use the service for any unlawful, illicit, criminal, or fraudulent purpose, or in any manner that could give rise to civil or criminal liability under applicable law.\n\n• You agree to comply with our <a href="https://duckduckgo.com/terms">DuckDuckGo Terms of Service</a>, which are incorporated by reference.</string>
+    <string name="netpTermQuestionThree">You must be eligible to use this service.</string>
+    <string name="netpTermAnswerThree">• Access to this beta is randomly awarded. You are responsible for ensuring eligibility.\n\n• You must be at least 18 years old and live in a location where use of a VPN is legal in order to be eligible to use this service.</string>
+    <string name="netpTermQuestionFour">We provide this beta service as-is and without warranty.</string>
+    <string name="netpTermAnswerFour">• This service is provided as-is and without warranties or guarantees of any kind. \n\n• To the extent possible under applicable law, DuckDuckGo will not be liable for any damage or loss arising from your use of the service. In any event, the total aggregate liability of DuckDuckGo shall not exceed $25 or the equivalent in your local currency.</string>
+    <string name="netpTermQuestionFive">We may terminate access at any time.</string>
+    <string name="netpTermAnswerFive">• We reserve the right to revoke access to the service at any time in our sole discretion.\n\n• We may also terminate access for violation of these terms, including for repeated infringement of the intellectual property rights of others.</string>
+    <string name="netpTermQuestionSix">The service is free during the beta period.</string>
+    <string name="netpTermAnswerSix">• Access to this service is currently free of charge, but that is limited to this beta period. \n\n• You understand and agree that this service is provided on a temporary, testing basis only.</string>
+    <string name="netpTermQuestionSeven">We are continually updating the service.</string>
+    <string name="netpTermAnswerSeven">• The service is in beta, and we are regularly changing it.\n\n• Service coverage, speed, server locations, and quality may vary without warning.</string>
+    <string name="netpTermQuestionEight">Privacy Policy</string>
+    <string name="netpTermAnswerEight">• This VPN Privacy Policy is for our waitlist beta VPN product.\n\n• Our main <a href="https://duckduckgo.com/privacy">Privacy Policy</a> also applies here.\n\n• We don’t ask for any personal information from you in order to use this beta service. When you sign up, we provide you with a link which we can’t connect to you.</string>
+    <string name="netpTermQuestionNine">We don’t store logs that can connect you to your online activity</string>
+    <string name="netpTermAnswerNine">• When you use our VPN we don’t log:\n\t • Websites you visit\n\t • Traffic\n\t • DNS requests\n\t • Connections\n\t • Your IP Address\n\t • Session lengths\n\t • Location-based information\n\t • User bandwidth</string>
+    <string name="netpTermQuestionTen">We store aggregated performance metrics data</string>
+    <string name="netpTermAnswerTen">• Our servers send generic usage (ex. CPU load) and diagnostic data (ex. Errors encountered) to us.\n\nWe use this non-identifying information to monitor the performance and quality of the service, for example to make sure the system isn’t overloaded, monitor for abuse and develop the service.</string>
+    <string name="netpTermQuestionEleven">Server Management</string>
+    <string name="netpTermAnswerEleven">• We rent our servers from server providers we carefully selected and share our values for online privacy.\n\n• We use bare metal servers, meaning they are not virtual and are not shared with anyone else.\n\n• We encrypt all of our servers and only limited DDG team members have access to the encryption passwords.</string>
+    <string name="netpTermQuestionTwelve">If you need support</string>
+    <string name="netpTermAnswerTwelve">• If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\n• We will permanently delete all personal information you provided to us (email, contact information), 30 days after closing a support case.</string>
 
 </resources>

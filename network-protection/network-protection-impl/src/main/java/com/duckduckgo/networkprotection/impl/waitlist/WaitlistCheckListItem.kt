@@ -42,19 +42,19 @@ class WaitlistCheckListItem @JvmOverloads constructor(
     init {
         context.obtainStyledAttributes(
             attrs,
-            CommonR.styleable.CheckListItem,
+            R.styleable.WaitlistCheckListItem,
             0,
             CommonR.style.Widget_DuckDuckGo_CheckListItem,
         ).apply {
 
-            binding.primaryText.text = getString(CommonR.styleable.CheckListItem_primaryText)
-            binding.secondaryText.text = getString(CommonR.styleable.CheckListItem_secondaryText)
+            binding.primaryText.text = getString(R.styleable.WaitlistCheckListItem_primaryText)
+            binding.secondaryText.text = getString(R.styleable.WaitlistCheckListItem_secondaryText)
 
-            if (hasValue(CommonR.styleable.CheckListItem_primaryTextColorOverlay)) {
-                binding.primaryText.setTextColor(getColorStateList(CommonR.styleable.CheckListItem_primaryTextColorOverlay))
+            if (hasValue(R.styleable.WaitlistCheckListItem_primaryTextColorOverlay)) {
+                binding.primaryText.setTextColor(getColorStateList(R.styleable.WaitlistCheckListItem_primaryTextColorOverlay))
             }
 
-            val truncated = getBoolean(CommonR.styleable.CheckListItem_primaryTextTruncated, true)
+            val truncated = getBoolean(R.styleable.WaitlistCheckListItem_primaryTextTruncated, true)
             if (truncated) {
                 binding.primaryText.maxLines = 1
                 binding.primaryText.ellipsize = TextUtils.TruncateAt.END
@@ -62,18 +62,15 @@ class WaitlistCheckListItem @JvmOverloads constructor(
                 binding.primaryText.maxLines = Int.MAX_VALUE
             }
 
-            if (hasValue(CommonR.styleable.CheckListItem_secondaryTextColorOverlay)) {
-                binding.secondaryText.setTextColor(getColorStateList(CommonR.styleable.CheckListItem_secondaryTextColorOverlay))
+            if (hasValue(R.styleable.WaitlistCheckListItem_secondaryTextColorOverlay)) {
+                binding.secondaryText.setTextColor(getColorStateList(R.styleable.WaitlistCheckListItem_secondaryTextColorOverlay))
             }
 
-            val status = if (hasValue(CommonR.styleable.CheckListItem_itemState)) {
-                CheckItemStatus.from(getInt(CommonR.styleable.CheckListItem_itemState, 0))
-            } else {
-                CheckItemStatus.DISABLED
-            }
-            setItemStatus(status)
+            setLeadingIcon(
+                getResourceId(R.styleable.WaitlistCheckListItem_leadingIcon, R.drawable.ic_check_grey_round_16),
+            )
 
-            setPillVisible(getBoolean(CommonR.styleable.CheckListItem_showBetaPill, false))
+            setPillVisible(getBoolean(R.styleable.WaitlistCheckListItem_showBetaPill, false))
 
             recycle()
         }
@@ -104,12 +101,8 @@ class WaitlistCheckListItem @JvmOverloads constructor(
     }
 
     /** Sets the status: enabled, disabled, warning */
-    fun setItemStatus(status: CheckItemStatus) {
-        when (status) {
-            CheckItemStatus.DISABLED -> binding.leadingIcon.setImageResource(R.drawable.ic_check_grey_round_16)
-            CheckItemStatus.ENABLED -> binding.leadingIcon.setImageResource(R.drawable.ic_check_grey_round_16)
-            CheckItemStatus.WARNING -> binding.leadingIcon.setImageResource(R.drawable.ic_check_grey_round_16)
-        }
+    fun setLeadingIcon(status: Int) {
+        binding.leadingIcon.setImageResource(status)
     }
 
     override fun setEnabled(enabled: Boolean) {
