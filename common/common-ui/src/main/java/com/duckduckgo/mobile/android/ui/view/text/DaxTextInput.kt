@@ -39,7 +39,6 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_CLICKABLE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_SINGLE_LINE
@@ -177,7 +176,7 @@ class DaxTextInput @JvmOverloads constructor(
                 }
             }
         } else {
-            if (isClickable){
+            if (isClickable) {
                 binding.internalEditText.isEnabled = false
             }
         }
