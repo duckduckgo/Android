@@ -62,8 +62,8 @@
 
     <!-- Waitlist -->
     <string name="netpNotificationChannel">Network Protection</string>
-    <string name="netpNotificationTitle">Network Protection BETA is Available!</string>
-    <string name="netpNotificationByline">Your time in the waiting list is over.</string>
+    <string name="netpNotificationTitle">Network Protection beta is ready!</string>
+    <string name="netpNotificationByline">Open your invite.</string>
     <string name="netpWaitlistActivityLabel">Beta Feature</string>
     <string name="netpBetaFeature">Network Protection Beta</string>
     <string name="netpBetaFeatureByline">Secure your network connection and keep your online activity private with Network Protection, a VPN from DuckDuckGo.</string>
@@ -88,9 +88,9 @@
     <string name="netpWaitlistRedeemCodeGeneralError">Error redeeming code, please try again later</string>
     <string name="netpWaitlistCodeInvite">Invite Code</string>
 
-    <string name="netpWaitlistRedeemedCodeStatus">You\'re invited to try Network Protection Beta!</string>
+    <string name="netpWaitlistRedeemedCodeStatus">You\'re invited to try Network Protection beta!</string>
     <string name="netpWaitlistJoined">You\'re on the list!</string>
-    <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first server basis.\n\nWe\'ll notify you when your invite is ready.</string>
+    <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first served basis.\n\nWe\'ll notify you when your invite is ready.</string>
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
     <string name="netpWaitlistInBetaDescription">Network Protection is a VPN. Enable to secure your network connection and keep your online activity private.</string>
@@ -98,14 +98,14 @@
     <string name="netpWaitlistDescriptionItemTitle_1">Join the waitlist</string>
     <string name="netpWaitlistDescriptionItemByline_1">Beta access is limited for now.</string>
     <string name="netpWaitlistDescriptionItemTitle_2">Wait your turn</string>
-    <string name="netpWaitlistDescriptionItemByline_2">We send invites every few days.</string>
+    <string name="netpWaitlistDescriptionItemByline_2">We send new invites every few days.</string>
     <string name="netpWaitlistDescriptionItemTitle_3">Get your invite</string>
     <string name="netpWaitlistDescriptionItemByline_3">We can notify you when its your turn.</string>
 
     <string name="netpWaitlistInvitedDescriptionItemTitle_1">Secure all traffic to and from your device</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_1">We use the WireGuard protocol to encrypt all your online traffic across your browsers and apps.</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_1">We use the WireGuard protocol to encrypt online traffic across your browsers and apps.</string>
     <string name="netpWaitlistInvitedDescriptionItemTitle_2">Fast, reliable, and easy to use</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_2">Connect with one click to route all your browsing and app activity through the nearest VPN server.</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_2">Connect with one click to route your browsing and app activity through the nearest VPN server.</string>
     <string name="netpWaitlistInvitedDescriptionItemTitle_3">A VPN you can trust</string>
     <string name="netpWaitlistInvitedDescriptionItemByline_3">Unlike some VPNs, we do not log or save any data that can connect you to your online activity.</string>
 
