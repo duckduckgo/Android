@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.io.BufferedReader
 import org.junit.Before
 import org.junit.Test
@@ -64,6 +65,8 @@ class EmailInjectorJsTest {
                 override fun setEnabled(state: Toggle.State) {
                     this.state = state
                 }
+
+                override fun getRawStoredState(): State? = this.state
             },
         )
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
