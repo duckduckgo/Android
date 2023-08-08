@@ -1,0 +1,8 @@
+appId: com.duckduckgo.mobile.android
+name: Autofill Smoke Tests
+---
+- launchApp:
+    clearState: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: 1_autofill_shown_in_overflow.yaml
+- runFlow: 2_autofill_reach_creds_management.yaml

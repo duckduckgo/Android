@@ -8,7 +8,7 @@ apply from: "$rootDir/code-formatting.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
-    CI_HOME_DIR="${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
+    CI_HOME_DIR = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
 }
 
 android {
@@ -441,4 +441,9 @@ tasks.register('jvm_tests') {
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
+}
+
+task smokeTest(type: Exec) {
+    commandLine 'maestro', 'test', '../.maestro/release_tests'
+    dependsOn 'installPlayRelease'
 }
