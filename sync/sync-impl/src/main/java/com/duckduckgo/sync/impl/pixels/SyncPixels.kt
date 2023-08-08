@@ -33,7 +33,7 @@ interface SyncPixels {
 
     fun fireDecryptFailurePixel()
 
-    fun fireCountLimitPixel()
+    fun fireCountLimitPixel(feature: Feature)
 }
 
 @ContributesBinding(AppScope::class)
@@ -83,8 +83,13 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_DECRYPT_FAILURE)
     }
 
-    override fun fireCountLimitPixel() {
-        pixel.fire(SyncPixelName.SYNC_COUNT_LIMIT)
+    override fun fireCountLimitPixel(feature: Feature) {
+        pixel.fire(
+            SyncPixelName.SYNC_COUNT_LIMIT,
+            mapOf(
+                SyncPixelParameters.FEATURE to feature.toString(),
+            ),
+        )
     }
 }
 
@@ -105,10 +110,9 @@ object SyncPixelParameters {
 }
 
 object SyncPixelValues {
-    sealed class Feature{
-        object Bookmarks: Feature()
-        object Autofill: Feature()
-        object Settings: Feature()
+    sealed class Feature {
+        object Bookmarks : Feature()
+        object Autofill : Feature()
+        object Settings : Feature()
     }
-
 }

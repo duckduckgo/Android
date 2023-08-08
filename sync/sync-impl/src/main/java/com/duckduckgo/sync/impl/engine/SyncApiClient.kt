@@ -26,6 +26,9 @@ import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.pixels.SyncPixelValues.Feature.Autofill
+import com.duckduckgo.sync.impl.pixels.SyncPixelValues.Feature.Bookmarks
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -45,6 +48,7 @@ interface SyncApiClient {
 class AppSyncApiClient @Inject constructor(
     private val syncStore: SyncStore,
     private val syncApi: SyncApi,
+    private val syncPixels: SyncPixels,
 ) : SyncApiClient {
 
     override fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse> {
@@ -95,10 +99,13 @@ class AppSyncApiClient @Inject constructor(
     ): Result<SyncChangesResponse> {
         return when (val result = syncApi.getBookmarks(token, since)) {
             is Result.Error -> {
-                if (result.code == API_CODE.NOT_MODIFIED.code) {
-                    Result.Success(SyncChangesResponse.empty(type))
-                } else {
-                    Result.Error(result.code, result.reason)
+                when (result.code) {
+                    API_CODE.NOT_MODIFIED.code -> Result.Success(SyncChangesResponse.empty(type))
+                    API_CODE.COUNT_LIMIT.code -> {
+                        syncPixels.fireCountLimitPixel(Bookmarks)
+                        Result.Error(result.code, result.reason)
+                    }
+                    else -> Result.Error(result.code, result.reason)
                 }
             }
 
@@ -116,10 +123,13 @@ class AppSyncApiClient @Inject constructor(
     ): Result<SyncChangesResponse> {
         return when (val result = syncApi.getCredentials(token, since)) {
             is Result.Error -> {
-                if (result.code == API_CODE.NOT_MODIFIED.code) {
-                    Result.Success(SyncChangesResponse.empty(type))
-                } else {
-                    Result.Error(result.code, result.reason)
+                when (result.code) {
+                    API_CODE.NOT_MODIFIED.code -> Result.Success(SyncChangesResponse.empty(type))
+                    API_CODE.COUNT_LIMIT.code -> {
+                        syncPixels.fireCountLimitPixel(Autofill)
+                        Result.Error(result.code, result.reason)
+                    }
+                    else -> Result.Error(result.code, result.reason)
                 }
             }
 
