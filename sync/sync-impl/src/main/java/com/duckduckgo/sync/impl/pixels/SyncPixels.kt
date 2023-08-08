@@ -18,12 +18,22 @@ package com.duckduckgo.sync.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.pixels.SyncPixelValues.Feature
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface SyncPixels {
     fun fireStatsPixel()
+
+    fun fireMergeConflictPixel(feature: Feature)
+
+    fun fireOrphanPresentPixel(feature: Feature)
+    fun fireEncryptFailurePixel()
+
+    fun fireDecryptFailurePixel()
+
+    fun fireCountLimitPixel()
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,14 +56,59 @@ class RealSyncPixels @Inject constructor(
             ),
         )
     }
+
+    override fun fireMergeConflictPixel(feature: Feature) {
+        pixel.fire(
+            SyncPixelName.SYNC_MERGE_CONFLICT,
+            mapOf(
+                SyncPixelParameters.FEATURE to feature.toString(),
+            ),
+        )
+    }
+
+    override fun fireOrphanPresentPixel(feature: Feature) {
+        pixel.fire(
+            SyncPixelName.SYNC_ORPHAN_PRESENT,
+            mapOf(
+                SyncPixelParameters.FEATURE to feature.toString(),
+            ),
+        )
+    }
+
+    override fun fireEncryptFailurePixel() {
+        pixel.fire(SyncPixelName.SYNC_ENCRYPT_FAILURE)
+    }
+
+    override fun fireDecryptFailurePixel() {
+        pixel.fire(SyncPixelName.SYNC_DECRYPT_FAILURE)
+    }
+
+    override fun fireCountLimitPixel() {
+        pixel.fire(SyncPixelName.SYNC_COUNT_LIMIT)
+    }
 }
 
 enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SUCCESS_RATE("m_sync_daily_success_rate"),
     SYNC_DAILY_ATTEMPTS("m_sync_daily_attempts"),
+    SYNC_MERGE_CONFLICT("m_sync_merge_conflict"),
+    SYNC_ORPHAN_PRESENT("m_sync_orphan_present"),
+    SYNC_ENCRYPT_FAILURE("m_sync_encrypt_failure"),
+    SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
+    SYNC_COUNT_LIMIT("m_sync_count_limit"),
 }
 
 object SyncPixelParameters {
     const val ATTEMPTS = "attempts"
     const val RATE = "rate"
+    const val FEATURE = "feature"
+}
+
+object SyncPixelValues {
+    sealed class Feature{
+        object Bookmarks: Feature()
+        object Autofill: Feature()
+        object Settings: Feature()
+    }
+
 }
