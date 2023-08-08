@@ -21,6 +21,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.ResultReceiver
 import android.widget.RemoteViews
@@ -58,7 +59,7 @@ interface DeviceShieldAlertNotificationBuilder {
     fun buildAlwaysOnLockdownNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver,
+        contentNextIntent: Intent,
     ): Notification
 }
 
@@ -90,14 +91,15 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
         val notificationImage = getNotificationImage(deviceShieldNotification)
         notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
         notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
+        val vpnControllerIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = onNotificationPressedCallback)
 
-        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = true)
+        return buildNotification(context, notificationLayout, addReportIssueAction = true, contentNextIntent = vpnControllerIntent)
     }
 
     override fun buildAlwaysOnLockdownNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
-        onNotificationPressedCallback: ResultReceiver,
+        contentNextIntent: Intent,
     ): Notification {
         registerAlertChannel(context)
 
@@ -107,7 +109,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
         notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
         notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
-        return buildNotification(context, notificationLayout, onNotificationPressedCallback, addReportIssueAction = false)
+        return buildNotification(context, notificationLayout, addReportIssueAction = false, contentNextIntent = contentNextIntent)
     }
 
     private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
@@ -129,14 +131,13 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     private fun buildNotification(
         context: Context,
         content: RemoteViews,
-        resultReceiver: ResultReceiver? = null,
         addReportIssueAction: Boolean,
+        contentNextIntent: Intent,
     ): Notification {
         registerAlertChannel(context)
 
-        val vpnControllerIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = resultReceiver)
         val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-            addNextIntentWithParentStack(vpnControllerIntent)
+            addNextIntentWithParentStack(contentNextIntent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
 
