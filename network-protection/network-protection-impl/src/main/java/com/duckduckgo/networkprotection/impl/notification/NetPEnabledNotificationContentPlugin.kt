@@ -43,9 +43,11 @@ import kotlinx.coroutines.runBlocking
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
 class NetPEnabledNotificationContentPlugin @Inject constructor(
+    private val context: Context,
     private val resources: Resources,
     private val networkProtectionState: NetworkProtectionState,
     private val appTrackingProtection: AppTrackingProtection,
+    private val netPNotificationActions: NetPNotificationActions,
     netPIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
 
@@ -60,7 +62,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
                 title = SpannableStringBuilder(title),
                 message = SpannableStringBuilder(),
                 onNotificationPressIntent = onPressIntent,
-                notificationAction = null,
+                notificationAction = netPNotificationActions.getReportIssueNotificationAction(context),
             )
         } else {
             null

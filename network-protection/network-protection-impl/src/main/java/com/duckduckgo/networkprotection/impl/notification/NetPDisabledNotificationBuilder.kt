@@ -27,16 +27,11 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
-import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp
-import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_DESCRIPTION
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_ID
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_NAME
-import com.duckduckgo.networkprotection.impl.di.NetpBreakageCategories
-import com.duckduckgo.networkprotection.impl.notification.NetPEnableReceiver.Companion.ACTION_NETP_DISABLED_RESTART
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -45,10 +40,9 @@ interface NetPDisabledNotificationBuilder {
     fun buildDisabledByVpnNotification(context: Context): Notification
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(VpnScope::class)
 class RealNetPDisabledNotificationBuilder @Inject constructor(
-    private val globalActivityStarter: GlobalActivityStarter,
-    @NetpBreakageCategories private val breakageCategories: List<AppBreakageCategory>,
+    private val netPNotificationActions: NetPNotificationActions,
 ) : NetPDisabledNotificationBuilder {
 
     private fun registerChannel(context: Context) {
@@ -76,8 +70,8 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .addAction(enableNetpNotificationAction(context))
-            .addAction(reportIssueNotificationAction(context))
+            .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))
+            .addAction(netPNotificationActions.getReportIssueNotificationAction(context))
             .setAutoCancel(false)
             .build()
     }
@@ -92,8 +86,8 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled_by_vpn))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .addAction(enableNetpNotificationAction(context))
-            .addAction(reportIssueNotificationAction(context))
+            .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))
+            .addAction(netPNotificationActions.getReportIssueNotificationAction(context))
             .setAutoCancel(false)
             .build()
     }
@@ -106,34 +100,5 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             ),
         )
         getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    }
-
-    private fun enableNetpNotificationAction(context: Context): NotificationCompat.Action {
-        val launchIntent = Intent(context, NetPEnableReceiver::class.java).let { intent ->
-            intent.action = ACTION_NETP_DISABLED_RESTART
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-        return NotificationCompat.Action(
-            R.drawable.ic_vpn_notification_24,
-            context.getString(R.string.netpNotificationCTAEnableNetp),
-            launchIntent,
-        )
-    }
-
-    private fun reportIssueNotificationAction(context: Context): NotificationCompat.Action {
-        val launchIntent = globalActivityStarter.startIntent(
-            context,
-            OpenVpnBreakageCategoryWithBrokenApp(
-                launchFrom = "netp",
-                appName = "",
-                appPackageId = "",
-                breakageCategories = breakageCategories,
-            ),
-        )
-        return NotificationCompat.Action(
-            R.drawable.ic_baseline_feedback_24,
-            context.getString(R.string.netpNotificationCTAReportIssue),
-            PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE),
-        )
     }
 }

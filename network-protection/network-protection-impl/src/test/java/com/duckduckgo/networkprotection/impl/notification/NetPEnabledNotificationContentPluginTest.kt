@@ -44,7 +44,7 @@ class NetPEnabledNotificationContentPluginTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Mock
     private lateinit var appTrackingProtection: AppTrackingProtection
@@ -52,12 +52,21 @@ class NetPEnabledNotificationContentPluginTest {
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
 
+    @Mock
+    private lateinit var notificationActions: NetPNotificationActions
+
     private lateinit var plugin: NetPEnabledNotificationContentPlugin
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        plugin = NetPEnabledNotificationContentPlugin(resources, networkProtectionState, appTrackingProtection) { null }
+        plugin = NetPEnabledNotificationContentPlugin(
+            context,
+            context.resources,
+            networkProtectionState,
+            appTrackingProtection,
+            notificationActions,
+        ) { null }
     }
 
     @Test
