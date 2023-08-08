@@ -15,7 +15,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">App Tracking Protection</string>
     <string name="refresh">Refresh</string>
 
@@ -213,11 +213,11 @@
     <string name="atp_ActivityPastWeekBlocked">Blocked</string>
     <string name="atp_ActivityPastWeekAcross">Across</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Tracking Attempt</item>
         <item quantity="other">Tracking Attempts</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">App</item>
         <item quantity="other">Apps</item>
     </plurals>
