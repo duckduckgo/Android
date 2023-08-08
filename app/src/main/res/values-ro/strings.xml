@@ -469,7 +469,7 @@
         <item quantity="few"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
         <item quantity="other"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ încerca să te urmărească aici. <br/><br/>Am blocat-o!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
         <item quantity="few"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
         <item quantity="other"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>

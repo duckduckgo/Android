@@ -470,7 +470,7 @@
         <item quantity="many"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.]]></item>
         <item quantity="other"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme ho!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
         <item quantity="few"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
         <item quantity="many"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
