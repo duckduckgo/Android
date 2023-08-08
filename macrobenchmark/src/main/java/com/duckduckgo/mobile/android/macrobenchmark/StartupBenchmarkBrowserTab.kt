@@ -24,6 +24,7 @@ import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
@@ -47,6 +48,26 @@ class StartupBenchmarkBrowserTab {
         }
     )
 
+    @Test
+    fun startupBrowserTabAndLoadDuckDuckGo() = startupBenchmark(
+        setupBlock = {
+            launchBrowserTab()
+            pressHome()
+        },
+        measureBlock = {
+            startActivityAndWait()
+
+            val selector = UiSelector()
+                .className("android.widget.EditText")
+                .instance(0)
+
+            device.findObject(selector).text = "https://www.duckduckgo.com"
+            device.pressEnter()
+
+            device.waitForIdle(TIMEOUT_MS)
+        }
+    )
+
     private fun MacrobenchmarkScope.launchBrowserTab() {
         startActivityAndWait()
 
@@ -65,22 +86,22 @@ class StartupBenchmarkBrowserTab {
             click()
             device.wait(Until.hasObject(By.text("Cancel")), TIMEOUT_MS)
             val cancelButton = device.findObject(By.text("Cancel"))
-            cancelButton.click()
+            cancelButton?.click()
         }
 
         device.wait(Until.hasObject(By.text("Next,")), TIMEOUT_MS)
     }
 
     private fun startupBenchmark(
-        startupMode: StartupMode= StartupMode.WARM,
+        startupMode: StartupMode = StartupMode.WARM,
         setupBlock: MacrobenchmarkScope.() -> Unit,
+        measureBlock: MacrobenchmarkScope.() -> Unit = { startActivityAndWait() },
     ) = benchmarkRule.measureRepeated(
         packageName = TARGET_PACKAGE_NAME,
         metrics = listOf(StartupTimingMetric(), FrameTimingMetric()),
         iterations = ITERATIONS,
         startupMode = startupMode,
-        setupBlock = setupBlock
-    ) {
-        startActivityAndWait()
-    }
+        setupBlock = setupBlock,
+        measureBlock = measureBlock
+    )
 }
