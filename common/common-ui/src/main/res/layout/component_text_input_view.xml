@@ -56,11 +56,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_3"
-            android:hint="Non-editable text full click listener"
-            android:text="Non-editable text full click listener."
+            android:hint="Non-editable text full click listener with end icon"
+            android:text="Non-editable text full click listener with end icon."
             app:editable="true"
             app:clickable="true"
             app:endIcon="@drawable/ic_copy"
+            app:type="single_line" />
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+            android:id="@+id/outlinedinputtext31"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:hint="Non-editable text full click listener"
+            android:text="Non-editable text full click listener."
+            app:clickable="true"
             app:type="single_line" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput

@@ -54,6 +54,7 @@ class ComponentTextInputFragment : Fragment() {
         binding.outlinedinputtext8.onAction { toastOnClick(it) }
         binding.outlinedinputtext20.onAction { toastOnClick(it) }
         binding.outlinedinputtext30.onAction { toastOnClick(it) }
+        binding.outlinedinputtext31.onAction { toastOnClick(it) }
     }
 
     private fun toastOnClick(action: Action) = when (action) {
