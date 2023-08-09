@@ -95,7 +95,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         }
     }
 
-    private fun shouldShowImmediateNotification(): Boolean {
+    private suspend fun shouldShowImmediateNotification(): Boolean {
         // When VPN is stopped and if AppTP has been prior enabled AND user has been onboarded, then we show the disabled notif
         return isAppTPEnabled.get() && appTrackingProtection.isOnboarded()
     }
@@ -119,7 +119,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         }
     }
 
-    private fun handleNotifForDisabledAppTP() {
+    private suspend fun handleNotifForDisabledAppTP() {
         if (shouldShowImmediateNotification()) {
             logcat { "VPN Manually stopped, showing disabled notification for AppTP" }
             showImmediateReminderNotification()
@@ -129,7 +129,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         }
     }
 
-    private fun onVPNRevoked() {
+    private suspend fun onVPNRevoked() {
         if (shouldShowImmediateNotification()) {
             // These only need to be executed when AppTP has been enabled when vpn was revoked
             // else either AppTP was never enabled OR AppTP was disabled before hence already schedule reminders
