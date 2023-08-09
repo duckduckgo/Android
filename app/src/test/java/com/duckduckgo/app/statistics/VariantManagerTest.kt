@@ -17,6 +17,9 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AudienceLever
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CadenceLever
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.TimingLever
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -50,6 +53,42 @@ class VariantManagerTest {
                 fail("Duplicate variant name found: ${it.key}")
             }
         }
+    }
+
+    @Test
+    fun pushNotificationControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "zr" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun pushNotificationAudienceLeverExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zs" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(AudienceLever))
+    }
+
+    @Test
+    fun pushNotificationTimingLeverExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zt" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(TimingLever))
+    }
+
+    @Test
+    fun pushNotificationCadenceLeverExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zu" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(CadenceLever))
     }
 
     @Suppress("SameParameterValue")

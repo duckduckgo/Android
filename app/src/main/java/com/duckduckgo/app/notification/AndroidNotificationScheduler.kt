@@ -19,13 +19,18 @@ package com.duckduckgo.app.notification
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.work.*
+import androidx.work.WorkInfo.State.ENQUEUED
+import androidx.work.WorkInfo.State.RUNNING
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isNotificationSchedulingBugFixEnabled
+import com.duckduckgo.app.statistics.isAudienceLeverEnabled
+import com.duckduckgo.app.statistics.isCadenceLeverEnabled
+import com.duckduckgo.app.statistics.isTimingLeverEnabled
 import com.duckduckgo.di.scopes.AppScope
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import timber.log.Timber
@@ -49,53 +54,58 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
-        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
-
-        if (variantManager.isNotificationSchedulingBugFixEnabled()) {
-            scheduleUnusedAppNotificationsWithBugFix()
-        } else {
-            scheduleUnusedAppNotifications()
-        }
-    }
-
-    private suspend fun scheduleUnusedAppNotifications() {
         when {
-            privacyNotification.canShow() -> {
-                scheduleNotification(
-                    OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
-                    PRIVACY_DELAY_DURATION_IN_DAYS,
-                    TimeUnit.DAYS,
-                    UNUSED_APP_WORK_REQUEST_TAG,
+            variantManager.isAudienceLeverEnabled() -> {
+                if (!isWorkScheduled(UNUSED_APP_WORK_REQUEST_TAG)) {
+                    scheduleUnusedAppNotifications(
+                        1L to TimeUnit.DAYS,
+                        3L to TimeUnit.DAYS,
+                    )
+                }
+            }
+            variantManager.isTimingLeverEnabled() -> {
+                if (!isWorkScheduled(UNUSED_APP_WORK_REQUEST_TAG)) {
+                    scheduleUnusedAppNotifications(
+                        30L to TimeUnit.MINUTES,
+                        2L to TimeUnit.DAYS,
+                    )
+                }
+            }
+            variantManager.isCadenceLeverEnabled() -> {
+                if (!isWorkScheduled(UNUSED_APP_WORK_REQUEST_TAG)) {
+                    scheduleUnusedAppNotifications(
+                        30L to TimeUnit.MINUTES,
+                        1L to TimeUnit.DAYS,
+                    )
+                }
+            }
+            else -> {
+                workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
+                scheduleUnusedAppNotifications(
+                    PRIVACY_DELAY_DURATION_IN_DAYS to TimeUnit.DAYS,
+                    CLEAR_DATA_DELAY_DURATION_IN_DAYS to TimeUnit.DAYS,
                 )
             }
-
-            clearDataNotification.canShow() -> {
-                scheduleNotification(
-                    OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
-                    CLEAR_DATA_DELAY_DURATION_IN_DAYS,
-                    TimeUnit.DAYS,
-                    UNUSED_APP_WORK_REQUEST_TAG,
-                )
-            }
-
-            else -> Timber.v("Notifications not enabled for this variant")
         }
     }
 
-    private suspend fun scheduleUnusedAppNotificationsWithBugFix() {
+    private suspend fun scheduleUnusedAppNotifications(
+        privacyDelayTime: Pair<Long, TimeUnit>,
+        clearDataDelayTime: Pair<Long, TimeUnit>,
+    ) {
         if (privacyNotification.canShow()) {
             scheduleNotification(
                 OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
-                PRIVACY_DELAY_DURATION_IN_DAYS,
-                TimeUnit.DAYS,
+                privacyDelayTime.first,
+                privacyDelayTime.second,
                 UNUSED_APP_WORK_REQUEST_TAG,
             )
         }
         if (clearDataNotification.canShow()) {
             scheduleNotification(
                 OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
-                CLEAR_DATA_DELAY_DURATION_IN_DAYS,
-                TimeUnit.DAYS,
+                clearDataDelayTime.first,
+                clearDataDelayTime.second,
                 UNUSED_APP_WORK_REQUEST_TAG,
             )
         }
@@ -114,6 +124,25 @@ class NotificationScheduler(
             .build()
 
         workManager.enqueue(request)
+    }
+
+    private fun isWorkScheduled(tag: String): Boolean {
+        val statuses = workManager.getWorkInfosByTag(tag)
+        return try {
+            var running = false
+            val workInfoList: List<WorkInfo> = statuses.get()
+            for (workInfo in workInfoList) {
+                val state = workInfo.state
+                running = (state == RUNNING) or (state == ENQUEUED)
+            }
+            running
+        } catch (e: ExecutionException) {
+            e.printStackTrace()
+            false
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+            false
+        }
     }
 
     companion object {
