@@ -39,7 +39,7 @@ interface WgVpnControllerService {
     ): List<EligibleServerInfo>
 }
 
-const val NETP_ENVIRONMENT_URL = "https://staging.netp.duckduckgo.com"
+const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
 
 data class NetPRedeemCodeRequest(
     val code: String,

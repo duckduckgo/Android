@@ -41,7 +41,7 @@ class WgVpnControllerRequestInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val url = chain.request().url
         val newRequest = chain.request().newBuilder()
-        if (ENDPOINTS.any { url.toString() == it }) {
+        if (ENDPOINTS_PATTERN_MATCHER.any { url.toString().endsWith(it) }) {
             logcat { "Adding Authorization Bearer token to request $url" }
             newRequest.addHeader(
                 name = "Authorization",
@@ -62,9 +62,10 @@ class WgVpnControllerRequestInterceptor @Inject constructor(
     }
 
     companion object {
-        private val ENDPOINTS = listOf(
-            "https://staging.netp.duckduckgo.com/servers",
-            "https://staging.netp.duckduckgo.com/register",
+        // The NetP environments are for now https://<something>.netp.duckduckgo.com/<endpoint>
+        private val ENDPOINTS_PATTERN_MATCHER = listOf(
+            "netp.duckduckgo.com/servers",
+            "netp.duckduckgo.com/register",
         )
     }
 }
