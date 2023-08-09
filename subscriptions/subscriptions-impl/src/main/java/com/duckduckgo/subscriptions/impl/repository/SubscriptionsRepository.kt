@@ -20,6 +20,7 @@ import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.Purchase
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.BASIC_SUBSCRIPTION
@@ -44,6 +45,7 @@ interface SubscriptionsRepository {
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsRepository @Inject constructor(
     billingClientWrapper: BillingClientWrapper,
+    dispatchers: DispatcherProvider,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : SubscriptionsRepository {
 
@@ -66,7 +68,7 @@ class RealSubscriptionsRepository @Inject constructor(
     override val purchases: Flow<List<Purchase>> = billingClientWrapper.purchases
 
     init {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             subscriptionDetails.collect { productDetails ->
                 val offersMap = productDetails.subscriptionOfferDetails?.associateBy { it.basePlanId }.orEmpty()
                 _offerDetails.emit(offersMap)
