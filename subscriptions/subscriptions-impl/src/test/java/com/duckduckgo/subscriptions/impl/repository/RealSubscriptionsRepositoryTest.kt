@@ -3,12 +3,14 @@ package com.duckduckgo.subscriptions.impl.repository
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.android.billingclient.api.Purchase
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.BASIC_SUBSCRIPTION
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -18,13 +20,16 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class RealSubscriptionsRepositoryTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private lateinit var repository: RealSubscriptionsRepository
     private val billingClient: BillingClientWrapper = mock()
 
     @Test
     fun whenPurchasesContainsSubscriptionReturnTrue() = runTest {
         whenever(billingClient.purchases).thenReturn(flowOf(listOf(purchaseWithSubscription())))
-        repository = RealSubscriptionsRepository(billingClient)
+        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
 
         repository.hasSubscription.test {
             assertTrue(awaitItem())
@@ -35,7 +40,7 @@ class RealSubscriptionsRepositoryTest {
     @Test
     fun whenPurchasesDoesNotContainSubscriptionReturnFalse() = runTest {
         whenever(billingClient.purchases).thenReturn(flowOf(listOf(purchaseWithoutSubscription())))
-        repository = RealSubscriptionsRepository(billingClient)
+        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
 
         repository.hasSubscription.test {
             assertFalse(awaitItem())
@@ -46,7 +51,7 @@ class RealSubscriptionsRepositoryTest {
     @Test
     fun whenPurchasesEmptyReturnFalse() = runTest {
         whenever(billingClient.purchases).thenReturn(flowOf(listOf()))
-        repository = RealSubscriptionsRepository(billingClient)
+        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
 
         repository.hasSubscription.test {
             assertFalse(awaitItem())
@@ -57,7 +62,7 @@ class RealSubscriptionsRepositoryTest {
     @Test
     fun whenPurchasesExistReturnThem() = runTest {
         whenever(billingClient.purchases).thenReturn(flowOf(listOf(purchaseWithoutSubscription())))
-        repository = RealSubscriptionsRepository(billingClient)
+        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
 
         repository.purchases.test {
             assertTrue(awaitItem().size == 1)
@@ -68,7 +73,7 @@ class RealSubscriptionsRepositoryTest {
     @Test
     fun whenPurchasesEmptyReturnEmpty() = runTest {
         whenever(billingClient.purchases).thenReturn(flowOf(listOf()))
-        repository = RealSubscriptionsRepository(billingClient)
+        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
 
         repository.purchases.test {
             assertTrue(awaitItem().isEmpty())

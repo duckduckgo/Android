@@ -21,7 +21,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.ProductDetails
-import com.android.billingclient.api.Purchase
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -29,6 +28,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.billing.getPrice
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -46,11 +47,13 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.subscriptionsFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
-            if (it.hasSubscription == true) {
-                renderPurchases(it.purchases)
-            }
-            if (it.subscriptionDetails != null) {
-                renderProductDetails(it.subscriptionDetails)
+            it.subscriptionDetails?.let { subscriptionDetails ->
+                if (it.hasSubscription == true) {
+                    renderSubscribed(subscriptionDetails)
+                } else {
+                    renderNotSubscribed()
+                }
+                renderProducts(it)
             }
         }.launchIn(lifecycleScope)
 
@@ -58,25 +61,64 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
     }
 
-    private fun renderPurchases(purchases: List<Purchase>?) {
-        if (!purchases.isNullOrEmpty()) {
-            if (purchases.first().products.first() != null) {
-                val purchase = purchases.first()
-                binding.purchaseDetails.text = "You are subscribed to ${purchase.products.first()}"
-                binding.buyButton.isEnabled = false
-            }
-        } else {
-            binding.purchaseDetails.text = "You are not subscribed yet"
-            binding.buyButton.isEnabled = true
-        }
+    private fun renderNotSubscribed() {
+        binding.purchaseDetails.text = "You are not subscribed yet"
+        binding.buyButtonPlan1.isEnabled = true
+        binding.buyButtonPlan2.isEnabled = true
+    }
+    private fun renderSubscribed(productDetails: ProductDetails) {
+        binding.purchaseDetails.text = "You are subscribed to ${productDetails.name}"
+        binding.buyButtonPlan1.isEnabled = false
+        binding.buyButtonPlan2.isEnabled = false
+        binding.buyButtonPlan3.isEnabled = false
+        binding.buyButtonPlan4.isEnabled = false
     }
 
-    private fun renderProductDetails(productDetails: ProductDetails) {
-        binding.buyButton.setOnClickListener {
-            viewModel.buySubscription(this, productDetails)
-        }
+    private fun renderProducts(state: ViewState) {
+        val yearly = state.yearlySubscription
+        val monthly = state.monthlySubscription
+        val uk = state.ukSubscription
+        val ne = state.netherlandsSubscription
+        val productDetails = state.subscriptionDetails!!
+        val hasSubscription = state.hasSubscription
         binding.description.text = productDetails.description
         binding.name.text = productDetails.name
+        binding.buyButtonPlan3.isEnabled = false
+        binding.buyButtonPlan4.isEnabled = false
+        yearly?.let {
+            binding.buyButtonPlan1.apply {
+                text = yearly.getPrice()
+                setOnClickListener {
+                    viewModel.buySubscription(this@SubscriptionsActivity, productDetails, yearly.offerToken)
+                }
+            }
+        }
+        monthly?.let {
+            binding.buyButtonPlan2.apply {
+                text = monthly.getPrice()
+                setOnClickListener {
+                    viewModel.buySubscription(this@SubscriptionsActivity, productDetails, monthly.offerToken)
+                }
+            }
+        }
+        uk?.let {
+            binding.buyButtonPlan3.apply {
+                isEnabled = hasSubscription == false
+                text = uk.getPrice()
+                setOnClickListener {
+                    viewModel.buySubscription(this@SubscriptionsActivity, productDetails, uk.offerToken)
+                }
+            }
+        }
+        ne?.let {
+            binding.buyButtonPlan4.apply {
+                isEnabled = hasSubscription == false
+                text = ne.getPrice()
+                setOnClickListener {
+                    viewModel.buySubscription(this@SubscriptionsActivity, productDetails, ne.offerToken)
+                }
+            }
+        }
     }
 
     companion object {
