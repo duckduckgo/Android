@@ -132,6 +132,13 @@ private val appTrackingProtectionOnboarded: (JsonMatchingAttribute) -> MatchingA
     )
 }
 
+private val networkProtectionOnboarded: (JsonMatchingAttribute) -> MatchingAttribute<Boolean> = { jsonMatchingAttribute ->
+    NetPOnboarded(
+        value = jsonMatchingAttribute.value as Boolean,
+        fallback = jsonMatchingAttribute.fallback,
+    )
+}
+
 private val widgetAddedMapper: (JsonMatchingAttribute) -> MatchingAttribute<Boolean> = { jsonMatchingAttribute ->
     WidgetAdded(
         value = jsonMatchingAttribute.value as Boolean,
@@ -213,6 +220,7 @@ private val attributesMappers = mapOf(
     Pair("daysSinceInstalled", daysSinceInstalledMapper),
     Pair("daysUsedSince", daysUsedSinceMapper),
     Pair("atpOnboarded", appTrackingProtectionOnboarded),
+    Pair("netpOnboarded", networkProtectionOnboarded),
 )
 
 fun List<JsonMatchingRule>.mapToMatchingRules(): Map<Int, List<MatchingAttribute<*>>> = this.map {
