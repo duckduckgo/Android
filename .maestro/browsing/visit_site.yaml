@@ -1,8 +1,11 @@
 appId: com.duckduckgo.mobile.android
+name: "SmokeTest: General website browsing works"
+tags:
+  - smokeTest
 ---
 - launchApp:
-      clearState: true
-      stopApp: true
+    clearState: true
+    stopApp: true
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
 - tapOn: "let's do it!"

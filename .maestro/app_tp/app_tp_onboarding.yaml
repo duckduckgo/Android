@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "SmokeTest: AppTP onboarding"
+tags:
+    - smokeTest
 ---
 - launchApp:
       clearState: true

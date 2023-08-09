@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "SmokeTest: Can add and remove favorites"
+tags:
+    - smokeTest
 ---
 - launchApp:
     clearState: true
@@ -25,25 +28,28 @@ appId: com.duckduckgo.mobile.android
     text: "add favorite"
 - tapOn:
     text: "add favorite"
-# Navigate to bookmarks screen
+# Remove favorite from menu button
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "remove favorite"
+- tapOn:
+    text: "remove favorite"
+# Re-add favorite from menu button
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "add favorite"
+- tapOn:
+    text: "add favorite"
+# Check favorites from bookmarks screen
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-# Remove favorite from bookmarks screen
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/trailingIcon"
-    index: 0
-- assertVisible:
-    text: "Delete"
-- tapOn:
-    text: "delete"
-# Undo remove favorite from bookmarks screen
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/snackbar_action"
-- assertNotVisible:
-    text: "No favorites added yet"
 - assertNotVisible:
     text: "No bookmarks added yet"
+- assertVisible:
+    text: "Privacy Test Pages - Home"

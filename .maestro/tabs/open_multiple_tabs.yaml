@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "SmokeTest: Multiple tabs can be opened"
+tags:
+    - smokeTest
 ---
 - launchApp:
       clearState: true

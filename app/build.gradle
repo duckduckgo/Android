@@ -454,7 +454,7 @@ tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
 }
 
-task smokeTest(type: Exec) {
-    commandLine 'maestro', 'test', '../.maestro/release_tests'
+tasks.register('smokeTest', Exec) {
+    commandLine 'maestro', 'test', '--include-tags', 'smokeTest', '../.maestro'
     dependsOn 'installPlayRelease'
 }

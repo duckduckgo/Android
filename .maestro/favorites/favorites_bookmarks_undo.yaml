@@ -1,8 +1,11 @@
 appId: com.duckduckgo.mobile.android
+name: "SmokeTest: Can undo a deleted favorite"
+tags:
+    - smokeTest
 ---
 - launchApp:
-      clearState: true
-      stopApp: true
+    clearState: true
+    stopApp: true
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
 - tapOn: "let's do it!"
@@ -18,29 +21,32 @@ appId: com.duckduckgo.mobile.android
     text: ".*keep browsing.*"
 - tapOn:
     text: "got it"
+# Add favorite from menu button
 - tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
-    text: "add bookmark"
+    text: "add favorite"
 - tapOn:
-    text: "add bookmark"
+    text: "add favorite"
+# Navigate to bookmarks screen
 - tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-- assertVisible:
-    text: "No favorites added yet"
-- assertVisible:
-    text: "Privacy Test Pages - Home"
+# Remove favorite from bookmarks screen
 - tapOn:
-      id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+    index: 0
 - assertVisible:
     text: "Delete"
 - tapOn:
     text: "delete"
+# Undo remove favorite from bookmarks screen
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/snackbar_action"
 - assertNotVisible:
-    text: "Privacy Test Pages - Home"
-- assertVisible:
+    text: "No favorites added yet"
+- assertNotVisible:
     text: "No bookmarks added yet"

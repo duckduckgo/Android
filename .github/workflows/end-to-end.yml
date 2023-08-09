@@ -80,7 +80,8 @@ jobs:
           name: ${{ github.sha }}
           app-file: apk/release.apk
           android-api-level: 30
-          workspace: .maestro/release_tests
+          workspace: .maestro
+          include-tags: smokeTest
 
       - name: Notifications permissions Android 13+
         if: always()

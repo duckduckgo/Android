@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "SmokeTest: Bookmarks can be added and deleted"
+tags:
+    - smokeTest
 ---
 - launchApp:
     clearState: true
@@ -18,32 +21,29 @@ appId: com.duckduckgo.mobile.android
     text: ".*keep browsing.*"
 - tapOn:
     text: "got it"
-# Add favorite from menu button
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
-    text: "add favorite"
+    text: "add bookmark"
 - tapOn:
-    text: "add favorite"
-# Navigate to bookmarks screen
+    text: "add bookmark"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-# Remove favorite from bookmarks screen
+- assertVisible:
+    text: "No favorites added yet"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/trailingIcon"
-    index: 0
 - assertVisible:
     text: "Delete"
 - tapOn:
     text: "delete"
-# When a favorite is removed, it still stays as Bookmark
-- assertVisible:
-    text: "No favorites added yet"
 - assertNotVisible:
+    text: "Privacy Test Pages - Home"
+- assertVisible:
     text: "No bookmarks added yet"
-# Undo Snackbar should be visible
-- assertVisible: "Undo"
