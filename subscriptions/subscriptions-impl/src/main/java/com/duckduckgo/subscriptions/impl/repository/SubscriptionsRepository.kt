@@ -22,7 +22,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.BASIC_SUBSCRIPTION
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -34,7 +33,6 @@ interface SubscriptionsRepository {
     val purchases: Flow<List<Purchase>>
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsRepository @Inject constructor(billingClientWrapper: BillingClientWrapper) : SubscriptionsRepository {
 

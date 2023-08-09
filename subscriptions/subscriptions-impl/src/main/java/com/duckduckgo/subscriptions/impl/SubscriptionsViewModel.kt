@@ -22,13 +22,13 @@ import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class SubscriptionsViewModel @Inject constructor(
     private val billingClientWrapper: BillingClientWrapper,
     subscriptionsRepository: SubscriptionsRepository,
