@@ -59,7 +59,7 @@ jobs:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
           app-file: apk/release.apk
-          workspace: .maestro/sync_flows
+          workspace: .maestro/ads_preview_flows
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
