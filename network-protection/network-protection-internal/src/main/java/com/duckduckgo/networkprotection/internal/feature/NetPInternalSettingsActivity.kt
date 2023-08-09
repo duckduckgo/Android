@@ -31,9 +31,11 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyer
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
+import com.duckduckgo.networkprotection.internal.feature.NetPEnvironmentSettingActivity.Companion.NetPEnvironmentSettingScreen
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
@@ -52,7 +54,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-@Suppress("NoHardcodedCoroutineDispatcher")
 @InjectWith(ActivityScope::class)
 class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
@@ -69,6 +70,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject lateinit var netPRekeyer: NetPRekeyer
+
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val job = ConflatedJob()
 
@@ -203,6 +206,10 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 netPRekeyer.doRekey()
             }
+        }
+
+        binding.changeEnvironment.setClickListener {
+            globalActivityStarter.start(this, NetPEnvironmentSettingScreen)
         }
     }
 
