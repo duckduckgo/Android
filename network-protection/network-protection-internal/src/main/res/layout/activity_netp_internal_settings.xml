@@ -111,6 +111,13 @@
                 app:primaryText="@string/netpForceRekey"
                 app:showSwitch="false"
                 />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/changeEnvironment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpEnvironmentSetting"
+                app:showSwitch="false"
+                />
 
             <!-- Section PCAP -->
             <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem

@@ -21,6 +21,7 @@
     <string name="netpDevSettingHeaderPCAPDelete">Delete PCAP file</string>
     <string name="netpDevSettingHeaderPCAPShare">Share PCAP file</string>
     <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
+    <string name="netpEnvironmentSetting">Change NetP Environment</string>
     <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
     <string name="netpMtuSize">MTU Size</string>
     <string name="netpDevSettingInternalIP">Internal IP</string>
