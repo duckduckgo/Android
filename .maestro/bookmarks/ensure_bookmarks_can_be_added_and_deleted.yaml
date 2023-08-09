@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "SmokeTest: Bookmarks can be added and deleted"
 tags:
-    - smokeTest
+    - releaseTest
 ---
 - launchApp:
     clearState: true

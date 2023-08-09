@@ -81,7 +81,7 @@ jobs:
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
-          include-tags: smokeTest
+          include-tags: releaseTest
 
       - name: Notifications permissions Android 13+
         if: always()

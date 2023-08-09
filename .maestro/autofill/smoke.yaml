@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "SmokeTest: Autofill screen is reachable from overflow menu"
 tags:
-    - smokeTest
+    - releaseTest
 ---
 - launchApp:
     clearState: true

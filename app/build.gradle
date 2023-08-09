@@ -454,7 +454,12 @@ tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
 }
 
-tasks.register('smokeTest', Exec) {
-    commandLine 'maestro', 'test', '--include-tags', 'smokeTest', '../.maestro'
+tasks.register('releaseTestLocal', Exec) {
+    commandLine 'maestro', 'test', '--include-tags', 'releaseTest', '../.maestro'
     dependsOn 'installPlayRelease'
+}
+
+tasks.register('releaseTestCloud', Exec) {
+    commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
+    dependsOn 'assemblePlayRelease'
 }

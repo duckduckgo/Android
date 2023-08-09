@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "SmokeTest: General website browsing works"
 tags:
-  - smokeTest
+  - releaseTest
 ---
 - launchApp:
     clearState: true

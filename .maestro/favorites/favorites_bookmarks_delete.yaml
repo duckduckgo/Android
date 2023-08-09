@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "SmokeTest: Deleting a favorite does not delete bookmark"
 tags:
-    - smokeTest
+    - releaseTest
 ---
 - launchApp:
     clearState: true
