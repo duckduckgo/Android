@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "SmokeTest: Can add and remove favorites"
+name: "ReleaseTest: Can add and remove favorites"
 tags:
     - releaseTest
 ---

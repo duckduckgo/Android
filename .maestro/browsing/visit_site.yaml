@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "SmokeTest: General website browsing works"
+name: "ReleaseTest: General website browsing works"
 tags:
   - releaseTest
 ---

@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "SmokeTest: AppTP onboarding"
+name: "ReleaseTest: AppTP onboarding"
 tags:
     - releaseTest
 ---

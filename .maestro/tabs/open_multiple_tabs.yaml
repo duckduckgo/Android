@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "SmokeTest: Multiple tabs can be opened"
+name: "ReleaseTest: Multiple tabs can be opened"
 tags:
     - releaseTest
 ---
