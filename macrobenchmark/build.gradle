@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.duckduckgo.mobile.android.macrobenchmark'
-    compileSdk 33
+    compileSdk compile_sdk
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -17,8 +17,8 @@ android {
     }
 
     defaultConfig {
-        minSdk 23
-        targetSdk 33
+        minSdk min_sdk
+        targetSdk target_sdk
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,10 +44,9 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.test.ext:junit:1.1.5'
-    implementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    implementation 'androidx.benchmark:benchmark-macro-junit4:1.1.1'
+    implementation AndroidX.test.ext.junit
+    implementation "androidx.test.uiautomator:uiautomator:_"
+    implementation "androidx.benchmark:benchmark-macro-junit4:_"
 }
 
 androidComponents {
