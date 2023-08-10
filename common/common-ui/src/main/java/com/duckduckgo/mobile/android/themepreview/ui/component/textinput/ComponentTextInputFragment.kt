@@ -55,11 +55,14 @@ class ComponentTextInputFragment : Fragment() {
         binding.outlinedinputtext20.onAction { toastOnClick(it) }
         binding.outlinedinputtext30.onAction { toastOnClick(it) }
         binding.outlinedinputtext31.onAction { toastOnClick(it) }
+        binding.outlinedinputtext32.onAction { toastOnClick(it) }
+        binding.outlinedinputtext33.onAction { toastOnClick(it) }
     }
 
     private fun toastOnClick(action: Action) = when (action) {
         is Action.PerformEndAction -> {
-            Snackbar.make(binding.root, "End icon clicked", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, "Element clicked", Snackbar.LENGTH_SHORT).show()
         }
     }
+
 }

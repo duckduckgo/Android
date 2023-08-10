@@ -19,15 +19,18 @@
         <attr name="android:hint" />
         <attr name="android:text" />
         <attr name="android:minLines" />
-        <attr name="editable" format="boolean" />
         <attr name="clickable" format="boolean" />
+        <attr name="editable" format="boolean" />
         <attr name="endIcon" format="reference" />
         <attr name="endIconContentDescription" format="string" />
+        <attr name="formMode" format="boolean" />
+        <attr name="singleLineTextTruncated" format="boolean"/>
 
         <attr name="type" format="enum" >
             <enum name="multi_line" value="0"/>
             <enum name="single_line" value="1"/>
             <enum name="password" value="2"/>
+            <enum name="clickable" value="3"/>
         </attr>
 
     </declare-styleable>

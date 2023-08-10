@@ -71,7 +71,7 @@
                     android:hint="@string/atp_ReportBreakageFormInputHint"
                     app:editable="true"
                     app:type="multi_line"
-                    android:minLines="3"/>
+                    app:formMode="true"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/appBreakageFormDisclaimer"

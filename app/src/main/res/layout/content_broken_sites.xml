@@ -78,7 +78,7 @@
             android:hint="@string/brokenSiteDescriptionTextInputHint"
             app:editable="true"
             app:type="multi_line"
-            android:minLines="3"
+            app:formMode="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/categoriesSelection" />

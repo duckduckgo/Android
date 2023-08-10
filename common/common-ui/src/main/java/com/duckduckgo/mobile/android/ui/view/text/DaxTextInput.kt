@@ -22,7 +22,7 @@ import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.ClassLoaderCreator
-import android.text.TextUtils.TruncateAt
+import android.text.TextUtils.TruncateAt.END
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
@@ -41,7 +41,6 @@ import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_SINGLE_LINE
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -79,6 +78,7 @@ class DaxTextInput @JvmOverloads constructor(
     private val transformationMethod by lazy {
         PasswordTransformationMethod.getInstance()
     }
+    private var truncated: Boolean = false
     private var isPassword: Boolean = false
     private var isPasswordShown: Boolean = false
     private var isClickable: Boolean = false
@@ -121,13 +121,12 @@ class DaxTextInput @JvmOverloads constructor(
                     }
                 }
             }
-
-            val minLines = getInt(R.styleable.DaxTextInput_android_minLines, 1)
+            val formMode = getBoolean(R.styleable.DaxTextInput_formMode, false)
+            val minLines = if (formMode) { 3 } else { getInt(R.styleable.DaxTextInput_android_minLines, 1) }
             binding.internalEditText.minLines = minLines
 
-            if (inputType == INPUT_TYPE_SINGLE_LINE) {
-                binding.internalEditText.ellipsize = TruncateAt.END
-            }
+            truncated = getBoolean(R.styleable.DaxTextInput_singleLineTextTruncated, false)
+            setSingleLineTextTruncation(truncated)
 
             recycle()
         }
@@ -287,6 +286,14 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
         } else {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
+        }
+    }
+    private fun setSingleLineTextTruncation(truncated: Boolean) {
+        if (truncated) {
+            binding.internalEditText.apply {
+                inputType = EditorInfo.TYPE_NULL
+                ellipsize = END
+            }
         }
     }
 
