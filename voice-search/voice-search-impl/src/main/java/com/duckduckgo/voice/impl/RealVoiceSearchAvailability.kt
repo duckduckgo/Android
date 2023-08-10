@@ -16,31 +16,36 @@
 
 package com.duckduckgo.voice.impl
 
-import android.os.Build
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
+import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealVoiceSearchAvailability @Inject constructor(
     private val configProvider: VoiceSearchAvailabilityConfigProvider,
+    private val voiceSearchFeature: VoiceSearchFeature,
+    private val voiceSearchRepository: VoiceSearchFeatureRepository,
 ) : VoiceSearchAvailability {
     companion object {
         private const val LANGUAGE_TAG_ENG_US = "en-US"
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
     }
 
-    private val allowList = listOf("pixel 6", "pixel 6 pro")
-
     override val isVoiceSearchSupported: Boolean
         get() = configProvider.get().run {
-            hasValidDevice(deviceModel.lowercase()) && hasValidVersion(sdkInt) && isOnDeviceSpeechRecognitionSupported && hasValidLocale(languageTag)
+            voiceSearchFeature.self().isEnabled() &&
+                hasValidVersion(sdkInt) &&
+                isOnDeviceSpeechRecognitionSupported &&
+                hasValidLocale(languageTag) &&
+                voiceSearchRepository.manufacturers.none { it.name == deviceManufacturer }
         }
 
-    private fun hasValidDevice(model: String) = allowList.contains(model)
-
-    private fun hasValidVersion(sdkInt: Int) = sdkInt >= Build.VERSION_CODES.S
+    private fun hasValidVersion(sdkInt: Int) = voiceSearchRepository.minVersion?.let { minVersion ->
+        sdkInt >= minVersion
+    } ?: true
 
     private fun hasValidLocale(localeLanguageTag: String) = localeLanguageTag == LANGUAGE_TAG_ENG_US
 
