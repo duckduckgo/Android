@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.ClassLoaderCreator
+import android.text.TextUtils.TruncateAt
 import android.text.TextUtils.TruncateAt.END
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
@@ -39,8 +40,10 @@ import androidx.core.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewDaxTextInputBinding
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_FORM_MODE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_MULTI_LINE
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_PASSWORD
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput.Type.INPUT_TYPE_SINGLE_LINE
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
 import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action.PerformEndAction
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -101,34 +104,49 @@ class DaxTextInput @JvmOverloads constructor(
             binding.internalInputLayout.setHintWithoutAnimation(getString(R.styleable.DaxTextInput_android_hint))
 
             val inputType = getInputType()
+            setupInputMode(inputType)
 
-            isPassword = inputType == INPUT_TYPE_PASSWORD
-            if (isPassword) {
-                setupPasswordMode()
-            } else {
-                setupTextMode(inputType)
-            }
-
-            binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    if (isPassword) {
-                        showPassword()
-                    }
-                    binding.internalEditText.showKeyboard()
-                } else {
-                    if (isPassword) {
-                        hidePassword()
-                    }
-                }
-            }
-            val formMode = getBoolean(R.styleable.DaxTextInput_formMode, false)
-            val minLines = if (formMode) { 3 } else { getInt(R.styleable.DaxTextInput_android_minLines, 1) }
-            binding.internalEditText.minLines = minLines
+            val minLines = getInt(R.styleable.DaxTextInput_android_minLines, 1)
+            setMinLines(inputType, minLines)
 
             truncated = getBoolean(R.styleable.DaxTextInput_singleLineTextTruncated, false)
             setSingleLineTextTruncation(truncated)
 
+            setFocusListener()
+
             recycle()
+        }
+    }
+
+    private fun setupInputMode(inputType: Type) {
+        isPassword = inputType == INPUT_TYPE_PASSWORD
+        if (isPassword) {
+            setupPasswordMode()
+        } else {
+            setupTextMode(inputType)
+        }
+    }
+
+    private fun setMinLines(inputType: Type, minLines: Int) {
+        if (inputType == INPUT_TYPE_FORM_MODE) {
+            binding.internalEditText.minLines = 3
+        } else {
+            binding.internalEditText.minLines = minLines
+        }
+    }
+
+    private fun setFocusListener() {
+        binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                if (isPassword) {
+                    showPassword()
+                }
+                binding.internalEditText.showKeyboard()
+            } else {
+                if (isPassword) {
+                    hidePassword()
+                }
+            }
         }
     }
 
@@ -282,7 +300,11 @@ class DaxTextInput @JvmOverloads constructor(
     private fun setupTextMode(inputType: Type) {
         binding.internalPasswordIcon.visibility = View.GONE
 
-        if (inputType == INPUT_TYPE_MULTI_LINE) {
+        if (inputType == INPUT_TYPE_SINGLE_LINE) {
+            binding.internalEditText.ellipsize = TruncateAt.END
+        }
+
+        if (inputType == INPUT_TYPE_MULTI_LINE || inputType == INPUT_TYPE_FORM_MODE) {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
         } else {
             binding.internalEditText.inputType = EditorInfo.TYPE_CLASS_TEXT
@@ -342,7 +364,7 @@ class DaxTextInput @JvmOverloads constructor(
         INPUT_TYPE_MULTI_LINE(0),
         INPUT_TYPE_SINGLE_LINE(1),
         INPUT_TYPE_PASSWORD(2),
-        INPUT_TYPE_CLICKABLE(3),
+        INPUT_TYPE_FORM_MODE(3),
     }
 
     companion object {
