@@ -61,7 +61,7 @@ class BrokenSiteSubmitter @Inject constructor(
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val params = mapOf(
-                CATEGORY_KEY to brokenSite.category,
+                CATEGORY_KEY to brokenSite.category.orEmpty(),
                 DESCRIPTION_KEY to brokenSite.description.orEmpty(),
                 SITE_URL_KEY to absoluteUrl,
                 UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),

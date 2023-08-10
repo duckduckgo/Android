@@ -20,7 +20,7 @@ import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
 
 data class BrokenSite(
-    val category: String,
+    val category: String?,
     val description: String?,
     val siteUrl: String,
     val upgradeHttps: Boolean,
