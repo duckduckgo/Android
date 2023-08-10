@@ -31,7 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class UserWhitelistDaoTest {
+class UserAllowListDaoTest {
 
     @get:Rule
     @Suppress("unused")
@@ -42,14 +42,14 @@ class UserWhitelistDaoTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
-    private lateinit var dao: UserWhitelistDao
+    private lateinit var dao: UserAllowListDao
 
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        dao = db.userWhitelistDao()
+        dao = db.userAllowListDao()
     }
 
     @After

@@ -23,7 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -55,7 +55,7 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
     }
 
-    private val userWhitelistDao = mock<UserWhitelistDao>()
+    private val userAllowListDao = mock<UserAllowListDao>()
 
     private val contentBlocking = mock<ContentBlocking>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
@@ -63,7 +63,7 @@ class PrivacyDashboardHybridViewModelTest {
     private val pixel = mock<Pixel>()
 
     val testee = PrivacyDashboardHybridViewModel(
-        userWhitelistDao = userWhitelistDao,
+        userAllowListDao = userAllowListDao,
         pixel = pixel,
         dispatcher = coroutineRule.testDispatcherProvider,
         siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
@@ -113,7 +113,7 @@ class PrivacyDashboardHybridViewModelTest {
         testee.onSiteChanged(site)
         testee.onPrivacyProtectionsClicked(enabled = false)
 
-        verify(userWhitelistDao).insert(site.domain!!)
+        verify(userAllowListDao).insert(site.domain!!)
     }
 
     private fun site(

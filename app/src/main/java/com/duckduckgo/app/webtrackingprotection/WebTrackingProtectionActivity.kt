@@ -33,7 +33,7 @@ import com.duckduckgo.app.browser.databinding.ActivityWebTrackingProtectionBindi
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
-import com.duckduckgo.app.privacy.ui.WhitelistActivity
+import com.duckduckgo.app.privacy.ui.AllowListActivity
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
@@ -72,7 +72,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.globalPrivacyControlSetting.setClickListener { viewModel.onGlobalPrivacyControlClicked() }
-        binding.whitelist.setClickListener { viewModel.onManageWhitelistSelected() }
+        binding.allowlist.setClickListener { viewModel.onManageAllowListSelected() }
     }
 
     private fun configureClickableLink() {
@@ -123,7 +123,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
         when (it) {
             is Command.LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it.url)
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
-            is Command.LaunchWhitelist -> launchWhitelist()
+            is Command.LaunchAllowList -> launchAllowList()
         }
     }
 
@@ -137,9 +137,9 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
         )
     }
 
-    private fun launchWhitelist() {
+    private fun launchAllowList() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(WhitelistActivity.intent(this), options)
+        startActivity(AllowListActivity.intent(this), options)
     }
 
     private fun launchGlobalPrivacyControl() {

@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
-    private val userWhitelistDao: UserWhitelistDao,
+    private val userAllowListDao: UserAllowListDao,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : UserAllowListRepository {
@@ -64,6 +64,6 @@ class RealUserAllowListRepository @Inject constructor(
     }
 
     private fun all(): Flow<List<String>> {
-        return userWhitelistDao.allDomainsFlow()
+        return userAllowListDao.allDomainsFlow()
     }
 }

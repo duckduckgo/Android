@@ -4063,8 +4063,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.manageWhitelist` appears to be unused"
-        errorLine1="    &lt;string name=&quot;manageWhitelist&quot;>Unprotected Sites&lt;/string>"
+        message="The resource `R.string.manageAllowlist` appears to be unused"
+        errorLine1="    &lt;string name=&quot;manageAllowlist&quot;>Unprotected Sites&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -4096,8 +4096,8 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.string.whitelistEntryOverflowContentDescription` appears to be unused"
-        errorLine1="    &lt;string name=&quot;whitelistEntryOverflowContentDescription&quot; instruction=&quot;Placeholder is a website&quot;>More options for unprotected site %1$s&lt;/string>"
+        message="The resource `R.string.allowlistEntryOverflowContentDescription` appears to be unused"
+        errorLine1="    &lt;string name=&quot;allowlistEntryOverflowContentDescription&quot; instruction=&quot;Placeholder is a website&quot;>More options for unprotected site %1$s&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
@@ -4338,11 +4338,11 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.menu.whitelist_individual_overflow_menu` appears to be unused"
+        message="The resource `R.menu.allowlist_individual_overflow_menu` appears to be unused"
         errorLine1="&lt;menu xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
         errorLine2="^">
         <location
-            file="src/main/res/menu/whitelist_individual_overflow_menu.xml"
+            file="src/main/res/menu/allowlist_individual_overflow_menu.xml"
             line="19"
             column="1"/>
     </issue>

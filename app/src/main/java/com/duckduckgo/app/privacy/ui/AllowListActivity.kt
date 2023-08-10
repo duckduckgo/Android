@@ -24,13 +24,13 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
-import com.duckduckgo.app.browser.databinding.DialogEditWhitelistBinding
+import com.duckduckgo.app.browser.databinding.ActivityAllowlistBinding
+import com.duckduckgo.app.browser.databinding.DialogEditAllowlistBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
-import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
+import com.duckduckgo.app.privacy.ui.AllowListViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
@@ -39,14 +39,14 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-class WhitelistActivity : DuckDuckGoActivity() {
+class AllowListActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
 
     private lateinit var adapter: WebsitesAdapter
-    private val binding: ActivityWhitelistBinding by viewBinding()
-    private val viewModel: WhitelistViewModel by bindViewModel()
+    private val binding: ActivityAllowlistBinding by viewBinding()
+    private val viewModel: AllowListViewModel by bindViewModel()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -63,7 +63,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.whitelist_activity_menu, menu)
+        menuInflater.inflate(R.menu.allowlist_activity_menu, menu)
         return true
     }
 
@@ -89,24 +89,24 @@ class WhitelistActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderViewState(viewState: WhitelistViewModel.ViewState) {
-        adapter.entries = viewState.whitelist
-        if (viewState.showWhitelist) {
+    private fun renderViewState(viewState: AllowListViewModel.ViewState) {
+        adapter.entries = viewState.allowList
+        if (viewState.showAllowList) {
             invalidateOptionsMenu()
         }
     }
 
-    private fun processCommand(command: WhitelistViewModel.Command) {
+    private fun processCommand(command: AllowListViewModel.Command) {
         when (command) {
             is ShowAdd -> showAddDialog()
             is ShowEdit -> showEditDialog(command.entry)
             is ConfirmDelete -> showDeleteDialog(command.entry)
-            is ShowWhitelistFormatError -> showWhitelistFormatError()
+            is ShowAllowListFormatError -> showAllowListFormatError()
         }
     }
 
     private fun showAddDialog() {
-        val inputBinding = DialogEditWhitelistBinding.inflate(layoutInflater)
+        val inputBinding = DialogEditAllowlistBinding.inflate(layoutInflater)
         CustomAlertDialogBuilder(this)
             .setTitle(R.string.dialogAddTitle)
             .setPositiveButton(R.string.dialogSave)
@@ -116,15 +116,15 @@ class WhitelistActivity : DuckDuckGoActivity() {
                 object : CustomAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         val newText = inputBinding.customDialogTextInput.text
-                        viewModel.onEntryAdded(UserWhitelistedDomain(newText))
+                        viewModel.onEntryAdded(UserAllowListedDomain(newText))
                     }
                 },
             )
             .show()
     }
 
-    private fun showEditDialog(entry: UserWhitelistedDomain) {
-        val inputBinding = DialogEditWhitelistBinding.inflate(layoutInflater)
+    private fun showEditDialog(entry: UserAllowListedDomain) {
+        val inputBinding = DialogEditAllowlistBinding.inflate(layoutInflater)
         inputBinding.customDialogTextInput.text = entry.domain
         CustomAlertDialogBuilder(this)
             .setTitle(R.string.dialogEditTitle)
@@ -135,17 +135,17 @@ class WhitelistActivity : DuckDuckGoActivity() {
                 object : CustomAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         val newText = inputBinding.customDialogTextInput.text
-                        viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
+                        viewModel.onEntryEdited(entry, UserAllowListedDomain(newText))
                     }
                 },
             )
             .show()
     }
 
-    private fun showDeleteDialog(entry: UserWhitelistedDomain) {
+    private fun showDeleteDialog(entry: UserAllowListedDomain) {
         TextAlertDialogBuilder(this)
             .setTitle(R.string.dialogConfirmTitle)
-            .setMessage(getString(R.string.whitelistEntryDeleteConfirmMessage, entry.domain).html(this))
+            .setMessage(getString(R.string.allowlistEntryDeleteConfirmMessage, entry.domain).html(this))
             .setPositiveButton(android.R.string.yes)
             .setNegativeButton(android.R.string.no)
             .addEventListener(
@@ -158,13 +158,13 @@ class WhitelistActivity : DuckDuckGoActivity() {
             .show()
     }
 
-    private fun showWhitelistFormatError() {
-        Toast.makeText(this, R.string.whitelistFormatError, Toast.LENGTH_LONG).show()
+    private fun showAllowListFormatError() {
+        Toast.makeText(this, R.string.allowlistFormatError, Toast.LENGTH_LONG).show()
     }
 
     companion object {
         fun intent(context: Context): Intent {
-            return Intent(context, WhitelistActivity::class.java)
+            return Intent(context, AllowListActivity::class.java)
         }
     }
 }

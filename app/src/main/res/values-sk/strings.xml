@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Pri použití zmien sa aplikácia môže zavrieť. Po nadšení zo svojej novej peknej ikony sa vráťte späť.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Nezabezpečené webové stránky</string>
+    <string name="manageAllowlist">Nezabezpečené webové stránky</string>
     <string name="reportBrokenSite">Nahlásiť nefunkčný web</string>
 
     <!-- Dialogs -->
@@ -523,19 +523,19 @@
     <string name="dialogEditTitle">Upraviť</string>
     <string name="dialogSaveAction">Uložiť</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Nezabezpečené webové stránky</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Nezabezpečené webové stránky</string>
     <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
     <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Viac možností pre nezabezpečené webové stránky %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt; z nezabezpečených webových stránok?</string>
-    <string name="whitelistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
-    <string name="whitelistNoEntries">Ochrana súkromia je zapnutá pre všetky webové stránky</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Zadajte doménu, napríklad <b>example.com</b>, a skúste to znova</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Viac možností pre nezabezpečené webové stránky %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt; z nezabezpečených webových stránok?</string>
+    <string name="allowlistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
+    <string name="allowlistNoEntries">Ochrana súkromia je zapnutá pre všetky webové stránky</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Zadajte doménu, napríklad <b>example.com</b>, a skúste to znova</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Nezabezpečené webové stránky</string>
+    <string name="settingsPrivacyProtectionAllowlist">Nezabezpečené webové stránky</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zabezpečené stránky</string>

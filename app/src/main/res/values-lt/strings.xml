@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Programėlė gali būti uždaryta, kad būtų pritaikyti pakeitimai. Grįžkite pasigrožėję savo gražia nauja piktograma.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Neapsaugotos svetainės</string>
+    <string name="manageAllowlist">Neapsaugotos svetainės</string>
     <string name="reportBrokenSite">Pranešti apie sugadintą svetainę</string>
 
     <!-- Dialogs -->
@@ -523,19 +523,19 @@
     <string name="dialogEditTitle">Redaguoti</string>
     <string name="dialogSaveAction">Išsaugoti</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
-    <string name="whitelistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
-    <string name="whitelistNoEntries">Privatumo apsauga įjungta visose svetainėse</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Įveskite domeną, pavyzdžiui, <b>example.com</b>, ir bandykite dar kartą</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
+    <string name="allowlistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
+    <string name="allowlistNoEntries">Privatumo apsauga įjungta visose svetainėse</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Įveskite domeną, pavyzdžiui, <b>example.com</b>, ir bandykite dar kartą</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Neapsaugotos svetainės</string>
+    <string name="settingsPrivacyProtectionAllowlist">Neapsaugotos svetainės</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Apsaugoti svetaines</string>

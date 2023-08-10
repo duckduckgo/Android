@@ -35,7 +35,7 @@ import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
@@ -93,7 +93,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val resourceSurrogates = ResourceSurrogatesImpl()
 
     private var webView: WebView = mock()
-    private val mockUserWhitelistDao: UserWhitelistDao = mock()
+    private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
@@ -212,7 +212,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         trackerDetector =
             TrackerDetectorImpl(
                 entityLookup,
-                mockUserWhitelistDao,
+                mockUserAllowListDao,
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,

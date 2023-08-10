@@ -35,7 +35,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName.*
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -109,7 +109,7 @@ class CtaViewModelTest {
     private lateinit var mockOnboardingStore: OnboardingStore
 
     @Mock
-    private lateinit var mockUserWhitelistDao: UserWhitelistDao
+    private lateinit var mockUserAllowListDao: UserAllowListDao
 
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
@@ -144,7 +144,7 @@ class CtaViewModelTest {
             .build()
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
+        whenever(mockUserAllowListDao.contains(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
 
@@ -154,7 +154,7 @@ class CtaViewModelTest {
             surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
-            userWhitelistDao = mockUserWhitelistDao,
+            userAllowListDao = mockUserAllowListDao,
             settingsDataStore = mockSettingsDataStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
@@ -339,7 +339,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndPrivacyOffForSiteThenReturnNull() = runTest {
         givenDaxOnboardingActive()
-        whenever(mockUserWhitelistDao.contains(any())).thenReturn(true)
+        whenever(mockUserAllowListDao.contains(any())).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)

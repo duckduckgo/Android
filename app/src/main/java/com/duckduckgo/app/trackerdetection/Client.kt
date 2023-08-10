@@ -20,7 +20,7 @@ interface Client {
 
     enum class ClientType {
         BLOCKING,
-        WHITELIST,
+        ALLOWLIST,
     }
 
     enum class ClientName(val type: ClientType) {
@@ -30,7 +30,7 @@ interface Client {
         // legacy clients
         EASYLIST(ClientType.BLOCKING),
         EASYPRIVACY(ClientType.BLOCKING),
-        TRACKERSWHITELIST(ClientType.WHITELIST),
+        TRACKERSALLOWLIST(ClientType.ALLOWLIST),
     }
 
     data class Result(

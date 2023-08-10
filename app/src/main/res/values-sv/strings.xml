@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Appen kanske måste stängas för att tillämpa ändringar. Kom tillbaka när du har tillämpat din nya ikon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Oskyddade webbplatser</string>
+    <string name="manageAllowlist">Oskyddade webbplatser</string>
     <string name="reportBrokenSite">Rapportera skadad webbplats</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Redigera</string>
     <string name="dialogSaveAction">Spara</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Oskyddade webbplatser</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Fler alternativ för den oskyddade webbplatsen %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt; från de oskyddade webbplatserna?</string>
-    <string name="whitelistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
-    <string name="whitelistNoEntries">Integritetsskydd aktiverat för alla webbplatser</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Ange en domän som <b>example.com</b> och försök igen</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Fler alternativ för den oskyddade webbplatsen %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt; från de oskyddade webbplatserna?</string>
+    <string name="allowlistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
+    <string name="allowlistNoEntries">Integritetsskydd aktiverat för alla webbplatser</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Ange en domän som <b>example.com</b> och försök igen</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Oskyddade webbplatser</string>
+    <string name="settingsPrivacyProtectionAllowlist">Oskyddade webbplatser</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>

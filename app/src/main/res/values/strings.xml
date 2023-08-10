@@ -512,7 +512,7 @@
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Unprotected Sites</string>
+    <string name="manageAllowlist">Unprotected Sites</string>
     <string name="reportBrokenSite">Report Broken Site</string>
 
     <!-- Dialogs -->
@@ -520,19 +520,19 @@
     <string name="dialogEditTitle">Edit</string>
     <string name="dialogSaveAction">Save</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Unprotected Sites</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Are you sure you want to remove &lt;b>%1$s&lt;/b> from Unprotected Sites?</string>
-    <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection.</string>
-    <string name="whitelistNoEntries">Privacy Protection enabled for all sites</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Please enter a domain like <b>example.com</b> and try again</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Are you sure you want to remove &lt;b>%1$s&lt;/b> from Unprotected Sites?</string>
+    <string name="allowlistExplanation">These sites will not be enhanced by Privacy Protection.</string>
+    <string name="allowlistNoEntries">Privacy Protection enabled for all sites</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Please enter a domain like <b>example.com</b> and try again</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
+    <string name="settingsPrivacyProtectionAllowlist">Unprotected Sites</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
