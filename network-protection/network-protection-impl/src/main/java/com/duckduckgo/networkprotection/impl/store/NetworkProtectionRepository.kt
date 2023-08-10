@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.store
+package com.duckduckgo.networkprotection.impl.store
 
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ClientInterface
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ClientInterface
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
+import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 
 interface NetworkProtectionRepository {
     var reconnectStatus: ReconnectStatus
@@ -49,9 +55,17 @@ interface NetworkProtectionRepository {
     )
 }
 
-class RealNetworkProtectionRepository constructor(
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = NetworkProtectionRepository::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
+)
+class RealNetworkProtectionRepository @Inject constructor(
     private val networkProtectionPrefs: NetworkProtectionPrefs,
-) : NetworkProtectionRepository {
+) : NetworkProtectionRepository, NetPFeatureRemover.NetPStoreRemovalPlugin {
 
     override var privateKey: String?
         get() = networkProtectionPrefs.getString(KEY_WG_PRIVATE_KEY, null)
@@ -110,6 +124,10 @@ class RealNetworkProtectionRepository constructor(
         set(value) {
             networkProtectionPrefs.setStringSet(KEY_WG_CLIENT_IFACE_TUNNEL_IP, value?.tunnelCidrSet ?: emptySet())
         }
+
+    override fun clearStore() {
+        networkProtectionPrefs.clear()
+    }
 
     override var reconnectStatus: ReconnectStatus
         get() = when (networkProtectionPrefs.getInt(KEY_WG_RECONNECT_STATUS, 0)) {

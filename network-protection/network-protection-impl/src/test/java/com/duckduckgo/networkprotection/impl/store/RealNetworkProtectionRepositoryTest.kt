@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.store
+package com.duckduckgo.networkprotection.impl.store
 
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
+import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -158,5 +159,12 @@ class RealNetworkProtectionRepositoryTest {
             ),
             testee.serverDetails,
         )
+    }
+
+    @Test
+    fun whenClearStoreThenClearStore() {
+        networkProtectionPrefs.clear()
+
+        verify(networkProtectionPrefs).clear()
     }
 }

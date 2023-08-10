@@ -1,7 +1,9 @@
 package com.duckduckgo.networkprotection.impl.waitlist
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
@@ -11,18 +13,23 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
+import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.impl.waitlist.store.FakeNetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NetworkProtectionWaitlistTest {
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private val appBuildConfig: AppBuildConfig = mock()
 
@@ -35,8 +42,20 @@ class NetworkProtectionWaitlistTest {
     fun setup() {
         netPWaitlistRepository = FakeNetPWaitlistRepository()
         netPRemoteFeature = FakeNetPRemoteFeatureFactory.create()
+        val netPRemoteFeatureWrapper = NetPRemoteFeatureWrapper(
+            netPRemoteFeature,
+            mock<NetPFeatureRemover>(),
+            appBuildConfig,
+            coroutinesTestRule.testScope,
+        )
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
 
-        networkProtectionWaitlist = NetworkProtectionWaitlistImpl(netPRemoteFeature, appBuildConfig, netPWaitlistRepository, networkProtectionState)
+        networkProtectionWaitlist = NetworkProtectionWaitlistImpl(
+            netPRemoteFeatureWrapper,
+            appBuildConfig,
+            netPWaitlistRepository,
+            networkProtectionState,
+        )
     }
 
     @Test
@@ -137,6 +156,16 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenNotTreatedAndWaitlistBetaFinishedAndAuthTokenExistsThenReturnNotUnlocked() {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        netPWaitlistRepository.setAuthenticationToken("token")
+
+        assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
+    }
+
+    @Test
     fun whenGetScreenForStateAndNotTreatedThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
@@ -145,9 +174,28 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenGetScreenForStateAndWaitlistBetaFinishedAndNotTreatedThenReturnWaitlistScreen() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
     fun whenGetScreenForStateNotTreatedAndInternalThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
+    fun whenGetScreenForStateNotTreatedAndWaitlistBetaFinishedAndInternalThenReturnWaitlistScreen() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
 
         assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
@@ -163,6 +211,16 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenGetScreenForStateSubFeatureDisabledAndWaitlistBetaFinishedAndInternalThenReturnWaitlistScreen() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
     fun whenGetScreenForStateFeatureDisabledAndInternalThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
@@ -172,9 +230,28 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenGetScreenForStateFeatureDisabledandWaitlistBetaFinishedAndInternalThenReturnWaitlistScreen() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
     fun whenGetScreenForStateAndTreatedThenReturnWaitlistScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
+    fun whenGetScreenForStateAndWaitlistBetaFinishedAndTreatedThenReturnWaitlistScreen() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
 
         assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
     }
@@ -191,6 +268,18 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenGetScreenForStateWithAuthTokenAndWaitlistBetaFinishedAndTreatedAndTermsNotAcceptedAndOnboardedThenReturnInviteCodeScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        netPWaitlistRepository.setAuthenticationToken("token")
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
     fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsNotAcceptedAndNotOnboardedThenReturnInviteCodeScreen() = runTest {
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
 
@@ -199,6 +288,18 @@ class NetworkProtectionWaitlistTest {
         netPWaitlistRepository.setAuthenticationToken("token")
 
         assertEquals(NetPWaitlistInvitedScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
+    fun whenGetScreenForStateWithAuthTokenAndWaitlistBetaFinishedAndTreatedAndTermsNotAcceptedAndNotOnboardedThenReturnInviteCodeScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        netPWaitlistRepository.setAuthenticationToken("token")
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
     }
 
     @Test
@@ -214,6 +315,19 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenGetScreenForStateWithAuthTokenAndWaitlistBetaFinishedAndTreatedAndTermsAcceptedAndOnboardedThenReturnNetPManagementScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        netPWaitlistRepository.setAuthenticationToken("token")
+        netPWaitlistRepository.acceptWaitlistTerms()
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
     fun whenGetScreenForStateWithAuthTokenAndTreatedAndTermsAcceptedAndNotOnboardedThenReturnNetPManagementScreen() = runTest {
         whenever(networkProtectionState.isOnboarded()).thenReturn(false)
 
@@ -226,9 +340,32 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenGetScreenForStateWithAuthTokenAndWaitlistBetaFinishedAndTreatedAndTermsAcceptedAndNotOnboardedThenReturnNetPManagementScreen() = runTest {
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
+        netPWaitlistRepository.setAuthenticationToken("token")
+        netPWaitlistRepository.acceptWaitlistTerms()
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
     fun whenGetScreenForStateWithWaitlistTokenThenReturnInviteCodeScreen() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPWaitlistRepository.setWaitlistToken("token")
+
+        assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())
+    }
+
+    @Test
+    fun whenGetScreenForStateWithWaitlistTokenAndWaitlistBetaFinishedThenReturnInviteCodeScreen() = runTest {
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
         netPWaitlistRepository.setWaitlistToken("token")
 
         assertEquals(NetPWaitlistScreenNoParams, networkProtectionWaitlist.getScreenForCurrentState())

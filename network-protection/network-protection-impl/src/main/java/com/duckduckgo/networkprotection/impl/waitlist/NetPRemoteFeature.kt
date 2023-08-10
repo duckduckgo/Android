@@ -33,4 +33,10 @@ interface NetPRemoteFeature {
      */
     @Toggle.DefaultValue(false)
     fun waitlist(): Toggle
+
+    /**
+     *
+     */
+    @Toggle.DefaultValue(true)
+    fun waitlistBetaActive(): Toggle
 }
