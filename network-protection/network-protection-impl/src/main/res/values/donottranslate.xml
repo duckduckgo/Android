@@ -31,7 +31,8 @@
     <string name="netpManagementConnectionDetailsIp">IP Address</string>
 
     <!-- NetP enabled notification -->
-    <string name="netpEnabledNotificationTitle">"Network Protection is enabled and routing traffic through the VPN."</string>
+    <string name="netpEnabledNotificationInitialTitle">Network Protection is enabled and routing traffic through the VPN.</string>
+    <string name="netpEnabledNotificationTitle" instruction="Placeholder is location of server with format City,Country">Network Protection is enabled and routing device traffic through &lt;b>%1$s&lt;/b>.</string>
 
     <!-- Reconnect -->
     <string name="netpMessageReconnecting">Network Protection interrupted. Attempting to reconnect now…</string>
@@ -208,4 +209,9 @@
     <string name="netpTermQuestionTwelve">If you need support</string>
     <string name="netpTermAnswerTwelve">• If you reach out to us for support by submitting a bug report or through email and agree to be contacted to troubleshoot the issue, we’ll contact you using the information you provide.\n\n• We will permanently delete all personal information you provided to us (email, contact information), 30 days after closing a support case.</string>
 
+    <!-- Notifications -->
+    <string name="netpNotificationCTAEnableNetp">Enable Network Protection</string>
+    <string name="netpNotificationCTAReportIssue">Having problems with an app?</string>
+    <string name="netpNotificationDisabled">Network Protection is disabled. Tap to continue securing your device traffic.</string>
+    <string name="netpNotificationDisabledByVpn">A VPN app on your device disabled Network Protection. Tap to re-enable.</string>
 </resources>

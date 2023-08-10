@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.alerts
+package com.duckduckgo.networkprotection.impl.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -25,72 +25,70 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_DESCRIPTION
+import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_ID
+import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_NAME
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface NetPAlertNotiticationBuilder {
-    fun buildReconnectingNotification(context: Context): Notification
-    fun buildReconnectedNotification(context: Context): Notification
-    fun buildReconnectionFailedNotification(context: Context): Notification
+interface NetPDisabledNotificationBuilder {
+    fun buildDisabledNotification(context: Context): Notification
+    fun buildDisabledByVpnNotification(context: Context): Notification
 }
 
-@ContributesBinding(AppScope::class)
-class RealNetPAlertNotiticationBuilder @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
-) : NetPAlertNotiticationBuilder {
+@ContributesBinding(VpnScope::class)
+class RealNetPDisabledNotificationBuilder @Inject constructor(
+    private val netPNotificationActions: NetPNotificationActions,
+) : NetPDisabledNotificationBuilder {
 
-    @Suppress("NewApi") // we use appBuildConfig
     private fun registerChannel(context: Context) {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = NotificationManagerCompat.from(context)
             if (notificationManager.getNotificationChannel(NETP_ALERTS_CHANNEL_ID) == null) {
-                val channel = NotificationChannel(NETP_ALERTS_CHANNEL_ID, NETP_ALERTS_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+                val channel = NotificationChannel(
+                    NETP_ALERTS_CHANNEL_ID,
+                    NETP_ALERTS_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                )
                 channel.description = NETP_ALERTS_CHANNEL_DESCRIPTION
                 notificationManager.createNotificationChannel(channel)
-                notificationManager.isNotificationPolicyAccessGranted
             }
         }
     }
 
-    override fun buildReconnectingNotification(context: Context): Notification {
+    override fun buildDisabledNotification(context: Context): Notification {
         registerChannel(context)
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
-            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_reconnecting))
+            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))
+            .addAction(netPNotificationActions.getReportIssueNotificationAction(context))
+            .setAutoCancel(false)
             .build()
     }
 
-    override fun buildReconnectedNotification(context: Context): Notification {
-        registerChannel(context)
-        return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
-            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setContentIntent(getPendingIntent(context))
-            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_reconnect_success))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .build()
-    }
-
-    override fun buildReconnectionFailedNotification(context: Context): Notification {
+    override fun buildDisabledByVpnNotification(context: Context): Notification {
         registerChannel(context)
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
-            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_reconnect_failed))
+            .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_netp_disabled_by_vpn))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .addAction(netPNotificationActions.getEnableNetpNotificationAction(context))
+            .addAction(netPNotificationActions.getReportIssueNotificationAction(context))
+            .setAutoCancel(false)
             .build()
     }
 
@@ -102,11 +100,5 @@ class RealNetPAlertNotiticationBuilder @Inject constructor(
             ),
         )
         getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    }
-
-    companion object {
-        const val NETP_ALERTS_CHANNEL_ID = "com.duckduckgo.networkprotection.impl.alerts"
-        const val NETP_ALERTS_CHANNEL_NAME = "Network Protection Alerts"
-        const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from Network Protection"
     }
 }

@@ -42,4 +42,10 @@ interface NetworkProtectionState {
      * This method will restart the App Tracking Protection feature by disabling it and re-enabling back again
      */
     fun restart()
+
+    /**
+     * This method returns the current server location Network Protection is routing device's data through.
+     * @return Returns the server location if available, otherwise null.
+     */
+    fun serverLocation(): String?
 }

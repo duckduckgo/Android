@@ -26,7 +26,6 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -46,7 +45,7 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppTpEnabledNotificationContentPluginTest {
+class AppTPAndNetPEnabledNotificationContentPluginTest {
 
     @get:Rule
     @Suppress("unused")
@@ -64,7 +63,7 @@ class AppTpEnabledNotificationContentPluginTest {
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
     private val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
-    private lateinit var plugin: AppTpEnabledNotificationContentPlugin
+    private lateinit var plugin: AppTPAndNetPEnabledNotificationContentPlugin
 
     @Before
     fun setup() {
@@ -74,7 +73,7 @@ class AppTpEnabledNotificationContentPluginTest {
             .build()
         appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
-        plugin = AppTpEnabledNotificationContentPlugin(
+        plugin = AppTPAndNetPEnabledNotificationContentPlugin(
             InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
             resources,
             appTrackerBlockingStatsRepository,
@@ -89,13 +88,27 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getInitialContentThenReturnsCorrectNotificationContent() = runTest {
+    fun getInitialContentNoServerLocationThenReturnsCorrectNotificationContent() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.serverLocation()).thenReturn(null)
 
         val content = plugin.getInitialContent()
 
-        content!!.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
+        content!!.assertTitleEquals("Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).")
+        content.assertMessageEquals("")
+        assertNull(content.notificationAction)
+    }
+
+    @Test
+    fun getInitialContentWithServerLocationThenReturnsCorrectNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
+
+        val content = plugin.getInitialContent()
+
+        content!!.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
         content.assertMessageEquals("")
         assertNull(content.notificationAction)
     }
@@ -103,32 +116,27 @@ class AppTpEnabledNotificationContentPluginTest {
     @Test
     fun getInitialContentAppTpNotEnabledThenReturnsCorrectNotificationContent() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+
+        assertNull(plugin.getInitialContent())
+    }
+
+    @Test
+    fun getInitialContentNetPNotEnabledThenReturnsCorrectNotificationContent() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
         assertNull(plugin.getInitialContent())
     }
 
     @Test
     fun getUpdateContentThenReturnsCorrectInitialUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
 
         plugin.getUpdatedContent().test {
             val item = awaitItem()
 
-            item.assertTitleEquals("Scanning for tracking activity… beep… boop")
-            item.assertMessageEquals("")
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun getUpdateContentAppTpNotEnabledThenReturnsCorrectInitialUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
-
-        plugin.getUpdatedContent().test {
-            val item = awaitItem()
-
-            item.assertTitleEquals("")
+            item.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
             item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
@@ -137,8 +145,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentOneCompanyThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(aTrackerAndCompany())
@@ -148,26 +155,7 @@ class AppTpEnabledNotificationContentPluginTest {
             skipItems(1)
             val item = awaitItem()
 
-            item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun getUpdateContentOneCompanyAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
-
-        plugin.getUpdatedContent().test {
-            val trackers = listOf(aTrackerAndCompany())
-            appTrackerBlockingStatsRepository.insert(trackers)
-            db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
-
-            skipItems(1)
-            val item = awaitItem()
-
-            item.assertTitleEquals("")
+            item.assertTitleEquals("Device traffic routing through Stockholm, SE. Tracking attempts blocked in 1 app (past hour).")
             item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
@@ -176,8 +164,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentMultipleDifferentAppsThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(
@@ -193,7 +180,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
+            item.assertTitleEquals("Device traffic routing through Stockholm, SE. Tracking attempts blocked across 2 apps (past hour).")
             item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
@@ -201,8 +188,8 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getUpdateContentMultipleDifferentAppsAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+    fun getUpdateContentMultipleDifferentAppsNoLocationThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        whenever(networkProtectionState.serverLocation()).thenReturn(null)
 
         plugin.getUpdatedContent().test {
             val trackers = listOf(
@@ -216,10 +203,9 @@ class AppTpEnabledNotificationContentPluginTest {
             appTrackerBlockingStatsRepository.insert(trackers)
             db.vpnAppTrackerBlockingDao().insertTrackerEntities(trackers.map { it.asEntity() })
 
-            skipItems(1)
-            val item = awaitItem()
+            val item = expectMostRecentItem()
 
-            item.assertTitleEquals("")
+            item.assertTitleEquals("Device traffic routing through the VPN. Tracking attempts blocked across 2 apps (past hour).")
             item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
@@ -228,15 +214,30 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentTrackersWithoutEntityThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
 
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("Scanning for tracking activity… beep… boop")
+            item.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
+            item.assertMessageEquals("")
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun getUpdateContentTrackersWithoutEntityNoLocationThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        whenever(networkProtectionState.serverLocation()).thenReturn(null)
+
+        plugin.getUpdatedContent().test {
+            appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
+
+            val item = expectMostRecentItem()
+
+            item.assertTitleEquals("Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).")
             item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
@@ -245,8 +246,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
     @Test
     fun getUpdateContentMultipleSameThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.serverLocation()).thenReturn("Stockholm, SE")
 
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
@@ -256,7 +256,7 @@ class AppTpEnabledNotificationContentPluginTest {
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
+            item.assertTitleEquals("Device traffic routing through Stockholm, SE. Tracking attempts blocked in 1 app (past hour).")
             item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
@@ -264,14 +264,18 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun getUpdateContentMultipleSameAppTpNotEnabledThenReturnsCorrectUpdatedNotificationContent() = runTest {
-        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
+    fun getUpdateContentMultipleSameNoLocationThenReturnsCorrectUpdatedNotificationContent() = runTest {
+        whenever(networkProtectionState.serverLocation()).thenReturn(null)
+
         plugin.getUpdatedContent().test {
             appTrackerBlockingStatsRepository.insert(listOf(aTrackerAndCompany(), aTrackerAndCompany()))
+            db.vpnAppTrackerBlockingDao().insertTrackerEntities(
+                listOf(aTrackerAndCompany().asEntity()),
+            )
 
             val item = expectMostRecentItem()
 
-            item.assertTitleEquals("")
+            item.assertTitleEquals("Device traffic routing through the VPN. Tracking attempts blocked in 1 app (past hour).")
             item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
@@ -279,14 +283,14 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun isActiveWhenAppTpEnabledThenReturnsTrue() = runTest {
+    fun isActiveWhenAppTpAndNetPEnabledThenReturnsTrue() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         assertTrue(plugin.isActive())
     }
 
     @Test
-    fun isActiveWhenAppTpNotEnabledThenReturnsFalse() = runTest {
+    fun isActiveWhenAppTpAndNetPNotEnabledThenReturnsFalse() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(false)
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
@@ -294,8 +298,16 @@ class AppTpEnabledNotificationContentPluginTest {
     }
 
     @Test
-    fun isActiveWhenAppTpAndNetPEnabledThenReturnsFalse() = runTest {
+    fun isActiveWhenAppTpOnlyEnabledThenReturnsFalse() = runTest {
         whenever(appTrackingProtection.isEnabled()).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
+        assertFalse(plugin.isActive())
+    }
+
+    @Test
+    fun isActiveWhenNetPOnlyEnabledThenReturnsFalse() = runTest {
+        whenever(appTrackingProtection.isEnabled()).thenReturn(false)
         whenever(networkProtectionState.isEnabled()).thenReturn(true)
 
         assertFalse(plugin.isActive())
@@ -328,12 +340,4 @@ class AppTpEnabledNotificationContentPluginTest {
             signals = emptyList(),
         )
     }
-}
-
-internal fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTitleEquals(expected: String) {
-    assertEquals(expected, this.title.toString())
-}
-
-internal fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertMessageEquals(expected: String) {
-    assertEquals(expected, this.message.toString())
 }

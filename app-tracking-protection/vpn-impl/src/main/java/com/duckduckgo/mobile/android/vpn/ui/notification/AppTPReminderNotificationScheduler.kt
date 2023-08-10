@@ -25,10 +25,10 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
@@ -41,63 +41,104 @@ import com.duckduckgo.mobile.android.vpn.service.notification.getHighestPriority
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
-class DeviceShieldReminderNotificationScheduler @Inject constructor(
+class AppTPReminderNotificationScheduler @Inject constructor(
     private val context: Context,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val vpnReminderNotificationBuilder: VpnReminderNotificationBuilder,
     private val vpnReminderNotificationContentPluginPoint: PluginPoint<VpnReminderNotificationContentPlugin>,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : VpnServiceCallbacks {
+    private var isAppTPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        scheduleUndesiredStopReminderAlarm()
-        cancelReminderForTomorrow()
-        hideReminderNotification()
-        enableReminderReceiver()
+        coroutineScope.launch {
+            isAppTPEnabled.set(appTrackingProtection.isEnabled())
+            if (isAppTPEnabled.get()) {
+                // These are all relevant for when AppTP has been enabled.
+                scheduleUndesiredStopReminderAlarm()
+                cancelReminderForTomorrow()
+                hideReminderNotification()
+            }
+            enableReminderReceiver()
+        }
     }
 
     override fun onVpnStopped(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        when (vpnStopReason) {
-            VpnStopReason.RESTART -> {} // no-op
-            VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
-            VpnStopReason.REVOKED -> onVPNRevoked()
-            else -> onVPNUndesiredStop()
+        coroutineScope.launch {
+            when (vpnStopReason) {
+                VpnStopReason.RESTART -> {} // no-op
+                VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
+                VpnStopReason.REVOKED -> onVPNRevoked()
+                else -> onVPNUndesiredStop()
+            }
         }
     }
 
-    private fun onVPNManuallyStopped() {
-        appCoroutineScope.launch(dispatchers.io()) {
-            if (vpnFeatureRemover.isFeatureRemoved()) {
-                logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
-            } else {
-                withContext(dispatchers.main()) {
-                    logcat { "VPN Manually stopped, showing disabled notification" }
-                    showImmediateReminderNotification()
-                    cancelUndesiredStopReminderAlarm()
-                    scheduleReminderForTomorrow()
+    private suspend fun onVPNManuallyStopped() {
+        if (vpnFeatureRemover.isFeatureRemoved()) {
+            logcat { "VPN Manually stopped because user disabled the feature, nothing to do" }
+        } else {
+            handleNotifForDisabledAppTP()
+        }
+    }
+
+    private suspend fun shouldShowImmediateNotification(): Boolean {
+        // When VPN is stopped and if AppTP has been prior enabled AND user has been onboarded, then we show the disabled notif
+        return isAppTPEnabled.get() && appTrackingProtection.isOnboarded()
+    }
+
+    override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
+        coroutineScope.launch(dispatchers.io()) {
+            val reconfiguredAppTPState = appTrackingProtection.isEnabled()
+            if (isAppTPEnabled.get() != reconfiguredAppTPState) {
+                if (!reconfiguredAppTPState) {
+                    // AppTP changed state to disabled
+                    logcat { "VPN has been reconfigured, showing disabled notification for AppTP" }
+                    handleNotifForDisabledAppTP()
+                } else {
+                    // AppTP changed state to enabled
+                    scheduleUndesiredStopReminderAlarm()
+                    cancelReminderForTomorrow()
+                    hideReminderNotification()
+                    isAppTPEnabled.set(true)
                 }
             }
         }
     }
 
-    private fun onVPNRevoked() {
-        logcat { "VPN Revoked, showing revoke notification" }
-        showImmediateRevokedNotification()
-        cancelUndesiredStopReminderAlarm()
-        scheduleReminderForTomorrow()
+    private suspend fun handleNotifForDisabledAppTP() {
+        if (shouldShowImmediateNotification()) {
+            logcat { "VPN Manually stopped, showing disabled notification for AppTP" }
+            showImmediateReminderNotification()
+            cancelUndesiredStopReminderAlarm()
+            scheduleReminderForTomorrow()
+            isAppTPEnabled.set(false)
+        }
+    }
+
+    private suspend fun onVPNRevoked() {
+        if (shouldShowImmediateNotification()) {
+            // These only need to be executed when AppTP has been enabled when vpn was revoked
+            // else either AppTP was never enabled OR AppTP was disabled before hence already schedule reminders
+            logcat { "VPN has been revoked, showing revoked notification for AppTP" }
+            showImmediateRevokedNotification()
+            cancelUndesiredStopReminderAlarm()
+            scheduleReminderForTomorrow()
+            isAppTPEnabled.set(false)
+        }
     }
 
     private fun onVPNUndesiredStop() {
