@@ -64,5 +64,4 @@ class ComponentTextInputFragment : Fragment() {
             Snackbar.make(binding.root, "Element clicked", Snackbar.LENGTH_SHORT).show()
         }
     }
-
 }
