@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Multiple tabs can be opened"
+tags:
+    - releaseTest
 ---
 - launchApp:
       clearState: true

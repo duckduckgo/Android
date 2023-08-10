@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Fire button is working"
+tags:
+    - releaseTest
 ---
 - launchApp:
     clearState: true

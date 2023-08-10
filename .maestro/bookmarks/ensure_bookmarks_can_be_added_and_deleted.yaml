@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Bookmarks can be added and deleted"
+tags:
+    - releaseTest
 ---
 - launchApp:
     clearState: true
@@ -18,35 +21,29 @@ appId: com.duckduckgo.mobile.android
     text: ".*keep browsing.*"
 - tapOn:
     text: "got it"
-# Add favorite from menu button
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
-    text: "add favorite"
+    text: "add bookmark"
 - tapOn:
-    text: "add favorite"
-# Remove favorite from menu button
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "remove favorite"
-- tapOn:
-    text: "remove favorite"
-# Re-add favorite from menu button
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- assertVisible:
-    text: "add favorite"
-- tapOn:
-    text: "add favorite"
-# Check favorites from bookmarks screen
+    text: "add bookmark"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-- assertNotVisible:
-    text: "No bookmarks added yet"
+- assertVisible:
+    text: "No favorites added yet"
 - assertVisible:
     text: "Privacy Test Pages - Home"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+- assertVisible:
+    text: "Delete"
+- tapOn:
+    text: "delete"
+- assertNotVisible:
+    text: "Privacy Test Pages - Home"
+- assertVisible:
+    text: "No bookmarks added yet"

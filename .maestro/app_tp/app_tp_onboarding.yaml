@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: AppTP onboarding"
+tags:
+    - releaseTest
 ---
 - launchApp:
       clearState: true

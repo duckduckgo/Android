@@ -1,6 +1,0 @@
-appId: com.duckduckgo.mobile.android
-name: Ensure autofill is available
----
-- launchApp:
-      clearState: true
-- runFlow: ../autofill/smoke.yaml

@@ -1,4 +1,7 @@
 appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Can add and remove favorites"
+tags:
+    - releaseTest
 ---
 - launchApp:
     clearState: true
@@ -25,25 +28,28 @@ appId: com.duckduckgo.mobile.android
     text: "add favorite"
 - tapOn:
     text: "add favorite"
-# Navigate to bookmarks screen
+# Remove favorite from menu button
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "remove favorite"
+- tapOn:
+    text: "remove favorite"
+# Re-add favorite from menu button
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+    text: "add favorite"
+- tapOn:
+    text: "add favorite"
+# Check favorites from bookmarks screen
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
 - assertVisible:
     text: "bookmarks"
 - tapOn:
     text: "bookmarks"
-# Remove favorite from bookmarks screen
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/trailingIcon"
-    index: 0
-- assertVisible:
-    text: "Delete"
-- tapOn:
-    text: "delete"
-# When a favorite is removed, it still stays as Bookmark
-- assertVisible:
-    text: "No favorites added yet"
 - assertNotVisible:
     text: "No bookmarks added yet"
-# Undo Snackbar should be visible
-- assertVisible: "Undo"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
