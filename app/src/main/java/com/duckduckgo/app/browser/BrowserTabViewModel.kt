@@ -134,6 +134,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
+import dagger.Lazy
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -167,7 +168,7 @@ class BrowserTabViewModel @Inject constructor(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val remoteMessagingModel: RemoteMessagingModel,
+    private val remoteMessagingModel: Lazy<RemoteMessagingModel>,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
@@ -668,25 +669,29 @@ class BrowserTabViewModel @Inject constructor(
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
-        remoteMessagingModel.activeMessages
-            .combine(ctaChangedTicker.asStateFlow(), ::Pair)
-            .onEach { (activeMessage, ticker) ->
-                Timber.v("RMF: $ticker-$activeMessage")
+        viewModelScope.launch(dispatchers.io()) {
+            remoteMessagingModel.get().activeMessages
+                .combine(ctaChangedTicker.asStateFlow(), ::Pair)
+                .onEach { (activeMessage, ticker) ->
+                    Timber.v("RMF: $ticker-$activeMessage")
 
-                if (ticker.isEmpty()) return@onEach
-                if (currentBrowserViewState().browserShowing) return@onEach
+                    if (ticker.isEmpty()) return@onEach
+                    if (currentBrowserViewState().browserShowing) return@onEach
 
-                val cta = currentCtaViewState().cta?.takeUnless { it ->
-                    activeMessage != null && it is HomePanelCta
+                    val cta = currentCtaViewState().cta?.takeUnless { it ->
+                        activeMessage != null && it is HomePanelCta
+                    }
+
+                    withContext(dispatchers.main()) {
+                        ctaViewState.value = currentCtaViewState().copy(
+                            cta = cta,
+                            message = if (cta == null) activeMessage else null,
+                        )
+                    }
                 }
-
-                withContext(dispatchers.main()) {
-                    ctaViewState.value = currentCtaViewState().copy(
-                        cta = cta,
-                        message = if (cta == null) activeMessage else null,
-                    )
-                }
-            }.launchIn(viewModelScope)
+                .flowOn(dispatchers.io())
+                .launchIn(viewModelScope)
+        }
     }
 
     fun loadData(
@@ -2441,14 +2446,14 @@ class BrowserTabViewModel @Inject constructor(
     fun onMessageShown() {
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
-            remoteMessagingModel.onMessageShown(message)
+            remoteMessagingModel.get().onMessageShown(message)
         }
     }
 
     fun onMessageCloseButtonClicked() {
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
-            remoteMessagingModel.onMessageDismissed(message)
+            remoteMessagingModel.get().onMessageDismissed(message)
             refreshCta()
         }
     }
@@ -2456,7 +2461,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onMessagePrimaryButtonClicked() {
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
-            val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
         }
@@ -2465,7 +2470,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onMessageSecondaryButtonClicked() {
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
-            val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
         }
@@ -2474,7 +2479,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onMessageActionButtonClicked() {
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
-            val action = remoteMessagingModel.onActionClicked(message) ?: return@launch
+            val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
         }
