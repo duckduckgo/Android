@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl.handlers
 
+import android.os.Trace
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -37,6 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
+import kotlin.random.Random
 
 @ContributesMultibinding(AppScope::class)
 class InitMessageHandlerPlugin @Inject constructor(
@@ -50,6 +52,8 @@ class InitMessageHandlerPlugin @Inject constructor(
     private lateinit var rules: String
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("INIT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT", traceCookie)
         if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {
@@ -87,6 +91,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                 }
             }
         }
+        Trace.endAsyncSection("INIT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     override val supportedTypes: List<String> = listOf("init")

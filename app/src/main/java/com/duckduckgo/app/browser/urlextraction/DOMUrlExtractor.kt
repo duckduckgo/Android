@@ -19,8 +19,10 @@ package com.duckduckgo.app.browser.urlextraction
 import android.content.Context
 import android.webkit.WebView
 import androidx.annotation.UiThread
+import androidx.tracing.Trace
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionJavascriptInterface.Companion.URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME
+import kotlin.random.Random
 
 interface DOMUrlExtractor {
     fun addUrlExtraction(webView: WebView, onUrlExtracted: (extractedUrl: String?) -> Unit)
@@ -36,7 +38,10 @@ class JsUrlExtractor : DOMUrlExtractor {
 
     @UiThread
     override fun injectUrlExtractionJS(webView: WebView) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("DOM_URL_EXTRACTOR_EVALUATE_JAVASCRIPT", traceCookie)
         webView.evaluateJavascript("javascript:${javaScriptDetector.getUrlExtractionJS(webView.context)}", null)
+        Trace.endAsyncSection("DOM_URL_EXTRACTOR_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     private class JavaScriptDetector {

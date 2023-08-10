@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.dashboard.impl.ui
 
+import android.os.Trace
 import android.webkit.WebView
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.EntityViewState
@@ -26,6 +27,7 @@ import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.ViewState
 import com.squareup.moshi.Moshi
 import timber.log.Timber
+import kotlin.random.Random
 
 class PrivacyDashboardRenderer(
     private val webView: WebView,
@@ -61,6 +63,8 @@ class PrivacyDashboardRenderer(
     }
 
     fun render(viewState: ViewState) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("PRIVACY_DASHBOARD_RENDER_EVALUATE_JAVASCRIPT", traceCookie)
         Timber.i("PrivacyDashboard viewState $viewState")
         val siteViewStateAdapter = moshi.adapter(SiteViewState::class.java)
         val siteViewStateJson = siteViewStateAdapter.toJson(viewState.siteViewState)
@@ -101,5 +105,6 @@ class PrivacyDashboardRenderer(
         webView.evaluateJavascript("javascript:onChangeRequestData(\"${viewState.siteViewState.url}\", $requestDataJson);", null)
 
         lastSeenPrivacyDashboardViewState = viewState
+        Trace.endAsyncSection("PRIVACY_DASHBOARD_RENDER_EVALUATE_JAVASCRIPT", traceCookie)
     }
 }

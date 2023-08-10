@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl.handlers
 
+import android.os.Trace
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
@@ -30,6 +31,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.random.Random
 
 @ContributesMultibinding(AppScope::class)
 class EvalMessageHandlerPlugin @Inject constructor(
@@ -40,6 +42,8 @@ class EvalMessageHandlerPlugin @Inject constructor(
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("EVAL_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT", traceCookie)
         if (supportedTypes.contains(messageType)) {
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 try {
@@ -55,6 +59,7 @@ class EvalMessageHandlerPlugin @Inject constructor(
                 }
             }
         }
+        Trace.endAsyncSection("EVAL_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     private fun script(code: String): String {

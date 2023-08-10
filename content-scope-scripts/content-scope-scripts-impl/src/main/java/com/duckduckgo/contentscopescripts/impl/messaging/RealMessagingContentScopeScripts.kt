@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
+import android.os.Trace
 import android.webkit.WebView
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
@@ -26,6 +27,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.*
 import javax.inject.Inject
+import kotlin.random.Random
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -47,9 +49,12 @@ class RealMessagingContentScopeScripts @Inject constructor(
     }
 
     override fun injectContentScopeScripts(webView: WebView) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("REAL_MESSAGING_CSS_INJECT_CSS_EVALUATE_JAVASCRIPT", traceCookie)
         if (coreContentScopeScripts.isEnabled()) {
             webView.evaluateJavascript("javascript:${getScript()}", null)
         }
+        Trace.endAsyncSection("REAL_MESSAGING_CSS_INJECT_CSS_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     override fun addJsInterface(webView: WebView) {
@@ -60,7 +65,10 @@ class RealMessagingContentScopeScripts @Inject constructor(
     }
 
     override fun sendMessage(message: String, webView: WebView) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("REAL_MESSAGING_CSS_SEND_MESSAGE_EVALUATE_JAVASCRIPT", traceCookie)
         webView.evaluateJavascript(ReplyHandler.constructReply(message, messageCallback, messageSecret), null)
+        Trace.endAsyncSection("REAL_MESSAGING_CSS_SEND_MESSAGE_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     companion object {

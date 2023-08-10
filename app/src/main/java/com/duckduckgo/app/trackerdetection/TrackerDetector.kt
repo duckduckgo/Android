@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection
 
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
+import androidx.tracing.Trace
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListDao
@@ -35,6 +36,7 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import timber.log.Timber
+import kotlin.random.Random
 
 interface TrackerDetector {
     fun addClient(client: Client)
@@ -73,8 +75,11 @@ class TrackerDetectorImpl @Inject constructor(
         checkFirstParty: Boolean,
         requestHeaders: Map<String, String>,
     ): TrackingEvent? {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("TRACKER_DETECTOR_EVALUATE", traceCookie)
         if (checkFirstParty && firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
+            Trace.endAsyncSection("TRACKER_DETECTOR_EVALUATE", traceCookie)
             return null
         }
 
@@ -109,7 +114,9 @@ class TrackerDetectorImpl @Inject constructor(
 
         Timber.v("$documentUrl resource $url WAS identified as a tracker and status=$status")
 
-        return TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type)
+        val trackingEventResult = TrackingEvent(documentUrl, url, result.categories, entity, result.surrogate, status, type)
+        Trace.endAsyncSection("TRACKER_DETECTOR_EVALUATE", traceCookie)
+        return trackingEventResult
     }
 
     private fun firstParty(

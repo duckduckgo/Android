@@ -20,6 +20,7 @@ import android.content.Context
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.annotation.UiThread
+import androidx.tracing.Trace
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
@@ -27,6 +28,7 @@ import com.duckduckgo.app.global.getValidUrl
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import javax.inject.Inject
 import timber.log.Timber
+import kotlin.random.Random
 
 interface DOMLoginDetector {
     fun addLoginDetection(
@@ -54,7 +56,7 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
         webView: WebView,
         onLoginDetected: () -> Unit,
     ) {
-        webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
+       webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
     }
 
     @UiThread
@@ -85,12 +87,18 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
 
     @UiThread
     private fun scanForPasswordFields(webView: WebView) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVALUATE_JAVASCRIPT", traceCookie)
         webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
+        Trace.endAsyncSection("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     @UiThread
     private fun injectLoginFormDetectionJS(webView: WebView) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVENTS_EVALUATE_JAVASCRIPT", traceCookie)
         webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormEventsDetector(webView.context)}", null)
+        Trace.endAsyncSection("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVENTS_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     private class JavaScriptDetector {

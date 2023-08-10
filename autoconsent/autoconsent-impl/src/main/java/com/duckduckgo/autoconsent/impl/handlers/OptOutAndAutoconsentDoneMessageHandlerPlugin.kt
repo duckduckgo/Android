@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl.handlers
 
+import android.os.Trace
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -31,6 +32,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.random.Random
 
 @ContributesMultibinding(AppScope::class)
 class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
@@ -68,6 +70,8 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
     }
 
     private fun processAutoconsentDone(jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("OPT_OUT_AUTOCONSENT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT", traceCookie)
         try {
             val message: AutoconsentDoneMessage = parseAutoconsentDoneMessage(jsonString) ?: return
             message.url.toUri().host ?: return
@@ -84,6 +88,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPlugin @Inject constructor(
         } catch (e: Exception) {
             Timber.d(e.localizedMessage)
         }
+        Trace.endAsyncSection("OPT_OUT_AUTOCONSENT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     private fun parseOptOutMessage(jsonString: String): OptOutResultMessage? {

@@ -15,6 +15,7 @@
  */
 package com.duckduckgo.autofill.impl.configuration
 
+import android.os.Trace
 import android.webkit.WebView
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -29,6 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.random.Random
 
 @ContributesBinding(AppScope::class)
 class InlineBrowserAutofillConfigurator @Inject constructor(
@@ -42,6 +44,8 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
         webView: WebView,
         url: String?,
     ) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("INLINE_BROWSER_AUTOFILL_EVALUATE_JAVASCRIPT", traceCookie)
         coroutineScope.launch(dispatchers.io()) {
             if (canJsBeInjected(url)) {
                 Timber.v("Injecting autofill JS into WebView for %s", url)
@@ -56,6 +60,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
                 Timber.v("Won't inject autofill JS into WebView for: %s", url)
             }
         }
+        Trace.endAsyncSection("INLINE_BROWSER_AUTOFILL_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     private suspend fun canJsBeInjected(url: String?): Boolean {

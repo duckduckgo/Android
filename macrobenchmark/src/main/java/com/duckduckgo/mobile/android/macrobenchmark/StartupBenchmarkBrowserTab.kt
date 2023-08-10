@@ -17,10 +17,12 @@
 package com.duckduckgo.mobile.android.macrobenchmark
 
 import android.os.Build
+import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
+import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.By
@@ -60,8 +62,10 @@ class StartupBenchmarkBrowserTab {
             val selector = UiSelector()
                 .className("android.widget.EditText")
                 .instance(0)
-
+            // [ANA] TEMP: Tested the below 3 websites in individual benchmark runs.
             device.findObject(selector).text = "https://www.duckduckgo.com"
+//            device.findObject(selector).text = "https://www.wikipedia.org"
+//            device.findObject(selector).text = "https://www.bbc.com"
             device.pressEnter()
 
             device.waitForIdle(TIMEOUT_MS)
@@ -92,13 +96,43 @@ class StartupBenchmarkBrowserTab {
         device.wait(Until.hasObject(By.text("Next,")), TIMEOUT_MS)
     }
 
+    @OptIn(ExperimentalMetricApi::class)
     private fun startupBenchmark(
         startupMode: StartupMode = StartupMode.WARM,
         setupBlock: MacrobenchmarkScope.() -> Unit,
         measureBlock: MacrobenchmarkScope.() -> Unit = { startActivityAndWait() },
     ) = benchmarkRule.measureRepeated(
         packageName = TARGET_PACKAGE_NAME,
-        metrics = listOf(StartupTimingMetric(), FrameTimingMetric()),
+        metrics = listOf(
+            StartupTimingMetric(),
+            FrameTimingMetric(),
+            TraceSectionMetric("LOAD_PAGE_START_TO_FINISH"),
+            TraceSectionMetric("LOAD_PAGE_ON_PAGE_STARTED"),
+            TraceSectionMetric("LOAD_PAGE_ON_PAGE_FINISHED"),
+            TraceSectionMetric("LOAD_PAGE_SHOULD_OVERRIDE_URL_LOADING"),
+            TraceSectionMetric("LOAD_PAGE_SHOULD_INTERCEPT_REQUEST"),
+            TraceSectionMetric("LOAD_PAGE_ON_RENDER_PROCESS_GONE"),
+            TraceSectionMetric("LOAD_PAGE_ON_RENDER_PROCESS_GONE"),
+            TraceSectionMetric("LOAD_PAGE_ON_RECEIVED_SSL_ERROR"),
+            TraceSectionMetric("LOAD_PAGE_ON_RECEIVED_SSL_ERROR"),
+            TraceSectionMetric("TRACKER_DETECTOR_EVALUATE"),
+            TraceSectionMetric("CLOAKED_CNAME_DETECTOR_DETECT"),
+            TraceSectionMetric("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVENTS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("BLOB_CONVERTER_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("DOM_URL_EXTRACTOR_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("EMAIL_INJECTOR_INJECT_ADDRESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("EMAIL_INJECTOR_NOTIFY_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("AUTOCONSENT_INJECT_AUTOCONSENT_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("AUTOCONSENT_OPT_OUT_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("EVAL_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("INIT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("OPT_OUT_AUTOCONSENT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("INLINE_BROWSER_AUTOFILL_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("REAL_MESSAGING_CSS_INJECT_CSS_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("REAL_MESSAGING_CSS_SEND_MESSAGE_EVALUATE_JAVASCRIPT"),
+            TraceSectionMetric("PRIVACY_DASHBOARD_RENDER_EVALUATE_JAVASCRIPT"),
+        ),
         iterations = ITERATIONS,
         startupMode = startupMode,
         setupBlock = setupBlock,

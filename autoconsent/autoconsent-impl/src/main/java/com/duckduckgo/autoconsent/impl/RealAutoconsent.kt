@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autoconsent.impl
 
+import android.os.Trace
 import android.webkit.WebView
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.plugins.PluginPoint
@@ -32,6 +33,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlin.random.Random
 
 @ContributesBinding(AppScope::class)
 class RealAutoconsent @Inject constructor(
@@ -46,9 +48,12 @@ class RealAutoconsent @Inject constructor(
     private lateinit var autoconsentJs: String
 
     override fun injectAutoconsent(webView: WebView, url: String) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("AUTOCONSENT_INJECT_AUTOCONSENT_EVALUATE_JAVASCRIPT", traceCookie)
         if (canBeInjected() && !urlInUserAllowList(url) && !isAnException(url)) {
             webView.evaluateJavascript("javascript:${getFunctionsJS()}", null)
         }
+        Trace.endAsyncSection("AUTOCONSENT_INJECT_AUTOCONSENT_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     override fun addJsInterface(webView: WebView, autoconsentCallback: AutoconsentCallback) {
@@ -67,8 +72,11 @@ class RealAutoconsent @Inject constructor(
     }
 
     override fun setAutoconsentOptOut(webView: WebView) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("AUTOCONSENT_OPT_OUT_EVALUATE_JAVASCRIPT", traceCookie)
         settingsRepository.userSetting = true
         webView.evaluateJavascript("javascript:${ReplyHandler.constructReply("""{ "type": "optOut" }""")}", null)
+        Trace.endAsyncSection("AUTOCONSENT_OPT_OUT_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     override fun setAutoconsentOptIn() {

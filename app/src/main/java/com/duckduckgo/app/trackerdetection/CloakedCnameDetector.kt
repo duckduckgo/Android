@@ -17,6 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import android.net.Uri
+import androidx.tracing.Trace
 import com.duckduckgo.app.global.UrlScheme
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
@@ -26,6 +27,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import timber.log.Timber
+import kotlin.random.Random
 
 interface CloakedCnameDetector {
     fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String?
@@ -40,9 +42,14 @@ class CloakedCnameDetectorImpl @Inject constructor(
 ) : CloakedCnameDetector {
 
     override fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String? {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("CLOAKED_CNAME_DETECTOR_DETECT", traceCookie)
         if (documentUrl != null && trackerAllowlist.isAnException(documentUrl, url.toString()) ||
             userAllowListRepository.isUriInUserAllowList(url)
-        ) { return null }
+        ) {
+            Trace.endAsyncSection("CLOAKED_CNAME_DETECTOR_DETECT", traceCookie)
+            return null
+        }
 
         url.host?.let { host ->
             tdsCnameEntityDao.get(host)?.let { cnameEntity ->
@@ -56,9 +63,11 @@ class CloakedCnameDetectorImpl @Inject constructor(
                 } else {
                     "${UrlScheme.http}://$uncloakedHostName"
                 }
+                Trace.endAsyncSection("CLOAKED_CNAME_DETECTOR_DETECT", traceCookie)
                 return uncloakedHostName
             }
         }
+        Trace.endAsyncSection("CLOAKED_CNAME_DETECTOR_DETECT", traceCookie)
         return null
     }
 }

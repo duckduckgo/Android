@@ -19,8 +19,10 @@ package com.duckduckgo.app.browser.downloader
 import android.content.Context
 import android.webkit.WebView
 import androidx.annotation.UiThread
+import androidx.tracing.Trace
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.BlobConverterJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+import kotlin.random.Random
 
 interface BlobConverterInjector {
     fun addJsInterface(
@@ -51,7 +53,10 @@ class BlobConverterInjectorJs : BlobConverterInjector {
         blobUrl: String,
         contentType: String?,
     ) {
+        val traceCookie = Random(System.currentTimeMillis()).nextInt()
+        Trace.beginAsyncSection("BLOB_CONVERTER_EVALUATE_JAVASCRIPT", traceCookie)
         webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context, blobUrl, contentType)}", null)
+        Trace.endAsyncSection("BLOB_CONVERTER_EVALUATE_JAVASCRIPT", traceCookie)
     }
 
     private class JavaScriptInjector {
