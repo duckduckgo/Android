@@ -10,6 +10,10 @@ appId: com.duckduckgo.mobile.android.debug
 - tapOn: "Turn On Sync"
 - tapOn: "Not Now"
 - tapOn: "Not Now"
+- scrollUntilVisible:
+    element:
+      id: "com.duckduckgo.mobile.android.debug:id/item_container"
+    direction: DOWN
 - tapOn:
     id: "com.duckduckgo.mobile.android.debug:id/item_container"
     index: 2
@@ -21,6 +25,10 @@ appId: com.duckduckgo.mobile.android.debug
 - tapOn:
     id: "com.duckduckgo.mobile.android.debug:id/trailingSwitch"
 - tapOn: "Recover Your Synced Data"
+- scrollUntilVisible:
+    element:
+      id: "com.duckduckgo.mobile.android.debug:id/item_container"
+    direction: DOWN
 - tapOn:
     id: "com.duckduckgo.mobile.android.debug:id/item_container"
 - tapOn: "Paste Code"
