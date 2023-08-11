@@ -15,8 +15,4 @@
   -->
 
 <resources>
-    <string name="autofill_email_protection_choose_email_dialog_title">Select email address</string>
-    <string name="autofillTooltipUseYourAliasDescription">Block email trackers</string>
-    <string name="autofillTooltipGenerateAddress" instruction="'Duck Address' is the feature name, and should not be translated.">Generate Private Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription" instruction="'hide address' refers to using an alias so your real email address is not used">Block email trackers &amp; hide address</string>
 </resources>
