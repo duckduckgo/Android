@@ -111,5 +111,10 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Zapnite ochranu e-mailu</annotation> na správu Duck adries v tomto zariadení.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">Vyberte e-mailovú adresu</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokuje e-mailové sledovače</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generovať súkromnú adresu Duck</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokujte sledovače e-mailov a skryte adresu</string>
+
 
 </resources>
