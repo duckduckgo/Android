@@ -25,6 +25,9 @@ appId: com.duckduckgo.mobile.android.debug
 - tapOn:
     id: "com.duckduckgo.mobile.android.debug:id/trailingSwitch"
 - tapOn: "Recover Your Synced Data"
+- tapOn:
+    text: "While using the app"
+    optional: true
 - scrollUntilVisible:
     element:
       id: "com.duckduckgo.mobile.android.debug:id/item_container"
