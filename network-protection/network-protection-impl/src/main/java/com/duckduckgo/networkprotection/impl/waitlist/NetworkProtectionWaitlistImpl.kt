@@ -29,6 +29,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -44,9 +45,12 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : NetworkProtectionWaitlist {
     override fun getState(): NetPWaitlistState {
         if (isTreated()) {
+            networkProtectionPixels.waitlistBetaIsEnabled()
+
             return if (didJoinBeta()) {
                 InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
             } else if (didJoinWaitlist()) {
