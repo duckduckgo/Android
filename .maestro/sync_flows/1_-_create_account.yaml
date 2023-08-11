@@ -1,0 +1,14 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: ../shared/open_sync_screen.yaml
+- tapOn:
+      id: "com.duckduckgo.mobile.android.debug:id/trailingSwitch"
+- tapOn: "Turn On Sync"
+- tapOn: "Not Now"
+- tapOn: "Not Now"
+- assertVisible:
+      id: "com.duckduckgo.mobile.android.debug:id/qrCodeImageView"
