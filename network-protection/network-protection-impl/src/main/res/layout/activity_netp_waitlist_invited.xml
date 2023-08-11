@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:text="@string/netpWaitlistTitle"
+                android:text="@string/netpWaitlistRedeemedCodeStatus"
                 android:textAlignment="center"
             />
 

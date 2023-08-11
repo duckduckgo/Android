@@ -70,37 +70,6 @@
                 android:textAlignment="center"
             />
 
-            <LinearLayout
-                    android:id="@+id/waitlistDescriptionItems"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:paddingTop="@dimen/keyline_2"
-            >
-                <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:leadingIcon="@drawable/ic_join_24"
-                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_1"
-                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_1"/>
-
-                <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:leadingIcon="@drawable/ic_timer_24"
-                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_2"
-                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_2"/>
-
-                <com.duckduckgo.networkprotection.impl.waitlist.WaitlistCheckListItem
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:leadingIcon="@drawable/ic_gift_24"
-                        app:primaryText="@string/netpWaitlistDescriptionItemTitle_3"
-                        app:secondaryText="@string/netpWaitlistDescriptionItemByline_3"/>
-
-            </LinearLayout>
-
             <FrameLayout
                     android:id="@+id/waitlistNotifyMeContainer"
                     android:layout_width="match_parent"

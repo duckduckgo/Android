@@ -66,8 +66,7 @@
     <string name="netpNotificationByline">Open your invite.</string>
     <string name="netpWaitlistActivityLabel">Network Protection Beta</string>
     <string name="netpBetaFeature">Network Protection Beta</string>
-    <string name="netpBetaFeatureByline">Secure your network connection and keep your online activity private with Network Protection, a VPN from DuckDuckGo.</string>
-    <string name="netpWaitlistTitle">You\'re invited to test a beta feature!</string>
+    <string name="netpBetaFeatureByline">Secure your network connection anytime, anywhere with Network Protection, the VPN from DuckDuckGo.\n\nJoin the waitlist, and we\'ll notify you when it\'s your turn.</string>
     <string name="netpJoinWaitlist">Join the Waitlist</string>
     <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
     <string name="netpEnterCode">I Have an Invite Code</string>
@@ -78,7 +77,7 @@
     <string name="netpWaitlistOnTheListNotificationEnabled">We\'ll send you a notification when Network Protection is ready for you.</string>
     <string name="netpWaitlistOnTheListNotificationDisabled">Your invite to try Network Protection will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
     <string name="netpWaitlistNotifyMeTitle">Know the instant you\'re invited</string>
-    <string name="netpWaitlistNotifyMeByline">Get a notification when your copy of DuckDuckGo for Windows is ready for download.</string>
+    <string name="netpWaitlistNotifyMeByline">Get a notification when you\'re invited to Network Protection.</string>
 
     <string name="netpWaitlistRedeemCodeActivityLabel">Enter Your Invite Code</string>
     <string name="netpWaitlistRedeemCodeTitle">Almost there…</string>
@@ -93,7 +92,7 @@
     <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first served basis.\n\nWe\'ll notify you when your invite is ready.</string>
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
-    <string name="netpWaitlistInBetaDescription">Network Protection is a VPN. Enable to secure your network connection and keep your online activity private.</string>
+    <string name="netpWaitlistInBetaDescription">Get an extra layer of protection online with the VPN built for speed and simplicity. Encrypt your internet connection across your entire device and hide your location and IP address from sites you visit.</string>
 
     <string name="netpWaitlistDescriptionItemTitle_1">Join the waitlist</string>
     <string name="netpWaitlistDescriptionItemByline_1">Beta access is limited for now.</string>
@@ -102,12 +101,12 @@
     <string name="netpWaitlistDescriptionItemTitle_3">Get your invite</string>
     <string name="netpWaitlistDescriptionItemByline_3">We can notify you when its your turn.</string>
 
-    <string name="netpWaitlistInvitedDescriptionItemTitle_1">Secure all traffic to and from your device</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_1">We use the WireGuard protocol to encrypt online traffic across your browsers and apps.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_1">Full-device coverage</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_1">Encrypt online traffic across your browsers and apps.</string>
     <string name="netpWaitlistInvitedDescriptionItemTitle_2">Fast, reliable, and easy to use</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_2">Connect with one click to route your browsing and app activity through the nearest VPN server.</string>
-    <string name="netpWaitlistInvitedDescriptionItemTitle_3">A VPN you can trust</string>
-    <string name="netpWaitlistInvitedDescriptionItemByline_3">Unlike some VPNs, we do not log or save any data that can connect you to your online activity.</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_2">No need for a separate app. Connect in one click and see your connection status at a glance.</string>
+    <string name="netpWaitlistInvitedDescriptionItemTitle_3">Strict no-logging policy</string>
+    <string name="netpWaitlistInvitedDescriptionItemByline_3">We do not log or save any data that can connect you to your online activity.</string>
 
     <!--Breakage reporting -->
     <string name="netpReportBreakageCategoryCrashes">App freezes or crashes</string>
