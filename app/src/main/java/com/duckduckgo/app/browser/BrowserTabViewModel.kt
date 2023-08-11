@@ -283,6 +283,7 @@ class BrowserTabViewModel @Inject constructor(
         val isEditing: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
         val showVoiceSearch: Boolean = false,
+        val forceExpand: Boolean = true,
     )
 
     data class LoadingViewState(
@@ -940,6 +941,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = trimmedInput,
             shouldMoveCaretToEnd = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
+            forceExpand = true,
         )
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value =
@@ -1140,6 +1142,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = "",
             shouldMoveCaretToEnd = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
+            forceExpand = true,
         )
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
 
@@ -1219,6 +1222,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = omnibarText,
             shouldMoveCaretToEnd = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
+            forceExpand = true,
         )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
@@ -1396,6 +1400,7 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = omnibarText,
                 shouldMoveCaretToEnd = false,
                 showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
+                forceExpand = false,
             ),
         )
         browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite()))
@@ -1809,6 +1814,7 @@ class BrowserTabViewModel @Inject constructor(
                 isEditing = hasFocus,
                 urlLoaded = url ?: "",
             ),
+            forceExpand = true,
         )
 
         val currentBrowserViewState = currentBrowserViewState()
@@ -2602,6 +2608,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = request.site,
                 showVoiceSearch = false,
+                forceExpand = true,
             )
             command.value = HideWebContent
         }

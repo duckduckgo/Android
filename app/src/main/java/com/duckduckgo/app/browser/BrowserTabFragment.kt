@@ -3034,7 +3034,9 @@ class BrowserTabFragment :
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibar.omnibarTextInput.setText(viewState.omnibarText)
-                    omnibar.appBarLayout.setExpanded(true, true)
+                    if (viewState.forceExpand) {
+                        omnibar.appBarLayout.setExpanded(true, true)
+                    }
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
