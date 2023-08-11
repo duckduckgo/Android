@@ -30,11 +30,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROKEN_SITE_REPORTED("m_bsr"),
     BROKEN_SITE_REPORT("epbf"),
 
-    ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
-    ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
-    ONBOARDING_DEFAULT_BROWSER_SKIPPED("m_odb_s"),
-    ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE("m_odb_jo"),
-
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
