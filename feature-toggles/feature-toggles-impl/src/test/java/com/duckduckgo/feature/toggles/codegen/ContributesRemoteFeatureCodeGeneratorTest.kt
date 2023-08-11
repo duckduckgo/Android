@@ -109,6 +109,34 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `when sub-feature is present remotely but missing locally continue without error`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "missingFeature": {
+                            "state": "enabled"
+                        },
+                        "fooFeature": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
     fun `fresh install and later update returns correct feature values`() {
         val feature = generatedFeatureNewInstance()
 
