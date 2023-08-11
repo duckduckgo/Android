@@ -70,11 +70,20 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
+    fun whenInBetaAndTermsAcceptedThenInBetaTermsAccepted() {
+        netPWaitlistRepository.setAuthenticationToken("fakeToken")
+        netPWaitlistRepository.acceptWaitlistTerms()
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        assertEquals(InBeta(true), networkProtectionWaitlist.getState())
+    }
+
+    @Test
     fun whenAuthTokenSetStateIsInBeta() {
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -83,7 +92,7 @@ class NetworkProtectionWaitlistTest {
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
 
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -101,7 +110,7 @@ class NetworkProtectionWaitlistTest {
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
 
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -116,7 +125,7 @@ class NetworkProtectionWaitlistTest {
     @Test
     fun whenFeatureAndSubFeatureNotTreatedAndAuthTokenSetStateInBeta() {
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -124,7 +133,7 @@ class NetworkProtectionWaitlistTest {
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
 
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -133,10 +142,10 @@ class NetworkProtectionWaitlistTest {
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
 
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
 
         netPWaitlistRepository.setWaitlistToken("fakeToken")
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -152,7 +161,7 @@ class NetworkProtectionWaitlistTest {
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
         netPWaitlistRepository.setAuthenticationToken("token")
 
-        assertEquals(InBeta, networkProtectionWaitlist.getState())
+        assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
 
     @Test

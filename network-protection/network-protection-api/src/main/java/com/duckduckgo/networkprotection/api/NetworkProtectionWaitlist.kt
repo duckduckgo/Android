@@ -37,6 +37,6 @@ interface NetworkProtectionWaitlist {
         object NotUnlocked : NetPWaitlistState()
         object JoinedWaitlist : NetPWaitlistState()
         object PendingInviteCode : NetPWaitlistState()
-        object InBeta : NetPWaitlistState()
+        data class InBeta(val termsAccepted: Boolean) : NetPWaitlistState()
     }
 }

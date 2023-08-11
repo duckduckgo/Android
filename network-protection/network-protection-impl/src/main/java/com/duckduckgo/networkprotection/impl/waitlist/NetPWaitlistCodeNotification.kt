@@ -53,7 +53,7 @@ open class NetPWaitlistCodeNotification @Inject constructor(
     override val id: String = "com.duckduckgo.netp.waitlist"
 
     override suspend fun canShow(): Boolean {
-        return netPWaitlistManager.getStateSync() == InBeta && !networkProtectionState.isOnboarded()
+        return (netPWaitlistManager.getStateSync() is InBeta) && !networkProtectionState.isOnboarded()
     }
 
     override suspend fun buildSpecification(): NotificationSpec {

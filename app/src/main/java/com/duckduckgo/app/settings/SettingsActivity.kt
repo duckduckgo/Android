@@ -291,20 +291,26 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun updateNetPSettings(networkProtectionState: Boolean, networkProtectionWaitlistState: NetPWaitlistState) {
         with(viewsPrivacy) {
             when (networkProtectionWaitlistState) {
-                NetPWaitlistState.InBeta -> {
-                    netpPSetting.show()
-                    when (networkProtectionState) {
-                        true -> R.string.netpSettingsConnected
-                        false -> R.string.netpSettingsDisconnected
-                    }.run {
-                        netpPSetting.setSecondaryText(getString(this))
-                    }
-                    val netPItemStatus = if (networkProtectionState) {
-                        CheckListItem.CheckItemStatus.ENABLED
+                is NetPWaitlistState.InBeta -> {
+                    if (networkProtectionWaitlistState.termsAccepted) {
+                        netpPSetting.show()
+                        when (networkProtectionState) {
+                            true -> R.string.netpSettingsConnected
+                            false -> R.string.netpSettingsDisconnected
+                        }.run {
+                            netpPSetting.setSecondaryText(getString(this))
+                        }
+                        val netPItemStatus = if (networkProtectionState) {
+                            CheckListItem.CheckItemStatus.ENABLED
+                        } else {
+                            CheckListItem.CheckItemStatus.WARNING
+                        }
+                        netpPSetting.setItemStatus(netPItemStatus)
                     } else {
-                        CheckListItem.CheckItemStatus.WARNING
+                        netpPSetting.show()
+                        netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
+                        netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
                     }
-                    netpPSetting.setItemStatus(netPItemStatus)
                 }
                 NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
                 NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> {

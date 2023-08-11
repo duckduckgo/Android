@@ -44,7 +44,7 @@ class NetPWaitlistChecker @Inject constructor(
 
     internal suspend fun checkAndUpdateState() {
         netPWaitlistManager.upsertState().also { state ->
-            if (state == InBeta) {
+            if (state is InBeta) {
                 waitlistNotification.sendNotification()
             }
         }

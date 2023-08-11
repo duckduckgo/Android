@@ -48,7 +48,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
     override fun getState(): NetPWaitlistState {
         if (isTreated()) {
             return if (didJoinBeta()) {
-                InBeta
+                InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
             } else if (didJoinWaitlist()) {
                 JoinedWaitlist
             } else {
@@ -61,7 +61,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
 
     override suspend fun getScreenForCurrentState(): ActivityParams {
         return when (getState()) {
-            InBeta -> {
+            is InBeta -> {
                 if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams
                 } else {

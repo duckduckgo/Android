@@ -73,9 +73,6 @@
     <string name="netpWaitlistFooter">DuckDuckGo Network Protection is currently in closed, invite-only beta.</string>
     <string name="netpWaitlistFooterRedeemed">DuckDuckGo will never log, track, or share your network data.</string>
 
-    <string name="netpWaitlistOnTheListTitle">You\'re on the list!</string>
-    <string name="netpWaitlistOnTheListNotificationEnabled">We\'ll send you a notification when Network Protection is ready for you.</string>
-    <string name="netpWaitlistOnTheListNotificationDisabled">Your invite to try Network Protection will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
     <string name="netpWaitlistNotifyMeTitle">Know the instant you\'re invited</string>
     <string name="netpWaitlistNotifyMeByline">Get a notification when you\'re invited to Network Protection.</string>
 
