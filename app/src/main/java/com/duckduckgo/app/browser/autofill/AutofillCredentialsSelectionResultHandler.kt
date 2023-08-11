@@ -331,7 +331,6 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
     fun processEmailProtectionSelectEmailChoice(
         result: Bundle,
         viewModel: BrowserTabViewModel,
-        tabId: String,
     ) {
         val userSelection: UseEmailResultType = if (appBuildConfig.sdkInt >= VERSION_CODES.TIRAMISU) {
             result.getParcelable(EmailProtectionChooserDialog.KEY_RESULT, UseEmailResultType::class.java)!!

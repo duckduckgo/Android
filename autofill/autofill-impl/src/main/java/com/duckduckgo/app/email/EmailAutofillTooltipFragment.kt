@@ -29,7 +29,6 @@ import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
 import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillTooltipBinding
-import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -40,18 +39,21 @@ import timber.log.Timber
 @InjectWith(FragmentScope::class)
 class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectionChooserDialog {
 
+    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
 
-    /**
-     * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
-     * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
-     */
-    private var ignoreCancellationEvents = false
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+        if (savedInstanceState != null) {
+            // If being created after a configuration change, dismiss the dialog as the WebView will be re-created too
+            dismiss()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,58 +77,57 @@ class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectio
 
             binding.secondaryCta.setOnClickListener {
                 returnResult(UseEmailResultType.UsePrivateAliasAddress)
-                dismiss()
             }
 
             binding.primaryCta.setOnClickListener {
                 returnResult(UseEmailResultType.UsePersonalEmailAddress)
-                dismiss()
             }
         }
     }
 
     private fun returnResult(resultType: UseEmailResultType) {
+        Timber.v("User action: %s", resultType::class.java.simpleName)
+
         val result = Bundle().also {
             it.putString(EmailProtectionChooserDialog.KEY_URL, getOriginalUrl())
             it.putParcelable(EmailProtectionChooserDialog.KEY_RESULT, resultType)
         }
 
         parentFragment?.setFragmentResult(EmailProtectionChooserDialog.resultKey(getTabId()), result)
+        dismiss()
     }
 
     private fun configureCloseButton(binding: ContentAutofillTooltipBinding) {
-        binding.closeButton.setOnClickListener { animateClosed() }
-        returnResult(UseEmailResultType.DoNotUseEmailProtection)
-    }
-
-    private fun animateClosed() {
-        (dialog as BottomSheetDialog).animateClosed()
+        binding.closeButton.setOnClickListener {
+            returnResult(UseEmailResultType.DoNotUseEmailProtection)
+        }
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        if (ignoreCancellationEvents) {
-            Timber.v("onCancel: Ignoring cancellation event")
-            return
-        }
-
         Timber.v("onCancel: EmailAutofillTooltipFragment. User declined to use Email Protection")
-
         returnResult(UseEmailResultType.DoNotUseEmailProtection)
     }
 
-    private fun getPersonalAddress() = arguments?.getString(EmailProtectionChooserDialog.KEY_ADDRESS)!!
+    private fun getPersonalAddress() = arguments?.getString(KEY_ADDRESS)!!
     private fun getOriginalUrl() = arguments?.getString(EmailProtectionChooserDialog.KEY_URL)!!
-    private fun getTabId() = arguments?.getString(EmailProtectionChooserDialog.KEY_TAB_ID)!!
+    private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
 
     companion object {
-        fun instance(personalDuckAddress: String, url: String, tabId: String): EmailAutofillTooltipFragment {
+        fun instance(
+            personalDuckAddress: String,
+            url: String,
+            tabId: String,
+        ): EmailAutofillTooltipFragment {
             val fragment = EmailAutofillTooltipFragment()
             fragment.arguments = Bundle().also {
-                it.putString(EmailProtectionChooserDialog.KEY_ADDRESS, personalDuckAddress)
+                it.putString(KEY_ADDRESS, personalDuckAddress)
                 it.putString(EmailProtectionChooserDialog.KEY_URL, url)
-                it.putString(EmailProtectionChooserDialog.KEY_TAB_ID, tabId)
+                it.putString(KEY_TAB_ID, tabId)
             }
             return fragment
         }
+
+        private const val KEY_TAB_ID = "tabId"
+        private const val KEY_ADDRESS = "address"
     }
 }

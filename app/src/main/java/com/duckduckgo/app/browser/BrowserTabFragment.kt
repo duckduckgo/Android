@@ -2030,7 +2030,7 @@ class BrowserTabFragment :
         }
 
         setFragmentResultListener(EmailProtectionChooserDialog.resultKey(tabId)) { _, result ->
-            autofillCredentialsSelectionResultHandler.processEmailProtectionSelectEmailChoice(result, viewModel, tabId)
+            autofillCredentialsSelectionResultHandler.processEmailProtectionSelectEmailChoice(result, viewModel)
         }
     }
 

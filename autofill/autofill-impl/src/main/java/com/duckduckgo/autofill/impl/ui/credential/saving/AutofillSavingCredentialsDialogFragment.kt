@@ -108,6 +108,15 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            // If being created after a configuration change, dismiss the dialog as the WebView will be re-created too
+            dismiss()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
