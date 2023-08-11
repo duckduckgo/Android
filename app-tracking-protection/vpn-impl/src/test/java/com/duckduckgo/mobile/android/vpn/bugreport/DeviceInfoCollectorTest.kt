@@ -44,7 +44,7 @@ class DeviceInfoCollectorTest {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         whenever(appBuildConfig.sdkInt).thenReturn(30)
 
-        deviceInfoCollector = DeviceInfoCollector(appBuildConfig)
+        deviceInfoCollector = DeviceInfoCollector(appBuildConfig, { false })
     }
 
     @Test
@@ -53,8 +53,21 @@ class DeviceInfoCollectorTest {
 
         assertEquals("deviceInfo", deviceInfoCollector.collectorName)
 
-        assertEquals(2, state.length())
+        assertEquals(3, state.length())
         assertEquals("PLAY", state.get("buildFlavor"))
         assertEquals(30, state.get("os"))
+        assertEquals("true", state.get("batteryOptimizations"))
+    }
+
+    @Test
+    fun whenIgnoringBatteryOptimizationsThenReportBatteryOptimizationsTrue() = runTest {
+        val state = DeviceInfoCollector(appBuildConfig, { true }).collectVpnRelatedState()
+
+        assertEquals("deviceInfo", deviceInfoCollector.collectorName)
+
+        assertEquals(3, state.length())
+        assertEquals("PLAY", state.get("buildFlavor"))
+        assertEquals(30, state.get("os"))
+        assertEquals("false", state.get("batteryOptimizations"))
     }
 }
