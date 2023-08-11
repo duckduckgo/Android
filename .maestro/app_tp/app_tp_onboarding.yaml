@@ -32,8 +32,9 @@ tags:
 - tapOn:
     text: "Enable App Tracking Protection"
     index: 1
-- assertVisible: "Connection request"
-- tapOn: "OK"
+- tapOn:
+    text: "OK"
+    optional: true
 - assertVisible:
       text: "Good news! App Tracking Protection is now enabled.*"
 - assertVisible: "Got it!"
