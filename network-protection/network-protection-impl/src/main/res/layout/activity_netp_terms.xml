@@ -40,6 +40,46 @@
             <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:question="@string/netpPrivacyPolicyHeadline" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:question="@string/netpPrivacyQuestionOne"
+                    app:answer="@string/netpPrivacyAnswerOne" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:question="@string/netpPrivacyQuestionTwo"
+                    app:answer="@string/netpPrivacyAnswerTwo" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:question="@string/netpPrivacyQuestionThree"
+                    app:answer="@string/netpPrivacyAnswerThree" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:question="@string/netpPrivacyQuestionFour"
+                    app:answer="@string/netpPrivacyAnswerFour" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:question="@string/netpPrivacyQuestionFive"
+                    app:answer="@string/netpPrivacyAnswerFive" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:question="@string/netpTermsHeadline" />
+
+            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:answer="@string/netpTermAnswerOne"
                 app:question="@string/netpTermQuestionOne" />
 
@@ -53,7 +93,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:answer="@string/netpTermAnswerThree"
-                app:question="@string/netpFaqQuestionThree" />
+                app:question="@string/netpTermQuestionThree" />
 
             <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
                 android:layout_width="match_parent"
@@ -84,30 +124,6 @@
                 android:layout_height="wrap_content"
                 app:answer="@string/netpTermAnswerEight"
                 app:question="@string/netpTermQuestionEight" />
-
-            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:answer="@string/netpTermAnswerNine"
-                app:question="@string/netpTermQuestionNine" />
-
-            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:answer="@string/netpTermAnswerTen"
-                app:question="@string/netpTermQuestionTen" />
-
-            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:answer="@string/netpTermAnswerEleven"
-                app:question="@string/netpTermQuestionEleven" />
-
-            <com.duckduckgo.networkprotection.impl.about.AboutQAItemView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:answer="@string/netpTermAnswerTwelve"
-                app:question="@string/netpTermQuestionTwelve" />
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
                     android:id="@+id/termsAgreeAndClose"

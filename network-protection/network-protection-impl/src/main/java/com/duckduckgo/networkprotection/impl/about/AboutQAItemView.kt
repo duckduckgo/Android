@@ -39,10 +39,12 @@ internal class AboutQAItemView @JvmOverloads constructor(
             R.styleable.AboutQAItemView,
         ).apply {
             binding.aboutQuestion.text = getText(R.styleable.AboutQAItemView_question)
-            binding.aboutAnswer.text = HtmlCompat.fromHtml(
-                getText(R.styleable.AboutQAItemView_answer).toSpanned().toHtml(),
-                HtmlCompat.FROM_HTML_MODE_LEGACY,
-            )
+            if (hasValue(R.styleable.AboutQAItemView_answer)) {
+                binding.aboutAnswer.text = HtmlCompat.fromHtml(
+                    getText(R.styleable.AboutQAItemView_answer).toSpanned().toHtml(),
+                    HtmlCompat.FROM_HTML_MODE_LEGACY,
+                )
+            }
             recycle()
         }
         binding.aboutAnswer.movementMethod = LinkMovementMethod.getInstance()
