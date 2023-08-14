@@ -15,25 +15,25 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".ui.credential.management.AutofillManagementActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?daxColorSurface"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="?attr/actionBarSize"
+            android:background="?daxColorSurface">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -49,13 +49,13 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/keyline_2"
                 android:visibility="gone"
-                app:searchHint="@string/autofillManagementSearchLogins"
-                app:clearActionContentDescription="@string/autofillManagementSearchClearDescription"/>
+                app:clearActionContentDescription="@string/autofillManagementSearchClearDescription"
+                app:searchHint="@string/autofillManagementSearchLogins" />
         </FrameLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

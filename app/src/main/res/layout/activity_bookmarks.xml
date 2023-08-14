@@ -29,12 +29,12 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/daxColorSurface"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/daxColorSurface">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
