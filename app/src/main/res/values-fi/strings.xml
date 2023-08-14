@@ -468,7 +468,7 @@
         <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ yritti seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
         <item quantity="other"><![CDATA[ yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
     </plurals>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Sovellus voi sulkeutua muutosten tekemiseksi. Tule takaisin, kun olet ihaillut komeaa uutta kuvakettasi.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Suojaamattomat sivustot</string>
+    <string name="manageAllowlist">Suojaamattomat sivustot</string>
     <string name="reportBrokenSite">Ilmoita viallisesta sivustosta</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Muokkaa</string>
     <string name="dialogSaveAction">Tallenna</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Suojaamattomat sivustot</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Haluatko varmasti poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; suojaamattomista sivustoista?</string>
-    <string name="whitelistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
-    <string name="whitelistNoEntries">Tietosuoja on käytössä kaikilla sivustoilla</string>
-    <string name="whitelistDomainHint">www.esimerkki.com</string>
-    <string name="whitelistFormatError">Anna verkkotunnus, kuten <b>esimerkki.com</b> ja kokeile uudelleen</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Haluatko varmasti poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; suojaamattomista sivustoista?</string>
+    <string name="allowlistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
+    <string name="allowlistNoEntries">Tietosuoja on käytössä kaikilla sivustoilla</string>
+    <string name="allowlistDomainHint">www.esimerkki.com</string>
+    <string name="allowlistFormatError">Anna verkkotunnus, kuten <b>esimerkki.com</b> ja kokeile uudelleen</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Suojaamattomat sivustot</string>
+    <string name="settingsPrivacyProtectionAllowlist">Suojaamattomat sivustot</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tee sivustoista palonkestäviä</string>
@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Vedä yläreunasta alaspäin ja poistu koko näytöstä painamalla takaisin-painiketta</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Sulje kaikki välilehdet?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Haluatko varmasti sulkea kaikki välilehdet?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Peruuta</string>
+    <string name="closeAppTabsConfirmationDialogClose">Sulje</string>
 </resources>

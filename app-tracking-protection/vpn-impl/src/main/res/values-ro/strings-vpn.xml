@@ -16,7 +16,7 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="atp_name">Protecția la urmărirea aplicațiilor</string>
     <string name="refresh">Reîncărcare</string>
 
@@ -214,12 +214,12 @@
     <string name="atp_ActivityPastWeekBlocked">Blocat</string>
     <string name="atp_ActivityPastWeekAcross">Din</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Încercare de urmărire</item>
         <item quantity="few">Încercări de urmărire</item>
         <item quantity="other">Încercări de urmărire</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
         <item quantity="one">Aplicație</item>
         <item quantity="few">Aplicații</item>
         <item quantity="other">Aplicații</item>

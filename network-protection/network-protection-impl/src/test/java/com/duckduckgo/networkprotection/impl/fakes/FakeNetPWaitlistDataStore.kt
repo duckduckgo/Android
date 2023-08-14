@@ -18,19 +18,10 @@ package com.duckduckgo.networkprotection.impl.fakes
 
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistDataStore
 
-class FakeNetPWaitlistDataStore : NetPWaitlistDataStore {
-    private var _settingUnlocked: Boolean = false
-    private var _authToken: String? = null
-
-    override var settingUnlocked: Boolean
-        get() = _settingUnlocked
-        set(value) {
-            _settingUnlocked = value
-        }
-
-    override var authToken: String?
-        get() = _authToken
-        set(value) {
-            _authToken = value
-        }
-}
+class FakeNetPWaitlistDataStore(
+    override var settingUnlocked: Boolean = false,
+    override var authToken: String? = null,
+    override var waitlistToken: String? = null,
+    override var waitlistTimestamp: Int = -1,
+    override var didAcceptedTerms: Boolean = false,
+) : NetPWaitlistDataStore

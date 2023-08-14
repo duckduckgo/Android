@@ -185,7 +185,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
             loadFavicon(bookmark.url, twoListItem.leadingIcon())
 
-            twoListItem.setTrailingIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+            twoListItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             twoListItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, bookmark)
             }

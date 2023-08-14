@@ -468,7 +468,7 @@
         <item quantity="one"><![CDATA[ en <b>%1$d andere </b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
         <item quantity="other"><![CDATA[ en <b>%1$d anderen</b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ probeerde je hier te volgen. <br/><br/>Ik heb het geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
         <item quantity="other"><![CDATA[ probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
     </plurals>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">De app wordt mogelijk gesloten om wijzigingen toe te passen. Kom terug nadat je je mooie nieuwe pictogram hebt bewonderd.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Onbeschermde sites</string>
+    <string name="manageAllowlist">Onbeschermde sites</string>
     <string name="reportBrokenSite">Defecte website melden</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Bewerken</string>
     <string name="dialogSaveAction">Opslaan</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Onbeschermde sites</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Meer opties voor onbeschermde site %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
-    <string name="whitelistExplanation">Deze sites worden niet beschermd met Privacybescherming.</string>
-    <string name="whitelistNoEntries">Privacybescherming ingeschakeld voor alle sites</string>
-    <string name="whitelistDomainHint">www.voorbeeld.com</string>
-    <string name="whitelistFormatError">Voer een domein in zoals <b>voorbeeld.com</b> en probeer het opnieuw</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Meer opties voor onbeschermde site %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
+    <string name="allowlistExplanation">Deze sites worden niet beschermd met Privacybescherming.</string>
+    <string name="allowlistNoEntries">Privacybescherming ingeschakeld voor alle sites</string>
+    <string name="allowlistDomainHint">www.voorbeeld.com</string>
+    <string name="allowlistFormatError">Voer een domein in zoals <b>voorbeeld.com</b> en probeer het opnieuw</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Onbeschermde sites</string>
+    <string name="settingsPrivacyProtectionAllowlist">Onbeschermde sites</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandveilige websites</string>
@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Sleep van boven naar beneden en tik op de knop \'Terug\' om het volledige scherm af te sluiten</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Alle tabbladen sluiten?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Weet je zeker dat je alle tabbladen wilt sluiten?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Annuleren</string>
+    <string name="closeAppTabsConfirmationDialogClose">Sluiten</string>
 </resources>

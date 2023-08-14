@@ -23,6 +23,9 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 interface NetPWaitlistDataStore {
     var settingUnlocked: Boolean
     var authToken: String?
+    var waitlistToken: String?
+    var waitlistTimestamp: Int
+    var didAcceptedTerms: Boolean
 }
 
 class NetPWaitlistDataStoreSharedPreferences constructor(
@@ -56,10 +59,40 @@ class NetPWaitlistDataStoreSharedPreferences constructor(
                 }
             }
         }
+    override var waitlistToken: String?
+        get() = preferences.getString(KEY_WAITLIST_TOKEN, null)
+        set(value) {
+            preferences.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_WAITLIST_TOKEN)
+                } else {
+                    putString(KEY_WAITLIST_TOKEN, value)
+                }
+            }
+        }
+
+    override var waitlistTimestamp: Int
+        get() = preferences.getInt(KEY_WAITLIST_TIMESTAMP, -1)
+        set(value) {
+            preferences.edit(commit = true) {
+                putInt(KEY_WAITLIST_TIMESTAMP, value)
+            }
+        }
+
+    override var didAcceptedTerms: Boolean
+        get() = preferences.getBoolean(KEY_WAITLIST_ACCEPTED_TERMS, false)
+        set(value) {
+            preferences.edit(commit = true) {
+                putBoolean(KEY_WAITLIST_ACCEPTED_TERMS, value)
+            }
+        }
 
     companion object {
         const val FILENAME = "com.duckduckgo.netp.store.waitlist"
         const val KEY_SETTING_UNLOCKED = "KEY_SETTING_UNLOCKED"
         const val KEY_AUTH_TOKEN = "KEY_AUTH_TOKEN"
+        const val KEY_WAITLIST_TOKEN = "KEY_WAITLIST_TOKEN"
+        const val KEY_WAITLIST_TIMESTAMP = "KEY_WAITLIST_TIMESTAMP"
+        const val KEY_WAITLIST_ACCEPTED_TERMS = "KEY_WAITLIST_ACCEPTED_TERMS"
     }
 }

@@ -19,30 +19,46 @@
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.CompoundButton.OnCheckedChangeListener
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.children
+import android.widget.ImageView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewTwoLineItemBinding
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.view.SwitchView
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class TwoLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.twoLineListItemStyle,
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : DaxListItem(context, attrs, defStyleAttr) {
 
     private val binding: ViewTwoLineItemBinding by viewBinding()
+
+    override val primaryText: DaxTextView
+        get() = binding.primaryText
+
+    override val secondaryText: DaxTextView
+        get() = binding.secondaryText
+    override val leadingIcon: ImageView
+        get() = binding.leadingIcon
+    override val leadingIconContainer: View
+        get() = binding.leadingIconBackground
+    override val trailingIcon: ImageView
+        get() = binding.trailingIcon
+    override val trailingIconContainer: View
+        get() = binding.trailingIconContainer
+    override val trailingSwitch: SwitchView
+        get() = binding.trailingSwitch
+    override val betaPill: ImageView
+        get() = binding.betaPill
+
+    override val itemContainer: View
+        get() = binding.itemContainer
+
+    override val verticalPadding: Int
+        get() = R.dimen.twoLineItemVerticalPadding
 
     init {
         context.obtainStyledAttributes(
@@ -51,34 +67,38 @@ class TwoLineListItem @JvmOverloads constructor(
             0,
             R.style.Widget_DuckDuckGo_TwoLineListItem,
         ).apply {
-
-            binding.primaryText.text = getString(R.styleable.TwoLineListItem_primaryText)
-            binding.secondaryText.text = getString(R.styleable.TwoLineListItem_secondaryText)
+            setPrimaryText(getString(R.styleable.TwoLineListItem_primaryText))
+            setSecondaryText(getString(R.styleable.TwoLineListItem_secondaryText))
 
             if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
-                binding.primaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
+                setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
             val truncated = getBoolean(R.styleable.TwoLineListItem_primaryTextTruncated, true)
-            if (truncated) {
-                binding.primaryText.maxLines = 1
-                binding.primaryText.ellipsize = TruncateAt.END
-            } else {
-                binding.primaryText.maxLines = Int.MAX_VALUE
-            }
+            setPrimaryTextTruncation(truncated)
 
             if (hasValue(R.styleable.TwoLineListItem_secondaryTextColorOverlay)) {
-                binding.secondaryText.setTextColor(getColorStateList(R.styleable.TwoLineListItem_secondaryTextColorOverlay))
+                setSecondaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_secondaryTextColorOverlay))
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIcon)) {
                 setLeadingIconDrawable(getDrawable(R.styleable.TwoLineListItem_leadingIcon)!!)
             } else {
-                binding.leadingIconBackground.gone()
+                hideLeadingItems()
             }
 
             if (hasValue(R.styleable.TwoLineListItem_leadingIconBackground)) {
-                setLeadingIconBackgroundType(getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0))
+                val type = ImageBackground.from(getInt(R.styleable.TwoLineListItem_leadingIconBackground, 0))
+                setLeadingIconBackgroundType(type)
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_leadingIconSize)) {
+                val imageSize = LeadingIconSize.from(getInt(R.styleable.TwoLineListItem_leadingIconSize, 1))
+                setLeadingIconSize(imageSize)
+            }
+
+            if (hasValue(R.styleable.TwoLineListItem_primaryTextColorOverlay)) {
+                setPrimaryTextColorStateList(getColorStateList(R.styleable.TwoLineListItem_primaryTextColorOverlay))
             }
 
             setPillVisible(getBoolean(R.styleable.TwoLineListItem_showBetaPill, false))
@@ -88,137 +108,15 @@ class TwoLineListItem @JvmOverloads constructor(
             when {
                 showSwitch -> showSwitch()
                 showTrailingIcon -> {
-                    binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon))
+                    setTrailingIconDrawable(getDrawable(R.styleable.TwoLineListItem_trailingIcon)!!)
                     showTrailingIcon()
                 }
                 else -> {
-                    binding.trailingIconContainer.gone()
-                    binding.trailingSwitch.gone()
+                    hideTrailingItems()
                 }
             }
 
             recycle()
-        }
-    }
-
-    /** Sets the item title */
-    fun setPrimaryText(title: String) {
-        binding.primaryText.text = title
-    }
-
-    /** Sets the item subtitle */
-    fun setSecondaryText(subtitle: String) {
-        binding.secondaryText.text = subtitle
-    }
-
-    fun leadingIcon() = binding.leadingIcon
-
-    /** Sets the item image resource */
-    fun setLeadingIcon(idRes: Int) {
-        binding.leadingIcon.setImageResource(idRes)
-        binding.leadingIconBackground.show()
-    }
-
-    /** Sets the item image resource */
-    fun setLeadingIconDrawable(drawable: Drawable) {
-        binding.leadingIcon.setImageDrawable(drawable)
-        binding.leadingIconBackground.show()
-    }
-
-    /** Sets the item click listener */
-    fun setClickListener(onClick: () -> Unit) {
-        binding.itemContainer.setOnClickListener { onClick() }
-    }
-
-    /** Sets the item overflow menu click listener */
-    fun setLeadingIconClickListener(onClick: (View) -> Unit) {
-        binding.leadingIcon.setOnClickListener { onClick(binding.leadingIcon) }
-    }
-
-    /** Sets the leading image content description */
-    fun setLeadingIconContentDescription(description: String) {
-        binding.leadingIcon.contentDescription = description
-    }
-
-    /** Sets the background image type */
-    fun setLeadingIconBackgroundType(value: Int) {
-        if (value == 0) {
-            binding.leadingIconBackground.setBackgroundResource(android.R.color.transparent)
-        }
-        if (value == 1) {
-            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
-        }
-        if (value == 2) {
-            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
-        }
-        binding.leadingIconBackground.show()
-    }
-
-    /** Sets the item image resource */
-    fun setTrailingIcon(idRes: Int) {
-        binding.trailingIcon.setImageResource(idRes)
-        showTrailingIcon()
-    }
-
-    /** Sets the item overflow menu click listener */
-    fun setTrailingIconClickListener(onClick: (View) -> Unit) {
-        binding.trailingIconContainer.setOnClickListener { onClick(binding.trailingIcon) }
-    }
-
-    /** Sets the trailing image content description */
-    fun setTrailingContentDescription(description: String) {
-        binding.trailingIcon.contentDescription = description
-    }
-
-    /** Sets the trailing image content description */
-    fun setPillVisible(isVisible: Boolean) {
-        if (isVisible) {
-            binding.betaPill.show()
-        } else {
-            binding.betaPill.gone()
-        }
-    }
-
-    /** Sets the Switch Visible */
-    fun showSwitch() {
-        binding.trailingIconContainer.gone()
-        binding.trailingSwitch.show()
-    }
-
-    /** Sets the Trailing Icon Visible */
-    fun showTrailingIcon() {
-        binding.trailingIconContainer.show()
-        binding.trailingSwitch.gone()
-    }
-
-    /** Sets the checked change listener for the switch */
-    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener) {
-        binding.trailingSwitch.setOnCheckedChangeListener(onCheckedChangeListener)
-    }
-
-    /** Sets the switch value */
-    fun setIsChecked(isChecked: Boolean) {
-        binding.trailingSwitch.isChecked = isChecked
-    }
-
-    /** Allows to set a new value to the switch, without triggering the onChangeListener */
-    fun quietlySetIsChecked(
-        newCheckedState: Boolean,
-        changeListener: CompoundButton.OnCheckedChangeListener?,
-    ) {
-        binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
-    }
-
-    override fun setEnabled(enabled: Boolean) {
-        setEnabledOpacity(enabled)
-        recursiveEnable(enabled)
-        super.setEnabled(enabled)
-    }
-
-    fun View.recursiveEnable(enabled: Boolean) {
-        (this as? ViewGroup)?.children?.forEach {
-            it.isEnabled = enabled
-            it.recursiveEnable(enabled)
         }
     }
 }

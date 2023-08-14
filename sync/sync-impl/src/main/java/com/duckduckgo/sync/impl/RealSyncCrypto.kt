@@ -34,6 +34,7 @@ class RealSyncCrypto @Inject constructor(
     }
 
     override fun decrypt(data: String): String {
+        if (data.isEmpty()) return data
         val decryptResult = nativeLib.decryptData(data, syncStore.secretKey.orEmpty())
         return if (decryptResult.result != 0L) "" else decryptResult.decryptedData
     }

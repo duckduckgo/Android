@@ -218,7 +218,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         }
     }
 
-    private fun credentialsListUpdated(
+    private suspend fun credentialsListUpdated(
         credentials: List<LoginCredentials>,
         credentialSearchQuery: String,
     ) {
@@ -242,16 +242,15 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         binding.logins.gone()
     }
 
-    private fun renderCredentialList(credentials: List<LoginCredentials>) {
+    private suspend fun renderCredentialList(credentials: List<LoginCredentials>) {
         binding.emptyStateLayout.emptyStateContainer.gone()
         binding.logins.show()
 
         val currentUrl = getCurrentUrlForSuggestions()
-        val suggestions = suggestionMatcher.getSuggestions(currentUrl, credentials)
+        val directSuggestions = suggestionMatcher.getDirectSuggestions(currentUrl, credentials)
+        val shareableCredentials = suggestionMatcher.getShareableSuggestions(currentUrl)
 
-        adapter.updateLogins(credentials, suggestions)
-
-        Timber.v("Current url: %s. Matching suggestions: %d", currentUrl, suggestions.size)
+        adapter.updateLogins(credentials, directSuggestions, shareableCredentials)
     }
 
     private fun configureRecyclerView() {

@@ -1,0 +1,56 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Multiple tabs can be opened"
+tags:
+    - releaseTest
+---
+- launchApp:
+      clearState: true
+      stopApp: true
+- assertVisible:
+      text: ".*Not to worry! Searching and browsing privately.*"
+- tapOn: "let's do it!"
+- tapOn: "cancel"
+- assertVisible:
+      text: ".*I'll also upgrade the security of your connection if possible.*"
+- tapOn:
+    text: "search or type URL"
+- inputText: "https://privacy-test-pages.glitch.me"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: ".*keep browsing.*"
+- tapOn:
+    text: "got it"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/tabCount"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
+- tapOn: "New Tab"
+- assertVisible:
+    text: "Search or type URL"
+- inputText: "https://www.search-company.site"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: "Search engine"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/tabCount"
+- assertVisible:
+    text: "Ad Click Flow"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
+- tapOn:
+    text: "Privacy Test Pages - Home"
+- assertNotVisible:
+    text: "Ad Click Flow"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/tabCount"
+- assertVisible:
+    text: "Ad Click Flow"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/close"
+    rightOf: "Ad Click Flow"
+- assertNotVisible:
+    text: "Ad Click Flow"

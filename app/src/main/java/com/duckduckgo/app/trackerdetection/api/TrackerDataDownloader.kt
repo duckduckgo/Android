@@ -62,7 +62,7 @@ class TrackerDataDownloader @Inject constructor(
 
     fun clearLegacyLists(): Completable {
         return Completable.fromAction {
-            listOf(EASYLIST, EASYPRIVACY, TRACKERSWHITELIST).forEach {
+            listOf(EASYLIST, EASYPRIVACY, TRACKERSALLOWLIST).forEach {
                 if (binaryDataStore.hasData(it.name)) {
                     binaryDataStore.clearData(it.name)
                 }

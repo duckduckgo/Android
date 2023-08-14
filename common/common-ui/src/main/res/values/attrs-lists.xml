@@ -37,6 +37,14 @@
         <!-- Rectangular shape, with optional rounded corners. -->
         <enum name="rounded" value="2" />
     </attr>
+    <attr name="leadingIconSize">
+        <!-- Small 16dp -->
+        <enum name="small" value="0" />
+        <!-- Medium 24dp (default) -->
+        <enum name="medium" value="1" />
+        <!-- Large 40dp -->
+        <enum name="large" value="2" />
+    </attr>
     <attr name="textColorOverride" format="color"/>
     <attr name="showOverflowMenu" format="boolean"/>
 
@@ -53,6 +61,7 @@
         <attr name="primaryTextTruncated"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
+        <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showSwitch"/>
     </declare-styleable>
@@ -66,6 +75,7 @@
         <attr name="secondaryTextColorOverlay"/>
         <attr name="leadingIcon"/>
         <attr name="leadingIconBackground"/>
+        <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>
         <attr name="showSwitch"/>

@@ -26,18 +26,20 @@ import retrofit2.http.POST
 @ContributesServiceApi(AppScope::class)
 interface WgVpnControllerService {
     @Headers("Content-Type: application/json")
-    @POST("https://staging.netp.duckduckgo.com/redeem")
+    @POST("$NETP_ENVIRONMENT_URL/redeem")
     suspend fun redeemCode(@Body code: NetPRedeemCodeRequest): NetPRedeemCodeResponse
 
-    @GET("https://staging.netp.duckduckgo.com/servers")
+    @GET("$NETP_ENVIRONMENT_URL/servers")
     suspend fun getServers(): List<RegisteredServerInfo>
 
     @Headers("Content-Type: application/json")
-    @POST("https://staging.netp.duckduckgo.com/register")
+    @POST("$NETP_ENVIRONMENT_URL/register")
     suspend fun registerKey(
         @Body registerKeyBody: RegisterKeyBody,
     ): List<EligibleServerInfo>
 }
+
+const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
 
 data class NetPRedeemCodeRequest(
     val code: String,

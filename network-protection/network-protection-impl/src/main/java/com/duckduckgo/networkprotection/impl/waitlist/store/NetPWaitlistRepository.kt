@@ -16,16 +16,23 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.app.global.DispatcherProvider
+import kotlinx.coroutines.withContext
 
 interface NetPWaitlistRepository {
     fun getAuthenticationToken(): String?
     fun setAuthenticationToken(authToken: String)
-    fun getState(isInternalBuild: Boolean): NetPWaitlistState
+    suspend fun getWaitlistToken(): String?
+    suspend fun setWaitlistToken(token: String)
+    suspend fun getWaitlistTimestamp(): Int
+    suspend fun setWaitlistTimestamp(timestamp: Int)
+    fun acceptWaitlistTerms()
+    fun didAcceptWaitlistTerms(): Boolean
 }
 
 class RealNetPWaitlistRepository(
     private val dataStore: NetPWaitlistDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : NetPWaitlistRepository {
 
     override fun getAuthenticationToken(): String? = dataStore.authToken
@@ -34,22 +41,27 @@ class RealNetPWaitlistRepository(
         dataStore.authToken = authToken
     }
 
-    override fun getState(isInternalBuild: Boolean): NetPWaitlistState {
-        if (isInternalBuild) {
-            return if (didJoinBeta()) {
-                // internal users bypass easter egg
-                NetPWaitlistState.InBeta
-            } else {
-                NetPWaitlistState.PendingInviteCode
-            }
-        }
-
-        if (didJoinBeta()) {
-            return NetPWaitlistState.InBeta
-        }
-
-        return NetPWaitlistState.NotUnlocked
+    override suspend fun getWaitlistToken(): String? = withContext(dispatcherProvider.io()) {
+        return@withContext dataStore.waitlistToken
     }
 
-    private fun didJoinBeta(): Boolean = dataStore.authToken != null
+    override suspend fun setWaitlistToken(token: String) = withContext(dispatcherProvider.io()) {
+        dataStore.waitlistToken = token
+    }
+
+    override suspend fun getWaitlistTimestamp(): Int = withContext(dispatcherProvider.io()) {
+        return@withContext dataStore.waitlistTimestamp
+    }
+
+    override suspend fun setWaitlistTimestamp(timestamp: Int) = withContext(dispatcherProvider.io()) {
+        dataStore.waitlistTimestamp = timestamp
+    }
+
+    override fun acceptWaitlistTerms() {
+        dataStore.didAcceptedTerms = true
+    }
+
+    override fun didAcceptWaitlistTerms(): Boolean {
+        return dataStore.didAcceptedTerms
+    }
 }

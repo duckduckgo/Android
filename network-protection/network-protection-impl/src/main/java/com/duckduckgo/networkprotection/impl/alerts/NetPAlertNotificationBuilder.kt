@@ -60,7 +60,7 @@ class RealNetPAlertNotiticationBuilder @Inject constructor(
         registerChannel(context)
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_netp_notification_logo)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_reconnecting))
@@ -72,7 +72,7 @@ class RealNetPAlertNotiticationBuilder @Inject constructor(
     override fun buildReconnectedNotification(context: Context): Notification {
         registerChannel(context)
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_netp_notification_logo)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_reconnect_success))
@@ -85,7 +85,7 @@ class RealNetPAlertNotiticationBuilder @Inject constructor(
         registerChannel(context)
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_netp_notification_logo)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(getPendingIntent(context))
             .setCustomContentView(RemoteViews(context.packageName, R.layout.notification_reconnect_failed))
@@ -106,7 +106,7 @@ class RealNetPAlertNotiticationBuilder @Inject constructor(
 
     companion object {
         const val NETP_ALERTS_CHANNEL_ID = "com.duckduckgo.networkprotection.impl.alerts"
-        private const val NETP_ALERTS_CHANNEL_NAME = "Network Protection Alerts"
-        private const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from Network Protection"
+        const val NETP_ALERTS_CHANNEL_NAME = "Network Protection Alerts"
+        const val NETP_ALERTS_CHANNEL_DESCRIPTION = "Alerts from Network Protection"
     }
 }

@@ -21,11 +21,11 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
+import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -35,16 +35,13 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class RealAutofillRuntimeConfigProviderTest {
-    @Mock
-    private lateinit var emailManager: EmailManager
 
-    @Mock
-    private lateinit var autofillStore: AutofillStore
-
-    @Mock
-    private lateinit var runtimeConfigurationWriter: RuntimeConfigurationWriter
     private lateinit var testee: RealAutofillRuntimeConfigProvider
 
+    private val emailManager: EmailManager = mock()
+    private val autofillStore: AutofillStore = mock()
+    private val runtimeConfigurationWriter: RuntimeConfigurationWriter = mock()
+    private val shareableCredentials: ShareableCredentials = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
 
     @Before
@@ -55,6 +52,7 @@ class RealAutofillRuntimeConfigProviderTest {
             autofillStore,
             runtimeConfigurationWriter,
             autofillCapabilityChecker = autofillCapabilityChecker,
+            shareableCredentials = shareableCredentials,
         )
 
         runTest {
@@ -84,6 +82,7 @@ class RealAutofillRuntimeConfigProviderTest {
     @Test
     fun whenAutofillEnabledThenConfigurationUserPrefsCredentialsIsTrue() = runTest {
         configureAutofillCapabilities(enabled = true)
+        configureNoShareableLogins()
         testee.getRuntimeConfiguration("", EXAMPLE_URL)
         verifyAutofillCredentialsReturnedAs(true)
     }
@@ -92,6 +91,7 @@ class RealAutofillRuntimeConfigProviderTest {
     fun whenCanAutofillThenConfigSpecifiesShowingKeyIcon() = runTest {
         configureAutofillCapabilities(enabled = true)
         configureAutofillAvailableForSite(EXAMPLE_URL)
+        configureNoShareableLogins()
         testee.getRuntimeConfiguration("", EXAMPLE_URL)
         verifyKeyIconRequestedToShow()
     }
@@ -100,6 +100,7 @@ class RealAutofillRuntimeConfigProviderTest {
     fun whenNoCredentialsForUrlThenConfigurationInputTypeCredentialsIsFalse() = runTest {
         configureAutofillCapabilities(enabled = true)
         whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
+        configureNoShareableLogins()
         testee.getRuntimeConfiguration("", EXAMPLE_URL)
 
         val expectedCredentialResponse = AvailableInputTypeCredentials(username = false, password = false)
@@ -113,6 +114,31 @@ class RealAutofillRuntimeConfigProviderTest {
     fun whenWithCredentialsForUrlThenConfigurationInputTypeCredentialsIsTrue() = runTest {
         configureAutofillCapabilities(enabled = true)
         whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = EXAMPLE_URL,
+                    username = "username",
+                    password = "password",
+                ),
+            ),
+        )
+        configureNoShareableLogins()
+
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
+
+        val expectedCredentialResponse = AvailableInputTypeCredentials(username = true, password = true)
+        verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
+            credentialsAvailable = eq(expectedCredentialResponse),
+            emailAvailable = any(),
+        )
+    }
+
+    @Test
+    fun whenWithShareableCredentialsForUrlThenConfigurationInputTypeCredentialsIsTrue() = runTest {
+        configureAutofillCapabilities(enabled = true)
+        whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
+        whenever(shareableCredentials.shareableCredentials(any())).thenReturn(
             listOf(
                 LoginCredentials(
                     id = 1,
@@ -146,6 +172,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 ),
             ),
         )
+        configureNoShareableLogins()
 
         testee.getRuntimeConfiguration("", url)
 
@@ -170,6 +197,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 ),
             ),
         )
+        configureNoShareableLogins()
 
         testee.getRuntimeConfiguration("", url)
 
@@ -194,6 +222,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 ),
             ),
         )
+        configureNoShareableLogins()
 
         testee.getRuntimeConfiguration("", url)
 
@@ -218,6 +247,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 ),
             ),
         )
+        configureNoShareableLogins()
 
         testee.getRuntimeConfiguration("", url)
 
@@ -281,6 +311,7 @@ class RealAutofillRuntimeConfigProviderTest {
         val url = "example.com"
         configureAutofillCapabilities(enabled = true)
         whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        configureNoShareableLogins()
         whenever(emailManager.isSignedIn()).thenReturn(true)
 
         testee.getRuntimeConfiguration("", url)
@@ -296,6 +327,7 @@ class RealAutofillRuntimeConfigProviderTest {
         val url = "example.com"
         configureAutofillCapabilities(enabled = true)
         whenever(autofillStore.getCredentials(url)).thenReturn(emptyList())
+        configureNoShareableLogins()
         whenever(emailManager.isSignedIn()).thenReturn(false)
 
         testee.getRuntimeConfiguration("", url)
@@ -326,6 +358,10 @@ class RealAutofillRuntimeConfigProviderTest {
             passwordGeneration = any(),
             showInlineKeyIcon = any(),
         )
+    }
+
+    private suspend fun configureNoShareableLogins() {
+        whenever(shareableCredentials.shareableCredentials(any())).thenReturn(emptyList())
     }
 
     private fun verifyKeyIconRequestedToShow() {

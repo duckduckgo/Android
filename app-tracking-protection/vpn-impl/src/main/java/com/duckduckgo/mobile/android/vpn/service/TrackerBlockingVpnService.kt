@@ -683,8 +683,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 
     companion object {
-        const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
-
         const val VPN_REMINDER_NOTIFICATION_ID = 999
         const val VPN_FOREGROUND_SERVICE_ID = 200
 

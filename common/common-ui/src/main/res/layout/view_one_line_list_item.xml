@@ -20,6 +20,8 @@
     android:id="@+id/item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="@dimen/oneLineItemVerticalPadding"
+    android:paddingBottom="@dimen/oneLineItemVerticalPadding"
     android:background="?attr/selectableItemBackground"
     android:minHeight="@dimen/oneLineItemHeight">
 
@@ -28,16 +30,14 @@
         android:layout_width="@dimen/listItemImageContainerSize"
         android:layout_height="@dimen/listItemImageContainerSize"
         android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="@dimen/keyline_2"
-        android:layout_marginBottom="@dimen/keyline_2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/leadingIcon"
-            android:layout_width="@dimen/listItemImageSize"
-            android:layout_height="@dimen/listItemImageSize"
+            android:layout_width="@dimen/listItemImageMediumSize"
+            android:layout_height="@dimen/listItemImageMediumSize"
             android:layout_gravity="center"
             android:importantForAccessibility="no" />
 
@@ -87,8 +87,8 @@
 
         <ImageView
             android:id="@+id/trailingIcon"
-            android:layout_width="@dimen/listItemImageSize"
-            android:layout_height="@dimen/listItemImageSize"
+            android:layout_width="@dimen/listItemImageMediumSize"
+            android:layout_height="@dimen/listItemImageMediumSize"
             android:layout_gravity="center"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:srcCompat="@drawable/ic_menu_vertical_24"

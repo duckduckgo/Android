@@ -46,8 +46,8 @@ class DevPrivacyConfigSettingsDataStoreImpl @Inject constructor(private val cont
     }
 
     companion object {
-        const val FILENAME = "com.duckduckgo.privacy.config.internal.settings"
-        const val KEY_SELECTED_REMOTE_PRIVACY_CONFIG = "KEY_SELECTED_REMOTE_PRIVACY_CONFIG"
-        const val KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED = "KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED"
+        private const val FILENAME = "com.duckduckgo.privacy.config.internal.settings"
+        private const val KEY_SELECTED_REMOTE_PRIVACY_CONFIG = "KEY_SELECTED_REMOTE_PRIVACY_CONFIG"
+        private const val KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED = "KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED"
     }
 }

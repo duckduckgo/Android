@@ -69,13 +69,6 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
     }
 
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-        if (isVisibleToUser) {
-            viewModel.pageBecameVisible()
-        }
-    }
-
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -170,7 +163,7 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
             viewModel.onDefaultBrowserClicked()
         }
         secondaryButton.setOnClickListener {
-            viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
+            viewModel.onContinueToBrowser()
         }
     }
 

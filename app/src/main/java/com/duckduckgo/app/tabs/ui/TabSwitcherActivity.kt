@@ -45,7 +45,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -178,6 +180,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun processCommand(command: Command) {
         when (command) {
             is Close -> finishAfterTransition()
+            is CloseAllTabsRequest -> showCloseAllTabsConfirmation()
         }
     }
 
@@ -195,6 +198,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.settings -> showSettings()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
+        closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun onFire() {
@@ -262,11 +271,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun closeAllTabs() {
-        launch {
-            viewModel.tabs.value?.forEach {
-                viewModel.onTabDeleted(it)
-            }
-        }
+        viewModel.onCloseAllTabsRequested()
     }
 
     private fun showDownloads() {
@@ -295,6 +300,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun clearObserversEarlyToStopViewUpdates() {
         viewModel.tabs.removeObservers(this)
         viewModel.deletableTabs.removeObservers(this)
+    }
+
+    private fun showCloseAllTabsConfirmation() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.closeAppTabsConfirmationDialogTitle)
+            .setMessage(R.string.closeAppTabsConfirmationDialogDescription)
+            .setDestructiveButtons(true)
+            .setPositiveButton(R.string.closeAppTabsConfirmationDialogClose)
+            .setNegativeButton(R.string.closeAppTabsConfirmationDialogCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onCloseAllTabsConfirmed()
+                    }
+                },
+            )
+            .show()
     }
 
     companion object {

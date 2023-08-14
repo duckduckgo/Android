@@ -218,14 +218,14 @@
     <string name="atp_ActivityPastWeekBlocked">Užblokuota</string>
     <string name="atp_ActivityPastWeekAcross">Per</string>
 
-    <plurals name="atp_ActivityPastWeekTrackerCount">
-        <item quantity="one" tools:ignore="ImpliedQuantity">Bandymas sekti</item>
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Bandymas sekti</item>
         <item quantity="few">Bandymai sekti</item>
         <item quantity="many">Bandymų sekti</item>
         <item quantity="other">Bandymų sekti</item>
     </plurals>
-    <plurals name="atp_ActivityPastWeekAppCount">
-        <item quantity="one" tools:ignore="ImpliedQuantity">Programa</item>
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Programa</item>
         <item quantity="few">Programos</item>
         <item quantity="many">Programų</item>
         <item quantity="other">Programų</item>

@@ -47,6 +47,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     private val brokenSites
         get() = binding.contentBrokenSites
 
+    private var submitted = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -80,7 +82,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
+        val categories = viewModel.shuffledCategories.map { getString(it.category) }.toTypedArray()
 
         brokenSites.categoriesSelection.onAction {
             RadioListAlertDialogBuilder(this)
@@ -106,9 +108,12 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 .show()
         }
         brokenSites.submitButton.setOnClickListener {
-            val webViewVersion = webViewVersionProvider.getFullVersion()
-            val description = brokenSites.brokenSiteFormFeedbackInput.text
-            viewModel.onSubmitPressed(webViewVersion, description)
+            if (!submitted) {
+                val webViewVersion = webViewVersionProvider.getFullVersion()
+                val description = brokenSites.brokenSiteFormFeedbackInput.text
+                viewModel.onSubmitPressed(webViewVersion, description)
+                submitted = true
+            }
         }
     }
 

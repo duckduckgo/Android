@@ -468,8 +468,8 @@
         <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
         <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
         <item quantity="other"><![CDATA[ essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Lors de votre navigation, je bloque les traqueurs indésirables.<br/><br/>Continuez à naviguer en toute tranquillité !]]></string>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">L\'appli peut se fermer pour appliquer les modifications. Revenez après avoir admiré votre magnifique nouvelle icône.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Sites non protégés</string>
+    <string name="manageAllowlist">Sites non protégés</string>
     <string name="reportBrokenSite">Signaler un problème de site</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Modifier</string>
     <string name="dialogSaveAction">Enregistrer</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Sites non protégés</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
     <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Plus d\'options pour le site non protégé %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Voulez-vous vraiment retirer &lt;b&gt;%1$s&lt;/b&gt; des sites non protégés ?</string>
-    <string name="whitelistExplanation">Les sites suivants ne bénéficient pas de la protection de la confidentialité.</string>
-    <string name="whitelistNoEntries">La protection de la confidentialité est activée pour tous les sites</string>
-    <string name="whitelistDomainHint">www.exemple.com</string>
-    <string name="whitelistFormatError">Veuillez saisir un domaine comme <b>exemple.com</b> et réessayer</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Plus d\'options pour le site non protégé %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Voulez-vous vraiment retirer &lt;b&gt;%1$s&lt;/b&gt; des sites non protégés ?</string>
+    <string name="allowlistExplanation">Les sites suivants ne bénéficient pas de la protection de la confidentialité.</string>
+    <string name="allowlistNoEntries">La protection de la confidentialité est activée pour tous les sites</string>
+    <string name="allowlistDomainHint">www.exemple.com</string>
+    <string name="allowlistFormatError">Veuillez saisir un domaine comme <b>exemple.com</b> et réessayer</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Sites non protégés</string>
+    <string name="settingsPrivacyProtectionAllowlist">Sites non protégés</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sites coupe-feu</string>
@@ -759,4 +759,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Faites glisser de haut en bas et appuyez sur le bouton Retour pour quitter le mode plein écran</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fermer tous les onglets ?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Voulez-vous vraiment fermer tous les onglets ?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Annuler</string>
+    <string name="closeAppTabsConfirmationDialogClose">Fermer</string>
 </resources>

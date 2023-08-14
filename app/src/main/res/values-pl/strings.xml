@@ -470,7 +470,7 @@
         <item quantity="many"><![CDATA[ i <b>%1$d innych</b> próbowało Cię tutaj śledzić. <br/><br/>Zablokowałem je!<br/><br/> ☝️ Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
         <item quantity="other"><![CDATA[ i <b>%1$d innego</b> próbowało Cię tutaj śledzić. <br/><br/>Zablokowałem je!<br/><br/> ☝️ Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ próbował Cię tu śledzić. <br/><br/>Zablokowałem to!<br/><br/> ☝️ Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
         <item quantity="few"><![CDATA[ próbowały Cię tu śledzić. <br/><br/>Zablokowałem to!<br/><br/> ☝️ Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
         <item quantity="many"><![CDATA[ próbowało Cię tu śledzić. <br/><br/>Zablokowałem to!<br/><br/> ☝️ Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Aplikacja może się zamknąć, aby zastosować zmiany. Wróć po podziwianiu swojej pięknej nowej ikony.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Niezabezpieczone witryny</string>
+    <string name="manageAllowlist">Niezabezpieczone witryny</string>
     <string name="reportBrokenSite">Zgłoś uszkodzoną witrynę</string>
 
     <!-- Dialogs -->
@@ -523,19 +523,19 @@
     <string name="dialogEditTitle">Edytuj</string>
     <string name="dialogSaveAction">Zapisz</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Niezabezpieczone witryny</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Niezabezpieczone witryny</string>
     <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
     <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Więcej opcji dla niezabezpieczonej witryny %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Na pewno usunąć &lt;b&gt;%1$s&lt;/b&gt; z niezabezpieczonych witryn?</string>
-    <string name="whitelistExplanation">Te witryny nie będą ulepszane przez ochronę prywatności.</string>
-    <string name="whitelistNoEntries">Ochrona prywatności włączona dla wszystkich witryn</string>
-    <string name="whitelistDomainHint">www.domena.pl</string>
-    <string name="whitelistFormatError">Wprowadź domenę, na przykład <b>domena.pl</b>, i spróbuj ponownie</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Więcej opcji dla niezabezpieczonej witryny %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Na pewno usunąć &lt;b&gt;%1$s&lt;/b&gt; z niezabezpieczonych witryn?</string>
+    <string name="allowlistExplanation">Te witryny nie będą ulepszane przez ochronę prywatności.</string>
+    <string name="allowlistNoEntries">Ochrona prywatności włączona dla wszystkich witryn</string>
+    <string name="allowlistDomainHint">www.domena.pl</string>
+    <string name="allowlistFormatError">Wprowadź domenę, na przykład <b>domena.pl</b>, i spróbuj ponownie</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Niezabezpieczone witryny</string>
+    <string name="settingsPrivacyProtectionAllowlist">Niezabezpieczone witryny</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Bezpieczne witryny internetowe</string>
@@ -767,4 +767,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Przeciągnij w dół od góry i naciśnij przycisk Wstecz, aby zamknąć tryb pełnoekranowy.</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Zamknąć wszystkie karty?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Czy na pewno chcesz zamknąć wszystkie karty?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Anuluj</string>
+    <string name="closeAppTabsConfirmationDialogClose">Zamknij</string>
 </resources>

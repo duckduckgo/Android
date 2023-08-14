@@ -50,11 +50,17 @@
 
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
-    <dimen name="listItemImageSize">24dp</dimen>
+    <dimen name="listItemImageSmallSize">16dp</dimen>
+    <dimen name="listItemImageMediumSize">24dp</dimen>
+    <dimen name="listItemImageLargeSize">40dp</dimen>
     <dimen name="listItemTrailingIconWidth">52dp</dimen>
-    <dimen name="oneLineItemHeight">44dp</dimen>
-    <dimen name="twoLineItemHeight">64dp</dimen>
-    <dimen name="twoLineItemVerticalPadding">16dp</dimen>
+    <dimen name="oneLineItemHeight">48dp</dimen>
+    <dimen name="oneLineItemWithLargeImageHeight">56dp</dimen>
+    <dimen name="oneLineItemVerticalPadding">8dp</dimen>
+    <dimen name="twoLineItemHeight">56dp</dimen>
+    <dimen name="twoLineItemWithLargeImageHeight">64dp</dimen>
+    <dimen name="twoLineItemVerticalPadding">12dp</dimen>
+    <dimen name="twoLineItemVerticalBigPadding">14dp</dimen>
     <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
     <dimen name="sectionHeaderListItemHeight">44dp</dimen>
     <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>
@@ -70,7 +76,7 @@
     <dimen name="dialogButtonHeight">40dp</dimen>
     <dimen name="dialogImageSize">40dp</dimen>
     <dimen name="dialogBorderRadius">@dimen/mediumShapeCornerRadius</dimen>
-    <dimen name="dialogRadioGroupHeightMax">376dp</dimen>
+    <dimen name="dialogRadioGroupHeightMax">176dp</dimen>
 
     <!-- Bottom Sheet -->
     <dimen name="actionBottomSheetVerticalPadding">8dp</dimen>

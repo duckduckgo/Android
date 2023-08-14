@@ -92,6 +92,22 @@ class RealSecureStorageRepositoryTest {
     }
 
     @Test
+    fun whenRetrievingLoginCredentialByEmptyDomainThenReturnedIfDirectMatch() = runTest {
+        val testEntity = entity().copy(domain = "")
+        dao.insert(testEntity)
+        val result: List<WebsiteLoginCredentialsEntity> = testee.websiteLoginCredentialsForDomain("").first()
+        assertEquals(testEntity, result[0])
+    }
+
+    @Test
+    fun whenRetrievingLoginCredentialByNullDomainThenReturnedIfDirectMatch() = runTest {
+        val testEntity = entity().copy(domain = null)
+        dao.insert(testEntity)
+        val result: List<WebsiteLoginCredentialsEntity> = testee.websiteLoginCredentialsForDomain("").first()
+        assertEquals(testEntity, result[0])
+    }
+
+    @Test
     fun whenRetrievingLoginCredentialByDomainThenEmptyListReturnedIfNoMatches() = runTest {
         val testEntity = entity()
         dao.insert(testEntity)

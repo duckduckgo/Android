@@ -24,15 +24,14 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.DeviceSyncState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -50,12 +49,11 @@ class SettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
-    private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val networkProtectionState: NetworkProtectionState,
     private val deviceSyncState: DeviceSyncState,
-    private val netpWaitlistRepository: NetPWaitlistRepository,
+    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
 ) : ViewModel() {
@@ -81,8 +79,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchAccessibilitySettings : Command()
         object LaunchAddHomeScreenWidget : Command()
         object LaunchAppTPTrackersScreen : Command()
-        object LaunchNetPManagementScreen : Command()
-        object LaunchNetPWaitlist : Command()
+        data class LaunchNetPWaitlist(val screen: ActivityParams) : Command()
         object LaunchAppTPOnboarding : Command()
         object LaunchMacOs : Command()
         object LaunchWindows : Command()
@@ -118,7 +115,7 @@ class SettingsViewModel @Inject constructor(
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
                     networkProtectionStateEnabled = networkProtectionState.isRunning(),
-                    networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
+                    networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
             )
@@ -220,21 +217,22 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAppTPSettingClicked() {
-        if (appTrackingProtection.isOnboarded()) {
-            viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
-        } else {
-            viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+        viewModelScope.launch {
+            if (appTrackingProtection.isOnboarded()) {
+                command.send(Command.LaunchAppTPTrackersScreen)
+            } else {
+                command.send(Command.LaunchAppTPOnboarding)
+            }
+            pixel.fire(SETTINGS_APPTP_PRESSED)
         }
-        pixel.fire(SETTINGS_APPTP_PRESSED)
     }
 
     fun onNetPSettingClicked() {
-        if (netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()) == NetPWaitlistState.InBeta) {
-            viewModelScope.launch { command.send(Command.LaunchNetPManagementScreen) }
-        } else {
-            viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
+        viewModelScope.launch {
+            val screen = networkProtectionWaitlist.getScreenForCurrentState()
+            command.send(Command.LaunchNetPWaitlist(screen))
+            pixel.fire(SETTINGS_NETP_PRESSED)
         }
-        pixel.fire(SETTINGS_NETP_PRESSED)
     }
 
     private fun currentViewState(): ViewState {

@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
@@ -49,7 +49,8 @@ class DataModule {
     @Provides
     fun provideNetPWaitlistRepository(
         vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetPWaitlistRepository = RealNetPWaitlistRepository(NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider))
+        dispatcherProvider: DispatcherProvider,
+    ): NetPWaitlistRepository = RealNetPWaitlistRepository(NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider), dispatcherProvider)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -71,7 +72,7 @@ class DataModule {
 }
 
 @Module
-@ContributesTo(ActivityScope::class)
+@ContributesTo(AppScope::class)
 object NetPBreakageCategoriesModule {
     @Provides
     @NetpBreakageCategories

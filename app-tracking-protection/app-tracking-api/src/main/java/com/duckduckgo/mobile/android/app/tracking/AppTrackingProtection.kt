@@ -22,7 +22,7 @@ interface AppTrackingProtection {
      * This method returns whether the user has gone through AppTP onboarding
      * @return Returns `true` if user has gone through AppTP onboarding, `false` otherwise
      */
-    fun isOnboarded(): Boolean
+    suspend fun isOnboarded(): Boolean
 
     /**
      * This is a suspend function because the operation can take time.

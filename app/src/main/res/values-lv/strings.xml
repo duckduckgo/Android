@@ -469,9 +469,9 @@
         <item quantity="one"><![CDATA[ un <b>%1$d cita vietne</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
         <item quantity="other"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="zero" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+        <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
         <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Tev pieskaroties un ritinot, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet! Turpini pārlūkot!]]></string>
@@ -513,7 +513,7 @@
     <string name="changeIconDialogMessage">Lietotne var aizvērties, lai piemērotu jaunās izmaiņas. Atgriezies pēc tam, kad būsi apbrīnojis savu jauno, glīto ikonu.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Neaizsargātas vietnes</string>
+    <string name="manageAllowlist">Neaizsargātas vietnes</string>
     <string name="reportBrokenSite">Ziņot par bojātu vietni</string>
 
     <!-- Dialogs -->
@@ -521,19 +521,19 @@
     <string name="dialogEditTitle">Rediģēt</string>
     <string name="dialogSaveAction">Saglabāt</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Neaizsargātas vietnes</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
     <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas neaizsargātai vietnei %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
-    <string name="whitelistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
-    <string name="whitelistNoEntries">Privātuma aizsardzība ir iespējota visām vietnēm</string>
-    <string name="whitelistDomainHint">www.piemērs.com</string>
-    <string name="whitelistFormatError">Lūdzu, ievadi tādu domēnu kā, piemēram, <b>example.com</b>, un mēģini vēlreiz</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Citas opcijas neaizsargātai vietnei %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
+    <string name="allowlistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
+    <string name="allowlistNoEntries">Privātuma aizsardzība ir iespējota visām vietnēm</string>
+    <string name="allowlistDomainHint">www.piemērs.com</string>
+    <string name="allowlistFormatError">Lūdzu, ievadi tādu domēnu kā, piemēram, <b>example.com</b>, un mēģini vēlreiz</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Neaizsargātas vietnes</string>
+    <string name="settingsPrivacyProtectionAllowlist">Neaizsargātas vietnes</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ugunsdrošas vietnes</string>
@@ -763,4 +763,10 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Velciet no augšas uz leju un pieskarieties pogai Atpakaļ, lai izietu no pilnekrāna režīma</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Aizvērt visas cilnes?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Vai tiešām vēlies aizvērt visas cilnes?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Atcelt</string>
+    <string name="closeAppTabsConfirmationDialogClose">Aizvērt</string>
 </resources>

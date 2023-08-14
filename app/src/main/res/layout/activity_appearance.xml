@@ -65,7 +65,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="@string/changeIconCtaLabel"
-                    app:typography="body1" />
+                    app:typography="h4" />
 
                 <ImageView
                     android:id="@+id/changeAppIcon"

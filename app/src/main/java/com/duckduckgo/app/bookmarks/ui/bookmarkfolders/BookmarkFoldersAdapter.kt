@@ -137,7 +137,7 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
                 listItem.setSecondaryText(context.resources.getQuantityString(R.plurals.bookmarkFolderItems, totalItems, totalItems))
             }
 
-            listItem.setLeadingIcon(R.drawable.ic_folder_24)
+            listItem.setLeadingIconResource(R.drawable.ic_folder_24)
 
             listItem.showTrailingIcon()
             listItem.setTrailingIconClickListener {

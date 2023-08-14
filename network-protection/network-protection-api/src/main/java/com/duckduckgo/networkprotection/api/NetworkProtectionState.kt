@@ -18,6 +18,13 @@ package com.duckduckgo.networkprotection.api
 
 interface NetworkProtectionState {
     /**
+     * This is a suspend function because the operation has I/O.
+     * You DO NOT need to set any dispatcher to call this suspend function
+     * @return `true` when NetP was onboarded (enabled at least once in the past), `false` otherwise
+     */
+    suspend fun isOnboarded(): Boolean
+
+    /**
      * This is a suspend function because the operation can take time.
      * You DO NOT need to set any dispatcher to call this suspend function
      * @return `true` when NetP is enabled
@@ -35,4 +42,10 @@ interface NetworkProtectionState {
      * This method will restart the App Tracking Protection feature by disabling it and re-enabling back again
      */
     fun restart()
+
+    /**
+     * This method returns the current server location Network Protection is routing device's data through.
+     * @return Returns the server location if available, otherwise null.
+     */
+    fun serverLocation(): String?
 }

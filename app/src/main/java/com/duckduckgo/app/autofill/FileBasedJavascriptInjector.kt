@@ -60,7 +60,7 @@ class FileBasedJavascriptInjector @Inject constructor() : JavascriptInjector {
         return signOutFunctions
     }
 
-    fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
+    private fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
 
     private fun readResource(resourceName: String): BufferedReader? {
         return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()

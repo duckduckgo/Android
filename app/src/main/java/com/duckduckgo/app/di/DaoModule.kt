@@ -36,7 +36,7 @@ object DaoModule {
     fun providesTdsCnameEntityDao(database: AppDatabase) = database.tdsCnameEntityDao()
 
     @Provides
-    fun providesUserWhitelist(database: AppDatabase) = database.userWhitelistDao()
+    fun providesUserAllowList(database: AppDatabase) = database.userAllowListDao()
 
     @Provides
     fun providesNetworkLeaderboardDao(database: AppDatabase) = database.networkLeaderboardDao()

@@ -8,12 +8,16 @@ apply from: "$rootDir/code-formatting.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
-    CI_HOME_DIR="${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
+    CI_HOME_DIR = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
 }
 
 android {
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+        if (project.hasProperty('internal-testing')) {
+            applicationId "com.quackquackgo.mobile"
+        } else {
+            applicationId "com.duckduckgo.mobile.android"
+        }
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
@@ -68,7 +72,9 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            if (!project.hasProperty('internal-testing')) {
+                applicationIdSuffix ".debug"
+            }
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",
@@ -283,6 +289,14 @@ dependencies {
 
     implementation project(':internal-features-api')
 
+    implementation project(':web-compat-impl')
+    implementation project(':web-compat-store')
+
+    if (project.hasProperty('internal-testing')) {
+        implementation project(':subscriptions-impl')
+        internalImplementation project(':subscriptions-internal')
+    }
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -438,4 +452,14 @@ tasks.register('jvm_tests') {
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
+}
+
+tasks.register('releaseTestLocal', Exec) {
+    commandLine 'maestro', 'test', '--include-tags', 'releaseTest', '../.maestro'
+    dependsOn 'installPlayRelease'
+}
+
+tasks.register('releaseTestCloud', Exec) {
+    commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
+    dependsOn 'assemblePlayRelease'
 }
