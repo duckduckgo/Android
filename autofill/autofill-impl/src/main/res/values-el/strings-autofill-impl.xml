@@ -111,5 +111,10 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Ενεργοποιήστε την Προστασία email</annotation> για διαχείριση του Duck Address στη συσκευή αυτή.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">Επιλογή διεύθυνσης email</string>
+    <string name="autofillTooltipUseYourAliasDescription">Αποκλεισμός εφαρμογών παρακολούθησης email</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Δημιουργήστε ιδιωτική Duck Address</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Αποκλεισμός εφαρμογών παρακολούθησης email και απόκρυψη διεύθυνσης</string>
+
 
 </resources>
