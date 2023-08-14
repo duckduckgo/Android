@@ -22,7 +22,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         style="@style/AutofillDialogRootViewStyle"
-        android:paddingBottom="64dp">
+        android:paddingBottom="@dimen/autofillBottomSheetBottomPadding">
 
         <ImageView
             android:id="@+id/closeButton"
@@ -56,7 +56,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:background="@drawable/autofill_rounded_container_listitem_background"
             tools:primaryText="dax@duck.com"
-            app:layout_constraintWidth_percent="0.8"
+            app:layout_constraintWidth_percent="0.9"
             app:layout_constraintTop_toBottomOf="@id/dialogTitle"
             app:leadingIcon="@drawable/ic_dax_icon"
             app:secondaryText="@string/autofillTooltipUseYourAliasDescription" />
@@ -71,7 +71,7 @@
             android:layout_marginTop="@dimen/keyline_2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintWidth_percent="0.8"
+            app:layout_constraintWidth_percent="0.9"
             app:leadingIcon="@drawable/ic_dax_icon"
             app:layout_constraintTop_toBottomOf="@id/primaryCta"
             app:primaryText="@string/autofillTooltipGenerateAddress"
