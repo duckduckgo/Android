@@ -138,7 +138,6 @@ import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsFileActions
-import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
@@ -183,6 +182,7 @@ import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -636,8 +636,6 @@ class BrowserTabFragment :
     private var loginDetectionDialog: DaxAlertDialog? = null
 
     private var automaticFireproofDialog: DaxAlertDialog? = null
-
-    private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
 
@@ -2030,6 +2028,10 @@ class BrowserTabFragment :
         setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(tabId)) { _, _ ->
             autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptDismissed()
         }
+
+        setFragmentResultListener(EmailProtectionChooserDialog.resultKey(tabId)) { _, result ->
+            autofillCredentialsSelectionResultHandler.processEmailProtectionSelectEmailChoice(result, viewModel)
+        }
     }
 
     private fun injectAutofillCredentials(
@@ -2515,7 +2517,6 @@ class BrowserTabFragment :
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
-        emailAutofillTooltipDialog?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
         super.onDestroy()
@@ -2733,14 +2734,13 @@ class BrowserTabFragment :
     private fun showEmailTooltip(address: String) {
         context?.let {
             val url = webView?.url ?: return
-            val isShowing: Boolean? = emailAutofillTooltipDialog?.isShowing
-            if (isShowing != true) {
-                emailAutofillTooltipDialog = EmailAutofillTooltipFragment(context = it, address = address)
-                emailAutofillTooltipDialog?.show()
-                emailAutofillTooltipDialog?.setOnCancelListener { viewModel.cancelAutofillTooltip() }
-                emailAutofillTooltipDialog?.useAddress = { viewModel.useAddress(url) }
-                emailAutofillTooltipDialog?.usePrivateAlias = { viewModel.consumeAlias(url) }
-            }
+
+            val dialog = credentialAutofillDialogFactory.autofillEmailProtectionEmailChooserDialog(
+                url = url,
+                personalDuckAddress = address,
+                tabId = tabId,
+            )
+            showDialogHidingPrevious(dialog, EmailProtectionChooserDialog.TAG, url)
         }
     }
 

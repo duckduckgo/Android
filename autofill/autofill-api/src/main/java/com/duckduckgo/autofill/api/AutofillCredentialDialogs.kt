@@ -103,10 +103,55 @@ interface CredentialUpdateExistingCredentialsDialog {
 }
 
 /**
+ * Dialog which prompts the user to choose whether to use their personal duck address or a private alias address
+ *
+ * Results of this dialog should be consumed by registering a fragment result listener:
+ *     setFragmentResultListener(EmailProtectionChooserDialog.resultKey(tabId))
+ */
+interface EmailProtectionChooserDialog {
+
+    /**
+     * Result of the dialog, as determined by which button the user pressed or if they cancelled the dialog
+     */
+    @Parcelize
+    sealed interface UseEmailResultType : Parcelable {
+
+        /**
+         * User chose to use their personal duck address
+         */
+        @Parcelize
+        object UsePersonalEmailAddress : UseEmailResultType
+
+        /**
+         * User chose to use a private alias address
+         */
+        @Parcelize
+        object UsePrivateAliasAddress : UseEmailResultType
+
+        /**
+         * User cancelled the dialog
+         */
+        @Parcelize
+        object DoNotUseEmailProtection : UseEmailResultType
+    }
+
+    companion object {
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+        const val TAG = "EmailProtectionChooserDialog"
+        const val KEY_URL = "url"
+        const val KEY_RESULT = "result"
+    }
+}
+
+/**
  * Factory used to get instances of the various autofill dialogs
  */
 interface CredentialAutofillDialogFactory {
 
+    /**
+     * Creates a dialog which prompts the user to choose which saved credential to autofill
+     */
     fun autofillSelectCredentialsDialog(
         url: String,
         credentials: List<LoginCredentials>,
@@ -114,28 +159,49 @@ interface CredentialAutofillDialogFactory {
         tabId: String,
     ): DialogFragment
 
+    /**
+     * Creates a dialog which prompts the user to choose whether to save credentials or not
+     */
     fun autofillSavingCredentialsDialog(
         url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
 
+    /**
+     * Creates a dialog which prompts the user to choose whether to update an existing credential's password
+     */
     fun autofillSavingUpdatePasswordDialog(
         url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
 
+    /**
+     * Creates a dialog which prompts the user to choose whether to update an existing credential's username
+     */
     fun autofillSavingUpdateUsernameDialog(
         url: String,
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment
 
+    /**
+     * Creates a dialog which prompts the user to choose whether to use generated password or not
+     */
     fun autofillGeneratePasswordDialog(
         url: String,
         username: String?,
         generatedPassword: String,
+        tabId: String,
+    ): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to choose whether to use their personal duck address or a private alias address
+     */
+    fun autofillEmailProtectionEmailChooserDialog(
+        url: String,
+        personalDuckAddress: String,
         tabId: String,
     ): DialogFragment
 }
