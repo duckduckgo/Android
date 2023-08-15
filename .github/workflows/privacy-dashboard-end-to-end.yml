@@ -71,4 +71,5 @@ jobs:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
           app-file: apk/release.apk
-          workspace: .maestro/privacy_tests
+          workspace: .maestro
+          include-tags: privacyTest

@@ -70,7 +70,8 @@ jobs:
           name: ${{ github.sha }}
           app-file: apk/release.apk
           android-api-level: 30
-          workspace: .maestro/privacy_tests
+          workspace: .maestro
+          include-tags: privacyTest
 
       - name: Release Tests
         if: always()

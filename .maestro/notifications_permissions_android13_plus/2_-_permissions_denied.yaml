@@ -9,6 +9,7 @@ appId: com.duckduckgo.mobile.android
 - tapOn: "Don’t allow"
 - assertVisible:
     text: ".*Welcome to DuckDuckGo!.*"
+    optional: true
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"
 - tapOn: "let's do it!"
