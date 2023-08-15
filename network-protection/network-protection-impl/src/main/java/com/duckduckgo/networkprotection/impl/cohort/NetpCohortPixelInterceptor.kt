@@ -80,6 +80,7 @@ class NetpCohortPixelInterceptor @Inject constructor(
             "m_netp_ev_waitlist_notification_shown",
             "m_netp_ev_waitlist_notification_cancelled",
             "m_netp_ev_waitlist_notification_launched",
+            "m_netp_ev_waitlist_enabled",
             "m_netp_ev_terms_accepted",
         )
     }

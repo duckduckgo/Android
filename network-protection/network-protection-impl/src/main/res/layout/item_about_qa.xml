@@ -19,8 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/keyline_5"
-    android:paddingVertical="@dimen/keyline_4">
+    android:paddingHorizontal="@dimen/keyline_5">
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/about_question"

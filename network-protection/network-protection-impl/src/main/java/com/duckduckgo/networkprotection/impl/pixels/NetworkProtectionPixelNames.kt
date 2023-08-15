@@ -85,4 +85,6 @@ enum class NetworkProtectionPixelNames(
     NETP_WAITLIST_NOTIFICATION_CANCELLED("m_netp_ev_waitlist_notification_cancelled_c"),
     NETP_WAITLIST_NOTIFICATION_LAUNCHED_DAILY("m_netp_ev_waitlist_notification_launched_d"),
     NETP_WAITLIST_NOTIFICATION_LAUNCHED("m_netp_ev_waitlist_notification_launched_c"),
+    NETP_WAITLIST_BETA_ENABLED_DAILY("m_netp_ev_waitlist_enabled_d"),
+    NETP_WAITLIST_BETA_ENABLED("m_netp_ev_waitlist_enabled_c"),
 }

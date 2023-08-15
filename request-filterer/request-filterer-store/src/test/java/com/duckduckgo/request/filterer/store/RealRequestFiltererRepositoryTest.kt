@@ -18,6 +18,7 @@ package com.duckduckgo.request.filterer.store
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.request.filterer.store.RealRequestFiltererRepository.Companion.DEFAULT_WINDOW_IN_MS
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
@@ -28,6 +29,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealRequestFiltererRepositoryTest {
 
     @get:Rule
