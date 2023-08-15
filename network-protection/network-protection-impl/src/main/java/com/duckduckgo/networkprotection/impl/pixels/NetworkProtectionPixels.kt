@@ -220,6 +220,14 @@ interface NetworkProtectionPixels {
      * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
      */
     fun waitlistBetaIsEnabled()
+
+    /**
+     * This fun will one daily pixel
+     * daily -> fire only once a day no matter how many times we call this fun
+     *
+     * The pixel is fired just to test the incremental rollout functionality
+     */
+    fun waitlistIncrementalRolloutTest()
 }
 
 @ContributesBinding(AppScope::class)
@@ -375,6 +383,10 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun waitlistBetaIsEnabled() {
         tryToFireDailyPixel(NETP_WAITLIST_BETA_ENABLED_DAILY)
         firePixel(NETP_WAITLIST_BETA_ENABLED)
+    }
+
+    override fun waitlistIncrementalRolloutTest() {
+        tryToFireDailyPixel(NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL_DAILY)
     }
 
     private fun firePixel(
