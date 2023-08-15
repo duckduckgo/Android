@@ -66,7 +66,7 @@
     <string name="netpNotificationByline">Open your invite.</string>
     <string name="netpWaitlistActivityLabel">Network Protection Beta</string>
     <string name="netpBetaFeature">Network Protection Beta</string>
-    <string name="netpBetaFeatureByline">Secure your network connection anytime, anywhere with Network Protection, the VPN from DuckDuckGo.\n\nJoin the waitlist, and we\'ll notify you when it\'s your turn.</string>
+    <string name="netpBetaFeatureByline">Secure your network connection anytime, anywhere with Network Protection, the VPN from DuckDuckGo.\n\nJoin the waitlist, and we can notify you when it\'s your turn.</string>
     <string name="netpJoinWaitlist">Join the Waitlist</string>
     <string name="netpJoinWaitlistError">Error joining the Waitlist, please try again later</string>
     <string name="netpEnterCode">I Have an Invite Code</string>
@@ -86,7 +86,7 @@
 
     <string name="netpWaitlistRedeemedCodeStatus">You\'re invited to try Network Protection beta!</string>
     <string name="netpWaitlistJoined">You\'re on the list!</string>
-    <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first served basis.\n\nWe\'ll notify you when your invite is ready.</string>
+    <string name="netpWaitlistJoinedNotificationsEnabled">New invites are sent every few days, on a first come first served basis.\n\nWe can notify you when your invite is ready.</string>
     <string name="netpWaitlistGetStartedCta">Get Started</string>
 
     <string name="netpWaitlistInBetaDescription">Get an extra layer of protection online with the VPN built for speed and simplicity. Encrypt your internet connection across your entire device and hide your location and IP address from sites you visit.</string>
