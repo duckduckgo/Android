@@ -62,7 +62,8 @@ jobs:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
           app-file: apk/release.apk
-          workspace: .maestro/ad_click_detection_flows
+          workspace: .maestro
+          include-tags: adClickTest
 
       - name: Privacy Tests
         if: always()

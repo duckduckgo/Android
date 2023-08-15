@@ -1,13 +1,12 @@
 appId: com.duckduckgo.mobile.android
+tags:
+    - adClickTest
 ---
 - launchApp:
     clearState: true
-- assertVisible:
-    text: ".*Not to worry! Searching and browsing privately.*"
-- tapOn: "let's do it!"
-- tapOn: "cancel"
-- assertVisible:
-    text: ".*I'll also upgrade the security of your connection if possible.*"
+
+- runFlow: ../shared/onboarding.yaml
+
 - inputText: "https://www.search-company.site/#ad-id-6" # scroll until the ad-id-6 instead of ad-id-7 (context: https://app.asana.com/0/0/1204397066248823/1204415854211764/f)
 - pressKey: Enter
 - assertVisible:

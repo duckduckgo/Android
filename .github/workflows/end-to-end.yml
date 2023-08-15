@@ -60,7 +60,8 @@ jobs:
           name: ${{ github.sha }}
           app-file: apk/release.apk
           android-api-level: 30
-          workspace: .maestro/ad_click_detection_flows
+          workspace: .maestro
+          include-tags: adClickTest
 
       - name: Privacy Tests
         if: always()
