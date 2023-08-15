@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

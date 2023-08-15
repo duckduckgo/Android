@@ -24,4 +24,12 @@ class FakeNetPWaitlistDataStore(
     override var waitlistToken: String? = null,
     override var waitlistTimestamp: Int = -1,
     override var didAcceptedTerms: Boolean = false,
-) : NetPWaitlistDataStore
+) : NetPWaitlistDataStore {
+    override fun clear() {
+        settingUnlocked = false
+        authToken = null
+        waitlistToken = null
+        waitlistTimestamp = -1
+        didAcceptedTerms = false
+    }
+}

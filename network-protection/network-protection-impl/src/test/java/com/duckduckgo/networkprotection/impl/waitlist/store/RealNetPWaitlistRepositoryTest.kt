@@ -19,8 +19,8 @@ package com.duckduckgo.networkprotection.impl.waitlist.store
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
@@ -52,5 +52,19 @@ class RealNetPWaitlistRepositoryTest {
     fun whenAuthTokenSetGetTokenReturnsToken() {
         testee.setAuthenticationToken(fakeToken)
         assertEquals(fakeToken, testee.getAuthenticationToken())
+    }
+
+    @Test
+    fun whenClearStoreThenClearData() = runTest {
+        testee.setAuthenticationToken(fakeToken)
+        testee.setWaitlistToken(fakeToken)
+        testee.setWaitlistTimestamp(11)
+        testee.acceptWaitlistTerms()
+
+        testee.clearStore()
+        assertNotEquals(fakeToken, testee.getAuthenticationToken())
+        assertNotEquals(fakeToken, testee.getWaitlistToken())
+        assertNotEquals(11, testee.getWaitlistTimestamp())
+        assertFalse(testee.didAcceptWaitlistTerms())
     }
 }

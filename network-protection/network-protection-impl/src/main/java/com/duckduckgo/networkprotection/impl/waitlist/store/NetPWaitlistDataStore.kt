@@ -18,7 +18,10 @@ package com.duckduckgo.networkprotection.impl.waitlist.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 interface NetPWaitlistDataStore {
     var settingUnlocked: Boolean
@@ -26,9 +29,12 @@ interface NetPWaitlistDataStore {
     var waitlistToken: String?
     var waitlistTimestamp: Int
     var didAcceptedTerms: Boolean
+
+    fun clear()
 }
 
-class NetPWaitlistDataStoreSharedPreferences constructor(
+@ContributesBinding(AppScope::class)
+class NetPWaitlistDataStoreSharedPreferences @Inject constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetPWaitlistDataStore {
 
@@ -86,6 +92,10 @@ class NetPWaitlistDataStoreSharedPreferences constructor(
                 putBoolean(KEY_WAITLIST_ACCEPTED_TERMS, value)
             }
         }
+
+    override fun clear() {
+        preferences.edit { clear() }
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.netp.store.waitlist"
