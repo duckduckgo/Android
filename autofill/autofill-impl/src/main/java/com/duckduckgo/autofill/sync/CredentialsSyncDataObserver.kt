@@ -33,6 +33,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -66,7 +67,7 @@ class CredentialsSyncDataObserver @Inject constructor(
                     cancelSyncTriggerObserver()
                 }
             }
-        }.launchIn(appCoroutineScope)
+        }.flowOn(dispatchers.io()).launchIn(appCoroutineScope)
     }
 
     private fun syncTriggerObserver() {
