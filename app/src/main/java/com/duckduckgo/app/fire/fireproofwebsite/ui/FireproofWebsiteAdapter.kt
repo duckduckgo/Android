@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ class FireproofWebsiteAdapter(
     private val viewModel: FireproofWebsitesViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
+    private val dispatcherProvider: DispatcherProvider,
 ) : RecyclerView.Adapter<FireproofWebSiteViewHolder>() {
 
     companion object {
@@ -103,6 +105,7 @@ class FireproofWebsiteAdapter(
                     viewModel,
                     lifecycleOwner,
                     faviconManager,
+                    dispatcherProvider,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -186,6 +189,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         private val viewModel: FireproofWebsitesViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
+        private val dispatcherProvider: DispatcherProvider,
     ) : FireproofWebSiteViewHolder(binding.root) {
 
         private val context: Context = binding.root.context
@@ -212,7 +216,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             url: String,
             image: ImageView,
         ) {
-            lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }

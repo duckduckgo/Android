@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.databinding.ViewSitePermissionsEmptyListBindin
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewSitePermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.sitepermissions.SitePermissionListItem.Divider
 import com.duckduckgo.app.sitepermissions.SitePermissionListItem.EmptySites
 import com.duckduckgo.app.sitepermissions.SitePermissionListItem.SiteAllowedItem
@@ -56,6 +57,7 @@ class SitePermissionsAdapter(
     private val viewModel: SitePermissionsViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
+    private val dispatcherProvider: DispatcherProvider,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items: List<SitePermissionListItem> = listOf()
@@ -100,7 +102,7 @@ class SitePermissionsAdapter(
             }
             TOGGLE -> {
                 val binding = ViewSitePermissionsToggleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                SitePermissionToggleViewHolder(binding)
+                SitePermissionToggleViewHolder(binding, dispatcherProvider)
             }
             DIVIDER -> {
                 val view = HorizontalDivider(parent.context)
@@ -112,7 +114,7 @@ class SitePermissionsAdapter(
             }
             SITE_ALLOWED_ITEM -> {
                 val binding = RowOneLineListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                SiteViewHolder(binding, viewModel, lifecycleOwner, faviconManager)
+                SiteViewHolder(binding, viewModel, lifecycleOwner, faviconManager, dispatcherProvider)
             }
         }
 
@@ -176,7 +178,10 @@ class SitePermissionsAdapter(
         }
     }
 
-    class SitePermissionToggleViewHolder(val binding: ViewSitePermissionsToggleBinding) : RecyclerView.ViewHolder(binding.root) {
+    class SitePermissionToggleViewHolder(
+        private val binding: ViewSitePermissionsToggleBinding,
+        private val dispatcherProvider: DispatcherProvider
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
             item: SitePermissionToggle,
             listener: CompoundButton.OnCheckedChangeListener,
@@ -221,11 +226,12 @@ class SitePermissionsAdapter(
         private val viewModel: SitePermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
+        private val dispatcherProvider: DispatcherProvider,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: SiteAllowedItem) {
             val oneListItem = binding.root
             oneListItem.setPrimaryText(item.domain)
-            lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = item.domain, view = oneListItem.leadingIcon())
             }
             oneListItem.setClickListener {

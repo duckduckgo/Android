@@ -91,6 +91,7 @@ class SurveyViewModelTest {
                 coroutineTestRule.testDispatcherProvider,
                 mockAppDaysUsedRepository,
                 mockSurveyRepository,
+                coroutineTestRule.testDispatcherProvider
             )
             testee.command.observeForever(mockCommandObserver)
         }

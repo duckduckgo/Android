@@ -19,6 +19,7 @@ package com.duckduckgo.app.privatesearch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -37,6 +38,7 @@ import timber.log.Timber
 class PrivateSearchViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -51,7 +53,7 @@ class PrivateSearchViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(ViewState(autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled))
         }
     }
@@ -63,11 +65,11 @@ class PrivateSearchViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-        viewModelScope.launch { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
+        viewModelScope.launch(dispatcherProvider.io()) { viewState.emit(currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)) }
     }
 
     fun onPrivateSearchMoreSearchSettingsClicked() {
-        viewModelScope.launch { command.send(Command.LaunchCustomizeSearchWebPage) }
+        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchCustomizeSearchWebPage) }
         pixel.fire(AppPixelName.SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED)
     }
 

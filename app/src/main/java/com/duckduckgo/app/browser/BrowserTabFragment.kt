@@ -1334,7 +1334,7 @@ class BrowserTabFragment :
         } else {
             getString(R.string.preciseLocationSiteDialogSubtitle)
         }
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatchers.io()) {
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, domain, binding.sitePermissionDialogFavicon)
         }
 
@@ -1859,6 +1859,7 @@ class BrowserTabFragment :
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteQuickAccessItemRequested(it.favorite) },
+            dispatchers,
         )
     }
 
@@ -1926,7 +1927,7 @@ class BrowserTabFragment :
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             viewModel.fireAutocompletePixel(suggestion)
             withContext(dispatchers.main()) {
                 val origin = when (suggestion) {
@@ -2490,7 +2491,7 @@ class BrowserTabFragment :
     }
 
     private fun launchDownloadMessagesJob() {
-        downloadMessagesJob += lifecycleScope.launch {
+        downloadMessagesJob += lifecycleScope.launch(dispatchers.io()) {
             viewModel.downloadCommands().cancellable().collect {
                 processFileDownloadedCommand(it)
             }
@@ -2700,6 +2701,7 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
+                dispatchers
             ).show()
         }
     }

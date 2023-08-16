@@ -17,18 +17,26 @@
 package com.duckduckgo.app.usage.app
 
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class AppDaysUsedRecorder(
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class AppDaysUsedRecorder @Inject constructor(
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onStart(owner: LifecycleOwner) {
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             Timber.i("Recording app used today")
             appDaysUsedRepository.recordAppUsedToday()
         }

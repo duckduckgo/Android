@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
@@ -34,6 +35,9 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var variantManager: VariantManager
 
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
     private val viewModel: LaunchViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +46,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        lifecycleScope.launch { viewModel.determineViewToShow() }
+        lifecycleScope.launch(dispatcherProvider.io()) { viewModel.determineViewToShow() }
     }
 
     private fun configureObservers() {

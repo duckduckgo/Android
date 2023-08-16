@@ -38,6 +38,10 @@ internal class PrivateSearchViewModelTest {
 
     @get:Rule
     @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
+    @get:Rule
+    @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var testee: PrivateSearchViewModel
@@ -58,6 +62,7 @@ internal class PrivateSearchViewModelTest {
         testee = PrivateSearchViewModel(
             mockAppSettingsDataStore,
             mockPixel,
+            coroutineRule.testDispatcherProvider
         )
     }
 

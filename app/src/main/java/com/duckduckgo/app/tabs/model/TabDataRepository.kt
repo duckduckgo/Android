@@ -255,7 +255,7 @@ class TabDataRepository @Inject constructor(
             siteData.remove(tabToDelete.tabId)
 
             tabToSelect?.let {
-                appCoroutineScope.launch {
+                appCoroutineScope.launch(dispatchers.io()) {
                     childTabClosedSharedFlow.emit(tabToSelect.tabId)
                 }
             }
@@ -315,7 +315,7 @@ class TabDataRepository @Inject constructor(
         currentFavicon: String? = null,
     ) {
         Timber.i("Deleting old favicon for $tabId. Current favicon is $currentFavicon")
-        appCoroutineScope.launch { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
+        appCoroutineScope.launch(dispatchers.io()) { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
     }
 
     private fun deleteOldPreviewImages(
@@ -323,7 +323,7 @@ class TabDataRepository @Inject constructor(
         currentPreviewImage: String? = null,
     ) {
         Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
-        appCoroutineScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
+        appCoroutineScope.launch(dispatchers.io()) { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
     }
 
     /**

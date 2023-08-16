@@ -19,6 +19,7 @@ package com.duckduckgo.app.appearance
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -41,6 +42,7 @@ class AppearanceViewModel @Inject constructor(
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -58,7 +60,7 @@ class AppearanceViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(
                 currentViewState().copy(
                     theme = themingDataStore.theme,
@@ -73,12 +75,12 @@ class AppearanceViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeTheme() {
-        viewModelScope.launch { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
+        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchThemeSettings(viewState.value.theme)) }
         pixel.fire(AppPixelName.SETTINGS_THEME_OPENED)
     }
 
     fun userRequestedToChangeIcon() {
-        viewModelScope.launch { command.send(Command.LaunchAppIcon) }
+        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAppIcon) }
         pixel.fire(AppPixelName.SETTINGS_APP_ICON_PRESSED)
     }
 
@@ -89,7 +91,7 @@ class AppearanceViewModel @Inject constructor(
             return
         }
         themingDataStore.theme = selectedTheme
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(currentViewState().copy(theme = selectedTheme))
             command.send(Command.UpdateTheme)
         }

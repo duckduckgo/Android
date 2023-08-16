@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ import timber.log.Timber
 @ContributesViewModel(ActivityScope::class)
 class AccessibilitySettingsViewModel @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -43,7 +45,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     fun viewState(): StateFlow<ViewState> = viewState
 
     fun start() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(
                 currentViewState().copy(
                     overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
@@ -57,7 +59,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     fun onForceZoomChanged(checked: Boolean) {
         Timber.v("AccessibilityActSettings: onForceZoomChanged $checked")
         accessibilitySettings.forceZoom = checked
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(
                 currentViewState().copy(
                     forceZoom = accessibilitySettings.forceZoom,
@@ -69,7 +71,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     fun onSystemFontSizeChanged(checked: Boolean) {
         Timber.v("AccessibilityActSettings: onOverrideSystemFontSizeChanged $checked")
         accessibilitySettings.overrideSystemFontSize = checked
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(
                 currentViewState().copy(
                     overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
@@ -81,7 +83,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     fun onFontSizeChanged(newValue: Float) {
         Timber.v("AccessibilityActSettings: onFontSizeChanged $newValue")
         accessibilitySettings.appFontSize = newValue
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(
                 currentViewState().copy(
                     appFontSize = accessibilitySettings.appFontSize,

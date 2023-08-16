@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -46,6 +47,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     private val sitePermissionsRepository: SitePermissionsRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val settingsDataStore: SettingsDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -64,7 +66,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     }
 
     fun websitePermissionSettings(url: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             val websitePermissionsSettings = sitePermissionsRepository.getSitePermissionsForWebsite(url)
             val locationSetting = locationPermissionsRepository.getDomainPermission(url)
             val websitePermissions = convertToWebsitePermissionSettings(websitePermissionsSettings, locationSetting)
@@ -120,13 +122,13 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     }
 
     fun permissionSettingSelected(setting: WebsitePermissionSetting) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             _commands.send(ShowPermissionSettingSelectionDialog(setting))
         }
     }
 
     fun removeWebsitePermissionsSettings(url: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             sitePermissionsRepository.deletePermissionsForSite(url)
             _commands.send(GoBackToSitePermissions)
         }
@@ -170,7 +172,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
             DENY -> LocationPermissionType.DENY_ALWAYS
             ALLOW -> LocationPermissionType.ALLOW_ALWAYS
         }
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             locationPermissionsRepository.savePermission(url, locationPermissionType)
         }
     }
@@ -185,7 +187,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
             askCameraSetting = askCameraSetting.toSitePermissionSettingEntityType().name,
             askMicSetting = askMicSetting.toSitePermissionSettingEntityType().name,
         )
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             sitePermissionsRepository.savePermission(sitePermissionsEntity)
         }
     }

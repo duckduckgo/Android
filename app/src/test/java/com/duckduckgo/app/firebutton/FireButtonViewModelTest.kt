@@ -72,6 +72,7 @@ internal class FireButtonViewModelTest {
             mockAppSettingsDataStore,
             mockFireAnimationLoader,
             mockPixel,
+            coroutineTestRule.testDispatcherProvider
         )
     }
 

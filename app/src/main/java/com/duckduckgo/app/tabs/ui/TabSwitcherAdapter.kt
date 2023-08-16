@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -49,6 +50,7 @@ class TabSwitcherAdapter(
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
+    private val dispatcherProvider: DispatcherProvider,
 ) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
@@ -141,7 +143,7 @@ class TabSwitcherAdapter(
         view: ImageView,
     ) {
         val url = tab.url ?: return
-        lifecycleOwner.lifecycleScope.launch {
+        lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
             faviconManager.loadToViewFromLocalWithPlaceholder(tab.tabId, url, view)
         }
     }

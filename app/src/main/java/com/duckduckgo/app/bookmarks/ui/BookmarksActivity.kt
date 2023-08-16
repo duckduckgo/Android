@@ -289,7 +289,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun initializeSearchBar() {
-        searchListener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
+        searchListener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter, dispatchers)
         searchMenuItem?.setOnMenuItemClickListener {
             showSearchBar()
             return@setOnMenuItemClickListener true

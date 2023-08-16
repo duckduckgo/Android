@@ -20,6 +20,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -43,6 +44,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val variantManager: VariantManager,
     private val pixel: Pixel,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -66,7 +68,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> = viewState.onStart {
         val variant = variantManager.getVariant()
 
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             viewState.emit(
                 currentViewState().copy(
                     networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
@@ -81,12 +83,12 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onLearnMoreLinkClicked() {
-        viewModelScope.launch { command.send(Command.LaunchBrowserWithLearnMoreUrl) }
+        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchBrowserWithLearnMoreUrl) }
         pixel.fire(SETTINGS_ABOUT_DDG_LEARN_MORE_PRESSED)
     }
 
     fun onPrivacyPolicyClicked() {
-        viewModelScope.launch { command.send(Command.LaunchWebViewWithPrivacyPolicyUrl) }
+        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchWebViewWithPrivacyPolicyUrl) }
         pixel.fire(SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED)
     }
 
@@ -94,7 +96,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         if (viewState.value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
             netPEasterEggCounter++
             if (netPEasterEggCounter >= MAX_EASTER_EGG_COUNT) {
-                viewModelScope.launch { command.send(Command.ShowNetPUnlockedSnackbar) }
+                viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.ShowNetPUnlockedSnackbar) }
                 resetNetPEasterEggCounter()
                 pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
             }
@@ -102,12 +104,12 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onProvideFeedbackClicked() {
-        viewModelScope.launch { command.send(Command.LaunchFeedback) }
+        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchFeedback) }
         pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
     fun onNetPUnlockedActionClicked() {
-        viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
+        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchNetPWaitlist) }
         pixel.fire(SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED)
     }
 

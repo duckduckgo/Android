@@ -90,6 +90,7 @@ class FavoritesAdapter(
                     viewModel,
                     lifecycleOwner,
                     faviconManager,
+                    dispatchers,
                 )
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
@@ -182,6 +183,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
+        private val dispatcherProvider: DispatcherProvider,
     ) : FavoritesScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -214,7 +216,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun loadFavicon(url: String, image: ImageView) {
-            lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }

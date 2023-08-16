@@ -95,6 +95,7 @@ class BookmarksAdapter(
                     viewModel,
                     lifecycleOwner,
                     faviconManager,
+                    dispatchers,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -167,6 +168,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
+        private val dispatchers: DispatcherProvider,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context
@@ -196,7 +198,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         }
 
         private fun loadFavicon(url: String, image: ImageView) {
-            lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }

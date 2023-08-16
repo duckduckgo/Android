@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.Companion.getFireproofSettingOptionForIndex
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
@@ -42,6 +43,9 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     lateinit var adapter: FireproofWebsiteAdapter
 
@@ -78,7 +82,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun setupFireproofWebsiteRecycler() {
-        adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager)
+        adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager, dispatcherProvider)
         binding.recycler.adapter = adapter
     }
 

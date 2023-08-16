@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.databinding.ActivityDownloadsBinding
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.*
 import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.model.DownloadItem
@@ -61,6 +62,9 @@ class DownloadsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
 
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
     private val toolbar
         get() = binding.toolbar
 
@@ -75,13 +79,13 @@ class DownloadsActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         setupRecyclerView()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { render(it) }
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.commands()
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { processCommands(it) }
