@@ -99,7 +99,8 @@ class FireproofingReferenceTest(private val testCase: TestCase) {
         testee = WebViewCookieManager(cookieManagerProvider, removeCookiesStrategy, DefaultDispatcherProvider())
 
         fireproofedSites.map { url ->
-            fireproofWebsiteDao.insert(FireproofWebsiteEntity(url.toUri().domain().orEmpty()))
+            val domain = url.toUri().domain() ?: url
+            fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain))
         }
     }
 
