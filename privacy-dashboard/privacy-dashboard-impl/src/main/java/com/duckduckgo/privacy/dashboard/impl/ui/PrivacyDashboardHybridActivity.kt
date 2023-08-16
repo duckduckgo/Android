@@ -30,6 +30,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
@@ -76,6 +77,9 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var appTheme: AppTheme
 
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
     private val binding: ActivityPrivacyHybridDashboardBinding by viewBinding()
 
     private val webView
@@ -119,7 +123,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
             viewModel.onSiteChanged(it)
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatchers.io()) {
             viewModel.commands()
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { processCommands(it) }
@@ -191,7 +195,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
     }
 
     private fun configViewStateObserver() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatchers.io()) {
             viewModel.viewState()
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest {
