@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.email
+package com.duckduckgo.autofill.impl.email.incontext
 
 import android.content.Context
 import android.content.DialogInterface
@@ -24,22 +24,29 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.impl.databinding.ContentAutofillTooltipBinding
+import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionInContextSignUpBinding
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISPLAYED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_NEVER_AGAIN
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectionChooserDialog {
+class EmailProtectionInContextSignUpFragment : BottomSheetDialogFragment(), EmailProtectionInContextSignUpDialog {
 
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
+
+    @Inject
+    lateinit var pixel: Pixel
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -60,74 +67,66 @@ class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectio
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = ContentAutofillTooltipBinding.inflate(inflater, container, false)
+        pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISPLAYED)
+
+        val binding = DialogEmailProtectionInContextSignUpBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
     }
 
-    private fun configureViews(binding: ContentAutofillTooltipBinding) {
+    private fun configureViews(binding: DialogEmailProtectionInContextSignUpBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        configureCloseButton(binding)
-        configureEmailButtons(binding)
+        configureDialogButtons(binding)
     }
 
-    private fun configureEmailButtons(binding: ContentAutofillTooltipBinding) {
+    private fun configureDialogButtons(binding: DialogEmailProtectionInContextSignUpBinding) {
         context?.let {
-            binding.primaryCta.setPrimaryText(getPersonalAddress().html(it).toString())
-
-            binding.secondaryCta.setOnClickListener {
-                returnResult(UseEmailResultType.UsePrivateAliasAddress)
+            binding.protectMyEmailButton.setOnClickListener {
+                pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_CONFIRMED)
+                returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.SignUp)
             }
 
-            binding.primaryCta.setOnClickListener {
-                returnResult(UseEmailResultType.UsePersonalEmailAddress)
+            binding.closeButton.setOnClickListener {
+                pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED)
+                returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.Cancel)
+            }
+
+            binding.doNotShowAgainButton.setOnClickListener {
+                pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_NEVER_AGAIN)
+                returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.DoNotShowAgain)
             }
         }
     }
 
-    private fun returnResult(resultType: UseEmailResultType) {
+    private fun returnResult(resultType: EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult) {
         Timber.v("User action: %s", resultType::class.java.simpleName)
 
         val result = Bundle().also {
-            it.putString(EmailProtectionChooserDialog.KEY_URL, getOriginalUrl())
-            it.putParcelable(EmailProtectionChooserDialog.KEY_RESULT, resultType)
+            it.putParcelable(EmailProtectionInContextSignUpDialog.KEY_RESULT, resultType)
         }
 
-        parentFragment?.setFragmentResult(EmailProtectionChooserDialog.resultKey(getTabId()), result)
+        parentFragment?.setFragmentResult(EmailProtectionInContextSignUpDialog.resultKey(getTabId()), result)
         dismiss()
     }
 
-    private fun configureCloseButton(binding: ContentAutofillTooltipBinding) {
-        binding.closeButton.setOnClickListener {
-            returnResult(UseEmailResultType.DoNotUseEmailProtection)
-        }
-    }
-
     override fun onCancel(dialog: DialogInterface) {
-        Timber.v("onCancel: EmailAutofillTooltipFragment. User declined to use Email Protection")
-        returnResult(UseEmailResultType.DoNotUseEmailProtection)
+        pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED)
+        returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.Cancel)
     }
 
-    private fun getPersonalAddress() = arguments?.getString(KEY_ADDRESS)!!
-    private fun getOriginalUrl() = arguments?.getString(EmailProtectionChooserDialog.KEY_URL)!!
     private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
 
     companion object {
         fun instance(
-            personalDuckAddress: String,
-            url: String,
             tabId: String,
-        ): EmailAutofillTooltipFragment {
-            val fragment = EmailAutofillTooltipFragment()
+        ): EmailProtectionInContextSignUpFragment {
+            val fragment = EmailProtectionInContextSignUpFragment()
             fragment.arguments = Bundle().also {
-                it.putString(KEY_ADDRESS, personalDuckAddress)
-                it.putString(EmailProtectionChooserDialog.KEY_URL, url)
                 it.putString(KEY_TAB_ID, tabId)
             }
             return fragment
         }
 
         private const val KEY_TAB_ID = "tabId"
-        private const val KEY_ADDRESS = "address"
     }
 }

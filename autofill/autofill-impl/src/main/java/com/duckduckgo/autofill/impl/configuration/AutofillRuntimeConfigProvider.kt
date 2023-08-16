@@ -20,6 +20,7 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.di.scopes.AppScope
@@ -41,6 +42,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val shareableCredentials: ShareableCredentials,
+    private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
@@ -55,6 +57,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
             credentialSaving = canSaveCredentials(url),
             passwordGeneration = canGeneratePasswords(url),
             showInlineKeyIcon = true,
+            showInContextEmailProtectionSignup = canShowInContextEmailProtectionSignup(url),
         )
         val availableInputTypes = generateAvailableInputTypes(url)
 
@@ -105,6 +108,11 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private suspend fun canGeneratePasswords(url: String?): Boolean {
         if (url == null) return false
         return autofillCapabilityChecker.canGeneratePasswordFromWebView(url)
+    }
+
+    private suspend fun canShowInContextEmailProtectionSignup(url: String?): Boolean {
+        if (url == null) return false
+        return emailProtectionInContextAvailabilityRules.permittedToShow(url)
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()

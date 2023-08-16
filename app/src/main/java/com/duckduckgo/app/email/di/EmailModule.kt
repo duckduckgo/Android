@@ -17,34 +17,14 @@
 package com.duckduckgo.app.email.di
 
 import android.content.Context
-import com.duckduckgo.app.autofill.JavascriptInjector
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.email.EmailInjector
-import com.duckduckgo.app.email.EmailInjectorJs
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.email.db.EmailEncryptedSharedPreferences
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.Autofill
-import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.api.email.EmailManager
 import dagger.Module
 import dagger.Provides
 
 @Module
 class EmailModule {
-
-    @Provides
-    fun providesEmailInjector(
-        emailManager: EmailManager,
-        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        dispatcherProvider: DispatcherProvider,
-        autofillFeature: AutofillFeature,
-        javascriptInjector: JavascriptInjector,
-        autofill: Autofill,
-    ): EmailInjector {
-        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, autofillFeature, javascriptInjector, autofill)
-    }
 
     @Provides
     fun providesEmailDataStore(

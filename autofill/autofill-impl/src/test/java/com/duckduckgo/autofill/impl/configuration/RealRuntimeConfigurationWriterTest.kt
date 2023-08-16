@@ -91,7 +91,8 @@ class RealRuntimeConfigurationWriterTest {
                       "emailProtection": true,
                       "password_generation": true,
                       "credentials_saving": true,
-                      "inlineIcon_credentials": true
+                      "inlineIcon_credentials": true,
+                      "emailProtection_incontext_signup": true
                     }
                   }
                 }
@@ -105,6 +106,7 @@ class RealRuntimeConfigurationWriterTest {
                 credentialSaving = true,
                 passwordGeneration = true,
                 showInlineKeyIcon = true,
+                showInContextEmailProtectionSignup = true,
             ),
         )
     }

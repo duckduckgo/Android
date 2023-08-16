@@ -67,6 +67,17 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
 
     SYSTEM_AUTOFILL_USED("m_autofill_system_autofillservice_autofilled"),
+
+    EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISPLAYED("m_email_incontext_prompt_displayed"),
+    EMAIL_PROTECTION_IN_CONTEXT_PROMPT_CONFIRMED("m_email_incontext_prompt_confirmed"),
+    EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED("m_email_incontext_prompt_dismissed"),
+    EMAIL_PROTECTION_IN_CONTEXT_PROMPT_NEVER_AGAIN("m_email_incontext_prompt_dismissed_persisted"),
+
+    EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED("m_email_incontext_modal_displayed"),
+    EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED("m_email_incontext_modal_dismissed"),
+
+    EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL("m_email_incontext_modal_exit_early_continue"),
+    EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM("m_email_incontext_modal_exit_early"),
 }
 
 @ContributesMultibinding(

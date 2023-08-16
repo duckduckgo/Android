@@ -18,13 +18,9 @@ package com.duckduckgo.autofill.impl.ui.credential.repository
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.email.DuckAddressStatusManagementService
+import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementService
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Activated
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Deactivated
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.GeneralError
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.NotSignedIn
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Unmanageable
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.*
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

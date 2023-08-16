@@ -438,7 +438,8 @@ class BrowserTabViewModel @Inject constructor(
             val originalUrl: String,
             val autoSaveLogin: Boolean,
         ) : Command()
-        class ShowEmailTooltip(val address: String) : Command()
+        class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
+        object ShowEmailProtectionInContextSignUpPrompt : Command()
         sealed class DaxCommand : Command() {
             object FinishPartialTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -2720,9 +2721,9 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
-    fun showEmailTooltip() {
+    fun showEmailProtectionChooseEmailPrompt() {
         emailManager.getEmailAddress()?.let {
-            command.postValue(ShowEmailTooltip(it))
+            command.postValue(ShowEmailProtectionChooseEmailPrompt(it))
         }
     }
 

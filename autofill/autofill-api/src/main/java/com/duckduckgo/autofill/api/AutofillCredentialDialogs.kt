@@ -24,7 +24,7 @@ import kotlinx.parcelize.Parcelize
 
 /**
  * Dialog which can be shown when user is required to select whether to use generated password or not
- * Results should be handled by defining a [com.duckduckgo.app.browser.autofill.AutofillFragmentResultsPlugin]
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
 interface UseGeneratedPasswordDialog {
 
@@ -43,7 +43,7 @@ interface UseGeneratedPasswordDialog {
 
 /**
  * Dialog which can be shown when user is required to select which saved credential to autofill
- * Results should be handled by defining a [com.duckduckgo.app.browser.autofill.AutofillFragmentResultsPlugin]
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
 interface CredentialAutofillPickerDialog {
 
@@ -62,7 +62,7 @@ interface CredentialAutofillPickerDialog {
 
 /**
  * Dialog which can be shown to prompt user to save credentials or not
- * Results should be handled by defining a [com.duckduckgo.app.browser.autofill.AutofillFragmentResultsPlugin]
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
 interface CredentialSavePickerDialog {
 
@@ -80,7 +80,7 @@ interface CredentialSavePickerDialog {
 
 /**
  * Dialog which can be shown to prompt user to update existing saved credentials or not
- * Results should be handled by defining a [com.duckduckgo.app.browser.autofill.AutofillFragmentResultsPlugin]
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
 interface CredentialUpdateExistingCredentialsDialog {
 
@@ -107,9 +107,9 @@ interface CredentialUpdateExistingCredentialsDialog {
 
 /**
  * Dialog which prompts the user to choose whether to use their personal duck address or a private alias address
- * Results should be handled by defining a [com.duckduckgo.app.browser.autofill.AutofillFragmentResultsPlugin]
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
  */
-interface EmailProtectionChooserDialog {
+interface EmailProtectionChooseEmailDialog {
 
     /**
      * Result of the dialog, as determined by which button the user pressed or if they cancelled the dialog
@@ -141,6 +141,45 @@ interface EmailProtectionChooserDialog {
 
         const val TAG = "EmailProtectionChooserDialog"
         const val KEY_URL = "url"
+        const val KEY_RESULT = "result"
+    }
+}
+
+/**
+ * Dialog which prompts the user to enable Email Protection
+ * Results should be handled by defining a [AutofillFragmentResultsPlugin]
+ */
+interface EmailProtectionInContextSignUpDialog {
+
+    /**
+     * Result of the dialog, as determined by which button the user pressed or if they cancelled the dialog
+     */
+    @Parcelize
+    sealed interface EmailProtectionInContextSignUpResult : Parcelable {
+
+        /**
+         * User chose to enable Email Protection
+         */
+        @Parcelize
+        object SignUp : EmailProtectionInContextSignUpResult
+
+        /**
+         * User chose to dismiss dialog
+         */
+        @Parcelize
+        object Cancel : EmailProtectionInContextSignUpResult
+
+        /**
+         * User chose to dismiss dialog and not be shown again
+         */
+        @Parcelize
+        object DoNotShowAgain : EmailProtectionInContextSignUpResult
+    }
+
+    companion object {
+        fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+        const val TAG = "EmailProtectionInContextSignUpDialog"
         const val KEY_RESULT = "result"
     }
 }
@@ -205,6 +244,11 @@ interface CredentialAutofillDialogFactory {
         personalDuckAddress: String,
         tabId: String,
     ): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to sign up for Email Protection
+     */
+    fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment
 }
 
 private fun prefix(

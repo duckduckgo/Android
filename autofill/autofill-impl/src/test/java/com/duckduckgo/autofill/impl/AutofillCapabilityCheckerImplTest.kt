@@ -129,8 +129,8 @@ class AutofillCapabilityCheckerImplTest {
     }
 
     private suspend fun setupConfig(
-        topLevelFeatureEnabled: Boolean,
-        autofillEnabledByUser: Boolean,
+        topLevelFeatureEnabled: Boolean = false,
+        autofillEnabledByUser: Boolean = false,
         canInjectCredentials: Boolean = false,
         canSaveCredentials: Boolean = false,
         canGeneratePassword: Boolean = false,
