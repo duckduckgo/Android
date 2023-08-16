@@ -87,5 +87,5 @@ enum class NetworkProtectionPixelNames(
     NETP_WAITLIST_NOTIFICATION_LAUNCHED("m_netp_ev_waitlist_notification_launched_c"),
     NETP_WAITLIST_BETA_ENABLED_DAILY("m_netp_ev_waitlist_enabled_d"),
     NETP_WAITLIST_BETA_ENABLED("m_netp_ev_waitlist_enabled_c"),
-    NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL_DAILY("m_netp_ev_incremental_rollout_test_d"),
+    NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL_UNIQUE("m_netp_ev_incremental_rollout_test_u"),
 }

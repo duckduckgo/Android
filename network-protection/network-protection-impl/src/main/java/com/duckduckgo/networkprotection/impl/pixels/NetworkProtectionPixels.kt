@@ -386,7 +386,7 @@ class RealNetworkProtectionPixel @Inject constructor(
     }
 
     override fun waitlistIncrementalRolloutTest() {
-        tryToFireDailyPixel(NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL_DAILY)
+        tryToFireUniquePixel(NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL_UNIQUE)
     }
 
     private fun firePixel(
@@ -432,6 +432,22 @@ class RealNetworkProtectionPixel @Inject constructor(
                 this.pixel.fire(pixelName, payload)
                     .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
             }
+        }
+    }
+
+    private fun tryToFireUniquePixel(
+        pixel: NetworkProtectionPixelNames,
+        tag: String? = null,
+        payload: Map<String, String> = emptyMap(),
+    ) {
+        val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
+
+        if (didExecuteAlready) return
+
+        if (pixel.enqueue) {
+            this.pixel.enqueueFire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        } else {
+            this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
         }
     }
 
