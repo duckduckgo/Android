@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.api
 
+import kotlinx.coroutines.flow.Flow
+
 interface NetworkProtectionState {
     /**
      * This is a suspend function because the operation has I/O.
@@ -48,4 +50,16 @@ interface NetworkProtectionState {
      * @return Returns the server location if available, otherwise null.
      */
     fun serverLocation(): String?
+
+    /**
+     * This method returns the [ConnectionState] of Network Protection which considers both the feature state and the VPNService state.
+     * @return [ConnectionState] of Network Protection.
+     */
+    fun getConnectionStateFlow(): Flow<ConnectionState>
+
+    enum class ConnectionState {
+        CONNECTED,
+        CONNECTING,
+        DISCONNECTED,
+    }
 }

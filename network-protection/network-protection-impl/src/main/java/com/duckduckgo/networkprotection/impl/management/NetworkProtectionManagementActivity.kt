@@ -203,6 +203,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
         netpStatusImage.setImageResource(R.drawable.illustration_vpn_off)
+        netpToggle.quietlySetChecked(true)
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
         netpToggle.isEnabled = false
