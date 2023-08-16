@@ -62,7 +62,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val defaultTimeWindow = TimeWindow(5, DAYS)
 
     private fun MutableStateFlow<Long>.refresh() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             emit(System.currentTimeMillis())
         }
     }
@@ -163,7 +163,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         report: Boolean,
     ) {
         pixel.didDisableAppProtectionFromApps()
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             excludedApps.manuallyExcludeApp(packageName)
             pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
@@ -182,14 +182,14 @@ class ManageAppsProtectionViewModel @Inject constructor(
         packageName: String,
     ) {
         pixel.didEnableAppProtectionFromApps()
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             excludedApps.manuallyEnabledApp(packageName)
         }
     }
 
     fun restoreProtectedApps() {
         pixel.restoreDefaultProtectionList()
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             excludedApps.restoreDefaultProtectedList()
             // as product wanted to restart VPN as soon as we restored protections, we need to refresh the snapshot here
             refreshSnapshot.refresh()
@@ -213,7 +213,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun canRestoreDefaults() = currentManualProtections.isNotEmpty()
 
     fun applyAppsFilter(value: AppsFilter) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             filterState.emit(value)
         }
     }
@@ -227,7 +227,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     private fun onLeavingScreen() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             if (userMadeChanges()) {
                 command.send(Command.RestartVpn)
             }
@@ -239,7 +239,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         position: Int,
         enabled: Boolean,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             if (enabled) {
                 checkForAppProtectionEnabled(excludedAppInfo, position)
             } else {
@@ -269,7 +269,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     fun launchFeedback() {
         pixel.launchAppTPFeedback()
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             command.send(
                 Command.LaunchFeedback(
                     ReportBreakageScreen.ListOfInstalledApps("apptp", breakageCategories),
@@ -280,7 +280,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     fun launchManageAppsProtection() {
         pixel.didOpenExclusionListActivityFromManageAppsProtectionScreen()
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             command.send(Command.LaunchAllAppsProtection)
         }
     }

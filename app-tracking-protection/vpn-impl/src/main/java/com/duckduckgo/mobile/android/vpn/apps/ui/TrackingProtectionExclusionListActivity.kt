@@ -28,6 +28,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
@@ -81,6 +82,9 @@ class TrackingProtectionExclusionListActivity :
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
@@ -198,7 +202,7 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.getProtectedApps()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
@@ -235,7 +239,7 @@ class TrackingProtectionExclusionListActivity :
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }

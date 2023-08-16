@@ -149,7 +149,7 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
         checked: Boolean,
         packageName: String,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.io()) {
                 if (checked) {
                     deviceShieldPixels.didEnableAppProtectionFromDetail()

@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.breakage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import javax.inject.Inject
@@ -30,7 +31,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(VpnScope::class)
-class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewModel() {
+class ReportBreakageCategorySingleChoiceViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
+) : ViewModel() {
 
     private var categories = mutableListOf<AppBreakageCategory>()
 
@@ -80,7 +83,7 @@ class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewMo
             )
     }
 
-    fun onSubmitPressed() { viewModelScope.launch { command.send(Command.ConfirmAndFinish) } }
+    fun onSubmitPressed() { viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.ConfirmAndFinish) } }
 
     private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
 }

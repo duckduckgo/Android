@@ -45,7 +45,7 @@ class ReportBreakageCategorySingleChoiceViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = ReportBreakageCategorySingleChoiceViewModel()
+        viewModel = ReportBreakageCategorySingleChoiceViewModel(coroutineRule.testDispatcherProvider)
         viewModel.setCategories(
             listOf(
                 AppBreakageCategory("zero", "0"),

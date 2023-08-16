@@ -36,6 +36,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -69,6 +70,9 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     @Inject
     @AppTpBreakageCategories
     lateinit var breakageCategories: List<AppBreakageCategory>
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private val viewModel: ReportBreakageAppListViewModel by bindViewModel()
 
@@ -194,7 +198,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.getInstalledApps()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }

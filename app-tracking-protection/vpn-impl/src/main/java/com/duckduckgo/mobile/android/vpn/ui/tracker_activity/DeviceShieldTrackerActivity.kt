@@ -210,7 +210,7 @@ class DeviceShieldTrackerActivity :
 
     @OptIn(FlowPreview::class)
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.getBlockedTrackersCount()
                 .combine(viewModel.getTrackingAppsCount()) { trackers, apps ->
                     DeviceShieldTrackerActivityViewModel.TrackerCountInfo(trackers, apps)
@@ -222,7 +222,7 @@ class DeviceShieldTrackerActivity :
                 .collect { renderViewState(it) }
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             // This is a one-shot check as soon as the screen is shown
             viewModel.getRunningState()
                 .map { it.alwaysOnState }
