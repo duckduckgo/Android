@@ -21,7 +21,7 @@ import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
+import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS

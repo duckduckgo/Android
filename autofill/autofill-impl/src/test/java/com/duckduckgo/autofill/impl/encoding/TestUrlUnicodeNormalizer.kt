@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.api
-
-import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
+package com.duckduckgo.autofill.impl.encoding
 
 class TestUrlUnicodeNormalizer : UrlUnicodeNormalizer {
 

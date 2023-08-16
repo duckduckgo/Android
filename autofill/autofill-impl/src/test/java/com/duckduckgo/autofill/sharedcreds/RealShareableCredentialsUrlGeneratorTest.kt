@@ -2,7 +2,7 @@ package com.duckduckgo.autofill.sharedcreds
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
+import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.sharedcreds.RealShareableCredentialsUrlGenerator
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.OmnidirectionalRule

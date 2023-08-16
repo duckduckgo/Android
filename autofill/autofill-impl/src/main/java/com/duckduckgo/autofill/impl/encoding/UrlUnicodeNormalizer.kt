@@ -20,13 +20,17 @@ import android.icu.text.IDNA
 import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.IDN
 import javax.inject.Inject
 import javax.inject.Named
 import timber.log.Timber
+
+interface UrlUnicodeNormalizer {
+    fun normalizeAscii(url: String?): String?
+    fun normalizeUnicode(url: String?): String?
+}
 
 @ContributesBinding(AppScope::class)
 class UrlUnicodeNormalizerDelegator @Inject constructor(

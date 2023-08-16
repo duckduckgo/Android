@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.encoding
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any

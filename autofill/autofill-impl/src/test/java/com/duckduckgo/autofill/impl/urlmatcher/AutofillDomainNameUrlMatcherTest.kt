@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.urlmatcher
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
+import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

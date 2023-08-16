@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.ui.credential.management.suggestion
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ListItem.CredentialListItem.SuggestedCredential
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorterByTitleAndDomain
