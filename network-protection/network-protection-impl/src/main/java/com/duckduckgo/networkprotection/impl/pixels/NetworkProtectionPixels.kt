@@ -220,6 +220,14 @@ interface NetworkProtectionPixels {
      * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
      */
     fun waitlistBetaIsEnabled()
+
+    /**
+     * This fun will one daily pixel
+     * daily -> fire only once a day no matter how many times we call this fun
+     *
+     * The pixel is fired just to test the incremental rollout functionality
+     */
+    fun waitlistIncrementalRolloutTest()
 }
 
 @ContributesBinding(AppScope::class)
@@ -377,6 +385,10 @@ class RealNetworkProtectionPixel @Inject constructor(
         firePixel(NETP_WAITLIST_BETA_ENABLED)
     }
 
+    override fun waitlistIncrementalRolloutTest() {
+        tryToFireUniquePixel(NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL_UNIQUE)
+    }
+
     private fun firePixel(
         p: NetworkProtectionPixelNames,
         payload: Map<String, String> = emptyMap(),
@@ -420,6 +432,22 @@ class RealNetworkProtectionPixel @Inject constructor(
                 this.pixel.fire(pixelName, payload)
                     .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
             }
+        }
+    }
+
+    private fun tryToFireUniquePixel(
+        pixel: NetworkProtectionPixelNames,
+        tag: String? = null,
+        payload: Map<String, String> = emptyMap(),
+    ) {
+        val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
+
+        if (didExecuteAlready) return
+
+        if (pixel.enqueue) {
+            this.pixel.enqueueFire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        } else {
+            this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
         }
     }
 
