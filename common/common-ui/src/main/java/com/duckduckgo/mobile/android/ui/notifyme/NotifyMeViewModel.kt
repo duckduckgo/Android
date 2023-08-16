@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.ui.store.notifyme.NotifyMeDataStore
 import javax.inject.Inject
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 class NotifyMeViewModel(
     private val appBuildConfig: AppBuildConfig,
     private val notifyMeDataStore: NotifyMeDataStore,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -87,7 +89,7 @@ class NotifyMeViewModel(
     }
 
     fun updateNotificationsPermissions(granted: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             notificationsAllowed.emit(granted)
         }
     }
@@ -101,7 +103,7 @@ class NotifyMeViewModel(
     }
 
     fun onCloseButtonClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             command.send(Command.DismissComponent)
             if (this@NotifyMeViewModel::sharedPrefsKeyForDismiss.isInitialized) {
                 notifyMeDataStore.setComponentDismissed(sharedPrefsKeyForDismiss)
@@ -139,7 +141,7 @@ class NotifyMeViewModel(
     }
 
     private fun sendCommand(newCommand: Command) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             command.send(newCommand)
         }
     }
@@ -148,6 +150,7 @@ class NotifyMeViewModel(
     class Factory @Inject constructor(
         private val appBuildConfig: AppBuildConfig,
         private val notifyMeDataStore: NotifyMeDataStore,
+        private val dispatcherProvider: DispatcherProvider,
     ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
@@ -155,6 +158,7 @@ class NotifyMeViewModel(
                     isAssignableFrom(NotifyMeViewModel::class.java) -> NotifyMeViewModel(
                         appBuildConfig,
                         notifyMeDataStore,
+                        dispatcherProvider,
                     )
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
