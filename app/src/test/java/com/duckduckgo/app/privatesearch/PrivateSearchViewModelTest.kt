@@ -62,7 +62,7 @@ internal class PrivateSearchViewModelTest {
         testee = PrivateSearchViewModel(
             mockAppSettingsDataStore,
             mockPixel,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 

@@ -216,7 +216,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun loadFavicon(url: String, image: ImageView) {
-            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+            lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }

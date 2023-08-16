@@ -33,7 +33,6 @@ import com.duckduckgo.app.browser.databinding.IncludeDaxDialogCtaBinding
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
@@ -64,7 +63,6 @@ class FireDialog(
     private val settingsDataStore: SettingsDataStore,
     private val userEventsStore: UserEventsStore,
     private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -97,7 +95,7 @@ class FireDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             ctaViewModel.getFireDialogCta()?.let {
                 configureFireDialogCta(it)
             }
@@ -131,7 +129,7 @@ class FireDialog(
         cta.showCta(fireCtaBinding.daxCtaContainer)
         ctaViewModel.onCtaShown(cta)
         onClearDataOptionsDismissed = {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
+            appCoroutineScope.launch {
                 ctaViewModel.onUserDismissedCta(cta)
             }
         }
@@ -152,7 +150,7 @@ class FireDialog(
         }
         clearStarted()
 
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch {
             userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)

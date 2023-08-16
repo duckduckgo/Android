@@ -242,7 +242,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             }
 
             setOnMenuItemClickListener {
-                this@NetPInternalSettingsActivity.lifecycleScope.launch(dispatcherProvider.io()) {
+                this@NetPInternalSettingsActivity.lifecycleScope.launch {
                     serverRepository.setSelectedServer(it.serverName())
                     binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
                     networkProtectionState.restart()

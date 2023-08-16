@@ -68,7 +68,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     fun viewState(): Flow<ViewState> = viewState.onStart {
         val variant = variantManager.getVariant()
 
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
@@ -83,12 +83,12 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onLearnMoreLinkClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchBrowserWithLearnMoreUrl) }
+        viewModelScope.launch { command.send(Command.LaunchBrowserWithLearnMoreUrl) }
         pixel.fire(SETTINGS_ABOUT_DDG_LEARN_MORE_PRESSED)
     }
 
     fun onPrivacyPolicyClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchWebViewWithPrivacyPolicyUrl) }
+        viewModelScope.launch { command.send(Command.LaunchWebViewWithPrivacyPolicyUrl) }
         pixel.fire(SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED)
     }
 
@@ -96,7 +96,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         if (viewState.value.networkProtectionWaitlistState == NetPWaitlistState.NotUnlocked) {
             netPEasterEggCounter++
             if (netPEasterEggCounter >= MAX_EASTER_EGG_COUNT) {
-                viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.ShowNetPUnlockedSnackbar) }
+                viewModelScope.launch { command.send(Command.ShowNetPUnlockedSnackbar) }
                 resetNetPEasterEggCounter()
                 pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
             }
@@ -104,12 +104,12 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     }
 
     fun onProvideFeedbackClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchFeedback) }
+        viewModelScope.launch { command.send(Command.LaunchFeedback) }
         pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
     fun onNetPUnlockedActionClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchNetPWaitlist) }
+        viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
         pixel.fire(SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED)
     }
 

@@ -40,6 +40,7 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -68,17 +69,19 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
+                .flowOn(dispatcherProvider.io())
                 .collectLatest { state ->
                     val sitePermissionsWebsites = viewModel.combineAllPermissions(state.locationPermissionsAllowed, state.sitesPermissionsAllowed)
                     updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled)
                 }
         }
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.commands
                 .flowWithLifecycle(lifecycle, STARTED)
+                .flowOn(dispatcherProvider.io())
                 .collectLatest { processCommand(it) }
         }
     }
@@ -114,7 +117,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = SitePermissionsAdapter(viewModel, this, faviconManager, dispatcherProvider)
+        adapter = SitePermissionsAdapter(viewModel, this, faviconManager)
         binding.recycler.adapter = adapter
     }
 

@@ -87,7 +87,8 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             adapter = trackerFeedAdapter
         }
 
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        // let calling suspend fun define the thread
+        lifecycleScope.launch {
             viewModel.getMostRecentTrackers(
                 TimeWindow(
                     config.timeWindow.toLong(),

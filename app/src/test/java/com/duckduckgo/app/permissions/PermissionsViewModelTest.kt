@@ -65,7 +65,7 @@ class PermissionsViewModelTest {
         testee = PermissionsViewModel(
             mockAppSettingsDataStore,
             mockPixel,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 

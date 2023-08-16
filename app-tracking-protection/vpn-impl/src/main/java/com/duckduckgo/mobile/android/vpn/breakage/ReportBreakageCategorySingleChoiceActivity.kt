@@ -25,7 +25,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.VpnScope
@@ -54,8 +53,6 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject lateinit var metadataReporter: ReportBreakageMetadataReporter
-
-    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     private val binding: ActivityReportBreakageCategorySingleChoiceBinding by viewBinding()
     private val viewModel: ReportBreakageCategorySingleChoiceViewModel by bindViewModel()
@@ -127,12 +124,12 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.commands()
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { processCommand(it) }
         }
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.viewState()
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { render(it) }
@@ -146,7 +143,7 @@ class ReportBreakageCategorySingleChoiceActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmAndFinish() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             val issue =
                 IssueReport(
                     reportedFrom = brokenApp.launchFrom,

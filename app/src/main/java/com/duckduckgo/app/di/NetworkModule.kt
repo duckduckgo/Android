@@ -173,7 +173,14 @@ class NetworkModule {
         dispatcherProvider: DispatcherProvider,
     ): FeedbackSubmitter =
         FireAndForgetFeedbackSubmitter(
-            feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope, appBuildConfig, dispatcherProvider
+            feedbackService,
+            variantManager,
+            apiKeyMapper,
+            statisticsStore,
+            pixel,
+            appCoroutineScope,
+            appBuildConfig,
+            dispatcherProvider,
         )
 
     companion object {

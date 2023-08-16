@@ -65,7 +65,7 @@ class NotificationRegistrarTest {
             mockSchedulableNotificationPluginPoint,
             mockNotificationPluginPoint,
             appBuildConfig,
-            coroutineRule.testDispatcherProvider
+            coroutineRule.testDispatcherProvider,
         )
     }
 

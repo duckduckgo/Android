@@ -183,7 +183,9 @@ class BookmarksViewModel @Inject constructor(
     fun fetchBookmarksAndFolders(parentId: String) {
         viewModelScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.getSavedSites(parentId).collect {
-                onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)
+                withContext(dispatcherProvider.main()) {
+                    onSavedSitesItemsChanged(it.favorites, it.bookmarks, it.folders)
+                }
             }
         }
     }

@@ -339,7 +339,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch(dispatchers.io()) {
+        lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.commandsCredentialView.collect { commands ->
                     commands.forEach { processCommand(it) }
@@ -537,7 +537,7 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
     }
 
     private fun loadDomainFavicon(credentials: LoginCredentials) {
-        lifecycleScope.launch(dispatchers.io()) {
+        lifecycleScope.launch {
             showPlaceholderFavicon(credentials)
             generateFaviconFromDomain(credentials)?.let {
                 withContext(dispatchers.main()) {
@@ -553,17 +553,19 @@ class AutofillManagementCredentialsMode : DuckDuckGoFragment(R.layout.fragment_a
         binding.duckAddressManagementUnavailable.gone()
     }
 
-    private suspend fun generateFaviconFromDomain(credentials: LoginCredentials): BitmapDrawable? {
+    private suspend fun generateFaviconFromDomain(
+        credentials: LoginCredentials,
+    ): BitmapDrawable? = withContext(dispatchers.io()) {
         val size = resources.getDimensionPixelSize(dimen.toolbarIconSize)
-        val domain = credentials.domain ?: return null
+        val domain = credentials.domain ?: return@withContext null
         val favicon = faviconManager.loadFromDiskWithParams(
             tabId = null,
             url = domain,
             width = size,
             height = size,
             cornerRadius = resources.getDimensionPixelSize(dimen.keyline_0),
-        ) ?: return null
-        return BitmapDrawable(resources, favicon)
+        ) ?: return@withContext null
+        return@withContext BitmapDrawable(resources, favicon)
     }
 
     private fun generateDefaultFavicon(

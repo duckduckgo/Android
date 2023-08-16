@@ -25,7 +25,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
@@ -67,8 +66,6 @@ class ManageRecentAppsProtectionActivity :
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
-
-    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     private val binding: ActivityManageRecentAppsProtectionBinding by viewBinding()
 
@@ -149,7 +146,7 @@ class ManageRecentAppsProtectionActivity :
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.getRecentApps()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
@@ -194,7 +191,7 @@ class ManageRecentAppsProtectionActivity :
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch {
             vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }

@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewListItemDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewListItemEmptyHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
@@ -40,7 +39,6 @@ class WebsitesAdapter(
     private val viewModel: AllowListViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private val dispatcherProvider: DispatcherProvider,
 ) : RecyclerView.Adapter<WebsiteViewHolder>() {
 
     companion object {
@@ -118,7 +116,6 @@ class WebsitesAdapter(
                     viewModel,
                     lifecycleOwner,
                     faviconManager,
-                    dispatcherProvider
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -152,7 +149,6 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
         private val viewModel: AllowListViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
-        private val dispatcherProvider: DispatcherProvider,
     ) : WebsiteViewHolder(binding.root) {
 
         private val context: Context = binding.root.context
@@ -179,7 +175,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
             url: String,
             leadingIcon: ImageView,
         ) {
-            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+            lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = leadingIcon)
             }
         }

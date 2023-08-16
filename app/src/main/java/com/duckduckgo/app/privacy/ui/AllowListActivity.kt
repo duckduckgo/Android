@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAllowlistBinding
 import com.duckduckgo.app.browser.databinding.DialogEditAllowlistBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.privacy.model.UserAllowListedDomain
@@ -44,9 +43,6 @@ class AllowListActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
 
     private lateinit var adapter: WebsitesAdapter
     private val binding: ActivityAllowlistBinding by viewBinding()
@@ -79,7 +75,7 @@ class AllowListActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecycler() {
-        adapter = WebsitesAdapter(viewModel, this, faviconManager, dispatcherProvider)
+        adapter = WebsitesAdapter(viewModel, this, faviconManager)
         recycler.adapter = adapter
     }
 

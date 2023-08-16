@@ -40,9 +40,10 @@ import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissio
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
@@ -91,16 +92,18 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
+                .flowOn(dispatcherProvider.io())
                 .collectLatest { state ->
                     updatePermissionsList(state.websitePermissions)
                 }
         }
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.commands
                 .flowWithLifecycle(lifecycle, STARTED)
+                .flowOn(dispatcherProvider.io())
                 .collectLatest { processCommand(it) }
         }
     }

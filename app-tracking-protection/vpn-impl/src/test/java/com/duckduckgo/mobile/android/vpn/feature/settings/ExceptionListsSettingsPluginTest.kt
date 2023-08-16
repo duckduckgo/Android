@@ -27,7 +27,6 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -85,7 +84,10 @@ class ExceptionListsSettingsPluginTest {
     @Before
     fun setup() {
         exceptionListsSettingPlugin = ExceptionListsSettingPlugin(
-            mockVpnDatabase, coroutineRule.testScope, mockVpnFeaturesRegistry, coroutineRule.testDispatcherProvider
+            mockVpnDatabase,
+            coroutineRule.testScope,
+            mockVpnFeaturesRegistry,
+            coroutineRule.testDispatcherProvider,
         )
 
         whenever(mockVpnDatabase.vpnAppTrackerBlockingDao()).thenReturn(mockVpnAppTrackerBlockingDao)
@@ -107,7 +109,10 @@ class ExceptionListsSettingsPluginTest {
     @Test
     fun whenValidJSONUpdatesDB() = runTest {
         exceptionListsSettingPlugin = ExceptionListsSettingPlugin(
-            mockVpnDatabase, coroutineRule.testScope, mockVpnFeaturesRegistry, coroutineRule.testDispatcherProvider
+            mockVpnDatabase,
+            coroutineRule.testScope,
+            mockVpnFeaturesRegistry,
+            coroutineRule.testDispatcherProvider,
         )
 
         val packageNames = listOf("com.subway.mobile.subwayapp03")

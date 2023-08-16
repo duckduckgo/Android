@@ -46,7 +46,6 @@ class SurveyViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val surveyRepository: SurveyRepository,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     sealed class Command {
@@ -66,7 +65,7 @@ class SurveyViewModel @Inject constructor(
         val url = survey.url ?: return
         this.survey = survey
         this.source = source
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             lastActiveDay = when (source) {
                 SurveySource.IN_APP -> appDaysUsedRepository.getLastActiveDay()
                 SurveySource.PUSH -> appDaysUsedRepository.getPreviousActiveDay() ?: appDaysUsedRepository.getLastActiveDay()
@@ -105,7 +104,7 @@ class SurveyViewModel @Inject constructor(
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
         surveyRepository.clearSurveyNotification()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             withContext(dispatchers.io() + NonCancellable) {
                 surveyDao.update(survey)
             }

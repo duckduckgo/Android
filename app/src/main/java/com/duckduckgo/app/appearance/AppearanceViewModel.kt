@@ -60,7 +60,7 @@ class AppearanceViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     theme = themingDataStore.theme,

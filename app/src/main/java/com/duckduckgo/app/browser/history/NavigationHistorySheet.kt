@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigation
 import com.duckduckgo.app.browser.databinding.NavigationHistoryPopupViewBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
-import com.duckduckgo.app.global.DispatcherProvider
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 @SuppressLint("NoBottomSheetDialog")
@@ -36,7 +35,6 @@ class NavigationHistorySheet(
     private val tabId: String,
     private val history: ShowBackNavigationHistory,
     private val listener: NavigationHistorySheetListener,
-    private val dispatcherProvider: DispatcherProvider,
 ) : BottomSheetDialog(context) {
 
     private val binding = NavigationHistoryPopupViewBinding.inflate(LayoutInflater.from(context))
@@ -61,7 +59,6 @@ class NavigationHistorySheet(
                         listener.historicalPageSelected(stackIndex)
                     }
                 },
-                dispatcherProvider
             ).also { adapter ->
                 recycler.adapter = adapter
                 adapter.updateNavigationHistory(history.history)

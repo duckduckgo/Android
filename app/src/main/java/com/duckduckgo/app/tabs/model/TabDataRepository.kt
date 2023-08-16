@@ -77,17 +77,17 @@ class TabDataRepository @Inject constructor(
     override suspend fun add(
         url: String?,
         skipHome: Boolean,
-    ): String {
+    ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
         add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = false)
-        return tabId
+        return@withContext tabId
     }
 
     override suspend fun addFromSourceTab(
         url: String?,
         skipHome: Boolean,
         sourceTabId: String,
-    ): String {
+    ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
 
         add(
@@ -98,10 +98,10 @@ class TabDataRepository @Inject constructor(
             sourceTabId = sourceTabId,
         )
 
-        return tabId
+        return@withContext tabId
     }
 
-    override suspend fun addDefaultTab(): String {
+    override suspend fun addDefaultTab(): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
 
         add(
@@ -111,7 +111,7 @@ class TabDataRepository @Inject constructor(
             isDefaultTab = true,
         )
 
-        return tabId
+        return@withContext tabId
     }
 
     private fun generateTabId() = UUID.randomUUID().toString()

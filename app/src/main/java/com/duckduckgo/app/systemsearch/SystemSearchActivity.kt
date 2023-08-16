@@ -44,7 +44,6 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companio
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.view.TextChangedWatcher
@@ -86,9 +85,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var voiceSearchAvailability: VoiceSearchAvailability
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
@@ -235,7 +231,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             { viewModel.onQuickAccessItemClicked(it) },
             { viewModel.onEditQuickAccessItemRequested(it) },
             { viewModel.onDeleteQuickAccessItemRequested(it) },
-            dispatcherProvider,
         )
         itemTouchHelper = ItemTouchHelper(
             QuickAccessDragTouchItemListener(

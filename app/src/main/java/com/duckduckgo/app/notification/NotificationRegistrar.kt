@@ -56,7 +56,7 @@ class NotificationRegistrar @Inject constructor(
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val notificationPluginPoint: PluginPoint<NotificationPlugin>,
     private val appBuildConfig: AppBuildConfig,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     object NotificationId {

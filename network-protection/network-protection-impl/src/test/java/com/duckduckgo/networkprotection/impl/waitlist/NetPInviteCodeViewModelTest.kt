@@ -55,7 +55,9 @@ class NetPInviteCodeViewModelTest {
         whenever(mockNetPWaitlistManager.getState()).thenReturn(flow)
 
         viewModel = NetPInviteCodeViewModel(
-            mockNetPWaitlistManager, mock<NetPWaitlistCodeNotification>(), coroutineRule.testDispatcherProvider
+            mockNetPWaitlistManager,
+            mock<NetPWaitlistCodeNotification>(),
+            coroutineRule.testDispatcherProvider,
         )
     }
 

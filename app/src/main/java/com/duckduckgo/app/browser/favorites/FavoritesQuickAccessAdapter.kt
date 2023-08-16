@@ -34,7 +34,6 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessViewHolder
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.favorites.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlin.math.absoluteValue
@@ -48,7 +47,6 @@ class FavoritesQuickAccessAdapter(
     private val onItemSelected: (QuickAccessFavorite) -> Unit,
     private val onEditClicked: (QuickAccessFavorite) -> Unit,
     private val onDeleteClicked: (QuickAccessFavorite) -> Unit,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ListAdapter<QuickAccessFavorite, QuickAccessViewHolder>(QuickAccessAdapterDiffCallback()) {
 
     companion object {
@@ -66,7 +64,6 @@ class FavoritesQuickAccessAdapter(
         private val onItemSelected: (QuickAccessFavorite) -> Unit,
         private val onEditClicked: (QuickAccessFavorite) -> Unit,
         private val onDeleteClicked: (QuickAccessFavorite) -> Unit,
-        private val dispatcherProvider: DispatcherProvider,
     ) : RecyclerView.ViewHolder(binding.root), DragDropViewHolderListener {
 
         private var itemState: ItemState = ItemState.Stale
@@ -191,7 +188,7 @@ class FavoritesQuickAccessAdapter(
         }
 
         private fun loadFavicon(url: String) {
-            lifecycleOwner.lifecycleScope.launch(dispatcherProvider.io()) {
+            lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = binding.quickAccessFavicon)
             }
         }
@@ -224,7 +221,6 @@ class FavoritesQuickAccessAdapter(
             onItemSelected,
             onEditClicked,
             onDeleteClicked,
-            dispatcherProvider,
         )
     }
 

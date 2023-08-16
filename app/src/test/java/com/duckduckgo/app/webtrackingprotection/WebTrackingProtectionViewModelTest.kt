@@ -69,7 +69,7 @@ internal class WebTrackingProtectionViewModelTest {
             mockGpc,
             mockFeatureToggle,
             mockPixel,
-            coroutineTestRule.testDispatcherProvider
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 

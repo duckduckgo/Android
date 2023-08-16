@@ -1938,7 +1938,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onFireproofWebsiteMenuClicked() {
         val domain = site?.domain ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             if (currentBrowserViewState().isFireproofWebsite) {
                 val fireproofWebsiteEntity = FireproofWebsiteEntity(domain)
                 fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
@@ -2159,7 +2159,7 @@ class BrowserTabViewModel @Inject constructor(
 
             is RequiredAction.OpenInNewBackgroundTab -> {
                 command.value = GenerateWebViewPreviewImage
-                viewModelScope.launch(dispatchers.io()) { openInNewBackgroundTab(requiredAction.url) }
+                viewModelScope.launch { openInNewBackgroundTab(requiredAction.url) }
                 true
             }
 
@@ -2357,7 +2357,7 @@ class BrowserTabViewModel @Inject constructor(
             currentPage.toUri().baseHost ?: currentPage
         }
 
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val favicon: Bitmap? = faviconManager.loadFromDisk(tabId = tabId, url = currentPage)
             command.value = AddHomeShortcut(title, currentPage, favicon)
         }
@@ -2376,13 +2376,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBrowserMenuClosed() {
-        viewModelScope.launch(dispatchers.io()) {
-            Timber.i("favoritesOnboarding onBrowserMenuClosed")
-            if (currentBrowserViewState().addFavorite.isHighlighted()) {
-                browserViewState.value = currentBrowserViewState().copy(
-                    addFavorite = HighlightableButton.Visible(highlighted = false),
-                )
-            }
+        Timber.i("favoritesOnboarding onBrowserMenuClosed")
+        if (currentBrowserViewState().addFavorite.isHighlighted()) {
+            browserViewState.value = currentBrowserViewState().copy(
+                addFavorite = HighlightableButton.Visible(highlighted = false),
+            )
         }
     }
 
@@ -2430,23 +2428,28 @@ class BrowserTabViewModel @Inject constructor(
                 )
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
-            ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            withContext(dispatchers.main()) {
+                ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            }
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
         }
         return null
     }
 
-    private fun showOrHideKeyboard(cta: Cta?) {
+    private suspend fun showOrHideKeyboard(cta: Cta?) = withContext(dispatchers.main()) {
         command.value =
             if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
-        viewModelScope.launch(dispatchers.io()) {
+        // let calling suspend fun(s) to set dispatchers
+        viewModelScope.launch {
             val cta = ctaViewState.value?.cta ?: return@launch
             ctaViewModel.registerDaxBubbleCtaDismissed(cta)
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
+            withContext(dispatchers.main()) {
+                ctaViewState.value = currentCtaViewState().copy(cta = null)
+            }
         }
     }
 
@@ -2461,7 +2464,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserClickCtaSecondaryButton() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
         }
@@ -2484,7 +2487,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessagePrimaryButtonClicked() {
         val message = currentCtaViewState().message ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val action = remoteMessagingModel.get().onPrimaryActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
@@ -2493,7 +2496,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageSecondaryButtonClicked() {
         val message = currentCtaViewState().message ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val action = remoteMessagingModel.get().onSecondaryActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
@@ -2502,7 +2505,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageActionButtonClicked() {
         val message = currentCtaViewState().message ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val action = remoteMessagingModel.get().onActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
             refreshCta()
@@ -2524,7 +2527,8 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onUserDismissedCta() {
         val cta = currentCtaViewState().cta ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        // let calling suspend fun(s) to set the context
+        viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
             when (cta) {
                 is HomePanelCta -> refreshCta()
@@ -2604,7 +2608,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun printFromWebView() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             onPrintSelected()
         }
     }
@@ -2899,7 +2903,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onShowUserCredentialsSaved(it: LoginCredentials) {
-        viewModelScope.launch(dispatchers.main()) {
+        viewModelScope.launch {
             command.value = ShowUserCredentialSavedOrUpdatedConfirmation(
                 credentials = it,
                 includeShortcutToViewCredential = autofillCapabilityChecker.canAccessCredentialManagementScreen(),

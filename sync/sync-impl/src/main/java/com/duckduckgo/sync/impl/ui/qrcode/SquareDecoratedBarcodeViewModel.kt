@@ -46,7 +46,7 @@ class PermissionDeniedWrapper @Inject constructor() {
 
 class SquareDecoratedBarcodeViewModel(
     private val permissionDeniedWrapper: PermissionDeniedWrapper,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel(), MainProcessLifecycleObserver {
 
     sealed class Command {

@@ -108,7 +108,7 @@ class SystemSearchViewModel @Inject constructor(
         resetViewState()
         configureResults()
         refreshAppList()
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             savedSitesRepository.getFavorites().collect { favorite ->
                 latestQuickAccessItems = Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
                 resultsViewState.postValue(latestQuickAccessItems)
@@ -121,7 +121,7 @@ class SystemSearchViewModel @Inject constructor(
 
     fun resetViewState() {
         command.value = Command.ClearInputText
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             resetOnboardingState()
         }
         resetResultsState()
@@ -175,7 +175,7 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     fun userDismissedOnboarding() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             onboardingViewState.value = currentOnboardingState().copy(visible = false)
             userStageStore.stageCompleted(AppStage.NEW)
             pixel.fire(INTERSTITIAL_ONBOARDING_DISMISSED)
@@ -233,7 +233,7 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     fun userTappedDax() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             userStageStore.stageCompleted(AppStage.NEW)
             pixel.fire(INTERSTITIAL_LAUNCH_DAX)
             command.value = Command.LaunchDuckDuckGo
@@ -250,7 +250,7 @@ class SystemSearchViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             userStageStore.stageCompleted(AppStage.NEW)
             command.value = Command.LaunchBrowser(query.trim())
             pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)

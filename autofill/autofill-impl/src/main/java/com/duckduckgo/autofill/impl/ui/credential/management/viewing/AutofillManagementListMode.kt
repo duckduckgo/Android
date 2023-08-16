@@ -176,7 +176,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private fun parentActivity() = (activity as AutofillManagementActivity?)
 
     private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.viewState.collect { state ->
                     binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)

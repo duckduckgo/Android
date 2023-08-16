@@ -1334,7 +1334,7 @@ class BrowserTabFragment :
         } else {
             getString(R.string.preciseLocationSiteDialogSubtitle)
         }
-        lifecycleScope.launch(dispatchers.io()) {
+        lifecycleScope.launch {
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, domain, binding.sitePermissionDialogFavicon)
         }
 
@@ -1859,7 +1859,6 @@ class BrowserTabFragment :
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteQuickAccessItemRequested(it.favorite) },
-            dispatchers,
         )
     }
 
@@ -2701,7 +2700,6 @@ class BrowserTabFragment :
                         viewModel.historicalPageSelected(stackIndex)
                     }
                 },
-                dispatchers
             ).show()
         }
     }

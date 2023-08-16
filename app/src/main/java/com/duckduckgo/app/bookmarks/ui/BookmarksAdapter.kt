@@ -198,7 +198,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         }
 
         private fun loadFavicon(url: String, image: ImageView) {
-            lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
+            lifecycleOwner.lifecycleScope.launch {
                 faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = image)
             }
         }

@@ -100,12 +100,20 @@ class FireButtonViewModel @Inject constructor(
     }
 
     fun onAutomaticallyClearWhatClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            command.send(
+                Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption),
+            )
+        }
         pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
     }
 
     fun onAutomaticallyClearWhenClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)) }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            command.send(
+                Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption),
+            )
+        }
         pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHEN_PRESSED)
     }
 
