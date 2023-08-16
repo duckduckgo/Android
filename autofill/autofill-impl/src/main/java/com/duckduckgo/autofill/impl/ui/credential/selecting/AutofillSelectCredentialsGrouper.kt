@@ -17,9 +17,9 @@
 package com.duckduckgo.autofill.impl.ui.credential.selecting
 
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialListSorter
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper.Groups
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

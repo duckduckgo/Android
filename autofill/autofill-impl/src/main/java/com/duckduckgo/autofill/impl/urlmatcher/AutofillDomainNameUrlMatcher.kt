@@ -20,11 +20,52 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.global.normalizeScheme
 import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
-import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
-import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
 import javax.inject.Inject
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber
+
+/**
+ * This interface is used to clean and match URLs for autofill purposes. It can offer support for:
+ *    - When we have a full URL and might have to clean this up before we can save it.
+ *    - When we have two URLs and need to determine if they should be treated as matching for autofill purposes.
+ */
+interface AutofillUrlMatcher {
+
+    /**
+     * This method tries to extract the parts of a URL that are relevant for autofill.
+     */
+    fun extractUrlPartsForAutofill(originalUrl: String?): ExtractedUrlParts
+
+    /**
+     * This method tries to determine if two URLs are matching for autofill purposes.
+     * @return true if the two URLs are matching for autofill purposes, false otherwise.
+     */
+    fun matchingForAutofill(
+        visitedSite: ExtractedUrlParts,
+        savedSite: ExtractedUrlParts,
+    ): Boolean
+
+    /**
+     * This method tries to clean up a raw URL.
+     * @return a `String` containing host:port for the given raw URL.
+     */
+    fun cleanRawUrl(rawUrl: String): String
+
+    /**
+     * Data class to hold the extracted parts of a URL.
+     * @param eTldPlus1 the eTldPlus1 of the URL, an important component when considering whether two URLs are matching for autofill or not. IDNA-encoded if domain contains non-ascii.
+     * @param userFacingETldPlus1 the user-facing eTldPlus1. eTldPlus1 might be IDNA-encoded whereas this will be Unicode-encoded, and therefore might contain non-ascii characters.
+     * @param subdomain the subdomain of the URL or null if there was no subdomain.
+     * @param port the port of the URL or null if there was no explicit port.
+     */
+    data class ExtractedUrlParts(
+        val eTldPlus1: String?,
+        val userFacingETldPlus1: String?,
+        val subdomain: String?,
+        val port: Int? = null,
+    )
+}
 
 class AutofillDomainNameUrlMatcher @Inject constructor(
     private val unicodeNormalizer: UrlUnicodeNormalizer,
