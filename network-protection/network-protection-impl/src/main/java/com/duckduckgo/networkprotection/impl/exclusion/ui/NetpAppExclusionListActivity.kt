@@ -142,7 +142,7 @@ class NetpAppExclusionListActivity :
     private fun observeViewModel() {
         viewModel.initialize()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.getApps()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
