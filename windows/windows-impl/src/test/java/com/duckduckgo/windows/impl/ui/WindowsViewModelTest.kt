@@ -43,7 +43,7 @@ internal class WindowsViewModelTest {
 
     @Before
     fun before() {
-        testee = WindowsViewModel(mockPixel)
+        testee = WindowsViewModel(mockPixel, coroutineRule.testDispatcherProvider)
     }
 
     @Test
