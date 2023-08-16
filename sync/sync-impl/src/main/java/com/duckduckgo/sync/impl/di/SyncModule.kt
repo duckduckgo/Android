@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
@@ -49,8 +50,9 @@ object SyncStoreModule {
     fun providesSyncStore(
         sharedPrefsProvider: SharedPrefsProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): SyncStore {
-        return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope)
+        return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope, dispatcherProvider)
     }
 
     @Provides

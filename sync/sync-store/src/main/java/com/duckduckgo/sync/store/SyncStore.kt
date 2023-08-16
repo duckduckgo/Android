@@ -2,6 +2,7 @@ package com.duckduckgo.sync.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,7 @@ class SyncSharedPrefsStore
 constructor(
     private val sharedPrefsProv: SharedPrefsProvider,
     private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SyncStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
@@ -134,14 +136,14 @@ constructor(
         this.primaryKey = primaryKey
         this.secretKey = secretKey
 
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(true)
         }
     }
 
     override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(false)
         }
     }
