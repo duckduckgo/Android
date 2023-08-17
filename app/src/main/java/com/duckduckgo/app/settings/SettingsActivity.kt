@@ -59,6 +59,10 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
@@ -112,18 +116,12 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         configureInternalFeatures()
+        lifecycle.addObserver(viewModel)
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        viewModel.start()
-        viewModel.startPollingVpnState()
     }
 
     private fun configureUiEventHandlers() {
@@ -178,7 +176,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateNetPSettings(it.networkProtectionStateEnabled, it.networkProtectionWaitlistState)
+                    updateNetPSettings(it.networkProtectionConnectionState, it.networkProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
@@ -288,19 +286,23 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateNetPSettings(networkProtectionState: Boolean, networkProtectionWaitlistState: NetPWaitlistState) {
+    private fun updateNetPSettings(
+        networkProtectionState: NetworkProtectionState.ConnectionState,
+        networkProtectionWaitlistState: NetPWaitlistState,
+    ) {
         with(viewsPrivacy) {
             when (networkProtectionWaitlistState) {
                 is NetPWaitlistState.InBeta -> {
                     if (networkProtectionWaitlistState.termsAccepted) {
                         netpPSetting.show()
                         when (networkProtectionState) {
-                            true -> R.string.netpSettingsConnected
-                            false -> R.string.netpSettingsDisconnected
+                            CONNECTED -> R.string.netpSettingsConnected
+                            CONNECTING -> R.string.netpSettingsConnecting
+                            else -> R.string.netpSettingsDisconnected
                         }.run {
                             netpPSetting.setSecondaryText(getString(this))
                         }
-                        val netPItemStatus = if (networkProtectionState) {
+                        val netPItemStatus = if (networkProtectionState != DISCONNECTED) {
                             CheckListItem.CheckItemStatus.ENABLED
                         } else {
                             CheckListItem.CheckItemStatus.WARNING

@@ -16,6 +16,10 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -24,12 +28,15 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -40,10 +47,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+@SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
@@ -56,7 +67,7 @@ class SettingsViewModel @Inject constructor(
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val showDefaultBrowserSetting: Boolean = false,
@@ -66,7 +77,7 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
-        val networkProtectionStateEnabled: Boolean = false,
+        val networkProtectionConnectionState: ConnectionState = DISCONNECTED,
         val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
         val isAutoconsentEnabled: Boolean = false,
     )
@@ -96,12 +107,25 @@ class SettingsViewModel @Inject constructor(
     private val viewState = MutableStateFlow(ViewState())
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    private val appTPPollJob = ConflatedJob()
 
     init {
         pixel.fire(SETTINGS_OPENED)
     }
 
-    fun start() {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        start()
+        startPollingAppTPState()
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        appTPPollJob.cancel()
+    }
+
+    @VisibleForTesting
+    internal fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
 
         viewModelScope.launch {
@@ -114,11 +138,18 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
-                    networkProtectionStateEnabled = networkProtectionState.isRunning(),
+                    networkProtectionConnectionState = if (networkProtectionState.isRunning()) ConnectionState.CONNECTED else DISCONNECTED,
                     networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
             )
+            networkProtectionState.getConnectionStateFlow()
+                .onEach {
+                    viewState.emit(
+                        currentViewState().copy(networkProtectionConnectionState = it),
+                    )
+                }.flowOn(dispatcherProvider.main())
+                .launchIn(viewModelScope)
         }
     }
 
@@ -126,15 +157,13 @@ class SettingsViewModel @Inject constructor(
     // We need to fix this. This logic as inside the start method but it messes with the unit tests
     // because when doing runningBlockingTest {} there is no delay and the tests crashes because this
     // becomes a while(true) without any delay
-    fun startPollingVpnState() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+    private fun startPollingAppTPState() {
+        appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 val isDeviceShieldEnabled = appTrackingProtection.isRunning()
-                val isNetPEnabled = networkProtectionState.isRunning()
                 viewState.value = currentViewState().copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    networkProtectionStateEnabled = isNetPEnabled,
                 )
                 delay(1_000)
             }

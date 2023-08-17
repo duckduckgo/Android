@@ -30,11 +30,15 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -509,6 +513,36 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().isAutoconsentEnabled)
+        }
+    }
+
+    @Test
+    fun whenNetpConnectionStateFlowEmitsConnectingConnectionStateIsConnecting() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                CONNECTING,
+                expectMostRecentItem().networkProtectionConnectionState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetpConnectionStateFlowNoEmissionButNetpIsConnectedConnectionStateIsConnected() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(emptyFlow())
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                CONNECTED,
+                expectMostRecentItem().networkProtectionConnectionState,
+            )
         }
     }
 }
