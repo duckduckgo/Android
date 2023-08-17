@@ -551,12 +551,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
+        // Set the state to DISABLED here, then call the on stop/failure callbacks
+        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
+
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
-
-        // Set the state to DISABLED here, then call the on stop/failure callbacks
-        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
 
         stopForeground(true)
         stopSelf()
