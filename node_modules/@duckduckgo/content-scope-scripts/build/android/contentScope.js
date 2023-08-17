@@ -415,14 +415,17 @@
                     const isTainted = hasTaintedMethod(scope);
                     isExempt = !isTainted;
                 }
-                postDebugMessage(this.camelFeatureName, {
-                    isProxy: true,
-                    action: isExempt ? 'ignore' : 'restrict',
-                    kind: this.property,
-                    documentUrl: document.location.href,
-                    stack: getStack(),
-                    args: debugSerialize(args[2])
-                });
+                // Keep this here as getStack() is expensive
+                if (debug) {
+                    postDebugMessage(this.camelFeatureName, {
+                        isProxy: true,
+                        action: isExempt ? 'ignore' : 'restrict',
+                        kind: this.property,
+                        documentUrl: document.location.href,
+                        stack: getStack(),
+                        args: debugSerialize(args[2])
+                    });
+                }
                 // The normal return value
                 if (isExempt) {
                     return DDGReflect.apply(...args)
