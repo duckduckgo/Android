@@ -222,7 +222,8 @@ interface NetworkProtectionPixels {
     fun waitlistBetaIsEnabled()
 
     /**
-     * This fun will one daily pixel
+     * This fun will fire two pixels
+     * count -> fire a pixel on every call
      * daily -> fire only once a day no matter how many times we call this fun
      *
      * The pixel is fired just to test the incremental rollout functionality
@@ -386,6 +387,7 @@ class RealNetworkProtectionPixel @Inject constructor(
     }
 
     override fun waitlistIncrementalRolloutTest() {
+        firePixel(NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL)
         tryToFireUniquePixel(NETP_INCREMENTAL_ROLLOUT_TEST_PIXEL_UNIQUE)
     }
 
