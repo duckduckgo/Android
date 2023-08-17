@@ -23,12 +23,14 @@ import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class AnrSupervisor @Inject constructor(
     private val anrSupervisorRunnable: AnrSupervisorRunnable,
 ) : BrowserLifecycleObserver {
