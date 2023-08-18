@@ -33,6 +33,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillUpdateExistingCredentialsBinding
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -66,6 +67,9 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor
+
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
      * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
@@ -96,6 +100,8 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         savedInstanceState: Bundle?,
     ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
+
+        autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
 
         val binding = ContentAutofillUpdateExistingCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding)
@@ -183,7 +189,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
         }
 
         Timber.v("onCancel: AutofillUpdatingExistingCredentialsDialogFragment. User declined to update credentials")
-        parentFragment?.setFragmentResult(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(getTabId()), Bundle())
+        autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
         pixelNameDialogEvent(Dismissed)?.let { pixel.fire(it) }
     }
 

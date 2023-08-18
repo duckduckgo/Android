@@ -635,10 +635,6 @@
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Zobraziť</string>
     <string name="autofillLoginSavedSnackbarMessage">Prihlasovacie údaje sa uložili</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Prihlasovacie údaje sa aktualizovali</string>
-    <string name="autofillDisableAutofillPromptTitle">Chcete naďalej ukladať prihlasovacie údaje?</string>
-    <string name="autofillDisableAutofillPromptMessage">Túto funkciu môžete kedykoľvek vypnúť v Nastaveniach.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Pokračovať v ukladaní</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Zakázať</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Chcete, aby sme vám poslali upozornenie, keď na vás príde rad?</string>

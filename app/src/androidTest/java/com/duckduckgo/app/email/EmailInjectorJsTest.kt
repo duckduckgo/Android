@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.io.BufferedReader

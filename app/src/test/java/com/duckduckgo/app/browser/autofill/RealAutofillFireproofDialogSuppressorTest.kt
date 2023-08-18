@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.browser.autofill
 
+import com.duckduckgo.autofill.impl.RealAutofillFireproofDialogSuppressor
+import com.duckduckgo.autofill.impl.TimeProvider
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

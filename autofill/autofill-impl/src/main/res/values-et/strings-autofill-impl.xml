@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Loo privaatne Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokeeri e-posti jälgijad ja peida aadress</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Kas soovid sisselogimisandmete salvestamist jätkata?</string>
+    <string name="autofillDisableAutofillPromptMessage">Saad selle igal ajal sätetes keelata.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Jätka salvestamist</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Keela</string>
 
 </resources>

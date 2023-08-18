@@ -57,8 +57,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
-import com.duckduckgo.app.browser.autofill.AutofillFireproofDialogSuppressor
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -81,7 +79,6 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
@@ -115,10 +112,11 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -201,8 +199,6 @@ class BrowserTabViewModel @Inject constructor(
     EditSavedSiteListener,
     DeleteBookmarkListener,
     UrlExtractionListener,
-    AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
-    AutofillCredentialsSelectionResultHandler.CredentialInjector,
     ViewModel(),
     NavigationHistoryListener {
 
@@ -2824,34 +2820,15 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 
-    override fun shareCredentialsWithPage(
+    fun shareCredentialsWithPage(
         originalUrl: String,
         credentials: LoginCredentials,
     ) {
         command.postValue(InjectCredentials(originalUrl, credentials))
     }
 
-    override fun returnNoCredentialsWithPage(originalUrl: String) {
+    fun returnNoCredentialsWithPage(originalUrl: String) {
         command.postValue(CancelIncomingAutofillRequest(originalUrl))
-    }
-
-    override suspend fun saveCredentials(
-        url: String,
-        credentials: LoginCredentials,
-    ): LoginCredentials? {
-        return withContext(appCoroutineScope.coroutineContext) {
-            autofillStore.saveCredentials(url, credentials)
-        }
-    }
-
-    override suspend fun updateCredentials(
-        url: String,
-        credentials: LoginCredentials,
-        updateType: CredentialUpdateType,
-    ): LoginCredentials? {
-        return withContext(appCoroutineScope.coroutineContext) {
-            autofillStore.updateCredentials(url, credentials, updateType)
-        }
     }
 
     fun onConfigurationChanged() {

@@ -1,0 +1,124 @@
+/*
+ * Copyright (c) 2023 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.autofill.impl.ui.credential.selecting
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import android.os.Bundle
+import android.os.Parcelable
+import androidx.fragment.app.Fragment
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.api.AutofillEventListener
+import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+
+@ContributesMultibinding(AppScope::class)
+class ResultHandlerCredentialSelection @Inject constructor(
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
+    private val pixel: Pixel,
+    private val deviceAuthenticator: DeviceAuthenticator,
+    private val appBuildConfig: AppBuildConfig,
+) : AutofillFragmentResultsPlugin {
+
+    override fun processResult(
+        result: Bundle,
+        context: Context,
+        tabId: String,
+        fragment: Fragment,
+        autofillCallback: AutofillEventListener,
+    ) {
+        Timber.d("${this::class.java.simpleName}: processing result")
+
+        appCoroutineScope.launch(dispatchers.io()) {
+            processAutofillCredentialSelectionResult(result, fragment, autofillCallback)
+        }
+    }
+
+    private suspend fun processAutofillCredentialSelectionResult(
+        result: Bundle,
+        browserTabFragment: Fragment,
+        autofillCallback: AutofillEventListener,
+    ) {
+        val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
+
+        if (result.getBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED)) {
+            Timber.v("Autofill: User cancelled credential selection")
+            autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
+            return
+        }
+
+        val selectedCredentials: LoginCredentials =
+            result.safeGetParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
+
+        pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_SHOWN)
+
+        withContext(dispatchers.main()) {
+            deviceAuthenticator.authenticate(
+                DeviceAuthenticator.Features.AUTOFILL_TO_USE_CREDENTIALS,
+                browserTabFragment,
+            ) {
+                when (it) {
+                    DeviceAuthenticator.AuthResult.Success -> {
+                        Timber.v("Autofill: user selected credential to use, and successfully authenticated")
+                        pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
+                        autofillCallback.onShareCredentialsForAutofill(originalUrl, selectedCredentials)
+                    }
+
+                    DeviceAuthenticator.AuthResult.UserCancelled -> {
+                        Timber.d("Autofill: user selected credential to use, but cancelled without authenticating")
+                        pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED)
+                        autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
+                    }
+
+                    is DeviceAuthenticator.AuthResult.Error -> {
+                        Timber.w("Autofill: user selected credential to use, but there was an error when authenticating: ${it.reason}")
+                        pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE)
+                        autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
+                    }
+                }
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @SuppressLint("NewApi")
+    private inline fun <reified T : Parcelable> Bundle.safeGetParcelable(key: String) =
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelable(key, T::class.java)
+        } else {
+            getParcelable(key)
+        }
+
+    override fun resultKey(tabId: String): String {
+        return CredentialAutofillPickerDialog.resultKey(tabId)
+    }
+}

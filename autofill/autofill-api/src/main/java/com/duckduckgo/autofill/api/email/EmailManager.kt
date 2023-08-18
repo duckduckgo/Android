@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.email
+package com.duckduckgo.autofill.api.email
 
 import kotlinx.coroutines.flow.StateFlow
 

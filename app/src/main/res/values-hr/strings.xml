@@ -635,10 +635,6 @@
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Pregled</string>
     <string name="autofillLoginSavedSnackbarMessage">Prijava je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Prijava je ažurirana</string>
-    <string name="autofillDisableAutofillPromptTitle">Želiš li nastaviti spremati prijave?</string>
-    <string name="autofillDisableAutofillPromptMessage">Ovo možeš onemogućiti u svakom trenutku u Postavkama.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Nastavi spremati</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Onemogući</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Želite li da vam pošaljemo obavijest kad dođete na red?</string>

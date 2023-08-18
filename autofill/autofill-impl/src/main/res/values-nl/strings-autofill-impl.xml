@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Privé-Duck Address genereren</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-mailtrackers blokkeren en adres verbergen</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Wil je aanmeldgegevens blijven opslaan?</string>
+    <string name="autofillDisableAutofillPromptMessage">Je kunt dit op elk moment uitschakelen in de instellingen.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Blijf opslaan</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Uitschakelen</string>
 
 </resources>

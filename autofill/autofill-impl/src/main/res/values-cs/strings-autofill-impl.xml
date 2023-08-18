@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Vygenerovat soukromou adresu Duck</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokuj e-mailové trackery a skryj svou adresu</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Chceš dál ukládat přihlašovací údaje?</string>
+    <string name="autofillDisableAutofillPromptMessage">Funkci můžeš kdykoli vypnout v Nastaveních.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Dál ukládat</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Vypnout</string>
 
 </resources>

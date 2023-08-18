@@ -18,8 +18,10 @@ package com.duckduckgo.autofill.impl.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
@@ -89,3 +91,9 @@ class AutofillModule {
         return database.credentialsSyncDao()
     }
 }
+
+/**
+ * Used to generate a plugin point for autofill result handlers
+ */
+@ContributesPluginPoint(scope = AppScope::class, boundType = AutofillFragmentResultsPlugin::class)
+interface UnusedAutofillResultPlugin

@@ -56,7 +56,6 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.autofill.AutofillFireproofDialogSuppressor
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -80,7 +79,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -124,10 +122,11 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -4225,34 +4224,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.CancelIncomingAutofillRequest> {
             assertEquals(url, this.url)
         }
-    }
-
-    @Test
-    fun whenSaveCredentialsThenSaveCredentialsInAutofillStore() = runTest {
-        val url = "originalurl.com"
-        val credentials = LoginCredentials(
-            id = 1,
-            domain = url,
-            username = "tester",
-            password = "test123",
-        )
-        testee.saveCredentials(url, credentials)
-
-        verify(mockAutofillStore).saveCredentials(url, credentials)
-    }
-
-    @Test
-    fun whenUpdateCredentialsThenUpdateCredentialsInAutofillStore() = runTest {
-        val url = "originalurl.com"
-        val credentials = LoginCredentials(
-            id = 1,
-            domain = url,
-            username = "tester",
-            password = "test123",
-        )
-        testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
-
-        verify(mockAutofillStore).updateCredentials(url, credentials, CredentialUpdateType.Password)
     }
 
     @Test

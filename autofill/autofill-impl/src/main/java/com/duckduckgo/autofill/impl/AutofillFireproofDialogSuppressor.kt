@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autofill
+package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
@@ -29,8 +28,8 @@ interface AutofillFireproofDialogSuppressor {
     fun autofillSaveOrUpdateDialogVisibilityChanged(visible: Boolean)
 }
 
-@ContributesBinding(FragmentScope::class)
-@SingleInstanceIn(FragmentScope::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealAutofillFireproofDialogSuppressor @Inject constructor(private val timeProvider: TimeProvider) : AutofillFireproofDialogSuppressor {
 
     private var autofillDialogShowing = false
