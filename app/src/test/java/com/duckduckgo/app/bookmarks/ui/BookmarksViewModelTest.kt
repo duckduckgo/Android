@@ -169,6 +169,17 @@ class BookmarksViewModelTest {
     }
 
     @Test
+    fun whenBookmarkDeletedThenConfirmDeleteSavedSiteCommandAndRepositoryIsUpdated() = runTest {
+        testee.onBookmarkDeleted(bookmark)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertNotNull(commandCaptor.value)
+        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+        verify(faviconManager).deletePersistedFavicon(bookmark.url)
+        verify(savedSitesRepository).delete(bookmark)
+    }
+
+    @Test
     fun whenSavedSiteSelectedThenOpenCommand() {
         testee.onSelected(bookmark)
 

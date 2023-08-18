@@ -32,4 +32,10 @@
     <string name="netpSettingsDisconnected">Disabled</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
+
+    <!-- Edit Bookmark screen, "Delete Bookmark" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Delete this bookmark?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">This will delete your bookmark for &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteBookmarkConfirmationDialogCancel">Cancel</string>
+    <string name="deleteBookmarkConfirmationDialogDelete">Delete</string>
 </resources>

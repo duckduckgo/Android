@@ -19,9 +19,13 @@ package com.duckduckgo.app.bookmarks.ui
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
+import android.view.WindowManager
+import androidx.appcompat.widget.Toolbar
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -39,7 +43,14 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         )
     }
 
+    interface DeleteBookmarkListener {
+        fun onBookmarkDeleted(
+            bookmark: Bookmark,
+        )
+    }
+
     var listener: EditSavedSiteListener? = null
+    var deleteBookmarkListener: DeleteBookmarkListener? = null
 
     override fun configureUI() {
         validateBundleArguments()
@@ -48,6 +59,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
         } else {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
+            configureDeleteBookmark(binding.savedSiteAppBar.toolbar)
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
         showAddFolderMenu = true
@@ -125,6 +137,48 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         val args = requireArguments()
         if (!args.containsKey(KEY_SAVED_SITE)) {
             throw IllegalArgumentException("Bundle arguments required [KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
+        }
+    }
+
+    private fun configureDeleteBookmark(toolbar: Toolbar) {
+        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_delete_saved_site).isVisible = true
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_delete_saved_site -> {
+                    showDeleteBookmarkConfirmation(getExistingTitle())
+                    hideKeyboard()
+                    return@setOnMenuItemClickListener true
+                }
+            }
+            false
+        }
+    }
+
+    private fun showDeleteBookmarkConfirmation(title: String) {
+        TextAlertDialogBuilder(requireContext())
+            .setTitle(R.string.deleteBookmarkConfirmationDialogTitle)
+            .setMessage(getString(R.string.deleteBookmarkConfirmationDialogDescription, title).html(requireContext()))
+            .setDestructiveButtons(true)
+            .setPositiveButton(R.string.deleteBookmarkConfirmationDialogDelete)
+            .setNegativeButton(R.string.deleteBookmarkConfirmationDialogCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onDeleteBookmarkConfirmed()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun onDeleteBookmarkConfirmed() {
+        deleteBookmarkListener?.onBookmarkDeleted(getSavedSite() as Bookmark)
+        dismiss()
+    }
+
+    private fun hideKeyboard() {
+        activity?.let {
+            it.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         }
     }
 

@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
@@ -55,7 +56,7 @@ class BookmarksViewModel @Inject constructor(
     private val pixel: Pixel,
     private val syncEngine: SyncEngine,
     private val dispatcherProvider: DispatcherProvider,
-) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, ViewModel() {
+) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
     data class ViewState(
         val enableSearch: Boolean = false,
@@ -108,6 +109,10 @@ class BookmarksViewModel @Inject constructor(
             Timber.d("Bookmark: $bookmark from $oldFolderId")
             savedSitesRepository.updateBookmark(bookmark, oldFolderId)
         }
+    }
+
+    override fun onBookmarkDeleted(bookmark: Bookmark) {
+        onDeleteSavedSiteRequested(bookmark)
     }
 
     fun onSelected(savedSite: SavedSite) {
