@@ -58,7 +58,7 @@ class RealWgServerApiTest {
                 publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                 publicEndpoint = "162.245.204.100:443",
                 address = "",
-                location = null,
+                location = "Newark, US",
                 gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
@@ -68,6 +68,24 @@ class RealWgServerApiTest {
 
     @Test
     fun whenRegisterInInternalAndServerSelectedThenReturnSelectedServer() = runTest {
+        internalWgServerDebugProvider.selectedServer = "egress.euw.2"
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.euw.2",
+                publicKey = "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
+                publicEndpoint = "31.204.129.39:443",
+                address = "",
+                location = "Rotterdam, NL",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            internalApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenRegisterInInternalAndServerSelectedWithNoServerCountryThenReturnSelectedServerWithNullLocation() = runTest {
         internalWgServerDebugProvider.selectedServer = "egress.euw"
 
         assertEquals(
@@ -94,7 +112,7 @@ class RealWgServerApiTest {
                 publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
                 publicEndpoint = "162.245.204.100:443",
                 address = "",
-                location = null,
+                location = "Newark, US",
                 gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),
