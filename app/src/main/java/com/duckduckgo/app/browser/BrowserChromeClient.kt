@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
@@ -47,6 +48,7 @@ class BrowserChromeClient @Inject constructor(
 
     override fun onShowCustomView(
         view: View,
+        /* requestedOrientation: Int, */
         callback: CustomViewCallback?,
     ) {
         Timber.d("on show custom view")
@@ -56,7 +58,7 @@ class BrowserChromeClient @Inject constructor(
         }
 
         customView = view
-        webViewClientListener?.goFullScreen(view)
+        webViewClientListener?.goFullScreen(view, /* requestedOrientation */ ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
     }
 
     override fun onHideCustomView() {

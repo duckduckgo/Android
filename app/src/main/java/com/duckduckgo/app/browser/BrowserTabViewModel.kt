@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslCertificate
@@ -224,6 +225,7 @@ class BrowserTabViewModel @Inject constructor(
     data class BrowserViewState(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
+        val fullScreenRequestedOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED,
         val isDesktopBrowsingMode: Boolean = false,
         val canChangeBrowsingMode: Boolean = false,
         val showPrivacyShield: Boolean = false,
@@ -340,7 +342,7 @@ class BrowserTabViewModel @Inject constructor(
         class SendEmail(val emailAddress: String) : Command()
         object ShowKeyboard : Command()
         object HideKeyboard : Command()
-        class ShowFullScreen(val view: View) : Command()
+        class ShowFullScreen(val view: View, val requestedOrientation: Int) : Command()
         class DownloadImage(
             val url: String,
             val requestUserConfirmation: Boolean,
@@ -1146,16 +1148,20 @@ class BrowserTabViewModel @Inject constructor(
         deleteTabPreview(tabId)
     }
 
-    override fun goFullScreen(view: View) {
-        command.value = ShowFullScreen(view)
+    override fun goFullScreen(view: View, requestedOrientation: Int) {
+        command.value = ShowFullScreen(view, requestedOrientation)
 
         val currentState = currentBrowserViewState()
-        browserViewState.value = currentState.copy(isFullScreen = true)
+        browserViewState.value = currentState.copy(
+            isFullScreen = true,
+            fullScreenRequestedOrientation = requestedOrientation)
     }
 
     override fun exitFullScreen() {
         val currentState = currentBrowserViewState()
-        browserViewState.value = currentState.copy(isFullScreen = false)
+        browserViewState.value = currentState.copy(
+            isFullScreen = false,
+            fullScreenRequestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
     }
 
     override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {

@@ -3163,7 +3163,7 @@ class BrowserTabFragment :
         private fun renderFullscreenMode(viewState: BrowserViewState) {
             activity?.isImmersiveModeEnabled()?.let {
                 if (viewState.isFullScreen) {
-                    if (!it) goFullScreen()
+                    if (!it) goFullScreen(viewState.fullScreenRequestedOrientation)
                 } else {
                     if (it) exitFullScreen()
                 }
@@ -3462,10 +3462,10 @@ class BrowserTabFragment :
             }
         }
 
-        private fun goFullScreen() {
+        private fun goFullScreen(requestedOrientation: Int) {
             Timber.i("Entering full screen")
             binding.webViewFullScreenContainer.show()
-            activity?.toggleFullScreen()
+            activity?.toggleFullScreen(requestedOrientation)
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 

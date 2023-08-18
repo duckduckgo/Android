@@ -51,7 +51,7 @@ interface WebViewClientListener {
     fun sendEmailRequested(emailAddress: String)
     fun sendSmsRequested(telephoneNumber: String)
     fun dialTelephoneNumberRequested(telephoneNumber: String)
-    fun goFullScreen(view: View)
+    fun goFullScreen(view: View, requestedOrientation: Int)
     fun exitFullScreen()
     fun showFileChooser(
         filePathCallback: ValueCallback<Array<Uri>>,

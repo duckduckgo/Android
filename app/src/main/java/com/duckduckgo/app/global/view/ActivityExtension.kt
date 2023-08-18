@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.view
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -55,13 +56,14 @@ fun Context.fadeTransitionConfig(): Bundle? {
     return config.toBundle()
 }
 
-fun FragmentActivity.toggleFullScreen() {
+fun FragmentActivity.toggleFullScreen(requestedOrientation: Int = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED) {
     val newUiOptions = window.decorView.systemUiVisibility
         .xor(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         .xor(View.SYSTEM_UI_FLAG_FULLSCREEN)
         .xor(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
     window.decorView.systemUiVisibility = newUiOptions
+    this.requestedOrientation = requestedOrientation
 }
 
 fun FragmentActivity.isImmersiveModeEnabled(): Boolean {
