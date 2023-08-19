@@ -43,6 +43,13 @@
                 app:primaryText="@string/devSettingsScreenGeneralSection" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/useSandboxSurvey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/devSettingsUseSandBoxSurvey"
+                    app:showSwitch="true" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/enableAppStartupTrace"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,7 +116,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/devSettingsScreenUserAgentSelectorTitle" />
-
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
