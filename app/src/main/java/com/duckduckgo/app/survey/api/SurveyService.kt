@@ -27,6 +27,6 @@ interface SurveyService {
     @GET("https://staticcdn.duckduckgo.com/survey/v2/survey-mobile.json")
     fun survey(): Call<SurveyGroup?>
 
-    @GET("https://staticcdn.duckduckgo.com/survey/apptp/retention-survey-mobile.json")
-    fun surveyAppTp(): Call<SurveyGroup?>
+    @GET("https://staticcdn.duckduckgo.com/survey/netp/waitlist-survey-mobile.json")
+    fun surveyNetPWaitlistBeta(): Call<SurveyGroup?>
 }
