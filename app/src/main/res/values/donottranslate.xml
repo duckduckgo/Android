@@ -32,14 +32,4 @@
     <string name="netpSettingsDisconnected">Disabled</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Delete this bookmark?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">This will delete your bookmark for &lt;b>%1$s&lt;/b>.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Delete this favorite?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your favorite for &lt;b>%1$s&lt;/b>.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Delete this bookmark folder?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your &lt;b>%1$s&lt;/b> bookmark folder.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
 </resources>
