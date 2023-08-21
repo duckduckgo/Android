@@ -22,6 +22,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -121,6 +122,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {
+        Log.v("MARCOS", "Show default browser dialog")
         startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
 
@@ -140,13 +142,17 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         resultCode: Int,
         data: Intent?,
     ) {
+        Log.v("MARCOS", "On Activity Result")
         if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
             if (resultCode == RESULT_OK) {
+                Log.v("MARCOS", "Result Ok")
                 event(WelcomePageView.Event.OnDefaultBrowserSet)
             } else {
+                Log.v("MARCOS", "Result KO")
                 event(WelcomePageView.Event.OnDefaultBrowserNotSet)
             }
         } else {
+            Log.v("MARCOS", "Result else")
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
