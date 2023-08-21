@@ -22,7 +22,7 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyScheduler.Companion.DAILY_NETP_REKEY_TAG
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import logcat.logcat

@@ -28,7 +28,6 @@ import dagger.Provides
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Qualifier
-import logcat.logcat
 import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
@@ -62,9 +61,7 @@ object DeviceInfoCollectorModule {
         return runCatching {
             context.packageName?.let {
                 val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-                powerManager.isIgnoringBatteryOptimizations(context.packageName).also {
-                    logcat { "aitor $it" }
-                }
+                powerManager.isIgnoringBatteryOptimizations(context.packageName)
             } ?: false
         }.getOrDefault(false)
     }

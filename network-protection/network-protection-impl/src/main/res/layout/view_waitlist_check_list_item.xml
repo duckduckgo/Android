@@ -26,8 +26,8 @@
 
     <ImageView
         android:id="@+id/leadingIcon"
-        android:layout_width="@dimen/keyline_4"
-        android:layout_height="@dimen/keyline_4"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_4"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"

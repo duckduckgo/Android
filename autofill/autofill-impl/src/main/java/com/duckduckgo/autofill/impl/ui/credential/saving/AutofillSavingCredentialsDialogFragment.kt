@@ -34,7 +34,6 @@ import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
-import com.duckduckgo.autofill.api.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredentialsBinding
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -56,6 +55,7 @@ import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentia
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Accepted
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment.DialogEvent.Shown
+import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -106,6 +106,15 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            // If being created after a configuration change, dismiss the dialog as the WebView will be re-created too
+            dismiss()
+        }
     }
 
     override fun onCreateView(

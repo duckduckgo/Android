@@ -19,22 +19,33 @@ package com.duckduckgo.app.settings
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -509,6 +520,145 @@ class SettingsViewModelTest {
 
         testee.viewState().test {
             assertFalse(awaitItem().isAutoconsentEnabled)
+        }
+    }
+
+    @Test
+    fun whenNetPIsNotUnlockedThenNetPEntryStateShouldShowHidden() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                Hidden,
+                expectMostRecentItem().networkProtectionEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetPStateIsPendingInviteCodeThenNetPEntryStateShouldShowPending() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(PendingInviteCode)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                Pending,
+                expectMostRecentItem().networkProtectionEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetPStateIsJoinedWaitlistThenNetPEntryStateShouldShowPending() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(JoinedWaitlist)
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                Pending,
+                expectMostRecentItem().networkProtectionEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetPStateIsInBetaButNotAcceptedTermsThenNetPEntryStateShouldShowPending() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                Pending,
+                expectMostRecentItem().networkProtectionEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetPStateIsInBetaWithTermsAcceptedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(true))
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                ShowState(
+                    icon = CheckListItem.CheckItemStatus.ENABLED,
+                    subtitle = R.string.netpSettingsConnected,
+                ),
+                expectMostRecentItem().networkProtectionEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetPStateIsInBetaOnboardedAndEnabledThenNetPEntryStateShouldCorrectShowState() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(true)
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                ShowState(
+                    icon = CheckListItem.CheckItemStatus.ENABLED,
+                    subtitle = R.string.netpSettingsConnected,
+                ),
+                expectMostRecentItem().networkProtectionEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetPStateIsInBetaAndConnectingThenNetPEntryStateShouldCorrectShowState() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(CONNECTING))
+        whenever(networkProtectionState.isOnboarded()).thenReturn(false)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(true))
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                ShowState(
+                    icon = CheckListItem.CheckItemStatus.ENABLED,
+                    subtitle = R.string.netpSettingsConnecting,
+                ),
+                expectMostRecentItem().networkProtectionEntryState,
+            )
+        }
+    }
+
+    @Test
+    fun whenNetPStateIsInBetaAndDisabledThenNetPEntryStateShouldCorrectShowState() = runTest {
+        whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(networkProtectionState.getConnectionStateFlow()).thenReturn(flowOf(DISCONNECTED))
+        whenever(networkProtectionState.isOnboarded()).thenReturn(true)
+        whenever(networkProtectionWaitlist.getState()).thenReturn(InBeta(false))
+
+        testee.start()
+
+        testee.viewState().test {
+            assertEquals(
+                ShowState(
+                    icon = CheckListItem.CheckItemStatus.WARNING,
+                    subtitle = R.string.netpSettingsDisconnected,
+                ),
+                expectMostRecentItem().networkProtectionEntryState,
+            )
         }
     }
 }

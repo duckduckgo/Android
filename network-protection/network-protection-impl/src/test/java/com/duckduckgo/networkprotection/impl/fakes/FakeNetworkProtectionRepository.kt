@@ -16,10 +16,10 @@
 
 package com.duckduckgo.networkprotection.impl.fakes
 
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ServerDetails
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ServerDetails
 
 class FakeNetworkProtectionRepository : NetworkProtectionRepository {
     private var _reconnectStatus: ReconnectStatus? = null

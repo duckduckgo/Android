@@ -17,6 +17,11 @@
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface NetPWaitlistRepository {
@@ -30,10 +35,18 @@ interface NetPWaitlistRepository {
     fun didAcceptWaitlistTerms(): Boolean
 }
 
-class RealNetPWaitlistRepository(
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = NetPWaitlistRepository::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
+)
+class RealNetPWaitlistRepository @Inject constructor(
     private val dataStore: NetPWaitlistDataStore,
     private val dispatcherProvider: DispatcherProvider,
-) : NetPWaitlistRepository {
+) : NetPWaitlistRepository, NetPFeatureRemover.NetPStoreRemovalPlugin {
 
     override fun getAuthenticationToken(): String? = dataStore.authToken
 
@@ -63,5 +76,9 @@ class RealNetPWaitlistRepository(
 
     override fun didAcceptWaitlistTerms(): Boolean {
         return dataStore.didAcceptedTerms
+    }
+
+    override fun clearStore() {
+        dataStore.clear()
     }
 }

@@ -625,10 +625,6 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Έγινε αντιγραφή νέας διεύθυνσης στο πρόχειρό σας</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Χρησιμοποιήστε τη διεύθυνση %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Αποκλείει τις εφαρμογές παρακολούθησης email</string>
-    <string name="autofillTooltipGenerateAddress">Δημιουργήστε ιδιωτική Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Αποκλείει εφαρμογές παρακολούθησης email και αποκρύπτει τη διεύθυνσή σας</string>
     <string name="newEmailAliasMenuTitle">Δημιουργήστε Duck Address</string>
 
     <!-- Autofill -->

@@ -66,6 +66,7 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Intercepto
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
             StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName,
             "m_atp_unprotected_apps_bucket_",
+            "m_netp_ev_incremental_rollout_test",
         )
     }
 }

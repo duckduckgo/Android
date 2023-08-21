@@ -70,6 +70,11 @@ interface NetworkProtectionPrefs {
         key: String,
         default: Set<String> = emptySet(),
     ): Set<String>
+
+    /**
+     * Deletes all content in the shared preference
+     */
+    fun clear()
 }
 
 class RealNetworkProtectionPrefs constructor(
@@ -111,6 +116,10 @@ class RealNetworkProtectionPrefs constructor(
         val result = prefs.getStringSet(key, default) ?: default
         // ensure we never modify the set instance returned by the getStringSet call
         return result.toSet()
+    }
+
+    override fun clear() {
+        prefs.edit { clear() }
     }
 
     override fun putBoolean(

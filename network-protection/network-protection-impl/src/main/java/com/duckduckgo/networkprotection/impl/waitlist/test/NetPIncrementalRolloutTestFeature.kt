@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.api.encoding
+package com.duckduckgo.networkprotection.impl.waitlist.test
 
-interface UrlUnicodeNormalizer {
-    fun normalizeAscii(url: String?): String?
-    fun normalizeUnicode(url: String?): String?
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+
+// This is a dry-run test, temporary, see https://app.asana.com/0/1203137811378537/1205266828096214/f
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "incrementalRolloutTest",
+)
+interface NetPIncrementalRolloutTestFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun rollout(): Toggle
 }
