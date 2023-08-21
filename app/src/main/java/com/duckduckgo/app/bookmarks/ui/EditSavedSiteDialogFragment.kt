@@ -18,9 +18,9 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.os.Bundle
 import android.text.Editable
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.widget.Toolbar
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.extensions.html
@@ -59,7 +59,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
         } else {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
-            configureDeleteBookmark(binding.savedSiteAppBar.toolbar)
+            configureBookmarkMenuItemsVisibility()
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
         showAddFolderMenu = true
@@ -140,18 +140,19 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         }
     }
 
-    private fun configureDeleteBookmark(toolbar: Toolbar) {
-        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_delete_saved_site).isVisible = true
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_delete_saved_site -> {
-                    showDeleteBookmarkConfirmation(getExistingTitle())
-                    hideKeyboard()
-                    return@setOnMenuItemClickListener true
-                }
-            }
-            false
+    private fun configureBookmarkMenuItemsVisibility() {
+        val toolbar = binding.savedSiteAppBar.toolbar
+        toolbar.menu.findItem(R.id.action_delete_saved_site).isVisible = true
+        toolbar.menu.findItem(R.id.action_confirm_changes).isVisible = true
+    }
+
+    override fun onMenuItemClicked(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == R.id.action_delete_saved_site) {
+            showDeleteBookmarkConfirmation(getExistingTitle())
+            hideKeyboard()
+            return true
         }
+        return false
     }
 
     private fun showDeleteBookmarkConfirmation(title: String) {

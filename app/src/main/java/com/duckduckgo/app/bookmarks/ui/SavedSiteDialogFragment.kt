@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -44,6 +45,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     abstract fun onConfirmation()
     abstract fun configureUI()
+    open fun onMenuItemClicked(menuItem: MenuItem) = false
 
     private var _binding: DialogFragmentSavedSiteBinding? = null
     protected val binding get() = _binding!!
@@ -106,19 +108,17 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     private fun configureToolbar(toolbar: Toolbar) {
         toolbar.inflateMenu(R.menu.edit_saved_site_menu)
-        toolbar.setOnMenuItemClickListener(
-            Toolbar.OnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.action_confirm_changes -> {
-                        onConfirmation()
-                        hideKeyboard()
-                        dismiss()
-                        return@OnMenuItemClickListener true
-                    }
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_confirm_changes -> {
+                    onConfirmation()
+                    hideKeyboard()
+                    dismiss()
+                    true
                 }
-                false
-            },
-        )
+                else -> onMenuItemClicked(item)
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
