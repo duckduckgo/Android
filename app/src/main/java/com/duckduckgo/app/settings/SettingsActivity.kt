@@ -42,6 +42,10 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -59,11 +63,6 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
-import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
-import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
@@ -176,7 +175,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateNetPSettings(it.networkProtectionConnectionState, it.networkProtectionWaitlistState)
+                    updateNetPSettings(it.networkProtectionEntryState)
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
@@ -286,39 +285,19 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateNetPSettings(
-        networkProtectionState: NetworkProtectionState.ConnectionState,
-        networkProtectionWaitlistState: NetPWaitlistState,
-    ) {
+    private fun updateNetPSettings(networkProtectionEntryState: NetPEntryState) {
         with(viewsPrivacy) {
-            when (networkProtectionWaitlistState) {
-                is NetPWaitlistState.InBeta -> {
-                    if (networkProtectionWaitlistState.termsAccepted) {
-                        netpPSetting.show()
-                        when (networkProtectionState) {
-                            CONNECTED -> R.string.netpSettingsConnected
-                            CONNECTING -> R.string.netpSettingsConnecting
-                            else -> R.string.netpSettingsDisconnected
-                        }.run {
-                            netpPSetting.setSecondaryText(getString(this))
-                        }
-                        val netPItemStatus = if (networkProtectionState != DISCONNECTED) {
-                            CheckListItem.CheckItemStatus.ENABLED
-                        } else {
-                            CheckListItem.CheckItemStatus.WARNING
-                        }
-                        netpPSetting.setItemStatus(netPItemStatus)
-                    } else {
-                        netpPSetting.show()
-                        netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
-                        netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
-                    }
-                }
-                NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
-                NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> {
+            when (networkProtectionEntryState) {
+                Hidden -> netpPSetting.gone()
+                Pending -> {
                     netpPSetting.show()
                     netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
                     netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+                }
+                is ShowState -> {
+                    netpPSetting.show()
+                    netpPSetting.setSecondaryText(getString(networkProtectionEntryState.subtitle))
+                    netpPSetting.setItemStatus(networkProtectionEntryState.icon)
                 }
             }
         }

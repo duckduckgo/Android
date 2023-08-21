@@ -17,16 +17,22 @@
 package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
+import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.settings.CheckListItem.CheckItemStatus
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -36,6 +42,8 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
 import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
@@ -77,10 +85,18 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
-        val networkProtectionConnectionState: ConnectionState = DISCONNECTED,
-        val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
+        val networkProtectionEntryState: NetPEntryState = Hidden,
         val isAutoconsentEnabled: Boolean = false,
     )
+
+    sealed class NetPEntryState {
+        object Hidden : NetPEntryState()
+        object Pending : NetPEntryState()
+        data class ShowState(
+            val icon: CheckItemStatus,
+            @StringRes val subtitle: Int,
+        ) : NetPEntryState()
+    }
 
     sealed class Command {
         object LaunchDefaultBrowser : Command()
@@ -124,6 +140,35 @@ class SettingsViewModel @Inject constructor(
         appTPPollJob.cancel()
     }
 
+    private suspend fun getNetworkProtectionEntryState(networkProtectionConnectionState: ConnectionState): NetPEntryState {
+        return when (val networkProtectionWaitlistState = networkProtectionWaitlist.getState()) {
+            is NetPWaitlistState.InBeta -> {
+                if (networkProtectionWaitlistState.termsAccepted || networkProtectionState.isOnboarded()) {
+                    val subtitle = when (networkProtectionConnectionState) {
+                        CONNECTED -> R.string.netpSettingsConnected
+                        CONNECTING -> R.string.netpSettingsConnecting
+                        else -> R.string.netpSettingsDisconnected
+                    }
+
+                    val netPItemStatus = if (networkProtectionConnectionState != DISCONNECTED) {
+                        CheckListItem.CheckItemStatus.ENABLED
+                    } else {
+                        CheckListItem.CheckItemStatus.WARNING
+                    }
+
+                    ShowState(
+                        icon = netPItemStatus,
+                        subtitle = subtitle,
+                    )
+                } else {
+                    Pending
+                }
+            }
+            NetPWaitlistState.NotUnlocked -> Hidden
+            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
+        }
+    }
+
     @VisibleForTesting
     internal fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
@@ -138,15 +183,18 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
-                    networkProtectionConnectionState = if (networkProtectionState.isRunning()) ConnectionState.CONNECTED else DISCONNECTED,
-                    networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
+                    networkProtectionEntryState = (if (networkProtectionState.isRunning()) CONNECTED else DISCONNECTED).run {
+                        getNetworkProtectionEntryState(this)
+                    },
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
             )
             networkProtectionState.getConnectionStateFlow()
                 .onEach {
                     viewState.emit(
-                        currentViewState().copy(networkProtectionConnectionState = it),
+                        currentViewState().copy(
+                            networkProtectionEntryState = getNetworkProtectionEntryState(it),
+                        ),
                     )
                 }.flowOn(dispatcherProvider.main())
                 .launchIn(viewModelScope)
