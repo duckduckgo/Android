@@ -16,6 +16,9 @@
 
 package com.duckduckgo.mobile.android.app.tracking
 
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
@@ -47,24 +50,37 @@ class AppTPVpnConnectivityLossListener @Inject constructor(
     private val appTrackingProtection: AppTrackingProtection,
     private val appTpFeatureConfig: AppTpFeatureConfig,
     private val dispatcherProvider: DispatcherProvider,
+    private val context: Context,
 ) : VpnConnectivityLossListenerPlugin, VpnServiceCallbacks {
 
+    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
+
     private var connectivityLostEvents = 0
+    private var reconnectAttempts: Int
+        get() = preferences.getInt(RECONNECT_ATTEMPTS, 0)
+        set(value) = preferences.edit(commit = true) { putInt(RECONNECT_ATTEMPTS, value) }
 
     override fun onVpnConnected(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             if (isActive()) {
                 connectivityLostEvents = 0
+                reconnectAttempts = 0
             }
         }
     }
 
     override fun onVpnConnectivityLoss(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             if (isActive() && connectivityLostEvents++ > 1) {
-                logcat(LogPriority.WARN) { "AppTP detected connectivity loss, re-configuring..." }
                 connectivityLostEvents = 0
-                appTrackingProtection.restart()
+                if (reconnectAttempts++ > 2) {
+                    logcat(LogPriority.WARN) { "AppTP detected connectivity loss, again, give up..." }
+                    reconnectAttempts = 0
+                    appTrackingProtection.stop()
+                } else {
+                    logcat(LogPriority.WARN) { "AppTP detected connectivity loss, re-configuring..." }
+                    appTrackingProtection.restart()
+                }
             }
         }
     }
@@ -79,6 +95,9 @@ class AppTPVpnConnectivityLossListener @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         connectivityLostEvents = 0
+        coroutineScope.launch(dispatcherProvider.io()) {
+            reconnectAttempts = 0
+        }
     }
 
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
@@ -87,5 +106,10 @@ class AppTPVpnConnectivityLossListener @Inject constructor(
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStateMonitor.VpnStopReason) {
         connectivityLostEvents = 0
+    }
+
+    companion object {
+        private const val FILENAME = "com.duckduckgo.mobile.android.app.tracking.conn.loss"
+        private const val RECONNECT_ATTEMPTS = "RECONNECT_ATTEMPTS"
     }
 }

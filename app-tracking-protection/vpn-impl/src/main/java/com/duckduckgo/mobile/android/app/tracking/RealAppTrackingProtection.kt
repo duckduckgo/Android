@@ -53,4 +53,10 @@ class RealAppTrackingProtection @Inject constructor(
             vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }
+
+    override fun stop() {
+        coroutineScope.launch {
+            vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
+        }
+    }
 }
