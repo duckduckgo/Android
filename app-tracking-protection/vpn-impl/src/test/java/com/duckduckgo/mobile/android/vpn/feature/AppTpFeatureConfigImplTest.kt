@@ -29,9 +29,9 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class AppTpFeatureConfigImplTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -62,6 +62,7 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
+                AppTpSetting.RestartOnConnectivityLoss -> assertTrue(config.isEnabled(setting))
             }
         }
     }

@@ -21,6 +21,7 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     CPUMonitoring("cpuMonitoring"),
     ProtectGames("protectGames"),
     ExceptionLists("exceptionLists", defaultValue = true),
+    RestartOnConnectivityLoss("restartOnConnectivityLoss", defaultValue = true),
 }
 
 interface SettingName {
