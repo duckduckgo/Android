@@ -48,6 +48,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_VOICE_RESULT = "extra.voice.result"
         const val DELAY_SPEAKNOW_REMINDER_MILLIS = 2000L
+        const val VOICE_SEARCH_ERROR = 1
     }
 
     @Inject
@@ -134,7 +135,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                 when (it) {
                     is Command.UpdateVoiceIndicator -> handleVolume(it.volume)
                     is Command.HandleSpeechRecognitionSuccess -> handleSuccess(it.result)
-                    is Command.TerminateVoiceSearch -> finish()
+                    is Command.TerminateVoiceSearch -> handleError()
                 }
             }
             .launchIn(lifecycleScope)
@@ -151,6 +152,13 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                 putExtra(EXTRA_VOICE_RESULT, result.capitalizeFirstLetter())
                 setResult(Activity.RESULT_OK, this)
             }
+        }
+        finish()
+    }
+
+    private fun handleError() {
+        Intent().apply {
+            setResult(VOICE_SEARCH_ERROR, this)
         }
         finish()
     }

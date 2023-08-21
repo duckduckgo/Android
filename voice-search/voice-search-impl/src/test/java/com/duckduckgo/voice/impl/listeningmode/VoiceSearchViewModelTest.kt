@@ -155,6 +155,20 @@ class VoiceSearchViewModelTest {
     }
 
     @Test
+    fun whenRecognitionFailsThenEmitTerminateVoiceSearch() = runTest {
+        val captor = argumentCaptor<(Event) -> Unit>()
+        testee.startVoiceSearch()
+        verify(speechRecognizer).start(captor.capture())
+
+        captor.firstValue.invoke(Event.RecognitionFailed)
+
+        testee.commands().test {
+            assertEquals(Command.TerminateVoiceSearch, expectMostRecentItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenRecognitionTimedoutWithPartialResultThenEmiHandleSpeechRecognitionSuccessCommand() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
         testee.startVoiceSearch()

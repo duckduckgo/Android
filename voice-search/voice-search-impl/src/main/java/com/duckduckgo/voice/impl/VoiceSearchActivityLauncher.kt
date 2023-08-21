@@ -17,6 +17,9 @@
 package com.duckduckgo.voice.impl
 
 import android.app.Activity
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import android.view.WindowInsets
 import androidx.activity.result.ActivityResultCaller
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -24,7 +27,10 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchVoiceSearch
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
+import com.duckduckgo.voice.impl.R.string
+import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity.Companion.VOICE_SEARCH_ERROR
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -71,6 +77,17 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                         onEvent(Event.VoiceRecognitionSuccess(data))
                     } else {
                         onEvent(Event.SearchCancelled)
+                    }
+                } else if (code == VOICE_SEARCH_ERROR) {
+                    activity.window?.decorView?.rootView?.let {
+                        val snackbar = Snackbar.make(it, activity.getString(string.voiceSearchError), Snackbar.LENGTH_LONG)
+                        snackbar.view.translationY =
+                            if (VERSION.SDK_INT >= VERSION_CODES.R) {
+                                (-activity.window.decorView.rootWindowInsets.getInsets(WindowInsets.Type.systemBars()).bottom).toFloat()
+                            } else {
+                                (-activity.window.decorView.rootWindowInsets.systemWindowInsetBottom).toFloat()
+                            }
+                        snackbar.show()
                     }
                 } else {
                     onEvent(Event.SearchCancelled)

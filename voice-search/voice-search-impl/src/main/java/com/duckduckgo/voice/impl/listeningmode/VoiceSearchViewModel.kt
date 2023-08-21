@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionFailed
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionSuccess
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionTimedOut
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.VolumeUpdateReceived
@@ -76,6 +77,7 @@ class VoiceSearchViewModel @Inject constructor(
                 is PartialResultReceived -> showRecognizedSpeech(it.partialResult)
                 is RecognitionSuccess -> handleSuccess(it.result)
                 is VolumeUpdateReceived -> sendCommand(UpdateVoiceIndicator(it.normalizedVolume))
+                is RecognitionFailed -> handleRecognitionFailed()
                 is RecognitionTimedOut -> handleTimeOut()
             }
         }
@@ -83,12 +85,14 @@ class VoiceSearchViewModel @Inject constructor(
 
     private fun handleTimeOut() {
         if (viewState.value.result.isEmpty()) {
-            viewModelScope.launch {
-                command.send(Command.TerminateVoiceSearch)
-            }
+            viewModelScope.launch { command.send(Command.TerminateVoiceSearch) }
         } else {
             handleSuccess(viewState.value.result)
         }
+    }
+
+    private fun handleRecognitionFailed() {
+        sendCommand(Command.TerminateVoiceSearch)
     }
 
     fun stopVoiceSearch() {
@@ -96,9 +100,7 @@ class VoiceSearchViewModel @Inject constructor(
     }
 
     private fun sendCommand(commandToSend: Command) {
-        viewModelScope.launch {
-            command.send(commandToSend)
-        }
+        viewModelScope.launch { command.send(commandToSend) }
     }
 
     private fun handleSuccess(result: String) {
