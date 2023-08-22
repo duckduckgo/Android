@@ -48,7 +48,7 @@ class VoiceSearchViewModel @Inject constructor(
     sealed class Command {
         data class UpdateVoiceIndicator(val volume: Float) : Command()
         data class HandleSpeechRecognitionSuccess(val result: String) : Command()
-        object TerminateVoiceSearch : Command()
+        data class TerminateVoiceSearch(val error: Int) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -77,22 +77,22 @@ class VoiceSearchViewModel @Inject constructor(
                 is PartialResultReceived -> showRecognizedSpeech(it.partialResult)
                 is RecognitionSuccess -> handleSuccess(it.result)
                 is VolumeUpdateReceived -> sendCommand(UpdateVoiceIndicator(it.normalizedVolume))
-                is RecognitionFailed -> handleRecognitionFailed()
-                is RecognitionTimedOut -> handleTimeOut()
+                is RecognitionFailed -> handleRecognitionFailed(it.error)
+                is RecognitionTimedOut -> handleTimeOut(it.error)
             }
         }
     }
 
-    private fun handleTimeOut() {
+    private fun handleTimeOut(error: Int) {
         if (viewState.value.result.isEmpty()) {
-            viewModelScope.launch { command.send(Command.TerminateVoiceSearch) }
+            viewModelScope.launch { command.send(Command.TerminateVoiceSearch(error)) }
         } else {
             handleSuccess(viewState.value.result)
         }
     }
 
-    private fun handleRecognitionFailed() {
-        sendCommand(Command.TerminateVoiceSearch)
+    private fun handleRecognitionFailed(error: Int) {
+        sendCommand(Command.TerminateVoiceSearch(error))
     }
 
     fun stopVoiceSearch() {

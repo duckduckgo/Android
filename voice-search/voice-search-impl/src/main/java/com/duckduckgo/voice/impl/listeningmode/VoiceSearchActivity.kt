@@ -135,7 +135,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                 when (it) {
                     is Command.UpdateVoiceIndicator -> handleVolume(it.volume)
                     is Command.HandleSpeechRecognitionSuccess -> handleSuccess(it.result)
-                    is Command.TerminateVoiceSearch -> handleError()
+                    is Command.TerminateVoiceSearch -> handleError(it.error)
                 }
             }
             .launchIn(lifecycleScope)
@@ -156,8 +156,9 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun handleError() {
+    private fun handleError(error: Int) {
         Intent().apply {
+            putExtra(EXTRA_VOICE_RESULT, error.toString())
             setResult(VOICE_SEARCH_ERROR, this)
         }
         finish()

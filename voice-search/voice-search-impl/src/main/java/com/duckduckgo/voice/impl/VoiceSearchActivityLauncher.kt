@@ -79,6 +79,10 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                         onEvent(Event.SearchCancelled)
                     }
                 } else if (code == VOICE_SEARCH_ERROR) {
+                    pixel.fire(
+                        pixel = VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
+                        parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName, "error" to data),
+                    )
                     activity.window?.decorView?.rootView?.let {
                         val snackbar = Snackbar.make(it, activity.getString(string.voiceSearchError), Snackbar.LENGTH_LONG)
                         snackbar.view.translationY =

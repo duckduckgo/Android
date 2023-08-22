@@ -23,8 +23,10 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchVoiceSearch
 import com.duckduckgo.voice.impl.fakes.FakeActivityResultLauncherWrapper
+import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -67,6 +69,20 @@ class RealVoiceSearchActivityLauncherTest {
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
         assertEquals(Event.VoiceRecognitionSuccess("Result"), lastKnownEvent)
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchBrowserIsErrorThenEmitVoiceRecognitionError() {
+        var lastKnownEvent: Event? = null
+        testee.registerResultsCallback(mock(), mock(), BROWSER) {
+            lastKnownEvent = it
+        }
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(VoiceSearchActivity.VOICE_SEARCH_ERROR, "1")
+
+        verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_ERROR, mapOf("source" to "browser", "error" to "1"))
+        assertNull(lastKnownEvent)
     }
 
     @Test
