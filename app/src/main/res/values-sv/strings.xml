@@ -761,4 +761,10 @@
     <string name="closeAppTabsConfirmationDialogDescription">Är du säker på att du vill stänga alla flikar?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Avbryt</string>
     <string name="closeAppTabsConfirmationDialogClose">Stäng</string>
+
+    <!-- Edit Bookmark screen, "Delete Bookmark" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Vill du radera det här bokmärket?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ditt bokmärke för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteBookmarkConfirmationDialogCancel">Avbryt</string>
+    <string name="deleteBookmarkConfirmationDialogDelete">Ta bort</string>
 </resources>
