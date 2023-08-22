@@ -20,8 +20,8 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.text.Spanned
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -37,6 +37,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -45,7 +46,9 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     abstract fun onConfirmation()
     abstract fun configureUI()
-    open fun onMenuItemClicked(menuItem: MenuItem) = false
+    open fun deleteConfirmationTitle(): String = ""
+    open fun deleteConfirmationMessage(): Spanned? = null
+    open fun onDeleteConfirmed() = Unit
 
     private var _binding: DialogFragmentSavedSiteBinding? = null
     protected val binding get() = _binding!!
@@ -116,7 +119,12 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
                     dismiss()
                     true
                 }
-                else -> onMenuItemClicked(item)
+                R.id.action_delete -> {
+                    showDeleteConfirmation()
+                    hideKeyboard()
+                    true
+                }
+                else -> false
             }
         }
     }
@@ -183,7 +191,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     }
 
     protected fun setConfirmationVisibility(inputState: ValidationState = ValidationState.UNCHANGED) {
-        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible =
+        binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isEnabled =
             (inputState == ValidationState.CHANGED || titleState == ValidationState.CHANGED || folderChanged) &&
             (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
     }
@@ -203,6 +211,26 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
             }
             setConfirmationVisibility()
         }
+    }
+
+    private fun showDeleteConfirmation() {
+        val title = deleteConfirmationTitle()
+        val message = deleteConfirmationMessage() ?: ""
+
+        TextAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setDestructiveButtons(true)
+            .setPositiveButton(R.string.deleteSavedSiteConfirmationDialogDelete)
+            .setNegativeButton(R.string.deleteSavedSiteConfirmationDialogCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onDeleteConfirmed()
+                    }
+                },
+            )
+            .show()
     }
 }
 

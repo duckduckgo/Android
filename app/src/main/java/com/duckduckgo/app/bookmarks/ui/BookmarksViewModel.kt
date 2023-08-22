@@ -111,8 +111,8 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    override fun onBookmarkDeleted(bookmark: Bookmark) {
-        onDeleteSavedSiteRequested(bookmark)
+    override fun onSavedSiteDeleted(savedSite: SavedSite) {
+        onDeleteSavedSiteRequested(savedSite)
     }
 
     fun onSelected(savedSite: SavedSite) {
@@ -213,6 +213,10 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.update(bookmarkFolder)
         }
+    }
+
+    override fun onDeleteBookmarkFolderRequestedFromEdit(bookmarkFolder: BookmarkFolder) {
+        onDeleteBookmarkFolderRequested(bookmarkFolder)
     }
 
     fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {

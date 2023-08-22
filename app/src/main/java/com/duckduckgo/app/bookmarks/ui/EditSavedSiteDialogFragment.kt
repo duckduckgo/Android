@@ -18,14 +18,12 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.os.Bundle
 import android.text.Editable
-import android.view.MenuItem
+import android.text.Spanned
 import android.view.View
-import android.view.WindowManager
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -44,8 +42,8 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     }
 
     interface DeleteBookmarkListener {
-        fun onBookmarkDeleted(
-            bookmark: Bookmark,
+        fun onSavedSiteDeleted(
+            savedSite: SavedSite,
         )
     }
 
@@ -55,13 +53,14 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     override fun configureUI() {
         validateBundleArguments()
 
-        if (getSavedSite() is SavedSite.Favorite) {
+        if (getSavedSite() is Favorite) {
             setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
         } else {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
-            configureBookmarkMenuItemsVisibility()
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
+        configureMenuItems()
+
         showAddFolderMenu = true
 
         populateFields(binding.titleInput, binding.urlInput, binding.savedSiteLocation)
@@ -140,47 +139,27 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         }
     }
 
-    private fun configureBookmarkMenuItemsVisibility() {
+    private fun configureMenuItems() {
         val toolbar = binding.savedSiteAppBar.toolbar
-        toolbar.menu.findItem(R.id.action_delete_saved_site).isVisible = true
-        toolbar.menu.findItem(R.id.action_confirm_changes).isVisible = true
+        toolbar.menu.findItem(R.id.action_delete).isVisible = true
+        toolbar.menu.findItem(R.id.action_confirm_changes).isEnabled = false
     }
 
-    override fun onMenuItemClicked(menuItem: MenuItem): Boolean {
-        if (menuItem.itemId == R.id.action_delete_saved_site) {
-            showDeleteBookmarkConfirmation(getExistingTitle())
-            hideKeyboard()
-            return true
-        }
-        return false
+    override fun deleteConfirmationTitle(): String {
+        val isFavorite = (getSavedSite() as? Favorite != null)
+        val titleId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogTitle else R.string.deleteBookmarkConfirmationDialogTitle
+        return getString(titleId)
     }
 
-    private fun showDeleteBookmarkConfirmation(title: String) {
-        TextAlertDialogBuilder(requireContext())
-            .setTitle(R.string.deleteBookmarkConfirmationDialogTitle)
-            .setMessage(getString(R.string.deleteBookmarkConfirmationDialogDescription, title).html(requireContext()))
-            .setDestructiveButtons(true)
-            .setPositiveButton(R.string.deleteBookmarkConfirmationDialogDelete)
-            .setNegativeButton(R.string.deleteBookmarkConfirmationDialogCancel)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        onDeleteBookmarkConfirmed()
-                    }
-                },
-            )
-            .show()
+    override fun deleteConfirmationMessage(): Spanned? {
+        val isFavorite = (getSavedSite() as? Favorite != null)
+        val messageId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogDescription else R.string.deleteBookmarkConfirmationDialogDescription
+        return getString(messageId, getExistingTitle()).html(requireContext())
     }
 
-    private fun onDeleteBookmarkConfirmed() {
-        deleteBookmarkListener?.onBookmarkDeleted(getSavedSite() as Bookmark)
+    override fun onDeleteConfirmed() {
+        deleteBookmarkListener?.onSavedSiteDeleted(getSavedSite())
         dismiss()
-    }
-
-    private fun hideKeyboard() {
-        activity?.let {
-            it.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-        }
     }
 
     companion object {

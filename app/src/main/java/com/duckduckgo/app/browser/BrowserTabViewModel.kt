@@ -2026,15 +2026,15 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun onBookmarkDeleted(bookmark: Bookmark) {
-        command.value = DeleteSavedSiteConfirmation(bookmark)
-        delete(bookmark)
+    override fun onSavedSiteDeleted(savedSite: SavedSite) {
+        command.value = DeleteSavedSiteConfirmation(savedSite)
+        delete(savedSite)
     }
 
-    private fun delete(bookmark: Bookmark) {
+    private fun delete(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io()) {
-            faviconManager.deletePersistedFavicon(bookmark.url)
-            savedSitesRepository.delete(bookmark)
+            faviconManager.deletePersistedFavicon(savedSite.url)
+            savedSitesRepository.delete(savedSite)
         }
     }
 

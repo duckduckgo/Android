@@ -170,7 +170,7 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkDeletedThenConfirmDeleteSavedSiteCommandAndRepositoryIsUpdated() = runTest {
-        testee.onBookmarkDeleted(bookmark)
+        testee.onSavedSiteDeleted(bookmark)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertNotNull(commandCaptor.value)

@@ -677,7 +677,7 @@ class BrowserTabViewModelTest {
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
 
-        testee.onBookmarkDeleted(bookmark)
+        testee.onSavedSiteDeleted(bookmark)
 
         verify(mockFaviconManager).deletePersistedFavicon(bookmark.url)
         verify(mockSavedSitesRepository).delete(bookmark)
