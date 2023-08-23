@@ -58,10 +58,10 @@ class SyncLoginViewModelTest {
 
     @Test
     fun whenQRScannedThenPerformLoginAndEmitResult() = runTest {
-        whenever(syncRepostitory.login(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(syncRepostitory.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
 
         testee.commands().test {
-            testee.onConnectQRScanned(jsonRecoveryKeyEncoded)
+            testee.onQRCodeScanned(jsonRecoveryKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.LoginSucess)
             cancelAndIgnoreRemainingEvents()

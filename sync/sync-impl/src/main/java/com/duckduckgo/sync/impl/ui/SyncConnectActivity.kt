@@ -66,7 +66,7 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        binding.qrCodeReader.decodeSingle { result -> viewModel.onConnectQRScanned(result) }
+        binding.qrCodeReader.decodeSingle { result -> viewModel.onQRCodeScanned(result) }
 
         observeUiEvents()
         configureListeners()

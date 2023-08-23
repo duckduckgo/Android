@@ -25,7 +25,6 @@ import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState.Idle
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSucess
@@ -68,7 +67,7 @@ internal class EnterCodeViewModelTest {
     fun whenUserClicksOnPasteCodeThenClipboardIsPasted() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
 
-        testee.onPasteCodeClicked(Code.RECOVERY_CODE)
+        testee.onPasteCodeClicked()
 
         verify(clipboard).pasteFromClipboard()
     }
@@ -76,9 +75,9 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenUserClicksOnPasteCodeWithRecoveryCodeThenLoginWithCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
+        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
 
-        testee.onPasteCodeClicked(Code.RECOVERY_CODE)
+        testee.onPasteCodeClicked()
 
         testee.commands().test {
             val command = awaitItem()
@@ -90,9 +89,9 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenUserClicksOnPasteCodeWithConnectCodeThenConnectWithCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonConnectKeyEncoded)
-        whenever(syncAccountRepository.connectDevice(jsonConnectKeyEncoded)).thenReturn(Success(true))
+        whenever(syncAccountRepository.processCode(jsonConnectKeyEncoded)).thenReturn(Success(true))
 
-        testee.onPasteCodeClicked(Code.CONNECT_CODE)
+        testee.onPasteCodeClicked()
 
         testee.commands().test {
             val command = awaitItem()
@@ -104,9 +103,9 @@ internal class EnterCodeViewModelTest {
     @Test
     fun whenPastedCodeFailsThenEmitError() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
-        whenever(syncAccountRepository.login(jsonRecoveryKeyEncoded)).thenReturn(Error(reason = "error"))
+        whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Error(reason = "error"))
 
-        testee.onPasteCodeClicked(Code.RECOVERY_CODE)
+        testee.onPasteCodeClicked()
 
         testee.viewState().test {
             val item = awaitItem()
