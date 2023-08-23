@@ -770,9 +770,13 @@
     <string name="closeAppTabsConfirmationDialogCancel">Atšaukti</string>
     <string name="closeAppTabsConfirmationDialogClose">Uždaryti</string>
 
-    <!-- Edit Bookmark screen, "Delete Bookmark" confirmation prompt -->
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
     <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Ištrinti šią žymę?</string>
     <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymę.</string>
-    <string name="deleteBookmarkConfirmationDialogCancel">Atšaukti</string>
-    <string name="deleteBookmarkConfirmationDialogDelete">Trinti</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Ištrinti šį parankinį?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; parankinį.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Ištrinti šį žymių aplanką?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymių aplanką.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Atšaukti</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
 </resources>
