@@ -762,9 +762,13 @@
     <string name="closeAppTabsConfirmationDialogCancel">Abbrechen</string>
     <string name="closeAppTabsConfirmationDialogClose">Schließen</string>
 
-    <!-- Edit Bookmark screen, "Delete Bookmark" confirmation prompt -->
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
     <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Dieses Lesezeichen löschen?</string>
     <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Dadurch wird dein Lesezeichen für &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
-    <string name="deleteBookmarkConfirmationDialogCancel">Abbrechen</string>
-    <string name="deleteBookmarkConfirmationDialogDelete">Löschen</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Diesen Favoriten löschen?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Favorit für &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Diesen Lesezeichenordner löschen?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Lesezeichen-Ordner &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Abbrechen</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Löschen</string>
 </resources>
