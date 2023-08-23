@@ -21,31 +21,31 @@ import androidx.room.*
 import com.duckduckgo.app.survey.model.Survey
 
 @Dao
-abstract class SurveyDao {
+interface SurveyDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(survey: Survey)
+    fun insert(survey: Survey)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun update(survey: Survey)
+    fun update(survey: Survey)
 
     @Query("select count(1) > 0 from survey where surveyId = :surveyId")
-    abstract fun exists(surveyId: String): Boolean
+    fun exists(surveyId: String): Boolean
 
     @Query("select * from survey where surveyId = :surveyId")
-    abstract fun get(surveyId: String): Survey?
+    fun get(surveyId: String): Survey?
 
     @Query("""select * from survey where status = "SCHEDULED" limit 1""")
-    abstract fun getLiveScheduled(): LiveData<Survey>
+    fun getLiveScheduled(): LiveData<Survey>
 
     @Query("""select * from survey where status = "SCHEDULED"""")
-    abstract fun getScheduled(): List<Survey>
+    fun getScheduled(): List<Survey>
 
     @Query("""delete from survey where status = "SCHEDULED" or status = "NOT_ALLOCATED"""")
-    abstract fun deleteUnusedSurveys()
+    fun deleteUnusedSurveys()
 
     @Transaction
-    open fun cancelScheduledSurveys() {
+    fun cancelScheduledSurveys() {
         getScheduled().forEach {
             it.status = Survey.Status.CANCELLED
             update(it)
