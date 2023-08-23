@@ -770,9 +770,13 @@
     <string name="closeAppTabsConfirmationDialogCancel">Отменить</string>
     <string name="closeAppTabsConfirmationDialogClose">Закрыть</string>
 
-    <!-- Edit Bookmark screen, "Delete Bookmark" confirmation prompt -->
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
     <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Удалить эту закладку?</string>
     <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Закладка на &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
-    <string name="deleteBookmarkConfirmationDialogCancel">Отменить</string>
-    <string name="deleteBookmarkConfirmationDialogDelete">Удалить</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Удалить сайт из избранного?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Сайт &lt;b&gt;%1$s&lt;/b&gt; будет удален из избранного.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Удалить эту папку с закладками?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Папка &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Отменить</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Удалить</string>
 </resources>
