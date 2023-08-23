@@ -2330,24 +2330,14 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionEnabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
-        ).apply {
-            setAction(R.string.undoSnackbarAction) {
-                viewModel.onEnablePrivacyProtectionSnackbarUndoClicked(domain)
-            }
-            show()
-        }
+        ).show()
     }
 
     private fun privacyProtectionDisabledConfirmation(domain: String) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
-        ).apply {
-            setAction(R.string.undoSnackbarAction) {
-                viewModel.onDisablePrivacyProtectionSnackbarUndoClicked(domain)
-            }
-            show()
-        }
+        ).show()
     }
 
     private fun launchSharePageChooser(url: String) {
