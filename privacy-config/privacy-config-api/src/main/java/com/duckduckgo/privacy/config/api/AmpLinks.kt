@@ -33,6 +33,13 @@ interface AmpLinks {
      */
     fun extractCanonicalFromAmpLink(url: String): AmpLinkType?
 
+    /**
+     * This method takes an [initialUrl] and a [extractedUrl]. It returns a [String] containing
+     * the destination URL after checking extracted URL validity.
+     * @return the [String] containing the destination URL.
+     */
+    fun processDestinationUrl(initialUrl: String, extractedUrl: String?): String
+
     /** The last AMP link and its destination URL. */
     var lastAmpLinkInfo: AmpLinkInfo?
 }
