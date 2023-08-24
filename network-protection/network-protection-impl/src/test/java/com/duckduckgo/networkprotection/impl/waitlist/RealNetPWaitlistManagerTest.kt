@@ -38,8 +38,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -136,6 +135,31 @@ class RealNetPWaitlistManagerTest {
         assertEquals(RedeemCodeResult.Failure, testee.redeemCode("fake_code"))
 
         assertNull(netPWaitlistRepository.getAuthenticationToken())
+    }
+
+    @Test
+    fun whenUserDidNotJoinWaitlistThenDoNotCheckWaitlistStatus() = runTest {
+        testee.upsertState()
+
+        verify(netPWaitlistService, never()).waitlistStatus()
+    }
+
+    @Test
+    fun whenUserIsInBetaThenDoNotCheckWaitlistStatus() = runTest {
+        netPWaitlistRepository.setAuthenticationToken("token")
+        netPWaitlistRepository.setWaitlistToken("token")
+
+        testee.upsertState()
+
+        verify(netPWaitlistService, never()).waitlistStatus()
+    }
+
+    @Test
+    fun whenUserJoinWaitlistAndNotInBetaThenCheckWaitlistStatus() = runTest {
+        netPWaitlistRepository.setWaitlistToken("token")
+        testee.upsertState()
+
+        verify(netPWaitlistService, times(1)).waitlistStatus()
     }
 
     private fun convertToHTTPResponse(jsonResponse: String): Response<String> {
