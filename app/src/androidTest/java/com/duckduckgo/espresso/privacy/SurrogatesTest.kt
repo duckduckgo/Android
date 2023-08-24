@@ -17,10 +17,9 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
+import androidx.test.core.app.*
+import androidx.test.espresso.*
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingPolicies
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.model.Atoms.script
@@ -29,13 +28,12 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.espresso.PrivacyTest
-import com.duckduckgo.espresso.WebViewIdlingResource
-import com.duckduckgo.espresso.waitForView
+import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.TimeUnit
+import org.hamcrest.*
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -44,12 +42,7 @@ import org.junit.Test
 class SurrogatesTest {
 
     @get:Rule
-    var activityScenarioRule = activityScenarioRule<BrowserActivity>(
-        BrowserActivity.intent(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/",
-        ),
-    )
+    var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledSurrogatesAreLoaded() {
@@ -60,8 +53,15 @@ class SurrogatesTest {
         var webView: WebView? = null
 
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+        onView(isRoot()).perform(waitFor(2000))
 
-        activityScenarioRule.scenario.onActivity {
+        val scenario = ActivityScenario.launch<BrowserActivity>(
+            BrowserActivity.intent(
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/",
+            ),
+        )
+        scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
@@ -90,8 +90,15 @@ class SurrogatesTest {
         var webView: WebView? = null
 
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+        onView(isRoot()).perform(waitFor(2000))
 
-        activityScenarioRule.scenario.onActivity {
+        val scenario = ActivityScenario.launch<BrowserActivity>(
+            BrowserActivity.intent(
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/",
+            ),
+        )
+        scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 

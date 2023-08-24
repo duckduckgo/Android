@@ -17,6 +17,7 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
+import androidx.test.core.app.*
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
@@ -32,9 +33,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.espresso.PrivacyTest
-import com.duckduckgo.espresso.WebViewIdlingResource
-import com.duckduckgo.espresso.waitForView
+import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -47,12 +46,7 @@ import org.junit.Test
 class FingerprintProtectionTest {
 
     @get:Rule
-    var activityScenarioRule = activityScenarioRule<BrowserActivity>(
-        BrowserActivity.intent(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            queryExtra = "https://privacy-test-pages.glitch.me/privacy-protections/fingerprinting/",
-        ),
-    )
+    var activityScenarioRule = activityScenarioRule<BrowserActivity>()
 
     @Test @PrivacyTest
     fun whenProtectionsAreFingerprintProtected() {
@@ -63,8 +57,15 @@ class FingerprintProtectionTest {
         var webView: WebView? = null
 
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+        onView(isRoot()).perform(waitFor(2000))
 
-        activityScenarioRule.scenario.onActivity {
+        val scenario = ActivityScenario.launch<BrowserActivity>(
+            BrowserActivity.intent(
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                "https://privacy-test-pages.glitch.me/privacy-protections/fingerprinting/",
+            ),
+        )
+        scenario.onActivity {
             webView = it.findViewById(R.id.browserWebView)
         }
 
