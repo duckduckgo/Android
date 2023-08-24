@@ -90,6 +90,7 @@ class SurrogatesTest {
         var webView: WebView? = null
 
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+        onView(isRoot()).perform(waitFor(2000))
 
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
