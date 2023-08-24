@@ -73,7 +73,7 @@ class DeviceShieldTileService : TileService() {
         serviceScope.launch(dispatcherProvider.io()) {
             if (vpnFeaturesRegistry.isFeatureRunning(AppTpVpnFeature.APPTP_VPN)) {
                 deviceShieldPixels.disableFromQuickSettingsTile()
-                TrackerBlockingVpnService.stopService(this@DeviceShieldTileService)
+                vpnFeaturesRegistry.unregisterFeature(AppTpVpnFeature.APPTP_VPN)
             } else {
                 deviceShieldPixels.enableFromQuickSettingsTile()
                 if (hasVpnPermission()) {
