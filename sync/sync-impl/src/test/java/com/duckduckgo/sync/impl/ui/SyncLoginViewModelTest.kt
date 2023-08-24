@@ -57,7 +57,7 @@ class SyncLoginViewModelTest {
     }
 
     @Test
-    fun whenQRScannedThenPerformLoginAndEmitResult() = runTest {
+    fun whenProcessRecoveryCodeThenPerformLoginAndEmitResult() = runTest {
         whenever(syncRepostitory.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
 
         testee.commands().test {

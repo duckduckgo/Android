@@ -73,7 +73,7 @@ internal class EnterCodeViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnPasteCodeWithRecoveryCodeThenLoginWithCode() = runTest {
+    fun whenUserClicksOnPasteCodeWithRecoveryCodeThenProcessCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonRecoveryKeyEncoded)
         whenever(syncAccountRepository.processCode(jsonRecoveryKeyEncoded)).thenReturn(Success(true))
 
@@ -87,7 +87,7 @@ internal class EnterCodeViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnPasteCodeWithConnectCodeThenConnectWithCode() = runTest {
+    fun whenUserClicksOnPasteCodeWithConnectCodeThenProcessCode() = runTest {
         whenever(clipboard.pasteFromClipboard()).thenReturn(jsonConnectKeyEncoded)
         whenever(syncAccountRepository.processCode(jsonConnectKeyEncoded)).thenReturn(Success(true))
 

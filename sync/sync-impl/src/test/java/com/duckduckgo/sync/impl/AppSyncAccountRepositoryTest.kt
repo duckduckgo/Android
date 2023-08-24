@@ -359,7 +359,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenConnectingFromAuthenticatedDeviceThenConnectsDevice() {
+    fun whenProcessConnectCodeFromAuthenticatedDeviceThenConnectsDevice() {
         givenAuthenticatedDevice()
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
         whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Result.Success(true))
@@ -371,7 +371,7 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenConnectingFromUnauthenticatedDeviceThenAccountCreatedAndConnects() {
+    fun whenProcessConnectCodeFromUnauthenticatedDeviceThenAccountCreatedAndConnects() {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.isSignedIn()).thenReturn(false).thenReturn(true)
         whenever(syncStore.userId).thenReturn(userId)
