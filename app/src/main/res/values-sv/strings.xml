@@ -761,4 +761,14 @@
     <string name="closeAppTabsConfirmationDialogDescription">Är du säker på att du vill stänga alla flikar?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Avbryt</string>
     <string name="closeAppTabsConfirmationDialogClose">Stäng</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Vill du radera det här bokmärket?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ditt bokmärke för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Vill du radera den här favoriten?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din favoritmarkering av &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Vill du radera den här bokmärkesmappen?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din bokmärkesmapp för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Avbryt</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Ta bort</string>
 </resources>

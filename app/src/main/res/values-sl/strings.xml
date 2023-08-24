@@ -769,4 +769,14 @@
     <string name="closeAppTabsConfirmationDialogDescription">Ali ste prepričani, da želite zapreti vse zavihke?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Prekliči</string>
     <string name="closeAppTabsConfirmationDialogClose">Zapri</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Želite izbrisati ta zaznamek?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">S tem boste izbrisali svoj zaznamek za &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Želite izbrisati iz priljubljenih?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">S tem boste iz priljubljenih izbrisali stran &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Želite izbrisati to mapo z zaznamki?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">S tem boste izbrisali svojo mapo z zaznamki &lt;b&gt;%1$s&lt;/b&gt; .</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Prekliči</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
 </resources>

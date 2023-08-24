@@ -761,4 +761,14 @@
     <string name="closeAppTabsConfirmationDialogDescription">Tüm sekmeleri kapatmak istediğinizden emin misiniz?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Vazgeç</string>
     <string name="closeAppTabsConfirmationDialogClose">Kapat</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Bu yer işareti silinsin mi?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için yer işaretinizi siler.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Bu favori silinsin mi?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için favorinizi silecektir.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Bu yer işareti klasörü silinsin mi?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; yer işareti klasörünüzü silecektir.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Vazgeç</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Sil</string>
 </resources>
