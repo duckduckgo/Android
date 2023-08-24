@@ -79,11 +79,15 @@ class RealNetPWaitlistManager @Inject constructor(
 
     override suspend fun upsertState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         runCatching {
-            val frontier = netPWaitlistService.waitlistStatus().timestamp
-            if (frontier > repository.getWaitlistTimestamp()) {
-                repository.getWaitlistToken()?.let { token ->
-                    val inviteCode = netPWaitlistService.getCode(token).code
-                    redeemCode(inviteCode)
+            val didJoinWaitlist = repository.getWaitlistToken() != null
+            val didNotJoinBeta = repository.getAuthenticationToken() == null
+            if (didJoinWaitlist && didNotJoinBeta) {
+                val frontier = netPWaitlistService.waitlistStatus().timestamp
+                if (frontier > repository.getWaitlistTimestamp()) {
+                    repository.getWaitlistToken()?.let { token ->
+                        val inviteCode = netPWaitlistService.getCode(token).code
+                        redeemCode(inviteCode)
+                    }
                 }
             }
         }
