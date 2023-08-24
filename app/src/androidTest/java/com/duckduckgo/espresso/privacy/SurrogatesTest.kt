@@ -34,15 +34,19 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.TimeUnit
 import org.hamcrest.*
+import org.junit.*
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Rule
-import org.junit.Test
 
 class SurrogatesTest {
 
     @get:Rule
     var activityScenarioRule = activityScenarioRule<BrowserActivity>()
+
+    @Before
+    fun before() {
+        onView(isRoot()).perform(waitFor(2000))
+    }
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledSurrogatesAreLoaded() {
@@ -53,7 +57,6 @@ class SurrogatesTest {
         var webView: WebView? = null
 
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(isRoot()).perform(waitFor(2000))
 
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
@@ -90,7 +93,6 @@ class SurrogatesTest {
         var webView: WebView? = null
 
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(isRoot()).perform(waitFor(2000))
 
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(

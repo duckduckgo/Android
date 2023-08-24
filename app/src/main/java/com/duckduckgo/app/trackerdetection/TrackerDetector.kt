@@ -91,10 +91,6 @@ class TrackerDetectorImpl @Inject constructor(
         val isATrackerAllowed = result.isATracker && !result.matches
         val shouldBlock = result.matches && !isSiteAContentBlockingException && !isInTrackerAllowList && !isInAdClickAllowList && !sameEntity
 
-        Timber.i(
-            "FLAKY: shouldBlock $shouldBlock, because result.matches ${result.matches}, isSiteAContentBlockingException $isSiteAContentBlockingException, isInTrackerAllowList $isInTrackerAllowList, isInAdClickAllowList $isInAdClickAllowList, sameEntity $sameEntity",
-        )
-
         val status = when {
             sameEntity -> TrackerStatus.SAME_ENTITY_ALLOWED
             isDocumentInAllowedList -> TrackerStatus.USER_ALLOWED
