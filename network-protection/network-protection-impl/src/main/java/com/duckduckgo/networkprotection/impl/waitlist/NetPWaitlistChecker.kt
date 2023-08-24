@@ -46,6 +46,8 @@ class NetPWaitlistChecker @Inject constructor(
         netPWaitlistManager.upsertState().also { state ->
             if (state is InBeta) {
                 waitlistNotification.sendNotification()
+            } else {
+                workManager.cancelAllWorkByTag(TAG)
             }
         }
     }
@@ -60,7 +62,7 @@ class NetPWaitlistChecker @Inject constructor(
         workManager.enqueueUniquePeriodicWork(
             TAG,
             // REPLACE because we want it to execute on every app onStart
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.KEEP,
             workerRequest,
         )
     }
