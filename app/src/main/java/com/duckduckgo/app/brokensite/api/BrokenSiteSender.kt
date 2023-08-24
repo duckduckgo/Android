@@ -18,6 +18,7 @@ package com.duckduckgo.app.brokensite.api
 
 import android.net.Uri
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.pixels.AppPixelName
@@ -49,7 +50,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val privacyConfig: PrivacyConfig,

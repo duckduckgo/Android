@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.state
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
@@ -41,7 +42,7 @@ import kotlinx.coroutines.withContext
 @ContributesBinding(AppScope::class)
 class NetworkProtectionStateImpl @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val cohortStore: NetpCohortStore,
     private val dispatcherProvider: DispatcherProvider,
     private val networkProtectionRepository: NetworkProtectionRepository,

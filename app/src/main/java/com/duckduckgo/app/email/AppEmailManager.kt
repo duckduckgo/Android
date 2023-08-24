@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.email
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
@@ -46,7 +47,7 @@ class AppEmailManager @Inject constructor(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
 ) : EmailManager, BrowserFeatureStateReporterPlugin {
 

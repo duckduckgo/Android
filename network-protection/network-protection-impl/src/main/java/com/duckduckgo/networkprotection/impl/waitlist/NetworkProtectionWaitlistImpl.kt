@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
@@ -105,7 +106,7 @@ class NetPRemoteFeatureWrapper @Inject constructor(
     private val netPRemoteFeature: NetPRemoteFeature,
     private val netPFeatureRemover: NetPFeatureRemover,
     private val appBuildConfig: AppBuildConfig,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) {
     /**
      * @return `true` if the waitlist beta is active. This is different that having waitlist enabled and they are
