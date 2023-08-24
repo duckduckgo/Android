@@ -211,7 +211,7 @@
     <string name="netpPrivacyAnswerOne">• This Privacy Policy is for our limited waitlist beta VPN product.\n• Our main <a href="https://duckduckgo.com/privacy">Privacy Policy</a> also applies here.</string>
 
     <string name="netpPrivacyQuestionTwo">We don’t keep any logs of your online activity.</string>
-    <string name="netpPrivacyAnswerTwo">• That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:\n\t • Website visits\n\t • DNS requests\n\t • Connections made\n\t • IP addresses used\n\t • Session lengths\n\t • Session lengths</string>
+    <string name="netpPrivacyAnswerTwo">• That means we have no way to tie what you do online to you as an individual and we don’t have any record of things like:\n\t • Website visits\n\t • DNS requests\n\t • Connections made\n\t • IP addresses used\n\t • Session lengths</string>
 
     <string name="netpPrivacyQuestionThree">We only keep anonymous performance metrics that we cannot connect to your online activity.</string>
     <string name="netpPrivacyAnswerThree">• Our servers store generic usage (for example, CPU load) and diagnostic data (for example, errors), but none of that data is connected to any individual’s activity.\n• We use this non-identifying information to monitor and ensure the performance and quality of the service, for example to make sure servers aren’t overloaded.</string>
