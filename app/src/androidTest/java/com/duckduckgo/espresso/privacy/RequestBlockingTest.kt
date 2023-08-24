@@ -47,6 +47,8 @@ class RequestBlockingTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledRequestBlockedCorrectly() {
+        onView(isRoot()).perform(waitFor(2000))
+
         ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
