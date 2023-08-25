@@ -17,6 +17,10 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AccoladesCopy
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CompetitiveCopy
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ModifiedControl
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SetupCopy
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -50,6 +54,51 @@ class VariantManagerTest {
                 fail("Duplicate variant name found: ${it.key}")
             }
         }
+    }
+
+    @Test
+    fun pushNotificationControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "zv" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun pushNotificationModifiedControlExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zw" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(ModifiedControl))
+    }
+
+    @Test
+    fun pushNotificationCompetitiveCopyExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zx" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(CompetitiveCopy))
+    }
+
+    @Test
+    fun pushNotificationAccoladesCopyExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zy" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(AccoladesCopy))
+    }
+
+    @Test
+    fun pushNotificationSetupCopyExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zz" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(SetupCopy))
     }
 
     @Suppress("SameParameterValue")
