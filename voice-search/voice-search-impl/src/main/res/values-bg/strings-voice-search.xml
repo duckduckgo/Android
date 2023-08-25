@@ -17,6 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="voiceSearchError">Нещо се обърка, моля, опитайте отново по-късно</string>
     <string name="voiceSearchIconContentDescription">Гласово търсене</string>
     <string name="voiceSearchListening">Говорете сега</string>
     <string name="voiceSearchListeningFooter">Аудиото се обработва на устройството. То не се съхранява или споделя с никого, включително DuckDuckGo.</string>
