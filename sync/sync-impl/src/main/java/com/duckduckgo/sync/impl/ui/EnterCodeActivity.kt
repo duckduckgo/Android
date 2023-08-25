@@ -57,7 +57,7 @@ class EnterCodeActivity : DuckDuckGoActivity() {
 
     private fun configureListeners() {
         binding.pasteCodeButton.setOnClickListener {
-            viewModel.onPasteCodeClicked(codeType)
+            viewModel.onPasteCodeClicked()
         }
     }
 

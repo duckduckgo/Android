@@ -78,9 +78,9 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceSucceedsThenCommandIsLoginSuccess() = runTest {
-        whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Success(true))
+        whenever(syncRepostitory.processCode(jsonConnectKeyEncoded)).thenReturn(Result.Success(true))
         testee.commands().test {
-            testee.onConnectQRScanned(jsonConnectKeyEncoded)
+            testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.LoginSucess)
             cancelAndIgnoreRemainingEvents()
@@ -89,9 +89,9 @@ class SyncConnectViewModelTest {
 
     @Test
     fun whenUserScansConnectQRCodeAndConnectDeviceFailsThenCommandIsError() = runTest {
-        whenever(syncRepostitory.connectDevice(jsonConnectKeyEncoded)).thenReturn(Result.Error(reason = "error"))
+        whenever(syncRepostitory.processCode(jsonConnectKeyEncoded)).thenReturn(Result.Error(reason = "error"))
         testee.commands().test {
-            testee.onConnectQRScanned(jsonConnectKeyEncoded)
+            testee.onQRCodeScanned(jsonConnectKeyEncoded)
             val command = awaitItem()
             assertTrue(command is Command.Error)
             cancelAndIgnoreRemainingEvents()
