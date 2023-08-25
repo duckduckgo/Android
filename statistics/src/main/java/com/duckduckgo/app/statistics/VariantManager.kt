@@ -19,6 +19,10 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AccoladesCopy
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CompetitiveCopy
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ModifiedControl
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SetupCopy
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.*
@@ -28,7 +32,12 @@ import timber.log.Timber
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature
+    sealed class VariantFeature {
+        object ModifiedControl : VariantFeature()
+        object CompetitiveCopy : VariantFeature()
+        object AccoladesCopy : VariantFeature()
+        object SetupCopy : VariantFeature()
+    }
 
     companion object {
 
@@ -42,6 +51,13 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+
+            // Experiment: Change push notification audience, timing and cadence
+            Variant(key = "zv", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zw", weight = 1.0, features = listOf(ModifiedControl), filterBy = { isEnglishLocale() }),
+            Variant(key = "zx", weight = 1.0, features = listOf(CompetitiveCopy), filterBy = { isEnglishLocale() }),
+            Variant(key = "zy", weight = 1.0, features = listOf(AccoladesCopy), filterBy = { isEnglishLocale() }),
+            Variant(key = "zz", weight = 1.0, features = listOf(SetupCopy), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -171,6 +187,11 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 }
+
+fun VariantManager.isModifiedControlEnabled() = this.getVariant().hasFeature(ModifiedControl)
+fun VariantManager.isCompetitiveCopyEnabled() = this.getVariant().hasFeature(CompetitiveCopy)
+fun VariantManager.isAccoladesCopyEnabled() = this.getVariant().hasFeature(AccoladesCopy)
+fun VariantManager.isSetupCopyCopyEnabled() = this.getVariant().hasFeature(SetupCopy)
 
 /**
  * A variant which can be used for experimentation.
