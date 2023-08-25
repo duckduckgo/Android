@@ -18,9 +18,11 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.Spanned
 import android.view.View
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -39,17 +41,26 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         )
     }
 
+    interface DeleteBookmarkListener {
+        fun onSavedSiteDeleted(
+            savedSite: SavedSite,
+        )
+    }
+
     var listener: EditSavedSiteListener? = null
+    var deleteBookmarkListener: DeleteBookmarkListener? = null
 
     override fun configureUI() {
         validateBundleArguments()
 
-        if (getSavedSite() is SavedSite.Favorite) {
+        if (getSavedSite() is Favorite) {
             setToolbarTitle(getString(R.string.favoriteDialogTitleEdit))
         } else {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
+        configureMenuItems()
+
         showAddFolderMenu = true
 
         populateFields(binding.titleInput, binding.urlInput, binding.savedSiteLocation)
@@ -126,6 +137,29 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         if (!args.containsKey(KEY_SAVED_SITE)) {
             throw IllegalArgumentException("Bundle arguments required [KEY_PREEXISTING_TITLE, KEY_PREEXISTING_URL]")
         }
+    }
+
+    private fun configureMenuItems() {
+        val toolbar = binding.savedSiteAppBar.toolbar
+        toolbar.menu.findItem(R.id.action_delete).isVisible = true
+        toolbar.menu.findItem(R.id.action_confirm_changes).isEnabled = false
+    }
+
+    override fun deleteConfirmationTitle(): String {
+        val isFavorite = (getSavedSite() as? Favorite != null)
+        val titleId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogTitle else R.string.deleteBookmarkConfirmationDialogTitle
+        return getString(titleId)
+    }
+
+    override fun deleteConfirmationMessage(): Spanned? {
+        val isFavorite = (getSavedSite() as? Favorite != null)
+        val messageId = if (isFavorite) R.string.deleteFavoriteConfirmationDialogDescription else R.string.deleteBookmarkConfirmationDialogDescription
+        return getString(messageId, getExistingTitle()).html(requireContext())
+    }
+
+    override fun onDeleteConfirmed() {
+        deleteBookmarkListener?.onSavedSiteDeleted(getSavedSite())
+        dismiss()
     }
 
     companion object {

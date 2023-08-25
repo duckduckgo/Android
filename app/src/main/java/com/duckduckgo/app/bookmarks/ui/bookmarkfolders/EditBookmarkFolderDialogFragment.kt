@@ -20,12 +20,15 @@ import android.os.Bundle
 import android.view.View
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
 class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     interface EditBookmarkFolderListener {
         fun onBookmarkFolderUpdated(bookmarkFolder: BookmarkFolder)
+
+        fun onDeleteBookmarkFolderRequestedFromEdit(bookmarkFolder: BookmarkFolder)
     }
 
     var listener: EditBookmarkFolderListener? = null
@@ -33,8 +36,8 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
     override fun configureUI() {
         setToolbarTitle(getString(R.string.editFolder))
         showAddFolderMenu = true
-        arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER)?.let {
-            binding.titleInput.text = (it as BookmarkFolder).name
+        getBookmarkFolder()?.let {
+            binding.titleInput.text = it.name
         }
         configureFieldVisibility()
     }
@@ -42,7 +45,12 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
     private fun configureFieldVisibility() {
         binding.savedSiteLocationContainer.visibility = View.VISIBLE
         binding.urlInput.visibility = View.GONE
+        val toolbar = binding.savedSiteAppBar.toolbar
+        toolbar.menu.findItem(R.id.action_delete).isVisible = true
     }
+
+    private fun getBookmarkFolder(): BookmarkFolder? =
+        requireArguments().getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder?
 
     override fun onConfirmation() {
         arguments?.getString(KEY_PARENT_FOLDER_ID)?.let {
@@ -52,6 +60,19 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
                 listener?.onBookmarkFolderUpdated(bookmarkFolder.copy(name = name, parentId = it))
             }
         }
+    }
+
+    override fun deleteConfirmationTitle() = getString(R.string.deleteBookmarkFolderConfirmationDialogTitle)
+
+    override fun deleteConfirmationMessage() = getBookmarkFolder()?.name?.let { folderName ->
+        getString(R.string.deleteBookmarkFolderConfirmationDialogDescription, folderName).html(requireContext())
+    }
+
+    override fun onDeleteConfirmed() {
+        getBookmarkFolder()?.let {
+            listener?.onDeleteBookmarkFolderRequestedFromEdit(it)
+        }
+        dismiss()
     }
 
     companion object {

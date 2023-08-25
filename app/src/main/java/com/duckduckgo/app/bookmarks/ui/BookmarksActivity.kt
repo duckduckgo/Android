@@ -321,6 +321,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val dialog = EditSavedSiteDialogFragment.instance(savedSite, getParentFolderId(), getParentFolderName())
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
+        dialog.deleteBookmarkListener = viewModel
     }
 
     private fun openSavedSite(savedSite: SavedSite) {
@@ -403,6 +404,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         with(supportFragmentManager) {
             findFragmentByTag(EDIT_BOOKMARK_FRAGMENT_TAG)?.let { dialog ->
                 (dialog as EditSavedSiteDialogFragment).listener = viewModel
+                dialog.deleteBookmarkListener = viewModel
             }
             findFragmentByTag(ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)?.let { dialog ->
                 (dialog as AddBookmarkFolderDialogFragment).listener = viewModel

@@ -706,6 +706,7 @@ class BrowserTabFragment :
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
+            dialog.deleteBookmarkListener = viewModel
         }
     }
 
@@ -2289,6 +2290,7 @@ class BrowserTabFragment :
         )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
+        addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
