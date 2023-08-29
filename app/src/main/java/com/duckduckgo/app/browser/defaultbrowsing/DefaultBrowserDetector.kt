@@ -36,6 +36,7 @@ interface DefaultBrowserDetector {
     fun deviceSupportsDefaultBrowserConfiguration(): Boolean
     fun isDefaultBrowser(): Boolean
     fun hasDefaultBrowser(): Boolean
+    var defaultBrowserSetFromNotification: Boolean
 }
 
 @ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
@@ -57,6 +58,8 @@ class AndroidDefaultBrowserDetector @Inject constructor(
     }
 
     override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != null
+
+    override var defaultBrowserSetFromNotification: Boolean = false
 
     private fun defaultBrowserPackage(): String? {
         val intent = Intent(ACTION_VIEW, Uri.parse("https://"))

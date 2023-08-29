@@ -17,6 +17,8 @@
 package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -27,7 +29,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.CheckListItem.CheckItemStatus
 import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
@@ -61,6 +65,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -75,6 +80,9 @@ class SettingsViewModel @Inject constructor(
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val context: Context,
+    private val appInstallStore: AppInstallStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -118,6 +126,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchPermissionsScreen : Command()
         object LaunchAppearanceScreen : Command()
         object LaunchAboutScreen : Command()
+        data class ShowDefaultBrowserDialog(val intent: Intent) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -337,7 +346,35 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onLaunchedFromNotification(pixelName: String) {
+        if (pixelName == "") { // TODO find desfaultbrowser pixel name
+            launchSetAsDefaultBrowserOption()
+        } else {
+            defaultWebBrowserCapability.defaultBrowserSetFromNotification = true
+        }
         pixel.fire(pixelName)
+        Timber.d("NOELIA pixelName: $pixelName")
+    }
+    private fun launchSetAsDefaultBrowserOption() {
+        if (defaultRoleBrowserDialog.shouldShowDialog()) {
+            val intent = defaultRoleBrowserDialog.createIntent(context)
+            if (intent != null) {
+                viewModelScope.launch { command.send(Command.ShowDefaultBrowserDialog(intent)) }
+            } else {
+                viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
+                defaultWebBrowserCapability.defaultBrowserSetFromNotification = true
+            }
+        } else {
+            viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
+            defaultWebBrowserCapability.defaultBrowserSetFromNotification = true
+        }
+    }
+
+    fun onDefaultBrowserSetFromDialog(ddgSetAsDefault: Boolean) {
+        defaultRoleBrowserDialog.dialogShown()
+        appInstallStore.defaultBrowser = ddgSetAsDefault
+        if (ddgSetAsDefault) {
+            pixel.fire(DEFAULT_BROWSER_SET_FROM_NOTIFICATION)
+        }
     }
 
     companion object {

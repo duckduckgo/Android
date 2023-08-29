@@ -26,6 +26,7 @@ import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.DefaultBrowserNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -70,17 +71,27 @@ object NotificationModule {
     }
 
     @Provides
+    fun provideDefaultBrowserNotification(
+        context: Context,
+        notificationDao: NotificationDao,
+    ): DefaultBrowserNotification {
+        return DefaultBrowserNotification(context, notificationDao)
+    }
+
+    @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
+        defaultBrowserNotification: DefaultBrowserNotification,
         variantManager: VariantManager,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
+            defaultBrowserNotification,
             variantManager,
         )
     }
