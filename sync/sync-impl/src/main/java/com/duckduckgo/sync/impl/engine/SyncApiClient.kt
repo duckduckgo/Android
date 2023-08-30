@@ -23,6 +23,7 @@ import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
@@ -87,6 +88,7 @@ class AppSyncApiClient @Inject constructor(
         return when (type) {
             BOOKMARKS -> getBookmarks(type, token, since)
             CREDENTIALS -> getCredentials(type, token, since)
+            SETTINGS -> TODO()
         }
     }
 
