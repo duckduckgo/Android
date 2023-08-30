@@ -18,11 +18,15 @@ package com.duckduckgo.subscriptions.impl
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.subscriptions.impl.ExternalIdResult.ExternalId
+import com.duckduckgo.subscriptions.impl.ExternalIdResult.Failure
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.NETHERLANDS_PLAN
@@ -31,10 +35,16 @@ import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Compan
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import logcat.LogPriority
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionsViewModel @Inject constructor(
     private val billingClientWrapper: BillingClientWrapper,
+    private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionsManager: SubscriptionsManager,
     subscriptionsRepository: SubscriptionsRepository,
 ) : ViewModel() {
 
@@ -51,9 +61,10 @@ class SubscriptionsViewModel @Inject constructor(
         subscriptionsRepository.subscriptionDetails,
         subscriptionsRepository.offerDetails,
         subscriptionsRepository.hasSubscription,
-    ) { subscriptionDetails, offerDetails, hasSubscription ->
+        subscriptionsManager.isSignedIn,
+    ) { subscriptionDetails, offerDetails, hasSubscription, isSignedIn ->
         ViewState(
-            hasSubscription = hasSubscription,
+            hasSubscription = hasSubscription && isSignedIn,
             subscriptionDetails = subscriptionDetails,
             yearlySubscription = offerDetails[YEARLY_PLAN],
             monthlySubscription = offerDetails[MONTHLY_PLAN],
@@ -62,15 +73,48 @@ class SubscriptionsViewModel @Inject constructor(
         )
     }
 
-    fun buySubscription(activity: Activity, productDetails: ProductDetails, offerToken: String) {
-        val billingParams = billingFlowParamsBuilder(productDetails = productDetails, offerToken = offerToken).build()
-        billingClientWrapper.launchBillingFlow(activity, billingParams)
+    fun buySubscription(activity: Activity, productDetails: ProductDetails, offerToken: String, isReset: Boolean = false) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            when (val response = subscriptionsManager.getExternalId()) {
+                is ExternalId -> {
+                    val billingParams = billingFlowParamsBuilder(
+                        productDetails = productDetails,
+                        offerToken = offerToken,
+                        externalId = response.id,
+                        isReset = isReset,
+                    ).build()
+                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.id}" }
+                    withContext(dispatcherProvider.main()) {
+                        billingClientWrapper.launchBillingFlow(activity, billingParams)
+                    }
+                }
+                is Failure -> {
+                    logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
+                }
+            }
+        }
+    }
+
+    fun recoverSubscription() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            when (val response = subscriptionsManager.getExternalId()) {
+                is ExternalId -> {
+                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.id}" }
+                }
+                is Failure -> {
+                    logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
+                }
+            }
+        }
     }
 
     private fun billingFlowParamsBuilder(
         productDetails: ProductDetails,
-        offerToken: String = "",
+        offerToken: String,
+        externalId: String,
+        isReset: Boolean,
     ): BillingFlowParams.Builder {
+        val finalId = if (isReset) "randomId" else externalId
         return BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(
                 listOf(
@@ -80,7 +124,7 @@ class SubscriptionsViewModel @Inject constructor(
                         .build(),
                 ),
             )
-            .setObfuscatedAccountId("accountIdTest")
-            .setObfuscatedProfileId("profileIdTest")
+            .setObfuscatedAccountId(finalId)
+            .setObfuscatedProfileId(finalId)
     }
 }

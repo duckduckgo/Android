@@ -59,6 +59,10 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(toolbar)
+
+        binding.recoverSubscriptionButton.setOnClickListener {
+            viewModel.recoverSubscription()
+        }
     }
 
     private fun renderNotSubscribed() {
@@ -98,6 +102,11 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
                 text = monthly.getPrice()
                 setOnClickListener {
                     viewModel.buySubscription(this@SubscriptionsActivity, productDetails, monthly.offerToken)
+                }
+            }
+            binding.resetAccountButton.apply {
+                setOnClickListener {
+                    viewModel.buySubscription(this@SubscriptionsActivity, productDetails, monthly.offerToken, isReset = true)
                 }
             }
         }
