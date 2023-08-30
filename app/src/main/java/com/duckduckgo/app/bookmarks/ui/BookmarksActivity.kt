@@ -197,7 +197,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
                 is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
                 is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
-                is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
+                is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
             }
         }
     }
@@ -358,7 +358,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             Snackbar.LENGTH_LONG,
         )
             .setAction(R.string.fireproofWebsiteSnackbarAction) {
-                viewModel.insert(savedSite)
+                viewModel.undoDelete(savedSite)
             }
             .addCallback(
                 object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
@@ -370,7 +370,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                         // actually delete the saved site
                         Timber.d("Bookmark: dismissed with $event")
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.permaDelete(savedSite)
+                            viewModel.delete(savedSite)
                         }
                     }
                 },
@@ -380,8 +380,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteBookmarkFolder(
-        bookmarkFolder: BookmarkFolder,
-        folderBranch: FolderBranch,
+        bookmarkFolder: BookmarkFolder
     ) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
@@ -389,8 +388,23 @@ class BookmarksActivity : DuckDuckGoActivity() {
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertDeletedFolderBranch(folderBranch)
-        }.show()
+            viewModel.undoDelete(bookmarkFolder)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int
+                    ) {
+                        // when snackbar is not dismissed because of an action we want to
+                        // actually delete the saved site
+                        Timber.d("Bookmark: dismissed with $event")
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.delete(bookmarkFolder)
+                        }
+                    }
+                },
+            ).show()
     }
 
     private fun openBookmarkFolder(bookmarkFolder: BookmarkFolder) {
@@ -415,7 +429,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onBookmarkFolderDeleted(bookmarkFolder)
+                        viewModel.hide(bookmarkFolder)
                     }
                 },
             )

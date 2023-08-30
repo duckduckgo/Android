@@ -43,10 +43,8 @@ import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -75,10 +73,7 @@ class BookmarksViewModel @Inject constructor(
         class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ShowEditBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
-        class ConfirmDeleteBookmarkFolder(
-            val bookmarkFolder: BookmarkFolder,
-            val folderBranch: FolderBranch,
-        ) : Command()
+        class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
 
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
@@ -145,12 +140,11 @@ class BookmarksViewModel @Inject constructor(
                 }
             }
         }
-        delete(savedSite)
+        hide(savedSite)
     }
 
-    private fun delete(savedSite: SavedSite) {
+    private fun hide(savedSite: SavedSite) {
         // we don't delete, just remove from the ui list
-
         when (savedSite) {
             is Bookmark -> {
                 val bookmarks = viewState.value?.bookmarks!!.toMutableList()
@@ -171,17 +165,16 @@ class BookmarksViewModel @Inject constructor(
                 )
             }
         }
-
     }
 
-    fun permaDelete(savedSite: SavedSite){
+    fun delete(savedSite: SavedSite){
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             faviconManager.deletePersistedFavicon(savedSite.url)
             savedSitesRepository.delete(savedSite)
         }
     }
 
-    fun insert(savedSite: SavedSite) {
+    fun undoDelete(savedSite: SavedSite) {
         // we don't insert it, only flip the deleted flag
         when (savedSite) {
             is Bookmark -> {
@@ -205,11 +198,6 @@ class BookmarksViewModel @Inject constructor(
                 )
             }
         }
-
-
-        // viewModelScope.launch(dispatcherProvider.io()) {
-        //     savedSitesRepository.insert(savedSite)
-        // }
     }
 
     fun importBookmarks(uri: Uri) {
@@ -275,19 +263,43 @@ class BookmarksViewModel @Inject constructor(
         onDeleteBookmarkFolderRequested(bookmarkFolder)
     }
 
-    fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
-        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            val folderBranch = savedSitesRepository.deleteFolderBranch(bookmarkFolder)
-            command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder, folderBranch))
-        }
-    }
-
     fun onDeleteBookmarkFolderRequested(bookmarkFolder: BookmarkFolder) {
         if (bookmarkFolder.numFolders + bookmarkFolder.numBookmarks == 0) {
-            onBookmarkFolderDeleted(bookmarkFolder)
+            hide(bookmarkFolder)
         } else {
             command.value = DeleteBookmarkFolder(bookmarkFolder)
         }
+    }
+
+    fun undoDelete(bookmarkFolder: BookmarkFolder) {
+        val bookmarkFolders = viewState.value?.bookmarkFolders!!.toMutableList()
+        val undoFolder = bookmarkFolder.copy(deleted = "1")
+        val index = bookmarkFolders.indexOf(undoFolder)
+        bookmarkFolders[index] = undoFolder.copy(deleted = null)
+        val bookmarks = viewState.value?.bookmarks!!
+        viewState.value = viewState.value?.copy(
+            bookmarkFolders = bookmarkFolders,
+            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
+        )
+    }
+
+    fun delete(bookmarkFolder: BookmarkFolder) {
+        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
+            savedSitesRepository.deleteFolderBranch(bookmarkFolder)
+        }
+    }
+
+    fun hide(bookmarkFolder: BookmarkFolder) {
+        // we don't delete, just remove from the ui list
+        val folders = viewState.value?.bookmarkFolders!!.toMutableList()
+        val index = folders.indexOf(bookmarkFolder)
+        val bookmarks = viewState.value?.bookmarks!!
+        folders[index] = bookmarkFolder.copy(deleted = "1")
+        viewState.value = viewState.value?.copy(
+            bookmarkFolders = folders,
+            enableSearch = bookmarks.size + folders.size >= MIN_ITEMS_FOR_SEARCH,
+        )
+        command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder))
     }
 
     private fun onSavedSitesItemsChanged(
