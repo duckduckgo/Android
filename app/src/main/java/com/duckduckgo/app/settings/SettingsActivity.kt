@@ -126,7 +126,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
-            viewModel.onLaunchedFromNotification(it)
+            viewModel.onLaunchedFromNotification(it, this)
         }
     }
 

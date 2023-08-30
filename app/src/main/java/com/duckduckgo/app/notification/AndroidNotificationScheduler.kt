@@ -27,6 +27,7 @@ import com.duckduckgo.app.notification.model.DefaultBrowserNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isCompetitiveCopyEnabled
 import com.duckduckgo.app.statistics.isModifiedControlEnabled
 import com.duckduckgo.app.statistics.isSetupCopyCopyEnabled
 import com.duckduckgo.di.scopes.AppScope
@@ -67,11 +68,21 @@ class NotificationScheduler(
                     )
                 }
             }
+            variantManager.isCompetitiveCopyEnabled() -> {
+                if (setAsDefaultNotification.canShow()) {
+                    scheduleNotification(
+                        OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
+                        DEFAULT_BROWSER_DELAY_DURATION_IN_DAYS,
+                        TimeUnit.DAYS,
+                        UNUSED_APP_WORK_REQUEST_TAG,
+                    )
+                }
+            }
             variantManager.isSetupCopyCopyEnabled() -> {
                 if (setAsDefaultNotification.canShow()) {
                     scheduleNotification(
                         OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
-                        2L,
+                        DEFAULT_BROWSER_DELAY_DURATION_IN_DAYS,
                         TimeUnit.DAYS,
                         UNUSED_APP_WORK_REQUEST_TAG,
                     )
@@ -136,6 +147,7 @@ class NotificationScheduler(
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
         const val CLEAR_DATA_DELAY_DURATION_IN_DAYS = 3L
         const val PRIVACY_DELAY_DURATION_IN_DAYS = 1L
+        const val DEFAULT_BROWSER_DELAY_DURATION_IN_DAYS = 2L
     }
 }
 

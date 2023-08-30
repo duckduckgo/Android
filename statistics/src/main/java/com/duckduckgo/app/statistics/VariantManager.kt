@@ -19,7 +19,6 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AccoladesCopy
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CompetitiveCopy
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ModifiedControl
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SetupCopy
@@ -35,7 +34,6 @@ interface VariantManager {
     sealed class VariantFeature {
         object ModifiedControl : VariantFeature()
         object CompetitiveCopy : VariantFeature()
-        object AccoladesCopy : VariantFeature()
         object SetupCopy : VariantFeature()
     }
 
@@ -56,8 +54,7 @@ interface VariantManager {
             Variant(key = "zv", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "zw", weight = 1.0, features = listOf(ModifiedControl), filterBy = { isEnglishLocale() }),
             Variant(key = "zx", weight = 1.0, features = listOf(CompetitiveCopy), filterBy = { isEnglishLocale() }),
-            Variant(key = "zy", weight = 1.0, features = listOf(AccoladesCopy), filterBy = { isEnglishLocale() }),
-            Variant(key = "zz", weight = 1.0, features = listOf(SetupCopy), filterBy = { isEnglishLocale() }),
+            Variant(key = "zy", weight = 1.0, features = listOf(SetupCopy), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -190,7 +187,6 @@ class ExperimentationVariantManager(
 
 fun VariantManager.isModifiedControlEnabled() = this.getVariant().hasFeature(ModifiedControl)
 fun VariantManager.isCompetitiveCopyEnabled() = this.getVariant().hasFeature(CompetitiveCopy)
-fun VariantManager.isAccoladesCopyEnabled() = this.getVariant().hasFeature(AccoladesCopy)
 fun VariantManager.isSetupCopyCopyEnabled() = this.getVariant().hasFeature(SetupCopy)
 
 /**

@@ -74,8 +74,9 @@ object NotificationModule {
     fun provideDefaultBrowserNotification(
         context: Context,
         notificationDao: NotificationDao,
+        variantManager: VariantManager,
     ): DefaultBrowserNotification {
-        return DefaultBrowserNotification(context, notificationDao)
+        return DefaultBrowserNotification(context, notificationDao, variantManager)
     }
 
     @Provides

@@ -65,7 +65,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -81,7 +80,6 @@ class SettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val context: Context,
     private val appInstallStore: AppInstallStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -345,27 +343,25 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_APPEARANCE_PRESSED)
     }
 
-    fun onLaunchedFromNotification(pixelName: String) {
-        if (pixelName == "") { // TODO find desfaultbrowser pixel name
-            launchSetAsDefaultBrowserOption()
-        } else {
-            defaultWebBrowserCapability.defaultBrowserSetFromNotification = true
+    fun onLaunchedFromNotification(pixelName: String, context: Context) {
+        if (pixelName == DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION) {
+            launchSetAsDefaultBrowserOption(context)
         }
         pixel.fire(pixelName)
-        Timber.d("NOELIA pixelName: $pixelName")
     }
-    private fun launchSetAsDefaultBrowserOption() {
+
+    private fun launchSetAsDefaultBrowserOption(context: Context) {
         if (defaultRoleBrowserDialog.shouldShowDialog()) {
             val intent = defaultRoleBrowserDialog.createIntent(context)
             if (intent != null) {
                 viewModelScope.launch { command.send(Command.ShowDefaultBrowserDialog(intent)) }
             } else {
                 viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
-                defaultWebBrowserCapability.defaultBrowserSetFromNotification = true
+                appInstallStore.setDefaultBrowserFromNotification = true
             }
         } else {
             viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
-            defaultWebBrowserCapability.defaultBrowserSetFromNotification = true
+            appInstallStore.setDefaultBrowserFromNotification = true
         }
     }
 
@@ -373,11 +369,13 @@ class SettingsViewModel @Inject constructor(
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = ddgSetAsDefault
         if (ddgSetAsDefault) {
+            viewModelScope.launch { viewState.emit(currentViewState().copy(isAppDefaultBrowser = true)) }
             pixel.fire(DEFAULT_BROWSER_SET_FROM_NOTIFICATION)
         }
     }
 
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
+        const val DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION = "mnot_l_DefaultBrowser"
     }
 }

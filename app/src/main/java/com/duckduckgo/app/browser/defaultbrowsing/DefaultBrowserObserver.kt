@@ -34,9 +34,9 @@ class DefaultBrowserObserver(
         if (appInstallStore.defaultBrowser != isDefaultBrowser) {
             appInstallStore.defaultBrowser = isDefaultBrowser
             when {
-                isDefaultBrowser && defaultBrowserDetector.defaultBrowserSetFromNotification -> {
+                isDefaultBrowser && appInstallStore.setDefaultBrowserFromNotification -> {
                     pixel.fire(AppPixelName.DEFAULT_BROWSER_SET_FROM_NOTIFICATION)
-                    defaultBrowserDetector.defaultBrowserSetFromNotification = false
+                    appInstallStore.setDefaultBrowserFromNotification = false
                 }
                 isDefaultBrowser -> {
                     val params = mapOf(
@@ -44,7 +44,10 @@ class DefaultBrowserObserver(
                     )
                     pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
                 }
-                else -> pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
+                else -> {
+                    pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
+                    appInstallStore.setDefaultBrowserFromNotification = false
+                }
             }
         }
     }

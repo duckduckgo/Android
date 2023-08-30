@@ -26,6 +26,8 @@ import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isCompetitiveCopyEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -37,6 +39,7 @@ import kotlinx.coroutines.runBlocking
 class DefaultBrowserNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
+    private val variantManager: VariantManager,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.defaultbrowser"
@@ -46,17 +49,27 @@ class DefaultBrowserNotification(
     }
 
     override suspend fun buildSpecification(): NotificationSpec {
-        return DefaultBrowserNotificationSpecification(context)
+        val title: String
+        val description: String
+        if (variantManager.isCompetitiveCopyEnabled()) {
+            title = context.getString(R.string.setAsDefaultCompetitiveCopyNotificationTitle)
+            description = context.getString(R.string.setAsDefaultCompetitiveCopyNotificationDescription)
+        } else {
+            title = context.getString(R.string.setAsDefaultSetupCopyNotificationTitle)
+            description = context.getString(R.string.setAsDefaultSetupCopyNotificationDescription)
+        }
+        return DefaultBrowserNotificationSpecification(title, description)
     }
 }
 
-class DefaultBrowserNotificationSpecification(context: Context) : NotificationSpec {
+class DefaultBrowserNotificationSpecification(
+    override val title: String,
+    override val description: String,
+) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.DefaultBrowser
     override val name = "Default Browser"
     override val icon = com.duckduckgo.mobile.android.R.drawable.notification_logo
-    override val title: String = "Title" // context.getString(R.string.tbd)
-    override val description: String = "Description" // context.getString(R.string.tbd)
     override val launchButton: String? = null
     override val closeButton: String? = null
     override val pixelSuffix = "DefaultBrowser"
