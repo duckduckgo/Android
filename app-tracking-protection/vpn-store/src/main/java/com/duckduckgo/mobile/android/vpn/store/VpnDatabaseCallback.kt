@@ -53,25 +53,6 @@ internal class VpnDatabaseCallback(
         }
     }
 
-    override fun onOpen(db: SupportSQLiteDatabase) {
-        ioThread {
-            prepopulateTrackerEntities()
-        }
-    }
-
-    private fun prepopulateTrackerEntities() {
-        context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
-            .use { it.readText() }
-            .also {
-                val blocklist = getFullAppTrackerBlockingList(it)
-                with(vpnDatabase.get().vpnAppTrackerBlockingDao()) {
-                    if (!hasTrackerEntities()) {
-                        insertTrackerEntities(blocklist.entities)
-                    }
-                }
-            }
-    }
-
     @VisibleForTesting
     internal fun prepopulateAppTrackerBlockingList() {
         context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
