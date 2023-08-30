@@ -21,7 +21,6 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -127,14 +126,14 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenBookmarkInsertedThenDaoUpdated() = runTest {
-        testee.insert(bookmark)
+        testee.undoDelete(bookmark)
 
         verify(savedSitesRepository).insert(bookmark)
     }
 
     @Test
     fun whenFavoriteInsertedThenRepositoryUpdated() = runTest {
-        testee.insert(favorite)
+        testee.undoDelete(favorite)
 
         verify(savedSitesRepository).insert(favorite)
     }
@@ -151,7 +150,11 @@ class BookmarksViewModelTest {
     fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = runTest {
         testee.onDeleteSavedSiteRequested(favorite)
 
-        verify(savedSitesRepository).delete(favorite)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertNotNull(commandCaptor.value)
+        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+
+        verifyNoMoreInteractions(savedSitesRepository)
     }
 
     @Test
@@ -301,7 +304,6 @@ class BookmarksViewModelTest {
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
-        assertEquals(folderBranch, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).folderBranch)
     }
 
     @Test
@@ -318,17 +320,5 @@ class BookmarksViewModelTest {
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(nonEmptyBookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.DeleteBookmarkFolder).bookmarkFolder)
-    }
-
-    @Test
-    fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
-        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
-
-        testee.insertDeletedFolderBranch(folderBranch)
-
-        verify(savedSitesRepository).insertFolderBranch(folderBranch)
     }
 }
