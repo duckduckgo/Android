@@ -212,6 +212,19 @@ class SurveyRepositoryTest {
     }
 
     @Test
+    fun whenSurveyStatusIsDoneThenShouldNotShowSurvey() {
+        whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(4)
+        val survey = Survey(
+            surveyId = "id",
+            status = Survey.Status.DONE,
+            daysInstalled = -1,
+            url = null,
+        )
+
+        assertFalse(surveyRepository.shouldShowSurvey(survey))
+    }
+
+    @Test
     fun getScheduledSurveyReturnsLastSurvey() {
         val survey = Survey(
             surveyId = "1",
