@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AccoladesCopy
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CompetitiveCopy
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ModifiedControl
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SetupCopy
@@ -84,17 +83,8 @@ class VariantManagerTest {
     }
 
     @Test
-    fun pushNotificationAccoladesCopyExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zy" }
-
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(AccoladesCopy))
-    }
-
-    @Test
     fun pushNotificationSetupCopyExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zz" }
+        val variant = variants.first { it.key == "zy" }
 
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
