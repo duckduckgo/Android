@@ -26,6 +26,7 @@ import android.os.Message
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
@@ -174,6 +175,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
+        configureOnBackPressedListener()
     }
 
     override fun onStop() {
@@ -500,13 +502,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (currentTab?.onBackPressed() != true) {
-            // signal user press back button to exit the app so that BrowserApplicationStateInfo
-            // can call the right callback
-            destroyedByBackPress = true
-            super.onBackPressed()
-        }
+    private fun configureOnBackPressedListener() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (currentTab?.onBackPressed() != true) {
+                        // signal user press back button to exit the app so that BrowserApplicationStateInfo
+                        // can call the right callback
+                        destroyedByBackPress = true
+                        isEnabled = false
+                        this@BrowserActivity.onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            },
+        )
     }
 
     override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
