@@ -65,8 +65,8 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenOnlyTodayAttemptsThenDailyStatsHasCorrectData() {
-        val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
+    fun whenOnlyYesterdayAttemptsThenDailyStatsHasCorrectData() {
+        val lastSyncTimestamp = timestamp(Instant.now().minus(1, ChronoUnit.DAYS))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
 
         whenever(syncStateRepository.attempts()).thenReturn(listOf(lastSync))
@@ -77,8 +77,20 @@ class SyncStatsRepositoryTest {
     }
 
     @Test
-    fun whenOnlySuccessfulAttemptsThenDailyStatsHasCorrectData() {
+    fun whenOnlyTodayAttemptsThenDailyStatsHasCorrectData() {
         val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
+        val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
+
+        whenever(syncStateRepository.attempts()).thenReturn(listOf(lastSync))
+
+        val stats = repository.getDailyStats()
+
+        assertTrue(stats.attempts == 0)
+    }
+
+    @Test
+    fun whenOnlySuccessfulAttemptsThenDailyStatsHasCorrectData() {
+        val lastSyncTimestamp = timestamp(Instant.now().minus(1, ChronoUnit.DAYS))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
 
         whenever(syncStateRepository.attempts()).thenReturn(listOf(lastSync))
@@ -91,7 +103,7 @@ class SyncStatsRepositoryTest {
 
     @Test
     fun whenOnlyFailedAttemptsThenDailyStatsHasCorrectData() {
-        val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
+        val lastSyncTimestamp = timestamp(Instant.now().minus(1, ChronoUnit.DAYS))
         val lastSync = SyncAttempt(timestamp = lastSyncTimestamp, state = FAIL)
 
         whenever(syncStateRepository.attempts()).thenReturn(listOf(lastSync))
@@ -108,7 +120,7 @@ class SyncStatsRepositoryTest {
 
     @Test
     fun whenFewAttemptsThenDailyStatsHasCorrectData() {
-        val lastSyncTimestamp = timestamp(Instant.now().minus(5, ChronoUnit.MINUTES))
+        val lastSyncTimestamp = timestamp(Instant.now().minus(1, ChronoUnit.DAYS))
         val first = SyncAttempt(timestamp = lastSyncTimestamp, state = FAIL)
         val second = SyncAttempt(timestamp = lastSyncTimestamp, state = SUCCESS)
         val third = SyncAttempt(timestamp = lastSyncTimestamp, state = FAIL)

@@ -31,8 +31,8 @@ data class SyncAttempt(
     val state: SyncAttemptState,
     val meta: String = "",
 ) {
-    fun today(): Boolean {
-        return DatabaseDateFormatter.iso8601Date(this.timestamp).isEqual(LocalDate.now(ZoneOffset.UTC))
+    fun yesterday(): Boolean {
+        return DatabaseDateFormatter.iso8601Date(this.timestamp).isEqual(LocalDate.now(ZoneOffset.UTC).minusDays(1))
     }
 }
 

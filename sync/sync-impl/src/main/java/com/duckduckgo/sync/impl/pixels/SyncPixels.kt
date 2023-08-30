@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.pixels.SyncPixelValues.Feature
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -26,14 +25,17 @@ import javax.inject.Inject
 interface SyncPixels {
     fun fireStatsPixel()
 
-    fun fireMergeConflictPixel(feature: Feature)
+    fun fireMergeConflictPixel(feature: String)
 
-    fun fireOrphanPresentPixel(feature: Feature)
+    fun fireOrphanPresentPixel(feature: String)
+
     fun fireEncryptFailurePixel()
 
     fun fireDecryptFailurePixel()
 
-    fun fireCountLimitPixel(feature: Feature)
+    fun fireCountLimitPixel(feature: String)
+
+    fun fireSyncAttemptErrorPixel(feature: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -57,20 +59,20 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireMergeConflictPixel(feature: Feature) {
+    override fun fireMergeConflictPixel(feature: String) {
         pixel.fire(
             SyncPixelName.SYNC_MERGE_CONFLICT,
             mapOf(
-                SyncPixelParameters.FEATURE to feature.toString(),
+                SyncPixelParameters.FEATURE to feature,
             ),
         )
     }
 
-    override fun fireOrphanPresentPixel(feature: Feature) {
+    override fun fireOrphanPresentPixel(feature: String) {
         pixel.fire(
             SyncPixelName.SYNC_ORPHAN_PRESENT,
             mapOf(
-                SyncPixelParameters.FEATURE to feature.toString(),
+                SyncPixelParameters.FEATURE to feature,
             ),
         )
     }
@@ -83,11 +85,20 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_DECRYPT_FAILURE)
     }
 
-    override fun fireCountLimitPixel(feature: Feature) {
+    override fun fireCountLimitPixel(feature: String) {
         pixel.fire(
             SyncPixelName.SYNC_COUNT_LIMIT,
             mapOf(
-                SyncPixelParameters.FEATURE to feature.toString(),
+                SyncPixelParameters.FEATURE to feature,
+            ),
+        )
+    }
+
+    override fun fireSyncAttemptErrorPixel(feature: String) {
+        pixel.fire(
+            SyncPixelName.SYNC_ATTEMPT_FAILURE,
+            mapOf(
+                SyncPixelParameters.FEATURE to feature,
             ),
         )
     }
@@ -101,18 +112,11 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_ENCRYPT_FAILURE("m_sync_encrypt_failure"),
     SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
     SYNC_COUNT_LIMIT("m_sync_count_limit"),
+    SYNC_ATTEMPT_FAILURE("m_sync_attempt_failure"),
 }
 
 object SyncPixelParameters {
     const val ATTEMPTS = "attempts"
     const val RATE = "rate"
     const val FEATURE = "feature"
-}
-
-object SyncPixelValues {
-    sealed class Feature {
-        object Bookmarks : Feature()
-        object Autofill : Feature()
-        object Settings : Feature()
-    }
 }

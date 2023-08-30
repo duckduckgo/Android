@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
@@ -49,6 +50,7 @@ class RealSyncEngine @Inject constructor(
     private val syncApiClient: SyncApiClient,
     private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
+    private val syncPixels: SyncPixels,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
 ) : SyncEngine {
@@ -164,6 +166,7 @@ class RealSyncEngine @Inject constructor(
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 Timber.d("Sync-Feature: patch failed ${result.reason}")
+                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString())
             }
 
             is Success -> {
@@ -181,6 +184,7 @@ class RealSyncEngine @Inject constructor(
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince.value)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
+                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString())
             }
 
             is Success -> {

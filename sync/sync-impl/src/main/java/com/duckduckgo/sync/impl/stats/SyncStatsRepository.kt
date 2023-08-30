@@ -42,7 +42,7 @@ data class DailyStats(
 class RealSyncStatsRepository @Inject constructor(private val syncStateRepository: SyncStateRepository) : SyncStatsRepository {
     override fun getDailyStats(): DailyStats {
         val attempts = syncStateRepository.attempts().filter {
-            it.today()
+            it.yesterday()
         }
         val successfulAttempts = attempts.filter { it.state == SUCCESS }.size
         val totalAttempts = attempts.size

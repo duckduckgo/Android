@@ -25,8 +25,6 @@ import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
-import com.duckduckgo.sync.impl.pixels.SyncPixelValues.Feature.Autofill
-import com.duckduckgo.sync.impl.pixels.SyncPixelValues.Feature.Bookmarks
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import junit.framework.Assert.assertEquals
@@ -146,7 +144,7 @@ internal class SyncApiClientTest {
         whenever(syncApi.getBookmarks(any(), any())).thenReturn(getCountLimitError)
 
         val result = apiClient.get(BOOKMARKS, "")
-        verify(syncPixels).fireCountLimitPixel(Bookmarks)
+        verify(syncPixels).fireCountLimitPixel(BOOKMARKS.toString())
         assertTrue(result is Result.Error)
     }
 
@@ -156,7 +154,7 @@ internal class SyncApiClientTest {
         whenever(syncApi.getCredentials(any(), any())).thenReturn(getCountLimitError)
 
         val result = apiClient.get(CREDENTIALS, "")
-        verify(syncPixels).fireCountLimitPixel(Autofill)
+        verify(syncPixels).fireCountLimitPixel(CREDENTIALS.toString())
         assertTrue(result is Result.Error)
     }
 }
