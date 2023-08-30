@@ -20,6 +20,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.notification.NotificationRegistrar.NotificationId
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
@@ -69,7 +70,7 @@ class SurveyRepositoryImpl @Inject constructor(
     }
 
     override fun shouldShowSurvey(survey: Survey): Boolean {
-        return remainingDaysForShowingSurvey(survey) == 0L
+        return remainingDaysForShowingSurvey(survey) == 0L && survey.status != DONE
     }
 
     private fun validDaysInstalled(survey: Survey): Boolean {
