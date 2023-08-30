@@ -16,19 +16,11 @@
 
 package com.duckduckgo.settings.impl
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+import org.threeten.bp.*
+import org.threeten.bp.format.*
 
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [
-        SettingsSyncMetadataEntity::class,
-    ],
-)
-abstract class SettingsDatabase : RoomDatabase() {
-    abstract fun settingsSyncDao(): SettingsSyncMetadataDao
+class SyncDateProvider {
+    companion object {
+        fun now(): String = OffsetDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+    }
 }
-
-val ALL_MIGRATIONS = emptyArray<Migration>()

@@ -19,6 +19,7 @@ package com.duckduckgo.app.email
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.sync.EmailSync.Companion.DUCK_EMAIL_SETTING
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
@@ -27,6 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.settings.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -34,9 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
@@ -47,6 +47,8 @@ import timber.log.Timber
 class AppEmailManager @Inject constructor(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
+    private val emailSettings: SyncableSetting,
+    private val callback: SyncSettingCallback,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
@@ -61,6 +63,9 @@ class AppEmailManager @Inject constructor(
         // first call to isSignedIn() can be expensive and cause ANRs if done on main thread, so we do it on a background thread
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(isSignedIn())
+        }
+        emailSettings.registerToRemoteChanges {
+            onAccountDataChanged()
         }
     }
 
@@ -80,6 +85,7 @@ class AppEmailManager @Inject constructor(
             isSignedInStateFlow.emit(isSignedIn())
             generateNewAlias()
             pixel.fire(EMAIL_ENABLED)
+            callback.onSettingChanged(DUCK_EMAIL_SETTING)
         }
     }
 
@@ -88,6 +94,7 @@ class AppEmailManager @Inject constructor(
             emailDataStore.clearEmailData()
             isSignedInStateFlow.emit(false)
             pixel.fire(EMAIL_DISABLED)
+            callback.onSettingChanged(DUCK_EMAIL_SETTING)
         }
     }
 
@@ -123,6 +130,18 @@ class AppEmailManager @Inject constructor(
     }
 
     override fun getToken(): String? = emailDataStore.emailToken
+
+    private fun onAccountDataChanged() {
+        Timber.i("Sync-Settings: onAccountDataChanged()")
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(isSignedIn())
+            if (isSignedIn()) {
+                generateNewAlias()
+            } else {
+                emailDataStore.clearEmailData()
+            }
+        }
+    }
 
     private fun consumeAlias(): String? {
         val alias = emailDataStore.nextAlias

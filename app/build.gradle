@@ -272,6 +272,9 @@ dependencies {
     implementation project(':sync-store')
     implementation project(':sync-lib')
 
+    implementation project(':settings-api')
+    implementation project(':settings-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
@@ -326,6 +329,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"

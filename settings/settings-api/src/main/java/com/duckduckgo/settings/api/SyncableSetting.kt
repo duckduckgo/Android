@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.settings.impl
+package com.duckduckgo.settings.api
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+interface SyncableSetting {
+    val key: String
+    fun getValue(): String?
+    fun save(value: String?): Boolean
 
-@Database(
-    exportSchema = true,
-    version = 1,
-    entities = [
-        SettingsSyncMetadataEntity::class,
-    ],
-)
-abstract class SettingsDatabase : RoomDatabase() {
-    abstract fun settingsSyncDao(): SettingsSyncMetadataDao
+    fun mergeRemote(value: String?): Boolean
+
+    fun registerToRemoteChanges(listener: (String) -> Unit)
 }
-
-val ALL_MIGRATIONS = emptyArray<Migration>()

@@ -77,6 +77,11 @@ interface SyncApi {
         token: String,
         since: String,
     ): Result<JSONObject>
+
+    fun getSettings(
+        token: String,
+        since: String,
+    ): Result<JSONObject>
 }
 
 @ContributesBinding(AppScope::class)
@@ -288,6 +293,30 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
 
         return onSuccess(response) {
             Timber.i("Sync-service: get credentials response: $it")
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            Result.Success(data)
+        }
+    }
+
+    override fun getSettings(
+        token: String,
+        since: String,
+    ): Result<JSONObject> {
+        Timber.i("Sync-settings: get settings since servertime $since")
+        val response = runCatching {
+            val patchCall = if (since.isNotEmpty()) {
+                syncService.settingsSince("Bearer $token", since)
+            } else {
+                syncService.settings("Bearer $token")
+            }
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            Timber.i("Sync-service: patch response: ${throwable.localizedMessage}")
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Timber.i("Sync-service: get settings response: $it")
             val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
             Result.Success(data)
         }

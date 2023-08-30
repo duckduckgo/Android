@@ -88,7 +88,24 @@ class AppSyncApiClient @Inject constructor(
         return when (type) {
             BOOKMARKS -> getBookmarks(type, token, since)
             CREDENTIALS -> getCredentials(type, token, since)
-            SETTINGS -> TODO()
+            SETTINGS -> getSettings(type, token, since)
+        }
+    }
+
+    private fun getSettings(type: SyncableType, token: String, since: String): Result<SyncChangesResponse> {
+        return when (val result = syncApi.getSettings(token, since)) {
+            is Result.Error -> {
+                if (result.code == API_CODE.NOT_MODIFIED.code) {
+                    Result.Success(SyncChangesResponse.empty(type))
+                } else {
+                    Result.Error(result.code, result.reason)
+                }
+            }
+
+            is Result.Success -> {
+                val remoteChanges = mapResponse(type, result.data)
+                Result.Success(remoteChanges)
+            }
         }
     }
 
