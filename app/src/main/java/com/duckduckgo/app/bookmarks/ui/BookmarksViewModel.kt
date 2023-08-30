@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -42,8 +43,10 @@ import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -146,6 +149,32 @@ class BookmarksViewModel @Inject constructor(
     }
 
     private fun delete(savedSite: SavedSite) {
+        // we don't delete, just remove from the ui list
+
+        when (savedSite) {
+            is Bookmark -> {
+                val bookmarks = viewState.value?.bookmarks!!.toMutableList()
+                val index = bookmarks.indexOf(savedSite)
+                bookmarks[index] = savedSite.copy(deleted = "1")
+                val bookmarkFolders = viewState.value?.bookmarkFolders!!
+                viewState.value = viewState.value?.copy(
+                    bookmarks = bookmarks,
+                    enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
+                )
+            }
+            is Favorite -> {
+                val favourites = viewState.value?.favorites!!.toMutableList()
+                val index = favourites.indexOf(savedSite)
+                favourites[index] = savedSite.copy(deleted = "1")
+                viewState.value = viewState.value?.copy(
+                    favorites = favourites,
+                )
+            }
+        }
+
+    }
+
+    fun permaDelete(savedSite: SavedSite){
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             faviconManager.deletePersistedFavicon(savedSite.url)
             savedSitesRepository.delete(savedSite)
@@ -153,9 +182,34 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun insert(savedSite: SavedSite) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            savedSitesRepository.insert(savedSite)
+        // we don't insert it, only flip the deleted flag
+        when (savedSite) {
+            is Bookmark -> {
+                val bookmarks = viewState.value?.bookmarks!!.toMutableList()
+                val bookmark = bookmarks.find { it.id == savedSite.id }
+                val index = bookmarks.indexOf(bookmark)
+                bookmarks[index] = savedSite.copy(deleted = null)
+                val bookmarkFolders = viewState.value?.bookmarkFolders!!
+                viewState.value = viewState.value?.copy(
+                    bookmarks = bookmarks,
+                    enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
+                )
+            }
+            is Favorite -> {
+                val favourites = viewState.value?.favorites!!.toMutableList()
+                val favourite = favourites.find { it.id == savedSite.id }
+                val index = favourites.indexOf(favourite)
+                favourites[index] = savedSite.copy(deleted = null)
+                viewState.value = viewState.value?.copy(
+                    favorites = favourites,
+                )
+            }
         }
+
+
+        // viewModelScope.launch(dispatcherProvider.io()) {
+        //     savedSitesRepository.insert(savedSite)
+        // }
     }
 
     fun importBookmarks(uri: Uri) {

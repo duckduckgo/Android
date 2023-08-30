@@ -59,7 +59,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -175,10 +177,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ) { viewState ->
             viewState?.let { state ->
                 if (parentId == SavedSitesNames.BOOKMARKS_ROOT) {
-                    favoritesAdapter?.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
+                    favoritesAdapter?.setItems(state.favorites.filter { it.deleted == null }.map { FavoritesAdapter.FavoriteItem(it) })
                 }
-                bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
-                bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+                bookmarksAdapter.setItems(state.bookmarks.filter { it.deleted == null }.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
+                bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.filter { it.deleted == null }.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
                 setSearchMenuItemVisibility()
             }
         }
@@ -354,9 +356,27 @@ class BookmarksActivity : DuckDuckGoActivity() {
             binding.root,
             message,
             Snackbar.LENGTH_LONG,
-        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insert(savedSite)
-        }.show()
+        )
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.insert(savedSite)
+            }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int
+                    ) {
+                        // when snackbar is not dismissed because of an action we want to
+                        // actually delete the saved site
+                        Timber.d("Bookmark: dismissed with $event")
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.permaDelete(savedSite)
+                        }
+                    }
+                },
+            )
+
+            .show()
     }
 
     private fun confirmDeleteBookmarkFolder(
