@@ -26,9 +26,6 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isAudienceLeverEnabled
-import com.duckduckgo.app.statistics.isCadenceLeverEnabled
-import com.duckduckgo.app.statistics.isTimingLeverEnabled
 import com.duckduckgo.di.scopes.AppScope
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -54,39 +51,12 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
-        when {
-            variantManager.isAudienceLeverEnabled() -> {
-                if (!isWorkScheduled(UNUSED_APP_WORK_REQUEST_TAG)) {
-                    scheduleUnusedAppNotifications(
-                        1L to TimeUnit.DAYS,
-                        3L to TimeUnit.DAYS,
-                    )
-                }
-            }
-            variantManager.isTimingLeverEnabled() -> {
-                if (!isWorkScheduled(UNUSED_APP_WORK_REQUEST_TAG)) {
-                    scheduleUnusedAppNotifications(
-                        30L to TimeUnit.MINUTES,
-                        2L to TimeUnit.DAYS,
-                    )
-                }
-            }
-            variantManager.isCadenceLeverEnabled() -> {
-                if (!isWorkScheduled(UNUSED_APP_WORK_REQUEST_TAG)) {
-                    scheduleUnusedAppNotifications(
-                        30L to TimeUnit.MINUTES,
-                        1L to TimeUnit.DAYS,
-                    )
-                }
-            }
-            else -> {
-                workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
-                scheduleUnusedAppNotifications(
-                    PRIVACY_DELAY_DURATION_IN_DAYS to TimeUnit.DAYS,
-                    CLEAR_DATA_DELAY_DURATION_IN_DAYS to TimeUnit.DAYS,
-                )
-            }
-        }
+        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
+
+        scheduleUnusedAppNotifications(
+            PRIVACY_DELAY_DURATION_IN_DAYS to TimeUnit.DAYS,
+            CLEAR_DATA_DELAY_DURATION_IN_DAYS to TimeUnit.DAYS,
+        )
     }
 
     private suspend fun scheduleUnusedAppNotifications(
