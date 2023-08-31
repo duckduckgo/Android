@@ -761,4 +761,14 @@
     <string name="closeAppTabsConfirmationDialogDescription">Haluatko varmasti sulkea kaikki välilehdet?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Peruuta</string>
     <string name="closeAppTabsConfirmationDialogClose">Sulje</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Poistetaanko tämä kirjanmerkki?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tämä poistaa kirjanmerkin kohteesta &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Poistetaanko tämä suosikki?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tämä poistaa suosikkisi sivustolta &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Poistetaanko tämä kirjanmerkkikansio?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tämä poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; kirjanmerkkikansion.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Peruuta</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Poista</string>
 </resources>

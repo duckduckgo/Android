@@ -45,6 +45,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
@@ -123,7 +124,6 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.*
-import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
@@ -197,6 +197,7 @@ class BrowserTabViewModel @Inject constructor(
     private val device: DeviceInfo,
 ) : WebViewClientListener,
     EditSavedSiteListener,
+    DeleteBookmarkListener,
     UrlExtractionListener,
     AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
     AutofillCredentialsSelectionResultHandler.CredentialInjector,
@@ -283,6 +284,7 @@ class BrowserTabViewModel @Inject constructor(
         val isEditing: Boolean = false,
         val shouldMoveCaretToEnd: Boolean = false,
         val showVoiceSearch: Boolean = false,
+        val forceExpand: Boolean = true,
     )
 
     data class LoadingViewState(
@@ -940,6 +942,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = trimmedInput,
             shouldMoveCaretToEnd = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
+            forceExpand = true,
         )
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value =
@@ -1140,6 +1143,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = "",
             shouldMoveCaretToEnd = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
+            forceExpand = true,
         )
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
 
@@ -1219,6 +1223,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarText = omnibarText,
             shouldMoveCaretToEnd = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
+            forceExpand = true,
         )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
@@ -1396,6 +1401,7 @@ class BrowserTabViewModel @Inject constructor(
                 omnibarText = omnibarText,
                 shouldMoveCaretToEnd = false,
                 showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
+                forceExpand = false,
             ),
         )
         browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite()))
@@ -1809,6 +1815,7 @@ class BrowserTabViewModel @Inject constructor(
                 isEditing = hasFocus,
                 urlLoaded = url ?: "",
             ),
+            forceExpand = true,
         )
 
         val currentBrowserViewState = currentBrowserViewState()
@@ -2022,6 +2029,18 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.io()) {
             savedSitesRepository.updateBookmark(bookmark, oldFolderId)
+        }
+    }
+
+    override fun onSavedSiteDeleted(savedSite: SavedSite) {
+        command.value = DeleteSavedSiteConfirmation(savedSite)
+        delete(savedSite)
+    }
+
+    private fun delete(savedSite: SavedSite) {
+        viewModelScope.launch(dispatchers.io()) {
+            faviconManager.deletePersistedFavicon(savedSite.url)
+            savedSitesRepository.delete(savedSite)
         }
     }
 
@@ -2602,6 +2621,7 @@ class BrowserTabViewModel @Inject constructor(
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = request.site,
                 showVoiceSearch = false,
+                forceExpand = true,
             )
             command.value = HideWebContent
         }
@@ -2751,16 +2771,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun deleteQuickAccessItem(savedSite: SavedSite) {
-        val favorite = savedSite as? SavedSite.Favorite ?: return
         viewModelScope.launch(dispatchers.io() + NonCancellable) {
-            savedSitesRepository.delete(favorite)
+            faviconManager.deletePersistedFavicon(savedSite.url)
+            savedSitesRepository.delete(savedSite)
         }
     }
 
     fun insertQuickAccessItem(savedSite: SavedSite) {
-        val favorite = savedSite as? SavedSite.Favorite ?: return
         viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.insert(favorite)
+            savedSitesRepository.insert(savedSite)
         }
     }
 
@@ -2796,14 +2815,7 @@ class BrowserTabViewModel @Inject constructor(
         initialUrl: String,
         extractedUrl: String?,
     ) {
-        val destinationUrl: String = if (extractedUrl != null) {
-            ampLinks.lastAmpLinkInfo = AmpLinkInfo(ampLink = initialUrl)
-            Timber.d("AMP link detection: Success! Loading extracted URL: $extractedUrl")
-            extractedUrl
-        } else {
-            Timber.d("AMP link detection: Failed! Loading initial URL: $initialUrl")
-            initialUrl
-        }
+        val destinationUrl = ampLinks.processDestinationUrl(initialUrl, extractedUrl)
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 

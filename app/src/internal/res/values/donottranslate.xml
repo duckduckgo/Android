@@ -30,6 +30,7 @@
     <string name="devSettingsClearSavedSites">Clear saved sites</string>
     <string name="devSettingsClearSavedSitesSubtitle">Click here to clear all bookmarks, folders and favorites</string>
     <string name="devSettingsClearSavedSitesConfirmation">Saved sites cleared</string>
+    <string name="devSettingsUseSandBoxSurvey">Use Sandbox Survey</string>
 
     <string name="devSettingsScreenUserAgentSection">User Agent</string>
     <string name="devSettingsScreenUserAgentOverride">Override UserAgent</string>

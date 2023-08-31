@@ -42,4 +42,9 @@ interface AppTrackingProtection {
      * This method will restart the App Tracking Protection feature by disabling it and re-enabling back again
      */
     fun restart()
+
+    /**
+     * This method will stop the App Tracking Protection feature
+     */
+    fun stop()
 }

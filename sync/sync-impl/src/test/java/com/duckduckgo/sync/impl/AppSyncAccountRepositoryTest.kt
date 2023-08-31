@@ -219,10 +219,10 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenLoginFromQRSucceedsThenAccountPersisted() {
+    fun whenProcessJsonRecoveryCodeSucceedsThenAccountPersisted() {
         prepareForLoginSuccess()
 
-        val result = syncRepo.login(jsonRecoveryKeyEncoded)
+        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertEquals(Result.Success(true), result)
         verify(syncStore).storeCredentials(
@@ -240,7 +240,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.processCode(jsonRecoveryKey)
 
         assertTrue(result is Result.Error)
     }
@@ -250,7 +250,7 @@ class AppSyncAccountRepositoryTest {
         prepareToProvideDeviceIds()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
 
-        val result = syncRepo.login(jsonRecoveryKeyEncoded)
+        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertTrue(result is Result.Error)
     }
@@ -262,20 +262,20 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.processCode(jsonRecoveryKey)
 
         assertTrue(result is Result.Error)
     }
 
     @Test
-    fun whenLoginFromQRFailsThenReturnError() {
+    fun whenProcessJsonRecoveryCodeFailsThenReturnError() {
         prepareToProvideDeviceIds()
         prepareForEncryption()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(decryptedSecretKey)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
 
-        val result = syncRepo.login(jsonRecoveryKeyEncoded)
+        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertTrue(result is Result.Error)
     }
@@ -288,7 +288,7 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.decrypt(encryptedData = protectedEncryptionKey, secretKey = stretchedPrimaryKey)).thenReturn(invalidDecryptedSecretKey)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginSuccess)
 
-        val result = syncRepo.login(jsonRecoveryKey)
+        val result = syncRepo.processCode(jsonRecoveryKey)
 
         assertTrue(result is Result.Error)
     }
@@ -359,19 +359,19 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
-    fun whenConnectingUsingQRFromAuthenticatedDeviceThenConnectsDevice() {
+    fun whenProcessConnectCodeFromAuthenticatedDeviceThenConnectsDevice() {
         givenAuthenticatedDevice()
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
         whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Result.Success(true))
 
-        val result = syncRepo.connectDevice(jsonConnectKeyEncoded)
+        val result = syncRepo.processCode(jsonConnectKeyEncoded)
 
         verify(syncApi).connect(token, deviceId, encryptedRecoveryCode)
         assertTrue(result is Success)
     }
 
     @Test
-    fun whenConnectingUsingQRFromUnauthenticatedDeviceThenAccountCreatedAndConnects() {
+    fun whenProcessConnectCodeFromUnauthenticatedDeviceThenAccountCreatedAndConnects() {
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.isSignedIn()).thenReturn(false).thenReturn(true)
         whenever(syncStore.userId).thenReturn(userId)
@@ -382,7 +382,7 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.seal(jsonRecoveryKey, primaryKey)).thenReturn(encryptedRecoveryCode)
         whenever(syncApi.connect(token, deviceId, encryptedRecoveryCode)).thenReturn(Result.Success(true))
 
-        val result = syncRepo.connectDevice(jsonConnectKeyEncoded)
+        val result = syncRepo.processCode(jsonConnectKeyEncoded)
 
         verify(syncApi).connect(token, deviceId, encryptedRecoveryCode)
         assertTrue(result is Success)

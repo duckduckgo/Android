@@ -23,7 +23,8 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
-import java.util.*
+import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -32,17 +33,20 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import org.threeten.bp.LocalDate
 import retrofit2.Call
 import retrofit2.Response
 
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SurveyDownloaderTest {
     private var mockDao: SurveyDao = mock()
     private var mockService: SurveyService = mock()
     private var mockEmailManager: EmailManager = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
     private val mockSurveyRepository: SurveyRepository = mock()
-    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockSurveyRepository)
+    private lateinit var netpCohortStore: NetpCohortStore
+    private lateinit var testee: SurveyDownloader
 
     private val testSurvey = Survey("abc", SURVEY_URL, 7, SCHEDULED)
 
@@ -55,6 +59,12 @@ class SurveyDownloaderTest {
         val mockAppTPCall = mock<Call<SurveyGroup?>>()
         whenever(mockAppTPCall.execute()).thenReturn(Response.error(404, "error".toResponseBody()))
         whenever(mockSurveyRepository.isUserEligibleForSurvey(testSurvey)).thenReturn(true)
+        netpCohortStore = FakeNetpCohortStore()
+        val netpMockCall: Call<SurveyGroup?> = mock()
+        whenever(netpMockCall.execute()).thenReturn(Response.error(400, "".toResponseBody()))
+        whenever(mockService.surveyNetPWaitlistBeta()).thenReturn(netpMockCall)
+
+        testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockSurveyRepository, netpCohortStore)
     }
 
     @Test
@@ -144,16 +154,48 @@ class SurveyDownloaderTest {
 
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, emptyList()),
+            SurveyGroup.SurveyOption(
+                url = SURVEY_URL,
+                installationDay = 1,
+                ratioOfUsersToShow = 0.0,
+                isEmailSignedInRequired = null,
+                urlParameters = emptyList(),
+                isNetPOnboardedRequired = null,
+                daysSinceNetPEnabled = null,
+            ),
+            SurveyGroup.SurveyOption(
+                url = SURVEY_URL,
+                installationDay = 7,
+                ratioOfUsersToShow = 1.0,
+                isEmailSignedInRequired = null,
+                urlParameters = emptyList(),
+                isNetPOnboardedRequired = null,
+                daysSinceNetPEnabled = null,
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, emptyList()),
+            SurveyGroup.SurveyOption(
+                url = SURVEY_URL,
+                installationDay = 1,
+                ratioOfUsersToShow = 0.0,
+                isEmailSignedInRequired = null,
+                urlParameters = emptyList(),
+                isNetPOnboardedRequired = null,
+                daysSinceNetPEnabled = null,
+            ),
+            SurveyGroup.SurveyOption(
+                url = SURVEY_URL,
+                installationDay = 7,
+                ratioOfUsersToShow = 0.0,
+                isEmailSignedInRequired = null,
+                urlParameters = emptyList(),
+                isNetPOnboardedRequired = null,
+                daysSinceNetPEnabled = null,
+            ),
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -161,11 +203,13 @@ class SurveyDownloaderTest {
     private fun surveyWithAllocationForEmail(id: String): SurveyGroup {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(
-                SURVEY_URL,
-                -1,
-                1.0,
-                true,
-                listOf(SurveyUrlParameter.EmailCohortParam.parameter),
+                url = SURVEY_URL,
+                installationDay = -1,
+                ratioOfUsersToShow = 1.0,
+                isEmailSignedInRequired = true,
+                urlParameters = listOf(SurveyUrlParameter.EmailCohortParam.parameter),
+                isNetPOnboardedRequired = null,
+                daysSinceNetPEnabled = null,
             ),
         )
         return SurveyGroup(id, surveyOptions)
@@ -176,3 +220,7 @@ class SurveyDownloaderTest {
         const val SURVEY_URL_WITH_COHORT = "https://survey.com?cohort=cohort"
     }
 }
+
+private class FakeNetpCohortStore(
+    override var cohortLocalDate: LocalDate? = null,
+) : NetpCohortStore

@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.applinks
 
 import android.os.Build
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -44,6 +45,8 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
 
     var previousUrl: String? = null
     var isAUserQuery = false
+    var hasTriggeredForDomain = false
+    private val alwaysTriggerList = listOf("app.digid.nl")
 
     override fun handleAppLink(
         isForMainFrame: Boolean,
@@ -57,10 +60,11 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
         }
 
         previousUrl?.let {
-            if (UriString.sameOrSubdomain(it, urlString) || UriString.sameOrSubdomain(urlString, it)) {
-                if (isAUserQuery) {
+            if (isSameOrSubdomain(it, urlString)) {
+                if (isAUserQuery || !hasTriggeredForDomain || alwaysTriggerList.contains(urlString.extractDomain())) {
                     previousUrl = urlString
                     launchAppLink()
+                    hasTriggeredForDomain = true
                 }
                 return false
             }
@@ -68,10 +72,19 @@ class DuckDuckGoAppLinksHandler @Inject constructor(
 
         previousUrl = urlString
         launchAppLink()
+        hasTriggeredForDomain = true
         return shouldHaltWebNavigation
     }
 
+    private fun isSameOrSubdomain(
+        previousUrlString: String,
+        currentUrlString: String,
+    ) = UriString.sameOrSubdomain(previousUrlString, currentUrlString) || UriString.sameOrSubdomain(currentUrlString, previousUrlString)
+
     override fun updatePreviousUrl(urlString: String?) {
+        if (urlString == null || previousUrl?.let { isSameOrSubdomain(it, urlString) } == false) {
+            hasTriggeredForDomain = false
+        }
         previousUrl = urlString
     }
 

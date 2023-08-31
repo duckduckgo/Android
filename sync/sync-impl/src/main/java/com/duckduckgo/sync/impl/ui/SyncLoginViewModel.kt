@@ -58,9 +58,9 @@ class SyncLoginViewModel @Inject constructor(
         }
     }
 
-    fun onConnectQRScanned(qrCode: String) {
+    fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.login(qrCode)
+            val result = syncAccountRepository.processCode(qrCode)
             if (result is Error) {
                 command.send(Command.Error)
             } else {

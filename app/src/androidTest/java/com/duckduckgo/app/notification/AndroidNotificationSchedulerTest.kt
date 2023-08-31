@@ -128,42 +128,6 @@ class AndroidNotificationSchedulerTest {
         assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
     }
 
-    @Test
-    fun givenAudienceLeverVariantThenBothNotificationsAreScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zs" })
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun givenTimingLeverVariantThenBothNotificationsAreScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zt" })
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun givenCadenceLeverVariantThenBothNotificationsAreScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zu" })
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-    }
-
     private fun assertNotificationScheduled(
         workerName: String?,
         tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG,

@@ -673,6 +673,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBookmarkDeletedThenFaviconDeletedAndRepositoryIsUpdated() = runTest {
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
+
+        testee.onSavedSiteDeleted(bookmark)
+
+        verify(mockFaviconManager).deletePersistedFavicon(bookmark.url)
+        verify(mockSavedSitesRepository).delete(bookmark)
+    }
+
+    @Test
     fun whenBookmarkAddedThenRepositoryIsUpdatedAndUserNotified() = runTest {
         val url = "http://www.example.com"
         val title = "A title"
@@ -715,7 +726,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeletedThenRepositoryUpdated() = runTest {
+    fun whenDeleteQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() = runTest {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
 
         testee.deleteQuickAccessItem(savedSite)
@@ -724,8 +735,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessInsertedThenRepositoryUpdated() {
+    fun whenInsertQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
+
+        testee.insertQuickAccessItem(savedSite)
+
+        verify(mockSavedSitesRepository).insert(savedSite)
+    }
+
+    @Test
+    fun whenDeleteQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() = runTest {
+        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
+
+        testee.deleteQuickAccessItem(savedSite)
+
+        verify(mockSavedSitesRepository).delete(savedSite)
+    }
+
+    @Test
+    fun whenInsertQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() {
+        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
 
         testee.insertQuickAccessItem(savedSite)
 
@@ -3985,20 +4014,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlExtractedAndIsNotNullThenIssueLoadExtractedUrlCommandWithExtractedUrl() {
+    fun whenUrlExtractedThenIssueLoadExtractedUrlCommand() {
+        whenever(mockAmpLinks.processDestinationUrl(anyString(), anyOrNull())).thenReturn("http://example.com")
         testee.onUrlExtracted("http://foo.com", "http://example.com")
-        verify(mockAmpLinks).lastAmpLinkInfo = AmpLinkInfo(ampLink = "http://foo.com")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
         assertEquals("http://example.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
-    }
-
-    @Test
-    fun whenUrlExtractedAndIsNullThenIssueLoadExtractedUrlCommandWithInitialUrl() {
-        testee.onUrlExtracted("http://foo.com", null)
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
-        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
     }
 
     @Test
@@ -4406,6 +4427,28 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNoTabsThenActiveTabReturnsFalse() {
         assertFalse(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenUrlIsUpdatedWithDifferentHostThenForceUpdateShouldBeTrue() {
+        val originalUrl = "http://www.example.com/"
+        loadUrl(originalUrl, isBrowserShowing = true)
+        updateUrl(originalUrl, "http://twitter.com/explore", true)
+
+        assertTrue(omnibarViewState().forceExpand)
+    }
+
+    @Test
+    fun whenUrlIsUpdateButSameHostThenForceUpdateShouldBeFalse() = runTest {
+        val originalUrl = "https://www.example.com/search/sss#search=1~grid~0~25"
+        loadUrl(originalUrl, isBrowserShowing = true)
+        updateUrl(
+            originalUrl,
+            "https://www.example.com/search/sss#search=1~grid~0~28",
+            true,
+        )
+
+        assertFalse(omnibarViewState().forceExpand)
     }
 
     private fun aCredential(): LoginCredentials {

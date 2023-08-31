@@ -24,10 +24,13 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import io.reactivex.Completable
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
+import org.threeten.bp.LocalDate
+import org.threeten.bp.temporal.ChronoUnit
 import retrofit2.Response
 import timber.log.Timber
 
@@ -36,9 +39,20 @@ class SurveyDownloader @Inject constructor(
     private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
     private val surveyRepository: SurveyRepository,
+    private val netpCohortStore: NetpCohortStore,
 ) {
 
     private fun getSurveyResponse(): Response<SurveyGroup?> {
+        val callNetP = service.surveyNetPWaitlistBeta()
+        val responseNetP = callNetP.execute()
+
+        // Why? see https://app.asana.com/0/414730916066338/1201395604254213/f
+        // check temporary NetP survey endpoint else fallback to v2 survey endpoint
+        if (responseNetP.isSuccessful && responseNetP.body()?.id != null) {
+            Timber.v("Returning NetP response")
+            return responseNetP
+        }
+
         val call = service.survey()
         Timber.v("Returning v2 response")
         return call.execute()
@@ -64,7 +78,7 @@ class SurveyDownloader @Inject constructor(
             }
 
             if (surveyDao.exists(surveyGroup.id)) {
-                Timber.d("Survey received already in db, ignoring")
+                Timber.d("Survey received already in db, ignoring ${surveyGroup.id}")
                 return@fromAction
             }
 
@@ -88,6 +102,7 @@ class SurveyDownloader @Inject constructor(
 
             newSurvey?.let {
                 if (surveyRepository.isUserEligibleForSurvey(newSurvey)) {
+                    Timber.v("User eligible for survey, storing")
                     surveyDao.insert(newSurvey)
                 }
             }
@@ -118,6 +133,14 @@ class SurveyDownloader @Inject constructor(
     private fun canSurveyBeScheduled(surveyOption: SurveyOption): Boolean {
         return if (surveyOption.isEmailSignedInRequired == true) {
             emailManager.isSignedIn()
+        } else if (surveyOption.isNetPOnboardedRequired == true) {
+            val now = LocalDate.now()
+            val days = ChronoUnit.DAYS.between(netpCohortStore.cohortLocalDate, now)
+            Timber.v("Days since netp enabled = $days")
+            return surveyOption.daysSinceNetPEnabled?.let { daysSinceNetPEnabled ->
+                Timber.v("Days required since NetP enabled = $daysSinceNetPEnabled")
+                days >= daysSinceNetPEnabled
+            } ?: false
         } else {
             true
         }

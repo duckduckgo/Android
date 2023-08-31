@@ -706,6 +706,7 @@ class BrowserTabFragment :
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
+            dialog.deleteBookmarkListener = viewModel
         }
     }
 
@@ -1883,7 +1884,8 @@ class BrowserTabFragment :
             override fun onBackKey(): Boolean {
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
-                return true
+                //  Allow the event to be handled by the next receiver.
+                return false
             }
         }
 
@@ -2289,6 +2291,7 @@ class BrowserTabFragment :
         )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
+        addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
@@ -2330,24 +2333,14 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionEnabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
-        ).apply {
-            setAction(R.string.undoSnackbarAction) {
-                viewModel.onEnablePrivacyProtectionSnackbarUndoClicked(domain)
-            }
-            show()
-        }
+        ).show()
     }
 
     private fun privacyProtectionDisabledConfirmation(domain: String) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
-        ).apply {
-            setAction(R.string.undoSnackbarAction) {
-                viewModel.onDisablePrivacyProtectionSnackbarUndoClicked(domain)
-            }
-            show()
-        }
+        ).show()
     }
 
     private fun launchSharePageChooser(url: String) {
@@ -3034,7 +3027,9 @@ class BrowserTabFragment :
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibar.omnibarTextInput.setText(viewState.omnibarText)
-                    omnibar.appBarLayout.setExpanded(true, true)
+                    if (viewState.forceExpand) {
+                        omnibar.appBarLayout.setExpanded(true, true)
+                    }
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }

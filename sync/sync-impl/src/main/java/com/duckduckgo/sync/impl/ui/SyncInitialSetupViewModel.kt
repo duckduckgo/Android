@@ -183,7 +183,7 @@ constructor(
 
     fun onQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.login(contents)
+            val result = syncAccountRepository.processCode(contents)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -193,7 +193,7 @@ constructor(
 
     fun onConnectQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.connectDevice(contents)
+            val result = syncAccountRepository.processCode(contents)
             when (result) {
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))

@@ -761,4 +761,14 @@
     <string name="closeAppTabsConfirmationDialogDescription">Biztosan bezárod az összes lapot?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Mégsem</string>
     <string name="closeAppTabsConfirmationDialogClose">Bezárás</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Törölöd ezt a könyvjelzőt?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőt.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Törölöd ezt a kedvencet?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; kedvencet.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Törölöd ezt a könyvjelzőmappát?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőmappát.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Mégsem</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Törlés</string>
 </resources>

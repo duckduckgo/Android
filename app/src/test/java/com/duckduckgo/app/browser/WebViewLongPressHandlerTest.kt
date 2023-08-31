@@ -107,15 +107,17 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
-    fun whenUserLongPressesWithImageTypeThenDownloadImageMenuAdded() {
+    fun whenUserLongPressesWithImageTypeThenDownloadImageMenuAddedAndOpenImageInBackgroundItemAdded() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyDownloadImageItemAdded()
+        verifyOpenImageInBackgroundItemAdded()
     }
 
     @Test
-    fun whenUserLongPressesWithAnchorImageTypeThenDownloadImageMenuAdded() {
+    fun whenUserLongPressesWithAnchorImageTypeThenDownloadImageMenuAddedOpenImageInBackgroundItemAdded() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
         verifyDownloadImageItemAdded()
+        verifyOpenImageInBackgroundItemAdded()
     }
 
     @Test
@@ -125,9 +127,17 @@ class WebViewLongPressHandlerTest {
     }
 
     @Test
-    fun whenUserLongPressesWithImageTypeWhichIsADataUriThenDownloadImageMenuAdded() {
+    fun whenUserLongPressesWithImageTypeWhichIsADataUriThenDownloadImageMenuAddedAndOpenImageInBackgroundItemNotAdded() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, DATA_URI_IMAGE_URL, mockMenu)
         verifyDownloadImageItemAdded()
+        verifyOpenImageInBackgroundItemNotAdded()
+    }
+
+    @Test
+    fun whenUserLongPressesWithAnchorImageTypeWhichIsADataUriThenDownloadImageMenuAddedAndOpenImageInBackgroundItemNotAdded() {
+        testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, DATA_URI_IMAGE_URL, mockMenu)
+        verifyDownloadImageItemAdded()
+        verifyOpenImageInBackgroundItemNotAdded()
     }
 
     @Test
@@ -165,6 +175,24 @@ class WebViewLongPressHandlerTest {
 
     private fun verifyDownloadImageItemAdded() {
         verify(mockMenu).add(anyInt(), eq(WebViewLongPressHandler.CONTEXT_MENU_ID_DOWNLOAD_IMAGE), anyInt(), eq(R.string.downloadImage))
+    }
+
+    private fun verifyOpenImageInBackgroundItemNotAdded() {
+        verify(mockMenu, never()).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB),
+            anyInt(),
+            eq(R.string.openImageInNewTab),
+        )
+    }
+
+    private fun verifyOpenImageInBackgroundItemAdded() {
+        verify(mockMenu).add(
+            anyInt(),
+            eq(WebViewLongPressHandler.CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB),
+            anyInt(),
+            eq(R.string.openImageInNewTab),
+        )
     }
 
     private fun verifyNewForegroundTabItemAdded() {
