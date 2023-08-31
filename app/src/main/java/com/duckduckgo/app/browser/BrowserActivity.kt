@@ -26,13 +26,17 @@ import android.os.Message
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.duckduckgo.app.bookmarks.ui.BookmarksScreenNoParams
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
@@ -140,6 +144,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
+    private val startBookmarksActivityForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.getStringExtra(SAVED_SITE_URL_EXTRA)?.let {
+                    viewModel.onBookmarksActivityResult(it)
+                }
+            }
+        }
+
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
@@ -162,6 +175,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
+        configureOnBackPressedListener()
     }
 
     override fun onStop() {
@@ -398,6 +412,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
+            is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
         }
     }
 
@@ -468,7 +483,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchBookmarks() {
-        startActivity(BookmarksActivity.intent(this))
+        startBookmarksActivityForResult.launch(globalActivityStarter.startIntent(this, BookmarksScreenNoParams))
     }
 
     fun launchDownloads() {
@@ -487,13 +502,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (currentTab?.onBackPressed() != true) {
-            // signal user press back button to exit the app so that BrowserApplicationStateInfo
-            // can call the right callback
-            destroyedByBackPress = true
-            super.onBackPressed()
-        }
+    private fun configureOnBackPressedListener() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (currentTab?.onBackPressed() != true) {
+                        // signal user press back button to exit the app so that BrowserApplicationStateInfo
+                        // can call the right callback
+                        destroyedByBackPress = true
+                        isEnabled = false
+                        this@BrowserActivity.onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            },
+        )
     }
 
     override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {

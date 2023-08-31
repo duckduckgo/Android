@@ -28,12 +28,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.plurals
 import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
@@ -62,6 +62,7 @@ import java.util.*
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(BookmarksScreenNoParams::class)
 class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -325,7 +326,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun openSavedSite(savedSite: SavedSite) {
-        startActivity(BrowserActivity.intent(this, savedSite.url))
+        val resultValue = Intent()
+        resultValue.putExtra(SAVED_SITE_URL_EXTRA, savedSite.url)
+        setResult(RESULT_OK, resultValue)
         finish()
     }
 
@@ -424,6 +427,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        const val SAVED_SITE_URL_EXTRA = "SAVED_SITE_URL_EXTRA"
+
         fun intent(
             context: Context,
             bookmarkFolder: BookmarkFolder? = null,
