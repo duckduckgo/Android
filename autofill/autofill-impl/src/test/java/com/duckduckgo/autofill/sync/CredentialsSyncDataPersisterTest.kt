@@ -157,12 +157,12 @@ internal class CredentialsSyncDataPersisterTest {
 }
 
 private class FakeCredentialsMergeStrategy : CredentialsMergeStrategy {
-    var result: SyncMergeResult<Boolean> = Success(true)
+    var result: SyncMergeResult = Success(false)
 
     override fun processEntries(
         credentials: credentialsSyncEntries,
         clientModifiedSince: String,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         return result
     }
 }
