@@ -54,17 +54,16 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(BookmarksScreenNoParams::class)
@@ -179,8 +178,15 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 if (parentId == SavedSitesNames.BOOKMARKS_ROOT) {
                     favoritesAdapter?.setItems(state.favorites.filter { it.deleted == null }.map { FavoritesAdapter.FavoriteItem(it) })
                 }
-                bookmarksAdapter.setItems(state.bookmarks.filter { it.deleted == null }.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
-                bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.filter { it.deleted == null }.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+                bookmarksAdapter.setItems(
+                    state.bookmarks.filter { it.deleted == null }.map { BookmarksAdapter.BookmarkItem(it) },
+                    state.bookmarkFolders.isEmpty(),
+                )
+                bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.filter { it.deleted == null }.map {
+                    BookmarkFoldersAdapter.BookmarkFolderItem(
+                        it,
+                    )
+                }
                 setSearchMenuItemVisibility()
             }
         }
@@ -364,7 +370,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
                     override fun onDismissed(
                         transientBottomBar: Snackbar?,
-                        event: Int
+                        event: Int,
                     ) {
                         // when snackbar is not dismissed because of an action we want to
                         // actually delete the saved site
@@ -375,12 +381,11 @@ class BookmarksActivity : DuckDuckGoActivity() {
                     }
                 },
             )
-
             .show()
     }
 
     private fun confirmDeleteBookmarkFolder(
-        bookmarkFolder: BookmarkFolder
+        bookmarkFolder: BookmarkFolder,
     ) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
@@ -394,7 +399,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
                     override fun onDismissed(
                         transientBottomBar: Snackbar?,
-                        event: Int
+                        event: Int,
                     ) {
                         // when snackbar is not dismissed because of an action we want to
                         // actually delete the saved site

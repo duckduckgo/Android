@@ -106,6 +106,8 @@ class BookmarksViewModelTest {
                 ),
             ),
         )
+
+        testee.fetchBookmarksAndFolders(SavedSitesNames.BOOKMARKS_ROOT)
     }
 
     @After
@@ -115,36 +117,57 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkInsertedThenDaoUpdated() = runTest {
+    fun whenBookmarkDeleteUndoThenRepositoryNotUpdated() = runTest {
+        testee.onDeleteSavedSiteRequested(bookmark)
         testee.undoDelete(bookmark)
 
-        verify(savedSitesRepository).insert(bookmark)
+        verify(savedSitesRepository, never()).delete(bookmark)
+        verify(faviconManager, never()).deletePersistedFavicon(bookmark.url)
     }
 
     @Test
-    fun whenFavoriteInsertedThenRepositoryUpdated() = runTest {
-        testee.undoDelete(favorite)
-
-        verify(savedSitesRepository).insert(favorite)
-    }
-
-    @Test
-    fun whenBookmarkDeleteRequestedThenDaoUpdated() = runTest {
+    fun whenBookmarkDeleteThenRepositoryUpdated() = runTest {
         testee.onDeleteSavedSiteRequested(bookmark)
+        testee.delete(bookmark)
 
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
         verify(savedSitesRepository).delete(bookmark)
     }
 
     @Test
-    fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = runTest {
+    fun whenBookmarkDeleteRequestedThenConfirmCommandSent() = runTest {
+        testee.onDeleteSavedSiteRequested(bookmark)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertNotNull(commandCaptor.value)
+        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+    }
+
+    @Test
+    fun whenFavoriteDeleteUndoThenRepositoryNotUpdated() = runTest {
+        testee.onDeleteSavedSiteRequested(favorite)
+        testee.undoDelete(favorite)
+
+        verify(savedSitesRepository, never()).delete(favorite)
+        verify(faviconManager, never()).deletePersistedFavicon(favorite.url)
+    }
+
+    @Test
+    fun whenFavoriteDeleteThenRepositoryUpdated() = runTest {
+        testee.onDeleteSavedSiteRequested(favorite)
+        testee.delete(favorite)
+
+        verify(savedSitesRepository).delete(favorite)
+        verify(faviconManager, never()).deletePersistedFavicon(favorite.url)
+    }
+
+    @Test
+    fun whenFavoriteDeleteRequestedThenConfirmCommandSent() = runTest {
         testee.onDeleteSavedSiteRequested(favorite)
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertNotNull(commandCaptor.value)
         assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
-
-        verifyNoMoreInteractions(savedSitesRepository)
     }
 
     @Test
@@ -159,17 +182,6 @@ class BookmarksViewModelTest {
         testee.onFavouriteEdited(favorite)
 
         verify(savedSitesRepository).updateFavourite(favorite)
-    }
-
-    @Test
-    fun whenBookmarkDeletedThenConfirmDeleteSavedSiteCommandAndRepositoryIsUpdated() = runTest {
-        testee.onSavedSiteDeleted(bookmark)
-
-        verify(commandObserver).onChanged(commandCaptor.capture())
-        assertNotNull(commandCaptor.value)
-        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
-        verify(faviconManager).deletePersistedFavicon(bookmark.url)
-        verify(savedSitesRepository).delete(bookmark)
     }
 
     @Test
@@ -198,14 +210,6 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarksChangedThenObserverNotified() {
-        testee
-        verify(viewStateObserver).onChanged(viewStateCaptor.capture())
-        assertNotNull(viewStateCaptor.value)
-        assertNotNull(viewStateCaptor.value.bookmarks)
-    }
-
-    @Test
     fun whenBookmarkFolderSelectedThenIssueOpenBookmarkFolderCommand() {
         testee.onBookmarkFolderSelected(bookmarkFolder)
 
@@ -221,7 +225,7 @@ class BookmarksViewModelTest {
 
         verify(savedSitesRepository).getSavedSites(parentId)
 
-        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+        verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
         assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
@@ -245,16 +249,16 @@ class BookmarksViewModelTest {
         verify(savedSitesRepository).getBookmarksTree()
         verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
 
-        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+        verify(viewStateObserver, times(3)).onChanged(viewStateCaptor.capture())
 
         assertEquals(emptyList<Bookmark>(), viewStateCaptor.allValues[0].bookmarks)
         assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
-        assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
-        assertEquals(listOf(bookmark, bookmark, bookmark), viewStateCaptor.allValues[1].bookmarks)
-        assertEquals(listOf(bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
-        assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
+        assertEquals(emptyList<Favorite>(), viewStateCaptor.allValues[2].favorites)
+        assertEquals(listOf(bookmark, bookmark, bookmark), viewStateCaptor.allValues[2].bookmarks)
+        assertEquals(listOf(bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[2].bookmarkFolders)
+        assertEquals(true, viewStateCaptor.allValues[2].enableSearch)
     }
 
     @Test
@@ -280,7 +284,23 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
+    fun whenDeleteEmptyFolderRequestedThenCommandIssued() = runTest {
+        testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder).bookmarkFolder)
+    }
+
+    @Test
+    fun whenDeleteFolderRequestedThenCommandIssued() = runTest {
+        val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOKMARKS_ROOT, 1, 1, "timestamp")
+        testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(bookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.DeleteBookmarkFolder).bookmarkFolder)
+    }
+
+    @Test
+    fun whenDeleteBookmarkFolderUndoThenReposistoryNotUpdated() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
@@ -289,6 +309,22 @@ class BookmarksViewModelTest {
         whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
 
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
+        testee.undoDelete(bookmarkFolder)
+
+        verify(savedSitesRepository, never()).deleteFolderBranch(bookmarkFolder)
+    }
+
+    @Test
+    fun whenDeleteBookmarkFolderConfirmedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
+        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
+        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
+        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
+
+        whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
+
+        testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
+        testee.delete(bookmarkFolder)
 
         verify(savedSitesRepository).deleteFolderBranch(bookmarkFolder)
 
@@ -297,7 +333,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
+    fun whenDeleteBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
@@ -310,18 +346,6 @@ class BookmarksViewModelTest {
 
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(nonEmptyBookmarkFolder, (commandCaptor.value as BookmarksViewModel.Command.DeleteBookmarkFolder).bookmarkFolder)
-    }
-
-    @Test
-    fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
-        val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
-        val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
-        val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
-
-        testee.insertDeletedFolderBranch(folderBranch)
-
-        verify(savedSitesRepository).insertFolderBranch(folderBranch)
     }
 
     @Test
