@@ -43,7 +43,7 @@ interface SavedSitesSyncPersisterAlgorithm {
     fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean>
+    ): SyncMergeResult
 }
 
 @ContributesBinding(AppScope::class)
@@ -58,7 +58,9 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     override fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
+        var orphans = false
+
         val processIds: MutableList<String> = mutableListOf()
         val allResponseIds = bookmarks.entries.filterNot { it.deleted != null }.map { it.id }
         val allFolders = bookmarks.entries.filter { it.isFolder() }.filterNot { it.id == SavedSitesNames.FAVORITES_ROOT }
@@ -106,9 +108,12 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         }
 
         val unprocessedIds = allResponseIds.filterNot { processIds.contains(it) }
-        Timber.d("Sync-Feature: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
+        if (unprocessedIds.isNotEmpty()) {
+            orphans = true
+            Timber.d("Sync-Feature: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
+        }
 
-        return SyncMergeResult.Success(true)
+        return SyncMergeResult.Success(orphans = orphans)
     }
 
     private fun processFolder(

@@ -25,9 +25,9 @@ import javax.inject.Inject
 interface SyncPixels {
     fun fireStatsPixel()
 
-    fun fireMergeConflictPixel(feature: String)
-
     fun fireOrphanPresentPixel(feature: String)
+
+    fun firePersisterErrorPixel(feature: String)
 
     fun fireEncryptFailurePixel()
 
@@ -59,18 +59,18 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireMergeConflictPixel(feature: String) {
+    override fun fireOrphanPresentPixel(feature: String) {
         pixel.fire(
-            SyncPixelName.SYNC_MERGE_CONFLICT,
+            SyncPixelName.SYNC_ORPHAN_PRESENT,
             mapOf(
                 SyncPixelParameters.FEATURE to feature,
             ),
         )
     }
 
-    override fun fireOrphanPresentPixel(feature: String) {
+    override fun firePersisterErrorPixel(feature: String) {
         pixel.fire(
-            SyncPixelName.SYNC_ORPHAN_PRESENT,
+            SyncPixelName.SYNC_PERSISTER_FAILURE,
             mapOf(
                 SyncPixelParameters.FEATURE to feature,
             ),
@@ -107,12 +107,12 @@ class RealSyncPixels @Inject constructor(
 enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SUCCESS_RATE("m_sync_daily_success_rate"),
     SYNC_DAILY_ATTEMPTS("m_sync_daily_attempts"),
-    SYNC_MERGE_CONFLICT("m_sync_merge_conflict"),
     SYNC_ORPHAN_PRESENT("m_sync_orphan_present"),
     SYNC_ENCRYPT_FAILURE("m_sync_encrypt_failure"),
     SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
     SYNC_COUNT_LIMIT("m_sync_count_limit"),
     SYNC_ATTEMPT_FAILURE("m_sync_attempt_failure"),
+    SYNC_PERSISTER_FAILURE("m_sync_attempt_failure"),
 }
 
 object SyncPixelParameters {

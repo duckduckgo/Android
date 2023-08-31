@@ -27,7 +27,6 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
@@ -371,6 +370,19 @@ internal class SyncEngineTest {
         verifyNoInteractions(syncApiClient)
     }
 
+    @Test
+    fun whenPersistingChangesAndOrphansPresentThenPixelIsSent() {
+        givenLocalChanges()
+        givenGetSuccess()
+        givenPatchSuccess()
+
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(true)))
+
+        syncEngine.triggerSync(FEATURE_READ)
+
+        verify(syncPixels).fireOrphanPresentPixel(any())
+    }
+
     private fun givenNoLocalChanges() {
         val fakePersisterPlugin = FakeSyncableDataPersister()
         val fakeProviderPlugin = FakeSyncableDataProvider(SyncChangesRequest.empty())
@@ -403,12 +415,6 @@ internal class SyncEngineTest {
     private fun givenGetError() {
         whenever(syncApiClient.get(any(), any())).thenReturn(
             Result.Error(400, "get failed"),
-        )
-    }
-
-    private fun givenGetCountLimitError() {
-        whenever(syncApiClient.get(any(), any())).thenReturn(
-            Result.Error(API_CODE.COUNT_LIMIT.code, "get failed"),
         )
     }
 

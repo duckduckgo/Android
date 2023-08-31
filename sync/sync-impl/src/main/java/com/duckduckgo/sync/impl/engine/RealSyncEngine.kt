@@ -205,7 +205,17 @@ class RealSyncEngine @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ) {
         persisterPlugins.getPlugins().map {
-            it.persist(remoteChanges, conflictResolution)
+            when (val result = it.persist(remoteChanges, conflictResolution)) {
+                is SyncMergeResult.Success -> {
+                    if (result.orphans) {
+                        syncPixels.fireOrphanPresentPixel(remoteChanges.type.toString())
+                    }
+                }
+
+                else -> {
+                    syncPixels.firePersisterErrorPixel(remoteChanges.type.toString())
+                }
+            }
         }
     }
 
