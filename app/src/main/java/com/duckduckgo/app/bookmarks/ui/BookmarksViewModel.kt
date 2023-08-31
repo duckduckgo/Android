@@ -32,7 +32,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
-import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -166,9 +165,11 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    fun delete(savedSite: SavedSite){
+    fun delete(savedSite: SavedSite) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
-            faviconManager.deletePersistedFavicon(savedSite.url)
+            if (savedSite is Bookmark) {
+                faviconManager.deletePersistedFavicon(savedSite.url)
+            }
             savedSitesRepository.delete(savedSite)
         }
     }
@@ -311,5 +312,4 @@ class BookmarksViewModel @Inject constructor(
             enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
         )
     }
-
 }
