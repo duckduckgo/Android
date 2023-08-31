@@ -2815,14 +2815,7 @@ class BrowserTabViewModel @Inject constructor(
         initialUrl: String,
         extractedUrl: String?,
     ) {
-        val destinationUrl: String = if (extractedUrl != null) {
-            ampLinks.lastAmpLinkInfo = AmpLinkInfo(ampLink = initialUrl)
-            Timber.d("AMP link detection: Success! Loading extracted URL: $extractedUrl")
-            extractedUrl
-        } else {
-            Timber.d("AMP link detection: Failed! Loading initial URL: $initialUrl")
-            initialUrl
-        }
+        val destinationUrl = ampLinks.processDestinationUrl(initialUrl, extractedUrl)
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 

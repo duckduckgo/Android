@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -43,7 +42,6 @@ class UrlExtractingWebViewClient(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val urlExtractor: DOMUrlExtractor,
-    private val contentScopeScripts: ContentScopeScripts,
 ) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null
@@ -56,7 +54,6 @@ class UrlExtractingWebViewClient(
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }
-        contentScopeScripts.injectContentScopeScripts(webView)
         Timber.d("AMP link detection: Injecting JS for URL extraction")
         urlExtractor.injectUrlExtractionJS(webView)
     }
