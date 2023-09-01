@@ -63,6 +63,7 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.RestartOnConnectivityLoss -> assertTrue(config.isEnabled(setting))
+                AppTpSetting.VerboseLogging -> assertFalse(config.isEnabled(setting))
             }
         }
     }

@@ -31,6 +31,7 @@ class AppTpSettingTest {
                 AppTpSetting.ProtectGames -> assertFalse(setting.defaultValue)
                 AppTpSetting.ExceptionLists -> assertTrue(setting.defaultValue)
                 AppTpSetting.RestartOnConnectivityLoss -> assertTrue(setting.defaultValue)
+                AppTpSetting.VerboseLogging -> assertFalse(setting.defaultValue)
                 else -> throw java.lang.IllegalStateException("Missing AppTpSetting default checks")
             }
         }
