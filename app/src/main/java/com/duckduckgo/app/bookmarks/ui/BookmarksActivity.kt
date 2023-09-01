@@ -25,6 +25,8 @@ import android.text.SpannableString
 import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
@@ -89,6 +91,15 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private val searchBar
         get() = binding.searchBar
+
+    private val startBookmarkFoldersActivityForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.getStringExtra(SAVED_SITE_URL_EXTRA)?.let {
+                    viewModel.onBookmarkFoldersActivityResult(it)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -176,7 +187,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ) {
             when (it) {
                 is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
-                is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSite)
+                is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSiteUrl)
                 is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
                 is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
                 is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
@@ -325,9 +336,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
         dialog.deleteBookmarkListener = viewModel
     }
 
-    private fun openSavedSite(savedSite: SavedSite) {
+    private fun openSavedSite(url: String) {
         val resultValue = Intent()
-        resultValue.putExtra(SAVED_SITE_URL_EXTRA, savedSite.url)
+        resultValue.putExtra(SAVED_SITE_URL_EXTRA, url)
         setResult(RESULT_OK, resultValue)
         finish()
     }
@@ -358,7 +369,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun openBookmarkFolder(bookmarkFolder: BookmarkFolder) {
-        startActivity(intent(this, bookmarkFolder))
+        startBookmarkFoldersActivityForResult.launch(intent(this, bookmarkFolder))
     }
 
     private fun editBookmarkFolder(bookmarkFolder: BookmarkFolder) {
