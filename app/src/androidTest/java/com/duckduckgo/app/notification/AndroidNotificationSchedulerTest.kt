@@ -135,18 +135,6 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun givenModifiedControlVariantThenPrivacyProtectionAnClearDataNotificationsAreScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zw" })
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
     fun givenCompetitiveCopyVariantThenDefaultBrowserAndClearDataNotificationsAreScheduled() = runTest {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zx" })
         whenever(defaultBrowserNotification.canShow()).thenReturn(true)
@@ -167,19 +155,6 @@ class AndroidNotificationSchedulerTest {
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(DefaultBrowserNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun givenModifiedControlVariantThenPrivacyProtectionIsNotScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zw" })
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationNotScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
         assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
     }
 

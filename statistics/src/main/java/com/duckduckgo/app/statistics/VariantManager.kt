@@ -20,7 +20,6 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CompetitiveCopy
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ModifiedControl
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SetupCopy
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -32,7 +31,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object ModifiedControl : VariantFeature()
         object CompetitiveCopy : VariantFeature()
         object SetupCopy : VariantFeature()
     }
@@ -52,7 +50,6 @@ interface VariantManager {
 
             // Experiment: Change push notification audience, timing and cadence
             Variant(key = "zv", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zw", weight = 1.0, features = listOf(ModifiedControl), filterBy = { isEnglishLocale() }),
             Variant(key = "zx", weight = 1.0, features = listOf(CompetitiveCopy), filterBy = { isEnglishLocale() }),
             Variant(key = "zy", weight = 1.0, features = listOf(SetupCopy), filterBy = { isEnglishLocale() }),
         )
@@ -185,7 +182,6 @@ class ExperimentationVariantManager(
     }
 }
 
-fun VariantManager.isModifiedControlEnabled() = this.getVariant().hasFeature(ModifiedControl)
 fun VariantManager.isCompetitiveCopyEnabled() = this.getVariant().hasFeature(CompetitiveCopy)
 fun VariantManager.isSetupCopyCopyEnabled() = this.getVariant().hasFeature(SetupCopy)
 
