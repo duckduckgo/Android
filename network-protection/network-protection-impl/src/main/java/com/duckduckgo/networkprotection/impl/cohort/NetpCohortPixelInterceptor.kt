@@ -82,7 +82,6 @@ class NetpCohortPixelInterceptor @Inject constructor(
             "m_netp_ev_waitlist_notification_launched",
             "m_netp_ev_waitlist_enabled",
             "m_netp_ev_terms_accepted",
-            "m_netp_ev_incremental_rollout_test",
         )
     }
 }
