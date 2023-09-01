@@ -22,6 +22,7 @@ import androidx.work.*
 import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.WorkInfo.State.RUNNING
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.DefaultBrowserNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
@@ -48,6 +49,7 @@ class NotificationScheduler(
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
     private val setAsDefaultNotification: SchedulableNotification,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
 ) : AndroidNotificationScheduler {
 
@@ -59,27 +61,31 @@ class NotificationScheduler(
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
         when {
             variantManager.isModifiedControlEnabled() -> {
-                if (privacyNotification.canShow()) {
-                    scheduleNotification(
-                        OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
-                        2L,
-                        TimeUnit.DAYS,
-                        UNUSED_APP_WORK_REQUEST_TAG,
-                    )
+                if (!isWorkScheduled(EXPERIMENT_DEFAULT_BROWSER_WORK_REQUEST_TAG)) {
+                    if (privacyNotification.canShow() && !defaultBrowserDetector.isDefaultBrowser()) {
+                        scheduleNotification(
+                            OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
+                            2L,
+                            TimeUnit.DAYS,
+                            UNUSED_APP_WORK_REQUEST_TAG,
+                        )
+                    }
                 }
             }
             variantManager.isCompetitiveCopyEnabled() -> {
-                if (setAsDefaultNotification.canShow()) {
-                    scheduleNotification(
-                        OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
-                        DEFAULT_BROWSER_DELAY_DURATION_IN_DAYS,
-                        TimeUnit.DAYS,
-                        UNUSED_APP_WORK_REQUEST_TAG,
-                    )
+                if (!isWorkScheduled(EXPERIMENT_DEFAULT_BROWSER_WORK_REQUEST_TAG)) {
+                    if (setAsDefaultNotification.canShow() && !defaultBrowserDetector.isDefaultBrowser()) {
+                        scheduleNotification(
+                            OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
+                            DEFAULT_BROWSER_DELAY_DURATION_IN_DAYS,
+                            TimeUnit.DAYS,
+                            UNUSED_APP_WORK_REQUEST_TAG,
+                        )
+                    }
                 }
             }
             variantManager.isSetupCopyCopyEnabled() -> {
-                if (setAsDefaultNotification.canShow()) {
+                if (setAsDefaultNotification.canShow() && !defaultBrowserDetector.isDefaultBrowser()) {
                     scheduleNotification(
                         OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
                         DEFAULT_BROWSER_DELAY_DURATION_IN_DAYS,
@@ -145,6 +151,7 @@ class NotificationScheduler(
 
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val EXPERIMENT_DEFAULT_BROWSER_WORK_REQUEST_TAG = "com.duckduckgo.notification.defaultbrowser"
         const val CLEAR_DATA_DELAY_DURATION_IN_DAYS = 3L
         const val PRIVACY_DELAY_DURATION_IN_DAYS = 1L
         const val DEFAULT_BROWSER_DELAY_DURATION_IN_DAYS = 2L

@@ -26,6 +26,7 @@ import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,6 +49,7 @@ class AndroidNotificationSchedulerTest {
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
     private val defaultBrowserNotification: SchedulableNotification = mock()
+    private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
     private val mockVariantManager: VariantManager = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -58,12 +60,14 @@ class AndroidNotificationSchedulerTest {
     fun before() {
         initializeWorkManager()
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
         testee = NotificationScheduler(
             workManager,
             clearNotification,
             privacyNotification,
             defaultBrowserNotification,
+            mockDefaultBrowserDetector,
             mockVariantManager,
         )
     }
@@ -163,6 +167,45 @@ class AndroidNotificationSchedulerTest {
         testee.scheduleNextNotification()
 
         assertNotificationScheduled(DefaultBrowserNotificationWorker::class.javaObjectType.name)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
+    }
+
+    @Test
+    fun givenModifiedControlVariantThenPrivacyProtectionIsNotScheduled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zw" })
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNotificationNotScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
+    }
+
+    @Test
+    fun givenCompetitiveCopyVariantWhenBrowserIsSetAsDefaultThenDefaultBrowserIsNotScheduled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zx" })
+        whenever(defaultBrowserNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNotificationNotScheduled(DefaultBrowserNotificationWorker::class.javaObjectType.name)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
+    }
+
+    @Test
+    fun givenSetupCopyVariantWhenBrowserIsSetAsDefaultThenDefaultBrowserIsNotScheduled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zy" })
+        whenever(defaultBrowserNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        testee.scheduleNextNotification()
+
+        assertNotificationNotScheduled(DefaultBrowserNotificationWorker::class.javaObjectType.name)
         assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
     }
 

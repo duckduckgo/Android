@@ -20,10 +20,9 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.*
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.DefaultBrowserNotification
@@ -86,6 +85,7 @@ object NotificationModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         defaultBrowserNotification: DefaultBrowserNotification,
+        defaultBrowserDetector: DefaultBrowserDetector,
         variantManager: VariantManager,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
@@ -93,6 +93,7 @@ object NotificationModule {
             clearDataNotification,
             privacyProtectionNotification,
             defaultBrowserNotification,
+            defaultBrowserDetector,
             variantManager,
         )
     }
