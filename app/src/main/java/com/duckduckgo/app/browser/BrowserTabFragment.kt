@@ -1884,8 +1884,7 @@ class BrowserTabFragment :
             override fun onBackKey(): Boolean {
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
-                //  Allow the event to be handled by the next receiver.
-                return false
+                return true
             }
         }
 

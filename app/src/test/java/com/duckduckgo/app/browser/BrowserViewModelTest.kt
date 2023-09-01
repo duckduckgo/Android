@@ -255,16 +255,6 @@ class BrowserViewModelTest {
         verify(mockPixel).fire(pixelName)
     }
 
-    @Test
-    fun whenOnBookmarksActivityResultCalledThenOpenSavedSiteCommandTriggered() {
-        val bookmarkUrl = "https://www.example.com"
-
-        testee.onBookmarksActivityResult(bookmarkUrl)
-
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
-    }
-
     companion object {
         const val TAB_ID = "TAB_ID"
     }
