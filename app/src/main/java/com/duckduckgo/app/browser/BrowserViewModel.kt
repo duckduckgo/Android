@@ -85,7 +85,6 @@ class BrowserViewModel @Inject constructor(
         data class ShowAppEnjoymentPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppRatingPrompt(val promptCount: PromptCount) : Command()
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
-        data class OpenSavedSite(val url: String) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -276,9 +275,5 @@ class BrowserViewModel @Inject constructor(
 
     fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)
-    }
-
-    fun onBookmarksActivityResult(url: String) {
-        command.value = Command.OpenSavedSite(url)
     }
 }
