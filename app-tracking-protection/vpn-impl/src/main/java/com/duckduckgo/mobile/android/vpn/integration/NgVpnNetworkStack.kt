@@ -23,8 +23,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -58,7 +57,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val runtime: Runtime,
     private val appTrackerDetector: AppTrackerDetector,
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appTpLocalFeature: AppTpLocalFeature,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
@@ -182,7 +181,15 @@ class NgVpnNetworkStack @Inject constructor(
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
         if (tunnelThread == null) {
             logcat { "Start native runtime" }
-            val level = if (appBuildConfig.isDebug || appTpFeatureConfig.isEnabled(AppTpSetting.VerboseLogging)) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
+
+            val level = if (appBuildConfig.isDebug) {
+                VpnNetworkLog.DEBUG
+            } else if (appTpLocalFeature.verboseLogging().isEnabled()) {
+                VpnNetworkLog.INFO
+            } else {
+                VpnNetworkLog.ASSERT
+            }
+
             vpnNetwork.start(jniContext, level)
 
             tunnelThread = Thread {

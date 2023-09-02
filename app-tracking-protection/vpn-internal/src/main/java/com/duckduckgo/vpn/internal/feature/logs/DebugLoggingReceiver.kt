@@ -20,17 +20,14 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
-import com.duckduckgo.mobile.android.vpn.feature.edit
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.logcat
 
 class DebugLoggingReceiver(
@@ -68,7 +65,7 @@ class DebugLoggingReceiver(
 @ContributesMultibinding(VpnScope::class)
 class DebugLoggingReceiverRegister @Inject constructor(
     private val context: Context,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appTpLocalFeature: AppTpLocalFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
@@ -80,37 +77,25 @@ class DebugLoggingReceiverRegister @Inject constructor(
         receiver = DebugLoggingReceiver(context) { intent ->
             when {
                 DebugLoggingReceiver.isLoggingOnIntent(intent) -> {
-                    coroutineScope.launch {
-                        appTpFeatureConfig.edit {
-                            setEnabled(AppTpSetting.VerboseLogging, true, isManualOverride = true)
-                        }
-                        TimberExtensions.enableLogging()
+                    appTpLocalFeature.verboseLogging().setEnabled(Toggle.State(enable = true))
+                    TimberExtensions.enableLogging()
 
-                        // To propagate changes to NetGuard, reconfigure the VPN
-                        withContext(dispatcherProvider.main()) {
-                            Intent("vpn-service").apply {
-                                putExtra("action", "restart")
-                            }.also {
-                                context.sendBroadcast(it)
-                            }
-                        }
+                    // To propagate changes to NetGuard, reconfigure the VPN
+                    Intent("vpn-service").apply {
+                        putExtra("action", "restart")
+                    }.also {
+                        context.sendBroadcast(it)
                     }
                 }
                 DebugLoggingReceiver.isLoggingOffIntent(intent) -> {
-                    coroutineScope.launch {
-                        appTpFeatureConfig.edit {
-                            setEnabled(AppTpSetting.VerboseLogging, false, isManualOverride = true)
-                        }
-                        TimberExtensions.disableLogging()
+                    appTpLocalFeature.verboseLogging().setEnabled(Toggle.State(enable = false))
+                    TimberExtensions.disableLogging()
 
-                        // To propagate changes to NetGuard, reconfigure the VPN
-                        withContext(dispatcherProvider.main()) {
-                            Intent("vpn-service").apply {
-                                putExtra("action", "restart")
-                            }.also {
-                                context.sendBroadcast(it)
-                            }
-                        }
+                    // To propagate changes to NetGuard, reconfigure the VPN
+                    Intent("vpn-service").apply {
+                        putExtra("action", "restart")
+                    }.also {
+                        context.sendBroadcast(it)
                     }
                 }
                 else -> logcat { "Debug receiver DebugLoggingReceiver unknown intent" }
