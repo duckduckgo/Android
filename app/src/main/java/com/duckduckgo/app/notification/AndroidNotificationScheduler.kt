@@ -60,23 +60,45 @@ class NotificationScheduler(
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
         when {
             variantManager.isCompetitiveCopyEnabled() -> {
-                if (setAsDefaultNotification.canShow() && !defaultBrowserDetector.isDefaultBrowser()) {
-                    scheduleNotification(
-                        OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
-                        PRIVACY_DELAY_DURATION_IN_DAYS,
-                        TimeUnit.DAYS,
-                        UNUSED_APP_WORK_REQUEST_TAG,
-                    )
+                if (defaultBrowserDetector.isDefaultBrowser()) {
+                    if (privacyNotification.canShow()) {
+                        scheduleNotification(
+                            OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
+                            PRIVACY_DELAY_DURATION_IN_DAYS,
+                            TimeUnit.DAYS,
+                            UNUSED_APP_WORK_REQUEST_TAG,
+                        )
+                    }
+                } else {
+                    if (setAsDefaultNotification.canShow()) {
+                        scheduleNotification(
+                            OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
+                            PRIVACY_DELAY_DURATION_IN_DAYS,
+                            TimeUnit.DAYS,
+                            UNUSED_APP_WORK_REQUEST_TAG,
+                        )
+                    }
                 }
             }
             variantManager.isSetupCopyCopyEnabled() -> {
-                if (setAsDefaultNotification.canShow() && !defaultBrowserDetector.isDefaultBrowser()) {
-                    scheduleNotification(
-                        OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
-                        PRIVACY_DELAY_DURATION_IN_DAYS,
-                        TimeUnit.DAYS,
-                        UNUSED_APP_WORK_REQUEST_TAG,
-                    )
+                if (defaultBrowserDetector.isDefaultBrowser()) {
+                    if (privacyNotification.canShow()) {
+                        scheduleNotification(
+                            OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
+                            PRIVACY_DELAY_DURATION_IN_DAYS,
+                            TimeUnit.DAYS,
+                            UNUSED_APP_WORK_REQUEST_TAG,
+                        )
+                    }
+                } else {
+                    if (setAsDefaultNotification.canShow()) {
+                        scheduleNotification(
+                            OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
+                            PRIVACY_DELAY_DURATION_IN_DAYS,
+                            TimeUnit.DAYS,
+                            UNUSED_APP_WORK_REQUEST_TAG,
+                        )
+                    }
                 }
             }
             else -> {
