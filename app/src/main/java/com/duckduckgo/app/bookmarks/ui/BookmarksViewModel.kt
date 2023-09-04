@@ -150,17 +150,26 @@ class BookmarksViewModel @Inject constructor(
                 val index = bookmarks.indexOf(savedSite)
                 bookmarks[index] = savedSite.copy(deleted = "1")
                 val bookmarkFolders = viewState.value?.bookmarkFolders!!
+
+                val favourites = viewState.value?.favorites!!.toMutableList()
+                val favourite = favourites.find { it.id == savedSite.id }!!
+                val favouritesIndex = favourites.indexOf(favourite)
+                favourites[favouritesIndex] = favourite.copy(deleted = "1")
+
                 viewState.value = viewState.value?.copy(
+                    favorites = favourites,
                     bookmarks = bookmarks,
                     enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
                 )
             }
+
             is Favorite -> {
                 val favourites = viewState.value?.favorites!!.toMutableList()
                 val index = favourites.indexOf(savedSite)
                 favourites[index] = savedSite.copy(deleted = "1")
+
                 viewState.value = viewState.value?.copy(
-                    favorites = favourites,
+                    favorites = favourites
                 )
             }
         }
@@ -184,7 +193,14 @@ class BookmarksViewModel @Inject constructor(
                 val index = bookmarks.indexOf(bookmark)
                 bookmarks[index] = savedSite.copy(deleted = null)
                 val bookmarkFolders = viewState.value?.bookmarkFolders!!
+
+                val favourites = viewState.value?.favorites!!.toMutableList()
+                val favourite = favourites.find { it.id == savedSite.id }!!
+                val favouriteIndex = favourites.indexOf(favourite)
+                favourites[favouriteIndex] = favourite.copy(deleted = null)
+
                 viewState.value = viewState.value?.copy(
+                    favorites = favourites,
                     bookmarks = bookmarks,
                     enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
                 )
@@ -194,8 +210,16 @@ class BookmarksViewModel @Inject constructor(
                 val favourite = favourites.find { it.id == savedSite.id }
                 val index = favourites.indexOf(favourite)
                 favourites[index] = savedSite.copy(deleted = null)
+
+                val bookmarks = viewState.value?.bookmarks!!.toMutableList()
+                val bookmark = bookmarks.find { it.id == savedSite.id }!!
+                val bookmarkIndex = bookmarks.indexOf(bookmark)
+                bookmarks[bookmarkIndex] = bookmark.copy(deleted = null)
+                val bookmarkFolders = viewState.value?.bookmarkFolders!!
                 viewState.value = viewState.value?.copy(
                     favorites = favourites,
+                    bookmarks = bookmarks,
+                    enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
                 )
             }
         }
