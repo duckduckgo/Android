@@ -169,7 +169,7 @@ class BookmarksViewModel @Inject constructor(
                 favourites[index] = savedSite.copy(deleted = "1")
 
                 viewState.value = viewState.value?.copy(
-                    favorites = favourites
+                    favorites = favourites,
                 )
             }
         }

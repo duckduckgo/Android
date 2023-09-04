@@ -28,7 +28,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
-import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
@@ -74,8 +73,8 @@ class BookmarksViewModelTest {
     private val pixel: Pixel = mock()
 
     private val bookmark =
-        SavedSite.Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
-    private val favorite = SavedSite.Favorite(id = "favorite1", title = "title", url = "www.example.com", position = 0, lastModified = "timestamp")
+        Bookmark(id = "bookmark1", title = "title", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+    private val favorite = Favorite(id = "bookmark1", title = "title", url = "www.example.com", position = 0, lastModified = "timestamp")
     private val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
     private val bookmarkFolderItem = BookmarkFolderItem(0, bookmarkFolder, true)
 
@@ -95,7 +94,7 @@ class BookmarksViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf())
+        whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite)))
 
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
             flowOf(
