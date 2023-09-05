@@ -74,8 +74,10 @@ object NotificationModule {
         context: Context,
         notificationDao: NotificationDao,
         variantManager: VariantManager,
+        defaultBrowserDetector: DefaultBrowserDetector,
+        privacyProtectionNotification: PrivacyProtectionNotification,
     ): DefaultBrowserNotification {
-        return DefaultBrowserNotification(context, notificationDao, variantManager)
+        return DefaultBrowserNotification(context, notificationDao, variantManager, defaultBrowserDetector, privacyProtectionNotification)
     }
 
     @Provides
@@ -85,7 +87,6 @@ object NotificationModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         defaultBrowserNotification: DefaultBrowserNotification,
-        defaultBrowserDetector: DefaultBrowserDetector,
         variantManager: VariantManager,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
@@ -93,7 +94,6 @@ object NotificationModule {
             clearDataNotification,
             privacyProtectionNotification,
             defaultBrowserNotification,
-            defaultBrowserDetector,
             variantManager,
         )
     }

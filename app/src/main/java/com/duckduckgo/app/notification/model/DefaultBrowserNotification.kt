@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
@@ -40,6 +41,8 @@ class DefaultBrowserNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
     private val variantManager: VariantManager,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val privacyProtectionNotification: PrivacyProtectionNotification,
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.defaultbrowser"
@@ -51,14 +54,18 @@ class DefaultBrowserNotification(
     override suspend fun buildSpecification(): NotificationSpec {
         val title: String
         val description: String
-        if (variantManager.isCompetitiveCopyEnabled()) {
-            title = context.getString(R.string.setAsDefaultCompetitiveCopyNotificationTitle)
-            description = context.getString(R.string.setAsDefaultCompetitiveCopyNotificationDescription)
+        return if (defaultBrowserDetector.isDefaultBrowser()) {
+            privacyProtectionNotification.buildSpecification()
         } else {
-            title = context.getString(R.string.setAsDefaultSetupCopyNotificationTitle)
-            description = context.getString(R.string.setAsDefaultSetupCopyNotificationDescription)
+            if (variantManager.isCompetitiveCopyEnabled()) {
+                title = context.getString(R.string.setAsDefaultCompetitiveCopyNotificationTitle)
+                description = context.getString(R.string.setAsDefaultCompetitiveCopyNotificationDescription)
+            } else {
+                title = context.getString(R.string.setAsDefaultSetupCopyNotificationTitle)
+                description = context.getString(R.string.setAsDefaultSetupCopyNotificationDescription)
+            }
+            DefaultBrowserNotificationSpecification(title, description)
         }
-        return DefaultBrowserNotificationSpecification(title, description)
     }
 }
 
