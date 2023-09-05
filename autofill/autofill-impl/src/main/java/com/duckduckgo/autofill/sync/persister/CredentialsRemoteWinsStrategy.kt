@@ -34,7 +34,7 @@ class CredentialsRemoteWinsStrategy constructor(
     override fun processEntries(
         credentials: credentialsSyncEntries,
         clientModifiedSince: String,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         Timber.d("Sync-autofill-Persist: ======= MERGING REMOTEWINS =======")
         return kotlin.runCatching {
             runBlocking(dispatchers.io()) {
@@ -52,7 +52,7 @@ class CredentialsRemoteWinsStrategy constructor(
             return Error(reason = "RemoteWins merge failed with error $it")
         }.let {
             Timber.d("Sync-autofill-Persist: merging completed")
-            Success(true)
+            Success()
         }
     }
 

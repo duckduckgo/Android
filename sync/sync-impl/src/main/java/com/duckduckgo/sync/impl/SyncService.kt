@@ -156,4 +156,5 @@ data class ErrorResponse(
 enum class API_CODE(val code: Int) {
     INVALID_LOGIN_CREDENTIALS(401),
     NOT_MODIFIED(304),
+    COUNT_LIMIT(409),
 }

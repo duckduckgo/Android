@@ -24,7 +24,11 @@ sealed class ModifiedSince(open val value: String) {
 }
 
 // TODO: https://app.asana.com/0/0/1204958251694095/f
-data class SyncChangesRequest(val type: SyncableType, val jsonString: String, val modifiedSince: ModifiedSince) {
+data class SyncChangesRequest(
+    val type: SyncableType,
+    val jsonString: String,
+    val modifiedSince: ModifiedSince,
+) {
 
     fun isEmpty(): Boolean {
         return this.jsonString.isEmpty()
@@ -41,7 +45,10 @@ data class SyncChangesRequest(val type: SyncableType, val jsonString: String, va
     }
 }
 
-data class SyncChangesResponse(val type: SyncableType, val jsonString: String) {
+data class SyncChangesResponse(
+    val type: SyncableType,
+    val jsonString: String,
+) {
 
     companion object {
         fun empty(type: SyncableType): SyncChangesResponse {
@@ -56,17 +63,20 @@ enum class SyncableType(val field: String) {
 }
 
 // TODO: document api, when is it expected each case? https://app.asana.com/0/0/1204958251694095/f
-sealed class SyncMergeResult<out R> {
+sealed class SyncMergeResult {
 
-    data class Success<out T>(val data: T) : SyncMergeResult<T>()
+    data class Success(
+        val orphans: Boolean = false,
+    ) : SyncMergeResult()
+
     data class Error(
         val code: Int = -1,
         val reason: String,
-    ) : SyncMergeResult<Nothing>()
+    ) : SyncMergeResult()
 
     override fun toString(): String {
         return when (this) {
-            is Success<*> -> "Success[data=$data]"
+            is Success -> "Success[orphans=$orphans]"
             is Error -> "Error[exception=$code, $reason]"
         }
     }

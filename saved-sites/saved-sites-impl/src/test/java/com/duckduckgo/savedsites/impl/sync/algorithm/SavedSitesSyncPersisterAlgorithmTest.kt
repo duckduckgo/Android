@@ -30,10 +30,14 @@ import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
 import com.duckduckgo.savedsites.impl.sync.SyncFolderChildren
 import com.duckduckgo.sync.api.SyncCrypto
+import com.duckduckgo.sync.api.engine.SyncMergeResult
+import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,6 +45,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
@@ -179,7 +184,12 @@ class SavedSitesSyncPersisterAlgorithmTest {
             ),
             twoHoursAgo,
         )
-        algorithm.processEntries(someEntries, LOCAL_WINS)
+
+        val result = algorithm.processEntries(someEntries, LOCAL_WINS)
+
+        assertTrue(result is Success)
+        val success = result as Success
+        assertFalse(success.orphans)
 
         verify(localStrategy).processBookmarkFolder(folder)
         verify(localStrategy).processBookmark(bookmark, folder.id)
@@ -187,6 +197,28 @@ class SavedSitesSyncPersisterAlgorithmTest {
         verifyNoInteractions(timestampStrategy)
         verifyNoInteractions(remoteStrategy)
         verifyNoInteractions(deduplicationStrategy)
+    }
+
+    @Test
+    fun whenProcessingOrphansThenResultIsSuccess() {
+        val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = twoHoursAgo, parentId = SavedSitesNames.BOOKMARKS_ROOT)
+        val bookmark = Bookmark(id = "bookmark1", title = "title", url = "foo.com", lastModified = twoHoursAgo, parentId = folder.id)
+        val someEntries = SyncBookmarkEntries(
+            listOf(
+                fromSavedSite(bookmark),
+            ),
+            twoHoursAgo,
+        )
+
+        whenever(repository.getSavedSite(bookmark.id)).thenReturn(null)
+
+        algorithm.processEntries(someEntries, LOCAL_WINS)
+
+        val result = algorithm.processEntries(someEntries, LOCAL_WINS)
+
+        assertTrue(result is SyncMergeResult.Success)
+        val success = result as SyncMergeResult.Success
+        assertTrue(success.orphans)
     }
 
     private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {

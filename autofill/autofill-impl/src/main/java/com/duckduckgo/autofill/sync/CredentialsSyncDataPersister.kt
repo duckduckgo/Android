@@ -47,7 +47,7 @@ class CredentialsSyncDataPersister @Inject constructor(
     override fun persist(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         if (appBuildConfig.isInternalBuild()) checkMainThread()
 
         return if (changes.type == CREDENTIALS) {
@@ -64,7 +64,7 @@ class CredentialsSyncDataPersister @Inject constructor(
     private fun process(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         if (changes.jsonString.isEmpty()) {
             Timber.d("Sync-autofill-Persist: merging completed, no entries to merge")
             return Success(false)
@@ -97,7 +97,7 @@ class CredentialsSyncDataPersister @Inject constructor(
     private fun processEntries(
         credentials: credentialsSyncEntries,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         credentialsSyncStore.serverModifiedSince = credentials.last_modified
         credentialsSyncStore.clientModifiedSince = credentialsSyncStore.startTimeStamp
         Timber.d("Sync-autofill-Persist: updating credentials server last_modified to ${credentialsSyncStore.serverModifiedSince}")

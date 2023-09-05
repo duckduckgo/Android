@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
@@ -49,13 +50,14 @@ internal class SyncEngineTest {
     private val syncApiClient: SyncApiClient = mock()
     private val syncScheduler: SyncScheduler = mock()
     private val syncStateRepository: SyncStateRepository = mock()
+    private val syncPixels: SyncPixels = mock()
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
     private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
     fun before() {
-        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, providerPlugins, persisterPlugins)
+        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, syncPixels, providerPlugins, persisterPlugins)
     }
 
     @Test
@@ -366,6 +368,19 @@ internal class SyncEngineTest {
         whenever(syncStateRepository.current()).thenReturn(SyncAttempt(state = IN_PROGRESS))
         syncEngine.triggerSync(DATA_CHANGE)
         verifyNoInteractions(syncApiClient)
+    }
+
+    @Test
+    fun whenPersistingChangesAndOrphansPresentThenPixelIsSent() {
+        givenLocalChanges()
+        givenGetSuccess()
+        givenPatchSuccess()
+
+        whenever(persisterPlugins.getPlugins()).thenReturn(listOf(FakeSyncableDataPersister(true)))
+
+        syncEngine.triggerSync(FEATURE_READ)
+
+        verify(syncPixels).fireOrphanPresentPixel(any())
     }
 
     private fun givenNoLocalChanges() {

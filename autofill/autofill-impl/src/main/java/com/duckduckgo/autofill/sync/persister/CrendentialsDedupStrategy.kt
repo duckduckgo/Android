@@ -34,7 +34,7 @@ class CredentialsDedupStrategy(
     override fun processEntries(
         credentials: credentialsSyncEntries,
         clientModifiedSince: String,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         Timber.d("Sync-autofill-Persist: ======= MERGING DEDUPLICATION =======")
 
         return kotlin.runCatching {
@@ -62,7 +62,7 @@ class CredentialsDedupStrategy(
             return Error(reason = "DeDup merge failed with error $it")
         }.let {
             Timber.d("Sync-autofill-Persist: merging completed")
-            Success(true)
+            Success()
         }
     }
 

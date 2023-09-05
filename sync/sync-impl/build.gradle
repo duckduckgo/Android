@@ -33,6 +33,7 @@ dependencies {
 
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':privacy-config-api')
+    implementation project(':statistics')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')

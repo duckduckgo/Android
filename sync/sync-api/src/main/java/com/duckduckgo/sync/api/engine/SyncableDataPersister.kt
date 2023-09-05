@@ -25,7 +25,7 @@ interface SyncableDataPersister {
     fun persist(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean>
+    ): SyncMergeResult
 
     /**
      * Sync Feature has been disabled / device has been removed
