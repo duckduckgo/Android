@@ -361,6 +361,7 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
     androidTestImplementation AndroidX.work.testing
+    testImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
     // Dagger

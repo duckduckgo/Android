@@ -16,12 +16,14 @@
 
 package com.duckduckgo.app.settings
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -107,6 +109,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
+    private var defaultBrowserLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        val isBrowserSetAsDefault: Boolean = result.resultCode == Activity.RESULT_OK
+        viewModel.onDefaultBrowserSetFromDialog(isBrowserSetAsDefault)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -119,7 +126,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
-            viewModel.onLaunchedFromNotification(it)
+            viewModel.onLaunchedFromNotification(it, this)
         }
     }
 
@@ -244,8 +251,13 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             is Command.LaunchAboutScreen -> launchAboutScreen()
+            is Command.ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
             null -> TODO()
         }
+    }
+
+    private fun showDefaultBrowserDialog(intent: Intent) {
+        defaultBrowserLauncher.launch(intent)
     }
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
