@@ -22,5 +22,5 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 
 interface CredentialsMergeStrategy {
     @WorkerThread
-    fun processEntries(credentials: credentialsSyncEntries, clientModifiedSince: String): SyncMergeResult<Boolean>
+    fun processEntries(credentials: credentialsSyncEntries, clientModifiedSince: String): SyncMergeResult
 }

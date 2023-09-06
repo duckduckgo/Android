@@ -43,7 +43,7 @@ interface SavedSitesSyncPersisterAlgorithm {
     fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean>
+    ): SyncMergeResult
 }
 
 @ContributesBinding(AppScope::class)
@@ -58,8 +58,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     override fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
-        val processIds: MutableList<String> = mutableListOf()
+    ): SyncMergeResult {
+        var orphans = false
+
+        val processIds: MutableList<String> = mutableListOf(SavedSitesNames.BOOKMARKS_ROOT)
         val allResponseIds = bookmarks.entries.filterNot { it.deleted != null }.map { it.id }
         val allFolders = bookmarks.entries.filter { it.isFolder() }.filterNot { it.id == SavedSitesNames.FAVORITES_ROOT }
         val allFolderIds = allFolders.map { it.id }
@@ -77,6 +79,9 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         // check all children, the ones that are not in allFolders don't have a parent
         val foldersWithoutParent = allFolderIds.filterNot { allChildren.contains(it) }
         foldersWithoutParent.forEach { folderId ->
+            if (repository.getFolder(folderId) != null) {
+                processIds.add(folderId)
+            }
             processFolder(folderId, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
         }
 
@@ -84,7 +89,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         val allBookmarkIds = bookmarks.entries.filter { it.isBookmark() }.map { it.id }
         val bookmarksWithoutParent = allBookmarkIds.filterNot { allChildren.contains(it) }
         bookmarksWithoutParent.forEach { bookmarkId ->
-            processBookmark(
+            if (repository.getSavedSite(bookmarkId) != null) {
+                processIds.add(bookmarkId)
+            }
+            processChild(
                 conflictResolution,
                 bookmarkId,
                 processIds,
@@ -106,9 +114,12 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         }
 
         val unprocessedIds = allResponseIds.filterNot { processIds.contains(it) }
-        Timber.d("Sync-Feature: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
+        if (unprocessedIds.isNotEmpty()) {
+            orphans = true
+            Timber.d("Sync-Feature: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
+        }
 
-        return SyncMergeResult.Success(true)
+        return SyncMergeResult.Success(orphans = orphans)
     }
 
     private fun processFolder(
@@ -124,9 +135,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             Timber.d("Sync-Feature: processing folder $folderId with parentId $parentId")
             Timber.d("Sync-Feature: can't find folder $folderId")
         } else {
-            processBookmarkFolder(conflictResolution, remoteFolder, parentId, lastModified, processIds)
+            processBookmarkFolder(conflictResolution, remoteFolder, parentId, lastModified)
             remoteFolder.folder?.children?.forEach { child ->
-                processBookmark(conflictResolution, child, processIds, remoteUpdates, folderId, lastModified)
+                processIds.add(child)
+                processChild(conflictResolution, child, processIds, remoteUpdates, folderId, lastModified)
             }
         }
     }
@@ -136,7 +148,6 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         remoteFolder: SyncBookmarkEntry,
         parentId: String,
         lastModified: String,
-        processIds: MutableList<String>,
     ) {
         val folder = decryptFolder(remoteFolder, parentId, lastModified)
         if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT) {
@@ -148,10 +159,9 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 TIMESTAMP -> timestampStrategy.processBookmarkFolder(folder)
             }
         }
-        processIds.add(folder.id)
     }
 
-    private fun processBookmark(
+    private fun processChild(
         conflictResolution: SyncConflictResolution,
         child: String,
         processIds: MutableList<String>,
@@ -160,21 +170,13 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         lastModified: String,
     ) {
         Timber.d("Sync-Feature: processing id $child")
-        processIds.add(child)
         val childEntry = entries.find { it.id == child }
         if (childEntry == null) {
             Timber.d("Sync-Feature: id $child not present in the payload, omitting")
         } else {
             when {
                 childEntry.isBookmark() -> {
-                    Timber.d("Sync-Feature: child $child is a Bookmark")
-                    val bookmark = decryptBookmark(childEntry, folderId, lastModified)
-                    when (conflictResolution) {
-                        DEDUPLICATION -> deduplicationStrategy.processBookmark(bookmark, folderId)
-                        REMOTE_WINS -> remoteWinsStrategy.processBookmark(bookmark, folderId)
-                        LOCAL_WINS -> localWinsStrategy.processBookmark(bookmark, folderId)
-                        TIMESTAMP -> timestampStrategy.processBookmark(bookmark, folderId)
-                    }
+                    processBookmark(childEntry, conflictResolution, folderId, lastModified)
                 }
 
                 childEntry.isFolder() -> {
@@ -182,6 +184,22 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                     processFolder(childEntry.id, folderId, entries, lastModified, processIds, conflictResolution)
                 }
             }
+        }
+    }
+
+    private fun processBookmark(
+        childEntry: SyncBookmarkEntry,
+        conflictResolution: SyncConflictResolution,
+        folderId: String,
+        lastModified: String,
+    ) {
+        Timber.d("Sync-Feature: child ${childEntry.id} is a Bookmark")
+        val bookmark = decryptBookmark(childEntry, folderId, lastModified)
+        when (conflictResolution) {
+            DEDUPLICATION -> deduplicationStrategy.processBookmark(bookmark, folderId)
+            REMOTE_WINS -> remoteWinsStrategy.processBookmark(bookmark, folderId)
+            LOCAL_WINS -> localWinsStrategy.processBookmark(bookmark, folderId)
+            TIMESTAMP -> timestampStrategy.processBookmark(bookmark, folderId)
         }
     }
 

@@ -21,13 +21,13 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 
-class FakeSyncableDataPersister() : SyncableDataPersister {
+class FakeSyncableDataPersister(private val orphans: Boolean = false) : SyncableDataPersister {
 
     override fun persist(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
-        return SyncMergeResult.Success(false)
+    ): SyncMergeResult {
+        return SyncMergeResult.Success(orphans)
     }
 
     override fun onSyncDisabled() {
