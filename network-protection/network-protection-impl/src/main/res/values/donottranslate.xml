@@ -205,7 +205,7 @@
     <string name="netpTermAnswerSeven">• The service is in beta, and we are regularly changing it.\n• Service coverage, speed, server locations, and quality may vary without warning.</string>
 
     <string name="netpTermQuestionEight">We need your feedback.</string>
-    <string name="netpTermAnswerEight">• The service is in beta, and we are regularly changing it.\n• Service coverage, speed, server locations, and quality may vary without warning.</string>
+    <string name="netpTermAnswerEight">• You may be asked during the beta period to provide feedback about your experience. Doing so is optional and your feedback may be used to improve the service.\n• If you have enabled notifications for the DuckDuckGo app, we may use notifications to ask about your experience. You can disable notifications if you do not want to receive them.</string>
 
     <string name="netpPrivacyQuestionOne">We don’t ask for any personal information from you in order to use this beta service.</string>
     <string name="netpPrivacyAnswerOne">• This Privacy Policy is for our limited waitlist beta VPN product.\n• Our main <a href="https://duckduckgo.com/privacy">Privacy Policy</a> also applies here.</string>
