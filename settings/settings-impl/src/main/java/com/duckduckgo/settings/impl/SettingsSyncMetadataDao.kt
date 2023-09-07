@@ -34,12 +34,6 @@ interface SettingsSyncMetadataDao {
     @Query("select * from settings_sync_meta where modified_at > :since")
     fun getChangesSince(since: String): List<SettingsSyncMetadataEntity>
 
-    @Query("select * from settings_sync_meta where deleted_at >= :since")
-    fun getRemovedEntitiesSince(since: String): List<SettingsSyncMetadataEntity>
-
-    @Query("Delete from settings_sync_meta where deleted_at <= :before")
-    fun removeDeletedEntities(before: String)
-
     @Query("Delete from settings_sync_meta")
     fun removeAll()
 

@@ -65,7 +65,6 @@ class SettingsSyncDataPersister @Inject constructor(
     ): SyncMergeResult {
         if (changes.jsonString.isEmpty()) {
             Timber.i("Sync-Settings: jsonString is empty")
-            // update timestamps
             return Success()
         }
 
@@ -84,6 +83,7 @@ class SettingsSyncDataPersister @Inject constructor(
             syncSettingsSyncStore.clientModifiedSince = syncSettingsSyncStore.startTimeStamp
 
             if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
+                // first sync has a special case: ensure we send next time settings not updated during deduplication
                 settingsSyncMetadataDao.getAllObservable().firstOrNull()?.filter { it.modified_at != null }?.forEach {
                     Timber.i("Sync-Settings: post-dedup update timestamp for ${it.key} so we can send them next time")
                     settingsSyncMetadataDao.addOrUpdate(
@@ -91,9 +91,6 @@ class SettingsSyncDataPersister @Inject constructor(
                     )
                 }
             }
-            // prune metadata objects?
-            // should prune deleted objects?
-            // should nullify timestamps?
         }
 
         Timber.i("Sync-Settings: process() result=$result")
@@ -117,7 +114,7 @@ class SettingsSyncDataPersister @Inject constructor(
                         val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it) }
                         syncableFeature.mergeRemote(decryptedValue)
                     }
-                    if (valueUpdated) { // TODO: do we need this?
+                    if (valueUpdated) {
                         settingsSyncMetadataDao.addOrUpdate(
                             SettingsSyncMetadataEntity(
                                 key = entry.key,
@@ -127,13 +124,10 @@ class SettingsSyncDataPersister @Inject constructor(
                         )
                     }
                 }
-                SyncConflictResolution.REMOTE_WINS -> applyChanges(syncableFeature, entry)
-                SyncConflictResolution.LOCAL_WINS -> applyChanges(syncableFeature, entry)
-                SyncConflictResolution.TIMESTAMP -> applyChanges(syncableFeature, entry)
+                else -> applyChanges(syncableFeature, entry)
             }
         }
 
-        // TODO: should we do error handling per setting?
         return Success()
     }
 
@@ -141,9 +135,9 @@ class SettingsSyncDataPersister @Inject constructor(
         val localCredential = settingsSyncMetadataDao.get(entry.key)
         val clientModifiedSinceMillis =
             runCatching { DatabaseDateFormatter.parseIso8601ToMillis(syncSettingsSyncStore.startTimeStamp) }.getOrDefault(0)
-        val entitiyModifiedMillis =
+        val entityModifiedMillis =
             runCatching { DatabaseDateFormatter.parseIso8601ToMillis(localCredential?.modified_at.orEmpty()) }.getOrDefault(0)
-        val hasDataChangedWhileSyncing = entitiyModifiedMillis > clientModifiedSinceMillis
+        val hasDataChangedWhileSyncing = entityModifiedMillis > clientModifiedSinceMillis
         if (hasDataChangedWhileSyncing) return SyncMergeResult.Error(reason = "Data changed while syncing")
 
         if (entry.isDeleted()) {

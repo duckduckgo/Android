@@ -105,7 +105,7 @@ class EmailSync @Inject constructor(
 }
 
 class DuckAddressSetting(
-    val username: String,//TODO: change this
+    val username: String,
     val personal_access_token: String,
 )
 

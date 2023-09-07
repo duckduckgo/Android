@@ -38,7 +38,6 @@ dependencies {
     implementation JakeWharton.timber
 
     implementation KotlinX.coroutines.core
-    implementation AndroidX.fragment.ktx
 
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"

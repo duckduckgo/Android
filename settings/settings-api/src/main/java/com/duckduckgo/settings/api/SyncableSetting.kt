@@ -16,6 +16,7 @@
 
 package com.duckduckgo.settings.api
 
+//TODO: document api
 interface SyncableSetting {
     val key: String
     fun getValue(): String?

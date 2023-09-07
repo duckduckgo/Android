@@ -16,6 +16,7 @@
 
 package com.duckduckgo.settings.api
 
+//TODO: document api
 interface SyncSettingsListener {
     fun onSettingChanged(settingKey: String)
 }

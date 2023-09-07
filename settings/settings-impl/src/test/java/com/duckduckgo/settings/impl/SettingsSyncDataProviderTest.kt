@@ -203,6 +203,10 @@ open class FakeSyncableSetting() : SyncableSetting {
     override fun registerToRemoteChanges(onDataChanged: () -> Unit) {
         TODO("Not yet implemented")
     }
+
+    override fun onSettingChanged() {
+        TODO("Not yet implemented")
+    }
 }
 
 class FakeCrypto : SyncCrypto {
