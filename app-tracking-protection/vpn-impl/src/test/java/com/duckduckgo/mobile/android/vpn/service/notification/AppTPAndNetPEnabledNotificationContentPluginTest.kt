@@ -96,7 +96,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).")
-        content.assertMessageEquals("")
         assertNull(content.notificationAction)
     }
 
@@ -109,7 +108,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
-        content.assertMessageEquals("")
         assertNull(content.notificationAction)
     }
 
@@ -137,7 +135,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -156,7 +153,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("Device traffic routing through Stockholm, SE. Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -181,7 +177,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Device traffic routing through Stockholm, SE. Tracking attempts blocked across 2 apps (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -206,7 +201,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Device traffic routing through the VPN. Tracking attempts blocked across 2 apps (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -222,7 +216,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -238,7 +231,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -257,7 +249,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Device traffic routing through Stockholm, SE. Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -276,7 +267,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Device traffic routing through the VPN. Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }

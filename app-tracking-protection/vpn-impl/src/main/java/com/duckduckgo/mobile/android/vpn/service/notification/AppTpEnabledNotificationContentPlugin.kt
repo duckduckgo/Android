@@ -58,7 +58,6 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
         return if (isActive()) {
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
-                message = SpannableStringBuilder(),
                 onNotificationPressIntent = notificationPendingIntent,
                 notificationAction = null,
             )
@@ -85,7 +84,6 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
                 }
                 VpnEnabledNotificationContent(
                     title = SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
-                    message = SpannableStringBuilder(),
                     notificationAction = NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),
                     onNotificationPressIntent = if (isEnabled) notificationPendingIntent else null,
                 )
