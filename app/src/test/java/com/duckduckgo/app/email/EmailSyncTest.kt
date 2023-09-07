@@ -102,5 +102,4 @@ class EmailSyncTest {
         private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val adapter: JsonAdapter<DuckAddressSetting> = moshi.adapter(DuckAddressSetting::class.java).lenient()
     }
-
 }

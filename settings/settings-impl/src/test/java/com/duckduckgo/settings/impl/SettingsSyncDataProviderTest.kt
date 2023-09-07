@@ -20,7 +20,6 @@ import org.junit.*
 import org.junit.Assert.*
 import org.junit.Ignore
 import org.junit.runner.*
-import java.util.AbstractSet
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -66,19 +65,19 @@ class SettingsSyncDataProviderTest {
     @Test
     fun whenGetChangesForFirstTimeThenExistingMetadataUpdated() = runTest {
         metadataDao.addOrUpdate(
-            SettingsSyncMetadataEntity(duckAddressSetting.key, "", "")
+            SettingsSyncMetadataEntity(duckAddressSetting.key, "", ""),
         )
         syncableSettingsPP.syncableSettings.add(
             FakeSyncableSetting().apply {
                 key = "new_setting"
-            }
+            },
         )
         assertTrue(metadataDao.getAllObservable().first().size == 1)
 
         testee.getChanges()
 
         assertTrue(metadataDao.getAllObservable().first().size == 2)
-        val duckAddressMetadata = metadataDao.getAllObservable().first().find { it.key==duckAddressSetting.key }
+        val duckAddressMetadata = metadataDao.getAllObservable().first().find { it.key == duckAddressSetting.key }
         assertTrue(duckAddressMetadata?.modified_at.isNullOrEmpty().not())
     }
 
@@ -86,7 +85,7 @@ class SettingsSyncDataProviderTest {
     fun whenGetChangesForFirstSyncThenChangesIncludeAllValues() {
         val changes = testee.getChanges()
 
-        assertTrue(changes.type==SyncableType.SETTINGS)
+        assertTrue(changes.type == SyncableType.SETTINGS)
         patchAdapter.fromJson(changes.jsonString)?.let { patch ->
             assertEquals(1, patch.settings.updates.size)
             assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
@@ -104,7 +103,7 @@ class SettingsSyncDataProviderTest {
 
         val changes = testee.getChanges()
 
-        assertTrue(changes.type==SyncableType.SETTINGS)
+        assertTrue(changes.type == SyncableType.SETTINGS)
         patchAdapter.fromJson(changes.jsonString)?.let { patch ->
             assertEquals(1, patch.settings.updates.size)
             assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
@@ -122,7 +121,7 @@ class SettingsSyncDataProviderTest {
 
         val changes = testee.getChanges()
 
-        assertTrue(changes.type==SyncableType.SETTINGS)
+        assertTrue(changes.type == SyncableType.SETTINGS)
         assertTrue(changes.jsonString.isEmpty())
         assertTrue(changes.modifiedSince is ModifiedSince.Timestamp)
     }
@@ -133,7 +132,7 @@ class SettingsSyncDataProviderTest {
 
         val changes = testee.getChanges()
 
-        assertTrue(changes.type==SyncableType.SETTINGS)
+        assertTrue(changes.type == SyncableType.SETTINGS)
         patchAdapter.fromJson(changes.jsonString)?.let { patch ->
             assertEquals(1, patch.settings.updates.size)
             assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
@@ -149,7 +148,7 @@ class SettingsSyncDataProviderTest {
 
         val changes = testee.getChanges()
 
-        assertTrue(changes.type==SyncableType.SETTINGS)
+        assertTrue(changes.type == SyncableType.SETTINGS)
         patchAdapter.fromJson(changes.jsonString)?.let { patch ->
             assertEquals(1, patch.settings.updates.size)
             assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
@@ -168,7 +167,7 @@ class SettingsSyncDataProviderTest {
 
         val changes = testee.getChanges()
 
-        assertTrue(changes.type==SyncableType.SETTINGS)
+        assertTrue(changes.type == SyncableType.SETTINGS)
         patchAdapter.fromJson(changes.jsonString)?.let { patch ->
             assertEquals(1, patch.settings.updates.size)
             assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
@@ -221,8 +220,8 @@ class FakeSettingsSyncStore : SettingsSyncStore {
 }
 
 class SyncableSettingsPluginPoint(
-    val syncableSettings: MutableList<SyncableSetting>
-): PluginPoint<SyncableSetting> {
+    val syncableSettings: MutableList<SyncableSetting>,
+) : PluginPoint<SyncableSetting> {
     override fun getPlugins(): Collection<SyncableSetting> {
         return syncableSettings
     }

@@ -20,18 +20,18 @@ import com.duckduckgo.di.scopes.*
 import com.duckduckgo.settings.api.*
 import com.squareup.anvil.annotations.*
 import dagger.*
-import timber.log.*
 import javax.inject.Inject
+import timber.log.*
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class SyncSettingListener @Inject constructor(
     private val syncMetadataDao: SettingsSyncMetadataDao,
-): SyncSettingsListener {
+) : SyncSettingsListener {
     override fun onSettingChanged(settingKey: String) {
         Timber.i("Sync-Settings: onSettingChanged($settingKey)")
         val entity = SettingsSyncMetadataEntity(
-            key = settingKey ,
+            key = settingKey,
             modified_at = SyncDateProvider.now(),
             deleted_at = null,
         )

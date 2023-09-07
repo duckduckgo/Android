@@ -28,8 +28,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import timber.log.Timber
 import javax.inject.*
+import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SettingsSyncDataProvider @Inject constructor(
@@ -47,13 +47,13 @@ class SettingsSyncDataProvider @Inject constructor(
 
         val since = settingsSyncStore.clientModifiedSince
         val updates = getUpdatesSince(syncableSettings, since)
-        Timber.i("Sync-Settings: getChanges() since=$since updates=${updates}")
+        Timber.i("Sync-Settings: getChanges() since=$since updates=$updates")
         return formatUpdates(updates)
     }
 
     private fun getUpdatesSince(
         syncableSettings: Collection<SyncableSetting>,
-        clientModifiedSince: String
+        clientModifiedSince: String,
     ): List<SettingEntry> {
         settingsSyncStore.startTimeStamp = SyncDateProvider.now()
 
@@ -80,10 +80,10 @@ class SettingsSyncDataProvider @Inject constructor(
             }
         } else {
             val settingsToUpdate = settingsSyncMetadataDao.getChangesSince(clientModifiedSince)
-            //TODO: missing case for settings added later on, how to detect them?
+            // TODO: missing case for settings added later on, how to detect them?
             syncableSettings.forEach { setting ->
                 val metadata = settingsToUpdate.find { it.key == setting.key } ?: return@forEach
-                Timber.i("Sync-Settings: changes since=$clientModifiedSince metadata=${metadata}")
+                Timber.i("Sync-Settings: changes since=$clientModifiedSince metadata=$metadata")
                 setting.getValue()?.let { value ->
                     Timber.i("Sync-Settings: adding changed update key ${setting.key} value=$value")
                     updates.add(
@@ -114,7 +114,7 @@ class SettingsSyncDataProvider @Inject constructor(
             ModifiedSince.Timestamp(settingsSyncStore.serverModifiedSince)
         }
 
-        Timber.i("Sync-Settings: formatUpdates() modifiedSince=$modifiedSince updates=${updates}")
+        Timber.i("Sync-Settings: formatUpdates() modifiedSince=$modifiedSince updates=$updates")
 
         return if (updates.isEmpty()) {
             SyncChangesRequest(SETTINGS, "", modifiedSince)

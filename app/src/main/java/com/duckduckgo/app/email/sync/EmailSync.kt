@@ -24,8 +24,8 @@ import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.*
-import timber.log.*
 import javax.inject.*
+import timber.log.*
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncableSetting::class)
@@ -53,7 +53,7 @@ class EmailSync @Inject constructor(
     override fun save(value: String?): Boolean {
         Timber.i("Sync-Settings: save($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
-        if (duckAddressSetting!=null) {
+        if (duckAddressSetting != null) {
             val duckAddress = duckAddressSetting.main_duck_address
             val personalAccessToken = duckAddressSetting.personal_access_token
             storeNewCredentials(duckAddress, personalAccessToken)
@@ -67,11 +67,11 @@ class EmailSync @Inject constructor(
     override fun mergeRemote(value: String?): Boolean {
         Timber.i("Sync-Settings: mergeRemote($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
-        if (duckAddressSetting!=null) {
+        if (duckAddressSetting != null) {
             val duckAddress = duckAddressSetting.main_duck_address
             val personalAccessToken = duckAddressSetting.personal_access_token
             if (!emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()) {
-                if (duckAddress!=emailDataStore.emailUsername) {
+                if (duckAddress != emailDataStore.emailUsername) {
                     storeNewCredentials(duckAddress, personalAccessToken)
                     return true
                 }

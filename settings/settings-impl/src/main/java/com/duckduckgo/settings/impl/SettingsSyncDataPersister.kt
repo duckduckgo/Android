@@ -30,10 +30,10 @@ import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import javax.inject.*
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import timber.log.*
-import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SettingsSyncDataPersister @Inject constructor(
@@ -42,10 +42,10 @@ class SettingsSyncDataPersister @Inject constructor(
     val syncSettingsSyncStore: SettingsSyncStore,
     val syncCrypto: SyncCrypto,
     private val dispatchers: DispatcherProvider,
-): SyncableDataPersister {
+) : SyncableDataPersister {
     override fun persist(
         changes: SyncChangesResponse,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         if (changes.type == SETTINGS) {
             val syncableSettings = syncableSettings.getPlugins()
@@ -61,11 +61,11 @@ class SettingsSyncDataPersister @Inject constructor(
     private suspend fun process(
         changes: SyncChangesResponse,
         syncableSettings: Collection<SyncableSetting>,
-        conflictResolution: SyncConflictResolution
+        conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         if (changes.jsonString.isEmpty()) {
             Timber.i("Sync-Settings: jsonString is empty")
-            //update timestamps
+            // update timestamps
             return Success()
         }
 
@@ -91,35 +91,39 @@ class SettingsSyncDataPersister @Inject constructor(
                     )
                 }
             }
-            //prune metadata objects?
-            //should prune deleted objects?
-            //should nullify timestamps?
+            // prune metadata objects?
+            // should prune deleted objects?
+            // should nullify timestamps?
         }
 
         Timber.i("Sync-Settings: process() result=$result")
         return result
     }
 
-    private fun processEntries(settings: CredentialsSyncEntries, syncableSettings: Collection<SyncableSetting>, conflictResolution: SyncConflictResolution): SyncMergeResult {
+    private fun processEntries(
+        settings: CredentialsSyncEntries,
+        syncableSettings: Collection<SyncableSetting>,
+        conflictResolution: SyncConflictResolution,
+    ): SyncMergeResult {
         settings.entries.forEach { entry ->
             Timber.i("Sync-Settings: processEntries() entry=${entry.key}")
             val syncableFeature = syncableSettings.firstOrNull { it.key == entry.key } ?: return@forEach
             Timber.i("Sync-Settings: plugin found for ${entry.key}")
-            when(conflictResolution) {
+            when (conflictResolution) {
                 SyncConflictResolution.DEDUPLICATION -> {
-                    val valueUpdated = if(entry.isDeleted()) {
+                    val valueUpdated = if (entry.isDeleted()) {
                         syncableFeature.mergeRemote(null)
                     } else {
-                        val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it)}
+                        val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it) }
                         syncableFeature.mergeRemote(decryptedValue)
                     }
-                    if (valueUpdated) { //TODO: do we need this?
+                    if (valueUpdated) { // TODO: do we need this?
                         settingsSyncMetadataDao.addOrUpdate(
                             SettingsSyncMetadataEntity(
                                 key = entry.key,
                                 modified_at = "",
-                                deleted_at = ""
-                            )
+                                deleted_at = "",
+                            ),
                         )
                     }
                 }
@@ -129,7 +133,7 @@ class SettingsSyncDataPersister @Inject constructor(
             }
         }
 
-        //TODO: should we do error handling per setting?
+        // TODO: should we do error handling per setting?
         return Success()
     }
 
@@ -142,10 +146,10 @@ class SettingsSyncDataPersister @Inject constructor(
         val hasDataChangedWhileSyncing = entitiyModifiedMillis > clientModifiedSinceMillis
         if (hasDataChangedWhileSyncing) return SyncMergeResult.Error(reason = "Data changed while syncing")
 
-        if(entry.isDeleted()) {
+        if (entry.isDeleted()) {
             syncableFeature.save(null)
         } else {
-            val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it)}
+            val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it) }
             syncableFeature.save(decryptedValue)
         }
         return Success()

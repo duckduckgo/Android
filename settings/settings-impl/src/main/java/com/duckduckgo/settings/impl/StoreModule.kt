@@ -42,5 +42,4 @@ class StoreModule {
     fun provideSettingsSyncMetadataDao(database: SettingsDatabase): SettingsSyncMetadataDao {
         return database.settingsSyncDao()
     }
-
 }

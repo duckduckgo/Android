@@ -19,7 +19,6 @@ package com.duckduckgo.app.email
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
-import com.duckduckgo.app.email.sync.EmailSync.Companion.DUCK_EMAIL_SETTING
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED

@@ -130,7 +130,7 @@ class SettingsSyncDataPersisterTest {
                 key = "fake_setting",
                 modified_at = "2023-08-31T10:06:17.022Z",
                 deleted_at = null,
-            )
+            ),
         )
 
         val result = testee.persist(

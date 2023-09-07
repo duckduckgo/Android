@@ -52,4 +52,3 @@ class RealSettingsSyncStore @Inject constructor(private val context: Context) : 
         private const val KEY_END_TIMESTAMP = "KEY_END_TIMESTAMP"
     }
 }
-

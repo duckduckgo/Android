@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.email.db
 
-import kotlinx.coroutines.flow.StateFlow
-
 /**
  * Data store for Email Protection (duck addresses)
  *
