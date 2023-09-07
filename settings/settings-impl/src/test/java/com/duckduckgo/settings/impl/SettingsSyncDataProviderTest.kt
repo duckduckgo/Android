@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.*
 import androidx.room.*
 import androidx.test.ext.junit.runners.*
 import androidx.test.platform.app.*
+import com.duckduckgo.app.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.settings.api.*
 import com.duckduckgo.sync.api.*
@@ -12,20 +13,25 @@ import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.test.*
 import org.junit.*
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Ignore
 import org.junit.runner.*
 import java.util.AbstractSet
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SettingsSyncDataProviderTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     val db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, SettingsDatabase::class.java)
         .allowMainThreadQueries()
@@ -34,7 +40,7 @@ class SettingsSyncDataProviderTest {
     val metadataDao = db.settingsSyncDao()
     val settingSyncStore = FakeSettingsSyncStore()
     val duckAddressSetting = FakeSyncableSetting()
-    val syncableSettingsPP = SyncableSettingsPluginPoint(listOf(duckAddressSetting))
+    val syncableSettingsPP = SyncableSettingsPluginPoint(mutableListOf(duckAddressSetting))
 
     private val testee: SettingsSyncDataProvider = SettingsSyncDataProvider(
         syncableSettings = syncableSettingsPP,
@@ -49,14 +55,42 @@ class SettingsSyncDataProviderTest {
     }
 
     @Test
+    fun whenGetChangesForFirstTimeThenMetadataIsInitialized() = runTest {
+        assertTrue(metadataDao.getAllObservable().first().isEmpty())
+
+        testee.getChanges()
+
+        assertNotNull(metadataDao.getAllObservable().first().find { it.key == duckAddressSetting.key })
+    }
+
+    @Test
+    fun whenGetChangesForFirstTimeThenExistingMetadataUpdated() = runTest {
+        metadataDao.addOrUpdate(
+            SettingsSyncMetadataEntity(duckAddressSetting.key, "", "")
+        )
+        syncableSettingsPP.syncableSettings.add(
+            FakeSyncableSetting().apply {
+                key = "new_setting"
+            }
+        )
+        assertTrue(metadataDao.getAllObservable().first().size == 1)
+
+        testee.getChanges()
+
+        assertTrue(metadataDao.getAllObservable().first().size == 2)
+        val duckAddressMetadata = metadataDao.getAllObservable().first().find { it.key==duckAddressSetting.key }
+        assertTrue(duckAddressMetadata?.modified_at.isNullOrEmpty().not())
+    }
+
+    @Test
     fun whenGetChangesForFirstSyncThenChangesIncludeAllValues() {
         val changes = testee.getChanges()
 
         assertTrue(changes.type==SyncableType.SETTINGS)
         patchAdapter.fromJson(changes.jsonString)?.let { patch ->
             assertEquals(1, patch.settings.updates.size)
-            assertEquals("fake_setting", patch.settings.updates[0].key)
-            assertEquals("fake_value", patch.settings.updates[0].value)
+            assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
+            assertEquals(duckAddressSetting.getValue(), patch.settings.updates[0].value)
             assertTrue(patch.settings.updates[0].deleted.isNullOrEmpty())
         }
         assertTrue(changes.isFirstSync())
@@ -71,7 +105,12 @@ class SettingsSyncDataProviderTest {
         val changes = testee.getChanges()
 
         assertTrue(changes.type==SyncableType.SETTINGS)
-        assertTrue(changes.jsonString.contains("\"key\":\"fake_setting\",\"value\":\"fake_value\""))
+        patchAdapter.fromJson(changes.jsonString)?.let { patch ->
+            assertEquals(1, patch.settings.updates.size)
+            assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
+            assertEquals(duckAddressSetting.getValue(), patch.settings.updates[0].value)
+            assertTrue(patch.settings.updates[0].deleted.isNullOrEmpty())
+        }
         assertTrue(changes.modifiedSince is ModifiedSince.Timestamp)
     }
 
@@ -79,28 +118,33 @@ class SettingsSyncDataProviderTest {
     fun whenGetChangesSubsequentCallsAndNoChangesThenUpdatesAreEmpty() {
         settingSyncStore.serverModifiedSince = "2022-01-01T00:00:00Z"
         settingSyncStore.clientModifiedSince = "2022-01-01T00:00:00Z"
-        metadataDao.addOrUpdate(SettingsSyncMetadataEntity("fake_setting", "2022-01-01T00:00:00Z", ""))
+        metadataDao.addOrUpdate(SettingsSyncMetadataEntity(duckAddressSetting.key, "2022-01-01T00:00:00Z", ""))
 
         val changes = testee.getChanges()
 
         assertTrue(changes.type==SyncableType.SETTINGS)
-        assertFalse(changes.jsonString.contains("\"key\":\"fake_setting\",\"value\":\"fake_value\""))
+        assertTrue(changes.jsonString.isEmpty())
         assertTrue(changes.modifiedSince is ModifiedSince.Timestamp)
     }
 
     @Test
     fun whenDBHasDataButItIsFirstSyncThenIncludeAllValues() {
-        metadataDao.addOrUpdate(SettingsSyncMetadataEntity("fake_setting", "2022-01-01T00:00:00Z", ""))
+        metadataDao.addOrUpdate(SettingsSyncMetadataEntity(duckAddressSetting.key, "2022-01-01T00:00:00Z", ""))
 
         val changes = testee.getChanges()
 
         assertTrue(changes.type==SyncableType.SETTINGS)
-        assertTrue(changes.jsonString.contains("\"key\":\"fake_setting\",\"value\":\"fake_value\""))
+        patchAdapter.fromJson(changes.jsonString)?.let { patch ->
+            assertEquals(1, patch.settings.updates.size)
+            assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
+            assertEquals(duckAddressSetting.getValue(), patch.settings.updates[0].value)
+            assertTrue(patch.settings.updates[0].deleted.isNullOrEmpty())
+        }
         assertTrue(changes.modifiedSince is FirstSync)
     }
 
     @Test
-    fun whenSettingNullThenSendAsDeleted() {
+    fun whenGetChangesForFirstSyncAndSettingNullThenSendAsDeleted() {
         duckAddressSetting.save(null)
 
         val changes = testee.getChanges()
@@ -108,11 +152,30 @@ class SettingsSyncDataProviderTest {
         assertTrue(changes.type==SyncableType.SETTINGS)
         patchAdapter.fromJson(changes.jsonString)?.let { patch ->
             assertEquals(1, patch.settings.updates.size)
-            assertEquals("fake_setting", patch.settings.updates[0].key)
+            assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
             assertEquals("", patch.settings.updates[0].value)
             assertFalse(patch.settings.updates[0].deleted.isNullOrEmpty())
         }
         assertTrue(changes.modifiedSince is FirstSync)
+    }
+
+    @Test
+    fun whenGetChangesSubsequentCallsAndSettingNullThenUpdatesAreEmpty() {
+        settingSyncStore.serverModifiedSince = "2022-01-01T00:00:00Z"
+        settingSyncStore.clientModifiedSince = "2022-01-01T00:00:00Z"
+        metadataDao.addOrUpdate(SettingsSyncMetadataEntity(duckAddressSetting.key, "2022-01-02T00:00:00Z", ""))
+        duckAddressSetting.save(null)
+
+        val changes = testee.getChanges()
+
+        assertTrue(changes.type==SyncableType.SETTINGS)
+        patchAdapter.fromJson(changes.jsonString)?.let { patch ->
+            assertEquals(1, patch.settings.updates.size)
+            assertEquals(duckAddressSetting.key, patch.settings.updates[0].key)
+            assertEquals("", patch.settings.updates[0].value)
+            assertFalse(patch.settings.updates[0].deleted.isNullOrEmpty())
+        }
+        assertTrue(changes.modifiedSince is ModifiedSince.Timestamp)
     }
 
     companion object {
@@ -122,7 +185,7 @@ class SettingsSyncDataProviderTest {
 }
 
 open class FakeSyncableSetting() : SyncableSetting {
-    override val key: String = "fake_setting"
+    override var key: String = "fake_setting"
 
     private var value: String? = "fake_value"
 
@@ -158,7 +221,7 @@ class FakeSettingsSyncStore : SettingsSyncStore {
 }
 
 class SyncableSettingsPluginPoint(
-    val syncableSettings: List<SyncableSetting>
+    val syncableSettings: MutableList<SyncableSetting>
 ): PluginPoint<SyncableSetting> {
     override fun getPlugins(): Collection<SyncableSetting> {
         return syncableSettings

@@ -50,7 +50,7 @@ class SettingsSyncDataPersisterTest {
     val metadataDao = db.settingsSyncDao()
     val duckAddressSetting = spy(FakeSyncableSetting())
     val settingSyncStore = FakeSettingsSyncStore()
-    val syncableSettingsPP = SyncableSettingsPluginPoint(listOf(duckAddressSetting))
+    val syncableSettingsPP = SyncableSettingsPluginPoint(mutableListOf(duckAddressSetting))
 
     private val testee = SettingsSyncDataPersister(
         syncableSettings = syncableSettingsPP,
