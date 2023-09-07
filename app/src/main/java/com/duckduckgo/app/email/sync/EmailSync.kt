@@ -36,7 +36,7 @@ class EmailSync @Inject constructor(
     private val syncSettingsListener: SyncSettingsListener,
 ) : SyncableSetting {
 
-    private var listener: (String) -> Unit = {}
+    private var listener: () -> Unit = {}
 
     override val key: String = DUCK_EMAIL_SETTING
 
@@ -44,7 +44,7 @@ class EmailSync @Inject constructor(
         val address = emailDataStore.emailUsername ?: return null
         val token = emailDataStore.emailToken ?: return null
         DuckAddressSetting(
-            main_duck_address = address,
+            username = address,
             personal_access_token = token,
         ).let {
             return adapter.toJson(it)
@@ -55,7 +55,7 @@ class EmailSync @Inject constructor(
         Timber.i("Sync-Settings: save($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
         if (duckAddressSetting != null) {
-            val duckAddress = duckAddressSetting.main_duck_address
+            val duckAddress = duckAddressSetting.username
             val personalAccessToken = duckAddressSetting.personal_access_token
             storeNewCredentials(duckAddress, personalAccessToken)
             return true
@@ -69,30 +69,30 @@ class EmailSync @Inject constructor(
         Timber.i("Sync-Settings: mergeRemote($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
         if (duckAddressSetting != null) {
-            val duckAddress = duckAddressSetting.main_duck_address
+            val duckUsername = duckAddressSetting.username
             val personalAccessToken = duckAddressSetting.personal_access_token
             if (!emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()) {
-                if (duckAddress != emailDataStore.emailUsername) {
-                    storeNewCredentials(duckAddress, personalAccessToken)
+                if (duckUsername != emailDataStore.emailUsername) {
+                    storeNewCredentials(duckUsername, personalAccessToken)
                     return true
                 }
             } else {
-                storeNewCredentials(duckAddress, personalAccessToken)
+                storeNewCredentials(duckUsername, personalAccessToken)
                 return true
             }
         }
         return false
     }
 
-    private fun storeNewCredentials(address: String, token: String) {
-        Timber.i("Sync-Settings: storeNewCredentials($address, $token)")
+    private fun storeNewCredentials(username: String, token: String) {
+        Timber.i("Sync-Settings: storeNewCredentials($username, $token)")
         emailDataStore.emailToken = token
-        emailDataStore.emailUsername = address
-        listener.invoke(address)
+        emailDataStore.emailUsername = username
+        listener.invoke()
     }
 
-    override fun registerToRemoteChanges(listener: (String) -> Unit) {
-        this.listener = listener
+    override fun registerToRemoteChanges(onDataChanged: () -> Unit) {
+        this.listener = onDataChanged
     }
 
     override fun onSettingChanged() {
@@ -105,7 +105,7 @@ class EmailSync @Inject constructor(
 }
 
 class DuckAddressSetting(
-    val main_duck_address: String,
+    val username: String,//TODO: change this
     val personal_access_token: String,
 )
 

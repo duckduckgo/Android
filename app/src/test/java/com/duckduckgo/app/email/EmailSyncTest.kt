@@ -1,40 +1,39 @@
 package com.duckduckgo.app.email
 
+import com.duckduckgo.app.email.db.*
 import com.duckduckgo.app.email.sync.*
-import com.duckduckgo.app.email.sync.EmailSync.DuckAddressSetting
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
+import com.duckduckgo.settings.api.*
+import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import org.junit.Assert.*
-import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.junit.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.mockito.kotlin.*
 
 class EmailSyncTest {
 
-    private val emailManagerMock = mock<EmailManager>()
-    private val testee = EmailSync(emailManagerMock)
+    private val emailManagerMock = mock<EmailDataStore>()
+    private val syncSettingsListenerMock = mock<SyncSettingsListener>()
+
+    private val testee = EmailSync(emailManagerMock, syncSettingsListenerMock)
 
     @Test
     fun whenUserSignedInThenReturnAccountInfo() {
-        whenever(emailManagerMock.isSignedIn()).thenReturn(true)
-        whenever(emailManagerMock.getEmailAddress()).thenReturn("email")
-        whenever(emailManagerMock.getToken()).thenReturn("token")
+        whenever(emailManagerMock.emailUsername).thenReturn("username")
+        whenever(emailManagerMock.emailToken).thenReturn("token")
 
         val value = testee.getValue()
 
         with(adapter.fromJson(value)!!) {
-            assertEquals("email", this.main_duck_address)
+            assertEquals("username", this.username)
             assertEquals("token", this.personal_access_token)
         }
     }
 
     @Test
     fun whenUserSignedOutThenReturnNull() {
-        whenever(emailManagerMock.isSignedIn()).thenReturn(false)
+        whenever(emailManagerMock.emailUsername).thenReturn(null)
+        whenever(emailManagerMock.emailToken).thenReturn(null)
 
         val value = testee.getValue()
 
@@ -43,59 +42,62 @@ class EmailSyncTest {
 
     @Test
     fun whenSaveValueThenStoreCredentials() {
-        testee.save("{\"main_duck_address\":\"email\",\"personal_access_token\":\"token\"}")
+        testee.save("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock).storeCredentials("email", "token", "")
+        verify(emailManagerMock).emailUsername = "email"
+        verify(emailManagerMock).emailToken = "token"
     }
 
     @Test
     fun whenSaveNullThenLogoutUser() {
         testee.save(null)
 
-        verify(emailManagerMock).signOut()
+        verify(emailManagerMock).emailUsername = ""
+        verify(emailManagerMock).emailToken = ""
     }
 
     @Test
     fun whenMergeRemoteAddressWithSameLocalAddressThenDoNothing() {
-        whenever(emailManagerMock.isSignedIn()).thenReturn(true)
-        whenever(emailManagerMock.getEmailAddress()).thenReturn("email")
-        whenever(emailManagerMock.getToken()).thenReturn("token")
+        whenever(emailManagerMock.emailUsername).thenReturn("username")
+        whenever(emailManagerMock.emailToken).thenReturn("token")
 
-        testee.mergeRemote("{\"main_duck_address\":\"email\",\"personal_access_token\":\"token\"}")
+        testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock, times(0)).storeCredentials(anyString(), anyString(), anyString())
+        verify(emailManagerMock).emailUsername = "email"
+        verify(emailManagerMock).emailToken = "token"
     }
 
     @Test
     fun whenMergeRemoteAddressWithDifferentLocalAddressThenRemoteWins() {
-        whenever(emailManagerMock.isSignedIn()).thenReturn(true)
-        whenever(emailManagerMock.getEmailAddress()).thenReturn("email2")
-        whenever(emailManagerMock.getToken()).thenReturn("token2")
+        whenever(emailManagerMock.emailUsername).thenReturn("username2")
+        whenever(emailManagerMock.emailToken).thenReturn("token2")
 
-        testee.mergeRemote("{\"main_duck_address\":\"email\",\"personal_access_token\":\"token\"}")
+        testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock).signOut()
-        verify(emailManagerMock).storeCredentials("email", "token", "")
+        verify(emailManagerMock).emailUsername = "email"
+        verify(emailManagerMock).emailToken = "token"
     }
 
     @Test
     fun whenMergeRemoteAddressWithNoLocalAccountThenStoreRemote() {
-        whenever(emailManagerMock.isSignedIn()).thenReturn(false)
+        whenever(emailManagerMock.emailUsername).thenReturn(null)
+        whenever(emailManagerMock.emailToken).thenReturn(null)
 
-        testee.mergeRemote("{\"main_duck_address\":\"email\",\"personal_access_token\":\"token\"}")
+        testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock).storeCredentials("email", "token", "")
+        verify(emailManagerMock).emailUsername = "email"
+        verify(emailManagerMock).emailToken = "token"
     }
 
     @Test
     fun whenMergeNullAddresThenDoNothing() {
-        whenever(emailManagerMock.isSignedIn()).thenReturn(true)
-        whenever(emailManagerMock.getEmailAddress()).thenReturn("email")
-        whenever(emailManagerMock.getToken()).thenReturn("token")
+        whenever(emailManagerMock.emailUsername).thenReturn("username")
+        whenever(emailManagerMock.emailToken).thenReturn("token")
 
         testee.mergeRemote(null)
 
-        verify(emailManagerMock, times(0))
+        verify(emailManagerMock, times(0)).emailToken
+        verify(emailManagerMock, times(0)).emailUsername
     }
 
     companion object {

@@ -200,7 +200,7 @@ open class FakeSyncableSetting() : SyncableSetting {
         return true
     }
 
-    override fun registerToRemoteChanges(listener: (String) -> Unit) {
+    override fun registerToRemoteChanges(onDataChanged: () -> Unit) {
         TODO("Not yet implemented")
     }
 }

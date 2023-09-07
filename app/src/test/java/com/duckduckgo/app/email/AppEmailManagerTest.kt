@@ -18,6 +18,7 @@ package com.duckduckgo.app.email
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.*
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
@@ -27,6 +28,7 @@ import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.settings.api.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
@@ -41,11 +43,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -60,12 +58,20 @@ class AppEmailManagerTest {
 
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = FakeEmailDataStore()
+    private val emailSyncableSetting = spy(FakeEmailSync())
     private val mockPixel: Pixel = mock()
     lateinit var testee: AppEmailManager
 
     @Before
     fun setup() {
-        testee = AppEmailManager(mockEmailService, mockEmailDataStore, coroutineRule.testDispatcherProvider, TestScope(), mockPixel)
+        testee = AppEmailManager(
+            mockEmailService,
+            mockEmailDataStore,
+            emailSyncableSetting,
+            coroutineRule.testDispatcherProvider,
+            TestScope(),
+            mockPixel,
+        )
     }
 
     @Test
@@ -148,6 +154,16 @@ class AppEmailManagerTest {
     }
 
     @Test
+    fun whenStoreCredentialsThenNotifySyncableSetting() = runTest {
+        mockEmailDataStore.emailToken = "token"
+        whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
+
+        testee.storeCredentials("token", "username", "cohort")
+
+        verify(emailSyncableSetting).onSettingChanged()
+    }
+
+    @Test
     fun whenStoreCredentialsThenSendPixel() = runTest {
         mockEmailDataStore.emailToken = "token"
         whenever(mockEmailService.newAlias(any())).thenReturn(EmailAlias(""))
@@ -189,6 +205,13 @@ class AppEmailManagerTest {
         assertNull(mockEmailDataStore.nextAlias)
 
         assertNull(testee.getAlias())
+    }
+
+    @Test
+    fun whenSignedOutThenNotifySyncableSetting() {
+        testee.signOut()
+
+        verify(emailSyncableSetting).onSettingChanged()
     }
 
     @Test
@@ -273,6 +296,19 @@ class AppEmailManagerTest {
         assertEquals(expected, testee.getUserData())
     }
 
+    @Test
+    fun whenSyncableSettingNotifiesChangeThenRefreshEmailState() = runTest {
+        testee.signedInFlow().test {
+            assertFalse(awaitItem())
+            mockEmailDataStore.emailToken = "token"
+            mockEmailDataStore.emailUsername = "user"
+            mockEmailDataStore.nextAlias = "nextAlias@duck.com"
+            emailSyncableSetting.onDataChanged()
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun givenNextAliasExists() {
         mockEmailDataStore.nextAlias = "alias"
     }
@@ -291,4 +327,32 @@ class FakeEmailDataStore : EmailDataStore {
 
     var canUseEncryption: Boolean = false
     override fun canUseEncryption(): Boolean = canUseEncryption
+}
+
+open class FakeEmailSync : SyncableSetting {
+    lateinit var onDataChanged: () -> Unit
+
+    override var key: String = "fake_setting"
+
+    private var value: String? = "fake_value"
+
+    override fun getValue(): String? = value
+
+    override fun save(value: String?): Boolean {
+        this.value = value
+        return true
+    }
+
+    override fun mergeRemote(value: String?): Boolean {
+        this.value = value
+        return true
+    }
+
+    override fun registerToRemoteChanges(onDataChanged: () -> Unit) {
+        this.onDataChanged = onDataChanged
+    }
+
+    override fun onSettingChanged() {
+        //no-op
+    }
 }

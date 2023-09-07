@@ -64,7 +64,7 @@ class AppEmailManager @Inject constructor(
             isSignedInStateFlow.emit(isSignedIn())
         }
         emailSettings.registerToRemoteChanges {
-            onAccountDataChanged()
+            refreshEmailState()
         }
     }
 
@@ -130,7 +130,7 @@ class AppEmailManager @Inject constructor(
 
     override fun getToken(): String? = emailDataStore.emailToken
 
-    private fun onAccountDataChanged() {
+    private fun refreshEmailState() {
         Timber.i("Sync-Settings: onAccountDataChanged()")
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(isSignedIn())
