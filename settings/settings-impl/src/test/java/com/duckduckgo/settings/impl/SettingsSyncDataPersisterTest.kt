@@ -163,7 +163,7 @@ class SettingsSyncDataPersisterTest {
     }
 
     companion object {
-        val responseWithDeletedObject = "{\"settings\":{\"entries\":[{\"key\":\"fake_setting\",\"value\":\"\",\"deleted\":\"2023-08-31T10:06:16.022Z\",\"last_modified\":\"2023-08-31T10:06:16.022Z\"}],\"last_modified\":\"2023-08-31T10:06:16.022Z\"}}"
-        val responseWithValuesObject = "{\"settings\":{\"entries\":[{\"key\":\"fake_setting\",\"value\":\"fake_value\",\"deleted\":\"\",\"last_modified\":\"2023-08-31T10:06:16.022Z\"}],\"last_modified\":\"2023-08-31T10:06:16.022Z\"}}"
+        val responseWithDeletedObject = FileUtilities.loadText(javaClass.classLoader!!, "json/settings_with_deleted_object_response.json")
+        val responseWithValuesObject = FileUtilities.loadText(javaClass.classLoader!!, "json/settings_with_values_response.json")
     }
 }
