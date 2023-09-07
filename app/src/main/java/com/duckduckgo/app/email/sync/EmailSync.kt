@@ -28,6 +28,7 @@ import javax.inject.*
 import timber.log.*
 
 @SingleInstanceIn(AppScope::class)
+@Named(EmailSync.DUCK_EMAIL_SETTING)
 @ContributesBinding(scope = AppScope::class, boundType = SyncableSetting::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)
 class EmailSync @Inject constructor(

@@ -19,6 +19,7 @@ package com.duckduckgo.app.email
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.sync.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
@@ -33,12 +34,12 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
+import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = EmailManager::class)
@@ -46,7 +47,7 @@ import timber.log.Timber
 class AppEmailManager @Inject constructor(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
-    private val emailSettings: SyncableSetting,
+    @Named(EmailSync.DUCK_EMAIL_SETTING) private val emailSettings: SyncableSetting,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
