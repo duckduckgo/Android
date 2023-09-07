@@ -18,6 +18,7 @@ package com.duckduckgo.settings.impl
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.app.global.plugins.*
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.settings.api.*
 import com.duckduckgo.settings.impl.SettingsSyncDataPersister.Adapters.Companion.updatesAdapter
@@ -36,7 +37,7 @@ import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
 class SettingsSyncDataPersister @Inject constructor(
-    val duckAddress: SyncableSetting,
+    val syncableSettings: PluginPoint<SyncableSetting>,
     val settingsSyncMetadataDao: SettingsSyncMetadataDao,
     val syncSettingsSyncStore: SettingsSyncStore,
     val syncCrypto: SyncCrypto,
@@ -47,20 +48,21 @@ class SettingsSyncDataPersister @Inject constructor(
         conflictResolution: SyncConflictResolution
     ): SyncMergeResult<Boolean> {
         if (changes.type == SETTINGS) {
+            val syncableSettings = syncableSettings.getPlugins()
             return runBlocking(dispatchers.io()) {
                 Timber.i("Sync-Settings: persist() changes=${changes.jsonString}")
-                val result = process(changes, conflictResolution)
+                val result = process(changes, syncableSettings, conflictResolution)
                 result
             }
         }
         return Success(false)
     }
 
-    private suspend fun process(changes: SyncChangesResponse, conflictResolution: SyncConflictResolution): SyncMergeResult<Boolean> {
+    private suspend fun process(changes: SyncChangesResponse, syncableSettings: Collection<SyncableSetting>, conflictResolution: SyncConflictResolution): SyncMergeResult<Boolean> {
         if (changes.jsonString.isEmpty()) {
             Timber.i("Sync-Settings: jsonString is empty")
             //update timestamps
-            return SyncMergeResult.Success(false)
+            return Success(false)
         }
 
         val response = runCatching {
@@ -70,9 +72,9 @@ class SettingsSyncDataPersister @Inject constructor(
             return SyncMergeResult.Error(reason = "Error parsing credentials ${it.message}")
         }
 
-        val result = processEntries(response.settings, conflictResolution)
+        val result = processEntries(response.settings, syncableSettings, conflictResolution)
 
-        if (result is SyncMergeResult.Success) {
+        if (result is Success) {
             Timber.i("Sync-Settings: updating timestamps post-persist")
             syncSettingsSyncStore.serverModifiedSince = response.settings.last_modified
             syncSettingsSyncStore.clientModifiedSince = syncSettingsSyncStore.startTimeStamp
@@ -94,16 +96,18 @@ class SettingsSyncDataPersister @Inject constructor(
         return result
     }
 
-    private fun processEntries(settings: CredentialsSyncEntries, conflictResolution: SyncConflictResolution): SyncMergeResult<Boolean>  {
+    private fun processEntries(settings: CredentialsSyncEntries, syncableSettings: Collection<SyncableSetting>, conflictResolution: SyncConflictResolution): SyncMergeResult<Boolean>  {
         settings.entries.forEach { entry ->
             Timber.i("Sync-Settings: processEntries() entry=${entry.key}")
+            val syncableFeature = syncableSettings.firstOrNull { it.key == entry.key } ?: return@forEach
+            Timber.i("Sync-Settings: plugin found for ${entry.key}")
             when(conflictResolution) {
                 SyncConflictResolution.DEDUPLICATION -> {
                     val valueUpdated = if(entry.isDeleted()) {
-                        duckAddress.mergeRemote(null)
+                        syncableFeature.mergeRemote(null)
                     } else {
                         val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it)}
-                        duckAddress.mergeRemote(decryptedValue)
+                        syncableFeature.mergeRemote(decryptedValue)
                     }
                     if (valueUpdated) { //TODO: do we need this?
                         settingsSyncMetadataDao.addOrUpdate(
@@ -115,17 +119,17 @@ class SettingsSyncDataPersister @Inject constructor(
                         )
                     }
                 }
-                SyncConflictResolution.REMOTE_WINS -> applyChanges(entry)
-                SyncConflictResolution.LOCAL_WINS -> applyChanges(entry)
-                SyncConflictResolution.TIMESTAMP -> applyChanges(entry)
+                SyncConflictResolution.REMOTE_WINS -> applyChanges(syncableFeature, entry)
+                SyncConflictResolution.LOCAL_WINS -> applyChanges(syncableFeature, entry)
+                SyncConflictResolution.TIMESTAMP -> applyChanges(syncableFeature, entry)
             }
         }
 
         //TODO: should we do error handling per setting?
-        return SyncMergeResult.Success(true)
+        return Success(true)
     }
 
-    private fun applyChanges(entry: SettingEntryResponse): SyncMergeResult<Boolean> {
+    private fun applyChanges(syncableFeature: SyncableSetting, entry: SettingEntryResponse): SyncMergeResult<Boolean> {
         val localCredential = settingsSyncMetadataDao.get(entry.key)
         val clientModifiedSinceMillis =
             runCatching { DatabaseDateFormatter.parseIso8601ToMillis(syncSettingsSyncStore.startTimeStamp) }.getOrDefault(0)
@@ -135,12 +139,12 @@ class SettingsSyncDataPersister @Inject constructor(
         if (hasDataChangedWhileSyncing) return SyncMergeResult.Error(reason = "Data changed while syncing")
 
         if(entry.isDeleted()) {
-            duckAddress.save(null)
+            syncableFeature.save(null)
         } else {
             val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it)}
-            duckAddress.save(decryptedValue)
+            syncableFeature.save(decryptedValue)
         }
-        return SyncMergeResult.Success(true)
+        return Success(true)
     }
 
     override fun onSyncDisabled() {

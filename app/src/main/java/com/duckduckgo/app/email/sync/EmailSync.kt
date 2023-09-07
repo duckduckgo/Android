@@ -16,26 +16,20 @@
 
 package com.duckduckgo.app.email.sync
 
-import com.duckduckgo.app.email.*
-import com.duckduckgo.app.email.sync.EmailSync.Adapters.Companion.adapter
-import com.duckduckgo.app.email.db.EmailDataStore
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.settings.api.SyncSettingCallback
-import com.duckduckgo.settings.api.SyncableSetting
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
+import com.duckduckgo.app.email.db.*
+import com.duckduckgo.app.email.sync.Adapters.Companion.adapter
+import com.duckduckgo.di.scopes.*
+import com.duckduckgo.settings.api.*
+import com.squareup.anvil.annotations.*
+import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.*
-import kotlinx.coroutines.CoroutineScope
 import timber.log.*
 import javax.inject.*
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(scope = AppScope::class, boundType = SyncableSetting::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)
 class EmailSync @Inject constructor(
     private val emailDataStore: EmailDataStore,
 ) : SyncableSetting {
@@ -58,7 +52,7 @@ class EmailSync @Inject constructor(
     override fun save(value: String?): Boolean {
         Timber.i("Sync-Settings: save($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
-        if (duckAddressSetting != null) {
+        if (duckAddressSetting!=null) {
             val duckAddress = duckAddressSetting.main_duck_address
             val personalAccessToken = duckAddressSetting.personal_access_token
             storeNewCredentials(duckAddress, personalAccessToken)
@@ -72,11 +66,11 @@ class EmailSync @Inject constructor(
     override fun mergeRemote(value: String?): Boolean {
         Timber.i("Sync-Settings: mergeRemote($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
-        if (duckAddressSetting != null) {
+        if (duckAddressSetting!=null) {
             val duckAddress = duckAddressSetting.main_duck_address
             val personalAccessToken = duckAddressSetting.personal_access_token
             if (!emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()) {
-                if (duckAddress != emailDataStore.emailUsername) {
+                if (duckAddress!=emailDataStore.emailUsername) {
                     storeNewCredentials(duckAddress, personalAccessToken)
                     return true
                 }
@@ -102,16 +96,16 @@ class EmailSync @Inject constructor(
     companion object {
         const val DUCK_EMAIL_SETTING = "email_protection_generation"
     }
+}
 
-    private class Adapters {
-        companion object {
-            private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-            val adapter: JsonAdapter<DuckAddressSetting> = moshi.adapter(DuckAddressSetting::class.java).lenient()
-        }
+class DuckAddressSetting(
+    val main_duck_address: String,
+    val personal_access_token: String,
+)
+
+private class Adapters {
+    companion object {
+        private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        val adapter: JsonAdapter<DuckAddressSetting> = moshi.adapter(DuckAddressSetting::class.java).lenient()
     }
-
-    class DuckAddressSetting(
-        val main_duck_address: String,
-        val personal_access_token: String,
-    )
 }

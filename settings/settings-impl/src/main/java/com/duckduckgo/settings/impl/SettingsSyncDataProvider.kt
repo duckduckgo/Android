@@ -16,83 +16,91 @@
 
 package com.duckduckgo.settings.impl
 
-import com.duckduckgo.di.scopes.*
-import com.duckduckgo.settings.api.*
-import com.duckduckgo.sync.api.*
-import com.duckduckgo.sync.api.engine.*
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.settings.api.SyncableSetting
+import com.duckduckgo.sync.api.SyncCrypto
+import com.duckduckgo.sync.api.engine.ModifiedSince
+import com.duckduckgo.sync.api.engine.SyncChangesRequest
+import com.duckduckgo.sync.api.engine.SyncableDataProvider
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
-import com.squareup.anvil.annotations.*
-import com.squareup.moshi.*
+import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import timber.log.*
+import timber.log.Timber
 import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SettingsSyncDataProvider @Inject constructor(
-    val duckAddress: SyncableSetting,
+    val syncableSettings: PluginPoint<SyncableSetting>,
     val settingsSyncMetadataDao: SettingsSyncMetadataDao,
     val settingsSyncStore: SettingsSyncStore,
     val syncCrypto: SyncCrypto,
 ) : SyncableDataProvider {
     override fun getChanges(): SyncChangesRequest {
-        if (settingsSyncStore.serverModifiedSince=="0") {
-            val keys = listOf(duckAddress.key)
+        val syncableSettings = syncableSettings.getPlugins()
+        if (settingsSyncStore.serverModifiedSince == "0") {
+            val keys = syncableSettings.map { it.key }
             settingsSyncMetadataDao.initialize(keys)
         }
 
         val since = settingsSyncStore.clientModifiedSince
-        val updates = getUpdatesSince(since)
+        val updates = getUpdatesSince(syncableSettings, since)
         Timber.i("Sync-Settings: getChanges() since=$since updates=${updates}")
         return formatUpdates(updates)
     }
 
-    private fun getUpdatesSince(clientModifiedSince: String): List<SettingEntry> {
+    private fun getUpdatesSince(
+        syncableSettings: Collection<SyncableSetting>,
+        clientModifiedSince: String
+    ): List<SettingEntry> {
         settingsSyncStore.startTimeStamp = SyncDateProvider.now()
 
         val updates = mutableListOf<SettingEntry>()
-        if (clientModifiedSince=="0") {
-            duckAddress.getValue()?.let {
-                Timber.i("Sync-Settings: adding all update key ${duckAddress.key} value=$it")
-                updates.add(SettingEntry(
-                    key = duckAddress.key,
-                    value = syncCrypto.encrypt(it),
-                    client_last_modified = SyncDateProvider.now(),
-                ))
-            } ?: updates.add(SettingEntry(
-                key = duckAddress.key,
-                value = "",
-                deleted = "1",
-                client_last_modified = SyncDateProvider.now(),
-            ))
+        if (clientModifiedSince == "0") {
+            syncableSettings.forEach { setting ->
+                setting.getValue()?.let {
+                    Timber.i("Sync-Settings: adding all update key ${setting.key} value=$it")
+                    updates.add(
+                        SettingEntry(
+                            key = setting.key,
+                            value = syncCrypto.encrypt(it),
+                            client_last_modified = SyncDateProvider.now(),
+                        ),
+                    )
+                } ?: updates.add(
+                    SettingEntry(
+                        key = setting.key,
+                        value = "",
+                        deleted = "1",
+                        client_last_modified = SyncDateProvider.now(),
+                    ),
+                )
+            }
         } else {
+            val settingsToUpdate = settingsSyncMetadataDao.getChangesSince(clientModifiedSince)
             //TODO: missing case for settings added later on, how to detect them?
-            settingsSyncMetadataDao.getChangesSince(clientModifiedSince).forEach { metadata ->
+            syncableSettings.forEach { setting ->
+                val metadata = settingsToUpdate.find { it.key == setting.key } ?: return@forEach
                 Timber.i("Sync-Settings: changes since=$clientModifiedSince metadata=${metadata}")
-                if (metadata.key==duckAddress.key) {
-                    duckAddress.getValue()?.let { value ->
-                        Timber.i("Sync-Settings: adding changed update key ${duckAddress.key} value=$value")
-                        updates.add(SettingEntry(
-                            key = duckAddress.key,
+                setting.getValue()?.let { value ->
+                    Timber.i("Sync-Settings: adding changed update key ${setting.key} value=$value")
+                    updates.add(
+                        SettingEntry(
+                            key = setting.key,
                             value = syncCrypto.encrypt(value),
                             client_last_modified = metadata.modified_at,
-                        ))
-                    } ?: updates.add(SettingEntry(
-                        key = duckAddress.key,
+                        ),
+                    )
+                } ?: updates.add(
+                    SettingEntry(
+                        key = setting.key,
                         value = "",
                         deleted = "1",
                         client_last_modified = metadata.modified_at,
-                    ))
-                }
-            }
-            if (settingsSyncMetadataDao.get(duckAddress.key) == null) {
-                duckAddress.getValue()?.let { value ->
-                    Timber.i("Sync-Settings: adding new update key ${duckAddress.key} value=$value")
-                    updates.add(SettingEntry(
-                        key = duckAddress.key,
-                        value = syncCrypto.encrypt(value),
-                        client_last_modified = SyncDateProvider.now(),
-                    ))
-                }
+                    ),
+                )
             }
         }
 
@@ -100,7 +108,7 @@ class SettingsSyncDataProvider @Inject constructor(
     }
 
     private fun formatUpdates(updates: List<SettingEntry>): SyncChangesRequest {
-        val modifiedSince = if (settingsSyncStore.serverModifiedSince=="0") {
+        val modifiedSince = if (settingsSyncStore.serverModifiedSince == "0") {
             ModifiedSince.FirstSync
         } else {
             ModifiedSince.Timestamp(settingsSyncStore.serverModifiedSince)

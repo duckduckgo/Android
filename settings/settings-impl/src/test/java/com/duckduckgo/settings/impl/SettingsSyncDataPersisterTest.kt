@@ -16,26 +16,23 @@
 
 package com.duckduckgo.settings.impl
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Room
+import androidx.arch.core.executor.testing.*
+import androidx.room.*
 import androidx.test.ext.junit.runners.*
-import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.settings.api.SyncableSetting
-import com.duckduckgo.sync.api.SyncCrypto
-import com.duckduckgo.sync.api.engine.SyncChangesResponse
+import androidx.test.platform.app.*
+import com.duckduckgo.app.*
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
-import com.duckduckgo.sync.api.engine.SyncableType
+import kotlinx.coroutines.*
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.runner.*
-import org.mockito.Mockito.spy
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.kotlin.timeout
+import org.mockito.Mockito.*
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SettingsSyncDataPersisterTest {
 
@@ -43,20 +40,24 @@ class SettingsSyncDataPersisterTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     val db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, SettingsDatabase::class.java)
         .allowMainThreadQueries()
         .build()
 
     val metadataDao = db.settingsSyncDao()
-
-    val duckAddress = spy(FakeDuckAddressSyncableSetting())
-
+    val duckAddressSetting = spy(FakeSyncableSetting())
     val settingSyncStore = FakeSettingsSyncStore()
+    val syncableSettingsPP = SyncableSettingsPluginPoint(listOf(duckAddressSetting))
 
     private val testee = SettingsSyncDataPersister(
-        duckAddress = duckAddress,
+        syncableSettings = syncableSettingsPP,
         settingsSyncMetadataDao = metadataDao,
         syncSettingsSyncStore = settingSyncStore,
+        syncCrypto = FakeCrypto(),
+        dispatchers = coroutineRule.testDispatcherProvider,
     )
 
     @After
@@ -75,7 +76,7 @@ class SettingsSyncDataPersisterTest {
         )
 
         assertTrue(result is Success)
-        verify(duckAddress).mergeRemote("fake_value")
+        verify(duckAddressSetting).mergeRemote("fake_value")
     }
 
     @Test
@@ -89,7 +90,7 @@ class SettingsSyncDataPersisterTest {
         )
 
         assertTrue(result is Success)
-        verify(duckAddress).mergeRemote(null)
+        verify(duckAddressSetting).mergeRemote(null)
     }
 
     @Test
@@ -104,7 +105,7 @@ class SettingsSyncDataPersisterTest {
         )
 
         assertTrue(result is Success)
-        verify(duckAddress).save("fake_value")
+        verify(duckAddressSetting).save("fake_value")
     }
 
     @Test
@@ -118,7 +119,7 @@ class SettingsSyncDataPersisterTest {
         )
 
         assertTrue(result is Success)
-        verify(duckAddress).save(null)
+        verify(duckAddressSetting).save(null)
     }
 
     @Test
@@ -141,7 +142,7 @@ class SettingsSyncDataPersisterTest {
         )
 
         assertTrue(result is Success)
-        verify(duckAddress, times(0)).save("fake_value")
+        verify(duckAddressSetting, times(0)).save("fake_value")
     }
 
     @Test
@@ -164,18 +165,5 @@ class SettingsSyncDataPersisterTest {
     companion object {
         val responseWithDeletedObject = "{\"settings\":{\"entries\":[{\"key\":\"fake_setting\",\"value\":\"\",\"deleted\":\"2023-08-31T10:06:16.022Z\",\"last_modified\":\"2023-08-31T10:06:16.022Z\"}],\"last_modified\":\"2023-08-31T10:06:16.022Z\"}}"
         val responseWithValuesObject = "{\"settings\":{\"entries\":[{\"key\":\"fake_setting\",\"value\":\"fake_value\",\"deleted\":\"\",\"last_modified\":\"2023-08-31T10:06:16.022Z\"}],\"last_modified\":\"2023-08-31T10:06:16.022Z\"}}"
-    }
-}
-
-open class FakeDuckAddressSyncableSetting() : SyncableSetting {
-    override val key: String = "fake_setting"
-
-    override fun getValue(): String = "fake_value"
-    override fun save(value: String?) {
-        //no-op
-    }
-
-    override fun mergeRemote(value: String?) {
-        //no-op
     }
 }

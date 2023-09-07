@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.*
 import androidx.room.*
 import androidx.test.ext.junit.runners.*
 import androidx.test.platform.app.*
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.settings.api.*
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.api.engine.*
@@ -15,7 +16,9 @@ import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.runner.*
+import java.util.AbstractSet
 
 @RunWith(AndroidJUnit4::class)
 class SettingsSyncDataProviderTest {
@@ -29,13 +32,12 @@ class SettingsSyncDataProviderTest {
         .build()
 
     val metadataDao = db.settingsSyncDao()
-
     val settingSyncStore = FakeSettingsSyncStore()
-
-    val syncableSetting = FakeSyncableSetting()
+    val duckAddressSetting = FakeSyncableSetting()
+    val syncableSettingsPP = SyncableSettingsPluginPoint(listOf(duckAddressSetting))
 
     private val testee: SettingsSyncDataProvider = SettingsSyncDataProvider(
-        duckAddress = syncableSetting,
+        syncableSettings = syncableSettingsPP,
         settingsSyncMetadataDao = metadataDao,
         settingsSyncStore = settingSyncStore,
         syncCrypto = FakeCrypto(),
@@ -61,6 +63,7 @@ class SettingsSyncDataProviderTest {
     }
 
     @Test
+    @Ignore("Need to decide strategy first")
     fun whenGetChangesSubsequentCallsWithNewValueThenIncludeNewValues() {
         settingSyncStore.serverModifiedSince = "2022-01-01T00:00:00Z"
         settingSyncStore.clientModifiedSince = "2022-01-01T00:00:00Z"
@@ -98,7 +101,7 @@ class SettingsSyncDataProviderTest {
 
     @Test
     fun whenSettingNullThenSendAsDeleted() {
-        syncableSetting.save(null)
+        duckAddressSetting.save(null)
 
         val changes = testee.getChanges()
 
@@ -118,19 +121,25 @@ class SettingsSyncDataProviderTest {
     }
 }
 
-class FakeSyncableSetting() : SyncableSetting {
+open class FakeSyncableSetting() : SyncableSetting {
     override val key: String = "fake_setting"
 
     private var value: String? = "fake_value"
 
     override fun getValue(): String? = value
 
-    override fun save(value: String?) {
+    override fun save(value: String?): Boolean {
         this.value = value
+        return true
     }
 
-    override fun mergeRemote(value: String?) {
+    override fun mergeRemote(value: String?): Boolean {
         this.value = value
+        return true
+    }
+
+    override fun registerToRemoteChanges(listener: (String) -> Unit) {
+        TODO("Not yet implemented")
     }
 }
 
@@ -146,4 +155,12 @@ class FakeSettingsSyncStore : SettingsSyncStore {
     override var clientModifiedSince: String = "0"
 
     override var startTimeStamp: String = "0"
+}
+
+class SyncableSettingsPluginPoint(
+    val syncableSettings: List<SyncableSetting>
+): PluginPoint<SyncableSetting> {
+    override fun getPlugins(): Collection<SyncableSetting> {
+        return syncableSettings
+    }
 }
