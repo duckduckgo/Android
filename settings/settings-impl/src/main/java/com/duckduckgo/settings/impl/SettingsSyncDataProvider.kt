@@ -60,46 +60,17 @@ class SettingsSyncDataProvider @Inject constructor(
         val updates = mutableListOf<SettingEntry>()
         if (clientModifiedSince == "0") {
             syncableSettings.forEach { setting ->
-                setting.getValue()?.let {
-                    Timber.i("Sync-Settings: adding all update key ${setting.key} value=$it")
-                    updates.add(
-                        SettingEntry(
-                            key = setting.key,
-                            value = syncCrypto.encrypt(it),
-                            client_last_modified = SyncDateProvider.now(),
-                        ),
-                    )
-                } ?: updates.add(
-                    SettingEntry(
-                        key = setting.key,
-                        value = "",
-                        deleted = "1",
-                        client_last_modified = SyncDateProvider.now(),
-                    ),
+                updates.add(
+                    setting.asSettingEntry(clientModifiedSince = SyncDateProvider.now())
                 )
             }
         } else {
             val settingsToUpdate = settingsSyncMetadataDao.getChangesSince(clientModifiedSince)
-            // TODO: missing case for settings added later on, how to detect them?
             syncableSettings.forEach { setting ->
                 val metadata = settingsToUpdate.find { it.key == setting.key } ?: return@forEach
                 Timber.i("Sync-Settings: changes since=$clientModifiedSince metadata=$metadata")
-                setting.getValue()?.let { value ->
-                    Timber.i("Sync-Settings: adding changed update key ${setting.key} value=$value")
-                    updates.add(
-                        SettingEntry(
-                            key = setting.key,
-                            value = syncCrypto.encrypt(value),
-                            client_last_modified = metadata.modified_at,
-                        ),
-                    )
-                } ?: updates.add(
-                    SettingEntry(
-                        key = setting.key,
-                        value = "",
-                        deleted = "1",
-                        client_last_modified = metadata.modified_at,
-                    ),
+                updates.add(
+                    setting.asSettingEntry(metadata.modified_at ?: SyncDateProvider.now())
                 )
             }
         }
@@ -130,6 +101,16 @@ class SettingsSyncDataProvider @Inject constructor(
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
             SyncChangesRequest(SETTINGS, allDataJSON, modifiedSince)
         }
+    }
+
+    private fun SyncableSetting.asSettingEntry(clientModifiedSince: String): SettingEntry {
+        val value = getValue()?.let { syncCrypto.encrypt(it) }
+        return SettingEntry(
+            key = key,
+            value = value ?: "",
+            client_last_modified = clientModifiedSince,
+            deleted = if (value == null) "1" else null,
+        )
     }
 
     private class Adapters {

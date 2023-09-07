@@ -159,7 +159,7 @@ class SettingsSyncDataProviderTest {
     }
 
     @Test
-    fun whenGetChangesSubsequentCallsAndSettingNullThenUpdatesAreEmpty() {
+    fun whenGetChangesSubsequentCallsAndSettingNullThenSendAsDeleted() {
         settingSyncStore.serverModifiedSince = "2022-01-01T00:00:00Z"
         settingSyncStore.clientModifiedSince = "2022-01-01T00:00:00Z"
         metadataDao.addOrUpdate(SettingsSyncMetadataEntity(duckAddressSetting.key, "2022-01-02T00:00:00Z", ""))
@@ -175,6 +175,17 @@ class SettingsSyncDataProviderTest {
             assertFalse(patch.settings.updates[0].deleted.isNullOrEmpty())
         }
         assertTrue(changes.modifiedSince is ModifiedSince.Timestamp)
+    }
+
+    @Test
+    fun whenSyncableSettingNotFoundThenSkipUpdate() {
+        settingSyncStore.serverModifiedSince = "2022-01-01T00:00:00Z"
+        settingSyncStore.clientModifiedSince = "2022-01-01T00:00:00Z"
+        metadataDao.addOrUpdate(SettingsSyncMetadataEntity("unknown_setting", "2022-01-02T00:00:00Z", ""))
+
+        val changes = testee.getChanges()
+
+        assertTrue(changes.jsonString.isEmpty())
     }
 
     companion object {
