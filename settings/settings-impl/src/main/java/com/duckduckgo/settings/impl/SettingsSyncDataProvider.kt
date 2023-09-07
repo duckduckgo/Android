@@ -61,7 +61,7 @@ class SettingsSyncDataProvider @Inject constructor(
         if (clientModifiedSince == "0") {
             syncableSettings.forEach { setting ->
                 updates.add(
-                    setting.asSettingEntry(clientModifiedSince = SyncDateProvider.now())
+                    setting.asSettingEntry(clientModifiedSince = SyncDateProvider.now()),
                 )
             }
         } else {
@@ -70,7 +70,7 @@ class SettingsSyncDataProvider @Inject constructor(
                 val metadata = settingsToUpdate.find { it.key == setting.key } ?: return@forEach
                 Timber.i("Sync-Settings: changes since=$clientModifiedSince metadata=$metadata")
                 updates.add(
-                    setting.asSettingEntry(metadata.modified_at ?: SyncDateProvider.now())
+                    setting.asSettingEntry(metadata.modified_at ?: SyncDateProvider.now()),
                 )
             }
         }

@@ -353,6 +353,6 @@ open class FakeEmailSync : SyncableSetting {
     }
 
     override fun onSettingChanged() {
-        //no-op
+        // no-op
     }
 }

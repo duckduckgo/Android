@@ -34,12 +34,12 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import timber.log.Timber
-import javax.inject.*
 
 @ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = EmailManager::class)
