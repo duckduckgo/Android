@@ -12,15 +12,15 @@ import org.mockito.kotlin.*
 
 class EmailSyncTest {
 
-    private val emailManagerMock = mock<EmailDataStore>()
+    private val emailDataStoreMock = mock<EmailDataStore>()
     private val syncSettingsListenerMock = mock<SyncSettingsListener>()
 
-    private val testee = EmailSync(emailManagerMock, syncSettingsListenerMock)
+    private val testee = EmailSync(emailDataStoreMock, syncSettingsListenerMock)
 
     @Test
     fun whenUserSignedInThenReturnAccountInfo() {
-        whenever(emailManagerMock.emailUsername).thenReturn("username")
-        whenever(emailManagerMock.emailToken).thenReturn("token")
+        whenever(emailDataStoreMock.emailUsername).thenReturn("username")
+        whenever(emailDataStoreMock.emailToken).thenReturn("token")
 
         val value = testee.getValue()
 
@@ -32,8 +32,8 @@ class EmailSyncTest {
 
     @Test
     fun whenUserSignedOutThenReturnNull() {
-        whenever(emailManagerMock.emailUsername).thenReturn(null)
-        whenever(emailManagerMock.emailToken).thenReturn(null)
+        whenever(emailDataStoreMock.emailUsername).thenReturn(null)
+        whenever(emailDataStoreMock.emailToken).thenReturn(null)
 
         val value = testee.getValue()
 
@@ -44,60 +44,60 @@ class EmailSyncTest {
     fun whenSaveValueThenStoreCredentials() {
         testee.save("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock).emailUsername = "email"
-        verify(emailManagerMock).emailToken = "token"
+        verify(emailDataStoreMock).emailUsername = "email"
+        verify(emailDataStoreMock).emailToken = "token"
     }
 
     @Test
     fun whenSaveNullThenLogoutUser() {
         testee.save(null)
 
-        verify(emailManagerMock).emailUsername = ""
-        verify(emailManagerMock).emailToken = ""
+        verify(emailDataStoreMock).emailUsername = ""
+        verify(emailDataStoreMock).emailToken = ""
     }
 
     @Test
     fun whenMergeRemoteAddressWithSameLocalAddressThenDoNothing() {
-        whenever(emailManagerMock.emailUsername).thenReturn("username")
-        whenever(emailManagerMock.emailToken).thenReturn("token")
+        whenever(emailDataStoreMock.emailUsername).thenReturn("username")
+        whenever(emailDataStoreMock.emailToken).thenReturn("token")
 
         testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock).emailUsername = "email"
-        verify(emailManagerMock).emailToken = "token"
+        verify(emailDataStoreMock).emailUsername = "email"
+        verify(emailDataStoreMock).emailToken = "token"
     }
 
     @Test
     fun whenMergeRemoteAddressWithDifferentLocalAddressThenRemoteWins() {
-        whenever(emailManagerMock.emailUsername).thenReturn("username2")
-        whenever(emailManagerMock.emailToken).thenReturn("token2")
+        whenever(emailDataStoreMock.emailUsername).thenReturn("username2")
+        whenever(emailDataStoreMock.emailToken).thenReturn("token2")
 
         testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock).emailUsername = "email"
-        verify(emailManagerMock).emailToken = "token"
+        verify(emailDataStoreMock).emailUsername = "email"
+        verify(emailDataStoreMock).emailToken = "token"
     }
 
     @Test
     fun whenMergeRemoteAddressWithNoLocalAccountThenStoreRemote() {
-        whenever(emailManagerMock.emailUsername).thenReturn(null)
-        whenever(emailManagerMock.emailToken).thenReturn(null)
+        whenever(emailDataStoreMock.emailUsername).thenReturn(null)
+        whenever(emailDataStoreMock.emailToken).thenReturn(null)
 
         testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
-        verify(emailManagerMock).emailUsername = "email"
-        verify(emailManagerMock).emailToken = "token"
+        verify(emailDataStoreMock).emailUsername = "email"
+        verify(emailDataStoreMock).emailToken = "token"
     }
 
     @Test
     fun whenMergeNullAddresThenDoNothing() {
-        whenever(emailManagerMock.emailUsername).thenReturn("username")
-        whenever(emailManagerMock.emailToken).thenReturn("token")
+        whenever(emailDataStoreMock.emailUsername).thenReturn("username")
+        whenever(emailDataStoreMock.emailToken).thenReturn("token")
 
         testee.mergeRemote(null)
 
-        verify(emailManagerMock, times(0)).emailToken
-        verify(emailManagerMock, times(0)).emailUsername
+        verify(emailDataStoreMock, times(0)).emailToken
+        verify(emailDataStoreMock, times(0)).emailUsername
     }
 
     companion object {
