@@ -256,7 +256,7 @@ class BrowserTabViewModel @Inject constructor(
         val forceRenderingTicker: Long = System.currentTimeMillis(),
         val canPrintPage: Boolean = false,
         val showAutofill: Boolean = false,
-        val browserError: WebViewErrorResponse = OMITTED
+        val browserError: WebViewErrorResponse = OMITTED,
     )
 
     sealed class HighlightableButton {
@@ -478,7 +478,7 @@ class BrowserTabViewModel @Inject constructor(
         class AcceptGeneratedPassword(val url: String) : Command()
         class RejectGeneratedPassword(val url: String) : Command()
 
-        data class WebViewError(val errorType: WebViewErrorResponse): Command()
+        data class WebViewError(val errorType: WebViewErrorResponse) : Command()
     }
 
     sealed class NavigationCommand : Command() {

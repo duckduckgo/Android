@@ -42,5 +42,5 @@
     <!-- Sasquatch -->
     <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
     <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
-    <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
+    <string name="webViewErrorBadUrl">A server with the specified hostname\ncould not be found.</string>
 </resources>

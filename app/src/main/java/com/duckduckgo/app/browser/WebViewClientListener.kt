@@ -25,8 +25,6 @@ import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -41,7 +39,7 @@ interface WebViewClientListener {
 
     fun onSitePermissionRequested(
         request: PermissionRequest,
-        sitePermissionsAllowedToAsk: Array<String>
+        sitePermissionsAllowedToAsk: Array<String>,
     )
 
     fun onSiteLocationPermissionRequested(
