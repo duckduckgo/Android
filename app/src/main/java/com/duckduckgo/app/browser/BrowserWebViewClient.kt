@@ -407,7 +407,7 @@ class BrowserWebViewClient @Inject constructor(
     override fun onReceivedError(
         view: WebView?,
         request: WebResourceRequest?,
-        error: WebResourceError?
+        error: WebResourceError?,
     ) {
         error?.let {
             val error = parseErrorResponse(it)
