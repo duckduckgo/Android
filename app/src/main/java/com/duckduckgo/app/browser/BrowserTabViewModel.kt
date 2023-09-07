@@ -477,6 +477,8 @@ class BrowserTabViewModel @Inject constructor(
 
         class AcceptGeneratedPassword(val url: String) : Command()
         class RejectGeneratedPassword(val url: String) : Command()
+
+        data class WebViewError(val errorType: WebViewErrorResponse): Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -2437,7 +2439,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         command.value =
-            if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxEndEnableAppTpCta) HideKeyboard else ShowKeyboard
+            if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
