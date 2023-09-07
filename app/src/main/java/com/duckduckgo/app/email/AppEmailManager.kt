@@ -48,7 +48,6 @@ class AppEmailManager @Inject constructor(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
     private val emailSettings: SyncableSetting,
-    private val callback: SyncSettingCallback,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
@@ -85,7 +84,7 @@ class AppEmailManager @Inject constructor(
             isSignedInStateFlow.emit(isSignedIn())
             generateNewAlias()
             pixel.fire(EMAIL_ENABLED)
-            callback.onSettingChanged(DUCK_EMAIL_SETTING)
+            emailSettings.onSettingChanged()
         }
     }
 
@@ -94,7 +93,7 @@ class AppEmailManager @Inject constructor(
             emailDataStore.clearEmailData()
             isSignedInStateFlow.emit(false)
             pixel.fire(EMAIL_DISABLED)
-            callback.onSettingChanged(DUCK_EMAIL_SETTING)
+            emailSettings.onSettingChanged()
         }
     }
 

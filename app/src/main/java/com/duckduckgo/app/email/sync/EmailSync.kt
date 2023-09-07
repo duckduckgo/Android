@@ -32,6 +32,7 @@ import javax.inject.*
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)
 class EmailSync @Inject constructor(
     private val emailDataStore: EmailDataStore,
+    private val syncSettingsListener: SyncSettingsListener,
 ) : SyncableSetting {
 
     private var listener: (String) -> Unit = {}
@@ -91,6 +92,10 @@ class EmailSync @Inject constructor(
 
     override fun registerToRemoteChanges(listener: (String) -> Unit) {
         this.listener = listener
+    }
+
+    override fun onSettingChanged() {
+        syncSettingsListener.onSettingChanged(key)
     }
 
     companion object {

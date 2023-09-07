@@ -27,7 +27,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class SyncSettingListener @Inject constructor(
     private val syncMetadataDao: SettingsSyncMetadataDao,
-): SyncSettingCallback {
+): SyncSettingsListener {
     override fun onSettingChanged(settingKey: String) {
         Timber.i("Sync-Settings: onSettingChanged($settingKey)")
         val entity = SettingsSyncMetadataEntity(

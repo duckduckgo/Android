@@ -46,7 +46,7 @@ class SettingsSyncDataPersister @Inject constructor(
     override fun persist(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         if (changes.type == SETTINGS) {
             val syncableSettings = syncableSettings.getPlugins()
             return runBlocking(dispatchers.io()) {
@@ -55,14 +55,18 @@ class SettingsSyncDataPersister @Inject constructor(
                 result
             }
         }
-        return Success(false)
+        return Success()
     }
 
-    private suspend fun process(changes: SyncChangesResponse, syncableSettings: Collection<SyncableSetting>, conflictResolution: SyncConflictResolution): SyncMergeResult<Boolean> {
+    private suspend fun process(
+        changes: SyncChangesResponse,
+        syncableSettings: Collection<SyncableSetting>,
+        conflictResolution: SyncConflictResolution
+    ): SyncMergeResult {
         if (changes.jsonString.isEmpty()) {
             Timber.i("Sync-Settings: jsonString is empty")
             //update timestamps
-            return Success(false)
+            return Success()
         }
 
         val response = runCatching {
@@ -96,7 +100,7 @@ class SettingsSyncDataPersister @Inject constructor(
         return result
     }
 
-    private fun processEntries(settings: CredentialsSyncEntries, syncableSettings: Collection<SyncableSetting>, conflictResolution: SyncConflictResolution): SyncMergeResult<Boolean>  {
+    private fun processEntries(settings: CredentialsSyncEntries, syncableSettings: Collection<SyncableSetting>, conflictResolution: SyncConflictResolution): SyncMergeResult {
         settings.entries.forEach { entry ->
             Timber.i("Sync-Settings: processEntries() entry=${entry.key}")
             val syncableFeature = syncableSettings.firstOrNull { it.key == entry.key } ?: return@forEach
@@ -126,10 +130,10 @@ class SettingsSyncDataPersister @Inject constructor(
         }
 
         //TODO: should we do error handling per setting?
-        return Success(true)
+        return Success()
     }
 
-    private fun applyChanges(syncableFeature: SyncableSetting, entry: SettingEntryResponse): SyncMergeResult<Boolean> {
+    private fun applyChanges(syncableFeature: SyncableSetting, entry: SettingEntryResponse): SyncMergeResult {
         val localCredential = settingsSyncMetadataDao.get(entry.key)
         val clientModifiedSinceMillis =
             runCatching { DatabaseDateFormatter.parseIso8601ToMillis(syncSettingsSyncStore.startTimeStamp) }.getOrDefault(0)
@@ -144,7 +148,7 @@ class SettingsSyncDataPersister @Inject constructor(
             val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it)}
             syncableFeature.save(decryptedValue)
         }
-        return Success(true)
+        return Success()
     }
 
     override fun onSyncDisabled() {

@@ -24,4 +24,5 @@ interface SyncableSetting {
     fun mergeRemote(value: String?): Boolean
 
     fun registerToRemoteChanges(listener: (String) -> Unit)
+    fun onSettingChanged()
 }

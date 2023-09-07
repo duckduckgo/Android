@@ -16,6 +16,6 @@
 
 package com.duckduckgo.settings.api
 
-interface SyncSettingCallback {
+interface SyncSettingsListener {
     fun onSettingChanged(settingKey: String)
 }
