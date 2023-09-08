@@ -5,7 +5,6 @@ import androidx.room.*
 import androidx.test.ext.junit.runners.*
 import androidx.test.platform.app.*
 import com.duckduckgo.app.*
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.settings.api.*
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.api.engine.*
@@ -191,53 +190,5 @@ class SettingsSyncDataProviderTest {
     companion object {
         private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
         val patchAdapter: JsonAdapter<SyncSettingsRequest> = moshi.adapter(SyncSettingsRequest::class.java).serializeNulls()
-    }
-}
-
-open class FakeSyncableSetting() : SyncableSetting {
-    override var key: String = "fake_setting"
-
-    private var value: String? = "fake_value"
-
-    override fun getValue(): String? = value
-
-    override fun save(value: String?): Boolean {
-        this.value = value
-        return true
-    }
-
-    override fun mergeRemote(value: String?): Boolean {
-        this.value = value
-        return true
-    }
-
-    override fun registerToRemoteChanges(onDataChanged: () -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onSettingChanged() {
-        TODO("Not yet implemented")
-    }
-}
-
-class FakeCrypto : SyncCrypto {
-    override fun encrypt(text: String) = text
-
-    override fun decrypt(data: String) = data
-}
-
-class FakeSettingsSyncStore : SettingsSyncStore {
-    override var serverModifiedSince: String = "0"
-
-    override var clientModifiedSince: String = "0"
-
-    override var startTimeStamp: String = "0"
-}
-
-class SyncableSettingsPluginPoint(
-    val syncableSettings: MutableList<SyncableSetting>,
-) : PluginPoint<SyncableSetting> {
-    override fun getPlugins(): Collection<SyncableSetting> {
-        return syncableSettings
     }
 }

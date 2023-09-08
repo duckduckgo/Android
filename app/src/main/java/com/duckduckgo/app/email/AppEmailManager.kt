@@ -131,7 +131,7 @@ class AppEmailManager @Inject constructor(
     override fun getToken(): String? = emailDataStore.emailToken
 
     private fun refreshEmailState() {
-        Timber.i("Sync-Settings: onAccountDataChanged()")
+        Timber.i("Sync-Settings: refreshEmailState()")
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(isSignedIn())
             if (isSignedIn()) {
