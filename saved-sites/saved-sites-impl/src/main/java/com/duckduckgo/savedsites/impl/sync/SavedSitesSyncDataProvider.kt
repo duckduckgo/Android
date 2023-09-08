@@ -41,11 +41,11 @@ class SavedSitesSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
 
     override fun getChanges(): SyncChangesRequest {
-        val since = savedSitesSyncStore.modifiedSince
-        val updates = if (since == "0") {
+        savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
+        val updates = if (savedSitesSyncStore.modifiedSince == "0") {
             allContent()
         } else {
-            changesSince(since)
+            changesSince(savedSitesSyncStore.clientModifiedSince)
         }
         return formatUpdates(updates)
     }

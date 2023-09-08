@@ -60,6 +60,8 @@ class SavedSitesSyncPersister @Inject constructor(
 
     override fun onSyncDisabled() {
         savedSitesSyncStore.modifiedSince = "0"
+        savedSitesSyncStore.clientModifiedSince = "0"
+        savedSitesSyncStore.startTimeStamp = "0"
     }
 
     fun process(
@@ -77,9 +79,7 @@ class SavedSitesSyncPersister @Inject constructor(
 
             if (conflictResolution == DEDUPLICATION) {
                 // first sync has a special case, bookmarks and favorites that were added previously to sync need to be updated to lastModified
-                val modifiedSince = OffsetDateTime.parse(savedSitesSyncStore.modifiedSince)
-                val updatedModifiedSince = modifiedSince.plusSeconds(1)
-                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.modifiedSince, DatabaseDateFormatter.iso8601(updatedModifiedSince))
+                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.modifiedSince, savedSitesSyncStore.startTimeStamp)
             }
         }
 
@@ -98,8 +98,11 @@ class SavedSitesSyncPersister @Inject constructor(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
-        Timber.d("Sync-Feature: updating bookmarks last_modified to ${bookmarks.last_modified}")
-        savedSitesSyncStore.modifiedSince = bookmarks.last_modified
+        savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
+        savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp
+
+        Timber.d("Sync-Feature: updating bookmarks server last_modified to ${savedSitesSyncStore.serverModifiedSince}")
+        Timber.d("Sync-Feature: updating bookmarks client last_modified to ${savedSitesSyncStore.clientModifiedSince}")
 
         return if (bookmarks.entries.isEmpty()) {
             Timber.d("Sync-Feature: merging completed, no entries to merge")
