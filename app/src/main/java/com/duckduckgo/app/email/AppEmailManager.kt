@@ -47,7 +47,7 @@ import timber.log.Timber
 class AppEmailManager @Inject constructor(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
-    @Named(EmailSync.DUCK_EMAIL_SETTING) private val emailSettings: SyncableSetting,
+    private val emailSettings: EmailSync,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,

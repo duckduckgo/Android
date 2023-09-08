@@ -25,6 +25,7 @@ import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
 import com.duckduckgo.app.email.api.EmailAlias
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.email.sync.*
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -58,7 +59,8 @@ class AppEmailManagerTest {
 
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = FakeEmailDataStore()
-    private val emailSyncableSetting = spy(FakeEmailSync())
+    private val mockSyncSettingsListener = mock<SyncSettingsListener>()
+    private val emailSyncableSetting = EmailSync(mockEmailDataStore, mockSyncSettingsListener)
     private val mockPixel: Pixel = mock()
     lateinit var testee: AppEmailManager
 
@@ -160,7 +162,7 @@ class AppEmailManagerTest {
 
         testee.storeCredentials("token", "username", "cohort")
 
-        verify(emailSyncableSetting).onSettingChanged()
+        verify(mockSyncSettingsListener).onSettingChanged(emailSyncableSetting.key)
     }
 
     @Test
@@ -211,7 +213,7 @@ class AppEmailManagerTest {
     fun whenSignedOutThenNotifySyncableSetting() {
         testee.signOut()
 
-        verify(emailSyncableSetting).onSettingChanged()
+        verify(mockSyncSettingsListener).onSettingChanged(emailSyncableSetting.key)
     }
 
     @Test
@@ -300,10 +302,7 @@ class AppEmailManagerTest {
     fun whenSyncableSettingNotifiesChangeThenRefreshEmailState() = runTest {
         testee.signedInFlow().test {
             assertFalse(awaitItem())
-            mockEmailDataStore.emailToken = "token"
-            mockEmailDataStore.emailUsername = "user"
-            mockEmailDataStore.nextAlias = "nextAlias@duck.com"
-            emailSyncableSetting.onDataChanged()
+            emailSyncableSetting.save("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
             assertTrue(awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -327,32 +326,4 @@ class FakeEmailDataStore : EmailDataStore {
 
     var canUseEncryption: Boolean = false
     override fun canUseEncryption(): Boolean = canUseEncryption
-}
-
-open class FakeEmailSync : SyncableSetting {
-    lateinit var onDataChanged: () -> Unit
-
-    override var key: String = "fake_setting"
-
-    private var value: String? = "fake_value"
-
-    override fun getValue(): String? = value
-
-    override fun save(value: String?): Boolean {
-        this.value = value
-        return true
-    }
-
-    override fun mergeRemote(value: String?): Boolean {
-        this.value = value
-        return true
-    }
-
-    override fun registerToRemoteChanges(onDataChanged: () -> Unit) {
-        this.onDataChanged = onDataChanged
-    }
-
-    override fun onSettingChanged() {
-        // no-op
-    }
 }

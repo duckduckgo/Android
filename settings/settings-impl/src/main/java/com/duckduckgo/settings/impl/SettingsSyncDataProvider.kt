@@ -42,6 +42,7 @@ class SettingsSyncDataProvider @Inject constructor(
         val syncableSettings = syncableSettings.getPlugins()
         if (settingsSyncStore.serverModifiedSince == "0") {
             val keys = syncableSettings.map { it.key }
+            Timber.i("Sync-Settings: initialize keys=$keys")
             settingsSyncMetadataDao.initialize(keys)
         }
 
