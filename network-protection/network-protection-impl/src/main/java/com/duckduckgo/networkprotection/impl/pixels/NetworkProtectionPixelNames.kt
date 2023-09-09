@@ -47,6 +47,8 @@ enum class NetworkProtectionPixelNames(
     NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_c", enqueue = true),
     NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY_DAILY("m_netp_ev_wireguard_error_unable_to_load_wireguard_library_d", enqueue = true),
     NETP_LATENCY_REPORT("m_netp_ev_latency_c"),
+    NETP_REPORT_POOR_LATENCY_DAILY("m_netp_ev_poor_latency_d"),
+    NETP_REPORT_LATENCY_ERROR_DAILY("m_netp_ev_latency_error_d"),
     NETP_REKEY_COMPLETED("m_netp_ev_rekey_completed_c"),
     NETP_REKEY_COMPLETED_DAILY("m_netp_ev_rekey_completed_d"),
     NETP_VPN_CONFLICT_SHOWN("m_netp_imp_vpn_conflict_dialog_c"),

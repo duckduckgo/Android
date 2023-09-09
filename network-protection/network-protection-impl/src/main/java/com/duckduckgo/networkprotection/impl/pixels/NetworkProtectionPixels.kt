@@ -84,6 +84,18 @@ interface NetworkProtectionPixels {
     fun reportLatency(metadata: Map<String, String>)
 
     /**
+     * This fun will fire one pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     */
+    fun reportPoorLatency()
+
+    /**
+     * This fun will fire one pixel
+     * daily -> fire only once a day no matter how many times we call this fun
+     */
+    fun reportLatencyMeasurementError()
+
+    /**
      * This fun will fire two pixels
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
@@ -277,6 +289,14 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun reportLatency(metadata: Map<String, String>) {
         firePixel(NETP_LATENCY_REPORT, metadata)
+    }
+
+    override fun reportPoorLatency() {
+        tryToFireDailyPixel(NETP_REPORT_POOR_LATENCY_DAILY)
+    }
+
+    override fun reportLatencyMeasurementError() {
+        tryToFireDailyPixel(NETP_REPORT_LATENCY_ERROR_DAILY)
     }
 
     override fun reportRekeyCompleted() {
