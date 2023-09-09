@@ -1321,8 +1321,6 @@
      * @implements {MessagingTransport}
      */
     class WindowsMessagingTransport {
-        config
-
         /**
          * @param {WindowsMessagingConfig} config
          * @param {import('../index.js').MessagingContext} messagingContext
@@ -1822,11 +1820,6 @@
      * @implements {MessagingTransport}
      */
     class WebkitMessagingTransport {
-        /** @type {WebkitMessagingConfig} */
-        config
-        /** @internal */
-        globals
-
         /**
          * @param {WebkitMessagingConfig} config
          * @param {import('../index.js').MessagingContext} messagingContext
