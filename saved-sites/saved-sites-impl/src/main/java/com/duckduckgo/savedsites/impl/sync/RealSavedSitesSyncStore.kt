@@ -25,8 +25,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface SavedSitesSyncStore {
-    var modifiedSince: String
-
     var serverModifiedSince: String
     var startTimeStamp: String
     var clientModifiedSince: String
@@ -35,10 +33,6 @@ interface SavedSitesSyncStore {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealSavedSitesSyncStore @Inject constructor(private val context: Context) : SavedSitesSyncStore {
-
-    override var modifiedSince: String
-        get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"
-        set(value) = preferences.edit(true) { putString(KEY_MODIFIED_SINCE, value) }
 
     override var serverModifiedSince: String
         get() = preferences.getString(KEY_MODIFIED_SINCE, "0") ?: "0"

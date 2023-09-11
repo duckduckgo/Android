@@ -78,7 +78,7 @@ class SavedSitesSyncPersisterTest {
     @Test
     fun whenProcessingDataInEmptyDBThenResultIsSuccess() {
         whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(Success(true))
-        whenever(store.modifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(store.serverModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
         val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
         val result = syncPersister.process(validChanges, DEDUPLICATION)

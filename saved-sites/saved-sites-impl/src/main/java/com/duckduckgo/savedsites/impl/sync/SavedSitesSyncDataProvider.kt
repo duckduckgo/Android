@@ -42,7 +42,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     override fun getChanges(): SyncChangesRequest {
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
-        val updates = if (savedSitesSyncStore.modifiedSince == "0") {
+        val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
             allContent()
         } else {
             changesSince(savedSitesSyncStore.clientModifiedSince)
@@ -200,16 +200,16 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChangesRequest {
-        val modifiedSince = if (savedSitesSyncStore.modifiedSince == "0") {
+        val modifiedSince = if (savedSitesSyncStore.serverModifiedSince == "0") {
             ModifiedSince.FirstSync
         } else {
-            ModifiedSince.Timestamp(savedSitesSyncStore.modifiedSince)
+            ModifiedSince.Timestamp(savedSitesSyncStore.serverModifiedSince)
         }
 
         return if (updates.isEmpty()) {
             SyncChangesRequest(BOOKMARKS, "", modifiedSince)
         } else {
-            val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
+            val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.serverModifiedSince)
             val patch = SyncBookmarksRequest(bookmarkUpdates, DatabaseDateFormatter.iso8601())
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
             SyncChangesRequest(BOOKMARKS, allDataJSON, modifiedSince)

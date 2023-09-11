@@ -59,7 +59,7 @@ class SavedSitesSyncPersister @Inject constructor(
     }
 
     override fun onSyncDisabled() {
-        savedSitesSyncStore.modifiedSince = "0"
+        savedSitesSyncStore.serverModifiedSince = "0"
         savedSitesSyncStore.clientModifiedSince = "0"
         savedSitesSyncStore.startTimeStamp = "0"
     }
@@ -79,7 +79,7 @@ class SavedSitesSyncPersister @Inject constructor(
 
             if (conflictResolution == DEDUPLICATION) {
                 // first sync has a special case, bookmarks and favorites that were added previously to sync need to be updated to lastModified
-                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.modifiedSince, savedSitesSyncStore.startTimeStamp)
+                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.serverModifiedSince, savedSitesSyncStore.startTimeStamp)
             }
         }
 
