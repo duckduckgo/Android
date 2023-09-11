@@ -18,6 +18,7 @@ package com.duckduckgo.app.accessibility
 
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
 import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -77,6 +78,9 @@ class AccessibilityActivity : DuckDuckGoActivity() {
                 renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
                 binding.appFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
+                if (viewState.showVoiceSearch) {
+                    binding.voiceSearchToggle.visibility = View.VISIBLE
+                }
             }.launchIn(lifecycleScope)
     }
 

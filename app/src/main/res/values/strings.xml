@@ -677,6 +677,8 @@
     <string name="accessibilityForceZoomSubtitle">Pinch and zoom on any site, even those that would otherwise prevent it</string>
     <string name="accessibilityTextSizeOverrideTitle">Manage text size</string>
     <string name="accessibilityTextSizeOverrideSubtitle">Text on websites you view in DuckDuckGo will adjust to match the setting below</string>
+    <string name="accessibilityVoiceSearchSubtitle">Add Voice Search option to the address bar</string>
+    <string name="accessibilityVoiceSearchTitle">Private Voice Search</string>
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privacy Policy</string>
