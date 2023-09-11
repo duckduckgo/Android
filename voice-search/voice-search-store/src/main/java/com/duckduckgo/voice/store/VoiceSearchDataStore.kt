@@ -24,6 +24,7 @@ interface VoiceSearchDataStore {
     var permissionDeclinedForever: Boolean
     var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
+    var isVoiceSearchEnabled: Boolean
 }
 
 class SharedPreferencesVoiceSearchDataStore constructor(
@@ -34,6 +35,7 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         const val KEY_DECLINED_PERMISSION_FOREVER = "KEY_DECLINED_PERMISSION_FOREVER"
         const val KEY_RATIONALE_DIALOG_ACCEPTED = "KEY_RATIONALE_DIALOG_ACCEPTED"
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
+        const val KEY_VOICE_SEARCH_ENABLED = "KEY_VOICE_SEARCH_ENABLED"
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -54,6 +56,12 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         get() = preferences.getBoolean(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, false)
         set(value) {
             updateValue(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, value)
+        }
+
+    override var isVoiceSearchEnabled: Boolean
+        get() = preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, true)
+        set(value) {
+            updateValue(KEY_VOICE_SEARCH_ENABLED, value)
         }
 
     private fun updateValue(

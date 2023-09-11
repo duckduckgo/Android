@@ -58,6 +58,10 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         viewModel.onFontSizeChanged(newValue)
     }
 
+    private val voiceSearchChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onVoiceSearchChanged(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -80,6 +84,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
                 if (viewState.showVoiceSearch) {
                     binding.voiceSearchToggle.visibility = View.VISIBLE
+                    binding.voiceSearchToggle.quietlySetIsChecked(viewState.voiceSearchEnabled, voiceSearchChangeListener)
                 }
             }.launchIn(lifecycleScope)
     }

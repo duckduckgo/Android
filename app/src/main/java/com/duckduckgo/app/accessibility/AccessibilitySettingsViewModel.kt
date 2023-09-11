@@ -32,7 +32,8 @@ import timber.log.Timber
 @ContributesViewModel(ActivityScope::class)
 class AccessibilitySettingsViewModel @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore,
-    private val voiceSearchAvailability: VoiceSearchAvailability
+    private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val voiceSearchDataStore: VoiceSearchDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -54,7 +55,8 @@ class AccessibilitySettingsViewModel @Inject constructor(
                     overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom,
-                    showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported
+                    showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
+                    voiceSearchEnabled = voiceSearchDataStore.isVoiceSearchEnabled
                 ),
             )
         }
@@ -92,6 +94,15 @@ class AccessibilitySettingsViewModel @Inject constructor(
                 currentViewState().copy(
                     appFontSize = accessibilitySettings.appFontSize,
                 ),
+            )
+        }
+    }
+
+    fun onVoiceSearchChanged(checked: Boolean) {
+        voiceSearchDataStore.isVoiceSearchEnabled = checked
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(voiceSearchEnabled = voiceSearchDataStore.isVoiceSearchEnabled)
             )
         }
     }

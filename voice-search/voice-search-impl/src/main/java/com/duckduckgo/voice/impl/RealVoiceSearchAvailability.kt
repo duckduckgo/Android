@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
+import com.duckduckgo.voice.store.VoiceSearchDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -28,6 +29,7 @@ class RealVoiceSearchAvailability @Inject constructor(
     private val configProvider: VoiceSearchAvailabilityConfigProvider,
     private val voiceSearchFeature: VoiceSearchFeature,
     private val voiceSearchRepository: VoiceSearchFeatureRepository,
+    private val voiceSearchDataStore: VoiceSearchDataStore
 ) : VoiceSearchAvailability {
     companion object {
         private const val LANGUAGE_TAG_ENG_US = "en-US"
@@ -57,7 +59,7 @@ class RealVoiceSearchAvailability @Inject constructor(
         // - user is editing the address bar OR
         // - address bar is empty (initial state / new tab) OR
         // - DDG SERP is shown OR (address bar doesn't contain a website)
-        return if (isVoiceSearchSupported) {
+        return if (voiceSearchDataStore.isVoiceSearchEnabled && isVoiceSearchSupported) {
             isEditing || urlLoaded.isEmpty() || urlLoaded.startsWith(URL_DDG_SERP)
         } else {
             false
