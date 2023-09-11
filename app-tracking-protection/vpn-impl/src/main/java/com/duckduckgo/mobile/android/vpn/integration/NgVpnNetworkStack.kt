@@ -181,14 +181,7 @@ class NgVpnNetworkStack @Inject constructor(
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
         if (tunnelThread == null) {
             logcat { "Start native runtime" }
-
-            val level = if (appBuildConfig.isDebug) {
-                VpnNetworkLog.DEBUG
-            } else if (appTpLocalFeature.verboseLogging().isEnabled()) {
-                VpnNetworkLog.INFO
-            } else {
-                VpnNetworkLog.ASSERT
-            }
+            val level = if (appBuildConfig.isDebug || appTpLocalFeature.verboseLogging().isEnabled()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
 
             vpnNetwork.start(jniContext, level)
 
