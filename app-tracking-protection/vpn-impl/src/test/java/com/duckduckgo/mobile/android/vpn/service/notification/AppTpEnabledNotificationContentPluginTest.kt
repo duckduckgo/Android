@@ -96,7 +96,6 @@ class AppTpEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
-        content.assertMessageEquals("")
         assertNull(content.notificationAction)
     }
 
@@ -115,7 +114,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("Scanning for tracking activity… beep… boop")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -129,7 +127,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -149,7 +146,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -168,7 +164,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -194,7 +189,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -220,7 +214,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -237,7 +230,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Scanning for tracking activity… beep… boop")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -257,7 +249,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("Tracking attempts blocked in 1 app (past hour).")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -272,7 +263,6 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = expectMostRecentItem()
 
             item.assertTitleEquals("")
-            item.assertMessageEquals("")
 
             cancelAndConsumeRemainingEvents()
         }
@@ -332,8 +322,4 @@ class AppTpEnabledNotificationContentPluginTest {
 
 internal fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTitleEquals(expected: String) {
     assertEquals(expected, this.title.toString())
-}
-
-internal fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertMessageEquals(expected: String) {
-    assertEquals(expected, this.message.toString())
 }

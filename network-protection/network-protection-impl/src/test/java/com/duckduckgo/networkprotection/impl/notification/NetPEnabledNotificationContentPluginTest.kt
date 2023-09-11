@@ -86,7 +86,6 @@ class NetPEnabledNotificationContentPluginTest {
 
         assertNotNull(content)
         content!!.assertTitleEquals("Network Protection is enabled and routing traffic through the VPN.")
-        content.assertMessageEquals("")
     }
 
     @Test
@@ -110,7 +109,6 @@ class NetPEnabledNotificationContentPluginTest {
 
             assertNotNull(item)
             item!!.assertTitleEquals("Network Protection is enabled and routing traffic through the VPN.")
-            item.assertMessageEquals("")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -126,7 +124,6 @@ class NetPEnabledNotificationContentPluginTest {
 
             assertNotNull(item)
             item!!.assertTitleEquals("Network Protection is enabled and routing device traffic through Stockholm, SE.")
-            item.assertMessageEquals("")
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -161,8 +158,4 @@ class NetPEnabledNotificationContentPluginTest {
 
 private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertTitleEquals(expected: String) {
     Assert.assertEquals(expected, this.title.toString())
-}
-
-private fun VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.assertMessageEquals(expected: String) {
-    Assert.assertEquals(expected, this.message.toString())
 }
