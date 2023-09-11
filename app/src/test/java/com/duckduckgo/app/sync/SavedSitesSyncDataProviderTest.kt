@@ -42,6 +42,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.duckduckgo.sync.api.SyncCrypto
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
