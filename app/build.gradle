@@ -486,3 +486,7 @@ tasks.register('releaseTestCloud', Exec) {
     commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
     dependsOn 'assemblePlayRelease'
 }
+
+task newModule(type: com.duckduckgo.gradle.ModuleCreator) {
+    feature = project.hasProperty('feature') ? project.getProperty('feature') : null
+}
