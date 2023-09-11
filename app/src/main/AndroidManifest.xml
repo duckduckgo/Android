@@ -226,7 +226,7 @@
 
         <activity
             android:name=".BrowserActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
             android:label="@string/appDescription"
             android:launchMode="singleTask"
