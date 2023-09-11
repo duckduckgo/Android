@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -30,7 +31,7 @@ import kotlinx.coroutines.launch
 class DeviceShieldRetentionPixelSender @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : RefreshRetentionAtbPlugin {
 

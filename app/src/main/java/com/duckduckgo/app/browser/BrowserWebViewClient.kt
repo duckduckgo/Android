@@ -40,6 +40,7 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -63,7 +64,7 @@ class BrowserWebViewClient @Inject constructor(
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val browserAutofillConfigurator: BrowserAutofill.Configurator,
     private val accessibilityManager: AccessibilityManager,

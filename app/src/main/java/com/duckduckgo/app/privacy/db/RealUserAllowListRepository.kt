@@ -18,6 +18,7 @@ package com.duckduckgo.app.privacy.db
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.di.scopes.AppScope
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 @SingleInstanceIn(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
     private val userAllowListDao: UserAllowListDao,
-    coroutineScope: CoroutineScope,
+    @AppCoroutineScope coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : UserAllowListRepository {
 

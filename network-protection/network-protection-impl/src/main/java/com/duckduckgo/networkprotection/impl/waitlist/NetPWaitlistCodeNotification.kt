@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.model.Channel
@@ -46,7 +47,7 @@ open class NetPWaitlistCodeNotification @Inject constructor(
     private val context: Context,
     private val netPWaitlistManager: NetPWaitlistManager,
     private val notificationSender: Provider<NotificationSender>,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val networkProtectionState: NetworkProtectionState,
     private val notificationManager: NotificationManagerCompat,
 ) : SchedulableNotification {

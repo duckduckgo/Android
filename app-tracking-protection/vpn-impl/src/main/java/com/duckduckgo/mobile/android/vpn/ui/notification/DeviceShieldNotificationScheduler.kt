@@ -21,6 +21,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
@@ -30,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion
-import com.duckduckgo.vpn.di.VpnCoroutineScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -46,7 +46,7 @@ object DeviceShieldNotificationSchedulerModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldNotificationScheduler(
-        @VpnCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
         workManager: WorkManager,
         vpnDatabase: VpnDatabase,
         dispatchers: DispatcherProvider,
