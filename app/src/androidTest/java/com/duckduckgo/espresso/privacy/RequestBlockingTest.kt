@@ -52,7 +52,7 @@ class RequestBlockingTest {
         ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.glitch.me/privacy-protections/request-blocking/?run",
+                "https://privacy-test-pages.site/privacy-protections/request-blocking/?run",
             ),
         )
 
@@ -84,7 +84,7 @@ class RequestBlockingTest {
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.glitch.me/privacy-protections/request-blocking/?run",
+                "https://privacy-test-pages.site/privacy-protections/request-blocking/?run",
             ),
         )
         scenario.onActivity {

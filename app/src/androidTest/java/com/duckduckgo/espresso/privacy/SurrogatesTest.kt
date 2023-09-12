@@ -58,7 +58,7 @@ class SurrogatesTest {
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/",
+                "https://privacy-test-pages.site/privacy-protections/surrogates/",
             ),
         )
         scenario.onActivity {
@@ -95,7 +95,7 @@ class SurrogatesTest {
         val scenario = ActivityScenario.launch<BrowserActivity>(
             BrowserActivity.intent(
                 InstrumentationRegistry.getInstrumentation().targetContext,
-                "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/",
+                "https://privacy-test-pages.site/privacy-protections/surrogates/",
             ),
         )
         scenario.onActivity {
