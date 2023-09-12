@@ -51,7 +51,7 @@ class AccessibilitySettingsViewModelTest {
             appFontSize = 100f,
             forceZoom = false,
             voiceSearchEnabled = false,
-            showVoiceSearch = false
+            showVoiceSearch = false,
         )
         testee.viewState().test {
             assertEquals(viewState, awaitItem())
@@ -66,7 +66,7 @@ class AccessibilitySettingsViewModelTest {
             appFontSize = 150f,
             forceZoom = true,
             voiceSearchEnabled = true,
-            showVoiceSearch = true
+            showVoiceSearch = true,
         )
         whenever(accessibilitySettings.overrideSystemFontSize).thenReturn(true)
         whenever(accessibilitySettings.appFontSize).thenReturn(150f)
@@ -175,7 +175,6 @@ class AccessibilitySettingsViewModelTest {
         testee.onVoiceSearchChanged(false)
         verify(voiceSearchRepository).setVoiceSearchUserEnabled(false)
     }
-
 
     private fun defaultViewState() = AccessibilitySettingsViewModel.ViewState()
 }

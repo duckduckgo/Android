@@ -64,4 +64,5 @@ class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var permissionDeclinedForever: Boolean = false
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
+    override var isVoiceSearchEnabled: Boolean = false
 }

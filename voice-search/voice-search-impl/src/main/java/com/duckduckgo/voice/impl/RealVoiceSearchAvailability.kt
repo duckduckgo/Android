@@ -29,7 +29,7 @@ class RealVoiceSearchAvailability @Inject constructor(
     private val configProvider: VoiceSearchAvailabilityConfigProvider,
     private val voiceSearchFeature: VoiceSearchFeature,
     private val voiceSearchFeatureRepository: VoiceSearchFeatureRepository,
-    private val voiceSearchRepository: VoiceSearchRepository
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : VoiceSearchAvailability {
     companion object {
         private const val LANGUAGE_TAG_ENG_US = "en-US"

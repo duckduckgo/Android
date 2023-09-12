@@ -21,7 +21,6 @@ import android.content.Context
 import android.os.Build.VERSION_CODES
 import android.speech.SpeechRecognizer
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

@@ -58,6 +58,4 @@ class RealVoiceSearchFeatureRepository constructor(
         manufacturerExceptions.addAll(manufacturerExceptionsEntityList.map { Manufacturer(it.name) })
         _minVersion = voiceSearchDao.getMinVersion()?.minVersion
     }
-
-
 }

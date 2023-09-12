@@ -22,7 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.duckduckgo.voice.store.VoiceSearchDataStore
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +56,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom,
                     showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled()
+                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled(),
                 ),
             )
         }
@@ -103,7 +102,9 @@ class AccessibilitySettingsViewModel @Inject constructor(
         voiceSearchRepository.setVoiceSearchUserEnabled(checked)
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled())
+                currentViewState().copy(
+                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled(),
+                ),
             )
         }
     }

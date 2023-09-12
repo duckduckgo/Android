@@ -21,7 +21,6 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.voice.impl.remoteconfig.Manufacturer
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
-import com.duckduckgo.voice.store.VoiceSearchDataStore
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
@@ -60,7 +59,6 @@ class RealVoiceSearchAvailabilityTest {
 
         assertTrue(testee.isVoiceSearchSupported)
     }
-
 
     @Test
     fun whenDeviceHasValidConfigAndMinVersionIsNullThenIsVoiceSearchSupportedTrue() {
