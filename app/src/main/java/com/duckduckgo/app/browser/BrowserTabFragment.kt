@@ -1178,10 +1178,7 @@ class BrowserTabFragment :
                 includeShortcutToViewCredential = it.includeShortcutToViewCredential,
             )
 
-            is Command.WebViewError -> {
-                showError(it.errorType)
-            }
-
+            is Command.WebViewError -> showError(it.errorType)
             else -> {
                 // NO OP
             }
