@@ -22,11 +22,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MenuItem
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
-import androidx.annotation.MenuRes
-import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -39,9 +36,9 @@ import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalSettingsActivity
-import java.lang.IllegalStateException
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -118,7 +115,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.SendTdsIntent -> sendTdsIntent()
-            is Command.OpenUASelector -> showUASelector(R.menu.user_agent_menu)
+            is Command.OpenUASelector -> showUASelector()
             is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
             is Command.ChangePrivacyConfigUrl -> showChangePrivacyUrl()
             else -> TODO()
@@ -137,24 +134,18 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         sendBroadcast(intent)
     }
 
-    private fun showUASelector(@MenuRes popupMenu: Int) {
-        val popup = PopupMenu(this, binding.overrideUserAgentSelector)
-        popup.menuInflater.inflate(popupMenu, popup.menu)
-        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-            val userAgent = when (menuItem.itemId) {
-                R.id.noAppId -> UAOverride.NO_APP_ID
-                R.id.noVersion -> UAOverride.NO_VERSION
-                R.id.chrome -> UAOverride.CHROME
-                R.id.firefox -> UAOverride.FIREFOX
-                R.id.duckDuckGo -> UAOverride.DDG
-                R.id.webView -> UAOverride.WEBVIEW
-                else -> throw IllegalStateException()
-            }
-            viewModel.onUserAgentSelected(userAgent)
-            true
+    private fun showUASelector() {
+        val popup = PopupMenu(layoutInflater, R.layout.popup_window_user_agent_override)
+        val view = popup.contentView
+        popup.apply {
+            onMenuItemClicked(view.findViewById(R.id.noAppId)) { viewModel.onUserAgentSelected(UAOverride.NO_APP_ID) }
+            onMenuItemClicked(view.findViewById(R.id.noVersion)) { viewModel.onUserAgentSelected(UAOverride.NO_VERSION) }
+            onMenuItemClicked(view.findViewById(R.id.chrome)) { viewModel.onUserAgentSelected(UAOverride.CHROME) }
+            onMenuItemClicked(view.findViewById(R.id.firefox)) { viewModel.onUserAgentSelected(UAOverride.FIREFOX) }
+            onMenuItemClicked(view.findViewById(R.id.duckDuckGo)) { viewModel.onUserAgentSelected(UAOverride.DDG) }
+            onMenuItemClicked(view.findViewById(R.id.webView)) { viewModel.onUserAgentSelected(UAOverride.WEBVIEW) }
         }
-        popup.setOnDismissListener { }
-        popup.show()
+        popup.show(binding.root, binding.overrideUserAgentSelector)
     }
 
     private fun showSavedSitesClearedConfirmation() {
