@@ -40,7 +40,7 @@ abstract class VoiceSearchDao {
     }
 
     @Query("select * from voice_search_manufacturers")
-    abstract fun getAllManufacturers(): List<ManufacturerEntity>
+    abstract fun getAllExceptions(): List<ManufacturerEntity>
 
     @Query("select * from voice_search_min_version limit 1")
     abstract fun getMinVersion(): MinVersionEntity?

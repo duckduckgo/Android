@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 interface VoiceSearchFeatureRepository {
     fun updateAllExceptions(exceptions: List<Manufacturer>, minVersion: Int)
-    val manufacturers: CopyOnWriteArrayList<Manufacturer>
+    val manufacturerExceptions: CopyOnWriteArrayList<Manufacturer>
     val minVersion: Int?
 }
 
@@ -39,7 +39,7 @@ class RealVoiceSearchFeatureRepository constructor(
 
     private val voiceSearchDao: VoiceSearchDao = database.voiceSearchDao()
     private var _minVersion: Int? = null
-    override val manufacturers = CopyOnWriteArrayList<Manufacturer>()
+    override val manufacturerExceptions = CopyOnWriteArrayList<Manufacturer>()
     override val minVersion: Int?
         get() = _minVersion
 
@@ -53,9 +53,9 @@ class RealVoiceSearchFeatureRepository constructor(
     }
 
     private fun loadToMemory() {
-        manufacturers.clear()
-        val manufacturerEntities = voiceSearchDao.getAllManufacturers()
-        manufacturers.addAll(manufacturerEntities.map { Manufacturer(it.name) })
+        manufacturerExceptions.clear()
+        val manufacturerExceptionsEntityList = voiceSearchDao.getAllExceptions()
+        manufacturerExceptions.addAll(manufacturerExceptionsEntityList.map { Manufacturer(it.name) })
         _minVersion = voiceSearchDao.getMinVersion()?.minVersion
     }
 }
