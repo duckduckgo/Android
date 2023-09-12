@@ -21,6 +21,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.voice.impl.remoteconfig.Manufacturer
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
+import com.duckduckgo.voice.store.VoiceSearchDataStore
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
@@ -39,26 +40,32 @@ class RealVoiceSearchAvailabilityTest {
     @Mock
     private lateinit var voiceSearchFeatureRepository: VoiceSearchFeatureRepository
 
+    @Mock
+    private lateinit var voiceSearchDataStore: VoiceSearchDataStore
+
     private lateinit var testee: RealVoiceSearchAvailability
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealVoiceSearchAvailability(configProvider, voiceSearchFeature, voiceSearchFeatureRepository)
+        testee = RealVoiceSearchAvailability(configProvider, voiceSearchFeature, voiceSearchFeatureRepository, voiceSearchDataStore)
     }
 
     @Test
     fun whenDeviceHasValidConfigThenIsVoiceSearchSupportedTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         assertTrue(testee.isVoiceSearchSupported)
     }
+
 
     @Test
     fun whenDeviceHasValidConfigAndMinVersionIsNullThenIsVoiceSearchSupportedTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = null, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         assertTrue(testee.isVoiceSearchSupported)
     }
@@ -67,6 +74,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHasInvalidLanguageThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-UK", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
     }
@@ -75,6 +83,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHasInvalidSdkThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 33, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-UK", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
     }
@@ -83,6 +92,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHasNoSupportForOnDeviceSpeechRecognitionThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = false)
+        setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
     }
@@ -91,6 +101,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenManufacturerIsInExcludedManufacturersListThenIsVoiceSearchSupportedFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = arrayOf("Google"))
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         assertFalse(testee.isVoiceSearchSupported)
     }
@@ -99,6 +110,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchNotSupportedThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = false)
+        setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = true,
@@ -112,6 +124,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndIsEditingUrlThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = true,
@@ -122,9 +135,24 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
+    fun whenVoiceSearchSupportedAndIsEditingUrlAndUserDisabledThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(false)
+
+        val result = testee.shouldShowVoiceSearch(
+            isEditing = true,
+            urlLoaded = "www.fb.com",
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
     fun whenVoiceSearchSupportedAndIsEditingSERPThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = true,
@@ -138,6 +166,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndUrlShownInAddressBarThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = false,
@@ -151,6 +180,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndSERPShownThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = false,
@@ -164,6 +194,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndUrlEmptyThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = false,
@@ -177,6 +208,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenFeatureIsDisabledThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = false, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
             isEditing = false,
@@ -210,5 +242,9 @@ class RealVoiceSearchAvailabilityTest {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(manufacturer, sdkInt, languageTag, isOnDeviceSpeechRecognitionAvailable),
         )
+    }
+
+    private fun setupUserSettings(enabled: Boolean) {
+        whenever(voiceSearchDataStore.isVoiceSearchEnabled).thenReturn(enabled)
     }
 }
