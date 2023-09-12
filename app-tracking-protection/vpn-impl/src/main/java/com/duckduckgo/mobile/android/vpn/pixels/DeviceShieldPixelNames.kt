@@ -134,7 +134,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY("m_atp_imp_report_breakage_login_d"),
 
     ATP_DID_SHOW_DISABLE_TRACKING_PROTECTION_DIALOG("m_atp_imp_disable_protection_dialog_c"),
-    ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_disable_protection_c"),
+    ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_disable_protection_c", enqueue = true),
     ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG("m_atp_ev_selected_disable_app_protection_c"),
     ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG("m_atp_ev_selected_cancel_app_protection_c"),
 
@@ -202,6 +202,9 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR("m_atp_ev_apptp_create_network_stack_error_c"),
     ATP_REPORT_VPN_NETWORK_STACK_CREATE_ERROR_DAILY("m_atp_ev_apptp_create_network_stack_error_d"),
+
+    ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT("m_atp_ev_apptp_tunnel_thread_stop_timeout_c", enqueue = true),
+    ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY("m_atp_ev_apptp_tunnel_thread_stop_timeout_d", enqueue = true),
 
     ;
 }
