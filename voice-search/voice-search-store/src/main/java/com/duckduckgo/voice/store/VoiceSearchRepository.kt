@@ -24,6 +24,7 @@ interface VoiceSearchRepository {
     fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
     fun isVoiceSearchUserEnabled(): Boolean
+    fun setVoiceSearchUserEnabled(enabled: Boolean)
 }
 
 class RealVoiceSearchRepository constructor(
@@ -48,4 +49,8 @@ class RealVoiceSearchRepository constructor(
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
 
     override fun isVoiceSearchUserEnabled(): Boolean = dataStore.isVoiceSearchEnabled
+
+    override fun setVoiceSearchUserEnabled(enabled: Boolean) {
+        dataStore.isVoiceSearchEnabled = enabled
+    }
 }

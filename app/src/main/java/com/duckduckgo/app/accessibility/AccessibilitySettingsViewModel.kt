@@ -23,6 +23,7 @@ import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.store.VoiceSearchDataStore
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +34,7 @@ import timber.log.Timber
 class AccessibilitySettingsViewModel @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore,
     private val voiceSearchAvailability: VoiceSearchAvailability,
-    private val voiceSearchDataStore: VoiceSearchDataStore,
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : ViewModel() {
 
     data class ViewState(
@@ -56,7 +57,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom,
                     showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-                    voiceSearchEnabled = voiceSearchDataStore.isVoiceSearchEnabled
+                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled()
                 ),
             )
         }
@@ -99,10 +100,10 @@ class AccessibilitySettingsViewModel @Inject constructor(
     }
 
     fun onVoiceSearchChanged(checked: Boolean) {
-        voiceSearchDataStore.isVoiceSearchEnabled = checked
+        voiceSearchRepository.setVoiceSearchUserEnabled(checked)
         viewModelScope.launch {
             viewState.emit(
-                currentViewState().copy(voiceSearchEnabled = voiceSearchDataStore.isVoiceSearchEnabled)
+                currentViewState().copy(voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled())
             )
         }
     }
