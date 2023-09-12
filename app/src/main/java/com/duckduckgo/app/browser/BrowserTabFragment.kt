@@ -959,11 +959,11 @@ class BrowserTabFragment :
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
-        errorView.errorMessage!!.setText(errorType.errorId)
+        errorView.errorMessage.setText(errorType.errorId)
         if (appTheme.isLightModeEnabled()) {
-            errorView.yetiIcon!!.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
+            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
         } else {
-            errorView.yetiIcon!!.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
+            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
         }
         errorView.errorLayout.show()
     }
