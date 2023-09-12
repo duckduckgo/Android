@@ -20,7 +20,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -44,7 +43,6 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val variantManager: VariantManager,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(

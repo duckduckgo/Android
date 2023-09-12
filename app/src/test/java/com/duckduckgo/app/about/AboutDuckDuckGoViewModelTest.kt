@@ -78,7 +78,6 @@ internal class AboutDuckDuckGoViewModelTest {
             mockAppBuildConfig,
             mockVariantManager,
             mockPixel,
-            coroutineTestRule.testDispatcherProvider,
         )
     }
 
