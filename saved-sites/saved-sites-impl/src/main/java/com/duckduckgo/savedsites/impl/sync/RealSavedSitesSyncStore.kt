@@ -44,7 +44,6 @@ class RealSavedSitesSyncStore @Inject constructor(private val context: Context) 
         get() = preferences.getString(KEY_END_TIMESTAMP, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_END_TIMESTAMP, value) }
 
-
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 

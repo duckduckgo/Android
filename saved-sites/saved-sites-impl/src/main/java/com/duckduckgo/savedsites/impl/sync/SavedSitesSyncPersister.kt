@@ -16,7 +16,6 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
@@ -33,7 +32,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
