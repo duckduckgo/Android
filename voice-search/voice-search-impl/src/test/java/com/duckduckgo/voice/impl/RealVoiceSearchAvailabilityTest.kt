@@ -203,7 +203,7 @@ class RealVoiceSearchAvailabilityTest {
             },
         )
         whenever(voiceSearchFeatureRepository.minVersion).thenReturn(minSdk)
-        whenever(voiceSearchFeatureRepository.manufacturers).thenReturn(CopyOnWriteArrayList(excludedManufacturers.map { Manufacturer(it) }))
+        whenever(voiceSearchFeatureRepository.manufacturerExceptions).thenReturn(CopyOnWriteArrayList(excludedManufacturers.map { Manufacturer(it) }))
     }
 
     private fun setupDeviceConfig(manufacturer: String, sdkInt: Int, languageTag: String, isOnDeviceSpeechRecognitionAvailable: Boolean) {

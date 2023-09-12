@@ -40,7 +40,7 @@ class RealVoiceSearchAvailability @Inject constructor(
                 hasValidVersion(sdkInt) &&
                 isOnDeviceSpeechRecognitionSupported &&
                 hasValidLocale(languageTag) &&
-                voiceSearchRepository.manufacturers.none { it.name == deviceManufacturer }
+                voiceSearchRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
         }
 
     private fun hasValidVersion(sdkInt: Int) = voiceSearchRepository.minVersion?.let { minVersion ->
