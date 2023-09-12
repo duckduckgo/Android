@@ -23,6 +23,7 @@ interface VoiceSearchRepository {
     fun getHasPermissionDeclinedForever(): Boolean
     fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
+    fun isVoiceSearchUserEnabled(): Boolean
 }
 
 class RealVoiceSearchRepository constructor(
@@ -45,4 +46,6 @@ class RealVoiceSearchRepository constructor(
     override fun getHasAcceptedRationaleDialog(): Boolean = dataStore.userAcceptedRationaleDialog
 
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
+
+    override fun isVoiceSearchUserEnabled(): Boolean = dataStore.isVoiceSearchEnabled
 }

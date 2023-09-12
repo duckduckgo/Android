@@ -32,7 +32,7 @@ interface VoiceSearchFeatureRepository {
 }
 
 class RealVoiceSearchFeatureRepository constructor(
-    val database: VoiceSearchDatabase,
+    database: VoiceSearchDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : VoiceSearchFeatureRepository {
@@ -58,4 +58,6 @@ class RealVoiceSearchFeatureRepository constructor(
         manufacturerExceptions.addAll(manufacturerExceptionsEntityList.map { Manufacturer(it.name) })
         _minVersion = voiceSearchDao.getMinVersion()?.minVersion
     }
+
+
 }

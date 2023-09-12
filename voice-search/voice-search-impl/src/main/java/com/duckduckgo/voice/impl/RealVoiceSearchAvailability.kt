@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
-import com.duckduckgo.voice.store.VoiceSearchDataStore
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -28,8 +28,8 @@ import javax.inject.Inject
 class RealVoiceSearchAvailability @Inject constructor(
     private val configProvider: VoiceSearchAvailabilityConfigProvider,
     private val voiceSearchFeature: VoiceSearchFeature,
-    private val voiceSearchRepository: VoiceSearchFeatureRepository,
-    private val voiceSearchDataStore: VoiceSearchDataStore
+    private val voiceSearchFeatureRepository: VoiceSearchFeatureRepository,
+    private val voiceSearchRepository: VoiceSearchRepository
 ) : VoiceSearchAvailability {
     companion object {
         private const val LANGUAGE_TAG_ENG_US = "en-US"
@@ -42,10 +42,10 @@ class RealVoiceSearchAvailability @Inject constructor(
                 hasValidVersion(sdkInt) &&
                 isOnDeviceSpeechRecognitionSupported &&
                 hasValidLocale(languageTag) &&
-                voiceSearchRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
+                voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
         }
 
-    private fun hasValidVersion(sdkInt: Int) = voiceSearchRepository.minVersion?.let { minVersion ->
+    private fun hasValidVersion(sdkInt: Int) = voiceSearchFeatureRepository.minVersion?.let { minVersion ->
         sdkInt >= minVersion
     } ?: true
 
@@ -59,7 +59,7 @@ class RealVoiceSearchAvailability @Inject constructor(
         // - user is editing the address bar OR
         // - address bar is empty (initial state / new tab) OR
         // - DDG SERP is shown OR (address bar doesn't contain a website)
-        return if (voiceSearchDataStore.isVoiceSearchEnabled && isVoiceSearchSupported) {
+        return if (voiceSearchRepository.isVoiceSearchUserEnabled() && isVoiceSearchSupported) {
             isEditing || urlLoaded.isEmpty() || urlLoaded.startsWith(URL_DDG_SERP)
         } else {
             false

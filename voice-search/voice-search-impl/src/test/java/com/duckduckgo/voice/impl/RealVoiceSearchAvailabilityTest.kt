@@ -22,6 +22,7 @@ import com.duckduckgo.voice.impl.remoteconfig.Manufacturer
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchDataStore
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
@@ -41,14 +42,14 @@ class RealVoiceSearchAvailabilityTest {
     private lateinit var voiceSearchFeatureRepository: VoiceSearchFeatureRepository
 
     @Mock
-    private lateinit var voiceSearchDataStore: VoiceSearchDataStore
+    private lateinit var voiceSearchRepository: VoiceSearchRepository
 
     private lateinit var testee: RealVoiceSearchAvailability
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealVoiceSearchAvailability(configProvider, voiceSearchFeature, voiceSearchFeatureRepository, voiceSearchDataStore)
+        testee = RealVoiceSearchAvailability(configProvider, voiceSearchFeature, voiceSearchFeatureRepository, voiceSearchRepository)
     }
 
     @Test
@@ -245,6 +246,6 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     private fun setupUserSettings(enabled: Boolean) {
-        whenever(voiceSearchDataStore.isVoiceSearchEnabled).thenReturn(enabled)
+        whenever(voiceSearchRepository.isVoiceSearchUserEnabled()).thenReturn(enabled)
     }
 }
