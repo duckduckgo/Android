@@ -294,6 +294,7 @@ dependencies {
 
     if (project.hasProperty('internal-testing')) {
         implementation project(':subscriptions-impl')
+        implementation project(':subscriptions-store')
         internalImplementation project(':subscriptions-internal')
     }
 
