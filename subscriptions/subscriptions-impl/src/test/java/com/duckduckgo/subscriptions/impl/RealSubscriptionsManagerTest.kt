@@ -54,7 +54,6 @@ class RealSubscriptionsManagerTest {
 
     @Test
     fun whenGetExternalIdIfUserNotAuthenticatedAndNotPurchaseStoredThenCreateAccount() = runTest {
-        givenPurchaseStored()
         givenUserIsNotAuthenticated()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 

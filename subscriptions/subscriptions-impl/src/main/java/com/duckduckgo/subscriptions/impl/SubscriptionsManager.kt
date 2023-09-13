@@ -52,6 +52,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val context: Context,
 ) : SubscriptionsManager {
 
+    private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
     private val _isSignedIn = MutableStateFlow(isUserAuthenticated())
     override val isSignedIn = _isSignedIn.asStateFlow()
 
@@ -137,7 +138,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private fun parseError(e: HttpException): ResponseError? {
         return try {
-            val error = Moshi.Builder().build().adapter(ResponseError::class.java).fromJson(e.response()?.errorBody()?.string().orEmpty())
+            val error = adapter.fromJson(e.response()?.errorBody()?.string().orEmpty())
             error
         } catch (e: Exception) {
             null
