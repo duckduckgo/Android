@@ -18,8 +18,8 @@ package com.duckduckgo.subscriptions.impl
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.ExternalIdResult.ExternalId
-import com.duckduckgo.subscriptions.impl.ExternalIdResult.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Success
 import com.duckduckgo.subscriptions.impl.auth.AuthService
 import com.duckduckgo.subscriptions.impl.auth.CreateAccountResponse
 import com.duckduckgo.subscriptions.impl.auth.ResponseError
@@ -38,7 +38,7 @@ import logcat.logcat
 import retrofit2.HttpException
 
 interface SubscriptionsManager {
-    suspend fun getExternalId(): ExternalIdResult
+    suspend fun getSubscriptionData(): SubscriptionsDataResult
 
     val isSignedIn: Flow<Boolean>
 }
@@ -58,19 +58,19 @@ class RealSubscriptionsManager @Inject constructor(
 
     private fun isUserAuthenticated(): Boolean = !authDataStore.token.isNullOrBlank()
 
-    override suspend fun getExternalId(): ExternalIdResult {
+    override suspend fun getSubscriptionData(): SubscriptionsDataResult {
         try {
             val externalId = if (isUserAuthenticated()) {
                 getExternalIdFromToken()
             } else {
-                getExternalIdFromPurchaseHistory()
+                getDataFromPurchaseHistory()
             }
-            return if (externalId is ExternalId) {
+            return if (externalId is Success) {
                 externalId
             } else {
                 val newAccount = createAccount()
                 logcat(LogPriority.DEBUG) { "Subs: account created ${newAccount.externalId}" }
-                ExternalId(newAccount.externalId)
+                Success(externalId = newAccount.externalId, pat = newAccount.authToken)
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
@@ -80,7 +80,7 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private suspend fun getExternalIdFromPurchaseHistory(): ExternalIdResult {
+    private suspend fun getDataFromPurchaseHistory(): SubscriptionsDataResult {
         try {
             val purchase = subscriptionsRepository.lastPurchaseHistoryRecord.value
             if (purchase != null) {
@@ -96,7 +96,7 @@ class RealSubscriptionsManager @Inject constructor(
                 logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
                 authDataStore.token = response.authToken
                 _isSignedIn.emit(isUserAuthenticated())
-                return ExternalId(response.externalId)
+                return Success(externalId = response.externalId, pat = response.authToken)
             } else {
                 return Failure("Subs: no previous purchases found")
             }
@@ -108,17 +108,17 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private suspend fun getExternalIdFromToken(): ExternalIdResult {
+    private suspend fun getExternalIdFromToken(): SubscriptionsDataResult {
         try {
             val response = authService.validateToken("Bearer ${authDataStore.token}")
             logcat(LogPriority.DEBUG) { "Subs: token validated" }
-            return ExternalId(response.account.externalId)
+            return Success(externalId = response.account.externalId, pat = authDataStore.token!!)
         } catch (e: HttpException) {
             val error = parseError(e)
             return when (error?.error) {
                 "expired_token" -> {
                     logcat(LogPriority.DEBUG) { "Subs: token expired" }
-                    getExternalIdFromPurchaseHistory()
+                    getDataFromPurchaseHistory()
                 }
                 else -> {
                     Failure(error?.error ?: "An error happened")
@@ -146,7 +146,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 }
 
-sealed class ExternalIdResult {
-    data class ExternalId(val id: String) : ExternalIdResult()
-    data class Failure(val message: String) : ExternalIdResult()
+sealed class SubscriptionsDataResult {
+    data class Success(val externalId: String, val pat: String) : SubscriptionsDataResult()
+    data class Failure(val message: String) : SubscriptionsDataResult()
 }

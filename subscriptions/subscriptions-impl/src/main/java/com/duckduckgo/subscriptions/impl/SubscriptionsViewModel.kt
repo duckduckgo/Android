@@ -25,8 +25,8 @@ import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.ExternalIdResult.ExternalId
-import com.duckduckgo.subscriptions.impl.ExternalIdResult.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Success
 import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.Command.ErrorMessage
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.MONTHLY_PLAN
@@ -83,15 +83,15 @@ class SubscriptionsViewModel @Inject constructor(
 
     fun buySubscription(activity: Activity, productDetails: ProductDetails, offerToken: String, isReset: Boolean = false) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (val response = subscriptionsManager.getExternalId()) {
-                is ExternalId -> {
+            when (val response = subscriptionsManager.getSubscriptionData()) {
+                is Success -> {
                     val billingParams = billingFlowParamsBuilder(
                         productDetails = productDetails,
                         offerToken = offerToken,
-                        externalId = response.id,
+                        externalId = response.externalId,
                         isReset = isReset,
                     ).build()
-                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.id}" }
+                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
                     withContext(dispatcherProvider.main()) {
                         billingClientWrapper.launchBillingFlow(activity, billingParams)
                     }
@@ -106,9 +106,9 @@ class SubscriptionsViewModel @Inject constructor(
 
     fun recoverSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (val response = subscriptionsManager.getExternalId()) {
-                is ExternalId -> {
-                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.id}" }
+            when (val response = subscriptionsManager.getSubscriptionData()) {
+                is Success -> {
+                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
                 }
                 is Failure -> {
                     logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
