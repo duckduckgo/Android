@@ -18,8 +18,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_4"
     android:orientation="vertical">
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -30,46 +28,29 @@
         android:padding="@dimen/keyline_4"
         android:text="@string/sync_off_hint"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.sync.impl.ui.setup.SyncSetupCta
+        android:id="@+id/sync_setup_quick_connect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/sync_setup_quick_connect_title"/>
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        app:leadingIcon="@drawable/ic_sync_quick_connect"
+        app:primaryText="@string/sync_setup_quick_connect_title"
+        app:secondaryText="@string/sync_setup_quick_connect_subtitle"
+        app:primaryCta="@string/sync_setup_quick_primary_cta"
+        app:secondaryCta="@string/sync_setup_quick_secondary_cta" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_sync_another_device"
+    <com.duckduckgo.sync.impl.ui.setup.SyncSetupCta
+        android:id="@+id/sync_setup_single_device"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_device_double_24"
-        app:primaryText="@string/sync_setup_quick_primary_cta_title"
-        app:secondaryText="@string/sync_setup_quick_primary_cta_subtitle"/>
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_recover_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_document_replace_24"
-        app:primaryText="@string/sync_setup_quick_secondary_cta_title"
-        app:secondaryText="@string/sync_setup_quick_secondary_cta_subtitle"/>
-
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/sync_setup_single_device_title"/>
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_initialize_sync"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_start_stop_24"
-        app:primaryText="@string/sync_setup_single_device_primary_cta_title"
-        app:secondaryText="@string/sync_setup_single_device_primary_cta_subtitle"/>
+        app:leadingIcon="@drawable/ic_sync_single_device"
+        app:primaryText="@string/sync_setup_single_device_title"
+        app:secondaryText="@string/sync_setup_single_device_subtitle"
+        app:primaryCta="@string/sync_setup_single_device_primary_cta" />
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:layout_width="match_parent"

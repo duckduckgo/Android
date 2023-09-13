@@ -47,10 +47,10 @@
     <string name="sync_save_recovery_code_item_hint">If you lose your device, you will need this recovery code to restore your synced data.</string>
     <string name="sync_delete_account_item">Turn Off and Delete Server Data…</string>
     <string name="sync_disable_sync_item">Turn Off Sync…</string>
-    <string name="sync_enable_sync_title">Sync Initialized</string>
-    <string name="sync_enable_sync_content">Your bookmarks and logins are safely backed up. You can add other devices to sync with at any time.</string>
+    <string name="sync_enable_sync_title">Turn on Sync?</string>
+    <string name="sync_enable_sync_content">This will save an encrypted backup of your bookmarks on DuckDuckGo\'s servers, which can be synced with your other devices.\n\nThe decryption key is stored on your device and cannot be read by DuckDuckGo.</string>
     <string name="sync_enable_sync_primary_button">Turn On Sync</string>
-    <string name="sync_enable_sync_next_button">Next</string>
+    <string name="sync_enable_sync_secondary_button">Recover Your Synced Data</string>
     <string name="sync_another_device_title">Sync Another Device?</string>
     <string name="sync_another_device_content">Your bookmarks will be backed up! Would you like to sync another device now?\n\nIf you\'ve already set up Sync on another device, this will allow you to combine bookmarks from both devices into a single backup.</string>
     <string name="sync_another_device_primary_button">Sync Another Device</string>
@@ -62,7 +62,7 @@
     <string name="sync_recovery_code_secondary_button">Copy Code</string>
     <string name="sync_recovery_code_skip_button">Not Now</string>
     <string name="sync_connected_device_title">Device Synced!</string>
-    <string name="sync_connected_device_hint">Your bookmarks and logins are now syncing with this device.</string>
+    <string name="sync_connected_device_hint">Your bookmarks are now syncing with this device.</string>
     <string name="sync_connected_device_primary_button">Next</string>
     <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data.</string>
     <string name="sync_connect_scan_qr_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan the QR code to sync.</string>
@@ -108,11 +108,10 @@
     <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
     <string name="sync_go_to_settings">Go to Settings</string>
     <string name="sync_setup_quick_connect_title">Quick Connect</string>
-    <string name="sync_setup_quick_primary_cta_title">Sync with Another device</string>
-    <string name="sync_setup_quick_primary_cta_subtitle">Link to another device</string>
-    <string name="sync_setup_quick_secondary_cta_title">Recover Your Data</string>
-    <string name="sync_setup_quick_secondary_cta_subtitle">Retrieve data with a recovery code</string>
+    <string name="sync_setup_quick_connect_subtitle">Link to another device or retrieve synchronized data.</string>
+    <string name="sync_setup_quick_primary_cta">Sync with Another device</string>
+    <string name="sync_setup_quick_secondary_cta">Recover Your Data</string>
     <string name="sync_setup_single_device_title">Single Device Setup</string>
-    <string name="sync_setup_single_device_primary_cta_title">Initialize Sync</string>
-    <string name="sync_setup_single_device_primary_cta_subtitle">Secure your data today. Sync with other devices when you\'re ready.</string>
+    <string name="sync_setup_single_device_subtitle">Secure your data today. Sync with other devices when you\'re ready.</string>
+    <string name="sync_setup_single_device_primary_cta">Initialize Sync</string>
 </resources>
