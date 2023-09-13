@@ -956,6 +956,7 @@ class BrowserTabFragment :
 
     private fun showError(errorType: WebViewErrorResponse) {
         binding.browserLayout.gone()
+        newBrowserTab.newTabLayout.gone()
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
@@ -3158,8 +3159,9 @@ class BrowserTabFragment :
         fun renderBrowserViewState(viewState: BrowserViewState) {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
                 val browserShowing = viewState.browserShowing
-
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
+                val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
+
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
                     if (browserShowing) {
@@ -3167,11 +3169,15 @@ class BrowserTabFragment :
                     } else {
                         showHome()
                     }
-                } else {
+                } else if (errorChanged) {
                     if (viewState.browserError != OMITTED) {
                         showError(viewState.browserError)
                     } else {
-                        showBrowser()
+                        if (browserShowing) {
+                            showBrowser()
+                        } else {
+                            showHome()
+                        }
                     }
                 }
 
