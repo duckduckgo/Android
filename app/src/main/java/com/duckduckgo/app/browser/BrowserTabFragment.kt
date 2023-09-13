@@ -956,7 +956,6 @@ class BrowserTabFragment :
 
     private fun showError(errorType: WebViewErrorResponse) {
         binding.browserLayout.gone()
-        newBrowserTab.newTabLayout.gone()
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
