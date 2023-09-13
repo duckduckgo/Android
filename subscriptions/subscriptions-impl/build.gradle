@@ -32,6 +32,7 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':navigation-api')
+    implementation project(path: ':subscriptions-api')
     implementation project(path: ':subscriptions-store')
 
     implementation Kotlin.stdlib.jdk7
