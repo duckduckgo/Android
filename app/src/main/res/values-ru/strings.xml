@@ -156,8 +156,8 @@
 
     <!-- Private Search -->
     <string name="privateSearchActivityTitle">Частный поиск</string>
-    <string name="privateSearchTitle">Включена система Private Search</string>
-    <string name="privateSearchDescription">DuckDuckGo Private Search — ваша поисковая система по умолчанию. Вы можете пользоваться поиском в интернете, не опасаясь слежки.</string>
+    <string name="privateSearchTitle">Включена система частного поиска</string>
+    <string name="privateSearchDescription">Частный поиск DuckDuckGo — ваша поисковая система по умолчанию. Вы можете пользоваться поиском в интернете, не опасаясь слежки.</string>
     <string name="privateSearchHeadingSearchSettings">Настройки поиска</string>
     <string name="privateSearchAutocompleteToggle">Показать предложения автозаполнения</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Дополнительно</string>
