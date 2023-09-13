@@ -21,6 +21,7 @@ import android.content.ComponentName
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 class FavoritesObserver @Inject constructor(
     context: Context,
     private val savedSitesRepository: SavedSitesRepository,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     private val instance = AppWidgetManager.getInstance(context)

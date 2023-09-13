@@ -17,6 +17,7 @@
 package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.di.scopes.ActivityScope
@@ -54,7 +55,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsDao: SitePermissionsDao,
     private val sitePermissionsAllowedDao: SitePermissionsAllowedDao,
     private val sitePermissionsPreferences: SitePermissionsPreferences,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : SitePermissionsRepository {
 

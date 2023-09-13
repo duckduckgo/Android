@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.app.tracking
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -33,7 +34,7 @@ import kotlinx.coroutines.withContext
 class RealAppTrackingProtection @Inject constructor(
     private val vpnStore: VpnStore,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : AppTrackingProtection {
     override suspend fun isOnboarded(): Boolean = withContext(dispatcherProvider.io()) {

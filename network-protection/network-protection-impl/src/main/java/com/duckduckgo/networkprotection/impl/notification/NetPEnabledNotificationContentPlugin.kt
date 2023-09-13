@@ -60,7 +60,6 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
-                message = SpannableStringBuilder(),
                 onNotificationPressIntent = onPressIntent,
                 notificationAction = netPNotificationActions.getReportIssueNotificationAction(context),
             )

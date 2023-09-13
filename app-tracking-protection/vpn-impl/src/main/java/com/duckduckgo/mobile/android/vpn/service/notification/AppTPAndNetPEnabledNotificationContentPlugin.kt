@@ -60,7 +60,6 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
             } ?: resources.getString(R.string.vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlockedNoLocation)
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
-                message = SpannableStringBuilder(),
                 onNotificationPressIntent = notificationPendingIntent,
                 notificationAction = null,
             )
@@ -111,7 +110,6 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
 
                 VpnEnabledNotificationContent(
                     title = SpannableStringBuilder(notificationText),
-                    message = SpannableStringBuilder(),
                     notificationAction = NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),
                     onNotificationPressIntent = notificationPendingIntent,
                 )

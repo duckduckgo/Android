@@ -21,6 +21,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
@@ -51,6 +52,7 @@ class NgVpnNetworkStackTest {
     private val runtime: Runtime = mock()
     private val appTrackerDetector: AppTrackerDetector = mock()
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository = mock()
+    private val appTpLocalFeature: AppTpLocalFeature = mock()
 
     private lateinit var ngVpnNetworkStack: NgVpnNetworkStack
 
@@ -65,6 +67,7 @@ class NgVpnNetworkStackTest {
             runtime,
             appTrackerDetector,
             trackingProtectionAppsRepository,
+            appTpLocalFeature,
         )
     }
 

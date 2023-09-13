@@ -17,6 +17,7 @@
 package com.duckduckgo.app.anr
 
 import com.duckduckgo.anrs.api.CrashLogger
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
@@ -39,7 +40,7 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
     @InternalApi private val originalHandler: Thread.UncaughtExceptionHandler,
     private val crashLogger: CrashLogger,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(

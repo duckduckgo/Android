@@ -119,7 +119,7 @@ class BrokenSiteViewModel @Inject constructor(
     fun onCategoryAccepted() {
         viewState.value = viewState.value?.copy(
             indexSelected = indexSelected,
-            categorySelected = categories.elementAtOrNull(indexSelected),
+            categorySelected = shuffledCategories.elementAtOrNull(indexSelected),
         )
     }
 
@@ -149,7 +149,7 @@ class BrokenSiteViewModel @Inject constructor(
         webViewVersion: String,
         description: String?,
     ): BrokenSite {
-        val category = categories.elementAtOrNull(viewValue.indexSelected)
+        val category = shuffledCategories.elementAtOrNull(viewValue.indexSelected)
         return BrokenSite(
             category = category?.key,
             description = description,

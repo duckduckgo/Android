@@ -64,7 +64,7 @@ class NetpRealAppTrackerDetector constructor(
         val packageId = appNameResolver.getPackageIdForUid(uid) ?: return null
 
         if (VpnExclusionList.isDdgApp(packageId) || packageId.isInExclusionList()) {
-            logcat { "shouldAllowDomain: $packageId is excluded, allowing $domain" }
+            logcat { "shouldAllowDomain: $packageId is excluded, allowing packet" }
             return null
         }
 

@@ -31,6 +31,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
@@ -61,6 +62,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTpConfig: AppTpFeatureConfig
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     @Inject
     lateinit var appTrackerRepository: AppTrackerRepository
@@ -182,7 +186,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             while (isActive) {
                 val isEnabled = appTrackingProtection.isEnabled()
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
-                binding.debugLoggingToggle.isEnabled = isEnabled
+                binding.debugLoggingToggle.isEnabled = isEnabled && !appBuildConfig.isDebug
                 binding.settingsInfo.isVisible = !isEnabled
 
                 delay(1_000)

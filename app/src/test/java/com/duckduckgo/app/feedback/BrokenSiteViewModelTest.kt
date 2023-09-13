@@ -106,7 +106,7 @@ class BrokenSiteViewModelTest {
         val indexSelected = 0
         selectAndAcceptCategory(indexSelected)
 
-        val categoryExpected = testee.categories[indexSelected]
+        val categoryExpected = testee.shuffledCategories[indexSelected]
         assertEquals(categoryExpected, viewState.categorySelected)
     }
 
@@ -126,7 +126,7 @@ class BrokenSiteViewModelTest {
         testee.onSubmitPressed("webViewVersion", "description")
 
         val brokenSiteExpected = BrokenSite(
-            category = testee.categories[0].key,
+            category = testee.shuffledCategories[0].key,
             description = "description",
             siteUrl = url,
             upgradeHttps = false,
@@ -162,7 +162,7 @@ class BrokenSiteViewModelTest {
         testee.onSubmitPressed("webViewVersion", "description")
 
         val brokenSiteExpected = BrokenSite(
-            category = testee.categories[0].key,
+            category = testee.shuffledCategories[0].key,
             description = "description",
             siteUrl = nullUrl,
             upgradeHttps = false,
@@ -199,7 +199,7 @@ class BrokenSiteViewModelTest {
         testee.onSubmitPressed("webViewVersion", "description")
 
         val brokenSiteExpected = BrokenSite(
-            category = testee.categories[0].key,
+            category = testee.shuffledCategories[0].key,
             description = "description",
             siteUrl = url,
             upgradeHttps = false,
@@ -236,7 +236,7 @@ class BrokenSiteViewModelTest {
         testee.onSubmitPressed("webViewVersion", "description")
 
         val brokenSiteExpected = BrokenSite(
-            category = testee.categories[0].key,
+            category = testee.shuffledCategories[0].key,
             description = "description",
             siteUrl = trackingUrl,
             upgradeHttps = false,
@@ -308,7 +308,7 @@ class BrokenSiteViewModelTest {
         )
         selectAndAcceptCategory(categoryIndex)
 
-        val categoryExpected = testee.categories[categoryIndex].key
+        val categoryExpected = testee.shuffledCategories[categoryIndex].key
         val brokenSiteExpected = testee.getBrokenSite(url, "", "")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
