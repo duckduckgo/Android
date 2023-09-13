@@ -25,6 +25,8 @@ interface VoiceSearchDataStore {
     var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
     var isVoiceSearchEnabled: Boolean
+    var noMicAccessDialogDeclined: Boolean
+    var countVoiceSearchDismissed: Int
 }
 
 class SharedPreferencesVoiceSearchDataStore constructor(
@@ -36,6 +38,8 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         const val KEY_RATIONALE_DIALOG_ACCEPTED = "KEY_RATIONALE_DIALOG_ACCEPTED"
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
         const val KEY_VOICE_SEARCH_ENABLED = "KEY_VOICE_SEARCH_ENABLED"
+        const val KEY_VOICE_SEARCH_NO_MIC_ACCESS_DIALOG_DECLINED = "KEY_VOICE_SEARCH_NO_MIC_ACCESS_DIALOG_DECLINED"
+        const val KEY_VOICE_SEARCH_DISMISSED = "KEY_VOICE_SEARCH_DISMISSED"
     }
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -63,6 +67,17 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         set(value) {
             updateValue(KEY_VOICE_SEARCH_ENABLED, value)
         }
+    override var noMicAccessDialogDeclined: Boolean
+        get() = preferences.getBoolean(KEY_VOICE_SEARCH_NO_MIC_ACCESS_DIALOG_DECLINED, false)
+        set(value) {
+            updateValue(KEY_VOICE_SEARCH_NO_MIC_ACCESS_DIALOG_DECLINED, value)
+        }
+
+    override var countVoiceSearchDismissed: Int
+        get() = preferences.getInt(KEY_VOICE_SEARCH_DISMISSED, 0)
+        set(value) {
+            updateValue(KEY_VOICE_SEARCH_DISMISSED, value)
+        }
 
     private fun updateValue(
         key: String,
@@ -70,6 +85,15 @@ class SharedPreferencesVoiceSearchDataStore constructor(
     ) {
         preferences.edit(true) {
             putBoolean(key, value)
+        }
+    }
+
+    private fun updateValue(
+        key: String,
+        value: Int,
+    ) {
+        preferences.edit(true) {
+            putInt(key, value)
         }
     }
 }

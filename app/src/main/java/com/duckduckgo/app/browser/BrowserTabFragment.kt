@@ -651,8 +651,8 @@ class BrowserTabFragment :
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
-
-                else -> resumeWebView()
+                is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
+                is VoiceSearchLauncher.Event.VoiceSearchDisabled -> viewModel.voiceSearchDisabled()
             }
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
