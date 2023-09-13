@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
@@ -58,6 +59,7 @@ class NgVpnNetworkStack @Inject constructor(
     private val appTrackerDetector: AppTrackerDetector,
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
     private val appTpLocalFeature: AppTpLocalFeature,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
@@ -215,9 +217,15 @@ class NgVpnNetworkStack @Inject constructor(
             while (thread != null && thread.isAlive) {
                 try {
                     logcat { "Joining tunnel thread context $jniContext" }
-                    thread.join()
+                    thread.join(5000)
+
+                    // Check if we timed out and are stuck
+                    if (thread.isAlive) {
+                        logcat { "Timed out waiting for tunnel thread" }
+                        deviceShieldPixels.reportTunnelThreadStopTimeout()
+                    }
                 } catch (t: InterruptedException) {
-                    logcat { "Joined tunnel thread" }
+                    logcat { "Interrupted while waiting" }
                 }
                 thread = tunnelThread
             }
