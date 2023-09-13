@@ -27,14 +27,19 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.ExternalIdResult.ExternalId
 import com.duckduckgo.subscriptions.impl.ExternalIdResult.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.Command.ErrorMessage
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.NETHERLANDS_PLAN
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.UK_PLAN
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
@@ -47,6 +52,10 @@ class SubscriptionsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     subscriptionsRepository: SubscriptionsRepository,
 ) : ViewModel() {
+
+
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
         val hasSubscription: Boolean? = false,
@@ -90,6 +99,7 @@ class SubscriptionsViewModel @Inject constructor(
                 }
                 is Failure -> {
                     logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
+                    sendCommand(ErrorMessage(response.message))
                 }
             }
         }
@@ -103,6 +113,7 @@ class SubscriptionsViewModel @Inject constructor(
                 }
                 is Failure -> {
                     logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
+                    sendCommand(ErrorMessage(response.message))
                 }
             }
         }
@@ -127,4 +138,14 @@ class SubscriptionsViewModel @Inject constructor(
             .setObfuscatedAccountId(finalId)
             .setObfuscatedProfileId(finalId)
     }
+
+    private fun sendCommand(newCommand: Command) {
+        viewModelScope.launch {
+            command.send(newCommand)
+        }
+    }
+    sealed class Command {
+        data class ErrorMessage(val message: String): Command()
+    }
+
 }

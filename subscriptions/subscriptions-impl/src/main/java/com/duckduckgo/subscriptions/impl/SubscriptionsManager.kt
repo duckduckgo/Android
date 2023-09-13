@@ -75,7 +75,7 @@ class RealSubscriptionsManager @Inject constructor(
             val error = parseError(e)?.error ?: "An error happened"
             return Failure(error)
         } catch (e: Exception) {
-            return Failure("An error happened")
+            return Failure(e.message ?: "An error happened")
         }
     }
 
@@ -103,7 +103,7 @@ class RealSubscriptionsManager @Inject constructor(
             val error = parseError(e)?.error ?: "An error happened"
             return Failure(error)
         } catch (e: Exception) {
-            return Failure("An error happened")
+            return Failure(e.message ?: "An error happened")
         }
     }
 
@@ -124,7 +124,7 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            return Failure("An error happened")
+            return Failure(e.message ?: "An error happened")
         }
     }
 

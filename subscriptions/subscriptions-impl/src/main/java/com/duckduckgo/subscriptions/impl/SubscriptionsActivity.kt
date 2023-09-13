@@ -17,6 +17,7 @@
 package com.duckduckgo.subscriptions.impl
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +29,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.Command
+import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.Command.ErrorMessage
 import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.billing.getPrice
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsBinding
@@ -57,11 +60,22 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
             }
         }.launchIn(lifecycleScope)
 
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+
         setContentView(binding.root)
         setupToolbar(toolbar)
 
         binding.recoverSubscriptionButton.setOnClickListener {
             viewModel.recoverSubscription()
+        }
+    }
+
+    private fun processCommand(command: Command) {
+        if (command is ErrorMessage) {
+            Toast.makeText(this, command.message, Toast.LENGTH_LONG).show()
         }
     }
 
