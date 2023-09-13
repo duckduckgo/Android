@@ -1,0 +1,162 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Bookmark open and back navigation"
+tags:
+    - releaseTest
+---
+- launchApp:
+      clearState: true
+      stopApp: true
+
+- runFlow: ../shared/onboarding.yaml
+
+- tapOn:
+      text: "search or type URL"
+- inputText: "https://privacy-test-pages.glitch.me/"
+- tapOn:
+      id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+      text: ".*keep browsing.*"
+- tapOn:
+      text: "got it"
+- assertVisible:
+      text: "Privacy Test Pages"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+      text: "add bookmark"
+- tapOn:
+      text: "add bookmark"
+- tapOn:
+      text: "https://privacy-test-pages.glitch.me/"
+- inputText: "https://www.search-company.site/"
+- tapOn:
+    id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
+- assertVisible:
+    text: "Search engine"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- assertVisible:
+      text: "bookmarks"
+- tapOn:
+      text: "bookmarks"
+- assertVisible:
+      text: "Privacy Test Pages - Home"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingIcon"
+- assertVisible:
+    text: "Edit"
+- tapOn:
+    text: "edit"
+- assertVisible:
+    text: "Location"
+- assertVisible:
+    text: "Bookmarks"
+- tapOn:
+    text: "bookmarks"
+- assertVisible:
+    text: "Select Location"
+- assertVisible:
+    text: "Bookmarks"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/action_add_folder"
+- assertVisible:
+    text: "Add Folder"
+- assertVisible:
+    text: "Bookmarks"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/titleInput"
+- inputText: "Folder1"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
+- assertVisible:
+    text: "Select Location"
+- assertVisible:
+    text: "Bookmarks"
+- assertVisible:
+    text: "Folder1"
+- tapOn:
+    text: "Folder1"
+- assertVisible:
+    text: "Edit Bookmark"
+- assertVisible:
+    text: "Folder1"
+- tapOn:
+    text: "Folder1"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/action_add_folder"
+- assertVisible:
+    text: "Add Folder"
+- assertVisible:
+    text: "Bookmarks"
+- inputText: "Folder2"
+- tapOn:
+    text: "Bookmarks"
+- assertVisible:
+    text: "Select Location"
+- assertVisible:
+    text: "Bookmarks"
+- assertVisible:
+    text: "Folder1"
+- tapOn:
+    text: "Folder1"
+- assertVisible:
+    text: "Add Folder"
+- assertVisible:
+    text: "Folder2"
+- assertVisible:
+    text: "Folder1"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
+- assertVisible:
+    text: "Select Location"
+- assertVisible:
+    text: "Bookmarks"
+- assertVisible:
+    text: "Folder1"
+- tapOn:
+    text: "Folder1"
+- assertVisible:
+    text: "Edit Bookmark"
+- assertVisible:
+    text: "Folder1"
+- tapOn:
+    text: "Folder1"
+- assertVisible:
+    text: "Select Location"
+- assertVisible:
+    text: "Folder1"
+- assertVisible:
+    text: "Folder2"
+- tapOn:
+    text: "Folder2"
+- assertVisible:
+    text: "Edit Bookmark"
+- assertVisible:
+    text: "Folder2"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
+- assertVisible:
+    text: "Bookmarks"
+- assertVisible:
+    text: "Folder1"
+- assertNotVisible:
+    text: "Privacy Test Pages - Home"
+- tapOn:
+    text: "Folder1"
+- assertVisible:
+    text: "Folder2"
+- tapOn:
+    text: "Folder1"
+- assertVisible:
+    text: "Folder2"
+- tapOn:
+    text: "Folder2"
+- assertVisible:
+    text: "Privacy Test Pages - Home"
+- tapOn:
+    text: "Privacy Test Pages - Home"
+- assertVisible:
+    text: "Privacy Test Pages"
+- tapOn: "back"
+- assertVisible:
+    text: "Search engine"

@@ -331,4 +331,14 @@ class BookmarksViewModelTest {
 
         verify(savedSitesRepository).insertFolderBranch(folderBranch)
     }
+
+    @Test
+    fun whenOnBookmarkFoldersActivityResultCalledThenOpenSavedSiteCommandSent() {
+        val savedSiteUrl = "https://www.example.com"
+
+        testee.onBookmarkFoldersActivityResult(savedSiteUrl)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(savedSiteUrl, (commandCaptor.value as BookmarksViewModel.Command.OpenSavedSite).savedSiteUrl)
+    }
 }

@@ -66,7 +66,7 @@ class BookmarksViewModel @Inject constructor(
     )
 
     sealed class Command {
-        class OpenSavedSite(val savedSite: SavedSite) : Command()
+        class OpenSavedSite(val savedSiteUrl: String) : Command()
         class ConfirmDeleteSavedSite(val savedSite: SavedSite) : Command()
         class ShowEditSavedSite(val savedSite: SavedSite) : Command()
         class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
@@ -119,7 +119,7 @@ class BookmarksViewModel @Inject constructor(
         if (savedSite is Favorite) {
             pixel.fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         }
-        command.value = OpenSavedSite(savedSite)
+        command.value = OpenSavedSite(savedSite.url)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
@@ -262,5 +262,9 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             savedSitesRepository.insertFolderBranch(folderBranch)
         }
+    }
+
+    fun onBookmarkFoldersActivityResult(savedSiteUrl: String) {
+        command.value = OpenSavedSite(savedSiteUrl)
     }
 }
