@@ -16,4 +16,7 @@
 
 <resources>
     <string name="voiceSearchError">Something went wrong, please try again later</string>
+    <string name="voiceSearchRemovePositiveButton">Remove Voice Search</string>
+    <string name="voiceSearchRemoveTitle">Remove Voice Search option from the address bar?</string>
+    <string name="voiceSearchRemoveSubtitle">You can always manage this and other accessibility preferences in Settings.</string>
 </resources>

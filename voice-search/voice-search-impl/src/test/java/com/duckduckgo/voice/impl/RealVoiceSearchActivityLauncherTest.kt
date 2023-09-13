@@ -25,6 +25,7 @@ import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchVoic
 import com.duckduckgo.voice.impl.fakes.FakeActivityResultLauncherWrapper
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -46,6 +47,12 @@ class RealVoiceSearchActivityLauncherTest {
 
     private lateinit var testee: RealVoiceSearchActivityLauncher
 
+    @Mock
+    private lateinit var voiceSearchRepository: VoiceSearchRepository
+
+    @Mock
+    private lateinit var dialogLauncher: VoiceSearchPermissionDialogsLauncher
+
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -54,6 +61,7 @@ class RealVoiceSearchActivityLauncherTest {
             blurRenderer,
             pixel,
             activityResultLauncherWrapper,
+            voiceSearchRepository,
         )
     }
 

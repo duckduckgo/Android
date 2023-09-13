@@ -30,6 +30,7 @@ android {
 
 dependencies {
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':browser-api')
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
