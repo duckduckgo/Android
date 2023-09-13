@@ -86,15 +86,6 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var shareAction: ShareAction
 
-    private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
-        override fun onCheckedChanged(
-            buttonView: CompoundButton?,
-            isChecked: Boolean,
-        ) {
-            viewModel.onToggleClicked(isChecked)
-        }
-    }
-
     private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
         // no-op
     }
@@ -113,6 +104,8 @@ class SyncActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         registerForPermission()
+
+        setupClickListeners()
         setupRecyclerView()
     }
 
@@ -122,8 +115,34 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun setupClickListeners() {
+        binding.viewSyncDisabled.syncSetupSingleDevice.onPrimaryActionClicked {
+            viewModel.onInitializeSync()
+        }
+
+        binding.viewSyncEnabled.saveRecoveryCodeItem.setOnClickListener {
+            viewModel.onSaveRecoveryCodeClicked()
+        }
+
+        binding.viewSyncEnabled.deleteAccountButton.setOnClickListener {
+            viewModel.onDeleteAccountClicked()
+        }
+
+        binding.viewSyncEnabled.scanQrCodeItem.setOnClickListener {
+            viewModel.onScanQRCodeClicked()
+        }
+
+        binding.viewSyncEnabled.showTextCodeItem.setOnClickListener {
+            viewModel.onShowTextCodeClicked()
+        }
+
+        binding.viewSyncEnabled.disableSyncButton.setClickListener {
+            viewModel.onTurnOffClicked()
+        }
+    }
+
     private fun setupRecyclerView() {
-        with(binding.syncedDevicesRecyclerView) {
+        with(binding.viewSyncEnabled.syncedDevicesRecyclerView) {
             adapter = syncedDevicesAdapter
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         }
@@ -242,31 +261,15 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.syncToggleState, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
         if (viewState.showAccount) {
             if (viewState.loginQRCode != null) {
-                binding.qrCodeImageView.show()
-                binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
-            }
-
-            binding.saveRecoveryCodeItem.setOnClickListener {
-                viewModel.onSaveRecoveryCodeClicked()
-            }
-
-            binding.deleteAccountButton.setOnClickListener {
-                viewModel.onDeleteAccountClicked()
-            }
-
-            binding.scanQrCodeItem.setOnClickListener {
-                viewModel.onScanQRCodeClicked()
-            }
-
-            binding.showTextCodeItem.setOnClickListener {
-                viewModel.onShowTextCodeClicked()
+                binding.viewSyncEnabled.qrCodeImageView.show()
+                binding.viewSyncEnabled.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
             }
         }
+
         syncedDevicesAdapter.updateData(viewState.syncedDevices)
     }
 }

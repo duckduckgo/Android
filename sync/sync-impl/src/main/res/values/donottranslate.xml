@@ -28,7 +28,7 @@
     <string name="deviceNameSectionHeader">Device Name</string>
 
     <!-- Sync -->
-    <string name="sync_screen_title">Sync</string>
+    <string name="sync_screen_title">Sync &amp; Backup</string>
     <string name="login_screen_title">Scan QR Code</string>
     <string name="connect_screen_title">Scan QR Code</string>
     <string name="show_qr_screen_title">Show QR Code</string>
@@ -36,7 +36,8 @@
     <string name="show_code_screen_title">Code</string>
     <string name="connected_device_title">Device Synced</string>
     <string name="sync_toggle_text">Sync</string>
-    <string name="sync_off_hint">Sync your bookmarks across your devices and save an encrypted backup on DuckDuckGo\'s servers.</string>
+    <string name="sync_off_hint">Access bookmarks and logins seamlessly on all your devices.</string>
+    <string name="sync_off_encrypted_hint">Your data is encrypted from end to end, ensuring privacy and security. DuckDuckGo has no access to the decryption key.</string>
     <string name="synced_devices_section_title">Synced Devices</string>
     <string name="sync_new_device_section_title">Sync New Device</string>
     <string name="sync_new_device_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan to connect instantly.</string>
@@ -45,6 +46,7 @@
     <string name="sync_save_recovery_code_item">Save Recovery PDF</string>
     <string name="sync_save_recovery_code_item_hint">If you lose your device, you will need this recovery code to restore your synced data.</string>
     <string name="sync_delete_account_item">Turn Off and Delete Server Data…</string>
+    <string name="sync_disable_sync_item">Turn Off Sync…</string>
     <string name="sync_enable_sync_title">Turn on Sync?</string>
     <string name="sync_enable_sync_content">This will save an encrypted backup of your bookmarks on DuckDuckGo\'s servers, which can be synced with your other devices.\n\nThe decryption key is stored on your device and cannot be read by DuckDuckGo.</string>
     <string name="sync_enable_sync_primary_button">Turn On Sync</string>
@@ -105,5 +107,11 @@
     <string name="sync_camera_unavailable">Camera Unavailable</string>
     <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
     <string name="sync_go_to_settings">Go to Settings</string>
-
+    <string name="sync_setup_quick_connect_title">Quick Connect</string>
+    <string name="sync_setup_quick_connect_subtitle">Link to another device or retrieve synchronized data.</string>
+    <string name="sync_setup_quick_primary_cta">Sync with Another device</string>
+    <string name="sync_setup_quick_secondary_cta">Recover Your Data</string>
+    <string name="sync_setup_single_device_title">Single Device Setup</string>
+    <string name="sync_setup_single_device_subtitle">Secure your data today. Sync with other devices when you\'re ready.</string>
+    <string name="sync_setup_single_device_primary_cta">Initialize Sync</string>
 </resources>

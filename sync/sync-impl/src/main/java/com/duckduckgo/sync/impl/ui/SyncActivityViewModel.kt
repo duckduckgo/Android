@@ -137,17 +137,20 @@ class SyncActivityViewModel @Inject constructor(
         data class AskEditDevice(val device: ConnectedDevice) : Command()
     }
 
-    fun onToggleClicked(isChecked: Boolean) {
+    fun onTurnOffClicked() {
         viewModelScope.launch {
-            viewState.value = viewState.value.toggle(isChecked)
-            when (isChecked) {
-                true -> command.send(LaunchDeviceSetupFlow)
-                false -> {
-                    syncAccountRepository.getThisConnectedDevice()?.let {
-                        command.send(AskTurnOffSync(it))
-                    } ?: showAccountDetailsIfNeeded()
-                }
-            }
+            syncAccountRepository.getThisConnectedDevice()?.let {
+                command.send(AskTurnOffSync(it))
+            } ?: showAccountDetailsIfNeeded()
+
+            viewState.value = viewState.value.toggle(false)
+        }
+    }
+
+    fun onInitializeSync(){
+        viewModelScope.launch {
+            viewState.value = viewState.value.toggle(true)
+            command.send(LaunchDeviceSetupFlow)
         }
     }
 
