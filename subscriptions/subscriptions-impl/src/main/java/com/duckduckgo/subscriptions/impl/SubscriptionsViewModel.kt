@@ -34,10 +34,10 @@ import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Compan
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.UK_PLAN
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -52,7 +52,6 @@ class SubscriptionsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     subscriptionsRepository: SubscriptionsRepository,
 ) : ViewModel() {
-
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -145,7 +144,6 @@ class SubscriptionsViewModel @Inject constructor(
         }
     }
     sealed class Command {
-        data class ErrorMessage(val message: String): Command()
+        data class ErrorMessage(val message: String) : Command()
     }
-
 }
