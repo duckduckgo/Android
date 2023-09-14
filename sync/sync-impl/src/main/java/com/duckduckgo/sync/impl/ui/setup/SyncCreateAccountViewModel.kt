@@ -24,10 +24,16 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+<<<<<<< HEAD:sync/sync-impl/src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncCreateAccountViewModel.kt
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
+=======
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AbortFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncInitializedScreen
+>>>>>>> ff4b9cd7f (final sync flow):sync/sync-impl/src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupFlowViewModel.kt
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -57,6 +63,7 @@ class SyncCreateAccountViewModel @Inject constructor(
     }
 
     data class ViewState(
+<<<<<<< HEAD:sync/sync-impl/src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncCreateAccountViewModel.kt
         val viewMode: ViewMode = CreatingAccount,
     )
 
@@ -78,6 +85,21 @@ class SyncCreateAccountViewModel @Inject constructor(
         }
     }
 
+=======
+        val viewMode: ViewMode = SyncInitializedScreen,
+    )
+
+    sealed class ViewMode {
+        object SyncInitializedScreen : ViewMode()
+        object DeviceSyncedScreen : ViewMode()
+    }
+
+    sealed class Command {
+        object FinishSetupFlow : Command()
+        object AbortFlow : Command()
+    }
+
+>>>>>>> ff4b9cd7f (final sync flow):sync/sync-impl/src/main/java/com/duckduckgo/sync/impl/ui/setup/SyncSetupFlowViewModel.kt
     fun onNextClicked() {
         viewModelScope.launch {
             command.send(FinishSetupFlow)

@@ -119,7 +119,11 @@
     </ScrollView>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+<<<<<<< HEAD
         android:id="@+id/footer_button"
+=======
+        android:id="@+id/footer_secondary_button"
+>>>>>>> ff4b9cd7f (final sync flow)
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
@@ -129,9 +133,13 @@
         app:buttonSize="large"
         android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
+<<<<<<< HEAD
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
+=======
+        android:text="@string/sync_enable_sync_next_button"/>
+>>>>>>> ff4b9cd7f (final sync flow)
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
