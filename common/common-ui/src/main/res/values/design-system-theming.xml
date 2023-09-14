@@ -83,7 +83,6 @@
         <item name="twoLineListItemStyle">@style/Widget.DuckDuckGo.TwoLineListItem</item>
 
         <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
-        <item name="syncSetupCtaStyle">@style/Widget.DuckDuckGo.SyncSetupCta</item>
 
         <!-- CheckListItem Component -->
         <item name="checkListItemStyle">@style/Widget.DuckDuckGo.CheckListItem</item>
