@@ -135,7 +135,9 @@ class SurveyDownloader @Inject constructor(
             emailManager.isSignedIn()
         } else if (surveyOption.isNetPOnboardedRequired == true) {
             val now = LocalDate.now()
-            val days = ChronoUnit.DAYS.between(netpCohortStore.cohortLocalDate, now)
+            val days = netpCohortStore.cohortLocalDate?.let { cohortLocalDate ->
+                ChronoUnit.DAYS.between(cohortLocalDate, now)
+            } ?: 0
             Timber.v("Days since netp enabled = $days")
             return surveyOption.daysSinceNetPEnabled?.let { daysSinceNetPEnabled ->
                 Timber.v("Days required since NetP enabled = $daysSinceNetPEnabled")
