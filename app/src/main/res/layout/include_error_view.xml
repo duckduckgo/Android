@@ -19,7 +19,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/errorLayout"
-    android:background="?attr/daxColorSurface"
+    android:background="?attr/daxColorBackground"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,6 +68,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/error_title"
             app:typography="body1"
+            app:textType="secondary"
             android:textAlignment="center"
             tools:text="@string/webViewErrorBadUrl" />
 
