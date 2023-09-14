@@ -81,7 +81,7 @@ class NetworkProtectionStatusReportingWorker(
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     override suspend fun doWork(): Result {
-        if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
             netpPixels.reportEnabled()
         } else {
             netpPixels.reportDisabled()
