@@ -81,15 +81,9 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
 
     private fun renderNotSubscribed() {
         binding.purchaseDetails.text = "You are not subscribed yet"
-        binding.buyButtonPlan1.isEnabled = true
-        binding.buyButtonPlan2.isEnabled = true
     }
     private fun renderSubscribed(productDetails: ProductDetails) {
         binding.purchaseDetails.text = "You are subscribed to ${productDetails.name}"
-        binding.buyButtonPlan1.isEnabled = false
-        binding.buyButtonPlan2.isEnabled = false
-        binding.buyButtonPlan3.isEnabled = false
-        binding.buyButtonPlan4.isEnabled = false
     }
 
     private fun renderProducts(state: ViewState) {
@@ -98,11 +92,8 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
         val uk = state.ukSubscription
         val ne = state.netherlandsSubscription
         val productDetails = state.subscriptionDetails!!
-        val hasSubscription = state.hasSubscription
         binding.description.text = productDetails.description
         binding.name.text = productDetails.name
-        binding.buyButtonPlan3.isEnabled = false
-        binding.buyButtonPlan4.isEnabled = false
         yearly?.let {
             binding.buyButtonPlan1.apply {
                 text = yearly.getPrice()
@@ -126,7 +117,6 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
         }
         uk?.let {
             binding.buyButtonPlan3.apply {
-                isEnabled = hasSubscription == false
                 text = uk.getPrice()
                 setOnClickListener {
                     viewModel.buySubscription(this@SubscriptionsActivity, productDetails, uk.offerToken)
@@ -135,7 +125,6 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
         }
         ne?.let {
             binding.buyButtonPlan4.apply {
-                isEnabled = hasSubscription == false
                 text = ne.getPrice()
                 setOnClickListener {
                     viewModel.buySubscription(this@SubscriptionsActivity, productDetails, ne.offerToken)
