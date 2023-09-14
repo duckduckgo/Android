@@ -23,11 +23,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AbortFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.SyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncInitializedScreen
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -53,41 +50,20 @@ class SyncSetupFlowViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val viewMode: ViewMode = SyncAnotherDeviceScreen,
+        val viewMode: ViewMode = SyncInitializedScreen,
     )
 
     sealed class ViewMode {
-        object SyncAnotherDeviceScreen : ViewMode()
-        object InitialSetupScreen : ViewMode()
+        object SyncInitializedScreen : ViewMode()
+        object DeviceSyncedScreen : ViewMode()
     }
 
     sealed class Command {
-        object AskSyncAnotherDevice : Command()
-        object RecoverSyncData : Command()
-        object SyncAnotherDevice : Command()
         object FinishSetupFlow : Command()
         object AbortFlow : Command()
     }
 
-    fun onTurnOnSyncClicked() {
-        viewModelScope.launch {
-            command.send(AskSyncAnotherDevice)
-        }
-    }
-
-    fun onRecoverYourSyncDataClicked() {
-        viewModelScope.launch {
-            command.send(RecoverSyncData)
-        }
-    }
-
-    fun onSyncAnotherDeviceClicked() {
-        viewModelScope.launch {
-            command.send(SyncAnotherDevice)
-        }
-    }
-
-    fun onNotNowClicked() {
+    fun onNextClicked() {
         viewModelScope.launch {
             command.send(FinishSetupFlow)
         }

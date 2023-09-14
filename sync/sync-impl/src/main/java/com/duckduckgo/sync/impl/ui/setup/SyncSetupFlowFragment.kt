@@ -34,13 +34,10 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentSyncSetupBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AbortFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.InitialSetupScreen
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.DeviceSyncedScreen
+import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncInitializedScreen
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
@@ -53,7 +50,7 @@ class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
 
     private val binding: FragmentSyncSetupBinding by viewBinding()
 
-    private var fragmentType: ViewMode = InitialSetupScreen
+    private var fragmentType: ViewMode = SyncInitializedScreen
 
     private val viewModel: SyncSetupFlowViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SyncSetupFlowViewModel::class.java]
@@ -93,32 +90,25 @@ class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
-            InitialSetupScreen -> {
+            SyncInitializedScreen -> {
                 binding.closeIcon.show()
-                binding.contentIllustration.setImageResource(R.drawable.ic_sync_128)
+                binding.contentIllustration.setImageResource(R.drawable.ic_sync_start_128)
                 binding.contentTitle.text = getString(R.string.sync_enable_sync_title)
                 binding.contentBody.text = getString(R.string.sync_enable_sync_content)
-                binding.footerPrimaryButton.text = getString(R.string.sync_enable_sync_primary_button)
-                binding.footerPrimaryButton.setOnClickListener {
-                    viewModel.onTurnOnSyncClicked()
-                }
-                binding.footerSecondaryButton.text = getString(R.string.sync_enable_sync_secondary_button)
+                binding.footerSecondaryButton.text = getString(R.string.sync_enable_sync_next_button)
                 binding.footerSecondaryButton.setOnClickListener {
-                    viewModel.onRecoverYourSyncDataClicked()
+                    viewModel.onNextClicked()
                 }
+
             }
-            SyncAnotherDeviceScreen -> {
+            DeviceSyncedScreen -> {
                 binding.closeIcon.hide()
-                binding.contentIllustration.setImageResource(R.drawable.ic_connect_device_128)
-                binding.contentTitle.text = getString(R.string.sync_another_device_title)
-                binding.contentBody.text = getString(R.string.sync_another_device_content)
-                binding.footerPrimaryButton.text = getString(R.string.sync_another_device_primary_button)
-                binding.footerPrimaryButton.setOnClickListener {
-                    viewModel.onSyncAnotherDeviceClicked()
-                }
-                binding.footerSecondaryButton.text = getString(R.string.sync_another_device_secondary_button)
+                binding.contentIllustration.setImageResource(R.drawable.ic_sync_start_128)
+                binding.contentTitle.text = getString(R.string.sync_connected_device_title)
+                binding.contentBody.text = getString(R.string.sync_connected_device_hint)
+                binding.footerSecondaryButton.text = getString(R.string.sync_enable_sync_next_button)
                 binding.footerSecondaryButton.setOnClickListener {
-                    viewModel.onNotNowClicked()
+                    viewModel.onNextClicked()
                 }
             }
         }
@@ -131,9 +121,6 @@ class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
                 requireActivity().finish()
             }
             FinishSetupFlow -> listener?.launchFinishSetupFlow()
-            RecoverSyncData -> listener?.recoverYourSyncedData()
-            AskSyncAnotherDevice -> listener?.askSyncAnotherDevice()
-            SyncAnotherDevice -> listener?.syncAnotherDevice()
         }
     }
 

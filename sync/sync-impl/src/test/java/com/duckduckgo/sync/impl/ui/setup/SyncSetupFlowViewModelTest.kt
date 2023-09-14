@@ -43,9 +43,9 @@ class SyncSetupFlowViewModelTest {
 
     @Test
     fun whenInitialSetupScreenThenViewStateIsEnableSync() = runTest {
-        testee.viewState(ViewMode.InitialSetupScreen).test {
+        testee.viewState(ViewMode.SyncInitializedScreen).test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.InitialSetupScreen)
+            assertTrue(viewState.viewMode is ViewMode.SyncInitializedScreen)
         }
     }
 
@@ -59,9 +59,9 @@ class SyncSetupFlowViewModelTest {
 
     @Test
     fun whenUserClicksOnTurnOnSyncThenCommandIsAskSyncAnotherDevice() = runTest {
-        testee.viewState(ViewMode.InitialSetupScreen).test {
+        testee.viewState(ViewMode.SyncInitializedScreen).test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.InitialSetupScreen)
+            assertTrue(viewState.viewMode is ViewMode.SyncInitializedScreen)
             testee.onTurnOnSyncClicked()
         }
         testee.commands().test {
@@ -73,9 +73,9 @@ class SyncSetupFlowViewModelTest {
 
     @Test
     fun whenUserClicksOnRecoverYourSyncDataThenCommandIsRecoverSyncData() = runTest {
-        testee.viewState(ViewMode.InitialSetupScreen).test {
+        testee.viewState(ViewMode.SyncInitializedScreen).test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.InitialSetupScreen)
+            assertTrue(viewState.viewMode is ViewMode.SyncInitializedScreen)
             testee.onRecoverYourSyncDataClicked()
         }
         testee.commands().test {
@@ -90,7 +90,7 @@ class SyncSetupFlowViewModelTest {
         testee.viewState(ViewMode.SyncAnotherDeviceScreen).test {
             val viewState = awaitItem()
             assertTrue(viewState.viewMode is ViewMode.SyncAnotherDeviceScreen)
-            testee.onNotNowClicked()
+            testee.onNextClicked()
         }
         testee.commands().test {
             val command = awaitItem()

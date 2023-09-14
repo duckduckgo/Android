@@ -24,13 +24,10 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.INITIALISE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
 import javax.inject.*
@@ -55,9 +52,9 @@ class SetupAccountViewModel @Inject constructor(
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         if (!initialStateProcessed) {
             val viewMode = when (screen) {
-                SETUP -> TurnOnSync
-                RECOVERY_CODE -> AskSaveRecoveryCode
+                INITIALISE -> TurnOnSync
                 DEVICE_CONNECTED -> DeviceConnected
+                RECOVERY_CODE -> AskSaveRecoveryCode
             }
             viewState.emit(ViewState(viewMode))
             initialStateProcessed = true
@@ -72,60 +69,30 @@ class SetupAccountViewModel @Inject constructor(
 
     sealed class ViewMode {
         object TurnOnSync : ViewMode()
-        object AskSyncAnotherDevice : ViewMode()
-        object AskSaveRecoveryCode : ViewMode()
+        object AskSaveRecoveryCode: ViewMode()
         object DeviceConnected : ViewMode()
     }
 
     sealed class Command {
         object Close : Command()
-        object RecoverSyncData : Command()
-        object SyncAnotherDevice : Command()
     }
 
     fun onBackPressed() {
         viewModelScope.launch {
-            when (viewState.value.viewMode) {
-                AskSyncAnotherDevice -> {
-                    viewState.emit(ViewState(viewMode = TurnOnSync))
-                }
-
-                TurnOnSync, AskSaveRecoveryCode, DeviceConnected -> {
-                    viewModelScope.launch {
-                        command.send(Close)
-                    }
-                }
-            }
+            command.send(Close)
         }
     }
 
-    fun onAskSyncAnotherDevice() {
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = AskSyncAnotherDevice))
-        }
-    }
-
-    fun finishSetupFlow() {
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
-        }
-    }
-
-    fun onRecoverYourSyncedData() {
-        viewModelScope.launch {
-            command.send(RecoverSyncData)
-        }
-    }
-
-    fun onLoginSucess() {
+    fun onLoginSuccess() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = DeviceConnected))
         }
     }
 
-    fun onSyncAnotherDevice() {
+
+    fun onSetupComplete() {
         viewModelScope.launch {
-            command.send(SyncAnotherDevice)
+            viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
         }
     }
 }

@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/ic_sync_128"
+                android:src="@drawable/ic_sync_start_128"
                 android:layout_gravity="center_horizontal"
                 tools:ignore="ContentDescription"/>
 
@@ -94,18 +94,6 @@
     </ScrollView>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-        android:id="@+id/footer_primary_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
-        app:buttonSize="large"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/footer_secondary_button"
-        android:text="@string/sync_enable_sync_primary_button"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
         android:id="@+id/footer_secondary_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -116,7 +104,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/sync_enable_sync_secondary_button"/>
+        android:text="@string/sync_enable_sync_next_button"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
