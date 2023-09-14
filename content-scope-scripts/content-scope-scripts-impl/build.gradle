@@ -31,6 +31,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':fingerprint-protection-api')
     implementation project(':browser-api')
+    implementation project(':feature-toggles-api')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
