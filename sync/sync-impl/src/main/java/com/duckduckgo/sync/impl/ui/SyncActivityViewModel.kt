@@ -129,6 +129,12 @@ class SyncActivityViewModel @Inject constructor(
         object ScanQRCode : Command()
         object ShowTextCode : Command()
         object LaunchDeviceSetupFlow : Command()
+        object RecoverSyncData : Command()
+
+        object SyncAnotherDevice : Command()
+
+        object DeviceConnected : Command()
+
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
@@ -147,10 +153,28 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
+    fun onRecoverYourSyncedData() {
+        viewModelScope.launch {
+            command.send(Command.RecoverSyncData)
+        }
+    }
+
+    fun onSyncAnotherDevice() {
+        viewModelScope.launch {
+            command.send(Command.SyncAnotherDevice)
+        }
+    }
+
     fun onInitializeSync(){
         viewModelScope.launch {
             viewState.value = viewState.value.toggle(true)
             command.send(LaunchDeviceSetupFlow)
+        }
+    }
+
+    fun onLoginSuccess() {
+        viewModelScope.launch {
+            command.send(Command.DeviceConnected)
         }
     }
 

@@ -47,10 +47,10 @@
     <string name="sync_save_recovery_code_item_hint">If you lose your device, you will need this recovery code to restore your synced data.</string>
     <string name="sync_delete_account_item">Turn Off and Delete Server Data…</string>
     <string name="sync_disable_sync_item">Turn Off Sync…</string>
-    <string name="sync_enable_sync_title">Turn on Sync?</string>
-    <string name="sync_enable_sync_content">This will save an encrypted backup of your bookmarks on DuckDuckGo\'s servers, which can be synced with your other devices.\n\nThe decryption key is stored on your device and cannot be read by DuckDuckGo.</string>
+    <string name="sync_enable_sync_title">Sync Initialized</string>
+    <string name="sync_enable_sync_content">Your bookmarks and logins are safely backed up. You can add other devices to sync with at any time.</string>
     <string name="sync_enable_sync_primary_button">Turn On Sync</string>
-    <string name="sync_enable_sync_secondary_button">Recover Your Synced Data</string>
+    <string name="sync_enable_sync_next_button">Next</string>
     <string name="sync_another_device_title">Sync Another Device?</string>
     <string name="sync_another_device_content">Your bookmarks will be backed up! Would you like to sync another device now?\n\nIf you\'ve already set up Sync on another device, this will allow you to combine bookmarks from both devices into a single backup.</string>
     <string name="sync_another_device_primary_button">Sync Another Device</string>
