@@ -86,7 +86,27 @@ subprojects {
     configurations.configureEach {
         if (name == "compileClasspath" || name.endsWith("CompileClasspath")) {
             incoming.beforeResolve {
+
+                plugins.each { plugin ->
+                    // API modules cannot use the anvil plugin
+                    if (projectPath.endsWith("api")) {
+                        if (plugin.toString().contains("com.squareup.anvil.plugin")) {
+                            throw new GradleException("Invalid plugin $projectPath -> " +
+                                    "'api' modules can't use the anvil plugin")
+                        }
+                    }
+                }
+
                 for (dependency in dependencies) {
+                    // API modules cannot depend on dagger/anvil
+                    if (projectPath.endsWith("api") && projectPath != ":feature-toggles-api") {
+                        def notAllowedDeps = ["anvil", "dagger"]
+                        if (notAllowedDeps.contains(dependency.name)) {
+                            throw new GradleException("Invalid dependency $projectPath -> " +
+                                    "'api' modules can't depend on dagger/anvil")
+                        }
+                    }
+
                     if (dependency instanceof ProjectDependency) {
                         def dependencyPath = dependency.dependencyProject.path
                         if (dependencyPath == projectPath) continue
@@ -102,6 +122,12 @@ subprojects {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")
                         }
+                        // API modules cannot depend on :di
+                        if (projectPath.endsWith("api") && dependencyPath == ":di") {
+                            throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
+                                    "'api' modules can't depend on the 'di' module")
+                        }
+
                         // API modules can depend on :feature-toggles-api
                         if (projectPath.endsWith("api")
                                 && dependencyPath.endsWith("api")

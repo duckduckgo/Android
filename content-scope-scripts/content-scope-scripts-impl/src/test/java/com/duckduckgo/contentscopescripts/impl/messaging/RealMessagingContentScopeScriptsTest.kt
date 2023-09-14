@@ -19,7 +19,6 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 import android.webkit.WebView
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
-import com.duckduckgo.contentscopescripts.api.MessageHandlerPlugin
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import org.junit.Assert.assertTrue
 import org.junit.Before

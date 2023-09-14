@@ -20,8 +20,6 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
-import com.duckduckgo.contentscopescripts.api.MessageHandlerPlugin
-import com.duckduckgo.contentscopescripts.api.ResponseListener
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
