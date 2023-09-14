@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Bookmark open and back navigation"
+name: "ReleaseTest: Bookmark open in folder and back navigation"
 tags:
     - releaseTest
 ---
