@@ -108,10 +108,11 @@
     <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
     <string name="sync_go_to_settings">Go to Settings</string>
     <string name="sync_setup_quick_connect_title">Quick Connect</string>
-    <string name="sync_setup_quick_connect_subtitle">Link to another device or retrieve synchronized data.</string>
-    <string name="sync_setup_quick_primary_cta">Sync with Another device</string>
-    <string name="sync_setup_quick_secondary_cta">Recover Your Data</string>
+    <string name="sync_setup_quick_primary_cta_title">Sync with Another device</string>
+    <string name="sync_setup_quick_primary_cta_subtitle">Link to another device</string>
+    <string name="sync_setup_quick_secondary_cta_title">Recover Your Data</string>
+    <string name="sync_setup_quick_secondary_cta_subtitle">Retrieve data with a recovery code</string>
     <string name="sync_setup_single_device_title">Single Device Setup</string>
-    <string name="sync_setup_single_device_subtitle">Secure your data today. Sync with other devices when you\'re ready.</string>
-    <string name="sync_setup_single_device_primary_cta">Initialize Sync</string>
+    <string name="sync_setup_single_device_primary_cta_title">Initialize Sync</string>
+    <string name="sync_setup_single_device_primary_cta_subtitle">Secure your data today. Sync with other devices when you\'re ready.</string>
 </resources>

@@ -116,7 +116,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun setupClickListeners() {
-        binding.viewSyncDisabled.syncSetupSingleDevice.onPrimaryActionClicked {
+        binding.viewSyncDisabled.syncSetupInitializeSync.setClickListener {
             viewModel.onInitializeSync()
         }
 
