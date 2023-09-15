@@ -79,6 +79,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
                             parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
                         )
+                        voiceSearchRepository.resetVoiceSearchDismissed()
                         onEvent(Event.VoiceRecognitionSuccess(data))
                     } else {
                         onEvent(Event.SearchCancelled)

@@ -32,9 +32,11 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class RealVoiceSearchActivityLauncherTest {
     @Mock
@@ -62,6 +64,7 @@ class RealVoiceSearchActivityLauncherTest {
             pixel,
             activityResultLauncherWrapper,
             voiceSearchRepository,
+            dialogLauncher,
         )
     }
 
@@ -132,7 +135,54 @@ class RealVoiceSearchActivityLauncherTest {
         lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
 
         verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(voiceSearchRepository).dismissVoiceSearch()
         assertEquals(Event.SearchCancelled, lastKnownEvent)
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchIsCancelledSeveralTimesThenShowDialog() {
+        var lastKnownEvent: Event? = null
+        testee.registerResultsCallback(mock(), mock(), BROWSER) {
+            lastKnownEvent = it
+        }
+        whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(3)
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
+
+        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(dialogLauncher).showRemoveVoiceSearchDialog(any(), any(), any())
+        assertEquals(Event.SearchCancelled, lastKnownEvent)
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchIsCancelledLessThanTwoTimesThenDoNotShowDialog() {
+        var lastKnownEvent: Event? = null
+        testee.registerResultsCallback(mock(), mock(), BROWSER) {
+            lastKnownEvent = it
+        }
+        whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(1)
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(Activity.RESULT_CANCELED, "Result")
+
+        verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_DONE, mapOf("source" to "browser"))
+        verify(dialogLauncher, never()).showRemoveVoiceSearchDialog(any(), any(), any())
+        assertEquals(Event.SearchCancelled, lastKnownEvent)
+    }
+
+    @Test
+    fun whenResultFromVoiceSearchIsOkThenResetDismissedCounter() {
+        var lastKnownEvent: Event? = null
+        testee.registerResultsCallback(mock(), mock(), BROWSER) {
+            lastKnownEvent = it
+        }
+        whenever(voiceSearchRepository.countVoiceSearchDismissed()).thenReturn(1)
+
+        val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.ResultFromVoiceSearch
+        lastKnownRequest.onResult(Activity.RESULT_OK, "Result")
+
+        verify(voiceSearchRepository).resetVoiceSearchDismissed()
     }
 
     @Test
