@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore.Companion.SYNC_PROD_ENVIRONMENT_URL
 import com.squareup.moshi.Json
 import org.json.JSONObject
 import retrofit2.Call
@@ -32,67 +33,65 @@ import retrofit2.http.Query
 @ContributesServiceApi(AppScope::class)
 interface SyncService {
 
-    @POST("$SYNC_ENVIRONMENT_URL/sync/signup")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/signup")
     fun signup(
         @Body request: Signup,
     ): Call<AccountCreatedResponse>
 
-    @POST("$SYNC_ENVIRONMENT_URL/sync/logout-device")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/logout-device")
     fun logout(
         @Header("Authorization") token: String,
         @Body request: Logout,
     ): Call<Logout>
 
-    @POST("$SYNC_ENVIRONMENT_URL/sync/delete-account")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/delete-account")
     fun deleteAccount(
         @Header("Authorization") token: String,
     ): Call<Void>
 
-    @POST("$SYNC_ENVIRONMENT_URL/sync/login")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/login")
     fun login(
         @Body request: Login,
     ): Call<LoginResponse>
 
-    @GET("$SYNC_ENVIRONMENT_URL/sync/devices")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/devices")
     fun getDevices(
         @Header("Authorization") token: String,
     ): Call<DeviceResponse>
 
-    @POST("$SYNC_ENVIRONMENT_URL/sync/connect")
+    @POST("$SYNC_PROD_ENVIRONMENT_URL/sync/connect")
     fun connect(
         @Header("Authorization") token: String,
         @Body request: Connect,
     ): Call<Void>
 
-    @GET("$SYNC_ENVIRONMENT_URL/sync/connect/{device_id}")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/connect/{device_id}")
     fun connectDevice(
         @Path("device_id") deviceId: String,
     ): Call<ConnectKey>
 
-    @PATCH("$SYNC_ENVIRONMENT_URL/sync/data")
+    @PATCH("$SYNC_PROD_ENVIRONMENT_URL/sync/data")
     fun patch(
         @Header("Authorization") token: String,
         @Body request: JSONObject,
     ): Call<JSONObject>
 
-    @GET("$SYNC_ENVIRONMENT_URL/sync/bookmarks")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/bookmarks")
     fun bookmarks(
         @Header("Authorization") token: String,
     ): Call<JSONObject>
 
-    @GET("$SYNC_ENVIRONMENT_URL/sync/bookmarks")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/bookmarks")
     fun bookmarksSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
 
-    @GET("$SYNC_ENVIRONMENT_URL/sync/credentials")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/credentials")
     fun credentials(
         @Header("Authorization") token: String,
     ): Call<JSONObject>
 
-    @GET("https://dev-sync-use.duckduckgo.com/sync/credentials")
+    @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/credentials")
     fun credentialsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
 }
-
-const val SYNC_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
 
 data class Login(
     @field:Json(name = "user_id") val userId: String,
