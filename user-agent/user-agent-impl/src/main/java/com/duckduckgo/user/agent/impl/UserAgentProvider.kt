@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.useragent
+package com.duckduckgo.user.agent.impl
 
 import android.content.Context
 import android.os.Build
 import android.webkit.WebSettings
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.plugins.PluginPoint
@@ -29,10 +28,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UserAgent
+import com.duckduckgo.user.agent.api.UserAgentInterceptor
+import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 
@@ -43,15 +46,16 @@ import javax.inject.Provider
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider constructor(
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealUserAgentProvider @Inject constructor(
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
     device: DeviceInfo,
     private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
     private val userAgent: UserAgent,
     private val toggle: FeatureToggle,
     private val userAllowListRepository: UserAllowListRepository,
-    private val dispatcher: DispatcherProvider,
-) {
+) : UserAgentProvider {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
     private val baseDesktopAgent: String by lazy { concatWithSpaces(desktopPrefix, getWebKitVersionOnwards(true)) }
@@ -68,10 +72,7 @@ class UserAgentProvider constructor(
      *
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
-    fun userAgent(
-        url: String? = null,
-        isDesktop: Boolean = false,
-    ): String {
+    override fun userAgent(url: String?, isDesktop: Boolean): String {
         val host = url?.toUri()?.host
         val shouldUseDefaultUserAgent = if (host != null) userAgent.isADefaultException(host) else false
 
@@ -181,6 +182,6 @@ class DefaultUserAgentModule {
     fun provideDefaultUserAgent(context: Context): String {
         return runCatching {
             WebSettings.getDefaultUserAgent(context)
-        }.getOrDefault(UserAgentProvider.fallbackDefaultUA)
+        }.getOrDefault(RealUserAgentProvider.fallbackDefaultUA)
     }
 }

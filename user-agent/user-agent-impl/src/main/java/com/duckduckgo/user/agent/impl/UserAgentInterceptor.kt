@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.useragent
+package com.duckduckgo.user.agent.impl
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.user.agent.api.UserAgentInterceptor
 
-@ContributesPluginPoint(AppScope::class)
-interface UserAgentInterceptor {
-    fun intercept(userAgent: String): String
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = UserAgentInterceptor::class,
+)
+@Suppress("unused")
+interface UserAgentInterceptorPluginPoint

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.useragent
+package com.duckduckgo.user.agent.impl
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 
-fun provideUserAgentOverridePluginPoint(): PluginPoint<UserAgentInterceptor> {
+fun provideUserAgentFakePluginPoint(): PluginPoint<UserAgentInterceptor> {
     return object : PluginPoint<UserAgentInterceptor> {
         override fun getPlugins(): Collection<UserAgentInterceptor> {
             return listOf()
