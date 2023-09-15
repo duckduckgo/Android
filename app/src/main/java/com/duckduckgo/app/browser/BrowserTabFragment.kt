@@ -958,6 +958,7 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         newBrowserTab.newTabLayout.gone()
         omnibar.appBarLayout.setExpanded(true)
+        omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.setText(errorType.errorId)
