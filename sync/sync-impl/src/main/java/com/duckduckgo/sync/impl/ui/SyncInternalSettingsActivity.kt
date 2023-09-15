@@ -45,8 +45,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-class SyncInitialSetupActivity : DuckDuckGoActivity() {
-    private val binding: ActivitySyncSetupBinding by viewBinding()
+class SyncInternalSettingsActivity : DuckDuckGoActivity() {
+    private val binding: ActivityInternalSyncSettingsBinding by viewBinding()
     private val viewModel: SyncInitialSetupViewModel by bindViewModel()
 
     private val barcodeLauncher = registerForActivityResult(
