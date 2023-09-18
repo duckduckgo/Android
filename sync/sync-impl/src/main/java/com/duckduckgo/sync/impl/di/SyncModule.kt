@@ -26,6 +26,8 @@ import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
+import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore
+import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.stats.RealSyncStatsRepository
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
@@ -51,6 +53,14 @@ object SyncStoreModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
     ): SyncStore {
         return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesSyncInternalEnvStore(
+        context: Context,
+    ): SyncInternalEnvDataStore {
+        return AppSyncInternalEnvDataStore(context)
     }
 
     @Provides
