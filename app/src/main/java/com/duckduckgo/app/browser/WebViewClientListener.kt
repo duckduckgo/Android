@@ -94,5 +94,5 @@ interface WebViewClientListener {
     fun prefetchFavicon(url: String)
     fun linkOpenedInNewTab(): Boolean
     fun isActiveTab(): Boolean
-    fun onReceivedError(errorType: WebViewErrorResponse)
+    fun onReceivedError(errorType: WebViewErrorResponse, url: String)
 }

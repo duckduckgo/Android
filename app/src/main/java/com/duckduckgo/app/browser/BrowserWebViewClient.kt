@@ -414,7 +414,7 @@ class BrowserWebViewClient @Inject constructor(
         error?.let {
             val parsedError = parseErrorResponse(it)
             if (parsedError != OMITTED && request?.isForMainFrame == true) {
-                webViewClientListener?.onReceivedError(parsedError)
+                webViewClientListener?.onReceivedError(parsedError, request.url.toString())
             }
         }
         super.onReceivedError(view, request, error)
@@ -427,6 +427,8 @@ class BrowserWebViewClient @Inject constructor(
                 "net::ERR_INTERNET_DISCONNECTED" -> CONNECTION
                 else -> OMITTED
             }
+        } else if (error.errorCode == ERROR_FAILED_SSL_HANDSHAKE && error.description == "net::ERR_SSL_PROTOCOL_ERROR") {
+            WebViewErrorResponse.SSL_PROTOCOL_ERROR
         } else {
             OMITTED
         }
@@ -454,4 +456,5 @@ enum class WebViewErrorResponse(@StringRes val errorId: Int) {
     BAD_URL(R.string.webViewErrorBadUrl),
     CONNECTION(R.string.webViewErrorNoConnection),
     OMITTED(R.string.webViewErrorNoConnection),
+    SSL_PROTOCOL_ERROR(R.string.webViewErrorSslProtocol),
 }

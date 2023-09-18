@@ -961,14 +961,14 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
     }
 
-    private fun showError(errorType: WebViewErrorResponse) {
+    private fun showError(errorType: WebViewErrorResponse, url: String?) {
         binding.browserLayout.gone()
         newBrowserTab.newTabLayout.gone()
         omnibar.appBarLayout.setExpanded(true)
         omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
         webView?.hide()
-        errorView.errorMessage.setText(errorType.errorId)
+        errorView.errorMessage.text = getString(errorType.errorId, url)
         if (appTheme.isLightModeEnabled()) {
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
         } else {
@@ -1224,7 +1224,7 @@ class BrowserTabFragment :
                 includeShortcutToViewCredential = it.includeShortcutToViewCredential,
             )
 
-            is Command.WebViewError -> showError(it.errorType)
+            is Command.WebViewError -> showError(it.errorType, it.url)
             else -> {
                 // NO OP
             }
@@ -3176,7 +3176,7 @@ class BrowserTabFragment :
                     }
                 } else if (errorChanged) {
                     if (viewState.browserError != OMITTED) {
-                        showError(viewState.browserError)
+                        showError(viewState.browserError, webView?.url)
                     } else {
                         if (browserShowing) {
                             showBrowser()

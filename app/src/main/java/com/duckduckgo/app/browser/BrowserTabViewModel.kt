@@ -466,7 +466,7 @@ class BrowserTabViewModel @Inject constructor(
             val messageResourceId: Int,
         ) : Command()
 
-        data class WebViewError(val errorType: WebViewErrorResponse) : Command()
+        data class WebViewError(val errorType: WebViewErrorResponse, val url: String) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -2823,10 +2823,10 @@ class BrowserTabViewModel @Inject constructor(
         return false
     }
 
-    override fun onReceivedError(errorType: WebViewErrorResponse) {
+    override fun onReceivedError(errorType: WebViewErrorResponse, url: String) {
         browserViewState.value =
             currentBrowserViewState().copy(browserError = errorType, showPrivacyShield = false, showDaxIcon = false, showSearchIcon = false)
-        command.postValue(WebViewError(errorType))
+        command.postValue(WebViewError(errorType, url))
     }
 
     fun onAutofillMenuSelected() {

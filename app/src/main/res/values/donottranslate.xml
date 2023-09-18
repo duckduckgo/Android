@@ -43,4 +43,5 @@
     <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
     <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
     <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
+    <string name="webViewErrorSslProtocol">The certificate for this server is invalid. You might be connecting to a server that is pretending to be \"%1$s\" which could put your confidential information at risk.</string>
 </resources>
