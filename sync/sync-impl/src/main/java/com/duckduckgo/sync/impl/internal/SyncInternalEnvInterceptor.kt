@@ -18,8 +18,8 @@ package com.duckduckgo.sync.impl.internal
 
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore.Companion.SYNC_DEV_ENVIRONMENT_URL
-import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore.Companion.SYNC_PROD_ENVIRONMENT_URL
+import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_DEV_ENVIRONMENT_URL
+import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_PROD_ENVIRONMENT_URL
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import okhttp3.Interceptor

@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore.Companion.SYNC_PROD_ENVIRONMENT_URL
 import com.squareup.moshi.Json
 import org.json.JSONObject
 import retrofit2.Call
