@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -112,7 +113,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
     SYNC_COUNT_LIMIT("m_sync_count_limit"),
     SYNC_ATTEMPT_FAILURE("m_sync_attempt_failure"),
-    SYNC_PERSISTER_FAILURE("m_sync_attempt_failure"),
+    SYNC_PERSISTER_FAILURE("m_sync_persister_failure"),
 }
 
 object SyncPixelParameters {
