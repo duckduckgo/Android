@@ -299,6 +299,9 @@ dependencies {
         internalImplementation project(':subscriptions-internal')
     }
 
+    implementation project(':user-agent-api')
+    implementation project(':user-agent-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android

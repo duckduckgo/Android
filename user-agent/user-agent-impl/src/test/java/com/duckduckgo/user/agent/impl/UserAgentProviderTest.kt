@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.useragent
+package com.duckduckgo.user.agent.impl
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -24,15 +24,9 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.api.UserAgent
-import com.duckduckgo.privacy.config.api.UserAgentException
-import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
-import com.duckduckgo.privacy.config.impl.features.useragent.RealUserAgent
-import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
-import java.util.concurrent.CopyOnWriteArrayList
+import com.duckduckgo.user.agent.api.UserAgentInterceptor
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -52,20 +46,22 @@ class UserAgentProviderTest {
     private lateinit var testee: UserAgentProvider
 
     private var deviceInfo: DeviceInfo = mock()
-    private var userAgentRepository: UserAgentRepository = mock()
-    private var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = mock()
-    private var unprotectedTemporary: UnprotectedTemporary = RealUnprotectedTemporary(unprotectedTemporaryRepository)
-    private var userAgent: UserAgent = RealUserAgent(userAgentRepository, unprotectedTemporary)
+    private var userAgent: UserAgent = mock()
     private var toggle: FeatureToggle = mock()
 
     @Before
     fun before() {
         whenever(deviceInfo.majorAppVersion).thenReturn("5")
         whenever(toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName.value)).thenReturn(true)
-        whenever(userAgentRepository.defaultExceptions).thenReturn(defaultExceptions)
-        whenever(userAgentRepository.omitApplicationExceptions).thenReturn(applicationExceptions)
-        whenever(userAgentRepository.omitVersionExceptions).thenReturn(versionExceptions)
-        whenever(unprotectedTemporaryRepository.exceptions).thenReturn(unprotectedExceptions)
+
+        whenever(userAgent.isADefaultException("default.com")).thenReturn(true)
+        whenever(userAgent.isADefaultException("unprotected.com")).thenReturn(true)
+        whenever(userAgent.isADefaultException("subdomain.default.com")).thenReturn(true)
+        whenever(userAgent.isADefaultException("subdomain.unprotected.com")).thenReturn(true)
+        whenever(userAgent.isAVersionException("version.com")).thenReturn(true)
+        whenever(userAgent.isAVersionException("subdomain.version.com")).thenReturn(true)
+        whenever(userAgent.isAnApplicationException("application.com")).thenReturn(true)
+        whenever(userAgent.isAnApplicationException("subdomain.application.com")).thenReturn(true)
     }
 
     @Test
@@ -228,14 +224,13 @@ class UserAgentProviderTest {
         device: DeviceInfo,
         userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor> = provideUserAgentFakePluginPoint(),
     ): UserAgentProvider {
-        return UserAgentProvider(
+        return RealUserAgentProvider(
             { defaultUserAgent },
             device,
             userAgentInterceptorPluginPoint,
             userAgent,
             toggle,
             FakeUserAllowListRepo(),
-            coroutinesTestRule.testDispatcherProvider,
         )
     }
 
@@ -263,10 +258,6 @@ class UserAgentProviderTest {
         const val DESKTOP_ONLY_SITE_EXCEPTION = "http://m.facebook.com/dialog/"
         const val ALLOWED_URL = "http://allowed.com"
         const val ALLOWED_HOST = "allowed.com"
-        val applicationExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "application.com", reason = "reason")))
-        val versionExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "version.com", reason = "reason")))
-        val defaultExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "default.com", reason = "reason")))
-        val unprotectedExceptions = CopyOnWriteArrayList(listOf(UnprotectedTemporaryException(domain = "unprotected.com", reason = "reason")))
     }
 
     private object Agent {

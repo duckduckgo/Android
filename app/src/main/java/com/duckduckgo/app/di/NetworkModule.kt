@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
@@ -32,6 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.Module
