@@ -36,6 +36,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
 import com.duckduckgo.sync.store.model.SyncAttemptState.SUCCESS
@@ -51,19 +52,25 @@ class RealSyncEngine @Inject constructor(
     private val syncScheduler: SyncScheduler,
     private val syncStateRepository: SyncStateRepository,
     private val syncPixels: SyncPixels,
+    private val syncStore: SyncStore,
     private val providerPlugins: PluginPoint<SyncableDataProvider>,
     private val persisterPlugins: PluginPoint<SyncableDataPersister>,
 ) : SyncEngine {
 
     override fun triggerSync(trigger: SyncTrigger) {
         Timber.d("Sync-Feature: petition to sync now trigger: $trigger")
-        when (trigger) {
-            BACKGROUND_SYNC -> scheduleSync(trigger)
-            APP_OPEN -> performSync(trigger)
-            FEATURE_READ -> performSync(trigger)
-            DATA_CHANGE -> performSync(trigger)
-            ACCOUNT_CREATION -> sendLocalData()
-            ACCOUNT_LOGIN -> performSync(trigger)
+        if (syncStore.isSignedIn()) {
+            Timber.d("Sync-Feature: sync enabled, triggering operation: $trigger")
+            when (trigger) {
+                BACKGROUND_SYNC -> scheduleSync(trigger)
+                APP_OPEN -> performSync(trigger)
+                FEATURE_READ -> performSync(trigger)
+                DATA_CHANGE -> performSync(trigger)
+                ACCOUNT_CREATION -> sendLocalData()
+                ACCOUNT_LOGIN -> performSync(trigger)
+            }
+        } else {
+            Timber.d("Sync-Feature: sync disabled, nothing to do")
         }
     }
 
