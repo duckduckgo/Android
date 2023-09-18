@@ -91,6 +91,11 @@ interface SyncService {
 
     @GET("$SYNC_PROD_ENVIRONMENT_URL/sync/credentials")
     fun credentialsSince(@Header("Authorization") token: String, @Query("since") since: String): Call<JSONObject>
+
+    companion object {
+        const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
+        const val SYNC_DEV_ENVIRONMENT_URL = "https://dev-sync-use.duckduckgo.com"
+    }
 }
 
 data class Login(

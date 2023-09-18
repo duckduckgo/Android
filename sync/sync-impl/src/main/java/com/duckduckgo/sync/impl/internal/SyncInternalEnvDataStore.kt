@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.internal
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_DEV_ENVIRONMENT_URL
+import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_PROD_ENVIRONMENT_URL
 import javax.inject.Inject
 
 interface SyncInternalEnvDataStore {
@@ -50,8 +52,5 @@ class AppSyncInternalEnvDataStore @Inject constructor(
         private const val FILENAME = "com.duckduckgo.sync.internal.env.store.v1"
         private const val KEY_SYNC_ENVIRONMENT_URL = "KEY_SYNC_ENVIRONMENT_URL"
         private const val KEY_SYNC_USE_PROD_ENVIRONMENT_URL = "KEY_SYNC_USE_PROD_ENVIRONMENT_URL"
-
-        const val SYNC_PROD_ENVIRONMENT_URL = "https://sync.duckduckgo.com"
-        const val SYNC_DEV_ENVIRONMENT_URL = "https://dev-sync-use.duckduckgo.com"
     }
 }
