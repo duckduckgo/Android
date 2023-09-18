@@ -1926,7 +1926,7 @@ class BrowserTabFragment :
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             viewModel.fireAutocompletePixel(suggestion)
             withContext(dispatchers.main()) {
                 val origin = when (suggestion) {
@@ -2490,7 +2490,7 @@ class BrowserTabFragment :
     }
 
     private fun launchDownloadMessagesJob() {
-        downloadMessagesJob += lifecycleScope.launch {
+        downloadMessagesJob += lifecycleScope.launch(dispatchers.io()) {
             viewModel.downloadCommands().cancellable().collect {
                 processFileDownloadedCommand(it)
             }

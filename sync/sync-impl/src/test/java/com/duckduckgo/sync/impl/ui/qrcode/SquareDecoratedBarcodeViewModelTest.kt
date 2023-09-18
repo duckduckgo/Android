@@ -62,7 +62,7 @@ class SquareDecoratedBarcodeViewModelTest {
     }
 
     private val testee: SquareDecoratedBarcodeViewModel by lazy {
-        SquareDecoratedBarcodeViewModel(permissionDeniedWrapper)
+        SquareDecoratedBarcodeViewModel(permissionDeniedWrapper, coroutineRule.testDispatcherProvider)
     }
 
     @Test

@@ -26,6 +26,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
@@ -78,6 +79,9 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     @Inject
     lateinit var autofillSelectCredentialsListBuilder: AutofillSelectCredentialsListBuilder
 
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -124,7 +128,7 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         binding.siteName.text = url
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = binding.favicon)
         }
     }

@@ -46,7 +46,7 @@ class VoiceSearchViewModelTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = VoiceSearchViewModel(speechRecognizer)
+        testee = VoiceSearchViewModel(speechRecognizer, coroutineTestRule.testDispatcherProvider)
     }
 
     @Test

@@ -138,7 +138,7 @@ class DownloadsViewModel @Inject constructor(
     }
 
     fun onQueryTextChange(newText: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher.io()) {
             filterText.emit(newText)
         }
     }
@@ -173,11 +173,11 @@ class DownloadsViewModel @Inject constructor(
     }
 
     override fun onItemClicked(item: DownloadItem) {
-        viewModelScope.launch { command.send(OpenFile(item)) }
+        viewModelScope.launch(dispatcher.io()) { command.send(OpenFile(item)) }
     }
 
     override fun onShareItemClicked(item: DownloadItem) {
-        viewModelScope.launch { command.send(ShareFile(item)) }
+        viewModelScope.launch(dispatcher.io()) { command.send(ShareFile(item)) }
     }
 
     override fun onDeleteItemClicked(item: DownloadItem) {
@@ -195,7 +195,7 @@ class DownloadsViewModel @Inject constructor(
     }
 
     override fun onItemVisibilityChanged(visible: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher.io()) {
             showNotifyMe.emit(visible)
         }
     }

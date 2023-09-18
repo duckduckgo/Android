@@ -28,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
@@ -58,6 +59,9 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
     @Inject
     lateinit var trackerFeedAdapter: TrackerFeedAdapter
 
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
     private val viewModel: DeviceShieldActivityFeedViewModel by bindViewModel()
     private lateinit var binding: ViewDeviceShieldActivityFeedBinding
 
@@ -83,6 +87,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
             adapter = trackerFeedAdapter
         }
 
+        // let calling suspend fun define the thread
         lifecycleScope.launch {
             viewModel.getMostRecentTrackers(
                 TimeWindow(
@@ -96,7 +101,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                 }
         }
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.commands()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest { processCommands(it) }

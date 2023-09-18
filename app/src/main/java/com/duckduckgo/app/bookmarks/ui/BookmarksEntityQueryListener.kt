@@ -18,6 +18,7 @@ package com.duckduckgo.app.bookmarks.ui
 
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -30,12 +31,13 @@ class BookmarksEntityQueryListener(
     private val viewModel: BookmarksViewModel,
     private val bookmarksAdapter: BookmarksAdapter,
     private val bookmarkFoldersAdapter: BookmarkFoldersAdapter,
+    private val dispatcherProvider: DispatcherProvider,
 ) {
 
     private var searchJob = ConflatedJob()
 
     fun onQueryTextChange(newText: String) {
-        searchJob += viewModel.viewModelScope.launch {
+        searchJob += viewModel.viewModelScope.launch(dispatcherProvider.io()) {
             delay(DEBOUNCE_PERIOD)
             viewModel.viewState.value?.bookmarks?.let { bookmarks ->
                 viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->

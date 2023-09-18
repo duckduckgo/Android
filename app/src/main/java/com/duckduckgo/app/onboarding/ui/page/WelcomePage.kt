@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomeBinding
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
@@ -51,6 +52,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         // In case of screen rotation while the notifications permissions prompt is shown on screen a DENY result is received
@@ -86,7 +90,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         requestNotificationsPermissions()
         setSkipAnimationListener()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             events.asFlow()
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .collect(::render)
@@ -115,7 +119,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     }
 
     private fun event(event: WelcomePageView.Event) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             events.send(event)
         }
     }

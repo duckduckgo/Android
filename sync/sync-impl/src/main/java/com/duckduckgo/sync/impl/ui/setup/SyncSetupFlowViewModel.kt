@@ -70,31 +70,31 @@ class SyncSetupFlowViewModel @Inject constructor(
     }
 
     fun onTurnOnSyncClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(AskSyncAnotherDevice)
         }
     }
 
     fun onRecoverYourSyncDataClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(RecoverSyncData)
         }
     }
 
     fun onSyncAnotherDeviceClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(SyncAnotherDevice)
         }
     }
 
     fun onNotNowClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(FinishSetupFlow)
         }
     }
 
     fun onCloseClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(AbortFlow)
         }
     }
