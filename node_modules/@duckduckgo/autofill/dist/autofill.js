@@ -4471,15 +4471,8 @@ class ExtensionInterface extends _InterfacePrototype.default {
     return null;
   }
 
-  removeAutofillUIFromPage() {
-    var _this$activeForm2;
-
-    super.removeAutofillUIFromPage();
-    (_this$activeForm2 = this.activeForm) === null || _this$activeForm2 === void 0 ? void 0 : _this$activeForm2.removeAllDecorations();
-  }
-
   async resetAutofillUI(callback) {
-    this.removeAutofillUIFromPage();
+    this.removeAutofillUIFromPage('Resetting autofill.');
     await this.setupAutofill();
     if (callback) await callback();
     this.uiController = this.createUIController();
@@ -4517,7 +4510,7 @@ class ExtensionInterface extends _InterfacePrototype.default {
     switch (this.getActiveTooltipType()) {
       case TOOLTIP_TYPES.EmailProtection:
         {
-          var _this$activeForm3;
+          var _this$activeForm2;
 
           this._scannerCleanup = this.scanner.init();
           this.addLogoutListener(() => {
@@ -4532,12 +4525,12 @@ class ExtensionInterface extends _InterfacePrototype.default {
             }
           });
 
-          if ((_this$activeForm3 = this.activeForm) !== null && _this$activeForm3 !== void 0 && _this$activeForm3.activeInput) {
-            var _this$activeForm4;
+          if ((_this$activeForm2 = this.activeForm) !== null && _this$activeForm2 !== void 0 && _this$activeForm2.activeInput) {
+            var _this$activeForm3;
 
             this.attachTooltip({
               form: this.activeForm,
-              input: (_this$activeForm4 = this.activeForm) === null || _this$activeForm4 === void 0 ? void 0 : _this$activeForm4.activeInput,
+              input: (_this$activeForm3 = this.activeForm) === null || _this$activeForm3 === void 0 ? void 0 : _this$activeForm3.activeInput,
               click: null,
               trigger: 'postSignup',
               triggerMetaData: {
@@ -4773,7 +4766,7 @@ class InterfacePrototype {
 
   /** @type {boolean} */
 
-  /** @type {(()=>void) | null} */
+  /** @type {((reason, ...rest) => void) | null} */
 
   /**
    * @param {GlobalConfig} config
@@ -4847,12 +4840,16 @@ class InterfacePrototype {
   createUIController() {
     return new _NativeUIController.NativeUIController();
   }
+  /**
+   * @param {string} reason
+   */
 
-  removeAutofillUIFromPage() {
+
+  removeAutofillUIFromPage(reason) {
     var _this$uiController, _this$_scannerCleanup;
 
     (_this$uiController = this.uiController) === null || _this$uiController === void 0 ? void 0 : _this$uiController.destroy();
-    (_this$_scannerCleanup = this._scannerCleanup) === null || _this$_scannerCleanup === void 0 ? void 0 : _this$_scannerCleanup.call(this);
+    (_this$_scannerCleanup = this._scannerCleanup) === null || _this$_scannerCleanup === void 0 ? void 0 : _this$_scannerCleanup.call(this, reason);
   }
 
   get hasLocalAddresses() {
@@ -5092,7 +5089,7 @@ class InterfacePrototype {
   postInit() {
     const cleanup = this.scanner.init();
     this.addLogoutListener(() => {
-      cleanup();
+      cleanup('Logged out');
 
       if (this.globalConfig.isDDGDomain) {
         (0, _autofillUtils.notifyWebApp)({
@@ -6544,6 +6541,10 @@ class Form {
     return this.formAnalyzer.isHybrid;
   }
 
+  get isCCForm() {
+    return this.formAnalyzer.isCCForm();
+  }
+
   logFormInfo() {
     if (!(0, _autofillUtils.shouldLog)()) return;
     console.log("Form type: %c".concat(this.getFormType()), 'font-weight: bold');
@@ -6800,6 +6801,7 @@ class Form {
   destroy() {
     this.removeAllDecorations();
     this.removeTooltip();
+    this.forgetAllInputs();
     this.mutObs.disconnect();
     this.matching.clear();
     this.intObs = null;
@@ -6902,6 +6904,7 @@ class Form {
     const opts = {
       isLogin: this.isLogin,
       isHybrid: this.isHybrid,
+      isCCForm: this.isCCForm,
       hasCredentials: Boolean((_this$device$settings = this.device.settings.availableInputTypes.credentials) === null || _this$device$settings === void 0 ? void 0 : _this$device$settings.username),
       supportsIdentitiesAutofill: this.device.settings.featureToggles.inputType_identities
     };
@@ -7354,6 +7357,8 @@ class FormAnalyzer {
 
     _defineProperty(this, "matching", void 0);
 
+    _defineProperty(this, "_isCCForm", undefined);
+
     this.form = form;
     this.matching = matching || new _matching.Matching(_matchingConfiguration.matchingConfiguration);
     /**
@@ -7631,6 +7636,52 @@ class FormAnalyzer {
     }
 
     return this;
+  }
+  /** @type {undefined|boolean} */
+
+
+  /**
+   * Tries to infer if it's a credit card form
+   * @returns {boolean}
+   */
+  isCCForm() {
+    var _formEl$textContent;
+
+    if (this._isCCForm !== undefined) return this._isCCForm;
+    const formEl = this.form;
+    const ccFieldSelector = this.matching.joinCssSelectors('cc');
+
+    if (!ccFieldSelector) {
+      this._isCCForm = false;
+      return this._isCCForm;
+    }
+
+    const hasCCSelectorChild = formEl.matches(ccFieldSelector) || formEl.querySelector(ccFieldSelector); // If the form contains one of the specific selectors, we have high confidence
+
+    if (hasCCSelectorChild) {
+      this._isCCForm = true;
+      return this._isCCForm;
+    } // Read form attributes to find a signal
+
+
+    const hasCCAttribute = [...formEl.attributes].some(_ref3 => {
+      let {
+        name,
+        value
+      } = _ref3;
+      return /(credit|payment).?card/i.test("".concat(name, "=").concat(value));
+    });
+
+    if (hasCCAttribute) {
+      this._isCCForm = true;
+      return this._isCCForm;
+    } // Match form textContent against common cc fields (includes hidden labels)
+
+
+    const textMatches = (_formEl$textContent = formEl.textContent) === null || _formEl$textContent === void 0 ? void 0 : _formEl$textContent.match(/(credit|payment).?card(.?number)?|ccv|security.?code|cvv|cvc|csc/ig); // We check for more than one to minimise false positives
+
+    this._isCCForm = Boolean(textMatches && textMatches.length > 1);
+    return this._isCCForm;
   }
 
 }
@@ -10079,7 +10130,7 @@ class Matching {
     this.setActiveElementStrings(input, formEl); // // For CC forms we run aggressive matches, so we want to make sure we only
     // // run them on actual CC forms to avoid false positives and expensive loops
 
-    if (this.isCCForm(formEl)) {
+    if (opts.isCCForm) {
       const subtype = this.subtypeFromMatchers('cc', input);
 
       if (subtype && isValidCreditCardSubtype(subtype)) {
@@ -10130,6 +10181,7 @@ class Matching {
    * @typedef {{
    *   isLogin?: boolean,
    *   isHybrid?: boolean,
+   *   isCCForm?: boolean,
    *   hasCredentials?: boolean,
    *   supportsIdentitiesAutofill?: boolean
    * }} SetInputTypeOpts
@@ -10464,39 +10516,6 @@ class Matching {
     return this;
   }
   /**
-   * Tries to infer if it's a credit card form
-   * @param {HTMLElement} formEl
-   * @returns {boolean}
-   */
-
-
-  isCCForm(formEl) {
-    var _formEl$textContent;
-
-    const ccFieldSelector = this.joinCssSelectors('cc');
-
-    if (!ccFieldSelector) {
-      return false;
-    }
-
-    const hasCCSelectorChild = formEl.matches(ccFieldSelector) || formEl.querySelector(ccFieldSelector); // If the form contains one of the specific selectors, we have high confidence
-
-    if (hasCCSelectorChild) return true; // Read form attributes to find a signal
-
-    const hasCCAttribute = [...formEl.attributes].some(_ref => {
-      let {
-        name,
-        value
-      } = _ref;
-      return /(credit|payment).?card/i.test("".concat(name, "=").concat(value));
-    });
-    if (hasCCAttribute) return true; // Match form textContent against common cc fields (includes hidden labels)
-
-    const textMatches = (_formEl$textContent = formEl.textContent) === null || _formEl$textContent === void 0 ? void 0 : _formEl$textContent.match(/(credit|payment).?card(.?number)?|ccv|security.?code|cvv|cvc|csc/ig); // We check for more than one to minimise false positives
-
-    return Boolean(textMatches && textMatches.length > 1);
-  }
-  /**
    * @type {MatchingConfiguration}
    */
 
@@ -10664,7 +10683,8 @@ function getInputSubtype(input) {
 
 const removeExcessWhitespace = function () {
   let string = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-  return (string || '').replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
+  if (!string) return '';
+  return string.replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
 };
 /**
  * Get text from all explicit labels
@@ -11104,7 +11124,7 @@ class InContextSignup {
     };
 
     if (options.shouldHideTooltip) {
-      this.device.removeAutofillUIFromPage();
+      this.device.removeAutofillUIFromPage('Email Protection in-context signup dismissed.');
       this.device.deviceApi.notify(new _deviceApiCalls.CloseAutofillParentCall(null));
     }
 
@@ -11575,7 +11595,7 @@ const {
 /**
  * @typedef {{
  *     forms: Map<HTMLElement, import("./Form/Form").Form>;
- *     init(): ()=> void;
+ *     init(): (reason, ...rest)=> void;
  *     enqueue(elements: (HTMLElement|Document)[]): void;
  *     findEligibleInputs(context): Scanner;
  *     options: ScannerOptions;
@@ -11628,6 +11648,8 @@ class DefaultScanner {
 
   /** @type {boolean} A flag to indicate the whole page will be re-scanned */
 
+  /** @type {boolean} Indicates whether we called stopScanning */
+
   /**
    * @param {import("./DeviceInterface/InterfacePrototype").default} device
    * @param {ScannerOptions} options
@@ -11644,6 +11666,8 @@ class DefaultScanner {
     _defineProperty(this, "activeInput", null);
 
     _defineProperty(this, "rescanAll", false);
+
+    _defineProperty(this, "stopped", false);
 
     _defineProperty(this, "mutObs", new MutationObserver(mutationList => {
       /** @type {HTMLElement[]} */
@@ -11689,11 +11713,13 @@ class DefaultScanner {
    * Call this to scan once and then watch for changes.
    *
    * Call the returned function to remove listeners.
-   * @returns {() => void}
+   * @returns {(reason: string, ...rest) => void}
    */
 
 
   init() {
+    var _this = this;
+
     if (this.device.globalConfig.isExtension) {
       this.device.deviceApi.notify(new _deviceApiCalls.AddDebugFlagCall({
         flag: 'autofill'
@@ -11709,20 +11735,12 @@ class DefaultScanner {
       setTimeout(() => this.scanAndObserve(), delay);
     }
 
-    return () => {
-      var _this$device$activeFo;
+    return function (reason) {
+      for (var _len = arguments.length, rest = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
 
-      const activeInput = (_this$device$activeFo = this.device.activeForm) === null || _this$device$activeFo === void 0 ? void 0 : _this$device$activeFo.activeInput; // remove Dax, listeners, timers, and observers
-
-      clearTimeout(this.debounceTimer);
-      this.mutObs.disconnect();
-      this.forms.forEach(form => {
-        form.resetAllInputs();
-        form.removeAllDecorations();
-      });
-      this.forms.clear(); // Bring the user back to the input they were interacting with
-
-      activeInput === null || activeInput === void 0 ? void 0 : activeInput.focus();
+      _this.stopScanner(reason, ...rest);
     };
   }
   /**
@@ -11733,9 +11751,10 @@ class DefaultScanner {
   scanAndObserve() {
     var _window$performance, _window$performance$m, _window$performance2, _window$performance2$;
 
-    (_window$performance = window.performance) === null || _window$performance === void 0 ? void 0 : (_window$performance$m = _window$performance.mark) === null || _window$performance$m === void 0 ? void 0 : _window$performance$m.call(_window$performance, 'scanner:init:start');
+    (_window$performance = window.performance) === null || _window$performance === void 0 ? void 0 : (_window$performance$m = _window$performance.mark) === null || _window$performance$m === void 0 ? void 0 : _window$performance$m.call(_window$performance, 'initial_scanner:init:start');
     this.findEligibleInputs(document);
-    (_window$performance2 = window.performance) === null || _window$performance2 === void 0 ? void 0 : (_window$performance2$ = _window$performance2.mark) === null || _window$performance2$ === void 0 ? void 0 : _window$performance2$.call(_window$performance2, 'scanner:init:end');
+    (_window$performance2 = window.performance) === null || _window$performance2 === void 0 ? void 0 : (_window$performance2$ = _window$performance2.mark) === null || _window$performance2$ === void 0 ? void 0 : _window$performance2$.call(_window$performance2, 'initial_scanner:init:end');
+    (0, _autofillUtils.logPerformance)('initial_scanner');
     this.mutObs.observe(document.documentElement, {
       childList: true,
       subtree: true
@@ -11760,6 +11779,7 @@ class DefaultScanner {
       const inputs = context.querySelectorAll(_selectorsCss.FORM_INPUTS_SELECTOR);
 
       if (inputs.length > this.options.maxInputsPerPage) {
+        this.stopScanner('Too many input fields in the given context, stop scanning', context);
         return this;
       }
 
@@ -11769,6 +11789,38 @@ class DefaultScanner {
     return this;
   }
   /**
+   * Stops scanning, switches off the mutation observer and clears all forms
+   * @param {string} reason
+   * @param {...any} rest
+   */
+
+
+  stopScanner(reason) {
+    var _this$device$activeFo;
+
+    this.stopped = true;
+
+    if ((0, _autofillUtils.shouldLog)()) {
+      for (var _len2 = arguments.length, rest = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        rest[_key2 - 1] = arguments[_key2];
+      }
+
+      console.log(reason, ...rest);
+    }
+
+    const activeInput = (_this$device$activeFo = this.device.activeForm) === null || _this$device$activeFo === void 0 ? void 0 : _this$device$activeFo.activeInput; // remove Dax, listeners, timers, and observers
+
+    clearTimeout(this.debounceTimer);
+    this.changedElements.clear();
+    this.mutObs.disconnect();
+    this.forms.forEach(form => {
+      form.destroy();
+    });
+    this.forms.clear(); // Bring the user back to the input they were interacting with
+
+    activeInput === null || activeInput === void 0 ? void 0 : activeInput.focus();
+  }
+  /**
    * @param {HTMLElement|HTMLInputElement|HTMLSelectElement} input
    * @returns {HTMLFormElement|HTMLElement}
    */
@@ -11776,10 +11828,13 @@ class DefaultScanner {
 
   getParentForm(input) {
     if (input instanceof HTMLInputElement || input instanceof HTMLSelectElement) {
-      // Use input.form unless it encloses most of the DOM
-      // In that case we proceed to identify more precise wrappers
-      if (input.form && !(0, _autofillUtils.isFormLikelyToBeUsedAsPageWrapper)(input.form)) {
-        return input.form;
+      if (input.form) {
+        // Use input.form unless it encloses most of the DOM
+        // In that case we proceed to identify more precise wrappers
+        if (this.forms.has(input.form) || // If we've added the form we've already checked that it's not a page wrapper
+        !(0, _autofillUtils.isFormLikelyToBeUsedAsPageWrapper)(input.form)) {
+          return input.form;
+        }
       }
     }
 
@@ -11813,28 +11868,55 @@ class DefaultScanner {
 
 
   addInput(input) {
-    const parentForm = this.getParentForm(input); // Note that el.contains returns true for el itself
+    if (this.stopped) return;
+    const parentForm = this.getParentForm(input);
 
-    const previouslyFoundParent = [...this.forms.keys()].find(form => form.contains(parentForm));
+    if (parentForm instanceof HTMLFormElement && this.forms.has(parentForm)) {
+      var _this$forms$get;
+
+      // We've met the form, add the input
+      (_this$forms$get = this.forms.get(parentForm)) === null || _this$forms$get === void 0 ? void 0 : _this$forms$get.addInput(input);
+      return;
+    } // Check if the forms we've seen are either disconnected,
+    // or are parent/child of the currently-found form
+
+
+    let previouslyFoundParent, childForm;
+
+    for (const [formEl] of this.forms) {
+      // Remove disconnected forms to avoid leaks
+      if (!formEl.isConnected) {
+        this.forms.delete(formEl);
+        continue;
+      }
+
+      if (formEl.contains(parentForm)) {
+        previouslyFoundParent = formEl;
+        break;
+      }
+
+      if (parentForm.contains(formEl)) {
+        childForm = formEl;
+        break;
+      }
+    }
 
     if (previouslyFoundParent) {
       if (parentForm instanceof HTMLFormElement && parentForm !== previouslyFoundParent) {
         // If we had a prior parent but this is an explicit form, the previous was a false positive
         this.forms.delete(previouslyFoundParent);
       } else {
-        var _this$forms$get;
+        var _this$forms$get2;
 
         // If we've already met the form or a descendant, add the input
-        (_this$forms$get = this.forms.get(previouslyFoundParent)) === null || _this$forms$get === void 0 ? void 0 : _this$forms$get.addInput(input);
+        (_this$forms$get2 = this.forms.get(previouslyFoundParent)) === null || _this$forms$get2 === void 0 ? void 0 : _this$forms$get2.addInput(input);
       }
     } else {
       // if this form is an ancestor of an existing form, remove that before adding this
-      const childForm = [...this.forms.keys()].find(form => parentForm.contains(form));
-
       if (childForm) {
-        var _this$forms$get2;
+        var _this$forms$get3;
 
-        (_this$forms$get2 = this.forms.get(childForm)) === null || _this$forms$get2 === void 0 ? void 0 : _this$forms$get2.destroy();
+        (_this$forms$get3 = this.forms.get(childForm)) === null || _this$forms$get3 === void 0 ? void 0 : _this$forms$get3.destroy();
         this.forms.delete(childForm);
       } // Only add the form if below the limit of forms per page
 
@@ -11842,9 +11924,7 @@ class DefaultScanner {
       if (this.forms.size < this.options.maxFormsPerPage) {
         this.forms.set(parentForm, new _Form.Form(parentForm, input, this.device, this.matching, this.shouldAutoprompt));
       } else {
-        if ((0, _autofillUtils.shouldLog)()) {
-          console.log('The page has too many forms, stop adding them.');
-        }
+        this.stopScanner('The page has too many forms, stop adding them.');
       }
     }
   }
@@ -11870,9 +11950,14 @@ class DefaultScanner {
 
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
+      var _window$performance3, _window$performance3$, _window$performance4, _window$performance4$;
+
+      (_window$performance3 = window.performance) === null || _window$performance3 === void 0 ? void 0 : (_window$performance3$ = _window$performance3.mark) === null || _window$performance3$ === void 0 ? void 0 : _window$performance3$.call(_window$performance3, 'scanner:init:start');
       this.processChangedElements();
       this.changedElements.clear();
       this.rescanAll = false;
+      (_window$performance4 = window.performance) === null || _window$performance4 === void 0 ? void 0 : (_window$performance4$ = _window$performance4.mark) === null || _window$performance4$ === void 0 ? void 0 : _window$performance4$.call(_window$performance4, 'scanner:init:end');
+      (0, _autofillUtils.logPerformance)('scanner');
     }, this.options.debounceTimePeriod);
   }
   /**
@@ -14050,8 +14135,10 @@ exports.isLikelyASubmitButton = exports.isIncontextSignupEnabledFromProcessedCon
 exports.isLocalNetwork = isLocalNetwork;
 exports.isPotentiallyViewable = void 0;
 exports.isValidTLD = isValidTLD;
+exports.logPerformance = logPerformance;
 exports.setValue = exports.sendAndWaitForAnswer = exports.safeExecute = exports.removeInlineStyles = exports.notifyWebApp = void 0;
 exports.shouldLog = shouldLog;
+exports.shouldLogPerformance = shouldLogPerformance;
 exports.truncateFromMiddle = truncateFromMiddle;
 exports.wasAutofilledByChrome = void 0;
 exports.whenIdle = whenIdle;
@@ -14469,26 +14556,39 @@ const buttonMatchesFormType = (el, formObj) => {
     return true;
   }
 };
+
+exports.buttonMatchesFormType = buttonMatchesFormType;
+const buttonInputTypes = ['submit', 'button'];
 /**
  * Get the text of an element
  * @param {Element} el
  * @returns {string}
  */
 
-
-exports.buttonMatchesFormType = buttonMatchesFormType;
-
 const getText = el => {
   // for buttons, we don't care about descendants, just get the whole text as is
   // this is important in order to give proper attribution of the text to the button
   if (el instanceof HTMLButtonElement) return (0, _matching.removeExcessWhitespace)(el.textContent);
-  if (el instanceof HTMLInputElement && ['submit', 'button'].includes(el.type)) return el.value;
 
-  if (el instanceof HTMLInputElement && el.type === 'image') {
-    return (0, _matching.removeExcessWhitespace)(el.alt || el.value || el.title || el.name);
+  if (el instanceof HTMLInputElement) {
+    if (buttonInputTypes.includes(el.type)) {
+      return el.value;
+    }
+
+    if (el.type === 'image') {
+      return (0, _matching.removeExcessWhitespace)(el.alt || el.value || el.title || el.name);
+    }
   }
 
-  return (0, _matching.removeExcessWhitespace)(Array.from(el.childNodes).reduce((text, child) => child instanceof Text ? text + ' ' + child.textContent : text, ''));
+  let text = '';
+
+  for (const childNode of el.childNodes) {
+    if (childNode instanceof Text) {
+      text += ' ' + childNode.textContent;
+    }
+  }
+
+  return (0, _matching.removeExcessWhitespace)(text);
 };
 /**
  * Check if hostname is a local address
@@ -14532,7 +14632,7 @@ const wasAutofilledByChrome = input => {
   }
 };
 /**
- * Checks if we should log debug info to the console
+ * Checks if we should log form analysis debug info to the console
  * @returns {boolean}
  */
 
@@ -14540,13 +14640,42 @@ const wasAutofilledByChrome = input => {
 exports.wasAutofilledByChrome = wasAutofilledByChrome;
 
 function shouldLog() {
+  return readDebugSetting('ddg-autofill-debug');
+}
+/**
+ * Checks if we should log performance info to the console
+ * @returns {boolean}
+ */
+
+
+function shouldLogPerformance() {
+  return readDebugSetting('ddg-autofill-perf');
+}
+/**
+ * Check if a sessionStorage item is set to 'true'
+ * @param setting
+ * @returns {boolean}
+ */
+
+
+function readDebugSetting(setting) {
   // sessionStorage throws in invalid schemes like data: and file:
   try {
     var _window$sessionStorag;
 
-    return ((_window$sessionStorag = window.sessionStorage) === null || _window$sessionStorag === void 0 ? void 0 : _window$sessionStorag.getItem('ddg-autofill-debug')) === 'true';
+    return ((_window$sessionStorag = window.sessionStorage) === null || _window$sessionStorag === void 0 ? void 0 : _window$sessionStorag.getItem(setting)) === 'true';
   } catch (e) {
     return false;
+  }
+}
+
+function logPerformance(markName) {
+  if (shouldLogPerformance()) {
+    var _window$performance, _window$performance2;
+
+    const measurement = (_window$performance = window.performance) === null || _window$performance === void 0 ? void 0 : _window$performance.measure("".concat(markName, ":init"), "".concat(markName, ":init:start"), "".concat(markName, ":init:end"));
+    console.log("".concat(markName, " took ").concat(Math.round(measurement === null || measurement === void 0 ? void 0 : measurement.duration), "ms"));
+    (_window$performance2 = window.performance) === null || _window$performance2 === void 0 ? void 0 : _window$performance2.clearMarks();
   }
 }
 /**
