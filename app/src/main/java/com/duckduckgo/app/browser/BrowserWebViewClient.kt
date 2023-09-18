@@ -30,6 +30,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
@@ -411,9 +412,9 @@ class BrowserWebViewClient @Inject constructor(
         error: WebResourceError?,
     ) {
         error?.let {
-            val error = parseErrorResponse(it)
-            if (error != OMITTED) {
-                webViewClientListener?.onReceivedError(error)
+            val parsedError = parseErrorResponse(it)
+            if (parsedError != OMITTED && request?.isForMainFrame == true) {
+                webViewClientListener?.onReceivedError(parsedError)
             }
         }
         super.onReceivedError(view, request, error)
@@ -422,7 +423,7 @@ class BrowserWebViewClient @Inject constructor(
     private fun parseErrorResponse(error: WebResourceError): WebViewErrorResponse {
         return if (error.errorCode == ERROR_HOST_LOOKUP) {
             when (error.description) {
-                "net::ERR_NAME_NOT_RESOLVED" -> WebViewErrorResponse.BAD_URL
+                "net::ERR_NAME_NOT_RESOLVED" -> BAD_URL
                 "net::ERR_INTERNET_DISCONNECTED" -> CONNECTION
                 else -> OMITTED
             }
