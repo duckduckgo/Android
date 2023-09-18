@@ -94,7 +94,7 @@ class RealSyncEngine @Inject constructor(
             if (it.isEmpty()) {
                 Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
                 syncStateRepository.updateSyncState(SUCCESS)
-                return
+                return@forEach
             }
 
             Timber.d("Sync-Feature: sending ${it.type} local data $it")
