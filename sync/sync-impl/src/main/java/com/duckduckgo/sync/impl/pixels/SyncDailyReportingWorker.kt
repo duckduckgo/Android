@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.HOURS
@@ -45,11 +46,16 @@ class SyncDailyReportingWorker(
     lateinit var syncPixels: SyncPixels
 
     @Inject
+    lateinit var syncAccountRepository: SyncAccountRepository
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
-            syncPixels.fireStatsPixel()
+            if (syncAccountRepository.isSignedIn()) {
+                syncPixels.fireStatsPixel()
+            }
             return@withContext Result.success()
         }
     }

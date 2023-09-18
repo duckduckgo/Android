@@ -32,6 +32,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
 import com.duckduckgo.sync.impl.engine.SyncOperation.EXECUTE
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.store.SyncStore
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL
 import com.duckduckgo.sync.store.model.SyncAttemptState.IN_PROGRESS
@@ -51,13 +52,51 @@ internal class SyncEngineTest {
     private val syncScheduler: SyncScheduler = mock()
     private val syncStateRepository: SyncStateRepository = mock()
     private val syncPixels: SyncPixels = mock()
+    private val syncStore: SyncStore = mock()
     private val providerPlugins: PluginPoint<SyncableDataProvider> = mock()
     private val persisterPlugins: PluginPoint<SyncableDataPersister> = mock()
     private lateinit var syncEngine: RealSyncEngine
 
     @Before
     fun before() {
-        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, syncPixels, providerPlugins, persisterPlugins)
+        syncEngine = RealSyncEngine(syncApiClient, syncScheduler, syncStateRepository, syncPixels, syncStore, providerPlugins, persisterPlugins)
+        whenever(syncStore.isSignedIn()).thenReturn(true)
+    }
+
+    @Test
+    fun whenFeatureReadTriggeredAndSyncIsDisabledNoSyncOperationIsTriggered() {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
+        syncEngine.triggerSync(FEATURE_READ)
+        verifyNoInteractions(syncApiClient)
+        verifyNoInteractions(syncScheduler)
+        verifyNoInteractions(syncStateRepository)
+    }
+
+    @Test
+    fun whenAppOpensAndSyncIsDisabledNoSyncOperationIsTriggered() {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
+        syncEngine.triggerSync(APP_OPEN)
+        verifyNoInteractions(syncApiClient)
+        verifyNoInteractions(syncScheduler)
+        verifyNoInteractions(syncStateRepository)
+    }
+
+    @Test
+    fun whenBackgroundSyncOperationTriggeredAndSyncIsDisabledNoSyncOperationIsTriggered() {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
+        syncEngine.triggerSync(BACKGROUND_SYNC)
+        verifyNoInteractions(syncApiClient)
+        verifyNoInteractions(syncScheduler)
+        verifyNoInteractions(syncStateRepository)
+    }
+
+    @Test
+    fun whenDataChangesAndSyncIsDisabledNoSyncOperationIsTriggered() {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
+        syncEngine.triggerSync(DATA_CHANGE)
+        verifyNoInteractions(syncApiClient)
+        verifyNoInteractions(syncScheduler)
+        verifyNoInteractions(syncStateRepository)
     }
 
     @Test
