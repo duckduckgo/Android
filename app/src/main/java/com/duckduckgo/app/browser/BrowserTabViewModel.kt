@@ -444,11 +444,6 @@ class BrowserTabViewModel @Inject constructor(
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
 
-        class InjectCredentials(
-            val url: String,
-            val credentials: LoginCredentials,
-        ) : Command()
-
         class CancelIncomingAutofillRequest(val url: String) : Command()
         object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
@@ -470,9 +465,6 @@ class BrowserTabViewModel @Inject constructor(
             val includeShortcutToViewCredential: Boolean,
             val messageResourceId: Int,
         ) : Command()
-
-        class AcceptGeneratedPassword(val url: String) : Command()
-        class RejectGeneratedPassword(val url: String) : Command()
 
         data class WebViewError(val errorType: WebViewErrorResponse) : Command()
     }
@@ -2731,36 +2723,21 @@ class BrowserTabViewModel @Inject constructor(
 
     /**
      * API called after user selected to autofill a private alias into a form
-
-     * Consumes the alias and injects it into the current page
-     * Will also automatically save a login for this site if saving logins is enabled
      */
-    fun consumeAlias(originalUrl: String) {
-        emailManager.getAlias()?.let {
-            command.postValue(InjectEmailAddress(duckAddress = it, originalUrl = originalUrl, autoSaveLogin = true))
-            pixel.enqueueFire(
-                AppPixelName.EMAIL_USE_ALIAS,
-                mapOf(
-                    PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
-                ),
-            )
-            emailManager.setNewLastUsedDate()
-        }
+    fun usePrivateDuckAddress(originalUrl: String, duckAddress: String) {
+        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = true))
+        pixel.enqueueFire(
+            AppPixelName.EMAIL_USE_ALIAS,
+            mapOf(PixelParameter.COHORT to emailManager.getCohort(), PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()),
+        )
     }
 
-    fun useAddress(originalUrl: String) {
-        emailManager.getEmailAddress()?.let {
-            command.postValue(InjectEmailAddress(duckAddress = it, originalUrl = originalUrl, autoSaveLogin = false))
-            pixel.enqueueFire(
-                AppPixelName.EMAIL_USE_ADDRESS,
-                mapOf(
-                    PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
-                ),
-            )
-            emailManager.setNewLastUsedDate()
-        }
+    fun usePersonalDuckAddress(originalUrl: String, duckAddress: String) {
+        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = false))
+        pixel.enqueueFire(
+            AppPixelName.EMAIL_USE_ADDRESS,
+            mapOf(PixelParameter.COHORT to emailManager.getCohort(), PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()),
+        )
     }
 
     fun cancelAutofillTooltip() {
@@ -2818,13 +2795,6 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         val destinationUrl = ampLinks.processDestinationUrl(initialUrl, extractedUrl)
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
-    }
-
-    fun shareCredentialsWithPage(
-        originalUrl: String,
-        credentials: LoginCredentials,
-    ) {
-        command.postValue(InjectCredentials(originalUrl, credentials))
     }
 
     fun returnNoCredentialsWithPage(originalUrl: String) {
@@ -2894,14 +2864,6 @@ class BrowserTabViewModel @Inject constructor(
                 messageResourceId = R.string.autofillLoginUpdatedSnackbarMessage,
             )
         }
-    }
-
-    fun acceptGeneratedPassword(originalUrl: String) {
-        command.postValue(AcceptGeneratedPassword(originalUrl))
-    }
-
-    fun rejectGeneratedPassword(originalUrl: String) {
-        command.postValue(RejectGeneratedPassword(originalUrl))
     }
 
     private fun defaultMediaSize(): PrintAttributes.MediaSize {

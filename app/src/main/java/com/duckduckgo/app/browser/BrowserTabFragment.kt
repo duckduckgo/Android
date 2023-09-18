@@ -991,28 +991,32 @@ class BrowserTabFragment :
         webView?.loadUrl(url, headers)
     }
 
-    override fun onRefreshRequested() {
+    fun onRefreshRequested() {
+        viewModel.onRefreshRequested()
+    }
+
+    override fun onAutofillStateChange() {
         viewModel.onRefreshRequested()
     }
 
     override fun onRejectGeneratedPassword(originalUrl: String) {
-        viewModel.rejectGeneratedPassword(originalUrl)
+        rejectGeneratedPassword(originalUrl)
     }
 
     override fun onAcceptGeneratedPassword(originalUrl: String) {
-        viewModel.acceptGeneratedPassword(originalUrl)
+        acceptGeneratedPassword(originalUrl)
     }
 
     override fun onRejectToUseEmailProtection(originalUrl: String) {
         viewModel.cancelAutofillTooltip()
     }
 
-    override fun onUseEmailProtectionPrivateAlias(originalUrl: String) {
-        viewModel.consumeAlias(originalUrl)
+    override fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String) {
+        viewModel.usePrivateDuckAddress(originalUrl, duckAddress)
     }
 
-    override fun onUseEmailProtectionPersonalAddress(originalUrl: String) {
-        viewModel.useAddress(originalUrl)
+    override fun onUseEmailProtectionPersonalAddress(originalUrl: String, duckAddress: String) {
+        viewModel.usePersonalDuckAddress(originalUrl, duckAddress)
     }
 
     override fun onSavedCredentials(credentials: LoginCredentials) {
@@ -1028,7 +1032,7 @@ class BrowserTabFragment :
     }
 
     override fun onShareCredentialsForAutofill(originalUrl: String, selectedCredentials: LoginCredentials) {
-        viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
+        injectAutofillCredentials(originalUrl, selectedCredentials)
     }
 
     fun refresh() {
@@ -1198,9 +1202,6 @@ class BrowserTabFragment :
             )
 
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
-            is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
-            is Command.AcceptGeneratedPassword -> acceptGeneratedPassword(it.url)
-            is Command.RejectGeneratedPassword -> rejectGeneratedPassword(it.url)
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen()
             is Command.EditWithSelectedQuery -> {

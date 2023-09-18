@@ -58,16 +58,6 @@ class ResultHandlerCredentialSelection @Inject constructor(
     ) {
         Timber.d("${this::class.java.simpleName}: processing result")
 
-        appCoroutineScope.launch(dispatchers.io()) {
-            processAutofillCredentialSelectionResult(result, fragment, autofillCallback)
-        }
-    }
-
-    private suspend fun processAutofillCredentialSelectionResult(
-        result: Bundle,
-        browserTabFragment: Fragment,
-        autofillCallback: AutofillEventListener,
-    ) {
         val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
 
         if (result.getBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED)) {
@@ -76,6 +66,22 @@ class ResultHandlerCredentialSelection @Inject constructor(
             return
         }
 
+        appCoroutineScope.launch(dispatchers.io()) {
+            processAutofillCredentialSelectionResult(
+                result = result,
+                browserTabFragment = fragment,
+                autofillCallback = autofillCallback,
+                originalUrl = originalUrl,
+            )
+        }
+    }
+
+    private suspend fun processAutofillCredentialSelectionResult(
+        result: Bundle,
+        browserTabFragment: Fragment,
+        autofillCallback: AutofillEventListener,
+        originalUrl: String,
+    ) {
         val selectedCredentials: LoginCredentials =
             result.safeGetParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
 

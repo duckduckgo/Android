@@ -3475,7 +3475,7 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.consumeAlias("")
+        testee.usePrivateDuckAddress("", "foo@example.com")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
@@ -3515,7 +3515,7 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
-        testee.consumeAlias("")
+        testee.usePrivateDuckAddress("", "alias")
 
         assertCommandIssued<Command.InjectEmailAddress> {
             assertEquals("alias", this.duckAddress)
@@ -3528,21 +3528,12 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.consumeAlias("")
+        testee.usePrivateDuckAddress("", "foo@example.com")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ALIAS,
             mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
-    }
-
-    @Test
-    fun whenConsumeAliasThenSetNewLastUsedDateCalled() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-
-        testee.consumeAlias("")
-
-        verify(mockEmailManager).setNewLastUsedDate()
     }
 
     @Test
@@ -3559,7 +3550,7 @@ class BrowserTabViewModelTest {
     fun whenUseAddressThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.useAddress("")
+        testee.usePersonalDuckAddress("", "address")
 
         assertCommandIssued<Command.InjectEmailAddress> {
             assertEquals("address", this.duckAddress)
@@ -3572,21 +3563,12 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.useAddress("")
+        testee.usePersonalDuckAddress("", "")
 
         verify(mockPixel).enqueueFire(
             AppPixelName.EMAIL_USE_ADDRESS,
             mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
-    }
-
-    @Test
-    fun whenUseAddressThenSetNewLastUsedDateCalled() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
-
-        testee.useAddress("")
-
-        verify(mockEmailManager).setNewLastUsedDate()
     }
 
     @Test
@@ -4197,23 +4179,6 @@ class BrowserTabViewModelTest {
         buildNavigationHistoryStack(stackSize = 20)
         testee.onUserLongPressedBack()
         assertShowHistoryCommandSent(expectedStackSize = 10)
-    }
-
-    @Test
-    fun whenShareCredentialsWithPageThenEmitInjectCredentialsCommand() = runTest {
-        val url = "originalurl.com"
-        val credentials = LoginCredentials(
-            id = 1,
-            domain = url,
-            username = "tester",
-            password = "test123",
-        )
-        testee.shareCredentialsWithPage(url, credentials)
-
-        assertCommandIssued<Command.InjectCredentials> {
-            assertEquals(url, this.url)
-            assertEquals(credentials, this.credentials)
-        }
     }
 
     @Test

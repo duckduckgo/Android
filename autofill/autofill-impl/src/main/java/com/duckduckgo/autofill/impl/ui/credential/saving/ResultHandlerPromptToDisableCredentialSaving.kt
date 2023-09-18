@@ -95,7 +95,7 @@ class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
             declineCounter.disableDeclineCounter()
 
             withContext(dispatchers.main()) {
-                callback.onRefreshRequested()
+                callback.onAutofillStateChange()
             }
 
             Timber.i("Autofill disabled at user request")

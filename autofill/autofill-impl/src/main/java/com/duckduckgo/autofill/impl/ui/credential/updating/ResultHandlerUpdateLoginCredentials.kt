@@ -39,6 +39,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
@@ -67,7 +68,9 @@ class ResultHandlerUpdateLoginCredentials @Inject constructor(
 
         appCoroutineScope.launch(dispatchers.io()) {
             autofillStore.updateCredentials(originalUrl, selectedCredentials, updateType)?.let {
-                autofillCallback.onUpdatedCredentials(it)
+                withContext(dispatchers.main()) {
+                    autofillCallback.onUpdatedCredentials(it)
+                }
             }
         }
     }

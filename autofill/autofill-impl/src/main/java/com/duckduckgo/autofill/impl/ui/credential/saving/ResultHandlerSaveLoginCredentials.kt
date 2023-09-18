@@ -37,6 +37,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
@@ -68,7 +69,10 @@ class ResultHandlerSaveLoginCredentials @Inject constructor(
             val savedCredentials = autofillStore.saveCredentials(originalUrl, selectedCredentials)
             if (savedCredentials != null) {
                 declineCounter.disableDeclineCounter()
-                autofillCallback.onSavedCredentials(savedCredentials)
+
+                withContext(dispatchers.main()) {
+                    autofillCallback.onSavedCredentials(savedCredentials)
+                }
             }
         }
     }

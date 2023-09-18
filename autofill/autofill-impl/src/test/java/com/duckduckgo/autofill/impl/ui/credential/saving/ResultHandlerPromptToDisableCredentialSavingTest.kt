@@ -66,7 +66,7 @@ class ResultHandlerPromptToDisableCredentialSavingTest {
     @Test
     fun whenUserChoosesToDisableAutofillThenPageRefreshRequested() = runTest {
         testee.onDisableAutofill(callback)
-        verify(callback).onRefreshRequested()
+        verify(callback).onAutofillStateChange()
     }
 
     @Test

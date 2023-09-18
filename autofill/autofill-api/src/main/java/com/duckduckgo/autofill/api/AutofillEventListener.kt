@@ -16,11 +16,13 @@
 
 package com.duckduckgo.autofill.api
 
+import androidx.annotation.MainThread
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 
 /**
  * Autofill event listener interface. Used to communicate key events from Autofill back to the app.
  */
+@MainThread
 interface AutofillEventListener {
 
     /**
@@ -38,14 +40,16 @@ interface AutofillEventListener {
     /**
      * Called when user chooses to autofill their personal duck address.
      * @param originalUrl the URL of the page that prompted the user to use their personal duck address
+     * @param duckAddress the personal duck address that the user chose to autofill
      */
-    fun onUseEmailProtectionPersonalAddress(originalUrl: String)
+    fun onUseEmailProtectionPersonalAddress(originalUrl: String, duckAddress: String)
 
     /**
      * Called when user chooses to autofill a private duck address (private alias).
      * @param originalUrl the URL of the page that prompted the user to use a private duck address
+     * @param duckAddress the private duck address that the user chose to autofill
      */
-    fun onUseEmailProtectionPrivateAlias(originalUrl: String)
+    fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String)
 
     /**
      * Called when user chooses not to autofill any duck address.
@@ -79,7 +83,7 @@ interface AutofillEventListener {
     fun onUpdatedCredentials(credentials: LoginCredentials)
 
     /**
-     * Called when a change was detected in the autofill state, such that the current web page should be refreshed.
+     * Called when a change was detected in the autofill state, such that reloading the page may be necessary.
      */
-    fun onRefreshRequested()
+    fun onAutofillStateChange()
 }
