@@ -45,6 +45,9 @@ class RealVoiceSearchAvailability @Inject constructor(
                 voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
         }
 
+    override val isVoiceSearchAvailable: Boolean
+        get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled()
+
     private fun hasValidVersion(sdkInt: Int) = voiceSearchFeatureRepository.minVersion?.let { minVersion ->
         sdkInt >= minVersion
     } ?: true
@@ -59,7 +62,7 @@ class RealVoiceSearchAvailability @Inject constructor(
         // - user is editing the address bar OR
         // - address bar is empty (initial state / new tab) OR
         // - DDG SERP is shown OR (address bar doesn't contain a website)
-        return if (voiceSearchRepository.isVoiceSearchUserEnabled() && isVoiceSearchSupported) {
+        return if (isVoiceSearchAvailable) {
             isEditing || urlLoaded.isEmpty() || urlLoaded.startsWith(URL_DDG_SERP)
         } else {
             false

@@ -260,7 +260,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureVoiceSearch() {
-        if (voiceSearchAvailability.isVoiceSearchSupported) {
+        if (voiceSearchAvailability.isVoiceSearchAvailable) {
             voiceSearch.visibility = View.VISIBLE
             voiceSearchLauncher.registerResultsCallback(this, this, WIDGET) {
                 if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
