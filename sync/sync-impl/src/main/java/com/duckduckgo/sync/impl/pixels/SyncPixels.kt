@@ -18,7 +18,6 @@ package com.duckduckgo.sync.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
