@@ -5,8 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.subscriptions.impl.ExternalIdResult.ExternalId
-import com.duckduckgo.subscriptions.impl.ExternalIdResult.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Success
 import com.duckduckgo.subscriptions.impl.auth.AccountResponse
 import com.duckduckgo.subscriptions.impl.auth.AuthService
 import com.duckduckgo.subscriptions.impl.auth.CreateAccountResponse
@@ -57,7 +57,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsNotAuthenticated()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        subscriptionsManager.getExternalId()
+        subscriptionsManager.getSubscriptionData()
 
         verify(authService).createAccount()
     }
@@ -68,7 +68,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsNotAuthenticated()
         givenCreateAccountFails()
 
-        val value = subscriptionsManager.getExternalId()
+        val value = subscriptionsManager.getSubscriptionData()
 
         assertTrue(value is Failure)
     }
@@ -79,10 +79,11 @@ class RealSubscriptionsManagerTest {
         givenUserIsNotAuthenticated()
         givenCreateAccountSucceeds()
 
-        val value = subscriptionsManager.getExternalId()
+        val value = subscriptionsManager.getSubscriptionData()
 
-        assertTrue(value is ExternalId)
-        assertEquals("1234", (value as ExternalId).id)
+        assertTrue(value is Success)
+        assertEquals("1234", (value as Success).externalId)
+        assertEquals("validToken", value.pat)
     }
 
     @Test
@@ -94,11 +95,12 @@ class RealSubscriptionsManagerTest {
             RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
 
-        val value = subscriptionsManager.getExternalId()
+        val value = subscriptionsManager.getSubscriptionData()
 
         verify(authService).storeLogin(any())
-        assertTrue(value is ExternalId)
-        assertEquals("1234", (value as ExternalId).id)
+        assertTrue(value is Success)
+        assertEquals("1234", (value as Success).externalId)
+        assertEquals("validToken", value.pat)
     }
 
     @Test
@@ -111,7 +113,7 @@ class RealSubscriptionsManagerTest {
             RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
 
-        val value = subscriptionsManager.getExternalId()
+        val value = subscriptionsManager.getSubscriptionData()
 
         assertTrue(value is Failure)
     }
@@ -121,7 +123,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsAuthenticated()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        subscriptionsManager.getExternalId()
+        subscriptionsManager.getSubscriptionData()
 
         verify(authService).validateToken(any())
     }
@@ -132,10 +134,11 @@ class RealSubscriptionsManagerTest {
         givenValidateTokenSucceeds()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        val value = subscriptionsManager.getExternalId()
+        val value = subscriptionsManager.getSubscriptionData()
 
-        assertTrue(value is ExternalId)
-        assertEquals("1234", (value as ExternalId).id)
+        assertTrue(value is Success)
+        assertEquals("1234", (value as Success).externalId)
+        assertEquals("validToken", value.pat)
     }
 
     @Test
@@ -144,7 +147,7 @@ class RealSubscriptionsManagerTest {
         givenValidateTokenFails("failure")
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        val value = subscriptionsManager.getExternalId()
+        val value = subscriptionsManager.getSubscriptionData()
 
         assertTrue(value is Failure)
     }
@@ -155,7 +158,7 @@ class RealSubscriptionsManagerTest {
         givenValidateTokenFails("""{"error":"expired_token"}""")
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        subscriptionsManager.getExternalId()
+        subscriptionsManager.getSubscriptionData()
 
         verify(mockRepository).lastPurchaseHistoryRecord
     }
@@ -166,10 +169,10 @@ class RealSubscriptionsManagerTest {
         givenUserIsNotAuthenticated()
         givenCreateAccountSucceeds()
 
-        subscriptionsManager.getExternalId()
+        subscriptionsManager.getSubscriptionData()
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
-            assertEquals("token", authDataStore.token)
+            assertEquals("validToken", authDataStore.token)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -183,10 +186,10 @@ class RealSubscriptionsManagerTest {
             RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
 
-        subscriptionsManager.getExternalId()
+        subscriptionsManager.getSubscriptionData()
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
-            assertEquals("token", authDataStore.token)
+            assertEquals("validToken", authDataStore.token)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -207,7 +210,7 @@ class RealSubscriptionsManagerTest {
     private suspend fun givenCreateAccountSucceeds() {
         whenever(authService.createAccount()).thenReturn(
             CreateAccountResponse(
-                authToken = "token",
+                authToken = "validToken",
                 externalId = "1234",
                 status = "ok",
             ),
@@ -223,7 +226,7 @@ class RealSubscriptionsManagerTest {
         whenever(authService.validateToken(any())).thenReturn(
             ValidateTokenResponse(
                 account = AccountResponse(
-                    email = "token",
+                    email = "validToken",
                     externalId = "1234",
                     entitlements = listOf(),
                 ),
@@ -239,7 +242,7 @@ class RealSubscriptionsManagerTest {
     private suspend fun givenPurchaseStored() {
         val purchaseRecord = PurchaseHistoryRecord(
             """
-        {"purchaseToken": "token", "productId": "test", "purchaseTime":1, "quantity":1}
+        {"purchaseToken": "validToken", "productId": "test", "purchaseTime":1, "quantity":1}
         """,
             "signature",
         )
@@ -252,7 +255,7 @@ class RealSubscriptionsManagerTest {
     private suspend fun givenPurchaseStoredIsValid() {
         whenever(authService.storeLogin(any())).thenReturn(
             StoreLoginResponse(
-                authToken = "token",
+                authToken = "validToken",
                 externalId = "1234",
                 email = "test@duck.com",
                 status = "ok",

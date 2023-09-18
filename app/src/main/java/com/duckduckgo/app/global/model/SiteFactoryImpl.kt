@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.model
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.di.scopes.AppScope
@@ -35,6 +36,7 @@ class SiteFactoryImpl @Inject constructor(
     private val userAllowListDao: UserAllowListDao,
     private val contentBlocking: ContentBlocking,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SiteFactory {
 
     /**
@@ -48,7 +50,7 @@ class SiteFactoryImpl @Inject constructor(
         title: String?,
         httpUpgraded: Boolean,
     ): Site {
-        return SiteMonitor(url, title, httpUpgraded, userAllowListDao, contentBlocking, appCoroutineScope)
+        return SiteMonitor(url, title, httpUpgraded, userAllowListDao, contentBlocking, appCoroutineScope, dispatcherProvider)
     }
 
     /**

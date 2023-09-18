@@ -23,12 +23,16 @@ import android.net.http.SslError.*
 import android.os.Build
 import android.webkit.*
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
+import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
@@ -126,14 +130,17 @@ class BrowserWebViewClient @Inject constructor(
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Telephone -> {
                     webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Sms -> {
                     webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.AppLink -> {
                     Timber.i("Found app link for ${urlType.uriString}")
                     webViewClientListener?.let { listener ->
@@ -141,6 +148,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
                     Timber.i("Found non-http app link for ${urlType.uriString}")
                     if (isForMainFrame) {
@@ -150,6 +158,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     true
                 }
+
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.uriString}")
                     webView.originalUrl?.let {
@@ -157,6 +166,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
                     if (requestRewriter.shouldRewriteRequest(url)) {
@@ -169,6 +179,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
                     if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
@@ -180,6 +191,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
                     val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
                     if (isForMainFrame && (lastAmpLinkInfo == null || lastPageStarted != lastAmpLinkInfo.destinationUrl)) {
@@ -190,6 +202,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                     false
                 }
+
                 is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
                     if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
@@ -204,11 +217,13 @@ class BrowserWebViewClient @Inject constructor(
                                     loadUrl(listener, webView, urlType.cleanedUrl)
                                     listener.handleAppLink(parameterStrippedType, isForMainFrame)
                                 }
+
                                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
                                     Timber.d("AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
                                     loadUrl(listener, webView, parameterStrippedType.extractedUrl)
                                     true
                                 }
+
                                 else -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
                                     true
@@ -251,7 +266,7 @@ class BrowserWebViewClient @Inject constructor(
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
             requestInterceptor.onPageStarted(url)
-            appCoroutineScope.launch(dispatcherProvider.default()) {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }
@@ -361,6 +376,7 @@ class BrowserWebViewClient @Inject constructor(
                 Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
                 trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
             }
+
             else -> Timber.d("SSL error ${error.primaryError}")
         }
 
@@ -390,6 +406,32 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    override fun onReceivedError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        error: WebResourceError?,
+    ) {
+        error?.let {
+            val parsedError = parseErrorResponse(it)
+            if (parsedError != OMITTED && request?.isForMainFrame == true) {
+                webViewClientListener?.onReceivedError(parsedError)
+            }
+        }
+        super.onReceivedError(view, request, error)
+    }
+
+    private fun parseErrorResponse(error: WebResourceError): WebViewErrorResponse {
+        return if (error.errorCode == ERROR_HOST_LOOKUP) {
+            when (error.description) {
+                "net::ERR_NAME_NOT_RESOLVED" -> BAD_URL
+                "net::ERR_INTERNET_DISCONNECTED" -> CONNECTION
+                else -> OMITTED
+            }
+        } else {
+            OMITTED
+        }
+    }
+
     override fun onReceivedHttpError(
         view: WebView?,
         request: WebResourceRequest?,
@@ -406,4 +448,10 @@ class BrowserWebViewClient @Inject constructor(
 enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
+}
+
+enum class WebViewErrorResponse(@StringRes val errorId: Int) {
+    BAD_URL(R.string.webViewErrorBadUrl),
+    CONNECTION(R.string.webViewErrorNoConnection),
+    OMITTED(R.string.webViewErrorNoConnection),
 }

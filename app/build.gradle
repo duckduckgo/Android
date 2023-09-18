@@ -293,6 +293,7 @@ dependencies {
     implementation project(':web-compat-store')
 
     if (project.hasProperty('internal-testing')) {
+        implementation project(':subscriptions-api')
         implementation project(':subscriptions-impl')
         implementation project(':subscriptions-store')
         internalImplementation project(':subscriptions-internal')

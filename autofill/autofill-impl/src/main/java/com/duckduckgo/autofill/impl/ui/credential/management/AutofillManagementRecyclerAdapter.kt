@@ -194,7 +194,7 @@ class AutofillManagementRecyclerAdapter(
     }
 
     private fun ItemRowAutofillCredentialsManagementScreenBinding.updateFavicon(credentials: LoginCredentials) {
-        lifecycleOwner.lifecycleScope.launch {
+        lifecycleOwner.lifecycleScope.launch(dispatchers.io()) {
             val url = credentials.domain.orEmpty()
             val faviconPlaceholderLetter = initialExtractor.extractInitial(credentials)
             faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = favicon, placeholder = faviconPlaceholderLetter)

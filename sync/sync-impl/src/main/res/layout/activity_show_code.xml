@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
@@ -28,43 +28,42 @@
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/recoveryCode"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_6"
-        app:layout_constraintTop_toBottomOf="@+id/includeToolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:typography="body1"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginVertical="20dp"
+        app:typography="body1_mono"
         app:textType="primary"
         tools:text="eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyeV9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ=="
     />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-        android:id="@+id/copyCodeButton"
-        android:layout_width="wrap_content"
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:id="@+id/copyCodeTopDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recoveryCode"
-        app:icon="@drawable/ic_copy"
-        android:gravity="center"
-        app:buttonSize="small"
-        android:layout_margin="@dimen/keyline_4"
-        android:layout_gravity="center"
-        android:text="@string/sync_show_code_copy"/>
+        android:id="@+id/copyCodeButton"
+        app:leadingIcon="@drawable/ic_copy"
+        app:leadingIconBackground="circular"
+        app:leadingIconSize="medium"
+        app:primaryText="@string/sync_show_code_copy"/>
+
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:id="@+id/copyCodeBottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/copyCodeHint"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
-        app:layout_constraintTop_toBottomOf="@+id/copyCodeButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
+        android:layout_marginHorizontal="@dimen/keyline_4"
         app:typography="body2"
         app:textType="secondary"
         android:text="@string/sync_show_code_copy_hint"
     />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

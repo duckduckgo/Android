@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.api
-
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
-
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = MessageHandlerPlugin::class,
-)
-@Suppress("unused")
-interface MessageHandlerPlugin {
-    fun process(messageType: String, jsonString: String, responseListener: ResponseListener)
-    val supportedTypes: List<String>
+plugins {
+    id 'java-library'
+    id 'kotlin'
 }
 
-interface ResponseListener {
-    fun onResponse(message: String)
+apply from: "$rootProject.projectDir/code-formatting.gradle"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
 }

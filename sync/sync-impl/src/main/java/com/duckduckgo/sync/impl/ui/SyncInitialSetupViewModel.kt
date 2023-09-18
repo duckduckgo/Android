@@ -25,6 +25,7 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
@@ -44,6 +45,7 @@ class SyncInitialSetupViewModel
 @Inject
 constructor(
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -63,6 +65,8 @@ constructor(
         val protectedEncryptionKey: String = "",
         val passwordHash: String = "",
         val connectedDevices: List<ConnectedDevice> = emptyList(),
+        val useDevEnvironment: Boolean = false,
+        val environment: String = "",
     )
 
     sealed class Command {
@@ -70,6 +74,12 @@ constructor(
         object ReadQR : Command()
         object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
+    }
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            updateViewState()
+        }
     }
 
     fun onCreateAccountClicked() {
@@ -108,6 +118,13 @@ constructor(
                 command.send(Command.ShowMessage("$result"))
             }
             getConnectedDevices()
+        }
+    }
+
+    fun onEnvironmentChanged(devEnvironment: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            syncEnvDataStore.useSyncDevEnvironment = devEnvironment
+            updateViewState()
         }
     }
 
@@ -164,6 +181,8 @@ constructor(
                 token = syncAccountRepository.latestToken(),
                 primaryKey = accountInfo.primaryKey,
                 secretKey = accountInfo.secretKey,
+                useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
+                environment = syncEnvDataStore.syncEnvironmentUrl,
             ),
         )
     }

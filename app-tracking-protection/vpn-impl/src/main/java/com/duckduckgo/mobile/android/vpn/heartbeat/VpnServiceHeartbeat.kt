@@ -60,7 +60,7 @@ class VpnServiceHeartbeat @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         logcat { "onVpnStarted called" }
-        job += coroutineScope.launch {
+        job += coroutineScope.launch(dispatcherProvider.io()) {
             while (true) {
                 storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE)
                 delay(TimeUnit.MINUTES.toMillis(HEART_BEAT_PERIOD_MINUTES))

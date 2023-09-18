@@ -41,6 +41,10 @@ class PermissionsViewModelTest {
 
     @get:Rule
     @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
+    @get:Rule
+    @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var testee: PermissionsViewModel
@@ -61,6 +65,7 @@ class PermissionsViewModelTest {
         testee = PermissionsViewModel(
             mockAppSettingsDataStore,
             mockPixel,
+            coroutineRule.testDispatcherProvider,
         )
     }
 

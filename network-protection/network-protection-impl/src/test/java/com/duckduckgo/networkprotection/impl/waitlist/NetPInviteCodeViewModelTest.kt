@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.impl.waitlist
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.impl.waitlist.NetPInviteCodeViewModel.Command
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -36,6 +38,8 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class NetPInviteCodeViewModelTest {
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockNetPWaitlistManager: NetPWaitlistManager
@@ -50,7 +54,11 @@ class NetPInviteCodeViewModelTest {
 
         whenever(mockNetPWaitlistManager.getState()).thenReturn(flow)
 
-        viewModel = NetPInviteCodeViewModel(mockNetPWaitlistManager, mock<NetPWaitlistCodeNotification>())
+        viewModel = NetPInviteCodeViewModel(
+            mockNetPWaitlistManager,
+            mock<NetPWaitlistCodeNotification>(),
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     @Test

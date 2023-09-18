@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.waitlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import javax.inject.Inject
@@ -34,6 +35,7 @@ import kotlinx.coroutines.launch
 class NetPInviteCodeViewModel @Inject constructor(
     waitlistManager: NetPWaitlistManager,
     private val waitlistNotification: NetPWaitlistCodeNotification,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     val viewState: Flow<ViewState> = waitlistManager.getState().map { ViewState(it) }.distinctUntilChanged()
@@ -50,20 +52,20 @@ class NetPInviteCodeViewModel @Inject constructor(
     data class ViewState(val waitlist: NetPWaitlistState)
 
     fun haveAnInviteCode() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             commandChannel.send(Command.EnterInviteCode)
         }
     }
 
     fun onTermsAccepted() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             waitlistNotification.cancelNotification()
             commandChannel.send(Command.OpenNetP)
         }
     }
 
     fun getStarted() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             commandChannel.send(Command.OpenTermsScreen)
         }
     }

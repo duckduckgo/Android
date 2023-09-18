@@ -96,7 +96,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     private fun sendCommand(newCommand: Command) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             command.send(newCommand)
         }
     }
@@ -136,7 +136,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     internal fun onAppTpManuallyDisabled() {
         deviceShieldPixels.disableFromSummaryTrackerActivity()
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             command.send(Command.StopVPN)
         }
     }

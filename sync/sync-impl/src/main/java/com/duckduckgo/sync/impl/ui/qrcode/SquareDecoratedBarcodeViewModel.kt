@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.CheckPermissions
 import com.duckduckgo.sync.impl.ui.qrcode.SquareDecoratedBarcodeViewModel.Command.RequestPermissions
@@ -43,7 +44,10 @@ class PermissionDeniedWrapper @Inject constructor() {
     var permissionAlreadyDenied = false
 }
 
-class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: PermissionDeniedWrapper) : ViewModel(), MainProcessLifecycleObserver {
+class SquareDecoratedBarcodeViewModel(
+    private val permissionDeniedWrapper: PermissionDeniedWrapper,
+    private val dispatchers: DispatcherProvider,
+) : ViewModel(), MainProcessLifecycleObserver {
 
     sealed class Command {
         object CheckCameraAvailable : Command()
@@ -73,7 +77,7 @@ class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: Permi
     }
 
     private fun sendCommand(newCommand: Command) {
-        viewModelScope.launch { command.send(newCommand) }
+        viewModelScope.launch(dispatchers.io()) { command.send(newCommand) }
     }
 
     fun handlePermissions(granted: Boolean) {
@@ -88,13 +92,13 @@ class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: Permi
     }
 
     private fun handlePermissionDenied() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             _viewState.emit(PermissionsNotGranted)
         }
     }
 
     private fun handlePermissionGranted() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             _viewState.emit(PermissionsGranted)
         }
     }
@@ -107,7 +111,7 @@ class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: Permi
         if (cameraAvailable) {
             sendCommand(CheckPermissions)
         } else {
-            viewModelScope.launch {
+            viewModelScope.launch(dispatchers.io()) {
                 _viewState.emit(ViewState.CameraUnavailable)
             }
         }
@@ -116,11 +120,16 @@ class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: Permi
     @Suppress("UNCHECKED_CAST")
     class Factory
     @Inject
-    constructor(private val permissionDeniedWrapper: PermissionDeniedWrapper) : ViewModelProvider.NewInstanceFactory() {
+    constructor(
+        private val permissionDeniedWrapper: PermissionDeniedWrapper,
+        private val dispatcherProvider: DispatcherProvider,
+    ) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(SquareDecoratedBarcodeViewModel::class.java) -> SquareDecoratedBarcodeViewModel(permissionDeniedWrapper)
+                    isAssignableFrom(SquareDecoratedBarcodeViewModel::class.java) -> {
+                        SquareDecoratedBarcodeViewModel(permissionDeniedWrapper, dispatcherProvider)
+                    }
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T

@@ -29,7 +29,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupBinding
+import com.duckduckgo.sync.impl.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
@@ -45,8 +45,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-class SyncInitialSetupActivity : DuckDuckGoActivity() {
-    private val binding: ActivitySyncSetupBinding by viewBinding()
+class SyncInternalSettingsActivity : DuckDuckGoActivity() {
+    private val binding: ActivityInternalSyncSettingsBinding by viewBinding()
     private val viewModel: SyncInitialSetupViewModel by bindViewModel()
 
     private val barcodeLauncher = registerForActivityResult(
@@ -152,6 +152,11 @@ class SyncInitialSetupActivity : DuckDuckGoActivity() {
         binding.primaryKeyTextView.text = viewState.primaryKey
         binding.secretKeyTextView.text = viewState.secretKey
         binding.connectedDevicesList.removeAllViews()
+
+        binding.syncInternalEnvironment.quietlySetIsChecked(viewState.useDevEnvironment) { _, enabled ->
+            viewModel.onEnvironmentChanged(enabled)
+        }
+        binding.syncInternalEnvironment.setSecondaryText(viewState.environment)
         if (viewState.isSignedIn) {
             viewState.connectedDevices.forEach { device ->
                 val connectedBinding = ItemConnectedDeviceBinding.inflate(layoutInflater, binding.connectedDevicesList, true)

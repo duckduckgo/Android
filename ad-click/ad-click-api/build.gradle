@@ -32,6 +32,5 @@ kotlin {
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
-    implementation Google.dagger
     implementation KotlinX.coroutines.core
 }

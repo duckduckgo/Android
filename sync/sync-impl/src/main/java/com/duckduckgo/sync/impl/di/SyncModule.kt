@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.crypto.SyncNativeLib
@@ -26,6 +27,8 @@ import com.duckduckgo.sync.impl.AppQREncoder
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.engine.AppSyncStateRepository
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
+import com.duckduckgo.sync.impl.internal.AppSyncInternalEnvDataStore
+import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.stats.RealSyncStatsRepository
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.EncryptedSharedPrefsProvider
@@ -49,8 +52,17 @@ object SyncStoreModule {
     fun providesSyncStore(
         sharedPrefsProvider: SharedPrefsProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): SyncStore {
-        return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope)
+        return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope, dispatcherProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesSyncInternalEnvStore(
+        context: Context,
+    ): SyncInternalEnvDataStore {
+        return AppSyncInternalEnvDataStore(context)
     }
 
     @Provides

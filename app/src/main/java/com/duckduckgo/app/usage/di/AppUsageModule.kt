@@ -16,31 +16,16 @@
 
 package com.duckduckgo.app.usage.di
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDatabaseRepository
-import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 class AppUsageModule {
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    @IntoSet
-    fun appDaysUsedRecorderObserver(
-        appDaysUsedRepository: AppDaysUsedRepository,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope,
-    ): MainProcessLifecycleObserver {
-        return AppDaysUsedRecorder(appDaysUsedRepository, appCoroutineScope)
-    }
 
     @Provides
     @SingleInstanceIn(AppScope::class)

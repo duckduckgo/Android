@@ -23,8 +23,11 @@ import android.os.Build
 import android.webkit.CookieManager
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebViewClient.ERROR_HOST_LOOKUP
+import android.webkit.WebViewClient.ERROR_UNKNOWN
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
@@ -34,6 +37,8 @@ import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
+import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -89,6 +94,7 @@ class BrowserWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val browserAutofillConfigurator: BrowserAutofill.Configurator = mock()
     private val webResourceRequest: WebResourceRequest = mock()
+    private val webResourceError: WebResourceError = mock()
     private val ampLinks: AmpLinks = mock()
     private val printInjector: PrintInjector = mock()
     private val internalTestUserChecker: InternalTestUserChecker = mock()
@@ -587,6 +593,66 @@ class BrowserWebViewClientTest {
             null
         }
         return mockWebView
+    }
+
+    @Test
+    fun whenOnReceivedErrorAndErrorResponseIsBadUrlAndIsForMainFrameThenShowBadUrlError() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(testee.webViewClientListener)!!.onReceivedError(BAD_URL)
+    }
+
+    @Test
+    fun whenOnReceivedErrorAndErrorResponseIsConnectionAndIsForMainFrameThenShowConnectionError() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("net::ERR_INTERNET_DISCONNECTED")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(testee.webViewClientListener)!!.onReceivedError(CONNECTION)
+    }
+
+    @Test
+    fun whenOnReceivedErrorAndErrorDescriptionDoesNotMatchThenDoNotShowBrowserError() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("not matching")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any())
+    }
+
+    @Test
+    fun whenOnReceivedErrorAndErrorCodeIsNotHostLookupThenDoNotShowBrowserError() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_UNKNOWN)
+        whenever(webResourceError.description).thenReturn("some error")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any())
+    }
+
+    @Test
+    fun whenOnReceivedErrorAndIsNotForMainFrameThenDoNotShowBrowserError() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(webResourceError.errorCode).thenReturn(ERROR_HOST_LOOKUP)
+        whenever(webResourceError.description).thenReturn("net::ERR_NAME_NOT_RESOLVED")
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+
+        testee.onReceivedError(mockWebView, webResourceRequest, webResourceError)
+
+        verify(testee.webViewClientListener, times(0))!!.onReceivedError(any())
     }
 
     private class TestWebView(context: Context) : WebView(context) {
