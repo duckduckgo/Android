@@ -22,6 +22,10 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    namespace 'com.duckduckgo.sync.impl'
+}
+
 dependencies {
     implementation project(path: ':di')
     implementation project(':browser-api')
