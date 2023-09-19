@@ -16,10 +16,13 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.PatResult
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
+@ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : Subscriptions {
@@ -27,6 +30,13 @@ class RealSubscriptions @Inject constructor(
         return when (val result = subscriptionsManager.getSubscriptionData()) {
             is SubscriptionsDataResult.Success -> PatResult.Success(result.pat)
             is SubscriptionsDataResult.Failure -> PatResult.Failure(result.message)
+        }
+    }
+
+    override suspend fun hasEntitlement(product: String): Boolean {
+        return when (val result = subscriptionsManager.getSubscriptionData()) {
+            is SubscriptionsDataResult.Success -> return result.entitlements.firstOrNull { it.product == product } != null
+            is SubscriptionsDataResult.Failure -> false
         }
     }
 }
