@@ -18,30 +18,25 @@ package com.duckduckgo.sync.store
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SyncSharedPrefsStoreTest {
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
-
     private lateinit var store: SyncSharedPrefsStore
     private val sharedPrefsProvider =
         TestSharedPrefsProvider(InstrumentationRegistry.getInstrumentation().context)
 
     @Before
     fun setUp() {
-        store = SyncSharedPrefsStore(sharedPrefsProvider, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
+        store = SyncSharedPrefsStore(sharedPrefsProvider, TestScope())
     }
 
     @Test
@@ -72,7 +67,7 @@ class SyncSharedPrefsStoreTest {
     }
 
     @Test
-    fun whenStoreCredentialsThenValuesUpdatedInPrefsStore() = runTest {
+    fun whenStoreCredentialsThenValuesUpdatedInPrefsStore() {
         assertNull(store.userId)
         assertNull(store.deviceName)
         assertNull(store.deviceId)
@@ -89,14 +84,14 @@ class SyncSharedPrefsStoreTest {
     }
 
     @Test
-    fun whenIsSignedInThenReturnTrueIfUserHasAuthKeys() = runTest {
+    fun whenIsSignedInThenReturnTrueIfUserHasAuthKeys() {
         store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
 
         assertTrue(store.isSignedIn())
     }
 
     @Test
-    fun whenClearAllThenReturnRemoveAllKeys() = runTest {
+    fun whenClearAllThenReturnRemoveAllKeys() {
         store.storeCredentials("userId", "deviceId", "deviceName", "primaryKey", "secretKey", "token")
         assertEquals("userId", store.userId)
         assertEquals("deviceName", store.deviceName)

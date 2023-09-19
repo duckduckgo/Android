@@ -27,7 +27,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySitePermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.sitepermissions.SitePermissionsViewModel.Command
@@ -40,7 +39,6 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -48,9 +46,6 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
 
     private val viewModel: SitePermissionsViewModel by bindViewModel()
     private val binding: ActivitySitePermissionsBinding by viewBinding()
@@ -72,7 +67,6 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
-                .flowOn(dispatcherProvider.io())
                 .collectLatest { state ->
                     val sitePermissionsWebsites = viewModel.combineAllPermissions(state.locationPermissionsAllowed, state.sitesPermissionsAllowed)
                     updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled)
@@ -81,7 +75,6 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.commands
                 .flowWithLifecycle(lifecycle, STARTED)
-                .flowOn(dispatcherProvider.io())
                 .collectLatest { processCommand(it) }
         }
     }

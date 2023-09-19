@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
@@ -27,11 +26,11 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -40,9 +39,6 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class ExceptionListsSettingsPluginTest {
-
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
 
     private lateinit var exceptionListsSettingPlugin: ExceptionListsSettingPlugin
 
@@ -83,12 +79,7 @@ class ExceptionListsSettingsPluginTest {
 
     @Before
     fun setup() {
-        exceptionListsSettingPlugin = ExceptionListsSettingPlugin(
-            mockVpnDatabase,
-            coroutineRule.testScope,
-            mockVpnFeaturesRegistry,
-            coroutineRule.testDispatcherProvider,
-        )
+        exceptionListsSettingPlugin = ExceptionListsSettingPlugin(mockVpnDatabase, TestScope(), mockVpnFeaturesRegistry)
 
         whenever(mockVpnDatabase.vpnAppTrackerBlockingDao()).thenReturn(mockVpnAppTrackerBlockingDao)
         whenever(mockVpnDatabase.vpnSystemAppsOverridesDao()).thenReturn(mockVpnAppTrackerSystemAppsOverridesDao)
@@ -108,12 +99,7 @@ class ExceptionListsSettingsPluginTest {
 
     @Test
     fun whenValidJSONUpdatesDB() = runTest {
-        exceptionListsSettingPlugin = ExceptionListsSettingPlugin(
-            mockVpnDatabase,
-            coroutineRule.testScope,
-            mockVpnFeaturesRegistry,
-            coroutineRule.testDispatcherProvider,
-        )
+        exceptionListsSettingPlugin = ExceptionListsSettingPlugin(mockVpnDatabase, this, mockVpnFeaturesRegistry)
 
         val packageNames = listOf("com.subway.mobile.subwayapp03")
         val trackerExceptionRules = ArrayList<AppTrackerExceptionRule>(1)

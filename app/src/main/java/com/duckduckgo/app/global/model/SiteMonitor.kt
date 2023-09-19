@@ -20,7 +20,6 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -45,7 +44,6 @@ class SiteMonitor(
     private val userAllowListDao: UserAllowListDao,
     private val contentBlocking: ContentBlocking,
     private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : Site {
 
     override var url: String = url
@@ -110,7 +108,7 @@ class SiteMonitor(
 
     init {
         // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch {
             domain?.let { userAllowList = isAllowListed(it) }
         }
     }

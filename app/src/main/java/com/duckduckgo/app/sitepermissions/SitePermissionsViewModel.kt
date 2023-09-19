@@ -82,7 +82,7 @@ class SitePermissionsViewModel @Inject constructor(
     }
 
     fun allowedSites() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             val locationsPermissionsFlow = locationPermissionsRepository.getLocationPermissionsFlow()
             val sitePermissionsFlow = sitePermissionsRepository.sitePermissionsWebsitesFlow()
 
@@ -124,13 +124,13 @@ class SitePermissionsViewModel @Inject constructor(
     }
 
     private fun removeLocationSites() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             geolocationPermissions.clearAll()
         }
     }
 
     fun allowedSiteSelected(domain: String) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             _commands.send(LaunchWebsiteAllowed(domain))
         }
     }

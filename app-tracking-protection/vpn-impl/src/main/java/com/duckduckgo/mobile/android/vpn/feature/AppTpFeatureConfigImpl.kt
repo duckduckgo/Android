@@ -39,7 +39,7 @@ class AppTpFeatureConfigImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     vpnRemoteConfigDatabase: VpnRemoteConfigDatabase,
-    private val dispatcherProvider: DispatcherProvider,
+    dispatcherProvider: DispatcherProvider,
 ) : AppTpFeatureConfig, AppTpFeatureConfig.Editor {
 
     private val togglesDao = vpnRemoteConfigDatabase.vpnConfigTogglesDao()
@@ -76,7 +76,7 @@ class AppTpFeatureConfigImpl @Inject constructor(
     }
 
     private fun persistToggle(toggle: VpnConfigToggle) {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch {
             // Remote configs will not override any value that has isManualOverride = true
             // But this is only for INTERNAL builds, because we have internal settings
             // In any other build that is not internal isManualOverride is always false

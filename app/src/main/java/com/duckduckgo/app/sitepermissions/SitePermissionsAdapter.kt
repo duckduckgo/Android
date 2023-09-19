@@ -176,9 +176,7 @@ class SitePermissionsAdapter(
         }
     }
 
-    class SitePermissionToggleViewHolder(
-        private val binding: ViewSitePermissionsToggleBinding,
-    ) : RecyclerView.ViewHolder(binding.root) {
+    class SitePermissionToggleViewHolder(val binding: ViewSitePermissionsToggleBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
             item: SitePermissionToggle,
             listener: CompoundButton.OnCheckedChangeListener,

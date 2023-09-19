@@ -27,7 +27,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -66,9 +65,6 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
 
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
@@ -199,7 +195,7 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
         binding.siteName.text = url
 
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = binding.favicon)
         }
     }

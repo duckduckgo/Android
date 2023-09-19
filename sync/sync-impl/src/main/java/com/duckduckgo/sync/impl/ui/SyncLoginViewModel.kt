@@ -47,13 +47,13 @@ class SyncLoginViewModel @Inject constructor(
     }
 
     fun onReadTextCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(ReadTextCode)
         }
     }
 
     fun onLoginSuccess() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(LoginSucess)
         }
     }

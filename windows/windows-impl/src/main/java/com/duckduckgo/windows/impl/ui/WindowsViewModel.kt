@@ -19,7 +19,6 @@ package com.duckduckgo.windows.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.windows.impl.WindowsPixelNames.WINDOWS_WAITLIST_SHARE_PRESSED
@@ -33,7 +32,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class WindowsViewModel @Inject constructor(
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -45,14 +43,14 @@ class WindowsViewModel @Inject constructor(
     }
 
     fun onShareClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             commandChannel.send(ShareLink)
             pixel.fire(WINDOWS_WAITLIST_SHARE_PRESSED)
         }
     }
 
     fun onGoToMacClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             commandChannel.send(Command.GoToMacClientSettings)
         }
     }

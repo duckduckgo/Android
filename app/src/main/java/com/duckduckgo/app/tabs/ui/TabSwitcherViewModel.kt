@@ -23,7 +23,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -36,7 +35,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val adClickManager: AdClickManager,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -84,7 +82,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onCloseAllTabsConfirmed() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             tabs.value?.forEach {
                 onTabDeleted(it)
             }

@@ -27,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityPermissionPerWebsiteBinding
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.sitepermissions.permissionsperwebsite.PermissionsPerWebsiteViewModel.Command
@@ -40,15 +39,11 @@ import com.duckduckgo.app.sitepermissions.permissionsperwebsite.WebsitePermissio
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
 
     private val viewModel: PermissionsPerWebsiteViewModel by bindViewModel()
     private val binding: ActivityPermissionPerWebsiteBinding by viewBinding()
@@ -95,7 +90,6 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.viewState
                 .flowWithLifecycle(lifecycle, STARTED)
-                .flowOn(dispatcherProvider.io())
                 .collectLatest { state ->
                     updatePermissionsList(state.websitePermissions)
                 }
@@ -103,7 +97,6 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             viewModel.commands
                 .flowWithLifecycle(lifecycle, STARTED)
-                .flowOn(dispatcherProvider.io())
                 .collectLatest { processCommand(it) }
         }
     }

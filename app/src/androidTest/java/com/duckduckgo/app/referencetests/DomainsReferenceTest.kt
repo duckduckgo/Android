@@ -251,7 +251,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
 
     private fun initialiseResourceSurrogates() {
         val dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        val resourceSurrogateLoader = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore, coroutinesTestRule.testDispatcherProvider)
+        val resourceSurrogateLoader = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore)
         val surrogatesFile = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/surrogates.txt").toByteArray()
         val surrogates = resourceSurrogateLoader.convertBytes(surrogatesFile)
         resourceSurrogates.loadSurrogates(surrogates)

@@ -172,7 +172,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         Timber.v("onCancel: AutofillSavingCredentialsDialogFragment. User declined to save credentials")
 
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch {
             autofillDeclineCounter.userDeclinedToSaveCredentials(getOriginalUrl().extractDomain())
 
             if (autofillDeclineCounter.shouldPromptToDisableAutofill()) {
@@ -204,7 +204,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         binding.siteName.text = url
         val placeholder = initialExtractor.extractInitial(credentials)
 
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             faviconManager.loadToViewFromLocalWithPlaceholder(
                 tabId = getTabId(),
                 url = originalUrl,

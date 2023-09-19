@@ -106,7 +106,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.io()) {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
@@ -193,7 +193,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     fun storeFormData(data: String) {
         Timber.i("storeFormData called, credentials provided to be persisted")
 
-        storeFormDataJob += coroutineScope.launch(dispatcherProvider.io()) {
+        storeFormDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
 
             if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(currentUrl)) {
@@ -273,7 +273,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     override fun injectCredentials(credentials: LoginCredentials) {
         Timber.v("Informing JS layer with credentials selected")
-        injectCredentialsJob += coroutineScope.launch(dispatcherProvider.io()) {
+        injectCredentialsJob += coroutineScope.launch(dispatcherProvider.default()) {
             val jsCredentials = credentials.asJsCredentials()
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
         }

@@ -107,10 +107,7 @@ class TrackerFeedAdapter @Inject constructor(
 
         trackerFeedItems.clear().also { trackerFeedItems.addAll(newData) }
 
-        withContext(dispatchers.main()) {
-            // only the thread the creates the view hierarchy can touch the views
-            diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
-        }
+        diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
     }
 
     private class TrackerSkeletonViewHolder(view: View) : RecyclerView.ViewHolder(view) {

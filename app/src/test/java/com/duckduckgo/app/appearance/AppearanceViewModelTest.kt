@@ -71,7 +71,6 @@ internal class AppearanceViewModelTest {
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockPixel,
-            coroutineTestRule.testDispatcherProvider,
         )
     }
 
