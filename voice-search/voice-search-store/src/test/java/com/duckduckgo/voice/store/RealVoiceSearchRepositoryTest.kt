@@ -16,6 +16,7 @@
 
 package com.duckduckgo.voice.store
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -58,6 +59,33 @@ class RealVoiceSearchRepositoryTest {
 
         assertTrue(testee.getHasLoggedAvailability())
     }
+
+    @Test
+    fun whenSetVoiceSearchEnabledThenIsVoiceSearchEnabledShouldBeTrue() {
+        assertFalse(testee.isVoiceSearchUserEnabled())
+
+        testee.setVoiceSearchUserEnabled(true)
+
+        assertTrue(testee.isVoiceSearchUserEnabled())
+    }
+
+    @Test
+    fun whenDismissVoiceSearchThenCountVoiceSearchDismissedValueShouldIncrease() {
+        assertEquals(0, testee.countVoiceSearchDismissed())
+
+        testee.dismissVoiceSearch()
+
+        assertEquals(1, testee.countVoiceSearchDismissed())
+    }
+
+    @Test
+    fun whenDeclineMicAccessDialogThenWasNoMicAccessDialogAlreadyDismissedShouldBeTrue() {
+        assertFalse(testee.wasNoMicAccessDialogAlreadyDismissed())
+
+        testee.declineNoMicAccessDialog()
+
+        assertTrue(testee.wasNoMicAccessDialogAlreadyDismissed())
+    }
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
@@ -65,4 +93,6 @@ class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
     override var isVoiceSearchEnabled: Boolean = false
+    override var countVoiceSearchDismissed: Int = 0
+    override var noMicAccessDialogDeclined: Boolean = false
 }
