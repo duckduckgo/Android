@@ -19,7 +19,6 @@ package com.duckduckgo.voice.impl.listeningmode
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionSuccess
@@ -39,7 +38,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class VoiceSearchViewModel @Inject constructor(
     private val speechRecognizer: OnDeviceSpeechRecognizer,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
     data class ViewState(
         val result: String = "",
@@ -66,7 +64,7 @@ class VoiceSearchViewModel @Inject constructor(
 
     fun startVoiceSearch() {
         if (viewState.value.result.isNotEmpty()) {
-            viewModelScope.launch(dispatcherProvider.io()) {
+            viewModelScope.launch {
                 viewState.emit(
                     viewState.value.copy(unsentResult = viewState.value.result),
                 )
@@ -85,7 +83,7 @@ class VoiceSearchViewModel @Inject constructor(
 
     private fun handleTimeOut() {
         if (viewState.value.result.isEmpty()) {
-            viewModelScope.launch(dispatcherProvider.io()) {
+            viewModelScope.launch {
                 command.send(Command.TerminateVoiceSearch)
             }
         } else {
@@ -98,7 +96,7 @@ class VoiceSearchViewModel @Inject constructor(
     }
 
     private fun sendCommand(commandToSend: Command) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             command.send(commandToSend)
         }
     }
@@ -115,7 +113,7 @@ class VoiceSearchViewModel @Inject constructor(
     }
 
     private fun showRecognizedSpeech(result: String) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 viewState.value.copy(
                     result = getFullResult(result, viewState.value.unsentResult),

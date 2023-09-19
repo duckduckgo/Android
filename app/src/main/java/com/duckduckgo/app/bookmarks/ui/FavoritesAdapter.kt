@@ -90,7 +90,6 @@ class FavoritesAdapter(
                     viewModel,
                     lifecycleOwner,
                     faviconManager,
-                    dispatchers,
                 )
             }
             FAVORITE_SECTION_TITLE_TYPE -> {
@@ -183,7 +182,6 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
-        private val dispatcherProvider: DispatcherProvider,
     ) : FavoritesScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context

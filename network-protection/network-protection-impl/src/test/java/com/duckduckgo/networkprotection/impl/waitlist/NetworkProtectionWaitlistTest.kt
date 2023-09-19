@@ -49,7 +49,6 @@ class NetworkProtectionWaitlistTest {
             mock<NetPFeatureRemover>(),
             appBuildConfig,
             coroutinesTestRule.testScope,
-            coroutinesTestRule.testDispatcherProvider,
         )
         whenever(appBuildConfig.flavor).thenReturn(PLAY)
 

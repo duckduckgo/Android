@@ -97,7 +97,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
             }
@@ -112,7 +112,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)

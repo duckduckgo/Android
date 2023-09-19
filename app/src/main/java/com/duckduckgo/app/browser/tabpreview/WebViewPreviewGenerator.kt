@@ -37,7 +37,7 @@ class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvid
     }
 
     private suspend fun createBitmap(webView: WebView): Bitmap {
-        return withContext(dispatchers.computation()) {
+        return withContext(dispatchers.default()) {
             webView.drawToBitmap()
         }
     }
@@ -57,7 +57,7 @@ class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvid
     }
 
     private suspend fun scaleBitmap(bitmap: Bitmap): Bitmap {
-        return withContext(dispatchers.computation()) {
+        return withContext(dispatchers.default()) {
             return@withContext Bitmap.createScaledBitmap(
                 bitmap,
                 (bitmap.width * COMPRESSION_RATIO).toInt(),

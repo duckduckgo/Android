@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.FireAnimationLoader
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -44,7 +43,6 @@ class FireButtonViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -76,7 +74,7 @@ class FireButtonViewModel @Inject constructor(
         val automaticallyClearWhen = settingsDataStore.automaticallyClearWhenOption
         val automaticallyClearWhenEnabled = isAutomaticallyClearingDataWhenSettingEnabled(automaticallyClearWhat)
 
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 ViewState(
                     automaticallyClearData = AutomaticallyClearData(
@@ -95,25 +93,17 @@ class FireButtonViewModel @Inject constructor(
     }
 
     fun onFireproofWebsitesClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchFireproofWebsites) }
+        viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
         pixel.fire(AppPixelName.SETTINGS_FIREPROOF_WEBSITES_PRESSED)
     }
 
     fun onAutomaticallyClearWhatClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            command.send(
-                Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption),
-            )
-        }
+        viewModelScope.launch { command.send(Command.ShowClearWhatDialog(viewState.value.automaticallyClearData.clearWhatOption)) }
         pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED)
     }
 
     fun onAutomaticallyClearWhenClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            command.send(
-                Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption),
-            )
-        }
+        viewModelScope.launch { command.send(Command.ShowClearWhenDialog(viewState.value.automaticallyClearData.clearWhenOption)) }
         pixel.fire(AppPixelName.SETTINGS_AUTOMATICALLY_CLEAR_WHEN_PRESSED)
     }
 
@@ -127,7 +117,7 @@ class FireButtonViewModel @Inject constructor(
 
         settingsDataStore.automaticallyClearWhatOption = clearWhatNewSetting
 
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     automaticallyClearData = AutomaticallyClearData(
@@ -151,7 +141,7 @@ class FireButtonViewModel @Inject constructor(
         }
 
         settingsDataStore.automaticallyClearWhenOption = clearWhenNewSetting
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     automaticallyClearData = AutomaticallyClearData(
@@ -164,7 +154,7 @@ class FireButtonViewModel @Inject constructor(
     }
 
     fun userRequestedToChangeFireAnimation() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
+        viewModelScope.launch { command.send(Command.LaunchFireAnimationSettings(viewState.value.selectedFireAnimation)) }
         pixel.fire(AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
@@ -175,7 +165,7 @@ class FireButtonViewModel @Inject constructor(
         }
         settingsDataStore.selectedFireAnimation = selectedFireAnimation
         fireAnimationLoader.preloadSelectedAnimation()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(currentViewState().copy(selectedFireAnimation = selectedFireAnimation))
         }
         pixel.fire(AppPixelName.FIRE_ANIMATION_NEW_SELECTED, mapOf(Pixel.PixelParameter.FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))

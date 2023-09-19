@@ -100,7 +100,7 @@ class RealAppTrackerBlockingStatsRepository constructor(
             .map { it.asListOfVpnTracker() }
             .distinctUntilChanged()
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
-            .flowOn(dispatchers.io())
+            .flowOn(dispatchers.default())
     }
 
     @WorkerThread

@@ -182,7 +182,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupUiElementsState() {
-        job += lifecycleScope.launch(dispatchers.io()) {
+        job += lifecycleScope.launch {
             while (isActive) {
                 val isEnabled = appTrackingProtection.isEnabled()
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
@@ -213,7 +213,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     private fun setupBugReport() {
         binding.apptpBugreport.setOnClickListener {
             Snackbar.make(binding.root, "Generating AppTP Bug Report", Snackbar.LENGTH_LONG).show()
-            lifecycleScope.launch(dispatchers.io()) {
+            lifecycleScope.launch {
                 val bugreport = vpnBugReporter.generateBugReport()
                 shareBugReport(bugreport)
             }
