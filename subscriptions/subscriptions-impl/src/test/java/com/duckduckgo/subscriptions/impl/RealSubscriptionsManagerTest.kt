@@ -10,6 +10,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Success
 import com.duckduckgo.subscriptions.impl.auth.AccountResponse
 import com.duckduckgo.subscriptions.impl.auth.AuthService
 import com.duckduckgo.subscriptions.impl.auth.CreateAccountResponse
+import com.duckduckgo.subscriptions.impl.auth.EntitlementsResponse
 import com.duckduckgo.subscriptions.impl.auth.StoreLoginResponse
 import com.duckduckgo.subscriptions.impl.auth.ValidateTokenResponse
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
@@ -84,6 +85,7 @@ class RealSubscriptionsManagerTest {
         assertTrue(value is Success)
         assertEquals("1234", (value as Success).externalId)
         assertEquals("validToken", value.pat)
+        assertTrue(value.entitlements.isEmpty())
     }
 
     @Test
@@ -91,6 +93,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsNotAuthenticated()
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
+        givenValidateTokenSucceeds()
         val repository: SubscriptionsRepository =
             RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
@@ -101,6 +104,7 @@ class RealSubscriptionsManagerTest {
         assertTrue(value is Success)
         assertEquals("1234", (value as Success).externalId)
         assertEquals("validToken", value.pat)
+        assertTrue(value.entitlements.firstOrNull { it.product == "testProduct" } != null)
     }
 
     @Test
@@ -139,6 +143,7 @@ class RealSubscriptionsManagerTest {
         assertTrue(value is Success)
         assertEquals("1234", (value as Success).externalId)
         assertEquals("validToken", value.pat)
+        assertTrue(value.entitlements.firstOrNull { it.product == "testProduct" } != null)
     }
 
     @Test
@@ -228,7 +233,9 @@ class RealSubscriptionsManagerTest {
                 account = AccountResponse(
                     email = "validToken",
                     externalId = "1234",
-                    entitlements = listOf(),
+                    entitlements = listOf(
+                        EntitlementsResponse("id", "name", "testProduct"),
+                    ),
                 ),
             ),
         )

@@ -22,6 +22,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Failure
 import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Success
 import com.duckduckgo.subscriptions.impl.auth.AuthService
 import com.duckduckgo.subscriptions.impl.auth.CreateAccountResponse
+import com.duckduckgo.subscriptions.impl.auth.EntitlementsResponse
 import com.duckduckgo.subscriptions.impl.auth.ResponseError
 import com.duckduckgo.subscriptions.impl.auth.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
@@ -61,7 +62,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getSubscriptionData(): SubscriptionsDataResult {
         try {
             val externalId = if (isUserAuthenticated()) {
-                getExternalIdFromToken()
+                getSubscriptionDataFromToken()
             } else {
                 getDataFromPurchaseHistory()
             }
@@ -70,7 +71,7 @@ class RealSubscriptionsManager @Inject constructor(
             } else {
                 val newAccount = createAccount()
                 logcat(LogPriority.DEBUG) { "Subs: account created ${newAccount.externalId}" }
-                Success(externalId = newAccount.externalId, pat = newAccount.authToken)
+                Success(externalId = newAccount.externalId, pat = newAccount.authToken, entitlements = emptyList())
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
@@ -96,7 +97,7 @@ class RealSubscriptionsManager @Inject constructor(
                 logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
                 authDataStore.token = response.authToken
                 _isSignedIn.emit(isUserAuthenticated())
-                return Success(externalId = response.externalId, pat = response.authToken)
+                return getSubscriptionDataFromToken()
             } else {
                 return Failure("Subs: no previous purchases found")
             }
@@ -108,11 +109,11 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private suspend fun getExternalIdFromToken(): SubscriptionsDataResult {
+    private suspend fun getSubscriptionDataFromToken(): SubscriptionsDataResult {
         try {
             val response = authService.validateToken("Bearer ${authDataStore.token}")
             logcat(LogPriority.DEBUG) { "Subs: token validated" }
-            return Success(externalId = response.account.externalId, pat = authDataStore.token!!)
+            return Success(externalId = response.account.externalId, pat = authDataStore.token!!, entitlements = response.account.entitlements)
         } catch (e: HttpException) {
             val error = parseError(e)
             return when (error?.error) {
@@ -147,6 +148,6 @@ class RealSubscriptionsManager @Inject constructor(
 }
 
 sealed class SubscriptionsDataResult {
-    data class Success(val externalId: String, val pat: String) : SubscriptionsDataResult()
+    data class Success(val externalId: String, val pat: String, val entitlements: List<EntitlementsResponse>) : SubscriptionsDataResult()
     data class Failure(val message: String) : SubscriptionsDataResult()
 }
