@@ -37,9 +37,11 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
 import kotlin.reflect.KClass
@@ -136,36 +138,23 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScanQRCodeClickedThenEmitCommandScanQRCode() = runTest {
-        testee.onScanQRCodeClicked()
+    fun whenTurnOffClickedThenAskTurnOffCommandShown() = runTest {
+        givenAuthenticatedUser()
+
+        testee.onTurnOffClicked()
 
         testee.commands().test {
-            awaitItem().assertCommandType(Command.ScanQRCode::class)
+            awaitItem().assertCommandType(AskTurnOffSync::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenEnterTextCodeClickedThenEmitCommandEnterTextCode() = runTest {
-        testee.onEnterTextCodeClicked()
+    fun whenSyncAnotherDeviceThenSyncAnotherDeviceCommandSent() = runTest {
+        testee.onSyncAnotherDevice()
 
         testee.commands().test {
-            awaitItem().assertCommandType(Command.EnterTextCode::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenEnablingSyncThenLaunchDeviceSetupFlow() = runTest {
-        testee.viewState().test {
-            testee.onInitializeSync()
-            val initialState = expectMostRecentItem()
-            assertEquals(true, initialState.syncToggleState)
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        testee.commands().test {
-            awaitItem().assertCommandType(CreateAccount::class)
+            awaitItem().assertCommandType(SyncAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -181,13 +170,17 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffClickedThenAskTurnOffCommandShown() = runTest {
-        givenAuthenticatedUser()
-
-        testee.onTurnOffClicked()
+    fun whenEnablingSyncThenLaunchDeviceSetupFlow() = runTest {
+        testee.onInitializeSync()
 
         testee.commands().test {
-            awaitItem().assertCommandType(AskTurnOffSync::class)
+            awaitItem().assertCommandType(DeviceConnected::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.viewState().test {
+            val initialState = expectMostRecentItem()
+            assertEquals(true, initialState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -413,6 +406,16 @@ class SyncActivityViewModelTest {
             testee.generateRecoveryCode(mock())
             val command = awaitItem()
             assertTrue(command is RecoveryCodePDFSuccess)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnScanQRCodeClickedThenEmitCommandScanQRCode() = runTest {
+        testee.onScanQRCodeClicked()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(Command.ScanQRCode::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

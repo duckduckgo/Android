@@ -37,7 +37,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -128,7 +128,6 @@ class SyncActivityViewModel @Inject constructor(
     sealed class Command {
         object ScanQRCode : Command()
         object ShowTextCode : Command()
-        object LaunchDeviceSetupFlow : Command()
         object RecoverSyncData : Command()
 
         object SyncAnotherDevice : Command()
@@ -168,7 +167,7 @@ class SyncActivityViewModel @Inject constructor(
     fun onInitializeSync(){
         viewModelScope.launch {
             viewState.value = viewState.value.toggle(true)
-            command.send(LaunchDeviceSetupFlow)
+            command.send(DeviceConnected)
         }
     }
 

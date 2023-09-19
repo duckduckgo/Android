@@ -23,23 +23,11 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
-<<<<<<< HEAD
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
-=======
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.INITIALISE
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
->>>>>>> ff4b9cd7f (final sync flow)
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -62,13 +50,7 @@ class SetupAccountViewModel @Inject constructor(
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         if (!initialStateProcessed) {
             val viewMode = when (screen) {
-<<<<<<< HEAD
-                SYNC_SETUP -> CreateAccount
                 DEVICE_SYNCED -> DeviceSynced
-=======
-                INITIALISE -> TurnOnSync
-                DEVICE_CONNECTED -> DeviceConnected
->>>>>>> ff4b9cd7f (final sync flow)
                 RECOVERY_CODE -> AskSaveRecoveryCode
             }
             viewState.emit(ViewState(viewMode))
@@ -83,15 +65,8 @@ class SetupAccountViewModel @Inject constructor(
     )
 
     sealed class ViewMode {
-<<<<<<< HEAD
-        object CreateAccount : ViewMode()
-        object AskSaveRecoveryCode : ViewMode()
-        object DeviceSynced : ViewMode()
-=======
-        object TurnOnSync : ViewMode()
         object AskSaveRecoveryCode: ViewMode()
-        object DeviceConnected : ViewMode()
->>>>>>> ff4b9cd7f (final sync flow)
+        object DeviceSynced : ViewMode()
     }
 
     sealed class Command {
@@ -104,16 +79,13 @@ class SetupAccountViewModel @Inject constructor(
         }
     }
 
-<<<<<<< HEAD
-=======
     fun onLoginSuccess() {
         viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = DeviceConnected))
+            viewState.emit(ViewState(viewMode = DeviceSynced))
         }
     }
 
 
->>>>>>> ff4b9cd7f (final sync flow)
     fun onSetupComplete() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
