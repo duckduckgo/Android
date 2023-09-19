@@ -101,7 +101,7 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
                 }
         }
 
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             viewModel.commands()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest { processCommands(it) }
