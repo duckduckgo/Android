@@ -348,7 +348,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onDeleteCredentials(loginCredentials: LoginCredentials) {
         val credentialsId = loginCredentials.id ?: return
 
-        viewModelScope.launch(dispatchers.default()) {
+        viewModelScope.launch(dispatchers.io()) {
             loginCredentials.domain?.let {
                 faviconManager.deletePersistedFavicon(it)
             }
@@ -360,7 +360,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun saveOrUpdateCredentials(credentials: LoginCredentials) {
-        viewModelScope.launch(dispatchers.default()) {
+        viewModelScope.launch(dispatchers.io()) {
             val credentialMode = _viewState.value.credentialMode
 
             if (credentialMode is EditingExisting) {
@@ -507,7 +507,7 @@ class AutofillSettingsViewModel @Inject constructor(
         if (credMode is Viewing) {
             _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = SettingActivationStatus(checked)))
 
-            viewModelScope.launch {
+            viewModelScope.launch(dispatchers.io()) {
                 val success = duckAddressStatusRepository.setActivationStatus(duckAddress, checked)
                 if (success) {
                     if (checked) {

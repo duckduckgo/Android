@@ -106,7 +106,7 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
             logcat { "RemoteFeatureReceiver receive $intent" }
             when {
                 VpnRemoteFeatureReceiver.isOnIntent(intent) -> {
-                    coroutineScope.launch {
+                    coroutineScope.launch(dispatcherProvider.io()) {
                         appTpFeatureConfig.edit {
                             setEnabled(VpnRemoteFeatureReceiver.settingName(intent), true, isManualOverride = true)
                         }
@@ -120,7 +120,7 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
                     }
                 }
                 VpnRemoteFeatureReceiver.isOffIntent(intent) -> {
-                    coroutineScope.launch {
+                    coroutineScope.launch(dispatcherProvider.io()) {
                         appTpFeatureConfig.edit {
                             setEnabled(VpnRemoteFeatureReceiver.settingName(intent), false, isManualOverride = true)
                         }

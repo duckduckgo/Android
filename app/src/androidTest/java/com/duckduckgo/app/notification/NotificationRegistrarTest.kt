@@ -18,6 +18,7 @@ package com.duckduckgo.app.notification
 
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
@@ -30,11 +31,14 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class NotificationRegistrarTest {
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationManagerCompat = NotificationManagerCompat.from(context)
@@ -61,6 +65,7 @@ class NotificationRegistrarTest {
             mockSchedulableNotificationPluginPoint,
             mockNotificationPluginPoint,
             appBuildConfig,
+            coroutineRule.testDispatcherProvider,
         )
     }
 

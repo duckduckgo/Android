@@ -71,7 +71,7 @@ class SyncConnectViewModel @Inject constructor(
     }
 
     fun onReadTextCodeClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(ReadTextCode)
         }
     }
@@ -86,13 +86,13 @@ class SyncConnectViewModel @Inject constructor(
     }
 
     fun onShowQRCodeClicked() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(ShowQRCode)
         }
     }
 
     fun onLoginSucess() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(LoginSucess)
         }
     }

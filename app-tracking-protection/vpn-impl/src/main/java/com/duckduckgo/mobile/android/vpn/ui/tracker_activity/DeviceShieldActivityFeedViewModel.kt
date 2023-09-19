@@ -83,7 +83,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private fun startTickerRefresher() {
         logcat { "startTickerRefresher" }
         tickerJob?.cancel()
-        tickerJob = viewModelScope.launch {
+        tickerJob = viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 delay(TimeUnit.MINUTES.toMillis(1))
                 tickerChannel.emit(System.currentTimeMillis())
@@ -120,7 +120,6 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                 }
                 TrackerFeedViewState(trackers + appDataItems, trackerIntermediateState.runningState)
             }
-            .flowOn(dispatcherProvider.default())
             .onStart {
                 startTickerRefresher()
                 emit(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)))
@@ -129,7 +128,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     }
 
     fun trackerListDisplayed(viewState: TrackerFeedViewState) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             if (viewState.trackers.isNotEmpty() && viewState.trackers.first() != TrackerLoadingSkeleton) {
                 command.send(Command.TrackerListDisplayed(viewState.trackers.size))
             }
@@ -137,7 +136,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     }
 
     fun showAppsList(vpnState: VpnState, item: TrackerFeedItem.TrackerTrackerAppsProtection) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             if (item.selectedFilter == TrackingProtectionExclusionListActivity.Companion.AppsFilter.PROTECTED_ONLY) {
                 command.send(Command.ShowProtectedAppsList(vpnState))
             } else if (item.selectedFilter == TrackingProtectionExclusionListActivity.Companion.AppsFilter.UNPROTECTED_ONLY) {

@@ -29,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
@@ -90,6 +91,9 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     @Inject
     @AppTpBreakageCategories
     lateinit var breakageCategories: List<AppBreakageCategory>
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
 
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
@@ -164,7 +168,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     override fun onStart() {
         super.onStart()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             viewModel.loadData(
                 getDate(),
                 getPackage(),
@@ -181,7 +185,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         )
         binding.includeToolbar.appTrackedAgo.text = viewState.lastTrackerBlockedAgo
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(dispatcherProvider.io()) {
             itemsAdapter.updateData(viewState.trackingCompanies)
         }
 
@@ -225,7 +229,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }

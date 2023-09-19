@@ -42,6 +42,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
+        // determineViewToShow() does things with livedata, can't be on IO dispatcher
         lifecycleScope.launch { viewModel.determineViewToShow() }
     }
 

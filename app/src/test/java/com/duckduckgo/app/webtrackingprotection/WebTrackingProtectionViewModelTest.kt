@@ -25,6 +25,7 @@ import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.C
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -39,6 +40,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class WebTrackingProtectionViewModelTest {
 
     @get:Rule
@@ -67,6 +69,7 @@ internal class WebTrackingProtectionViewModelTest {
             mockGpc,
             mockFeatureToggle,
             mockPixel,
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 

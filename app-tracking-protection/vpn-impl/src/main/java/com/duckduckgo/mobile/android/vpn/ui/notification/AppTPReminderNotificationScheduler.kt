@@ -61,7 +61,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
     private var isAppTPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             isAppTPEnabled.set(appTrackingProtection.isEnabled())
             if (isAppTPEnabled.get()) {
                 // These are all relevant for when AppTP has been enabled.
@@ -77,7 +77,7 @@ class AppTPReminderNotificationScheduler @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
                 VpnStopReason.SELF_STOP -> onVPNManuallyStopped()

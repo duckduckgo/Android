@@ -54,7 +54,7 @@ class AuditSettingsViewModel @Inject constructor(
         url: String,
         protectionsEnabled: Boolean = true,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             if (protectionsEnabled) {
                 reAddProtections()
             } else {
@@ -65,7 +65,7 @@ class AuditSettingsViewModel @Inject constructor(
     }
 
     fun onDestroy() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             reAddProtections()
         }
     }
