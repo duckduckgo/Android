@@ -80,9 +80,8 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
             DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
         }
 
-        items.clear().also { items.addAll(newData) }
-
         withContext(Dispatchers.Main) {
+            items.clear().also { items.addAll(newData) }
             diffResult.dispatchUpdatesTo(this@AppTPCompanyDetailsAdapter)
         }
     }
