@@ -35,6 +35,7 @@ import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BookmarksAdapter(
     private val layoutInflater: LayoutInflater,
@@ -55,7 +56,7 @@ class BookmarksAdapter(
     object EmptyHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
 
-    fun setItems(
+    suspend fun setItems(
         bookmarkItems: List<BookmarkItem>,
         showEmptyHint: Boolean,
         filteringMode: Boolean = false,
@@ -64,7 +65,9 @@ class BookmarksAdapter(
         val diffCallback = DiffCallback(old = this.bookmarkItems, new = generatedList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
-        diffResult.dispatchUpdatesTo(this)
+        withContext(dispatchers.main()) {
+            diffResult.dispatchUpdatesTo(this@BookmarksAdapter)
+        }
 
         if (filteringMode || bookmarkItems.isEmpty()) {
             return
@@ -95,6 +98,7 @@ class BookmarksAdapter(
                     viewModel,
                     lifecycleOwner,
                     faviconManager,
+                    dispatchers,
                 )
             }
             EMPTY_STATE_TYPE -> {
@@ -167,6 +171,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
         private val viewModel: BookmarksViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
+        private val dispatchers: DispatcherProvider,
     ) : BookmarkScreenViewHolders(binding.root) {
 
         private val context: Context = binding.root.context

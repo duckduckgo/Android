@@ -22,6 +22,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
@@ -169,8 +170,18 @@ class NetworkModule {
         pixel: Pixel,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         appBuildConfig: AppBuildConfig,
+        dispatcherProvider: DispatcherProvider,
     ): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope, appBuildConfig)
+        FireAndForgetFeedbackSubmitter(
+            feedbackService,
+            variantManager,
+            apiKeyMapper,
+            statisticsStore,
+            pixel,
+            appCoroutineScope,
+            appBuildConfig,
+            dispatcherProvider,
+        )
 
     companion object {
         private const val CACHE_SIZE: Long = 10 * 1024 * 1024 // 10MB

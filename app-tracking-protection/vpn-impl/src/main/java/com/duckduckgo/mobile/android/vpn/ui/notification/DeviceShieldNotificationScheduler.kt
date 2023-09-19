@@ -72,7 +72,7 @@ class DeviceShieldNotificationScheduler(
 
     private fun scheduleDailyNotification() {
         val vpnNotificationsDao = vpnDatabase.vpnNotificationsDao()
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             val exists = withContext(dispatchers.io()) {
                 vpnNotificationsDao.exists(VPN_DAILY_NOTIFICATION_ID)
             }

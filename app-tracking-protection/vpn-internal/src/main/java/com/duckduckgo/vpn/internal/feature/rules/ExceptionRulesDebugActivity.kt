@@ -145,7 +145,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
     }
 
     private fun startRefreshTicker() {
-        refreshTickerJob += lifecycleScope.launch {
+        refreshTickerJob += lifecycleScope.launch(dispatchers.io()) {
             while (isActive) {
                 refreshTickerChannel.emit(System.currentTimeMillis())
                 delay(TimeUnit.SECONDS.toMillis(5))

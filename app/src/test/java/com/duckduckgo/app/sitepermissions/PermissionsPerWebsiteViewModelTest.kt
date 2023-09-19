@@ -57,6 +57,7 @@ class PermissionsPerWebsiteViewModelTest {
         sitePermissionsRepository = mockSitePermissionsRepository,
         locationPermissionsRepository = mockLocationPermissionsRepository,
         settingsDataStore = mockSettingsDataStore,
+        coroutineRule.testDispatcherProvider,
     )
 
     private val domain = "domain.com"

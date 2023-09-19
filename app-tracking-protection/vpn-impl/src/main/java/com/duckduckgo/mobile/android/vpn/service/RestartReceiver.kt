@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
@@ -41,10 +42,11 @@ class RestartReceiver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
+    private val dispatcherProvider: DispatcherProvider,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.getStringExtra("action")?.lowercase() == "restart") {
-            coroutineScope.launch {
+            coroutineScope.launch(dispatcherProvider.io()) {
                 TrackerBlockingVpnService.restartVpnService(context)
             }
         }

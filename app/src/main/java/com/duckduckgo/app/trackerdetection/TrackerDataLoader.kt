@@ -21,6 +21,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.trackerdetection.api.TdsJson
@@ -55,10 +56,11 @@ class TrackerDataLoader @Inject constructor(
     private val appDatabase: AppDatabase,
     private val moshi: Moshi,
     private val urlToTypeMapper: UrlToTypeMapper,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        appCoroutineScope.launch { loadData() }
+        appCoroutineScope.launch(dispatcherProvider.io()) { loadData() }
     }
 
     private fun loadData() {

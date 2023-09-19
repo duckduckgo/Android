@@ -84,14 +84,14 @@ class SetupAccountViewModel @Inject constructor(
     }
 
     fun onBackPressed() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             when (viewState.value.viewMode) {
                 AskSyncAnotherDevice -> {
                     viewState.emit(ViewState(viewMode = TurnOnSync))
                 }
 
                 TurnOnSync, AskSaveRecoveryCode, DeviceConnected -> {
-                    viewModelScope.launch {
+                    viewModelScope.launch(dispatchers.io()) {
                         command.send(Close)
                     }
                 }
@@ -100,31 +100,31 @@ class SetupAccountViewModel @Inject constructor(
     }
 
     fun onAskSyncAnotherDevice() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             viewState.emit(ViewState(viewMode = AskSyncAnotherDevice))
         }
     }
 
     fun finishSetupFlow() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
         }
     }
 
     fun onRecoverYourSyncedData() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(RecoverSyncData)
         }
     }
 
     fun onLoginSucess() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             viewState.emit(ViewState(viewMode = DeviceConnected))
         }
     }
 
     fun onSyncAnotherDevice() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             command.send(SyncAnotherDevice)
         }
     }

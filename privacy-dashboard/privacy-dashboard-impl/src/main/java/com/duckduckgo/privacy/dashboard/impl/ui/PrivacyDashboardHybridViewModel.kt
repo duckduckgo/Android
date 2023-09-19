@@ -183,7 +183,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         this.site = site
         if (site == null) return
 
-        viewModelScope.launch { updateSite(site) }
+        viewModelScope.launch(dispatcher.io()) { updateSite(site) }
     }
 
     private suspend fun updateSite(site: Site) {

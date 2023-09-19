@@ -55,6 +55,7 @@ class NetPRemoteFeatureWrapperTest {
             netPFeatureRemover,
             appBuildConfig,
             coroutinesTestRule.testScope,
+            coroutinesTestRule.testDispatcherProvider,
         )
     }
 
