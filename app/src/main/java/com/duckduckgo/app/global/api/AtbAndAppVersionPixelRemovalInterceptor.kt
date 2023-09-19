@@ -37,8 +37,8 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor(
     private val pixelsPlugin: PluginPoint<PixelRequiringDataCleaningPlugin>,
 ) : Interceptor, PixelInterceptorPlugin {
 
-    val pixels: List<String> by lazy {
-        pixelsPlugin.getPlugins().flatMap { it.names() }.distinct()
+    val pixels: Set<String> by lazy {
+        pixelsPlugin.getPlugins().flatMap { it.names() }.toSet()
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
