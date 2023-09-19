@@ -38,7 +38,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncAnotherDevice
@@ -171,16 +170,15 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenEnablingSyncThenLaunchDeviceSetupFlow() = runTest {
-        testee.onInitializeSync()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(DeviceConnected::class)
+        testee.viewState().test {
+            testee.onInitializeSync()
+            val initialState = expectMostRecentItem()
+            assertEquals(true, initialState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
 
-        testee.viewState().test {
-            val initialState = expectMostRecentItem()
-            assertEquals(true, initialState.syncToggleState)
+        testee.commands().test {
+            awaitItem().assertCommandType(DeviceConnected::class)
             cancelAndIgnoreRemainingEvents()
         }
     }

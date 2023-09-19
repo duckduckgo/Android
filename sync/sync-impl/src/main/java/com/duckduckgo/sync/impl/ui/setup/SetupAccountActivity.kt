@@ -48,18 +48,6 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private lateinit var screen: Screen
 
-    private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSuccess()
-        }
-    }
-
-    private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSuccess()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         screen = if (savedInstanceState != null) {
@@ -113,7 +101,6 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
-
             AskSaveRecoveryCode -> {
                 screen = RECOVERY_CODE
                 supportFragmentManager.commitNow {
