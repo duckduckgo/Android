@@ -69,25 +69,6 @@ class SetupAccountViewModelTest {
     }
 
     @Test
-    fun whenOnBackPressedAndViewModeSaveRecoveryCodeThenClose() = runTest {
-        testee.viewState(Screen.INITIALISE).test {
-            var viewState = awaitItem()
-            testee.onAskSyncAnotherDevice()
-            viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.AskSyncAnotherDevice)
-            testee.finishSetupFlow()
-            viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.AskSaveRecoveryCode)
-            testee.onBackPressed()
-        }
-        testee.commands().test {
-            val command = awaitItem()
-            assertTrue(command is Command.Close)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnAskSyncAnotherDeviceThenViewModeSyncAnotherDevice() = runTest {
         testee.viewState(Screen.INITIALISE).test {
             val viewState = awaitItem()
@@ -111,17 +92,17 @@ class SetupAccountViewModelTest {
 
     @Test
     fun whenFlowStartedFromDeviceConnectedThenViewModeDeviceConnected() = runTest {
-        testee.viewState(Screen.DEVICE_CONNECTED).test {
+        testee.viewState(Screen.DEVICE_SYNCED).test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.DeviceConnected)
+            assertTrue(viewState.viewMode is ViewMode.DeviceSynced)
         }
     }
 
     @Test
     fun whenOnBackPressedAndViewModeDeviceConnectedThenClose() = runTest {
-        testee.viewState(Screen.DEVICE_CONNECTED).test {
+        testee.viewState(Screen.DEVICE_SYNCED).test {
             val viewState = awaitItem()
-            assertTrue(viewState.viewMode is ViewMode.DeviceConnected)
+            assertTrue(viewState.viewMode is ViewMode.DeviceSynced)
             testee.onBackPressed()
         }
         testee.commands().test {
@@ -152,7 +133,7 @@ class SetupAccountViewModelTest {
             assertTrue(viewState.viewMode is ViewMode.TurnOnSync)
             testee.onLoginSucess()
             val viewState2 = awaitItem()
-            assertTrue(viewState2.viewMode is ViewMode.DeviceConnected)
+            assertTrue(viewState2.viewMode is ViewMode.DeviceSynced)
         }
     }
 

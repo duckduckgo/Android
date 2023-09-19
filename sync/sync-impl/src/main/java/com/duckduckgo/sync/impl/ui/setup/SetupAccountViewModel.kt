@@ -23,13 +23,11 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.INITIALISE
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -52,8 +50,7 @@ class SetupAccountViewModel @Inject constructor(
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         if (!initialStateProcessed) {
             val viewMode = when (screen) {
-                INITIALISE -> TurnOnSync
-                DEVICE_CONNECTED -> DeviceConnected
+                DEVICE_SYNCED -> DeviceSynced
                 RECOVERY_CODE -> AskSaveRecoveryCode
             }
             viewState.emit(ViewState(viewMode))
@@ -64,13 +61,12 @@ class SetupAccountViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val viewMode: ViewMode = TurnOnSync,
+        val viewMode: ViewMode = DeviceSynced,
     )
 
     sealed class ViewMode {
-        object TurnOnSync : ViewMode()
         object AskSaveRecoveryCode: ViewMode()
-        object DeviceConnected : ViewMode()
+        object DeviceSynced : ViewMode()
     }
 
     sealed class Command {
@@ -85,7 +81,7 @@ class SetupAccountViewModel @Inject constructor(
 
     fun onLoginSuccess() {
         viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = DeviceConnected))
+            viewState.emit(ViewState(viewMode = DeviceSynced))
         }
     }
 

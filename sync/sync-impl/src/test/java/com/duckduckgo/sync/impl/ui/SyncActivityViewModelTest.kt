@@ -35,9 +35,13 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
 import java.lang.String.format
 import kotlin.reflect.KClass
@@ -134,34 +138,49 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenToggleDisabledThenLaunchSetupFlow() = runTest {
-        testee.onToggleClicked(false)
-
-        testee.viewState().test {
-            val viewState = awaitItem()
-            assertFalse(viewState.syncToggleState)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenToggleEnabledThenLaunchSetupFlow() = runTest {
-        testee.onToggleClicked(true)
-
-        testee.commands().test {
-            awaitItem().assertCommandType(LaunchDeviceSetupFlow::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenToggleDisabledThenAskTurnOffSync() = runTest {
+    fun whenTurnOffClickedThenAskTurnOffCommandShown() = runTest {
         givenAuthenticatedUser()
 
-        testee.onToggleClicked(false)
+        testee.onTurnOffClicked()
 
         testee.commands().test {
-            awaitItem().assertCommandType(Command.AskTurnOffSync::class)
+            awaitItem().assertCommandType(AskTurnOffSync::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncAnotherDeviceThenSyncAnotherDeviceCommandSent() = runTest {
+        testee.onSyncAnotherDevice()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(SyncAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecoverDataThenRecoverDataCommandSent() = runTest {
+        testee.onRecoverYourSyncedData()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(RecoverSyncData::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenEnablingSyncThenLaunchDeviceSetupFlow() = runTest {
+        testee.onInitializeSync()
+
+        testee.commands().test {
+            awaitItem().assertCommandType(DeviceConnected::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.viewState().test {
+            val initialState = expectMostRecentItem()
+            assertEquals(true, initialState.syncToggleState)
             cancelAndIgnoreRemainingEvents()
         }
     }
