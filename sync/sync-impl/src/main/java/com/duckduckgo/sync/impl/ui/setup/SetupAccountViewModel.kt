@@ -79,13 +79,6 @@ class SetupAccountViewModel @Inject constructor(
         }
     }
 
-    fun onLoginSuccess() {
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = DeviceSynced))
-        }
-    }
-
-
     fun onSetupComplete() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
