@@ -51,10 +51,17 @@ class AppEmailManager @Inject constructor(
     private val pixel: Pixel,
 ) : EmailManager, BrowserFeatureStateReporterPlugin {
 
-    private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
+    private val isSignedInStateFlow = MutableStateFlow(false)
     override fun signedInFlow(): StateFlow<Boolean> = isSignedInStateFlow.asStateFlow()
 
     override fun getAlias(): String? = consumeAlias()
+
+    init {
+        // first call to isSignedIn() can be expensive and cause ANRs if done on main thread, so we do it on a background thread
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(isSignedIn())
+        }
+    }
 
     override fun isSignedIn(): Boolean {
         return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
