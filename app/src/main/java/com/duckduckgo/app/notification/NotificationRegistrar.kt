@@ -26,7 +26,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.notification.model.Channel
@@ -56,7 +55,6 @@ class NotificationRegistrar @Inject constructor(
     private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>,
     private val notificationPluginPoint: PluginPoint<NotificationPlugin>,
     private val appBuildConfig: AppBuildConfig,
-    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     object NotificationId {
@@ -78,7 +76,7 @@ class NotificationRegistrar @Inject constructor(
     }
 
     override fun onCreate(owner: LifecycleOwner) {
-        appCoroutineScope.launch(dispatcherProvider.io()) { registerApp() }
+        appCoroutineScope.launch { registerApp() }
     }
 
     @Suppress("NewApi") // we use NotificationCompatManager to retrieve channels

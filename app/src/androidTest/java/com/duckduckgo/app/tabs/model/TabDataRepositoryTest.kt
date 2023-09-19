@@ -37,6 +37,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -416,7 +417,7 @@ class TabDataRepositoryTest {
     ): TabDataRepository {
         return TabDataRepository(
             dao,
-            SiteFactoryImpl(entityLookup, allowListDao, contentBlocking, coroutinesTestRule.testScope, coroutinesTestRule.testDispatcherProvider),
+            SiteFactoryImpl(entityLookup, allowListDao, contentBlocking, TestScope()),
             webViewPreviewPersister,
             faviconManager,
             coroutinesTestRule.testScope,

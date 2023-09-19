@@ -35,7 +35,7 @@ class AutoconsentSettingsViewModelTest {
 
     private val autoconsent: Autoconsent = FakeAutoconsent()
 
-    private val viewModel = AutoconsentSettingsViewModel(autoconsent, coroutineRule.testDispatcherProvider)
+    private val viewModel = AutoconsentSettingsViewModel(autoconsent)
 
     @Test
     fun whenViewModelCreatedThenEmitViewState() = runTest {

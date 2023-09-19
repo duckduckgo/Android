@@ -102,7 +102,7 @@ class DeviceShieldTileService : TileService() {
 
     private fun pollDeviceShieldState() {
         deviceShieldStatePollingJob +=
-            serviceScope.launch(dispatcherProvider.io()) {
+            serviceScope.launch {
                 while (isActive) {
                     val tile = qsTile
                     tile?.let {

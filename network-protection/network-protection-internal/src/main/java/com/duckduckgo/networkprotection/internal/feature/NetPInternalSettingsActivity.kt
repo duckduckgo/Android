@@ -113,7 +113,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupUiElementState() {
-        job += lifecycleScope.launch(dispatcherProvider.io()) {
+        job += lifecycleScope.launch {
             while (isActive) {
                 val isEnabled = networkProtectionState.isEnabled()
 
@@ -164,7 +164,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.overrideMtuSelector.setOnClickListener { showMtuSelectorMenu() }
         binding.overrideServerBackendSelector.setOnClickListener {
-            lifecycleScope.launch(dispatcherProvider.io()) {
+            lifecycleScope.launch {
                 showServerSelectorMenu()
             }
         }
@@ -203,7 +203,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.forceRekey.setClickListener {
-            lifecycleScope.launch(dispatcherProvider.io()) {
+            lifecycleScope.launch {
                 netPRekeyer.doRekey()
             }
         }

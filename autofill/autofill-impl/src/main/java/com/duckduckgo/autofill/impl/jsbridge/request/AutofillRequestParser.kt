@@ -16,10 +16,13 @@
 
 package com.duckduckgo.autofill.impl.jsbridge.request
 
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface AutofillRequestParser {
     suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest
@@ -29,16 +32,21 @@ interface AutofillRequestParser {
 @ContributesBinding(FragmentScope::class)
 class AutofillJsonRequestParser @Inject constructor(
     val moshi: Moshi,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : AutofillRequestParser {
 
     private val autofillDataRequestParser by lazy { moshi.adapter(AutofillDataRequest::class.java) }
     private val autofillStoreFormDataRequestParser by lazy { moshi.adapter(AutofillStoreFormDataRequest::class.java) }
 
     override suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
-        return autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+        return withContext(dispatchers.default()) {
+            autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+        }
     }
 
     override suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
-        return autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+        return withContext(dispatchers.default()) {
+            autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+        }
     }
 }

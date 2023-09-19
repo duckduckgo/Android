@@ -48,7 +48,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = ReportBreakageAppListViewModel(trackingProtectionAppsRepository, coroutineRule.testDispatcherProvider)
+        viewModel = ReportBreakageAppListViewModel(trackingProtectionAppsRepository)
     }
 
     @Test

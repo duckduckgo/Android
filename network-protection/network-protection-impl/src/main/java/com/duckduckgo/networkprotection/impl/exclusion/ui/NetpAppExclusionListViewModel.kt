@@ -143,7 +143,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     }
 
     private fun MutableStateFlow<Long>.refresh() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             emit(System.currentTimeMillis())
         }
     }
@@ -157,7 +157,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     }
 
     private fun onLeavingScreen() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             if (userMadeChanges()) {
                 command.send(Command.RestartVpn)
             }
@@ -200,7 +200,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
     }
 
     fun applyAppsFilter(value: AppsFilter) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             filterState.emit(value)
         }
     }
@@ -209,7 +209,7 @@ class NetpAppExclusionListViewModel @Inject constructor(
         app: NetpExclusionListApp,
         enabled: Boolean,
     ) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             if (enabled) {
                 checkForAppProtectionEnabled(app)
             } else {

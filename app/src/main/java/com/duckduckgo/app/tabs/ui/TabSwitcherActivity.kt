@@ -95,9 +95,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter: TabSwitcherAdapter by lazy {
-        TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager)
-    }
+    private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager) }
 
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true

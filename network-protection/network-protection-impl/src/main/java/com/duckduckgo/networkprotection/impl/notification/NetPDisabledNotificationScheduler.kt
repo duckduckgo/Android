@@ -20,7 +20,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -38,13 +37,12 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val netPDisabledNotificationBuilder: NetPDisabledNotificationBuilder,
     private val networkProtectionState: NetworkProtectionState,
-    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch {
             isNetPEnabled.set(networkProtectionState.isEnabled())
             if (isNetPEnabled.get()) {
                 cancelDisabledNotification()
@@ -61,7 +59,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
                 VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
@@ -85,7 +83,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch {
             val reconfiguredNetPState = networkProtectionState.isEnabled()
             if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState) {
                 if (!reconfiguredNetPState) {

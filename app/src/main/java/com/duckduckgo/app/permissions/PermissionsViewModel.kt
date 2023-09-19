@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -43,7 +42,6 @@ import timber.log.Timber
 class PermissionsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -75,7 +73,7 @@ class PermissionsViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun start(notificationsEnabled: Boolean = false) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
@@ -94,17 +92,17 @@ class PermissionsViewModel @Inject constructor(
     }
 
     fun onSitePermissionsClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchLocation) }
+        viewModelScope.launch { command.send(Command.LaunchLocation) }
         pixel.fire(AppPixelName.SETTINGS_SITE_PERMISSIONS_PRESSED)
     }
 
     fun userRequestedToChangeNotificationsSetting() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchNotificationsSettings) }
+        viewModelScope.launch { command.send(Command.LaunchNotificationsSettings) }
         pixel.fire(AppPixelName.SETTINGS_NOTIFICATIONS_PRESSED)
     }
 
     fun userRequestedToChangeAppLinkSetting() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType)) }
+        viewModelScope.launch { command.send(Command.LaunchAppLinkSettings(viewState.value.appLinksSettingType)) }
         pixel.fire(AppPixelName.SETTINGS_APP_LINKS_PRESSED)
     }
 
@@ -129,7 +127,7 @@ class PermissionsViewModel @Inject constructor(
                     AppPixelName.SETTINGS_APP_LINKS_NEVER_SELECTED
                 }
             }
-        viewModelScope.launch(dispatcherProvider.io()) { viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType)) }
+        viewModelScope.launch { viewState.emit(currentViewState().copy(appLinksSettingType = appLinkSettingType)) }
 
         pixel.fire(pixelName)
     }

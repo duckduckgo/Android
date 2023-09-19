@@ -38,7 +38,7 @@ class AccessibilitySettingsViewModelTest {
     var coroutineRule = CoroutineTestRule()
 
     private val accessibilitySettings: AccessibilitySettingsDataStore = mock()
-    private val testee = AccessibilitySettingsViewModel(accessibilitySettings, coroutineRule.testDispatcherProvider)
+    private val testee = AccessibilitySettingsViewModel(accessibilitySettings)
 
     @Test
     fun whenViewModelCreatedThenDefaultViewStateEmitted() = runTest {

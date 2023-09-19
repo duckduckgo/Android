@@ -20,7 +20,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.di.scopes.ActivityScope
@@ -34,10 +33,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class AutoconsentSettingsViewModel @Inject constructor(
-    private val autoconsent: Autoconsent,
-    private val dispatcherProvider: DispatcherProvider,
-) : ViewModel() {
+class AutoconsentSettingsViewModel @Inject constructor(private val autoconsent: Autoconsent) : ViewModel() {
     data class ViewState(
         val autoconsentEnabled: Boolean,
     )
@@ -56,14 +52,14 @@ class AutoconsentSettingsViewModel @Inject constructor(
     }
 
     fun onUserToggleAutoconsent(enabled: Boolean) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             autoconsent.changeSetting(enabled)
             viewStateFlow.emit(ViewState(autoconsent.isSettingEnabled()))
         }
     }
 
     fun onLearnMoreSelected() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchLearnMoreWebPage()) }
+        viewModelScope.launch { command.send(Command.LaunchLearnMoreWebPage()) }
     }
 
     companion object {

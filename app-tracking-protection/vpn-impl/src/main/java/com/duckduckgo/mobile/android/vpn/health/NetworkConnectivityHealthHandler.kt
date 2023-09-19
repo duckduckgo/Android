@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
 import android.os.PowerManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.isAirplaneModeOn
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.utils.ConflatedJob
@@ -52,13 +51,12 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     private val pixel: DeviceShieldPixels,
     private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
     private val vpnConnectivityLossListenerPluginPoint: PluginPoint<VpnConnectivityLossListenerPlugin>,
-    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
     private val powerManager = context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
     private val job = ConflatedJob()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        job += coroutineScope.launch(dispatcherProvider.io()) {
+        job += coroutineScope.launch {
             while (isActive) {
                 delay(15_000)
                 if (powerManager.isInteractive && !context.isAirplaneModeOn() && !hasVpnConnectivity()) {

@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.statistics
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -30,8 +29,6 @@ import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class AtbInitializerTest {
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: AtbInitializer
 
@@ -43,13 +40,7 @@ class AtbInitializerTest {
     fun whenReferrerInformationInstantlyAvailableThenAtbInitialized() = runTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
-        testee = AtbInitializer(
-            coroutineRule.testScope,
-            statisticsDataStore,
-            statisticsUpdater,
-            setOf(appReferrerStateListener),
-            coroutineRule.testDispatcherProvider,
-        )
+        testee = AtbInitializer(TestScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
 
         testee.initialize()
 
@@ -60,13 +51,7 @@ class AtbInitializerTest {
     fun whenReferrerInformationQuicklyAvailableThenAtbInitialized() = runTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = 1000L)
-        testee = AtbInitializer(
-            coroutineRule.testScope,
-            statisticsDataStore,
-            statisticsUpdater,
-            setOf(appReferrerStateListener),
-            coroutineRule.testDispatcherProvider,
-        )
+        testee = AtbInitializer(TestScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
 
         testee.initialize()
 
@@ -77,13 +62,7 @@ class AtbInitializerTest {
     fun whenReferrerInformationTimesOutThenAtbInitialized() = runTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = Long.MAX_VALUE)
-        testee = AtbInitializer(
-            coroutineRule.testScope,
-            statisticsDataStore,
-            statisticsUpdater,
-            setOf(appReferrerStateListener),
-            coroutineRule.testDispatcherProvider,
-        )
+        testee = AtbInitializer(TestScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
 
         testee.initialize()
 
@@ -93,13 +72,7 @@ class AtbInitializerTest {
     @Test
     fun whenAlreadyInitializedThenRefreshCalled() = runTest {
         configureAlreadyInitialized()
-        testee = AtbInitializer(
-            coroutineRule.testScope,
-            statisticsDataStore,
-            statisticsUpdater,
-            setOf(appReferrerStateListener),
-            coroutineRule.testDispatcherProvider,
-        )
+        testee = AtbInitializer(TestScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
 
         testee.initialize()
         verify(statisticsUpdater).refreshAppRetentionAtb()

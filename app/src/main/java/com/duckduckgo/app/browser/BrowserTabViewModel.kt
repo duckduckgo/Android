@@ -763,7 +763,7 @@ class BrowserTabViewModel @Inject constructor(
 
         site = siteFactory.buildSite(url, title, httpsUpgraded)
         onSiteChanged()
-        buildingSiteFactoryJob = viewModelScope.launch(dispatchers.io()) {
+        buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
                 withContext(dispatchers.io()) {
                     siteFactory.loadFullSiteDetails(it)
@@ -829,21 +829,21 @@ class BrowserTabViewModel @Inject constructor(
 
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
-            viewModelScope.launch(dispatchers.io()) {
+            viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
             }
         } else {
             command.value = HideKeyboard
         }
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
     }
 
     fun onViewHidden() {
         skipHome = false
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             downloadCallback
             refreshOnViewVisible.emit(false)
         }
@@ -1007,7 +1007,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun prefetchFavicon(url: String) {
         faviconPrefetchJob?.cancel()
-        faviconPrefetchJob = viewModelScope.launch(dispatchers.io()) {
+        faviconPrefetchJob = viewModelScope.launch {
             val faviconFile = faviconManager.tryFetchFaviconForUrl(tabId = tabId, url = url)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
@@ -1043,7 +1043,7 @@ class BrowserTabViewModel @Inject constructor(
             Timber.d("Favicon received for a url $visitedUrl, different than the current one $currentUrl")
             return
         }
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val faviconFile = faviconManager.storeFavicon(currentTab.tabId, UrlFavicon(iconUrl, visitedUrl))
             faviconFile?.let {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
@@ -1054,7 +1054,7 @@ class BrowserTabViewModel @Inject constructor(
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
 
     override fun closeCurrentTab() {
-        viewModelScope.launch(dispatchers.io()) { removeCurrentTabFromRepository() }
+        viewModelScope.launch { removeCurrentTabFromRepository() }
     }
 
     fun closeAndReturnToSourceIfBlankTab() {
@@ -1064,7 +1064,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun closeAndSelectSourceTab() {
-        viewModelScope.launch(dispatchers.io()) { removeAndSelectTabFromRepository() }
+        viewModelScope.launch { removeAndSelectTabFromRepository() }
     }
 
     private suspend fun removeAndSelectTabFromRepository() {
@@ -1118,7 +1118,7 @@ class BrowserTabViewModel @Inject constructor(
             command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
         } else if (hasSourceTab) {
-            viewModelScope.launch(dispatchers.io()) {
+            viewModelScope.launch {
                 removeCurrentTabFromRepository()
             }
             return true
@@ -1198,7 +1198,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun showBlankContentfNewContentDelayed() {
         Timber.i("Blank: cancel job $deferredBlankSite")
         deferredBlankSite?.cancel()
-        deferredBlankSite = viewModelScope.launch(dispatchers.io()) {
+        deferredBlankSite = viewModelScope.launch {
             delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
             withContext(dispatchers.main()) {
                 command.value = HideWebContent
@@ -1263,13 +1263,13 @@ class BrowserTabViewModel @Inject constructor(
             statisticsUpdater.refreshSearchRetentionAtb()
         }
 
-        domain?.let { viewModelScope.launch(dispatchers.io()) { updateLoadingStatePrivacy(domain) } }
-        domain?.let { viewModelScope.launch(dispatchers.io()) { updatePrivacyProtectionState(domain) } }
+        domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
+        domain?.let { viewModelScope.launch { updatePrivacyProtectionState(domain) } }
 
-        viewModelScope.launch(dispatchers.io()) { updateBookmarkAndFavoriteState(url) }
+        viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
         val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
-        permissionOrigin?.let { viewModelScope.launch(dispatchers.io()) { notifyPermanentLocationPermission(permissionOrigin) } }
+        permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
 
@@ -1410,7 +1410,7 @@ class BrowserTabViewModel @Inject constructor(
             ),
         )
         browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite()))
-        viewModelScope.launch(dispatchers.io()) { updateBookmarkAndFavoriteState(url) }
+        viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
     }
 
     private fun omnibarTextForUrl(url: String?): String {
@@ -1514,7 +1514,7 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
             val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
             if (permissionEntity == null) {
@@ -1543,7 +1543,7 @@ class BrowserTabViewModel @Inject constructor(
                     onSiteLocationPermissionAlwaysAllowed()
                     setDomainHasLocationPermissionShown(domain)
                     pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
-                    viewModelScope.launch(dispatchers.io()) {
+                    viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
                         faviconManager.persistCachedFavicon(tabId, domain)
                     }
@@ -1558,7 +1558,7 @@ class BrowserTabViewModel @Inject constructor(
                 LocationPermissionType.DENY_ALWAYS -> {
                     pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                     onSiteLocationPermissionAlwaysDenied()
-                    viewModelScope.launch(dispatchers.io()) {
+                    viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
                         faviconManager.persistCachedFavicon(tabId, domain)
                     }
@@ -1645,7 +1645,7 @@ class BrowserTabViewModel @Inject constructor(
             appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
             appSettingsPreferencesStore.appLocationPermission = true
             pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
-            viewModelScope.launch(dispatchers.io()) {
+            viewModelScope.launch {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
                 if (permissionEntity == null) {
                     command.postValue(AskDomainPermission(locationPermission.origin))
@@ -1755,7 +1755,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onSiteChanged() {
         httpsUpgraded = false
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
@@ -1858,7 +1858,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onBookmarkMenuClicked() {
         val url = url ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val bookmark = currentBrowserViewState().bookmark
             if (bookmark != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
@@ -1872,7 +1872,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onFavoriteMenuClicked() {
         val url = url ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val favorite = currentBrowserViewState().favorite
             if (favorite != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
@@ -1905,7 +1905,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun removeFavoriteSite(favorite: SavedSite.Favorite) {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             withContext(dispatchers.io()) {
                 savedSitesRepository.delete(favorite)
             }
@@ -1919,7 +1919,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String,
     ) {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
                     faviconManager.persistCachedFavicon(tabId, url)
@@ -1955,19 +1955,19 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onFireproofLoginDialogShown() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             fireproofDialogsEventHandler.onFireproofLoginDialogShown()
         }
     }
 
     fun onUserConfirmedFireproofDialog(domain: String) {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(domain)
         }
     }
 
     fun onUserDismissedFireproofLoginDialog() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             fireproofDialogsEventHandler.onUserDismissedFireproofLoginDialog()
         }
     }
@@ -1998,7 +1998,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onUserDismissedAutomaticFireproofLoginDialog() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             fireproofDialogsEventHandler.onUserDismissedAutomaticFireproofLoginDialog()
         }
     }
@@ -2252,7 +2252,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun initializeViewStates() {
         initializeDefaultViewStates()
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             initializeViewStatesFromPersistedData()
         }
     }
@@ -2376,11 +2376,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBrowserMenuClosed() {
-        Timber.i("favoritesOnboarding onBrowserMenuClosed")
-        if (currentBrowserViewState().addFavorite.isHighlighted()) {
-            browserViewState.value = currentBrowserViewState().copy(
-                addFavorite = HighlightableButton.Visible(highlighted = false),
-            )
+        viewModelScope.launch {
+            Timber.i("favoritesOnboarding onBrowserMenuClosed")
+            if (currentBrowserViewState().addFavorite.isHighlighted()) {
+                browserViewState.value = currentBrowserViewState().copy(
+                    addFavorite = HighlightableButton.Visible(highlighted = false),
+                )
+            }
         }
     }
 
@@ -2398,7 +2400,7 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewState.value = currentCtaViewState().copy(cta = null)
             return
         }
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             if (survey != null) {
                 refreshCta()
                 surveyNotificationScheduler.scheduleSurveyAvailableNotification(survey)
@@ -2428,28 +2430,23 @@ class BrowserTabViewModel @Inject constructor(
                 )
             }
             if (isBrowserShowing && cta != null) hasCtaBeenShownForCurrentPage.set(true)
-            withContext(dispatchers.main()) {
-                ctaViewState.value = currentCtaViewState().copy(cta = cta)
-            }
+            ctaViewState.value = currentCtaViewState().copy(cta = cta)
             ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
         }
         return null
     }
 
-    private suspend fun showOrHideKeyboard(cta: Cta?) = withContext(dispatchers.main()) {
+    private fun showOrHideKeyboard(cta: Cta?) {
         command.value =
             if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
-        // let calling suspend fun(s) to set dispatchers
         viewModelScope.launch {
             val cta = ctaViewState.value?.cta ?: return@launch
             ctaViewModel.registerDaxBubbleCtaDismissed(cta)
-            withContext(dispatchers.main()) {
-                ctaViewState.value = currentCtaViewState().copy(cta = null)
-            }
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
     }
 
@@ -2472,14 +2469,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onMessageShown() {
         val message = currentCtaViewState().message ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             remoteMessagingModel.get().onMessageShown(message)
         }
     }
 
     fun onMessageCloseButtonClicked() {
         val message = currentCtaViewState().message ?: return
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             remoteMessagingModel.get().onMessageDismissed(message)
             refreshCta()
         }
@@ -2527,7 +2524,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onUserDismissedCta() {
         val cta = currentCtaViewState().cta ?: return
-        // let calling suspend fun(s) to set the context
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
             when (cta) {
@@ -2903,7 +2899,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onShowUserCredentialsSaved(it: LoginCredentials) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.main()) {
             command.value = ShowUserCredentialSavedOrUpdatedConfirmation(
                 credentials = it,
                 includeShortcutToViewCredential = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
