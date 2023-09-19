@@ -87,7 +87,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             }
         }
 
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
         }
     }

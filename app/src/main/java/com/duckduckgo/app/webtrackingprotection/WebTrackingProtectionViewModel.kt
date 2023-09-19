@@ -19,7 +19,6 @@ package com.duckduckgo.app.webtrackingprotection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -40,7 +39,6 @@ class WebTrackingProtectionViewModel @Inject constructor(
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     data class ViewState(
@@ -57,7 +55,7 @@ class WebTrackingProtectionViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 ViewState(
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
@@ -71,16 +69,16 @@ class WebTrackingProtectionViewModel @Inject constructor(
     }
 
     fun onLearnMoreSelected() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchLearnMoreWebPage()) }
+        viewModelScope.launch { command.send(Command.LaunchLearnMoreWebPage()) }
     }
 
     fun onGlobalPrivacyControlClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchGlobalPrivacyControl) }
+        viewModelScope.launch { command.send(Command.LaunchGlobalPrivacyControl) }
         pixel.fire(AppPixelName.SETTINGS_GPC_PRESSED)
     }
 
     fun onManageAllowListSelected() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAllowList) }
+        viewModelScope.launch { command.send(Command.LaunchAllowList) }
         pixel.fire(AppPixelName.SETTINGS_MANAGE_ALLOWLIST)
     }
 

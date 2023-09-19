@@ -53,7 +53,7 @@ class NotifyMeViewModelTest {
     private val mockLifecycleOwner = mock<LifecycleOwner>()
 
     private val testee: NotifyMeViewModel by lazy {
-        NotifyMeViewModel(mockAppBuildConfig, mockNotifyMeDataStore, coroutineRule.testDispatcherProvider)
+        NotifyMeViewModel(mockAppBuildConfig, mockNotifyMeDataStore)
     }
 
     @Before

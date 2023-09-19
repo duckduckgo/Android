@@ -143,14 +143,14 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(
 
     private fun onKeepUsingAutofill() {
         Timber.i("User selected to keep using autofill; will not prompt to disable again")
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             declineCounter.disableDeclineCounter()
         }
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_KEEP_USING)
     }
 
     private fun onDisableAutofill(viewModel: BrowserTabViewModel) {
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             autofillStore.autofillEnabled = false
             declineCounter.disableDeclineCounter()
             refreshCurrentWebPageToDisableAutofill(viewModel)

@@ -42,7 +42,6 @@ import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapte
 import com.facebook.shimmer.ShimmerFrameLayout
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -146,7 +145,6 @@ class NetpAppExclusionListActivity :
         lifecycleScope.launch {
             viewModel.getApps()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .flowOn(dispatcherProvider.io())
                 .collect { renderViewState(it) }
         }
         viewModel.commands()
@@ -218,7 +216,7 @@ class NetpAppExclusionListActivity :
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
         }
     }

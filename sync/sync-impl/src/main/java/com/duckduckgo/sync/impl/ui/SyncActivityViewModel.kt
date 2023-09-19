@@ -138,7 +138,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onToggleClicked(isChecked: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             viewState.value = viewState.value.toggle(isChecked)
             when (isChecked) {
                 true -> command.send(LaunchDeviceSetupFlow)
@@ -188,7 +188,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onDeleteAccountClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             viewState.value = viewState.value.toggle(false)
             command.send(AskDeleteAccount)
         }
@@ -214,7 +214,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onSaveRecoveryCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(CheckIfUserHasStoragePermission)
         }
     }
@@ -228,13 +228,13 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onEditDeviceClicked(device: ConnectedDevice) {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(AskEditDevice(device))
         }
     }
 
     fun onRemoveDeviceClicked(device: ConnectedDevice) {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(AskRemoveDevice(device))
         }
     }
@@ -268,19 +268,19 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onDeviceConnected() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             fetchRemoteDevices()
         }
     }
 
     fun onScanQRCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(Command.ScanQRCode)
         }
     }
 
     fun onShowTextCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(Command.ShowTextCode)
         }
     }

@@ -109,7 +109,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     }
 
     fun onNextClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(Finish)
         }
     }
@@ -123,7 +123,7 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     }
 
     fun onSaveRecoveryCodeClicked() {
-        viewModelScope.launch(dispatchers.io()) {
+        viewModelScope.launch {
             command.send(CheckIfUserHasStoragePermission)
         }
     }

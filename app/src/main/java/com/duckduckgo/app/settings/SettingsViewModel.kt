@@ -180,7 +180,7 @@ class SettingsViewModel @Inject constructor(
     internal fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
 
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
                     isAppDefaultBrowser = defaultBrowserAlready,
@@ -234,12 +234,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToAddHomeScreenWidget() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAddHomeScreenWidget) }
+        viewModelScope.launch { command.send(Command.LaunchAddHomeScreenWidget) }
     }
 
     fun onDefaultBrowserSettingClicked() {
         val defaultBrowserSelected = defaultWebBrowserCapability.isDefaultBrowser()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             viewState.emit(currentViewState().copy(isAppDefaultBrowser = defaultBrowserSelected))
             command.send(Command.LaunchDefaultBrowser)
         }
@@ -247,37 +247,37 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onPrivateSearchSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchPrivateSearchWebPage) }
+        viewModelScope.launch { command.send(Command.LaunchPrivateSearchWebPage) }
         pixel.fire(SETTINGS_PRIVATE_SEARCH_PRESSED)
     }
 
     fun onWebTrackingProtectionSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchWebTrackingProtectionScreen) }
+        viewModelScope.launch { command.send(Command.LaunchWebTrackingProtectionScreen) }
         pixel.fire(SETTINGS_WEB_TRACKING_PROTECTION_PRESSED)
     }
 
     fun onCookiePopupProtectionSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchCookiePopupProtectionScreen) }
+        viewModelScope.launch { command.send(Command.LaunchCookiePopupProtectionScreen) }
         pixel.fire(SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED)
     }
 
     fun onAutofillSettingsClick() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAutofillSettings) }
+        viewModelScope.launch { command.send(Command.LaunchAutofillSettings) }
         pixel.fire(SETTINGS_AUTOFILL_MANAGEMENT_OPENED)
     }
 
     fun onAccessibilitySettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAccessibilitySettings) }
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettings) }
         pixel.fire(SETTINGS_ACCESSIBILITY_PRESSED)
     }
 
     fun onAboutSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAboutScreen) }
+        viewModelScope.launch { command.send(Command.LaunchAboutScreen) }
         pixel.fire(SETTINGS_ABOUT_PRESSED)
     }
 
     fun onEmailProtectionSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             val command = if (emailManager.isEmailFeatureSupported()) {
                 Command.LaunchEmailProtection(EMAIL_PROTECTION_URL)
             } else {
@@ -289,19 +289,19 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onMacOsSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchMacOs) }
+        viewModelScope.launch { command.send(Command.LaunchMacOs) }
         pixel.fire(SETTINGS_MAC_APP_PRESSED)
     }
 
     fun windowsSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             command.send(Command.LaunchWindows)
         }
         pixel.fire(SETTINGS_WINDOWS_APP_PRESSED)
     }
 
     fun onAppTPSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             if (appTrackingProtection.isOnboarded()) {
                 command.send(Command.LaunchAppTPTrackersScreen)
             } else {
@@ -312,7 +312,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onNetPSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             val screen = networkProtectionWaitlist.getScreenForCurrentState()
             command.send(Command.LaunchNetPWaitlist(screen))
             pixel.fire(SETTINGS_NETP_PRESSED)
@@ -324,22 +324,22 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onSyncSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchSyncSettings) }
+        viewModelScope.launch { command.send(Command.LaunchSyncSettings) }
         pixel.fire(SETTINGS_SYNC_PRESSED)
     }
 
     fun onFireButtonSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchFireButtonScreen) }
+        viewModelScope.launch { command.send(Command.LaunchFireButtonScreen) }
         pixel.fire(SETTINGS_FIRE_BUTTON_PRESSED)
     }
 
     fun onPermissionsSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchPermissionsScreen) }
+        viewModelScope.launch { command.send(Command.LaunchPermissionsScreen) }
         pixel.fire(SETTINGS_PERMISSIONS_PRESSED)
     }
 
     fun onAppearanceSettingClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) { command.send(Command.LaunchAppearanceScreen) }
+        viewModelScope.launch { command.send(Command.LaunchAppearanceScreen) }
         pixel.fire(SETTINGS_APPEARANCE_PRESSED)
     }
 

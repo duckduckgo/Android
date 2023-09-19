@@ -42,7 +42,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
@@ -63,7 +62,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val defaultTimeWindow = TimeWindow(5, DAYS)
 
     private fun MutableStateFlow<Long>.refresh() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             emit(System.currentTimeMillis())
         }
     }
@@ -87,8 +86,8 @@ class ManageAppsProtectionViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    internal suspend fun getProtectedApps(): Flow<ViewState> = withContext(dispatcherProvider.io()) {
-        return@withContext excludedApps.getAppsAndProtectionInfo()
+    internal suspend fun getProtectedApps(): Flow<ViewState> {
+        return excludedApps.getAppsAndProtectionInfo()
             .combine(filterState.asStateFlow()) { list, filter ->
                 val protectedApps = list.filter { !it.isExcluded }.map { AppInfoType(it) }
                 val unprotectedApps = list.filter { it.isExcluded }.map { AppInfoType(it) }
@@ -125,8 +124,8 @@ class ManageAppsProtectionViewModel @Inject constructor(
             }
     }
 
-    internal suspend fun getRecentApps() = withContext(dispatcherProvider.io()) {
-        return@withContext appTrackersRepository.getMostRecentVpnTrackers { defaultTimeWindow.asString() }.map { aggregateDataPerApp(it) }
+    internal suspend fun getRecentApps() =
+        appTrackersRepository.getMostRecentVpnTrackers { defaultTimeWindow.asString() }.map { aggregateDataPerApp(it) }
             .combine(excludedApps.getAppsAndProtectionInfo()) { recentAppsBlocked, protectedApps ->
                 recentAppsBlocked.map {
                     protectedApps.firstOrNull { protectedApp -> protectedApp.packageName == it.packageId }
@@ -137,7 +136,6 @@ class ManageAppsProtectionViewModel @Inject constructor(
             }.map { ViewState(it) }
             .onStart { pixel.didShowExclusionListActivity() }
             .flowOn(dispatcherProvider.io())
-    }
 
     private suspend fun aggregateDataPerApp(
         trackerData: List<VpnTrackerWithEntity>,
@@ -165,7 +163,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         report: Boolean,
     ) {
         pixel.didDisableAppProtectionFromApps()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             excludedApps.manuallyExcludeApp(packageName)
             pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
@@ -184,14 +182,14 @@ class ManageAppsProtectionViewModel @Inject constructor(
         packageName: String,
     ) {
         pixel.didEnableAppProtectionFromApps()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
         }
     }
 
     fun restoreProtectedApps() {
         pixel.restoreDefaultProtectionList()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             excludedApps.restoreDefaultProtectedList()
             // as product wanted to restart VPN as soon as we restored protections, we need to refresh the snapshot here
             refreshSnapshot.refresh()
@@ -215,7 +213,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun canRestoreDefaults() = currentManualProtections.isNotEmpty()
 
     fun applyAppsFilter(value: AppsFilter) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             filterState.emit(value)
         }
     }
@@ -229,7 +227,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     private fun onLeavingScreen() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             if (userMadeChanges()) {
                 command.send(Command.RestartVpn)
             }
@@ -241,7 +239,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         position: Int,
         enabled: Boolean,
     ) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             if (enabled) {
                 checkForAppProtectionEnabled(excludedAppInfo, position)
             } else {
@@ -271,7 +269,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     fun launchFeedback() {
         pixel.launchAppTPFeedback()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             command.send(
                 Command.LaunchFeedback(
                     ReportBreakageScreen.ListOfInstalledApps("apptp", breakageCategories),
@@ -282,7 +280,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     fun launchManageAppsProtection() {
         pixel.didOpenExclusionListActivityFromManageAppsProtectionScreen()
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             command.send(Command.LaunchAllAppsProtection)
         }
     }

@@ -19,7 +19,6 @@ package com.duckduckgo.networkprotection.impl.waitlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import javax.inject.Inject
@@ -35,7 +34,6 @@ import kotlinx.coroutines.launch
 class NetPWaitlistViewModel @Inject constructor(
     waitlistManager: NetPWaitlistManager,
     private val netPWaitlistManager: NetPWaitlistManager,
-    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     val viewState: Flow<ViewState> = waitlistManager.getState().map { ViewState(it) }.distinctUntilChanged()
@@ -50,7 +48,7 @@ class NetPWaitlistViewModel @Inject constructor(
     data class ViewState(val waitlist: NetPWaitlistState)
 
     fun onJoinWaitlistClicked() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             netPWaitlistManager.joinWaitlist()
         }
     }

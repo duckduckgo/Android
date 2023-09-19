@@ -46,7 +46,7 @@ class MacOsViewModelTest {
 
     @Before
     fun before() {
-        testee = MacOsViewModel(mockPixel, coroutineRule.testDispatcherProvider)
+        testee = MacOsViewModel(mockPixel)
     }
 
     @Test
