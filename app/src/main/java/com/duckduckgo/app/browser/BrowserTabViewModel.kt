@@ -2877,7 +2877,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onReceivedError(errorType: WebViewErrorResponse) {
-        browserViewState.value = currentBrowserViewState().copy(browserError = errorType)
+        browserViewState.value =
+            currentBrowserViewState().copy(browserError = errorType, showPrivacyShield = false, showDaxIcon = false, showSearchIcon = false)
         command.postValue(WebViewError(errorType))
     }
 
