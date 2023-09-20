@@ -30,12 +30,16 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.util.Locale
 
 @InjectWith(FragmentScope::class)
 class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_connected) {
@@ -77,15 +81,25 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
     private fun processCommand(it: Command) {
         when (it) {
             FinishSetupFlow -> listener?.launchFinishSetupFlow()
+            Command.Error -> {}
         }
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.connectedDeviceItem.setPrimaryText(viewState.deviceName)
-        binding.connectedDeviceItem.setLeadingIconDrawable(ContextCompat.getDrawable(requireContext(), viewState.deviceType)!!)
-        binding.footerPrimaryButton.setOnClickListener {
-            viewModel.onNextClicked()
+        when (viewState.viewMode) {
+            is CreatingAccount -> {
+
+            }
+
+            is SignedIn -> {
+                binding.contentBody.text = String.format(Locale.US, getString(R.string.sync_connected_device_hint), viewState.viewMode.deviceName)
+                binding.footerPrimaryButton.setOnClickListener {
+                    viewModel.onNextClicked()
+                }
+            }
+
         }
+
     }
 
     companion object {

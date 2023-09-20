@@ -25,8 +25,10 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -50,6 +52,7 @@ class SetupAccountViewModel @Inject constructor(
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         if (!initialStateProcessed) {
             val viewMode = when (screen) {
+                SYNC_SETUP -> CreateAccount
                 DEVICE_SYNCED -> DeviceSynced
                 RECOVERY_CODE -> AskSaveRecoveryCode
             }
@@ -65,6 +68,7 @@ class SetupAccountViewModel @Inject constructor(
     )
 
     sealed class ViewMode {
+        object CreateAccount: ViewMode()
         object AskSaveRecoveryCode: ViewMode()
         object DeviceSynced : ViewMode()
     }
