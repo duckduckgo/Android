@@ -62,5 +62,4 @@ class SyncCreateAccountViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
 }

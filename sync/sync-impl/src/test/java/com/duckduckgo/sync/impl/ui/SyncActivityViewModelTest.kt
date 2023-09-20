@@ -38,7 +38,6 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -417,8 +416,6 @@ class SyncActivityViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-
 
     @Test
     fun whenOnShowTextCodeClickedThenEmitCommandShowTextCode() = runTest {

@@ -103,7 +103,6 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
-
             AskSaveRecoveryCode -> {
                 screen = RECOVERY_CODE
                 supportFragmentManager.commitNow {

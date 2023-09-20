@@ -153,7 +153,7 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onInitializeSync(){
+    fun onInitializeSync() {
         viewModelScope.launch {
             viewState.value = viewState.value.toggle(true)
             command.send(CreateAccount)
