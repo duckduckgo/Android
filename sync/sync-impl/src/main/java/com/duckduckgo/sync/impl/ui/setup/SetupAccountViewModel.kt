@@ -68,8 +68,8 @@ class SetupAccountViewModel @Inject constructor(
     )
 
     sealed class ViewMode {
-        object CreateAccount: ViewMode()
-        object AskSaveRecoveryCode: ViewMode()
+        object CreateAccount : ViewMode()
+        object AskSaveRecoveryCode : ViewMode()
         object DeviceSynced : ViewMode()
     }
 

@@ -28,7 +28,7 @@
     <string name="deviceNameSectionHeader">Device Name</string>
 
     <!-- Sync -->
-    <!-- Setup screen -->
+    <!-- Settings screen -->
     <string name="sync_screen_title">Sync &amp; Backup</string>
     <string name="sync_off_hint">Access bookmarks and logins seamlessly on all your devices.</string>
     <string name="sync_setup_quick_connect_title">Sync with Another Devicee</string>
@@ -43,13 +43,21 @@
     <string name="sync_setup_single_device_secondary_cta_subtitle">Retrieve data with a recovery code</string>
     <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.</string>
 
+    <!-- Setup screen -->
+    <string name="sync_enable_sync_title">Sync is Set Up</string>
+    <string name="sync_enable_sync_content">You can sync this device’s bookmarks and Logins with additional devices at any time from the Sync &amp; Back Up menu in Settings.</string>
+    <string name="sync_enable_options">Sync Options</string>
+    <string name="sync_enable_option_favicons_title">Sync Bookmark Icons</string>
+    <string name="sync_enable_option_favicons_subtitle">Automatically fetch icons for synced bookmarks on your other devices.</string>
+    <string name="sync_enable_option_favorites_title">Sync Favorites</string>
+    <string name="sync_enable_option_favorites_subtitle">Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.</string>
+
+
     <string name="login_screen_title">Recover Data</string>
     <string name="connect_screen_title">Scan QR Code</string>
     <string name="show_qr_screen_title">Show QR Code</string>
     <string name="enter_code_screen_title">Manually Enter Code</string>
     <string name="show_code_screen_title">Code</string>
-    <string name="connected_device_title">Device Synced</string>
-    <string name="sync_toggle_text">Sync</string>
 
     <string name="synced_devices_section_title">Synced Devices</string>
     <string name="sync_new_device_section_title">Sync New Device</string>
@@ -59,15 +67,8 @@
     <string name="sync_save_recovery_code_item">Save Recovery PDF</string>
     <string name="sync_save_recovery_code_item_hint">If you lose your device, you will need this recovery code to restore your synced data.</string>
     <string name="sync_delete_account_item">Turn Off and Delete Server Data…</string>
-    <string name="sync_disable_sync_item">Turn Off Sync…</string>
-    <string name="sync_enable_sync_title">Sync Initialized</string>
-    <string name="sync_enable_sync_content">Your bookmarks and logins are safely backed up. You can add other devices to sync with at any time.</string>
-    <string name="sync_enable_sync_primary_button">Turn On Sync</string>
+    <string name="sync_disable_sync_item">Turn Off Sync &amp; Backup…</string>
     <string name="sync_enable_sync_next_button">Next</string>
-    <string name="sync_another_device_title">Sync Another Device?</string>
-    <string name="sync_another_device_content">Your bookmarks will be backed up! Would you like to sync another device now?\n\nIf you\'ve already set up Sync on another device, this will allow you to combine bookmarks from both devices into a single backup.</string>
-    <string name="sync_another_device_primary_button">Sync Another Device</string>
-    <string name="sync_another_device_secondary_button">Not Now</string>
     <string name="sync_recovery_code_title">Save Recovery PDF?</string>
     <string name="sync_recovery_code_content">If you lose access to your devices, you will need this code to recover your synced data.</string>
     <string name="sync_recovery_code_hint">Anyone with access to this code can access your synced data, so please keep it in a safe place.</string>
@@ -84,10 +85,6 @@
     <string name="turn_off_sync_dialog_content">This Device will no longer be able to access your synced data</string>
     <string name="turn_off_sync_dialog_primary_button">Turn Off</string>
     <string name="turn_off_sync_dialog_secondary_button">Cancel</string>
-    <string name="delete_account_dialog_title">Delete server data?</string>
-    <string name="delete_account_dialog_content">All devices will be disconnected and your synced data will be deleted from the server.</string>
-    <string name="delete_account_dialog_primary_button">Delete Data</string>
-    <string name="delete_account_dialog_secondary_button">Cancel</string>
     <string name="sync_permission_required_store_recovery_code">Save recovery PDF requires storage permission</string>
     <string name="sync_share_title">Share with…</string>
     <string name="sync_pdf_title">Sync Recovery Code</string>

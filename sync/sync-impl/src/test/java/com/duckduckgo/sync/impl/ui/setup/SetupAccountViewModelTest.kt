@@ -93,5 +93,4 @@ class SetupAccountViewModelTest {
             assertTrue(viewState.viewMode is ViewMode.AskSaveRecoveryCode)
         }
     }
-
 }

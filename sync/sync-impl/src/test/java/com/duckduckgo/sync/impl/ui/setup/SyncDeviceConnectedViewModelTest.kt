@@ -16,10 +16,15 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
+import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Rule
+import org.junit.Test
 import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
@@ -35,6 +40,14 @@ class SyncDeviceConnectedViewModelTest {
         coroutineTestRule.testDispatcherProvider,
     )
 
+    @Test
+    fun whenNextClickedThenEmitFinishSetupCommand() = runTest {
+        testee.onNextClicked()
 
-
+        testee.commands().test {
+            val command = awaitItem()
+            Assert.assertTrue(command is FinishSetupFlow)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
