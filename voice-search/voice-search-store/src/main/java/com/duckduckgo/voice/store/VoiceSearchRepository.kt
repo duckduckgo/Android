@@ -16,6 +16,8 @@
 
 package com.duckduckgo.voice.store
 
+import com.duckduckgo.voice.api.VoiceSearchStatusListener
+
 interface VoiceSearchRepository {
     fun declinePermissionForever()
     fun acceptRationaleDialog()
@@ -36,6 +38,7 @@ interface VoiceSearchRepository {
 
 class RealVoiceSearchRepository constructor(
     private val dataStore: VoiceSearchDataStore,
+    private val voiceSearchStatusListener: VoiceSearchStatusListener,
 ) : VoiceSearchRepository {
     override fun declinePermissionForever() {
         dataStore.permissionDeclinedForever = true
@@ -59,6 +62,7 @@ class RealVoiceSearchRepository constructor(
 
     override fun setVoiceSearchUserEnabled(enabled: Boolean) {
         dataStore.isVoiceSearchEnabled = enabled
+        voiceSearchStatusListener.voiceSearchStatusChanged()
     }
 
     override fun declineNoMicAccessDialog() {
