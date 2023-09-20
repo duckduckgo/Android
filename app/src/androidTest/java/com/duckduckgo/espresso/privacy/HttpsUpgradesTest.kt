@@ -52,7 +52,7 @@ class HttpsUpgradesTest {
     var activityScenarioRule = activityScenarioRule<BrowserActivity>(
         BrowserActivity.intent(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            queryExtra = "http://privacy-test-pages.glitch.me/privacy-protections/https-upgrades/",
+            queryExtra = "http://privacy-test-pages.site/privacy-protections/https-upgrades/",
         ),
     )
 

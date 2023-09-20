@@ -5,7 +5,7 @@ tags:
 - launchApp:
     clearState: true
 - runFlow: ../shared/onboarding.yaml
-- inputText: "https://privacy-test-pages.glitch.me/privacy-protections/query-parameters/"
+- inputText: "https://privacy-test-pages.site/privacy-protections/query-parameters/"
 - pressKey: Enter
 - assertVisible:
     text: ".*Got It.*"

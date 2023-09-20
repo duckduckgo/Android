@@ -11,7 +11,7 @@ tags:
 
 - tapOn:
     text: "search or type URL"
-- inputText: "https://privacy-test-pages.glitch.me"
+- inputText: "https://privacy-test-pages.site"
 - tapOn:
     id: "com.google.android.inputmethod.latin:id/key_pos_ime_action"
 - assertVisible:
