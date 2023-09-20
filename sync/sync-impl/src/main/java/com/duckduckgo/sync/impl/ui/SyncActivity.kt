@@ -39,20 +39,23 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.EnterTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
 import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
@@ -93,6 +96,14 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val enterCodeLauncher = registerForActivityResult(
+        EnterCodeContract(),
+    ) { resultOk ->
+        if (resultOk) {
+            viewModel.onLoginSuccess()
+        }
+    }
+
     private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
         if (resultOk) {
             viewModel.onLoginSuccess()
@@ -125,6 +136,14 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun setupClickListeners() {
+        binding.viewSyncDisabled.syncSetupScanQr.setClickListener {
+            viewModel.onScanQRCodeClicked()
+        }
+
+        binding.viewSyncDisabled.syncSetupEnterText.setClickListener {
+            viewModel.onEnterTextCodeClicked()
+        }
+
         binding.viewSyncDisabled.syncSetupInitializeSync.setClickListener {
             viewModel.onInitializeSync()
         }
@@ -133,8 +152,8 @@ class SyncActivity : DuckDuckGoActivity() {
             viewModel.onRecoverYourSyncedData()
         }
 
-        binding.viewSyncDisabled.syncSetupSyncAnotherDevice.setClickListener {
-            viewModel.onSyncAnotherDevice()
+        binding.viewSyncEnabled.disableSyncButton.setClickListener {
+            viewModel.onTurnOffClicked()
         }
 
         binding.viewSyncEnabled.saveRecoveryCodeItem.setOnClickListener {
@@ -151,10 +170,6 @@ class SyncActivity : DuckDuckGoActivity() {
 
         binding.viewSyncEnabled.showTextCodeItem.setOnClickListener {
             viewModel.onShowTextCodeClicked()
-        }
-
-        binding.viewSyncEnabled.disableSyncButton.setClickListener {
-            viewModel.onTurnOffClicked()
         }
     }
 
@@ -176,17 +191,18 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is ScanQRCode -> {
-                connectFlow.launch(null)
-            }
-
+            is ScanQRCode -> connectFlow.launch(null)
+            is EnterTextCode -> enterCodeLauncher.launch(CONNECT_CODE)
+            is CreateAccount -> launcher.launch(SetupAccountActivity.intentSetupFlow(this))
+            is RecoverSyncData -> loginFlow.launch(null)
+            is DeviceConnected -> launcher.launch(SetupAccountActivity.intentDeviceConnectedFlow(this))
             is AskTurnOffSync -> askTurnOffsync(it.device)
-            AskDeleteAccount -> askDeleteAccount()
+            is AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
             }
 
-            CheckIfUserHasStoragePermission -> {
+            is CheckIfUserHasStoragePermission -> {
                 storagePermission.invokeOrRequestPermission {
                     viewModel.generateRecoveryCode(this@SyncActivity)
                 }
@@ -194,14 +210,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
-
-            RecoverSyncData -> loginFlow.launch(null)
-            SyncAnotherDevice -> connectFlow.launch(null)
-            DeviceConnected -> launcher.launch(SetupAccountActivity.intentDeviceConnectedFlow(this))
-
-            ShowTextCode -> {
-                startActivity(ShowCodeActivity.intent(this))
-            }
+            is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
         }
     }
 

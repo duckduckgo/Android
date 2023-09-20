@@ -37,6 +37,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
@@ -127,19 +128,48 @@ class SyncActivityViewModel @Inject constructor(
 
     sealed class Command {
         object ScanQRCode : Command()
-        object ShowTextCode : Command()
+        object EnterTextCode : Command()
+        object CreateAccount : Command()
         object RecoverSyncData : Command()
-
-        object SyncAnotherDevice : Command()
-
+        object ShowTextCode : Command()
         object DeviceConnected : Command()
-
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
+    }
+
+    fun onScanQRCodeClicked() {
+        viewModelScope.launch {
+            command.send(Command.ScanQRCode)
+        }
+    }
+
+    fun onEnterTextCodeClicked() {
+        viewModelScope.launch {
+            command.send(Command.EnterTextCode)
+        }
+    }
+
+    fun onInitializeSync(){
+        viewModelScope.launch {
+            viewState.value = viewState.value.toggle(true)
+            command.send(CreateAccount)
+        }
+    }
+
+    fun onRecoverYourSyncedData() {
+        viewModelScope.launch {
+            command.send(Command.RecoverSyncData)
+        }
+    }
+
+    fun onLoginSuccess() {
+        viewModelScope.launch {
+            command.send(Command.DeviceConnected)
+        }
     }
 
     fun onTurnOffClicked() {
@@ -152,28 +182,9 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onRecoverYourSyncedData() {
+    fun onShowTextCodeClicked() {
         viewModelScope.launch {
-            command.send(Command.RecoverSyncData)
-        }
-    }
-
-    fun onSyncAnotherDevice() {
-        viewModelScope.launch {
-            command.send(Command.SyncAnotherDevice)
-        }
-    }
-
-    fun onInitializeSync(){
-        viewModelScope.launch {
-            viewState.value = viewState.value.toggle(true)
-            command.send(DeviceConnected)
-        }
-    }
-
-    fun onLoginSuccess() {
-        viewModelScope.launch {
-            command.send(Command.DeviceConnected)
+            command.send(Command.ShowTextCode)
         }
     }
 
@@ -296,18 +307,6 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeviceConnected() {
         viewModelScope.launch {
             fetchRemoteDevices()
-        }
-    }
-
-    fun onScanQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(Command.ScanQRCode)
-        }
-    }
-
-    fun onShowTextCodeClicked() {
-        viewModelScope.launch {
-            command.send(Command.ShowTextCode)
         }
     }
 

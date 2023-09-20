@@ -36,20 +36,20 @@
         app:primaryText="@string/sync_setup_quick_connect_title"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_sync_another_device"
+        android:id="@+id/sync_setup_scan_qr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_device_double_24"
+        app:leadingIcon="@drawable/ic_sync_device_all_24"
         app:primaryText="@string/sync_setup_quick_primary_cta_title"
         app:secondaryText="@string/sync_setup_quick_primary_cta_subtitle"/>
 
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/sync_setup_recover_data"
+        android:id="@+id/sync_setup_enter_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:leadingIconBackground="circular"
-        app:leadingIcon="@drawable/ic_document_replace_24"
+        app:leadingIcon="@drawable/ic_keyboard_24"
         app:primaryText="@string/sync_setup_quick_secondary_cta_title"
         app:secondaryText="@string/sync_setup_quick_secondary_cta_subtitle"/>
 
@@ -70,6 +70,15 @@
         app:leadingIcon="@drawable/ic_start_stop_24"
         app:primaryText="@string/sync_setup_single_device_primary_cta_title"
         app:secondaryText="@string/sync_setup_single_device_primary_cta_subtitle"/>
+
+    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        android:id="@+id/sync_setup_recover_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIconBackground="circular"
+        app:leadingIcon="@drawable/ic_document_replace_24"
+        app:primaryText="@string/sync_setup_single_device_secondary_cta_title"
+        app:secondaryText="@string/sync_setup_single_device_secondary_cta_subtitle"/>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:layout_width="match_parent"

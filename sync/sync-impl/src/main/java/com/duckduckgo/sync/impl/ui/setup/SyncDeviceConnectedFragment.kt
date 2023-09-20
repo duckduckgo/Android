@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -25,18 +26,20 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.app.global.extensions.applyBoldSpanTo
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentDeviceConnectedBinding
+import com.duckduckgo.sync.impl.ui.setup.SaveRecoveryCodeViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.ViewState
-import java.util.Locale
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.util.Locale
 
 @InjectWith(FragmentScope::class)
 class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_connected) {
@@ -83,11 +86,20 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
     }
 
     private fun renderViewState(viewState: ViewState) {
-        val deviceName = String.format(Locale.US, getString(R.string.sync_connected_device_hint), viewState.deviceName)
-        binding.contentBody.text = deviceName.applyBoldSpanTo(viewState.deviceName)
-        binding.footerPrimaryButton.setOnClickListener {
-            viewModel.onNextClicked()
+        when (viewState.viewMode) {
+            is CreatingAccount -> {
+
+            }
+
+            is SignedIn -> {
+                binding.contentBody.text = String.format(Locale.US, getString(R.string.sync_connected_device_hint), viewState.viewMode.deviceName)
+                binding.footerPrimaryButton.setOnClickListener {
+                    viewModel.onNextClicked()
+                }
+            }
+
         }
+
     }
 
     companion object {
