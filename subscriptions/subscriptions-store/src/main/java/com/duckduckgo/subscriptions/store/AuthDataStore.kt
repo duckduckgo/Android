@@ -20,7 +20,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 interface AuthDataStore {
-    var token: String?
+    var accessToken: String?
+    var authToken: String?
     fun canUseEncryption(): Boolean
 }
 
@@ -35,14 +36,26 @@ class AuthEncryptedDataStore(
         return sharedPrefsProv.getSharedPrefs(FILENAME)
     }
 
-    override var token: String?
-        get() = encryptedPreferences?.getString(KEY_TOKEN, null)
+    override var accessToken: String?
+        get() = encryptedPreferences?.getString(KEY_ACCESS_TOKEN, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
                 if (value == null) {
-                    remove(KEY_TOKEN)
+                    remove(KEY_ACCESS_TOKEN)
                 } else {
-                    putString(KEY_TOKEN, value)
+                    putString(KEY_ACCESS_TOKEN, value)
+                }
+            }
+        }
+
+    override var authToken: String?
+        get() = encryptedPreferences?.getString(KEY_AUTH_TOKEN, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) {
+                    remove(KEY_AUTH_TOKEN)
+                } else {
+                    putString(KEY_AUTH_TOKEN, value)
                 }
             }
         }
@@ -51,6 +64,7 @@ class AuthEncryptedDataStore(
 
     companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.store"
-        const val KEY_TOKEN = "KEY_TOKEN"
+        const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
+        const val KEY_AUTH_TOKEN = "KEY_AUTH_TOKEN"
     }
 }

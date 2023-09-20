@@ -18,70 +18,33 @@ package com.duckduckgo.subscriptions.impl.repository
 
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
-import com.android.billingclient.api.PurchaseHistoryRecord
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.BASIC_SUBSCRIPTION
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 interface SubscriptionsRepository {
-    val hasSubscription: Flow<Boolean>
-    val subscriptionDetails: Flow<ProductDetails>
-    val offerDetails: StateFlow<Map<String, SubscriptionOfferDetails>>
-    val lastPurchaseHistoryRecord: StateFlow<PurchaseHistoryRecord?>
+    suspend fun subscriptionDetails(): ProductDetails?
+    suspend fun offerDetail(): Map<String, SubscriptionOfferDetails>
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealSubscriptionsRepository @Inject constructor(
-    billingClientWrapper: BillingClientWrapper,
-    dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val billingClientWrapper: BillingClientWrapper,
 ) : SubscriptionsRepository {
 
-    private val _offerDetails = MutableStateFlow<Map<String, SubscriptionOfferDetails>>(emptyMap())
-    override val offerDetails = _offerDetails.asStateFlow()
-
-    private val _lastPurchaseHistoryRecord = MutableStateFlow<PurchaseHistoryRecord?>(null)
-    override val lastPurchaseHistoryRecord = _lastPurchaseHistoryRecord.asStateFlow()
-
-    override val hasSubscription: Flow<Boolean> = billingClientWrapper.purchases.map { purchaseList ->
-        purchaseList.any { purchase ->
-            purchase.products.contains(BASIC_SUBSCRIPTION)
+    override suspend fun subscriptionDetails(): ProductDetails? {
+        return if (billingClientWrapper.products.containsKey(BASIC_SUBSCRIPTION)) {
+            billingClientWrapper.products[BASIC_SUBSCRIPTION]
+        } else {
+            null
         }
     }
 
-    override val subscriptionDetails: Flow<ProductDetails> =
-        billingClientWrapper.products.filter {
-            it.containsKey(
-                BASIC_SUBSCRIPTION,
-            )
-        }.map { it[BASIC_SUBSCRIPTION]!! }
-
-    init {
-        coroutineScope.launch(dispatchers.io()) {
-            subscriptionDetails.collect { productDetails ->
-                val offersMap = productDetails.subscriptionOfferDetails?.associateBy { it.basePlanId }.orEmpty()
-                _offerDetails.emit(offersMap)
-            }
-        }
-        coroutineScope.launch(dispatchers.io()) {
-            billingClientWrapper.purchaseHistory.collect { purchasesList ->
-                val lastPurchase = purchasesList.maxByOrNull { it.purchaseTime }
-                _lastPurchaseHistoryRecord.emit(lastPurchase)
-            }
-        }
+    override suspend fun offerDetail(): Map<String, SubscriptionOfferDetails> {
+        return subscriptionDetails()?.subscriptionOfferDetails?.associateBy { it.basePlanId }.orEmpty()
     }
 }

@@ -157,73 +157,6 @@
                     app:layout_constraintStart_toEndOf="@id/plan2"
                     app:layout_constraintTop_toBottomOf="@+id/plan1"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                    android:id="@+id/plan3"
-                    app:typography="body1"
-                    app:textType="secondary"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:textAlignment="textStart"
-                    android:text="Renews each month (only available in the UK)"
-                    android:breakStrategy="balanced"
-                    app:layout_constraintWidth_default="wrap"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/buyButtonPlan3"
-                    app:layout_constraintTop_toTopOf="@id/buyButtonPlan3"
-                    app:layout_constraintBottom_toBottomOf="@id/buyButtonPlan3"
-            />
-
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                    android:id="@+id/buyButtonPlan3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginTop="20dp"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    android:text="N/A"
-                    app:buttonSize="small"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/plan3"
-                    app:layout_constraintTop_toBottomOf="@+id/plan2"/>
-
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                    android:id="@+id/plan4"
-                    app:typography="body1"
-                    app:textType="secondary"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:textAlignment="textStart"
-                    android:text="Renews each month (only available in US and Netherlands)"
-                    android:breakStrategy="balanced"
-                    app:layout_constraintWidth_default="wrap"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/buyButtonPlan4"
-                    app:layout_constraintTop_toTopOf="@id/buyButtonPlan4"
-                    app:layout_constraintBottom_toBottomOf="@id/buyButtonPlan4"
-            />
-
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-                    android:id="@+id/buyButtonPlan4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginTop="20dp"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    android:text="N/A"
-                    app:buttonSize="small"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/plan4"
-                    app:layout_constraintTop_toBottomOf="@+id/plan3"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/purchaseDetails"
@@ -238,17 +171,29 @@
                     android:text="You are not subscribed yet"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/buyButtonPlan4"/>
+                    app:layout_constraintTop_toBottomOf="@+id/buyButtonPlan2"/>
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
-                    android:id="@+id/resetAccountButton"
+                    android:id="@+id/addDevices"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:buttonSize="small"
-                    app:layout_constraintTop_toBottomOf="@id/purchaseDetails"
+                    app:layout_constraintBottom_toTopOf="@id/manageAccountButton"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:text="Reset Account"/>
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:text="Add Devices"/>
+
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+                    android:id="@+id/manageAccountButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonSize="small"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:text="Manage Account"/>
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
                 android:id="@+id/recoverSubscriptionButton"
