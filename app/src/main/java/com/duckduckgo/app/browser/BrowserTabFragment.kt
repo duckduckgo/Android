@@ -968,7 +968,7 @@ class BrowserTabFragment :
         omnibar.shieldIcon.isInvisible = true
         webView?.onPause()
         webView?.hide()
-        errorView.errorMessage.text = getString(errorType.errorId, url)
+        errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
         if (appTheme.isLightModeEnabled()) {
             errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
         } else {
