@@ -21,8 +21,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_LOCALE_CHANGED
 import dagger.android.AndroidInjection
-import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
+import org.jetbrains.annotations.VisibleForTesting
 
 class VoiceSearchWidgetUpdaterReceiver : BroadcastReceiver() {
 
