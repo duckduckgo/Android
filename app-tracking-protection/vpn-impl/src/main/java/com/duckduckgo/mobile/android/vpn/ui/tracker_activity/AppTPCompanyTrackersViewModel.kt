@@ -150,25 +150,23 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
         packageName: String,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            withContext(dispatchers.io()) {
-                if (checked) {
-                    deviceShieldPixels.didEnableAppProtectionFromDetail()
-                    excludedAppsRepository.manuallyEnabledApp(packageName)
-                } else {
-                    deviceShieldPixels.didDisableAppProtectionFromDetail()
-                    excludedAppsRepository.manuallyExcludeApp(packageName)
-                }
-                command.send(Command.RestartVpn)
-                val protectionState = excludedAppsRepository.getAppProtectionStatus(packageName)
-
-                viewStateFlow.emit(
-                    viewStateFlow.value.copy(
-                        toggleChecked = protectionState == PROTECTED,
-                        bannerState = protectionState.getBannerState(),
-                        toggleEnabled = protectionState != UNPROTECTED_THROUGH_NETP,
-                    ),
-                )
+            if (checked) {
+                deviceShieldPixels.didEnableAppProtectionFromDetail()
+                excludedAppsRepository.manuallyEnabledApp(packageName)
+            } else {
+                deviceShieldPixels.didDisableAppProtectionFromDetail()
+                excludedAppsRepository.manuallyExcludeApp(packageName)
             }
+            command.send(Command.RestartVpn)
+            val protectionState = excludedAppsRepository.getAppProtectionStatus(packageName)
+
+            viewStateFlow.emit(
+                viewStateFlow.value.copy(
+                    toggleChecked = protectionState == PROTECTED,
+                    bannerState = protectionState.getBannerState(),
+                    toggleEnabled = protectionState != UNPROTECTED_THROUGH_NETP,
+                ),
+            )
         }
     }
 

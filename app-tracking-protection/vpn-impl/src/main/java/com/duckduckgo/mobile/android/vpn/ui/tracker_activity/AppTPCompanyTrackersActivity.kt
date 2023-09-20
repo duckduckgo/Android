@@ -185,7 +185,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         )
         binding.includeToolbar.appTrackedAgo.text = viewState.lastTrackerBlockedAgo
 
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             itemsAdapter.updateData(viewState.trackingCompanies)
         }
 
