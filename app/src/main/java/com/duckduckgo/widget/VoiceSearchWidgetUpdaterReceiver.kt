@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_LOCALE_CHANGED
 import dagger.android.AndroidInjection
+import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
 
 class VoiceSearchWidgetUpdaterReceiver : BroadcastReceiver() {
@@ -32,6 +33,11 @@ class VoiceSearchWidgetUpdaterReceiver : BroadcastReceiver() {
         intent: Intent,
     ) {
         AndroidInjection.inject(this, context)
+        processIntent(context, intent)
+    }
+
+    @VisibleForTesting
+    fun processIntent(context: Context, intent: Intent) {
         if (intent.action == ACTION_LOCALE_CHANGED) {
             widgetUpdater.updateWidgets(context)
         }
