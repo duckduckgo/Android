@@ -2925,6 +2925,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun voiceSearchDisabled() {
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url ?: ""),
+        )
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 

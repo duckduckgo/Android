@@ -33,6 +33,7 @@ import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -91,6 +92,8 @@ class SystemSearchViewModel @Inject constructor(
         data class ShowAppNotFoundMessage(val appName: String) : Command()
         object DismissKeyboard : Command()
         data class EditQuery(val query: String) : Command()
+
+        object UpdateVoiceSearch : Command()
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
@@ -345,5 +348,9 @@ class SystemSearchViewModel @Inject constructor(
             }
             else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
         }
+    }
+
+    fun voiceSearchDisabled() {
+        command.value = UpdateVoiceSearch
     }
 }
