@@ -52,7 +52,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
-        Timber.d("Sync-Feature: generating changes since $since")
+        Timber.d("Sync-Bookmarks: generating changes since $since")
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         // we start adding individual folders that have been modified
@@ -83,12 +83,12 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     @VisibleForTesting
     fun allContent(): List<SyncBookmarkEntry> {
-        Timber.d("Sync-Feature: generating all content")
+        Timber.d("Sync-Bookmarks: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
 
         if (!hasFavorites && !hasBookmarks) {
-            Timber.d("Sync-Feature: nothing to generate, favourites and bookmarks empty")
+            Timber.d("Sync-Bookmarks: nothing to generate, favourites and bookmarks empty")
             return emptyList()
         }
 

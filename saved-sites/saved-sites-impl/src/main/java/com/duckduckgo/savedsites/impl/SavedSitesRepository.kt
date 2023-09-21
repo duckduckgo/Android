@@ -363,7 +363,6 @@ class RealSavedSitesRepository(
     }
 
     override fun insert(savedSite: SavedSite): SavedSite {
-        Timber.d("Sync-Feature: inserting Saved Site $savedSite")
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {
@@ -524,7 +523,7 @@ class RealSavedSitesRepository(
         if (storedBookmark != null) {
             if (storedBookmark.parentId != bookmark.parentId) {
                 // bookmark has moved to another folder
-                Timber.d("Sync-Feature: ${bookmark.id} has moved from folder ${storedBookmark.parentId} to ${bookmark.parentId}")
+                Timber.d("Sync-Bookmarks: ${bookmark.id} has moved from folder ${storedBookmark.parentId} to ${bookmark.parentId}")
                 savedSitesRelationsDao.deleteRelationByEntityAndFolder(bookmark.id, storedBookmark.parentId)
                 savedSitesRelationsDao.insert(Relation(folderId = bookmark.parentId, entityId = bookmark.id))
             }
@@ -630,7 +629,7 @@ class RealSavedSitesRepository(
 
     override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
         val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedSince(since) }
-        Timber.d("Sync-Feature: folders modified since $since are $folders")
+        Timber.d("Sync-Bookmarks: folders modified since $since are $folders")
         return folders.map { mapBookmarkFolder(it) }
     }
 
@@ -652,12 +651,12 @@ class RealSavedSitesRepository(
 
     override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
         val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedSince(since) }
-        Timber.d("Sync-Feature: bookmarks modified since $since are $bookmarks")
+        Timber.d("Sync-Bookmarks: bookmarks modified since $since are $bookmarks")
         return bookmarks.map { mapToBookmark(it)!! }
     }
 
     override fun pruneDeleted() {
-        Timber.d("Sync-Feature: pruning soft deleted entities")
+        Timber.d("Sync-Bookmarks: pruning soft deleted entities")
         savedSitesEntitiesDao.allDeleted().forEach {
             savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
             savedSitesEntitiesDao.deletePermanently(it)
@@ -668,7 +667,7 @@ class RealSavedSitesRepository(
         originalDate: String,
         modifiedSince: String,
     ) {
-        Timber.d("Sync-Feature: updating entities modified before $originalDate to $modifiedSince")
+        Timber.d("Sync-Bookmarks: updating entities modified before $originalDate to $modifiedSince")
         val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filterNot { it.modifiedSince(originalDate) }
         bookmarks.forEach { bookmark ->
             savedSitesEntitiesDao.updateModified(bookmark.entityId, modifiedSince)

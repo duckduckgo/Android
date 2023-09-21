@@ -46,12 +46,12 @@ class SavedSitesSyncPersister @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         return if (changes.type == BOOKMARKS) {
-            Timber.d("Sync-Feature: received remote changes, merging with resolution $conflictResolution")
+            Timber.d("Sync-Bookmarks: received remote changes $changes, merging with resolution $conflictResolution")
             val result = process(changes, conflictResolution)
-            Timber.d("Sync-Feature: merging bookmarks finished with $result")
+            Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
             result
         } else {
-            Timber.d("Sync-Feature: no bookmarks to merge")
+            Timber.d("Sync-Bookmarks: no bookmarks to merge")
             Success(false)
         }
     }
@@ -69,7 +69,7 @@ class SavedSitesSyncPersister @Inject constructor(
         val result = when (val validation = validateChanges(changes)) {
             is SyncDataValidationResult.Error -> SyncMergeResult.Error(reason = validation.reason)
             is SyncDataValidationResult.Success -> processEntries(validation.data, conflictResolution)
-            else -> SyncMergeResult.Error(reason = "Something went wrong")
+            else -> Success(false)
         }
 
         if (result is Success) {
@@ -85,8 +85,13 @@ class SavedSitesSyncPersister @Inject constructor(
     }
 
     private fun validateChanges(changes: SyncChangesResponse): SyncDataValidationResult<SyncBookmarkEntries> {
+        if (changes.isEmpty()) {
+            Timber.d("Sync-Bookmarks: JSON doesn't have changes, nothing to store")
+            return SyncDataValidationResult.NoChanges
+        }
+
         val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString)!! }.getOrElse {
-            return SyncDataValidationResult.Error(reason = "Sync-Feature: JSON format incorrect, exception: $it")
+            return SyncDataValidationResult.Error(reason = "Sync-Bookmarks: JSON format incorrect, exception: $it")
         }
 
         return SyncDataValidationResult.Success(response.bookmarks)
@@ -96,14 +101,16 @@ class SavedSitesSyncPersister @Inject constructor(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
+        Timber.d("Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince} to ${bookmarks.last_modified}")
+        Timber.d(
+            "Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} to ${savedSitesSyncStore.startTimeStamp}",
+        )
+
         savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
         savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp
 
-        Timber.d("Sync-Feature: updating bookmarks server last_modified to ${savedSitesSyncStore.serverModifiedSince}")
-        Timber.d("Sync-Feature: updating bookmarks client last_modified to ${savedSitesSyncStore.clientModifiedSince}")
-
         return if (bookmarks.entries.isEmpty()) {
-            Timber.d("Sync-Feature: merging completed, no entries to merge")
+            Timber.d("Sync-Bookmarks: merging completed, no entries to merge")
             Success(false)
         } else {
             algorithm.processEntries(bookmarks, conflictResolution)

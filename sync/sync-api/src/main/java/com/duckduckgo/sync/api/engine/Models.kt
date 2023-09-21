@@ -31,7 +31,7 @@ data class SyncChangesRequest(
 ) {
 
     fun isEmpty(): Boolean {
-        return this.jsonString.isEmpty()
+        return this.jsonString.length == 0
     }
 
     fun isFirstSync(): Boolean {
@@ -49,6 +49,9 @@ data class SyncChangesResponse(
     val type: SyncableType,
     val jsonString: String,
 ) {
+    fun isEmpty(): Boolean {
+        return this.jsonString.length == 0
+    }
 
     companion object {
         fun empty(type: SyncableType): SyncChangesResponse {
@@ -86,6 +89,9 @@ sealed class SyncMergeResult {
 sealed class SyncDataValidationResult<out R> {
 
     data class Success<out T>(val data: T) : SyncDataValidationResult<T>()
+
+    object NoChanges : SyncDataValidationResult<Nothing>()
+
     data class Error(
         val reason: String,
     ) : SyncDataValidationResult<Nothing>()
@@ -94,6 +100,7 @@ sealed class SyncDataValidationResult<out R> {
         return when (this) {
             is Success<*> -> "Success[data=$data]"
             is Error -> "Error[reason= $reason]"
+            is NoChanges -> "No Changes"
         }
     }
 }

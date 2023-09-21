@@ -107,7 +107,7 @@ class RealSyncEngine @Inject constructor(
         if (syncInProgress()) {
             Timber.d("Sync-Feature: sync already in progress, throttling")
         } else {
-            Timber.d("Sync-Feature: starting to sync")
+            Timber.d("Sync-Feature: sync is not in progress, starting to sync")
             syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
             val changes = getChanges()
@@ -187,7 +187,7 @@ class RealSyncEngine @Inject constructor(
         changes: SyncChangesRequest,
         conflictResolution: SyncConflictResolution,
     ) {
-        Timber.d("Sync-Feature: receive remote change $changes")
+        Timber.d("Sync-Feature: asking for remote changes since $changes.modifiedSince.value")
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince.value)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
@@ -195,7 +195,7 @@ class RealSyncEngine @Inject constructor(
             }
 
             is Success -> {
-                Timber.d("Sync-Feature: get success")
+                Timber.d("Sync-Feature: get success ${result.data}")
                 persistChanges(result.data, conflictResolution)
             }
         }

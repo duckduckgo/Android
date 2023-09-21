@@ -29,13 +29,13 @@ interface SyncAttemptDao {
     fun insert(attempt: SyncAttempt)
 
     @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
-    fun lastAttempt(): SyncAttempt?
+    fun lastAttemptSync(): SyncAttempt?
 
     @Query("DELETE from sync_attempts")
     fun clear()
 
-    @Query("SELECT * FROM sync_attempts ORDER BY id DESC")
-    fun attempts(): Flow<SyncAttempt?>
+    @Query("SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1")
+    fun lastAttempt(): Flow<SyncAttempt?>
 
     @Query("SELECT * FROM sync_attempts ORDER BY id DESC")
     fun allAttempts(): List<SyncAttempt>
