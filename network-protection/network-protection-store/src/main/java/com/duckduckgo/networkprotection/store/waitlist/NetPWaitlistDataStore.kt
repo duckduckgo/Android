@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.waitlist.store
+package com.duckduckgo.networkprotection.store.waitlist
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 
 interface NetPWaitlistDataStore {
     var settingUnlocked: Boolean
@@ -33,8 +30,7 @@ interface NetPWaitlistDataStore {
     fun clear()
 }
 
-@ContributesBinding(AppScope::class)
-class NetPWaitlistDataStoreSharedPreferences @Inject constructor(
+class NetPWaitlistDataStoreSharedPreferences constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetPWaitlistDataStore {
 
