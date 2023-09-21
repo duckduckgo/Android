@@ -19,13 +19,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:alpha="0.85"
-    android:background="?attr/daxColorBackground">
+    android:background="?attr/daxColorBackground"
+    android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="@dimen/keyline_5"
         android:background="@android:color/transparent"
         android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:layout_constraintTop_toTopOf="parent"
