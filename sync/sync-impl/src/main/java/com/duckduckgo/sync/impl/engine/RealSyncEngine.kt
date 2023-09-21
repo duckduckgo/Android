@@ -203,6 +203,7 @@ class RealSyncEngine @Inject constructor(
 
     private fun getChanges(): List<SyncChangesRequest> {
         return providerPlugins.getPlugins().map {
+            Timber.d("Sync-Feature: asking for changes in ${it.javaClass}")
             it.getChanges()
         }
     }

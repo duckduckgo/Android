@@ -51,7 +51,7 @@ class SavedSitesSyncPersister @Inject constructor(
             Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
             result
         } else {
-            Timber.d("Sync-Bookmarks: no bookmarks to merge")
+            Timber.d("Sync-Bookmarks: no bookmarks to merge for ${changes.type}")
             Success(false)
         }
     }
