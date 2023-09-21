@@ -21,6 +21,7 @@ import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.voice.api.VoiceSearchStatusListener
 import com.duckduckgo.voice.impl.remoteconfig.RealVoiceSearchFeatureRepository
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchSetting
@@ -44,8 +45,8 @@ import kotlinx.coroutines.CoroutineScope
 object VoiceSearchModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideVoiceSearchRepository(dataStore: VoiceSearchDataStore): VoiceSearchRepository {
-        return RealVoiceSearchRepository(dataStore)
+    fun provideVoiceSearchRepository(dataStore: VoiceSearchDataStore, voiceSearchStatusListener: VoiceSearchStatusListener): VoiceSearchRepository {
+        return RealVoiceSearchRepository(dataStore, voiceSearchStatusListener)
     }
 
     @SingleInstanceIn(AppScope::class)
