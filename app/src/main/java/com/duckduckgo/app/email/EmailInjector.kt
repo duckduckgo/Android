@@ -24,6 +24,7 @@ import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_IN
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.email.EmailManager
 
 interface EmailInjector {
 

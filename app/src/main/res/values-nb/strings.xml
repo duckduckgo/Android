@@ -631,10 +631,6 @@
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Vis</string>
     <string name="autofillLoginSavedSnackbarMessage">Pålogging lagret</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Pålogging oppdatert</string>
-    <string name="autofillDisableAutofillPromptTitle">Vil du fortsette å lagre pålogginger?</string>
-    <string name="autofillDisableAutofillPromptMessage">Du kan deaktivere dette når som helst i innstillingene.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Fortsett å lagre</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Slå av</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Skal vi sende et varsel til deg når det er din tur?</string>

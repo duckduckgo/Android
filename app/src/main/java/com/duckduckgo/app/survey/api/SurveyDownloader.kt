@@ -18,12 +18,12 @@ package com.duckduckgo.app.survey.api
 
 import android.net.Uri
 import androidx.core.net.toUri
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import io.reactivex.Completable
 import java.io.IOException

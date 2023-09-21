@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Özel Duck Address Oluştur</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-posta izleyicileri engelleyin ve adresi gizleyin</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Giriş bilgilerini kaydetmeye devam etmek istiyor musunuz?</string>
+    <string name="autofillDisableAutofillPromptMessage">Bunu dilediğiniz zaman Ayarlar\'dan devre dışı bırakabilirsiniz.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Kaydetmeye Devam Et</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Devre dışı bırak</string>
 
 </resources>

@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Δημιουργήστε ιδιωτική Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Αποκλεισμός εφαρμογών παρακολούθησης email και απόκρυψη διεύθυνσης</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε τις συνδέσεις;</string>
+    <string name="autofillDisableAutofillPromptMessage">Μπορείτε να απενεργοποιήσετε τη λειτουργία αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Συνεχίστε την αποθήκευση</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Απενεργοποίηση</string>
 
 </resources>

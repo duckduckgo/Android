@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.email
+package com.duckduckgo.autofill.impl.email
 
 import android.content.Context
 import android.content.DialogInterface

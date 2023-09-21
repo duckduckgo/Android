@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generar Duck Address privada</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquear rastreadores de correo electrónico y ocultar dirección</string>
 
+    <string name="autofillDisableAutofillPromptTitle">¿Deseas seguir guardando inicios de sesión?</string>
+    <string name="autofillDisableAutofillPromptMessage">Puedes desactivar esta opción en cualquier momento en Ajustes.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Seguir guardando</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Deshabilitar</string>
 
 </resources>

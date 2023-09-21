@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Создать адрес на Duck</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Скрывает ваш адрес и блокирует почтовые трекеры</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Сохранять логины в дальнейшем?</string>
+    <string name="autofillDisableAutofillPromptMessage">Вы всегда можете изменить свой выбор в «Настройках».</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Сохранять</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Отключить</string>
 
 </resources>

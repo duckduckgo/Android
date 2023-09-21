@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSaveNewCredentialsBinding
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
@@ -93,6 +94,9 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor
+
     /**
      * To capture all the ways the BottomSheet can be dismissed, we might end up with onCancel being called when we don't want it
      * This flag is set to true when taking an action which dismisses the dialog, but should not be treated as a cancellation.
@@ -123,6 +127,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         savedInstanceState: Bundle?,
     ): View {
         pixelNameDialogEvent(Shown)?.let { pixel.fire(it) }
+        autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = true)
         viewModel.userPromptedToSaveCredentials()
 
         val binding = ContentAutofillSaveNewCredentialsBinding.inflate(inflater, container, false)
@@ -178,7 +183,7 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             if (autofillDeclineCounter.shouldPromptToDisableAutofill()) {
                 parentFragmentForResult?.setFragmentResult(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(getTabId()), Bundle())
             } else {
-                parentFragmentForResult?.setFragmentResult(CredentialSavePickerDialog.resultKeyPromptDismissed(getTabId()), Bundle())
+                autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
             }
         }
 

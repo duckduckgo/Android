@@ -21,7 +21,6 @@ import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
@@ -29,6 +28,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.squareup.moshi.Moshi
 import java.net.InetAddress
 import java.net.InetSocketAddress
