@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.voice.api
+package com.duckduckgo.widget
 
-interface VoiceSearchAvailability {
-    val isVoiceSearchSupported: Boolean
-    val isVoiceSearchAvailable: Boolean
-    fun shouldShowVoiceSearch(
-        isEditing: Boolean = false,
-        urlLoaded: String = "",
-    ): Boolean
+import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+
+class WidgetVoiceSearchStatusListenerTest {
+
+    private val widgetUpdater: WidgetUpdater = mock()
+    private val testee = WidgetVoiceSearchStatusListener(mock(), widgetUpdater)
+
+    @Test
+    fun whenVoiceSearchStatusChangedThenShouldUpdateWidgets() {
+        testee.voiceSearchStatusChanged()
+
+        verify(widgetUpdater).updateWidgets(any())
+    }
 }

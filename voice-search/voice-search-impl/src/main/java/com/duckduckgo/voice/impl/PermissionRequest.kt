@@ -35,6 +35,7 @@ interface PermissionRequest {
         caller: ActivityResultCaller,
         activity: Activity,
         onPermissionsGranted: () -> Unit,
+        onVoiceSearchDisabled: () -> Unit = {},
     )
 
     fun launch(activity: Activity)
@@ -52,10 +53,13 @@ class MicrophonePermissionRequest @Inject constructor(
         private const val SCHEME_PACKAGE = "package"
     }
 
+    private lateinit var voiceSearchDisabled: () -> Unit
+
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
         onPermissionsGranted: () -> Unit,
+        onVoiceSearchDisabled: () -> Unit,
     ) {
         activityResultLauncherWrapper.register(
             caller,
@@ -69,6 +73,7 @@ class MicrophonePermissionRequest @Inject constructor(
                 }
             },
         )
+        voiceSearchDisabled = onVoiceSearchDisabled
     }
 
     override fun launch(activity: Activity) {
@@ -76,6 +81,13 @@ class MicrophonePermissionRequest @Inject constructor(
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
                 activity,
                 { activity.launchDuckDuckGoSettings() },
+                {
+                    if (voiceSearchRepository.wasNoMicAccessDialogAlreadyDismissed()) {
+                        showRemoveVoiceSearchDialog(activity)
+                    } else {
+                        voiceSearchRepository.declineNoMicAccessDialog()
+                    }
+                },
             )
         } else {
             if (voiceSearchRepository.getHasAcceptedRationaleDialog()) {
@@ -84,7 +96,7 @@ class MicrophonePermissionRequest @Inject constructor(
                 voiceSearchPermissionDialogsLauncher.showPermissionRationale(
                     activity,
                     { handleRationaleAccepted() },
-                    { handleRationaleCancelled() },
+                    { handleRationaleCancelled(activity) },
                 )
             }
         }
@@ -103,7 +115,22 @@ class MicrophonePermissionRequest @Inject constructor(
         activityResultLauncherWrapper.launch(LaunchPermissionRequest)
     }
 
-    private fun handleRationaleCancelled() {
+    private fun handleRationaleCancelled(context: Context) {
         pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
+        if (voiceSearchRepository.wasNoMicAccessDialogAlreadyDismissed()) {
+            showRemoveVoiceSearchDialog(context)
+        } else {
+            voiceSearchRepository.declineNoMicAccessDialog()
+        }
+    }
+
+    private fun showRemoveVoiceSearchDialog(context: Context) {
+        voiceSearchPermissionDialogsLauncher.showRemoveVoiceSearchDialog(
+            context,
+            onRemoveVoiceSearch = {
+                voiceSearchRepository.setVoiceSearchUserEnabled(false)
+                voiceSearchDisabled()
+            },
+        )
     }
 }

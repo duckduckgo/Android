@@ -23,7 +23,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -51,8 +50,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         const val VOICE_SEARCH_ERROR = 1
     }
 
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()
@@ -67,11 +65,13 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    @SuppressLint("NewApi")
     private fun configureViews() {
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-        )
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false)
+            window.statusBarColor = Color.TRANSPARENT
+            window.navigationBarColor = Color.TRANSPARENT
+        }
         binding.indicator.onAction {
             if (it == INDICATOR_CLICKED) {
                 viewModel.userInitiatesSearchComplete()
