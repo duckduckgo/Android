@@ -108,6 +108,15 @@
                 app:secondaryText="@string/accessibilityForceZoomSubtitle"
                 app:showSwitch="true" />
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/voiceSearchToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/accessibilityVoiceSearchTitle"
+                app:secondaryText="@string/accessibilityVoiceSearchSubtitle"
+                app:showSwitch="true"
+                android:visibility="gone"/>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -23,6 +23,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.voice.impl.VoiceSearchPixelNames
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import okhttp3.Interceptor
@@ -65,6 +66,7 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Intercepto
             AppPixelName.EMAIL_USE_ADDRESS.pixelName,
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
             StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName,
+            VoiceSearchPixelNames.VOICE_SEARCH_ERROR.pixelName,
             "m_atp_unprotected_apps_bucket_",
         )
     }

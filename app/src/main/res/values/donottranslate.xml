@@ -38,4 +38,8 @@
     <string name="setAsDefaultCompetitiveCopyNotificationDescription">Google tracks you, we don\'t. Make DuckDuckGo your default browser today.</string>
     <string name="setAsDefaultSetupCopyNotificationTitle">Almost there! 🚀</string>
     <string name="setAsDefaultSetupCopyNotificationDescription">More privacy, faster page loads, and cleaner search results are just a tap away. Make DuckDuckGo your default browser today.</string>
+
+<!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Add Voice Search option to the address bar</string>
+    <string name="accessibilityVoiceSearchTitle">Private Voice Search</string>
 </resources>

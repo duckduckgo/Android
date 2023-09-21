@@ -146,10 +146,10 @@ class VoiceSearchViewModelTest {
         testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
-        captor.firstValue.invoke(Event.RecognitionTimedOut)
+        captor.firstValue.invoke(Event.RecognitionTimedOut(0))
 
         testee.commands().test {
-            assertEquals(Command.TerminateVoiceSearch, expectMostRecentItem())
+            assertEquals(Command.TerminateVoiceSearch(0), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -160,10 +160,10 @@ class VoiceSearchViewModelTest {
         testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
-        captor.firstValue.invoke(Event.RecognitionFailed)
+        captor.firstValue.invoke(Event.RecognitionFailed(0))
 
         testee.commands().test {
-            assertEquals(Command.TerminateVoiceSearch, expectMostRecentItem())
+            assertEquals(Command.TerminateVoiceSearch(0), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -175,7 +175,7 @@ class VoiceSearchViewModelTest {
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.PartialResultReceived("This is the result"))
-        captor.firstValue.invoke(Event.RecognitionTimedOut)
+        captor.firstValue.invoke(Event.RecognitionTimedOut(0))
 
         testee.commands().test {
             assertEquals(Command.HandleSpeechRecognitionSuccess("This is the result"), expectMostRecentItem())
