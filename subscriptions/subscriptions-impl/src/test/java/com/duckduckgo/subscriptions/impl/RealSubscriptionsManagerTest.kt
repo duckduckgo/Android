@@ -54,42 +54,17 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetExternalIdIfUserNotAuthenticatedAndNotPurchaseStoredThenCreateAccount() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfUserNotAuthenticatedAndNotPurchaseStoredThenReturnFailure() = runTest {
         givenUserIsNotAuthenticated()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        subscriptionsManager.getSubscriptionData()
-
-        verify(authService).createAccount()
-    }
-
-    @Test
-    fun whenCreateAccountFailsThenReturnFailure() = runTest {
-        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
-        givenUserIsNotAuthenticated()
-        givenCreateAccountFails()
-
-        val value = subscriptionsManager.getSubscriptionData()
+        val value = subscriptionsManager.recoverSubscriptionFromStore()
 
         assertTrue(value is Failure)
     }
 
     @Test
-    fun whenCreateAccountSucceedsThenReturnExternalId() = runTest {
-        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
-        givenUserIsNotAuthenticated()
-        givenCreateAccountSucceeds()
-
-        val value = subscriptionsManager.getSubscriptionData()
-
-        assertTrue(value is Success)
-        assertEquals("1234", (value as Success).externalId)
-        assertEquals("validToken", value.pat)
-        assertTrue(value.entitlements.isEmpty())
-    }
-
-    @Test
-    fun whenGetExternalIdIfUserNotAuthenticatedAndPurchaseStoredThenGetIdFromPurchase() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfUserNotAuthenticatedAndPurchaseStoredThenGetIdFromPurchase() = runTest {
         givenUserIsNotAuthenticated()
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
@@ -98,7 +73,7 @@ class RealSubscriptionsManagerTest {
             RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
 
-        val value = subscriptionsManager.getSubscriptionData()
+        val value = subscriptionsManager.recoverSubscriptionFromStore()
 
         verify(authService).storeLogin(any())
         assertTrue(value is Success)
@@ -108,7 +83,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenStoreLoginFailsThenReturnFailure() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfStoreLoginFailsThenReturnFailure() = runTest {
         givenUserIsNotAuthenticated()
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
@@ -117,28 +92,28 @@ class RealSubscriptionsManagerTest {
             RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
 
-        val value = subscriptionsManager.getSubscriptionData()
+        val value = subscriptionsManager.recoverSubscriptionFromStore()
 
         assertTrue(value is Failure)
     }
 
     @Test
-    fun whenGetExternalIdIfUserAuthenticatedThenValidateToken() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfUserAuthenticatedThenValidateToken() = runTest {
         givenUserIsAuthenticated()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        subscriptionsManager.getSubscriptionData()
+        subscriptionsManager.recoverSubscriptionFromStore()
 
         verify(authService).validateToken(any())
     }
 
     @Test
-    fun whenValidateTokenSucceedsThenReturnExternalId() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfValidateTokenSucceedsThenReturnExternalId() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenSucceeds()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
-        val value = subscriptionsManager.getSubscriptionData()
+        val value = subscriptionsManager.recoverSubscriptionFromStore()
 
         assertTrue(value is Success)
         assertEquals("1234", (value as Success).externalId)
@@ -147,9 +122,47 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenValidateTokenFailsReturnFailure() = runTest {
+    fun whenRecoverSubscriptionFromStoreIfValidateTokenFailsReturnFailure() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        val value = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(value is Failure)
+    }
+
+    @Test
+    fun whenRecoverSubscriptionFromStoreIfValidateTokenFailsWithExpiredTokenThenRetryWithPurchaseHistory() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenFails("""{"error":"expired_token"}""")
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        subscriptionsManager.recoverSubscriptionFromStore()
+
+        verify(mockRepository).lastPurchaseHistoryRecord
+    }
+
+    @Test
+    fun whenRecoverSubscriptionFromStoreIfPurchaseHistoryRetrievedThenSignInUserAndSetToken() = runTest {
+        givenUserIsNotAuthenticated()
+        givenPurchaseStored()
+        givenPurchaseStoredIsValid()
+        val repository: SubscriptionsRepository =
+            RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
+
+        subscriptionsManager.recoverSubscriptionFromStore()
+        subscriptionsManager.isSignedIn.test {
+            assertTrue(awaitItem())
+            assertEquals("validToken", authDataStore.token)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetSubscriptionDataIfUserNotAuthenticatedThenReturnFailure() = runTest {
+        givenUserIsNotAuthenticated()
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
 
         val value = subscriptionsManager.getSubscriptionData()
@@ -158,7 +171,22 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenValidateTokenFailsWithExpiredTokenThenRetryWithPurchaseHistory() = runTest {
+    fun whenGetSubscriptionDataIfTokenIsValidThenReturnSuccess() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenSucceeds()
+        val repository: SubscriptionsRepository =
+            RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
+
+        val value = subscriptionsManager.getSubscriptionData()
+        assertTrue(value is Success)
+        assertEquals("1234", (value as Success).externalId)
+        assertEquals("validToken", value.pat)
+        assertTrue(value.entitlements.firstOrNull { it.product == "testProduct" } != null)
+    }
+
+    @Test
+    fun whenGetSubscriptionDataIfValidateTokenFailsWithExpiredTokenThenRetryWithPurchaseHistory() = runTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("""{"error":"expired_token"}""")
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
@@ -169,12 +197,138 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenAccountCreatedThenSignInUserAndSetToken() = runTest {
+    fun whenGetSubscriptionDataIfValidateTokenFailsReturnFailure() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenFails("failure")
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        val value = subscriptionsManager.getSubscriptionData()
+
+        assertTrue(value is Failure)
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfUserNotAuthenticatedAndNotPurchaseStoredThenCreateAccount() = runTest {
+        givenUserIsNotAuthenticated()
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        subscriptionsManager.prePurchaseFlow()
+
+        verify(authService).createAccount()
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfCreateAccountFailsThenReturnFailure() = runTest {
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+        givenUserIsNotAuthenticated()
+        givenCreateAccountFails()
+
+        val value = subscriptionsManager.prePurchaseFlow()
+
+        assertTrue(value is Failure)
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfCreateAccountSucceedsThenReturnExternalId() = runTest {
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
         givenUserIsNotAuthenticated()
         givenCreateAccountSucceeds()
 
-        subscriptionsManager.getSubscriptionData()
+        val value = subscriptionsManager.prePurchaseFlow()
+
+        assertTrue(value is Success)
+        assertEquals("1234", (value as Success).externalId)
+        assertEquals("validToken", value.pat)
+        assertTrue(value.entitlements.isEmpty())
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfUserNotAuthenticatedAndPurchaseStoredThenGetIdFromPurchase() = runTest {
+        givenUserIsNotAuthenticated()
+        givenPurchaseStored()
+        givenPurchaseStoredIsValid()
+        givenValidateTokenSucceeds()
+        val repository: SubscriptionsRepository =
+            RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
+
+        val value = subscriptionsManager.prePurchaseFlow()
+
+        verify(authService).storeLogin(any())
+        assertTrue(value is Success)
+        assertEquals("1234", (value as Success).externalId)
+        assertEquals("validToken", value.pat)
+        assertTrue(value.entitlements.firstOrNull { it.product == "testProduct" } != null)
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfStoreLoginFailsThenReturnFailure() = runTest {
+        givenUserIsNotAuthenticated()
+        givenPurchaseStored()
+        givenPurchaseStoredIsValid()
+        givenStoreLoginFails()
+        val repository: SubscriptionsRepository =
+            RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
+
+        val value = subscriptionsManager.prePurchaseFlow()
+
+        assertTrue(value is Failure)
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfUserAuthenticatedThenValidateToken() = runTest {
+        givenUserIsAuthenticated()
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        subscriptionsManager.prePurchaseFlow()
+
+        verify(authService).validateToken(any())
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfValidateTokenSucceedsThenReturnExternalId() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenSucceeds()
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        val value = subscriptionsManager.prePurchaseFlow()
+
+        assertTrue(value is Success)
+        assertEquals("1234", (value as Success).externalId)
+        assertEquals("validToken", value.pat)
+        assertTrue(value.entitlements.firstOrNull { it.product == "testProduct" } != null)
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfValidateTokenFailsReturnFailure() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenFails("failure")
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        val value = subscriptionsManager.prePurchaseFlow()
+
+        assertTrue(value is Failure)
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfValidateTokenFailsWithExpiredTokenThenRetryWithPurchaseHistory() = runTest {
+        givenUserIsAuthenticated()
+        givenValidateTokenFails("""{"error":"expired_token"}""")
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+
+        subscriptionsManager.prePurchaseFlow()
+
+        verify(mockRepository).lastPurchaseHistoryRecord
+    }
+
+    @Test
+    fun whenPrePurchaseFlowIfAccountCreatedThenSignInUserAndSetToken() = runTest {
+        val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, mockRepository, context)
+        givenUserIsNotAuthenticated()
+        givenCreateAccountSucceeds()
+
+        subscriptionsManager.prePurchaseFlow()
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
             assertEquals("validToken", authDataStore.token)
@@ -183,7 +337,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenPurchaseHistoryRetrievedThenSignInUserAndSetToken() = runTest {
+    fun whenPrePurchaseFlowIfPurchaseHistoryRetrievedThenSignInUserAndSetToken() = runTest {
         givenUserIsNotAuthenticated()
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
@@ -191,7 +345,7 @@ class RealSubscriptionsManagerTest {
             RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
         val subscriptionsManager = RealSubscriptionsManager(authService, authDataStore, repository, context)
 
-        subscriptionsManager.getSubscriptionData()
+        subscriptionsManager.prePurchaseFlow()
         subscriptionsManager.isSignedIn.test {
             assertTrue(awaitItem())
             assertEquals("validToken", authDataStore.token)
