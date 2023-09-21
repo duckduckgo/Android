@@ -27,6 +27,8 @@ import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
+import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore
+import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStoreSharedPreferences
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -79,4 +81,14 @@ object NetPBreakageCategoriesModule {
             add(AppBreakageCategory("other", context.getString(R.string.netpReportBreakageCategoryOther)))
         }
     }
+}
+
+@Module
+@ContributesTo(AppScope::class)
+object NetPWaitlistDataModule {
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideNetPWaitlistDataStore(
+        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    ): NetPWaitlistDataStore = NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider)
 }
