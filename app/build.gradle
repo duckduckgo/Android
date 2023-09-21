@@ -297,6 +297,7 @@ dependencies {
         implementation project(':subscriptions-impl')
         implementation project(':subscriptions-store')
         internalImplementation project(':subscriptions-internal')
+        internalImplementation project(':network-protection-subscription-internal')
     }
 
     implementation project(':user-agent-api')

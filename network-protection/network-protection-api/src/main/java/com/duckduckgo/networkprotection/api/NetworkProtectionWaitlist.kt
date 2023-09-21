@@ -34,6 +34,7 @@ interface NetworkProtectionWaitlist {
     suspend fun getScreenForCurrentState(): ActivityParams
 
     sealed class NetPWaitlistState {
+        object VerifySubscription : NetPWaitlistState()
         object NotUnlocked : NetPWaitlistState()
         object JoinedWaitlist : NetPWaitlistState()
         object PendingInviteCode : NetPWaitlistState()
