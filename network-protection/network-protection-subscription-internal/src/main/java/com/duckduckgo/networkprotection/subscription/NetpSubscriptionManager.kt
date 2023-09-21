@@ -20,9 +20,12 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus
+import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.NoValidPAT
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Success
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.UnableToAuthorize
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Unknown
+import com.duckduckgo.subscriptions.api.PatResult
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +51,7 @@ class RealNetpSubscriptionManager @Inject constructor(
     private val service: NetworkProtectionAuthService,
     private val dispatcherProvider: DispatcherProvider,
     private val netPWaitlistRepository: NetPWaitlistRepository,
+    private val subscriptions: Subscriptions,
 ) : NetpSubscriptionManager {
     private val state: MutableStateFlow<NetpAuthorizationStatus> = MutableStateFlow(Unknown)
 
@@ -58,19 +62,20 @@ class RealNetpSubscriptionManager @Inject constructor(
     override suspend fun authorize() {
         withContext(dispatcherProvider.io()) {
             try {
-                service.authorize(NetPAuthorizeRequest(temp_pat)).also {
-                    netPWaitlistRepository.setAuthenticationToken(it.token)
-                    logcat { "Netp auth: Token received" }
+                val pat = subscriptions.getPAT()
+                if (pat is PatResult.Success) {
+                    service.authorize(NetPAuthorizeRequest(pat.pat)).also {
+                        netPWaitlistRepository.setAuthenticationToken(it.token)
+                        logcat { "Netp auth: Token received" }
+                    }
+                    state.emit(Success)
+                } else {
+                    state.emit(NoValidPAT)
                 }
-                state.emit(Success)
             } catch (e: Exception) {
                 logcat { "Netp auth: error in authorize $e" }
                 state.emit(UnableToAuthorize(e.toString()))
             }
         }
-    }
-
-    companion object {
-        private const val temp_pat = "replace_me"
     }
 }

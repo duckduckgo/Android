@@ -26,6 +26,7 @@ dependencies {
     implementation project(':navigation-api')
     implementation project(':network-protection-api')
     implementation project(':network-protection-impl')
+    implementation project(':subscriptions-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.lifecycle.runtime.ktx
