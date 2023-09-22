@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">See kustutab sinu järjehoidjate kausta &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Loobu</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Kustuta</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale häälotsingu valik</string>
+    <string name="accessibilityVoiceSearchTitle">Privaatne häälotsing</string>
 </resources>
