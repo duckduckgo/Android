@@ -775,4 +775,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Týmto sa zmaže priečinok so záložkami &lt;b&gt;%1$s&lt;/b&gt; .</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Zrušiť</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Odstrániť</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Pridať do panela s adresou možnosť Hlasové vyhľadávanie</string>
+    <string name="accessibilityVoiceSearchTitle">Súkromné hlasové vyhľadávanie</string>
 </resources>
