@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tämä poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; kirjanmerkkikansion.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Peruuta</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Poista</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Lisää äänihakuvaihtoehto osoitepalkkiin</string>
+    <string name="accessibilityVoiceSearchTitle">Yksityinen äänihaku</string>
 </resources>
