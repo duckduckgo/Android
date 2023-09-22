@@ -39,8 +39,26 @@ import logcat.logcat
 import retrofit2.HttpException
 
 interface SubscriptionsManager {
+
+    /**
+     * Executes the pre-purchase flow which tries to recover the external_id from the store,
+     * if it cannot, it creates a new account
+     */
+    suspend fun prePurchaseFlow(): SubscriptionsDataResult
+
+    /**
+     * Recovers a subscription from the store
+     */
+    suspend fun recoverSubscriptionFromStore(): SubscriptionsDataResult
+
+    /**
+     * Gets the subscription data for an authenticated user
+     */
     suspend fun getSubscriptionData(): SubscriptionsDataResult
 
+    /**
+     * Flow to know if a user is signed in or not
+     */
     val isSignedIn: Flow<Boolean>
 }
 
@@ -59,7 +77,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     private fun isUserAuthenticated(): Boolean = !authDataStore.token.isNullOrBlank()
 
-    override suspend fun getSubscriptionData(): SubscriptionsDataResult {
+    override suspend fun recoverSubscriptionFromStore(): SubscriptionsDataResult {
         try {
             val externalId = if (isUserAuthenticated()) {
                 getSubscriptionDataFromToken()
@@ -69,15 +87,46 @@ class RealSubscriptionsManager @Inject constructor(
             return if (externalId is Success) {
                 externalId
             } else {
-                val newAccount = createAccount()
-                logcat(LogPriority.DEBUG) { "Subs: account created ${newAccount.externalId}" }
-                Success(externalId = newAccount.externalId, pat = newAccount.authToken, entitlements = emptyList())
+                return Failure("Subscription data not found")
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
             return Failure(error)
         } catch (e: Exception) {
             return Failure(e.message ?: "An error happened")
+        }
+    }
+
+    override suspend fun getSubscriptionData(): SubscriptionsDataResult {
+        return try {
+            if (isUserAuthenticated()) {
+                getSubscriptionDataFromToken()
+            } else {
+                Failure("Subscription data not found")
+            }
+        } catch (e: HttpException) {
+            val error = parseError(e)?.error ?: "An error happened"
+            Failure(error)
+        } catch (e: Exception) {
+            Failure(e.message ?: "An error happened")
+        }
+    }
+
+    override suspend fun prePurchaseFlow(): SubscriptionsDataResult {
+        return try {
+            val externalId = recoverSubscriptionFromStore()
+            if (externalId is Success) {
+                externalId
+            } else {
+                val newAccount = createAccount()
+                logcat(LogPriority.DEBUG) { "Subs: account created ${newAccount.externalId}" }
+                Success(externalId = newAccount.externalId, pat = newAccount.authToken, entitlements = emptyList())
+            }
+        } catch (e: HttpException) {
+            val error = parseError(e)?.error ?: "An error happened"
+            Failure(error)
+        } catch (e: Exception) {
+            Failure(e.message ?: "An error happened")
         }
     }
 
