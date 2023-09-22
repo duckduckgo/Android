@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,6 @@
 
 package com.duckduckgo.voice.api
 
-interface VoiceSearchAvailability {
-    val isVoiceSearchSupported: Boolean
-    val isVoiceSearchAvailable: Boolean
-    fun shouldShowVoiceSearch(
-        isEditing: Boolean = false,
-        urlLoaded: String = "",
-    ): Boolean
+interface VoiceSearchStatusListener {
+    fun voiceSearchStatusChanged()
 }

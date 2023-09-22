@@ -4349,6 +4349,15 @@ class BrowserTabViewModelTest {
         assertFalse(omnibarViewState().forceExpand)
     }
 
+    @Test
+    fun whenVoiceSearchIsDisabledThenShowVoiceSearchShouldBeFalse() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any())).thenReturn(false)
+
+        testee.voiceSearchDisabled()
+
+        assertFalse(omnibarViewState().showVoiceSearch)
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }

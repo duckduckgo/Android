@@ -32,6 +32,8 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
 
+    implementation project(':voice-search-api')
+
     testImplementation Testing.junit4
 }
 android {

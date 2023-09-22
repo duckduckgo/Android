@@ -37,5 +37,6 @@ interface VoiceSearchLauncher {
     sealed class Event {
         data class VoiceRecognitionSuccess(val result: String) : Event()
         object SearchCancelled : Event()
+        object VoiceSearchDisabled : Event()
     }
 }
