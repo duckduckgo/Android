@@ -24,10 +24,10 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class BookmarksEntityQueryListener(
     private val viewModel: BookmarksViewModel,
+    private val favoritesAdapter: FavoritesAdapter?,
     private val bookmarksAdapter: BookmarksAdapter,
     private val bookmarkFoldersAdapter: BookmarkFoldersAdapter,
 ) {
@@ -39,11 +39,14 @@ class BookmarksEntityQueryListener(
             delay(DEBOUNCE_PERIOD)
             viewModel.viewState.value?.bookmarks?.let { bookmarks ->
                 viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
-                    val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
-                    val filteredBookmarks = filterBookmarks(newText, bookmarks)
-                    Timber.d("Bookmark: filter $filteredBookmarks")
-                    bookmarksAdapter.setItems(filteredBookmarks, filteredFolders.isEmpty(), true)
-                    bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
+                    viewModel.viewState.value?.favorites?.let { favorites ->
+                        val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
+                        val filteredBookmarks = filterBookmarks(newText, bookmarks)
+                        val filteredFavorites = filterFavorites(newText, favorites)
+                        favoritesAdapter?.setItems(filteredFavorites, true)
+                        bookmarksAdapter.setItems(filteredBookmarks, filteredFolders.isEmpty(), true)
+                        bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
+                    }
                 }
             }
         }
@@ -51,6 +54,17 @@ class BookmarksEntityQueryListener(
 
     fun cancelSearch() {
         searchJob.cancel()
+    }
+
+    private fun filterFavorites(
+        query: String,
+        favorites: List<SavedSite.Favorite>,
+    ): List<FavoritesAdapter.FavoriteItem> {
+        val lowercaseQuery = query.lowercase(Locale.getDefault())
+        return favorites.filter {
+            val lowercaseTitle = it.title.lowercase(Locale.getDefault())
+            lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
+        }.map { FavoritesAdapter.FavoriteItem(it) }
     }
 
     private fun filterBookmarks(

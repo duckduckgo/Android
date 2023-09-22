@@ -191,10 +191,12 @@ class BookmarksViewModel @Inject constructor(
     fun fetchAllBookmarksAndFolders() {
         viewModelScope.launch(dispatcherProvider.io()) {
             val favorites = savedSitesRepository.getFavoritesSync()
-            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null).map { it.bookmarkFolder }
+            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
+                .map { it.bookmarkFolder }
+                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
             val bookmarks = savedSitesRepository.getBookmarksTree()
             withContext(dispatcherProvider.main()) {
-                onSavedSitesItemsChanged(emptyList(), bookmarks, folders)
+                onSavedSitesItemsChanged(favorites, bookmarks, folders)
             }
         }
     }
@@ -241,17 +243,6 @@ class BookmarksViewModel @Inject constructor(
     ) {
         viewState.value = viewState.value?.copy(
             favorites = favorites,
-            bookmarks = bookmarks,
-            bookmarkFolders = bookmarkFolders,
-            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
-        )
-    }
-
-    private fun onBookmarkItemsChanged(
-        bookmarks: List<Bookmark>,
-        bookmarkFolders: List<BookmarkFolder>,
-    ) {
-        viewState.value = viewState.value?.copy(
             bookmarks = bookmarks,
             bookmarkFolders = bookmarkFolders,
             enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,

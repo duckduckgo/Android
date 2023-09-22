@@ -701,7 +701,15 @@ class RealSavedSitesRepository(
         Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified, deleted = this.deletedFlag())
 
     private fun Entity.mapToBookmarkFolder(relationId: String): BookmarkFolder =
-        BookmarkFolder(id = this.entityId, name = this.title, parentId = relationId, lastModified = this.lastModified, deleted = this.deletedFlag())
+        BookmarkFolder(
+            id = this.entityId,
+            name = this.title,
+            parentId = relationId,
+            numBookmarks = savedSitesRelationsDao.countEntitiesInFolder(this.entityId, BOOKMARK),
+            numFolders = savedSitesRelationsDao.countEntitiesInFolder(this.entityId, FOLDER),
+            lastModified = this.lastModified,
+            deleted = this.deletedFlag(),
+        )
 
     private fun Entity.mapToFavorite(index: Int = 0): Favorite =
         Favorite(this.entityId, this.title, this.url.orEmpty(), lastModified = this.lastModified, index, this.deletedFlag())
