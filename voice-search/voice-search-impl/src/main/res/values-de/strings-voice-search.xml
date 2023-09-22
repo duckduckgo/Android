@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Um die Sprachsuche in DuckDuckGo zu verwenden, musst du den Mikrofonzugriff in den Systemeinstellungen aktivieren.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Einstellungen</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofonzugriff erforderlich</string>
+    <string name="voiceSearchRemovePositiveButton">Sprachsuche entfernen</string>
+    <string name="voiceSearchRemoveTitle">Option Sprachsuche aus der Adressleiste entfernen?</string>
+    <string name="voiceSearchRemoveSubtitle">Du kannst diese und andere Barrierefreiheitseinstellungen jederzeit in den Einstellungen verwalten.</string>
     <string name="voiceSearchTitle">Sprachsuche</string>
 </resources>
