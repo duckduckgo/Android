@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Lesezeichen-Ordner &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Abbrechen</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Löschen</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Option Sprachsuche zur Adressleiste hinzufügen</string>
+    <string name="accessibilityVoiceSearchTitle">Private Sprachsuche</string>
 </resources>
