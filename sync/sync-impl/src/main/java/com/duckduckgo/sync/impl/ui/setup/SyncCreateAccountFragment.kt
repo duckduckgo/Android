@@ -32,7 +32,11 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentSyncSetupBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewState
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -71,10 +75,31 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_sync_setu
 
     private fun observeUiEvents() {
         viewModel
+            .viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(lifecycleScope)
+
+        viewModel
             .commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        when (viewState.viewMode) {
+            is SignedIn -> {
+                binding.footerButton.isEnabled = true
+                binding.footerButton.setOnClickListener {
+                    listener?.launchFinishSetupFlow()
+                }
+            }
+
+            CreatingAccount -> {
+                binding.footerButton.isEnabled = false
+            }
+        }
     }
 
     private fun processCommand(it: Command) {
@@ -85,6 +110,8 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_sync_setu
             }
 
             FinishSetupFlow -> listener?.launchFinishSetupFlow()
+            Error -> {
+            }
         }
     }
 

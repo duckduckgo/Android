@@ -21,13 +21,19 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -39,11 +45,37 @@ class SyncCreateAccountViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, DROP_OLDEST)
 
+    private val viewState = MutableStateFlow(ViewState())
+    fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
+
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     sealed class Command {
         object FinishSetupFlow : Command()
         object AbortFlow : Command()
+        object Error : Command()
+    }
+
+    data class ViewState(
+        val viewMode: ViewMode = CreatingAccount,
+    )
+
+    sealed class ViewMode {
+        object CreatingAccount : ViewMode()
+        object SignedIn : ViewMode()
+    }
+
+    private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
+        viewState.emit(ViewState(CreatingAccount))
+        when (syncAccountRepository.createAccount()) {
+            is Error -> {
+                command.send(Command.Error)
+            }
+
+            is Success -> {
+                viewState.emit(ViewState(SignedIn))
+            }
+        }
     }
 
     fun onNextClicked() {
