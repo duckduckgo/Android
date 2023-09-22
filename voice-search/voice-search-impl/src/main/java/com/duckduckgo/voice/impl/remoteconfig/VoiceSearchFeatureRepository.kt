@@ -32,7 +32,7 @@ interface VoiceSearchFeatureRepository {
 }
 
 class RealVoiceSearchFeatureRepository constructor(
-    val database: VoiceSearchDatabase,
+    database: VoiceSearchDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : VoiceSearchFeatureRepository {

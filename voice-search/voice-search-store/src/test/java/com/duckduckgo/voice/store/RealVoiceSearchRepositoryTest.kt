@@ -16,6 +16,8 @@
 
 package com.duckduckgo.voice.store
 
+import com.duckduckgo.voice.api.VoiceSearchStatusListener
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -24,12 +26,12 @@ import org.junit.Test
 class RealVoiceSearchRepositoryTest {
 
     private lateinit var testee: RealVoiceSearchRepository
-    private lateinit var dataSource: FakeVoiceSearchDataStore
+    private var dataSource = FakeVoiceSearchDataStore()
+    private var voiceSearchStatusListener = FakeVoiceSearchStatusListener()
 
     @Before
     fun setUp() {
-        dataSource = FakeVoiceSearchDataStore()
-        testee = RealVoiceSearchRepository(dataSource)
+        testee = RealVoiceSearchRepository(dataSource, voiceSearchStatusListener)
     }
 
     @Test
@@ -58,10 +60,56 @@ class RealVoiceSearchRepositoryTest {
 
         assertTrue(testee.getHasLoggedAvailability())
     }
+
+    @Test
+    fun whenSetVoiceSearchEnabledThenIsVoiceSearchEnabledShouldBeTrue() {
+        assertFalse(testee.isVoiceSearchUserEnabled())
+
+        testee.setVoiceSearchUserEnabled(true)
+
+        assertTrue(testee.isVoiceSearchUserEnabled())
+    }
+
+    @Test
+    fun whenSetVoiceSearchEnabledThenListenerShouldBeCalled() {
+        testee.setVoiceSearchUserEnabled(true)
+
+        assertTrue(voiceSearchStatusListener.statusChanged)
+    }
+
+    @Test
+    fun whenDismissVoiceSearchThenCountVoiceSearchDismissedValueShouldIncrease() {
+        assertEquals(0, testee.countVoiceSearchDismissed())
+
+        testee.dismissVoiceSearch()
+
+        assertEquals(1, testee.countVoiceSearchDismissed())
+    }
+
+    @Test
+    fun whenDeclineMicAccessDialogThenWasNoMicAccessDialogAlreadyDismissedShouldBeTrue() {
+        assertFalse(testee.wasNoMicAccessDialogAlreadyDismissed())
+
+        testee.declineNoMicAccessDialog()
+
+        assertTrue(testee.wasNoMicAccessDialogAlreadyDismissed())
+    }
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var permissionDeclinedForever: Boolean = false
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
+    override var isVoiceSearchEnabled: Boolean = false
+    override var countVoiceSearchDismissed: Int = 0
+    override var noMicAccessDialogDeclined: Boolean = false
+}
+
+class FakeVoiceSearchStatusListener : VoiceSearchStatusListener {
+
+    var statusChanged: Boolean = false
+        private set
+    override fun voiceSearchStatusChanged() {
+        statusChanged = true
+    }
 }

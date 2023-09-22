@@ -260,11 +260,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureVoiceSearch() {
-        if (voiceSearchAvailability.isVoiceSearchSupported) {
+        if (voiceSearchAvailability.isVoiceSearchAvailable) {
             voiceSearch.visibility = View.VISIBLE
             voiceSearchLauncher.registerResultsCallback(this, this, WIDGET) {
                 if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
                     viewModel.onUserSelectedToEditQuery(it.result)
+                } else if (it is VoiceSearchLauncher.Event.VoiceSearchDisabled) {
+                    viewModel.voiceSearchDisabled()
                 }
             }
             voiceSearch.setOnClickListener {
@@ -366,6 +368,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
             is DeleteSavedSiteConfirmation -> {
                 confirmDeleteSavedSite(command.savedSite)
+            }
+            is UpdateVoiceSearch -> {
+                configureVoiceSearch()
             }
         }
     }
