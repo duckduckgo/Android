@@ -18,15 +18,20 @@ package com.duckduckgo.sync.impl.ui.setup
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class SyncCreateAccountViewModelTest {
@@ -40,6 +45,34 @@ class SyncCreateAccountViewModelTest {
         syncRepostitory,
         coroutineTestRule.testDispatcherProvider,
     )
+
+    @Test
+    fun whenUserIsNotSignedInThenAccountCreatedAndViewStateUpdated() = runTest {
+        whenever(syncRepostitory.createAccount()).thenReturn(Result.Success(true))
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            Assert.assertTrue(viewState.viewMode is SignedIn)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCreateAccountFailsThenEmitError() = runTest {
+        whenever(syncRepostitory.createAccount()).thenReturn(Result.Error(1, ""))
+
+        testee.viewState().test {
+            val viewState = awaitItem()
+            Assert.assertTrue(viewState.viewMode is CreatingAccount)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        testee.commands().test {
+            val command = awaitItem()
+            Assert.assertTrue(command is Error)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     @Test
     fun whenNextClickedThenEmitFinishSetupCommand() = runTest {

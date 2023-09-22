@@ -127,6 +127,7 @@
         android:layout_marginBottom="@dimen/keyline_4"
         android:text="@string/sync_enable_sync_next_button"
         app:buttonSize="large"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
