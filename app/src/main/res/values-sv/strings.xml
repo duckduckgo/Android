@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din bokmärkesmapp för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Avbryt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Ta bort</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Lägg till alternativet Röstsökning i adressfältet</string>
+    <string name="accessibilityVoiceSearchTitle">Privat röstsökning</string>
 </resources>

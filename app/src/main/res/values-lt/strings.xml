@@ -775,4 +775,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymių aplanką.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Atšaukti</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite paieškos balsu parinktį</string>
+    <string name="accessibilityVoiceSearchTitle">Privati paieška balsu</string>
 </resources>
