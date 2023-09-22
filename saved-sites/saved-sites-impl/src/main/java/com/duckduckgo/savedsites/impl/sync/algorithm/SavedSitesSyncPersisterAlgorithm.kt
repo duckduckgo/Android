@@ -82,7 +82,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             if (repository.getFolder(folderId) != null) {
                 processIds.add(folderId)
             }
-            processFolder(folderId, "", bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+            processFolder(folderId, SavedSitesNames.BOOKMARKS_ROOT, bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
         }
 
         // 2. All bookmarks without a parent in the payload
@@ -108,7 +108,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
 
         // Favourites
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
-            Timber.d("Sync-Feature: favourites root found, traversing from there")
+            Timber.d("Sync-Bookmarks: favourites root found, traversing from there")
             processFavouritesFolder(conflictResolution, bookmarks.entries, bookmarks.last_modified)
             processIds.add(SavedSitesNames.FAVORITES_ROOT)
         }
@@ -116,7 +116,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         val unprocessedIds = allResponseIds.filterNot { processIds.contains(it) }
         if (unprocessedIds.isNotEmpty()) {
             orphans = true
-            Timber.d("Sync-Feature: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
+            Timber.d("Sync-Bookmarks: there are ${unprocessedIds.size} items orphaned $unprocessedIds")
         }
 
         return SyncMergeResult.Success(orphans = orphans)
@@ -132,8 +132,8 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     ) {
         val remoteFolder = remoteUpdates.find { it.id == folderId }
         if (remoteFolder == null) {
-            Timber.d("Sync-Feature: processing folder $folderId with parentId $parentId")
-            Timber.d("Sync-Feature: can't find folder $folderId")
+            Timber.d("Sync-Bookmarks: processing folder $folderId with parentId $parentId")
+            Timber.d("Sync-Bookmarks: can't find folder $folderId")
         } else {
             processBookmarkFolder(conflictResolution, remoteFolder, parentId, lastModified)
             remoteFolder.folder?.children?.forEach { child ->
@@ -151,7 +151,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     ) {
         val folder = decryptFolder(remoteFolder, parentId, lastModified)
         if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT) {
-            Timber.d("Sync-Feature: processing folder ${folder.id} with parentId $parentId")
+            Timber.d("Sync-Bookmarks: processing folder ${folder.id} with parentId $parentId")
             when (conflictResolution) {
                 DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder)
                 REMOTE_WINS -> remoteWinsStrategy.processBookmarkFolder(folder)
@@ -169,10 +169,10 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         folderId: String,
         lastModified: String,
     ) {
-        Timber.d("Sync-Feature: processing id $child")
+        Timber.d("Sync-Bookmarks: processing id $child")
         val childEntry = entries.find { it.id == child }
         if (childEntry == null) {
-            Timber.d("Sync-Feature: id $child not present in the payload, omitting")
+            Timber.d("Sync-Bookmarks: id $child not present in the payload, omitting")
         } else {
             when {
                 childEntry.isBookmark() -> {
@@ -180,7 +180,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 }
 
                 childEntry.isFolder() -> {
-                    Timber.d("Sync-Feature: child $child is a Folder")
+                    Timber.d("Sync-Bookmarks: child $child is a Folder")
                     processFolder(childEntry.id, folderId, entries, lastModified, processIds, conflictResolution)
                 }
             }
@@ -193,7 +193,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         folderId: String,
         lastModified: String,
     ) {
-        Timber.d("Sync-Feature: child ${childEntry.id} is a Bookmark")
+        Timber.d("Sync-Bookmarks: child ${childEntry.id} is a Bookmark")
         val bookmark = decryptBookmark(childEntry, folderId, lastModified)
         when (conflictResolution) {
             DEDUPLICATION -> deduplicationStrategy.processBookmark(bookmark, folderId)
@@ -211,34 +211,34 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         val favouriteFolder = entries.find { it.id == SavedSitesNames.FAVORITES_ROOT } ?: return
         val favourites = favouriteFolder.folder?.children ?: emptyList()
         if (favourites.isEmpty()) {
-            Timber.d("Sync-Feature: Favourites folder is empty, removing all local favourites")
+            Timber.d("Sync-Bookmarks: Favourites folder is empty, removing all local favourites")
             val storedFavourites = repository.getFavoritesSync()
             storedFavourites.forEach {
                 repository.delete(it)
             }
         } else {
             favourites.forEachIndexed { position, child ->
-                Timber.d("Sync-Feature: child $child is a Favourite")
+                Timber.d("Sync-Bookmarks: child $child is a Favourite")
                 val favouriteEntry = entries.find { it.id == child }
                 if (favouriteEntry == null) {
-                    Timber.d("Sync-Feature: id $child not present in the payload, has it moved position?")
+                    Timber.d("Sync-Bookmarks: id $child not present in the payload, has it moved position?")
                     val storedFavorite = repository.getFavoriteById(child)
                     if (storedFavorite == null) {
-                        Timber.d("Sync-Feature: id $child not present locally as Favourite")
+                        Timber.d("Sync-Bookmarks: id $child not present locally as Favourite")
                         val storedBookmark = repository.getBookmarkById(child)
                         if (storedBookmark == null) {
-                            Timber.d("Sync-Feature: id $child not present locally as Bookmark either, omitting")
+                            Timber.d("Sync-Bookmarks: id $child not present locally as Bookmark either, omitting")
                         } else {
-                            Timber.d("Sync-Feature: id $child is a Bookmark locally, adding it as Favourite")
+                            Timber.d("Sync-Bookmarks: id $child is a Bookmark locally, adding it as Favourite")
                             repository.insertFavorite(url = storedBookmark.url, title = storedBookmark.title)
                             // repository.markBookmarkAsFavourite(id)
                         }
                     } else {
                         if (storedFavorite.position != position) {
-                            Timber.d("Sync-Feature: id $child present locally and moved from position ${storedFavorite.position} to $position")
+                            Timber.d("Sync-Bookmarks: id $child present locally and moved from position ${storedFavorite.position} to $position")
                             processFavourite(conflictResolution, storedFavorite.copy(position = position, lastModified = lastModified))
                         } else {
-                            Timber.d("Sync-Feature: id $child present locally but in the same position")
+                            Timber.d("Sync-Bookmarks: id $child present locally but in the same position")
                         }
                     }
                 } else {
@@ -246,11 +246,11 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                     processFavourite(conflictResolution, favourite)
                 }
             }
-            Timber.d("Sync-Feature: comparing local favourites vs remote ones")
+            Timber.d("Sync-Bookmarks: comparing local favourites vs remote ones")
             val storedFavourites = repository.getFavoritesSync()
             storedFavourites.forEach {
                 if (!favourites.contains(it.id)) {
-                    Timber.d("Sync-Feature: stored favourite ${it.id} no longer exists in remote, removing it")
+                    Timber.d("Sync-Bookmarks: stored favourite ${it.id} no longer exists in remote, removing it")
                     repository.delete(it)
                 }
             }
@@ -270,21 +270,21 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     }
 
     private fun processDeletedItems(deletedItems: List<String>) {
-        Timber.d("Sync-Feature: processing deleted items $deletedItems")
+        Timber.d("Sync-Bookmarks: processing deleted items $deletedItems")
         deletedItems.forEach { id ->
             val isBookmark = repository.getBookmarkById(id)
             if (isBookmark != null) {
-                Timber.d("Sync-Feature: item $id is a bookmark, deleting it")
+                Timber.d("Sync-Bookmarks: item $id is a bookmark, deleting it")
                 repository.delete(isBookmark)
             }
             val isFavourite = repository.getFavoriteById(id)
             if (isFavourite != null) {
-                Timber.d("Sync-Feature: item $id is a favourite, deleting it")
+                Timber.d("Sync-Bookmarks: item $id is a favourite, deleting it")
                 repository.delete(isFavourite)
             }
             val isFolder = repository.getFolder(id)
             if (isFolder != null) {
-                Timber.d("Sync-Feature: item $id is a folder, deleting it")
+                Timber.d("Sync-Bookmarks: item $id is a folder, deleting it")
                 repository.delete(isFolder)
             }
         }
@@ -302,7 +302,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             lastModified = remoteEntry.client_last_modified ?: lastModified,
             deleted = remoteEntry.deleted,
         )
-        Timber.d("Sync-Feature: decrypted $folder")
+        Timber.d("Sync-Bookmarks: decrypted $folder")
         return folder
     }
 
@@ -319,7 +319,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             lastModified = remoteEntry.client_last_modified ?: lastModified,
             deleted = remoteEntry.deleted,
         )
-        Timber.d("Sync-Feature: decrypted $bookmark")
+        Timber.d("Sync-Bookmarks: decrypted $bookmark")
         return bookmark
     }
 
@@ -335,7 +335,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             lastModified = remoteEntry.client_last_modified ?: lastModified,
             position = position,
         )
-        Timber.d("Sync-Feature: decrypted $favourite")
+        Timber.d("Sync-Bookmarks: decrypted $favourite")
         return favourite
     }
 }
