@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.api
 interface Subscriptions {
 
     /**
-     * This method returns a sealed class with the PAT for the authenticated user or an error if it doesn't exist
+     * This method returns a sealed class with the long-lived PAT for the authenticated user or an error if it doesn't exist
      * or any errors arise.
      * @return [PatResult]
      */

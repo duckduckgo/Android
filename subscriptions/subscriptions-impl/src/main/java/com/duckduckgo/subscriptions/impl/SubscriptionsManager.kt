@@ -56,6 +56,8 @@ interface SubscriptionsManager {
      */
     suspend fun getSubscriptionData(): SubscriptionsDataResult
 
+    suspend fun authenticate(token: String): SubscriptionsDataResult
+
     /**
      * Flow to know if a user is signed in or not
      */
@@ -77,23 +79,33 @@ class RealSubscriptionsManager @Inject constructor(
 
     private fun isUserAuthenticated(): Boolean = !authDataStore.token.isNullOrBlank()
 
+    override suspend fun authenticate(token: String): SubscriptionsDataResult {
+        return try {
+            val accessToken = getAccessToken(token)
+            authDataStore.token = accessToken
+            _isSignedIn.emit(isUserAuthenticated())
+            return getSubscriptionDataFromToken()
+        } catch (e: HttpException) {
+            val error = parseError(e)?.error ?: "An error happened"
+            Failure(error)
+        } catch (e: Exception) {
+            Failure(e.message ?: "An error happened")
+        }
+    }
+
     override suspend fun recoverSubscriptionFromStore(): SubscriptionsDataResult {
-        try {
-            val externalId = if (isUserAuthenticated()) {
-                getSubscriptionDataFromToken()
-            } else {
-                getDataFromPurchaseHistory()
-            }
-            return if (externalId is Success) {
+        return try {
+            val externalId = getDataFromPurchaseHistory()
+            if (externalId is Success) {
                 externalId
             } else {
-                return Failure("Subscription data not found")
+                Failure("Subscription data not found")
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
-            return Failure(error)
+            Failure(error)
         } catch (e: Exception) {
-            return Failure(e.message ?: "An error happened")
+            Failure(e.message ?: "An error happened")
         }
     }
 
@@ -114,13 +126,17 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun prePurchaseFlow(): SubscriptionsDataResult {
         return try {
-            val externalId = recoverSubscriptionFromStore()
-            if (externalId is Success) {
-                externalId
+            val subscriptionData = if (isUserAuthenticated()) {
+                getSubscriptionDataFromToken()
+            } else {
+                recoverSubscriptionFromStore()
+            }
+            return if (subscriptionData is Success) {
+                subscriptionData
             } else {
                 val newAccount = createAccount()
                 logcat(LogPriority.DEBUG) { "Subs: account created ${newAccount.externalId}" }
-                Success(externalId = newAccount.externalId, pat = newAccount.authToken, entitlements = emptyList())
+                authenticate(newAccount.authToken)
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
@@ -131,12 +147,11 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun getDataFromPurchaseHistory(): SubscriptionsDataResult {
-        try {
+        return try {
             val purchase = subscriptionsRepository.lastPurchaseHistoryRecord.value
-            if (purchase != null) {
+            return if (purchase != null) {
                 val signature = purchase.signature
                 val body = purchase.originalJson
-                logcat(LogPriority.DEBUG) { "Subs: body is $body" }
                 val storeLoginBody = StoreLoginBody(
                     signature = signature,
                     signedData = body,
@@ -144,46 +159,40 @@ class RealSubscriptionsManager @Inject constructor(
                 )
                 val response = authService.storeLogin(storeLoginBody)
                 logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
-                authDataStore.token = response.authToken
-                _isSignedIn.emit(isUserAuthenticated())
-                return getSubscriptionDataFromToken()
+                authenticate(response.authToken)
             } else {
-                return Failure("Subs: no previous purchases found")
+                Failure("Subs: no previous purchases found")
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
-            return Failure(error)
+            Failure(error)
         } catch (e: Exception) {
-            return Failure(e.message ?: "An error happened")
+            Failure(e.message ?: "An error happened")
         }
     }
 
     private suspend fun getSubscriptionDataFromToken(): SubscriptionsDataResult {
-        try {
+        return try {
             val response = authService.validateToken("Bearer ${authDataStore.token}")
-            logcat(LogPriority.DEBUG) { "Subs: token validated" }
-            return Success(externalId = response.account.externalId, pat = authDataStore.token!!, entitlements = response.account.entitlements)
+            logcat(LogPriority.DEBUG) { "Subs: token validated ${authDataStore.token}" }
+            Success(externalId = response.account.externalId, pat = authDataStore.token!!, entitlements = response.account.entitlements)
         } catch (e: HttpException) {
             val error = parseError(e)
-            return when (error?.error) {
-                "expired_token" -> {
-                    logcat(LogPriority.DEBUG) { "Subs: token expired" }
-                    getDataFromPurchaseHistory()
-                }
-                else -> {
-                    Failure(error?.error ?: "An error happened")
-                }
-            }
+            Failure(error?.error ?: "An error happened")
         } catch (e: Exception) {
-            return Failure(e.message ?: "An error happened")
+            Failure(e.message ?: "An error happened")
         }
     }
 
+    private suspend fun getAccessToken(token: String): String {
+        logcat(LogPriority.DEBUG) { "Subs: getting access token $token" }
+        val response = authService.accessToken("Bearer $token")
+        logcat(LogPriority.DEBUG) { "Subs: access token ${response.accessToken}" }
+        return response.accessToken
+    }
+
     private suspend fun createAccount(): CreateAccountResponse {
-        val response = authService.createAccount()
-        authDataStore.token = response.authToken
-        _isSignedIn.emit(isUserAuthenticated())
-        return response
+        return authService.createAccount()
     }
 
     private fun parseError(e: HttpException): ResponseError? {
