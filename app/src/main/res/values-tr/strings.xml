@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; yer işareti klasörünüzü silecektir.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Vazgeç</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Sil</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Sesli Arama seçeneğini ekleyin</string>
+    <string name="accessibilityVoiceSearchTitle">Özel Sesli Arama</string>
 </resources>
