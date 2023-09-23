@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">A DuckDuckGo beszédhangalapú keresésének használatához a rendszerbeállításokban engedélyezned kell a mikrofonhoz való hozzáférést.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Beállítások</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofon-hozzáférés szükséges</string>
+    <string name="voiceSearchRemovePositiveButton">Beszédhangalapú keresés eltávolítása</string>
+    <string name="voiceSearchRemoveTitle">Eltávolítja a Beszédhangalapú keresési opciót a címsorból?</string>
+    <string name="voiceSearchRemoveSubtitle">A beállításokban bármikor módosíthatod ezt és a többi kisegítő lehetőséget.</string>
     <string name="voiceSearchTitle">Beszédhangalapú keresés</string>
 </resources>
