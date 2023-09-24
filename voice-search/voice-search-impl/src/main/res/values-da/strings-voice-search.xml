@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Hvis du vil bruge stemmesøgning i DuckDuckGo, skal du aktivere mikrofonadgang i systemindstillingerne.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Indstillinger</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofonadgang påkrævet</string>
+    <string name="voiceSearchRemovePositiveButton">Fjern stemmesøgning</string>
+    <string name="voiceSearchRemoveTitle">Vil du fjerne stemmesøgningmuligheden fra adresselinjen?</string>
+    <string name="voiceSearchRemoveSubtitle">Du kan altid administrere dette og andre tilgængelighedspræferencer i Indstillinger.</string>
     <string name="voiceSearchTitle">Stemmesøgning</string>
 </resources>
