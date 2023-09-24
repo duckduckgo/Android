@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Aby korzystać z wyszukiwania głosowego w DuckDuckGo, musisz włączyć dostęp do mikrofonu w ustawieniach systemu.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Ustawienia</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Wymagany dostęp do mikrofonu</string>
+    <string name="voiceSearchRemovePositiveButton">Usuń wyszukiwanie głosowe</string>
+    <string name="voiceSearchRemoveTitle">Usunąć opcję wyszukiwania głosowego z paska adresu?</string>
+    <string name="voiceSearchRemoveSubtitle">Tymi i innymi preferencjami dostępności możesz zarządzać w Ustawieniach.</string>
     <string name="voiceSearchTitle">Wyszukiwanie głosowe</string>
 </resources>
