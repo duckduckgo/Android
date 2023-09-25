@@ -84,7 +84,7 @@ class SettingsSyncDataPersister @Inject constructor(
 
             if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
                 // first sync has a special case: ensure we send next time settings not updated during deduplication
-                settingsSyncMetadataDao.getAllObservable().firstOrNull()?.filter { it.modified_at != null }?.forEach {
+                settingsSyncMetadataDao.getAllObservable().firstOrNull()?.filterNot { it.modified_at.isNullOrEmpty() }?.forEach {
                     Timber.i("Sync-Settings: post-dedup update timestamp for ${it.key} so we can send them next time")
                     settingsSyncMetadataDao.addOrUpdate(
                         SettingsSyncMetadataEntity(key = it.key, modified_at = SyncDateProvider.now(), deleted_at = null),
