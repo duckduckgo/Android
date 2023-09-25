@@ -28,7 +28,6 @@ class AppTpSettingTest {
             when (setting) {
                 AppTpSetting.AlwaysSetDNS -> assertFalse(setting.defaultValue)
                 AppTpSetting.CPUMonitoring -> assertFalse(setting.defaultValue)
-                AppTpSetting.ProtectGames -> assertFalse(setting.defaultValue)
                 AppTpSetting.ExceptionLists -> assertTrue(setting.defaultValue)
                 AppTpSetting.RestartOnConnectivityLoss -> assertTrue(setting.defaultValue)
                 else -> throw java.lang.IllegalStateException("Missing AppTpSetting default checks")
