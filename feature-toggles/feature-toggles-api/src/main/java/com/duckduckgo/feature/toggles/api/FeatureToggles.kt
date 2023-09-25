@@ -156,7 +156,13 @@ interface Toggle {
         val enabledOverrideValue: Boolean? = null,
         val rollout: List<Double>? = null,
         val rolloutStep: Int? = null,
-    )
+        val variants: List<Variant> = emptyList(),
+    ) {
+        data class Variant(
+            val name: String,
+            val weight: Double,
+        )
+    }
 
     interface Store {
         fun set(key: String, state: State)

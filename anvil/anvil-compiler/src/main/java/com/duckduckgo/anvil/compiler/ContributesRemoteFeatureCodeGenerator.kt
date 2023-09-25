@@ -309,6 +309,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addFunction(createInvokeMethod(boundType))
                     .addType(createJsonRolloutDataClass(generatedPackage, module))
                     .addType(createJsonRolloutStepDataClass(generatedPackage, module))
+//                    .addType(createJsonToggleListOfVariantDataClass(generatedPackage, module))
+                    .addType(createJsonToggleVariantDataClass(generatedPackage, module))
                     .addType(createJsonToggleDataClass(generatedPackage, module))
                     .addType(createJsonFeatureDataClass(generatedPackage, module))
                     .addType(createJsonExceptionDataClass(generatedPackage, module))
@@ -416,6 +418,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             remoteEnableState = isEnabled,
                             enable = isEnabled,
                             minSupportedVersion = feature.minSupportedVersion,
+                            variants = emptyList(),
                         )
                     )
         
@@ -432,6 +435,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 
                                 val previousRolloutStep = previousState?.rolloutStep 
                                 val newStateValue = (jsonToggle.state == "enabled" || (appBuildConfig.flavor == %T && jsonToggle.state == "internal"))
+                                val variants = jsonToggle?.variants?.map { variant ->
+                                    Toggle.State.Variant(
+                                        name = variant.name,
+                                        weight = variant.weight,
+                                    )
+                                } ?: emptyList()
                                 this.feature.get().invokeMethod(subfeature.key).setEnabled(
                                     Toggle.State(
                                         remoteEnableState = newStateValue,
@@ -439,6 +448,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                         minSupportedVersion = jsonToggle.minSupportedVersion?.toInt(),
                                         rollout = jsonToggle?.rollout?.steps?.map { it.percent },
                                         rolloutStep = previousRolloutStep,
+                                        variants = variants,
                                     ),
                                 )
                             } catch(e: Throwable) {
@@ -613,6 +623,49 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .build()
     }
 
+//    private fun createJsonToggleListOfVariantDataClass(
+//        generatedPackage: String,
+//        module: ModuleDescriptor,
+//    ): TypeSpec {
+//        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleVariantList").asClassName(module))
+//            .addModifiers(KModifier.PRIVATE)
+//            .addModifiers(KModifier.DATA)
+//            .primaryConstructor(
+//                FunSpec.constructorBuilder()
+//                    .addParameter(
+//                        "variants",
+//                        List::class.asClassName().parameterizedBy(FqName("JsonToggleVariant").asClassName(module)),
+//                    )
+//                    .build(),
+//            )
+//            .addProperty(
+//                PropertySpec.builder(
+//                    "variants",
+//                    List::class.asClassName().parameterizedBy(FqName("JsonToggleVariant").asClassName(module)),
+//                ).initializer("variants")
+//                    .build(),
+//            )
+//            .build()
+//    }
+
+    private fun createJsonToggleVariantDataClass(
+        generatedPackage: String,
+        module: ModuleDescriptor,
+    ): TypeSpec {
+        return TypeSpec.classBuilder(FqName("$generatedPackage.JsonToggleVariant").asClassName(module))
+            .addModifiers(KModifier.PRIVATE)
+            .addModifiers(KModifier.DATA)
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("name", String::class.asClassName())
+                    .addParameter("weight", Double::class.asClassName())
+                    .build(),
+            )
+            .addProperty(PropertySpec.builder("name", String::class.asClassName()).initializer("name").build())
+            .addProperty(PropertySpec.builder("weight", Double::class.asClassName()).initializer("weight").build())
+            .build()
+    }
+
     private fun createJsonToggleDataClass(
         generatedPackage: String,
         module: ModuleDescriptor,
@@ -634,6 +687,10 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                         "rollout",
                         FqName("JsonToggleRollout").asClassName(module).copy(nullable = true),
                     )
+                    .addParameter(
+                        "variants",
+                        List::class.asClassName().parameterizedBy(FqName("JsonToggleVariant").asClassName(module)),
+                    )
                     .build(),
             )
             .addProperty(
@@ -652,6 +709,12 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 PropertySpec
                     .builder("rollout", FqName("JsonToggleRollout").asClassName(module).copy(nullable = true))
                     .initializer("rollout")
+                    .build(),
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("variants", List::class.asClassName().parameterizedBy(FqName("JsonToggleVariant").asClassName(module)))
+                    .initializer("variants")
                     .build(),
             )
             .build()

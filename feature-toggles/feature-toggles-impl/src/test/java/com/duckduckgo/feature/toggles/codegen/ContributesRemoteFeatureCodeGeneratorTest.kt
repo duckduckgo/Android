@@ -1053,6 +1053,78 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         }
     }
 
+    @Test
+    fun `test variant parsing when no remote variant provided`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(emptyList<Toggle.State.Variant>(), testFeature.fooFeature().getRawStoredState()!!.variants)
+    }
+
+    @Test
+    fun `test variant parsing`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "variants": [
+                                    {
+                                        "name": "ma",
+                                        "weight": 1.0
+                                    },
+                                    {
+                                        "name": "mb",
+                                        "weight": 1.0
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Variant("ma", 1.0),
+                Toggle.State.Variant("mb", 1.0),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.variants,
+        )
+    }
+
     private fun generatedFeatureNewInstance(): Any {
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
