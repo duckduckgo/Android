@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.app.global.extensions.applyBoldSpanTo
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
@@ -82,7 +83,8 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.contentBody.text = String.format(Locale.US, getString(R.string.sync_connected_device_hint), viewState.deviceName)
+        val deviceName = String.format(Locale.US, getString(R.string.sync_connected_device_hint), viewState.deviceName)
+        binding.contentBody.text = deviceName.applyBoldSpanTo(viewState.deviceName)
         binding.footerPrimaryButton.setOnClickListener {
             viewModel.onNextClicked()
         }

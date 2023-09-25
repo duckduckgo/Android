@@ -44,14 +44,17 @@
     <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.</string>
 
     <!-- Setup screen -->
-    <string name="sync_enable_sync_title">Sync is Set Up</string>
+    <string name="sync_enable_sync_title">All Set!</string>
     <string name="sync_enable_sync_content">You can sync this device’s bookmarks and Logins with additional devices at any time from the Sync &amp; Back Up menu in Settings.</string>
-    <string name="sync_enable_options">Sync Options</string>
-    <string name="sync_enable_option_favicons_title">Sync Bookmark Icons</string>
-    <string name="sync_enable_option_favicons_subtitle">Automatically fetch icons for synced bookmarks on your other devices.</string>
-    <string name="sync_enable_option_favorites_title">Sync Favorites</string>
+    <string name="sync_enable_options">Settings</string>
+    <string name="sync_enable_option_favicons_title">Fetch Bookmark Icons</string>
+    <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
+    <string name="sync_enable_option_favorites_title">Share Favorites</string>
     <string name="sync_enable_option_favorites_subtitle">Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.</string>
 
+    <!-- Device synced screen -->
+    <string name="sync_connected_device_title">Device Synced!</string>
+    <string name="sync_connected_device_hint">Your bookmarks and Logins are now syncing with %1$s</string>
 
     <string name="login_screen_title">Recover Data</string>
     <string name="connect_screen_title">Scan QR Code</string>
@@ -75,8 +78,6 @@
     <string name="sync_recovery_code_primary_button">Save Recovery PDF</string>
     <string name="sync_recovery_code_secondary_button">Copy Code</string>
     <string name="sync_recovery_code_skip_button">Not Now</string>
-    <string name="sync_connected_device_title">Device Synced!</string>
-    <string name="sync_connected_device_hint">Your bookmarks and Logins are now syncing with %1$s</string>
     <string name="sync_connected_device_primary_button">Next</string>
     <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data.</string>
     <string name="sync_connect_scan_qr_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan the QR code to sync.</string>

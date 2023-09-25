@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.ui.notification
+package com.duckduckgo.app.global.extensions
 
 import android.graphics.Typeface
 import android.text.Spannable
