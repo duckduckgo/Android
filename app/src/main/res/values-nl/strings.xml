@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Hiermee verwijder je de bladwijzermap voor &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Annuleren</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Verwijderen</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">\'Zoeken via spraak\' toevoegen aan de adresbalk</string>
+    <string name="accessibilityVoiceSearchTitle">Private spraakzoekopdracht</string>
 </resources>
