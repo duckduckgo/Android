@@ -108,10 +108,10 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_margin="20dp"
+                android:layout_margin="@dimen/keyline_5"
                 android:background="@drawable/background_text_view_container"
                 app:layout_constraintTop_toBottomOf="@id/content_body"
-                android:padding="@dimen/keyline_5">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -121,6 +121,7 @@
                     <com.duckduckgo.mobile.android.ui.view.SkeletonView
                         android:layout_width="96dp"
                         android:layout_height="96dp"/>
+
                     <com.duckduckgo.mobile.android.ui.view.SkeletonView
                         android:layout_width="match_parent"
                         android:layout_marginStart="@dimen/keyline_4"
@@ -137,10 +138,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_margin="20dp"
+                android:layout_margin="@dimen/keyline_5"
                 app:layout_constraintTop_toBottomOf="@id/content_body"
                 android:background="@drawable/background_text_view_container"
-                android:padding="@dimen/keyline_5"
+                android:padding="20dp"
                 android:orientation="horizontal">
 
                 <ImageView

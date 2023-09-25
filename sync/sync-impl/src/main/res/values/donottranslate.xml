@@ -56,11 +56,14 @@
     <string name="sync_connected_device_title">Device Synced!</string>
     <string name="sync_connected_device_hint">Your bookmarks and Logins are now syncing with %1$s</string>
 
+    <!-- Connect screen -->
     <string name="login_screen_title">Recover Data</string>
     <string name="connect_screen_title">Scan QR Code</string>
     <string name="show_qr_screen_title">Show QR Code</string>
-    <string name="enter_code_screen_title">Manually Enter Code</string>
+    <string name="enter_code_screen_title">Enter Text Code</string>
     <string name="show_code_screen_title">Code</string>
+    <string name="enter_code_screen_cta">Manually Enter Code</string>
+    <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data.</string>
 
     <string name="synced_devices_section_title">Synced Devices</string>
     <string name="sync_new_device_section_title">Sync New Device</string>
@@ -79,8 +82,7 @@
     <string name="sync_recovery_code_secondary_button">Copy Code</string>
     <string name="sync_recovery_code_skip_button">Not Now</string>
     <string name="sync_connected_device_primary_button">Next</string>
-    <string name="sync_login_device_hint">Scan the QR code on your Recovery PDF, or another synced device, to recover your synced data.</string>
-    <string name="sync_connect_scan_qr_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan the QR code to sync.</string>
+    <string name="sync_connect_scan_qr_hint">Go to Settings > Sync &amp; Back Up in the DuckDuckGo App on a different device and scan this QR code to sync.</string>
     <string name="sync_connect_copy_code">Copy Code</string>
     <string name="turn_off_sync_dialog_title">Turn off sync?</string>
     <string name="turn_off_sync_dialog_content">This Device will no longer be able to access your synced data</string>

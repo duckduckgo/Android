@@ -41,7 +41,7 @@
         android:id="@+id/readTextCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="Manually Enter Code"
+        app:primaryText="@string/enter_code_screen_cta"
         app:leadingIcon="@drawable/ic_keyboard_24"
         app:leadingIconBackground="circular"/>
 
