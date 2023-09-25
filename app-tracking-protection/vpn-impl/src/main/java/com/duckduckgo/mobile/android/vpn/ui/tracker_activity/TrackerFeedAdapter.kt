@@ -105,9 +105,8 @@ class TrackerFeedAdapter @Inject constructor(
             DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
         }
 
-        trackerFeedItems.clear().also { trackerFeedItems.addAll(newData) }
-
         withContext(dispatchers.main()) {
+            trackerFeedItems.clear().also { trackerFeedItems.addAll(newData) }
             // only the thread the creates the view hierarchy can touch the views
             diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
         }
