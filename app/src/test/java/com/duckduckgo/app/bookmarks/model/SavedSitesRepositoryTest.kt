@@ -706,7 +706,7 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenChildFolderWithBookmarkThenGetFolderBranchReturnsFolderBranch() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 1, 0, "timestamp")
         val childBookmark = Bookmark("bookmark1", "title", "www.example.com", "folder2", "timestamp")
         val folderBranch = FolderBranch(listOf(childBookmark), listOf(parentFolder, childFolder))
 
@@ -722,9 +722,9 @@ class SavedSitesRepositoryTest {
     fun whenChildFoldersWithBookmarksThenGetFolderBranchReturnsFolderBranch() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val parentBookmark = Bookmark("bookmark1", "title1", "www.example1.com", "folder1", "timestamp")
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 1, 1, "timestamp")
         val childBookmark = Bookmark("bookmark2", "title2", "www.example2.com", "folder2", "timestamp")
-        val childSecondFolder = BookmarkFolder("folder3", "Parent Folder", "folder2", 0, 0, "timestamp")
+        val childSecondFolder = BookmarkFolder("folder3", "Parent Folder", "folder2", 2, 2, "timestamp")
         val childThirdBookmark = Bookmark("bookmark3", "title3", "www.example3.com", "folder3", "timestamp")
         val childFourthBookmark = Bookmark("bookmark4", "title4", "www.example4.com", "folder3", "timestamp")
         val childThirdFolder = BookmarkFolder("folder4", "Parent Folder", "folder3", 0, 0, "timestamp")
@@ -746,9 +746,9 @@ class SavedSitesRepositoryTest {
     fun whenChildFoldersWithBookmarksInRootThenGetFolderBranchReturnsFolderBranch() = runTest {
         val parentFolder = BookmarkFolder("folder1", "Parent Folder", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val parentBookmark = Bookmark("bookmark1", "title1", "www.example1.com", SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
-        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 0, 0, "timestamp")
+        val childFolder = BookmarkFolder("folder2", "Parent Folder", "folder1", 1, 1, "timestamp")
         val childBookmark = Bookmark("bookmark2", "title2", "www.example2.com", "folder2", "timestamp")
-        val childSecondFolder = BookmarkFolder("folder3", "Parent Folder", "folder2", 0, 0, "timestamp")
+        val childSecondFolder = BookmarkFolder("folder3", "Parent Folder", "folder2", 2, 2, "timestamp")
         val childThirdBookmark = Bookmark("bookmark3", "title3", "www.example3.com", "folder3", "timestamp")
         val childFourthBookmark = Bookmark("bookmark4", "title4", "www.example4.com", "folder3", "timestamp")
         val childThirdFolder = BookmarkFolder("folder4", "Parent Folder", "folder3", 0, 0, "timestamp")
@@ -790,7 +790,13 @@ class SavedSitesRepositoryTest {
     @Test
     fun whenBuildFlatStructureThenReturnFolderListWithDepth() = runTest {
         val rootFolder = BookmarkFolder(id = SavedSitesNames.BOOKMARKS_ROOT, name = "root", lastModified = "timestamp", parentId = "")
-        val parentFolder = BookmarkFolder(id = "folder1", name = "name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
+        val parentFolder = BookmarkFolder(
+            id = "folder1",
+            name = "name",
+            lastModified = "timestamp",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            numFolders = 1,
+        )
         val childFolder = BookmarkFolder(id = "folder2", name = "another name", lastModified = "timestamp", parentId = "folder1")
         val folder = BookmarkFolder(id = "folder3", name = "folder name", lastModified = "timestamp", parentId = SavedSitesNames.BOOKMARKS_ROOT)
 
