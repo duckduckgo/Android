@@ -43,8 +43,8 @@ class BookmarksEntityQueryListener(
                         val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
                         val filteredBookmarks = filterBookmarks(newText, bookmarks)
                         val filteredFavorites = filterFavorites(newText, favorites)
-                        favoritesAdapter?.setItems(filteredFavorites, true)
-                        bookmarksAdapter.setItems(filteredBookmarks, filteredFolders.isEmpty(), true)
+                        favoritesAdapter?.setItems(filteredFavorites)
+                        bookmarksAdapter.setItems(filteredBookmarks, filteredFolders.isEmpty())
                         bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
                     }
                 }

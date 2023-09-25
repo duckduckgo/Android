@@ -60,17 +60,12 @@ class FavoritesAdapter(
 
     fun setItems(
         favoriteItems: List<FavoriteItem>,
-        filteringMode: Boolean = false,
     ) {
         val generatedList = generateNewList(favoriteItems)
         val diffCallback = DiffCallback(old = this.favoriteItems, new = generatedList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.favoriteItems.clear().also { this.favoriteItems.addAll(generatedList) }
         diffResult.dispatchUpdatesTo(this)
-
-        if (filteringMode || favoriteItems.isEmpty()) {
-            return
-        }
     }
 
     private fun generateNewList(value: List<FavoriteItemTypes>): List<FavoriteItemTypes> {
