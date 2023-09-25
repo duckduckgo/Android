@@ -2726,22 +2726,10 @@ class BrowserTabViewModel @Inject constructor(
      */
     fun usePrivateDuckAddress(originalUrl: String, duckAddress: String) {
         command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = true))
-        pixel.enqueueFire(
-            AppPixelName.EMAIL_USE_ALIAS,
-            mapOf(PixelParameter.COHORT to emailManager.getCohort(), PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()),
-        )
     }
 
     fun usePersonalDuckAddress(originalUrl: String, duckAddress: String) {
         command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = false))
-        pixel.enqueueFire(
-            AppPixelName.EMAIL_USE_ADDRESS,
-            mapOf(PixelParameter.COHORT to emailManager.getCohort(), PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate()),
-        )
-    }
-
-    fun cancelAutofillTooltip() {
-        pixel.enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {

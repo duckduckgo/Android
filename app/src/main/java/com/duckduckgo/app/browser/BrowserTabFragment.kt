@@ -1007,10 +1007,6 @@ class BrowserTabFragment :
         acceptGeneratedPassword(originalUrl)
     }
 
-    override fun onRejectToUseEmailProtection(originalUrl: String) {
-        viewModel.cancelAutofillTooltip()
-    }
-
     override fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String) {
         viewModel.usePrivateDuckAddress(originalUrl, duckAddress)
     }

@@ -72,9 +72,6 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor(
 object PixelInterceptorPixelsRequiringDataCleaning : PixelRequiringDataCleaningPlugin {
     override fun names(): List<String> {
         return listOf(
-            AppPixelName.EMAIL_TOOLTIP_DISMISSED.pixelName,
-            AppPixelName.EMAIL_USE_ALIAS.pixelName,
-            AppPixelName.EMAIL_USE_ADDRESS.pixelName,
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
             StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName,
             "m_atp_unprotected_apps_bucket_",
