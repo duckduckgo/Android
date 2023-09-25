@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Para usar a Pesquisa por voz no DuckDuckGo, tens de autorizar o acesso ao microfone nas definições do sistema.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Definições</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">É necessário o acesso ao microfone</string>
+    <string name="voiceSearchRemovePositiveButton">Remover pesquisa por voz</string>
+    <string name="voiceSearchRemoveTitle">Remover opção de pesquisa por voz da barra de endereços?</string>
+    <string name="voiceSearchRemoveSubtitle">Podes sempre gerir esta e outras preferências de acessibilidade nas Definições.</string>
     <string name="voiceSearchTitle">Pesquisa por voz</string>
 </resources>
