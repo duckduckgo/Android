@@ -21,6 +21,9 @@ import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COHORT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LAST_USED_DAY
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
@@ -29,6 +32,9 @@ import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultTy
 import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.UsePrivateAliasAddress
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.ResultHandlerEmailProtectionChooseEmail
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -52,18 +58,22 @@ class ResultHandlerEmailProtectionChooseEmailTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
     private val emailManager: EmailManager = mock()
+    private val pixel: Pixel = mock()
 
     private val testee = ResultHandlerEmailProtectionChooseEmail(
         appBuildConfig = appBuildConfig,
         emailManager = emailManager,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         appCoroutineScope = coroutineTestRule.testScope,
+        pixel = pixel,
     )
 
     @Before
     fun before() {
         whenever(emailManager.getEmailAddress()).thenReturn("personal-example@duck.com")
         whenever(emailManager.getAlias()).thenReturn("private-example@duck.com")
+        whenever(emailManager.getCohort()).thenReturn("cohort")
+        whenever(emailManager.getLastUsedDate()).thenReturn("2021-01-01")
     }
 
     @Test
@@ -81,13 +91,6 @@ class ResultHandlerEmailProtectionChooseEmailTest {
     }
 
     @Test
-    fun whenUserRejectedUsingAnyDuckAddressThenCorrectCallbackInvoked() {
-        val bundle = bundle(result = DoNotUseEmailProtection)
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
-        verify(callback).onRejectToUseEmailProtection(any())
-    }
-
-    @Test
     fun whenUrlMissingFromBundleThenExceptionThrown() = runTest {
         val bundle = bundle(url = null, result = UsePersonalEmailAddress)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
@@ -102,17 +105,44 @@ class ResultHandlerEmailProtectionChooseEmailTest {
     }
 
     @Test
-    fun whenUserSelectedToUsePrivateAliasAddressThenSetNewLastUsedDateCalled() {
+    fun whenUserSelectedToUsePrivateAliasAddressThenSetNewLastUsedDateCalled() = runTest {
         val bundle = bundle(result = UsePrivateAliasAddress)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(emailManager).setNewLastUsedDate()
     }
 
     @Test
-    fun whenUserSelectedToUsePersonalDuckAddressThenSetNewLastUsedDateCalled() {
+    fun whenUserSelectedToUsePersonalDuckAddressThenSetNewLastUsedDateCalled() = runTest {
         val bundle = bundle(result = UsePersonalEmailAddress)
         testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
         verify(emailManager).setNewLastUsedDate()
+    }
+
+    @Test
+    fun whenUserSelectedNotToUseEmailProtectionThenPixelSent() = runTest {
+        val bundle = bundle(result = DoNotUseEmailProtection)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(pixel).enqueueFire(EMAIL_TOOLTIP_DISMISSED, mapOf(COHORT to "cohort"))
+    }
+
+    @Test
+    fun whenUserSelectedToUsePersonalDuckAddressThenPixelSent() = runTest {
+        val bundle = bundle(result = UsePersonalEmailAddress)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(pixel).enqueueFire(
+            EMAIL_USE_ADDRESS,
+            mapOf(COHORT to "cohort", LAST_USED_DAY to "2021-01-01"),
+        )
+    }
+
+    @Test
+    fun whenUserSelectedToUsePrivateAliasThenPixelSent() = runTest {
+        val bundle = bundle(result = UsePrivateAliasAddress)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        verify(pixel).enqueueFire(
+            EMAIL_USE_ALIAS,
+            mapOf(COHORT to "cohort", LAST_USED_DAY to "2021-01-01"),
+        )
     }
 
     private fun bundle(

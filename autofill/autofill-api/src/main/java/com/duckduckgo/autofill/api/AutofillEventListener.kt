@@ -52,12 +52,6 @@ interface AutofillEventListener {
     fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String)
 
     /**
-     * Called when user chooses not to autofill any duck address.
-     * @param originalUrl the URL of the page that prompted the user to use a duck address
-     */
-    fun onRejectToUseEmailProtection(originalUrl: String)
-
-    /**
      * Called when user chooses to autofill a login credential to a web page.
      * @param originalUrl the URL of the page that prompted the user to use a login credential
      * @param selectedCredentials the login credential that the user chose to autofill

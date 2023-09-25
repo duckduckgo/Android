@@ -3475,10 +3475,10 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.usePrivateDuckAddress("", "foo@example.com")
+        testee.consumeAliasAndCopyToClipboard()
 
         verify(mockPixel).enqueueFire(
-            AppPixelName.EMAIL_USE_ALIAS,
+            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
             mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
@@ -3523,30 +3523,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenConsumeAliasThenPixelSent() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
-
-        testee.usePrivateDuckAddress("", "foo@example.com")
-
-        verify(mockPixel).enqueueFire(
-            AppPixelName.EMAIL_USE_ALIAS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
-        )
-    }
-
-    @Test
-    fun whenCancelAutofillTooltipThenPixelSent() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-
-        testee.cancelAutofillTooltip()
-
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
-    }
-
-    @Test
     fun whenUseAddressThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
@@ -3555,20 +3531,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.InjectEmailAddress> {
             assertEquals("address", this.duckAddress)
         }
-    }
-
-    @Test
-    fun whenUseAddressThenPixelSent() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
-        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
-
-        testee.usePersonalDuckAddress("", "")
-
-        verify(mockPixel).enqueueFire(
-            AppPixelName.EMAIL_USE_ADDRESS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
-        )
     }
 
     @Test
