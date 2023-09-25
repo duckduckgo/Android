@@ -18,6 +18,10 @@ package com.duckduckgo.privacy.config.impl.features.useragent
 
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.DefaultPolicy
+import com.duckduckgo.privacy.config.api.DefaultPolicy.CLOSEST
+import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG
+import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG_FIXED
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
@@ -40,5 +44,38 @@ class RealUserAgent @Inject constructor(
 
     override fun isADefaultException(url: String): Boolean {
         return unprotectedTemporary.isAnException(url) || userAgentRepository.defaultExceptions.any { UriString.sameOrSubdomain(url, it.domain) }
+    }
+
+    override fun defaultPolicy(): DefaultPolicy {
+        return when (userAgentRepository.defaultPolicy) {
+            "ddg" -> { DDG }
+            "ddgFixed" -> { DDG_FIXED }
+            "closest" -> { CLOSEST }
+            else -> { DDG }
+        }
+    }
+
+    override fun isADdgDefaultSite(url: String): Boolean {
+        return userAgentRepository.ddgDefaultSites.any { UriString.sameOrSubdomain(url, it.domain) }
+    }
+
+    override fun isADdgFixedSite(url: String): Boolean {
+        return userAgentRepository.ddgFixedSites.any { UriString.sameOrSubdomain(url, it.domain) }
+    }
+
+    override fun closestUserAgentEnabled(): Boolean {
+        return userAgentRepository.closestUserAgentState
+    }
+
+    override fun ddgFixedUserAgentEnabled(): Boolean {
+        return userAgentRepository.ddgFixedUserAgentState
+    }
+
+    override fun isClosestUserAgentVersion(version: String): Boolean {
+        return userAgentRepository.closestUserAgentVersions.contains(version)
+    }
+
+    override fun isDdgFixedUserAgentVersion(version: String): Boolean {
+        return userAgentRepository.ddgFixedUserAgentVersions.contains(version)
     }
 }

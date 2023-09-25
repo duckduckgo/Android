@@ -23,6 +23,9 @@ import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UserAgentExceptionEntity
+import com.duckduckgo.privacy.config.store.UserAgentSitesEntity
+import com.duckduckgo.privacy.config.store.UserAgentStatesEntity
+import com.duckduckgo.privacy.config.store.UserAgentVersionsEntity
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -43,6 +46,8 @@ class UserAgentPlugin @Inject constructor(
         val privacyFeature = privacyFeatureValueOf(featureName) ?: return false
         if (privacyFeature.value == this.featureName) {
             val userAgentExceptions = mutableListOf<UserAgentExceptionEntity>()
+            val userAgentSites = mutableListOf<UserAgentSitesEntity>()
+            val userAgentVersions = mutableListOf<UserAgentVersionsEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<UserAgentFeature> =
                 moshi.adapter(UserAgentFeature::class.java)
@@ -51,6 +56,10 @@ class UserAgentPlugin @Inject constructor(
             val exceptionsList = userAgentFeature?.exceptions.orEmpty()
             val applicationList = userAgentFeature?.settings?.omitApplicationSites.orEmpty()
             val versionList = userAgentFeature?.settings?.omitVersionSites.orEmpty()
+            val ddgDefaultSitesList = userAgentFeature?.settings?.ddgDefaultSites.orEmpty()
+            val ddgFixedSitesList = userAgentFeature?.settings?.ddgFixedSites.orEmpty()
+            val closestUserAgentVersionList = userAgentFeature?.settings?.closestUserAgent?.versions.orEmpty()
+            val ddgFixedUserAgentVersionList = userAgentFeature?.settings?.ddgFixedUserAgent?.versions.orEmpty()
 
             val applicationAndVersionExceptionsList = applicationList intersect versionList
             val defaultExceptionList = (exceptionsList subtract applicationList) + (exceptionsList subtract versionList)
@@ -69,8 +78,28 @@ class UserAgentPlugin @Inject constructor(
             versionExceptionList.forEach {
                 userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = true))
             }
+            ddgDefaultSitesList.forEach {
+                userAgentSites.add(UserAgentSitesEntity(it.domain, it.reason, ddgDefaultSite = true, ddgFixedSite = false))
+            }
+            ddgFixedSitesList.forEach {
+                userAgentSites.add(UserAgentSitesEntity(it.domain, it.reason, ddgDefaultSite = false, ddgFixedSite = true))
+            }
+            closestUserAgentVersionList.forEach {
+                userAgentVersions.add(UserAgentVersionsEntity(it, closestUserAgent = true, ddgFixedUserAgent = false))
+            }
+            ddgFixedUserAgentVersionList.forEach {
+                userAgentVersions.add(UserAgentVersionsEntity(it, closestUserAgent = false, ddgFixedUserAgent = true))
+            }
 
-            userAgentRepository.updateAll(userAgentExceptions)
+            val userAgentStates = userAgentFeature?.settings?.let { settings ->
+                UserAgentStatesEntity(
+                    defaultPolicy = settings.defaultPolicy,
+                    closestUserAgent = settings.closestUserAgent.state == "enabled",
+                    ddgFixedUserAgent = settings.ddgFixedUserAgent.state == "enabled",
+                )
+            }
+
+            userAgentRepository.updateAll(userAgentExceptions, userAgentSites, userAgentStates, userAgentVersions)
             val isEnabled = userAgentFeature?.state == "enabled"
             privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(this.featureName, isEnabled, userAgentFeature?.minSupportedVersion))
             return true

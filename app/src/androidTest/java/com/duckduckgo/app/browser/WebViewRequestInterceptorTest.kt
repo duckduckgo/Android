@@ -29,6 +29,8 @@ import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.statistics.model.Atb
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
@@ -83,6 +85,7 @@ class WebViewRequestInterceptorTest {
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
+        FakeStatisticsDataStore(),
     )
 
     private var webView: WebView = mock()
@@ -806,5 +809,21 @@ class WebViewRequestInterceptorTest {
         const val DEFAULT =
             "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 " +
                 "(KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
+    }
+
+    class FakeStatisticsDataStore : StatisticsDataStore {
+        override val hasInstallationStatistics: Boolean = false
+
+        override var atb: Atb? = Atb("v123-4")
+
+        override var appRetentionAtb: String? = ""
+
+        override var searchRetentionAtb: String? = ""
+
+        override var variant: String? = ""
+
+        override var referrerVariant: String? = ""
+        override fun saveAtb(atb: Atb) {}
+        override fun clearAtb() {}
     }
 }

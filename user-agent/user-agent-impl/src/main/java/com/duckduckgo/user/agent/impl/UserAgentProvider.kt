@@ -24,8 +24,12 @@ import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.DefaultPolicy.CLOSEST
+import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG
+import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG_FIXED
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
@@ -55,10 +59,13 @@ class RealUserAgentProvider @Inject constructor(
     private val userAgent: UserAgent,
     private val toggle: FeatureToggle,
     private val userAllowListRepository: UserAllowListRepository,
+    private val statisticsDataStore: StatisticsDataStore,
 ) : UserAgentProvider {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
+    private val ddgFixedBaseAgent: String by lazy { concatWithSpaces(ddgFixedMobilePrefix, getWebKitVersionOnwards(false)) }
     private val baseDesktopAgent: String by lazy { concatWithSpaces(desktopPrefix, getWebKitVersionOnwards(true)) }
+    private val ddgFixedBaseDesktopAgent: String by lazy { concatWithSpaces(ddgFixedDesktopPrefix, getWebKitVersionOnwards(true)) }
     private val safariComponent: String? by lazy { getSafariComponentFromUserAgent() }
     private val applicationComponent = "DuckDuckGo/${device.majorAppVersion}"
 
@@ -86,27 +93,27 @@ class RealUserAgentProvider @Inject constructor(
             }
         }
 
-        val omitApplicationComponent = if (host != null) userAgent.isAnApplicationException(host) else false
-        val omitVersionComponent = if (host != null) userAgent.isAVersionException(host) else false
-        val shouldUseDesktopAgent =
-            if (url != null && host != null) {
-                sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(url, it) }
-            } else {
-                false
-            }
-        var prefix = if (isDesktop || shouldUseDesktopAgent) baseDesktopAgent else baseAgent
-        if (omitVersionComponent) {
-            prefix = prefix.replace(AgentRegex.version, "")
+        val shouldUseDdgUserAgent = if (host != null) userAgent.isADdgDefaultSite(host) else false
+        if (shouldUseDdgUserAgent) {
+            return getDdgUserAgent(url, host, isDesktop)
         }
 
-        val application = if (!omitApplicationComponent) applicationComponent else null
-        var userAgent = concatWithSpaces(prefix, application, safariComponent)
-
-        userAgentInterceptorPluginPoint.getPlugins().forEach {
-            userAgent = it.intercept(userAgent)
+        val shouldUseDdgFixedUserAgent = if (host != null) userAgent.isADdgFixedSite(host) else false
+        if (shouldUseDdgFixedUserAgent) {
+            return getDdgFixedUserAgent(url, host, isDesktop)
         }
 
-        return userAgent
+        statisticsDataStore.atb?.let { atb ->
+            val version = atb.version.substringAfter("v").substringBefore("-")
+            if (userAgent.isDdgFixedUserAgentVersion(version)) return getDdgFixedUserAgent(url, host, isDesktop)
+            if (userAgent.isClosestUserAgentVersion(version)) return getClosestUserAgent(url, host, isDesktop)
+        }
+
+        return when (userAgent.defaultPolicy()) {
+            DDG -> { getDdgUserAgent(url, host, isDesktop) }
+            DDG_FIXED -> { getDdgFixedUserAgent(url, host, isDesktop) }
+            CLOSEST -> { getClosestUserAgent(url, host, isDesktop) }
+        }
     }
 
     private fun isHostInUserAllowedList(host: String?): Boolean {
@@ -159,7 +166,9 @@ class RealUserAgentProvider @Inject constructor(
     companion object {
         const val SPACE = " "
         val mobilePrefix = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE})"
+        const val ddgFixedMobilePrefix = "Mozilla/5.0 (Linux; Android 10; K)"
         val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
+        val ddgFixedDesktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})".replace("aarch64", "x86_64")
         val fallbackDefaultUA = "$mobilePrefix AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
 
         val sitesThatShouldUseDesktopAgent = listOf(
@@ -171,6 +180,58 @@ class RealUserAgentProvider @Inject constructor(
         val host: String,
         val excludedPaths: List<String> = emptyList(),
     )
+
+    private fun getDdgUserAgent(url: String?, host: String?, isDesktop: Boolean): String {
+        val omitApplicationComponent = if (host != null) userAgent.isAnApplicationException(host) else false
+        val omitVersionComponent = if (host != null) userAgent.isAVersionException(host) else false
+        val shouldUseDesktopAgent =
+            if (url != null && host != null) {
+                sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(url, it) }
+            } else {
+                false
+            }
+        var prefix = if (isDesktop || shouldUseDesktopAgent) baseDesktopAgent else baseAgent
+        if (omitVersionComponent) {
+            prefix = prefix.replace(AgentRegex.version, "")
+        }
+
+        val application = if (!omitApplicationComponent) applicationComponent else null
+        var userAgent = concatWithSpaces(prefix, application, safariComponent)
+
+        userAgentInterceptorPluginPoint.getPlugins().forEach {
+            userAgent = it.intercept(userAgent)
+        }
+
+        return userAgent
+    }
+
+    private fun getDdgFixedUserAgent(url: String?, host: String?, isDesktop: Boolean, isClosest: Boolean = false): String {
+        if (!userAgent.ddgFixedUserAgentEnabled() && !isClosest) return getDdgUserAgent(url, host, isDesktop)
+
+        val omitApplicationComponent = if (host != null) userAgent.isAnApplicationException(host) else false
+        val shouldUseDesktopAgent =
+            if (url != null && host != null) {
+                sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(url, it) }
+            } else {
+                false
+            }
+        var prefix = if (isDesktop || shouldUseDesktopAgent) ddgFixedBaseDesktopAgent else ddgFixedBaseAgent
+        prefix = prefix.replace(AgentRegex.version, "")
+
+        val application = if (!omitApplicationComponent && !isClosest) applicationComponent else null
+        var userAgent = concatWithSpaces(prefix, application, safariComponent)
+
+        userAgentInterceptorPluginPoint.getPlugins().forEach {
+            userAgent = it.intercept(userAgent)
+        }
+
+        return userAgent
+    }
+
+    private fun getClosestUserAgent(url: String?, host: String?, isDesktop: Boolean): String {
+        if (!userAgent.closestUserAgentEnabled()) return getDdgUserAgent(url, host, isDesktop)
+        return getDdgFixedUserAgent(url, host, isDesktop, true)
+    }
 }
 
 @ContributesTo(AppScope::class)

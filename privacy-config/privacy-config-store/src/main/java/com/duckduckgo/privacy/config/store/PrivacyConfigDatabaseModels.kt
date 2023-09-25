@@ -122,6 +122,33 @@ data class UserAgentExceptionEntity(
     val omitVersion: Boolean,
 )
 
+@Entity(tableName = "user_agent_sites")
+data class UserAgentSitesEntity(
+    @PrimaryKey val domain: String,
+    val reason: String,
+    val ddgDefaultSite: Boolean,
+    val ddgFixedSite: Boolean,
+)
+
+@Entity(tableName = "user_agent_versions")
+data class UserAgentVersionsEntity(
+    @PrimaryKey val version: String,
+    val closestUserAgent: Boolean,
+    val ddgFixedUserAgent: Boolean,
+)
+
+fun UserAgentSitesEntity.toUserAgentException(): UserAgentException {
+    return UserAgentException(domain = this.domain, reason = this.reason)
+}
+
+@Entity(tableName = "user_agent_states")
+data class UserAgentStatesEntity(
+    @PrimaryKey val id: Int = 1,
+    val defaultPolicy: String,
+    val closestUserAgent: Boolean,
+    val ddgFixedUserAgent: Boolean,
+)
+
 fun UserAgentExceptionEntity.toUserAgentException(): UserAgentException {
     return UserAgentException(domain = this.domain, reason = this.reason)
 }
