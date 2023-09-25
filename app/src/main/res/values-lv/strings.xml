@@ -771,4 +771,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tādējādi tiks dzēsta tava &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmju mape.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Atcelt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Dzēst</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Pievienot opciju \"Meklēšana ar balsi\" adreses joslai</string>
+    <string name="accessibilityVoiceSearchTitle">Privātā balss meklēšana</string>
 </resources>
