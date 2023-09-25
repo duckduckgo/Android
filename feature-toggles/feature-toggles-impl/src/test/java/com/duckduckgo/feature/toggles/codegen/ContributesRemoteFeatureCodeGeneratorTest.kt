@@ -54,11 +54,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     fun setup() {
 //        provider = FakeProvider(appBuildConfig)
         whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        whenever(appBuildConfig.variantName).thenReturn("")
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
+            appVariantProvider = { appBuildConfig.variantName },
         ).build().create(TestTriggerFeature::class.java)
     }
 
@@ -1051,6 +1053,150 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             assertNotEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
             assertEquals(4, testFeature.fooFeature().rolloutStep())
         }
+    }
+
+    @Test
+    fun `test variant parsing when no remote variant provided`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled"
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertEquals(emptyList<Toggle.State.Target>(), testFeature.fooFeature().getRawStoredState()!!.targets)
+    }
+
+    @Test
+    fun `test variant parsing`() {
+        whenever(appBuildConfig.variantName).thenReturn("mc")
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "ma"
+                                    },
+                                    {
+                                        "variantKey": "mb"
+                                    }
+                                ]
+                            },
+                            "variantFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("mb"),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+        assertTrue(testFeature.variantFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc"),
+            ),
+            testFeature.variantFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test variant when assigned variant key is null`() {
+        whenever(appBuildConfig.variantName).thenReturn(null)
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "ma"
+                                    },
+                                    {
+                                        "variantKey": "mb"
+                                    }
+                                ]
+                            },
+                            "variantFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("mb"),
+            ),
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+        assertFalse(testFeature.variantFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc"),
+            ),
+            testFeature.variantFeature().getRawStoredState()!!.targets,
+        )
     }
 
     private fun generatedFeatureNewInstance(): Any {

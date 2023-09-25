@@ -47,4 +47,7 @@ interface TestTriggerFeature {
 
     @DefaultValue(false)
     fun defaultFalse(): Toggle
+
+    @DefaultValue(false)
+    fun variantFeature(): Toggle
 }

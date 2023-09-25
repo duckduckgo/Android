@@ -28,6 +28,7 @@ class FeatureToggles private constructor(
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String,
     private val featureName: String,
+    private val appVariantProvider: () -> String?,
 ) {
 
     private val featureToggleCache = mutableMapOf<Method, Toggle>()
@@ -37,12 +38,14 @@ class FeatureToggles private constructor(
         private var appVersionProvider: () -> Int = { Int.MAX_VALUE },
         private var flavorNameProvider: () -> String = { "" },
         private var featureName: String? = null,
+        private var appVariantProvider: () -> String? = { "" },
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
         fun appVersionProvider(appVersionProvider: () -> Int) = apply { this.appVersionProvider = appVersionProvider }
         fun flavorNameProvider(flavorNameProvider: () -> String) = apply { this.flavorNameProvider = flavorNameProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
+        fun appVariantProvider(variantName: () -> String?) = apply { this.appVariantProvider = variantName }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
             if (this.store == null) {
@@ -54,7 +57,7 @@ class FeatureToggles private constructor(
             if (missing.isNotBlank()) {
                 throw IllegalArgumentException("This following parameters can't be null: $missing")
             }
-            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!)
+            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!, appVariantProvider)
         }
     }
 
@@ -94,6 +97,7 @@ class FeatureToggles private constructor(
                 isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
                 appVersionProvider = appVersionProvider,
                 flavorNameProvider = flavorNameProvider,
+                appVariantProvider = appVariantProvider,
             ).also { featureToggleCache[method] = it }
         }
     }
@@ -156,7 +160,12 @@ interface Toggle {
         val enabledOverrideValue: Boolean? = null,
         val rollout: List<Double>? = null,
         val rolloutStep: Int? = null,
-    )
+        val targets: List<Target> = emptyList(),
+    ) {
+        data class Target(
+            val variantKey: String,
+        )
+    }
 
     interface Store {
         fun set(key: String, state: State)
@@ -182,10 +191,27 @@ internal class ToggleImpl constructor(
     private val isInternalAlwaysEnabled: Boolean,
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String = { "" },
+    private val appVariantProvider: () -> String?,
 ) : Toggle {
+
+    private fun Toggle.State.isVariantTreated(variant: String?): Boolean {
+        // if no variants a present, we consider always treated
+        if (this.targets.isEmpty()) {
+            return true
+        }
+        // if variants present BUT no variant has been assigned yet, consider not treated
+        if (variant == null) {
+            return false
+        }
+
+        return this.targets.map { it.variantKey }.contains(variant)
+    }
+
     override fun isEnabled(): Boolean {
         fun evaluateLocalEnable(state: State): Boolean {
-            return state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+            return state.enable &&
+                state.isVariantTreated(appVariantProvider.invoke()) &&
+                appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
         }
         // check if it should always be enabled for internal builds
         if (isInternalAlwaysEnabled && flavorNameProvider.invoke().lowercase() == "internal") {
