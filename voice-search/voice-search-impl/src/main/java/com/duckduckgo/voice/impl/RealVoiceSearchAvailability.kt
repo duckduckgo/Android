@@ -56,16 +56,8 @@ class RealVoiceSearchAvailability @Inject constructor(
 
     override fun shouldShowVoiceSearch(
         isEditing: Boolean,
-        urlLoaded: String,
+        currentText: String,
     ): Boolean {
-        // Show microphone icon only when:
-        // - user is editing the address bar OR
-        // - address bar is empty (initial state / new tab) OR
-        // - DDG SERP is shown OR (address bar doesn't contain a website)
-        return if (isVoiceSearchAvailable) {
-            isEditing || urlLoaded.isEmpty() || urlLoaded.startsWith(URL_DDG_SERP)
-        } else {
-            false
-        }
+        return isVoiceSearchAvailable && isEditing && currentText.isEmpty()
     }
 }

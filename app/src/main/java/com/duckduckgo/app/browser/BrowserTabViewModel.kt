@@ -934,7 +934,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = trimmedInput,
             shouldMoveCaretToEnd = false,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = urlToNavigate),
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
             forceExpand = true,
         )
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false, browserError = OMITTED)
@@ -1215,7 +1215,7 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState.copy(
             omnibarText = omnibarText,
             shouldMoveCaretToEnd = false,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
             forceExpand = true,
         )
         val currentBrowserViewState = currentBrowserViewState()
@@ -1393,7 +1393,7 @@ class BrowserTabViewModel @Inject constructor(
             currentOmnibarViewState.copy(
                 omnibarText = omnibarText,
                 shouldMoveCaretToEnd = false,
-                showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
+                showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
                 forceExpand = false,
             ),
         )
@@ -1806,9 +1806,10 @@ class BrowserTabViewModel @Inject constructor(
             isEditing = hasFocus,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
                 isEditing = hasFocus,
-                urlLoaded = url ?: "",
+                currentText = query,
             ),
             forceExpand = true,
+            omnibarText = query,
         )
 
         val currentBrowserViewState = currentBrowserViewState()
@@ -2865,7 +2866,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun voiceSearchDisabled() {
         omnibarViewState.value = currentOmnibarViewState().copy(
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url ?: ""),
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(),
         )
     }
 
