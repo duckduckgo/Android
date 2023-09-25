@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Lai DuckDuckGo izmantotu balss meklēšanu, sistēmas iestatījumos ir jāiespējo piekļuve mikrofonam.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Iestatījumi</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Nepieciešama piekļuve mikrofonam</string>
+    <string name="voiceSearchRemovePositiveButton">Noņemt opciju \"Meklēšana ar balsi\"</string>
+    <string name="voiceSearchRemoveTitle">Vai noņemt opciju \"Meklēšana ar balsi\" no adreses joslas?</string>
+    <string name="voiceSearchRemoveSubtitle">Šīs un citas pieejamības preferences vienmēr vari pārvaldīt sadaļā Iestatījumi.</string>
     <string name="voiceSearchTitle">Balss meklēšana</string>
 </resources>
