@@ -19,11 +19,10 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CompetitiveCopy
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SetupCopy
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NoEngagementNotifications
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import java.util.*
+import java.util.Locale
 import timber.log.Timber
 
 @WorkerThread
@@ -31,8 +30,7 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object CompetitiveCopy : VariantFeature()
-        object SetupCopy : VariantFeature()
+        object NoEngagementNotifications : VariantFeature()
     }
 
     companion object {
@@ -48,10 +46,9 @@ interface VariantManager {
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
-            // Experiment: Change push notification audience, timing and cadence
-            Variant(key = "zv", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zx", weight = 0.0, features = listOf(CompetitiveCopy), filterBy = { isEnglishLocale() }),
-            Variant(key = "zy", weight = 0.0, features = listOf(SetupCopy), filterBy = { isEnglishLocale() }),
+            // Experiment: Remove engagement notifications
+            Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "md", weight = 1.0, features = listOf(NoEngagementNotifications), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -182,8 +179,7 @@ class ExperimentationVariantManager(
     }
 }
 
-fun VariantManager.isCompetitiveCopyEnabled() = this.getVariant().hasFeature(CompetitiveCopy)
-fun VariantManager.isSetupCopyCopyEnabled() = this.getVariant().hasFeature(SetupCopy)
+fun VariantManager.isNoEngagementNotificationEnabled() = this.getVariant().hasFeature(NoEngagementNotifications)
 
 /**
  * A variant which can be used for experimentation.

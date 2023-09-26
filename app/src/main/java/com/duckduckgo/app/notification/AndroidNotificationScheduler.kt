@@ -19,18 +19,13 @@ package com.duckduckgo.app.notification
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.work.*
-import androidx.work.WorkInfo.State.ENQUEUED
-import androidx.work.WorkInfo.State.RUNNING
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.DefaultBrowserNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isCompetitiveCopyEnabled
-import com.duckduckgo.app.statistics.isSetupCopyCopyEnabled
+import com.duckduckgo.app.statistics.isNoEngagementNotificationEnabled
 import com.duckduckgo.di.scopes.AppScope
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import timber.log.Timber
@@ -46,7 +41,6 @@ class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
-    private val setAsDefaultNotification: SchedulableNotification,
     private val variantManager: VariantManager,
 ) : AndroidNotificationScheduler {
 
@@ -55,29 +49,20 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
-        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
-        when {
-            variantManager.isCompetitiveCopyEnabled() || variantManager.isSetupCopyCopyEnabled() -> {
-                if (setAsDefaultNotification.canShow()) {
-                    scheduleNotification(
-                        OneTimeWorkRequestBuilder<DefaultBrowserNotificationWorker>(),
-                        PRIVACY_DELAY_DURATION_IN_DAYS,
-                        TimeUnit.DAYS,
-                        UNUSED_APP_WORK_REQUEST_TAG,
-                    )
-                }
-            }
+        if (!variantManager.isNoEngagementNotificationEnabled()) {
+            workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
+            scheduleUnusedAppNotifications()
+        }
+    }
 
-            else -> {
-                if (privacyNotification.canShow()) {
-                    scheduleNotification(
-                        OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
-                        PRIVACY_DELAY_DURATION_IN_DAYS,
-                        TimeUnit.DAYS,
-                        UNUSED_APP_WORK_REQUEST_TAG,
-                    )
-                }
-            }
+    private suspend fun scheduleUnusedAppNotifications() {
+        if (privacyNotification.canShow()) {
+            scheduleNotification(
+                OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
+                PRIVACY_DELAY_DURATION_IN_DAYS,
+                TimeUnit.DAYS,
+                UNUSED_APP_WORK_REQUEST_TAG,
+            )
         }
         if (clearDataNotification.canShow()) {
             scheduleNotification(
@@ -102,25 +87,6 @@ class NotificationScheduler(
             .build()
 
         workManager.enqueue(request)
-    }
-
-    private fun isWorkScheduled(tag: String): Boolean {
-        val statuses = workManager.getWorkInfosByTag(tag)
-        return try {
-            var running = false
-            val workInfoList: List<WorkInfo> = statuses.get()
-            for (workInfo in workInfoList) {
-                val state = workInfo.state
-                running = (state == RUNNING) or (state == ENQUEUED)
-            }
-            running
-        } catch (e: ExecutionException) {
-            e.printStackTrace()
-            false
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-            false
-        }
     }
 
     companion object {
@@ -166,18 +132,6 @@ class PrivacyNotificationWorker(
 
     @Inject
     override lateinit var notification: PrivacyProtectionNotification
-}
-
-@ContributesWorker(AppScope::class)
-class DefaultBrowserNotificationWorker(
-    context: Context,
-    params: WorkerParameters,
-) : SchedulableNotificationWorker<DefaultBrowserNotification>(context, params) {
-    @Inject
-    override lateinit var notificationSender: NotificationSender
-
-    @Inject
-    override lateinit var notification: DefaultBrowserNotification
 }
 
 abstract class SchedulableNotificationWorker<T : SchedulableNotification>(

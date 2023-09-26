@@ -80,7 +80,6 @@ class AndroidNotificationSchedulerTest {
             workManager,
             clearNotification,
             privacyNotification,
-            defaultBrowserNotification,
             mockVariantManager,
         )
     }
@@ -145,35 +144,19 @@ class AndroidNotificationSchedulerTest {
 
         assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
         assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-        assertNotificationNotScheduled(DefaultBrowserNotificationWorker::class.javaObjectType.name)
     }
 
     @Test
-    fun givenCompetitiveCopyVariantThenDefaultBrowserNotificationScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zx" })
+    fun givenNoEngagementNotificationsVariantThenBothNotificationsAreNotScheduled() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "md" })
 
         whenever(defaultBrowserNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
-        assertNotificationScheduled(DefaultBrowserNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
         assertNotificationNotScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun givenSetupCopyVariantThenDefaultBrowserNotificationScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zy" })
-
-        whenever(defaultBrowserNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(DefaultBrowserNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-        assertNotificationNotScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
+        assertNotificationNotScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
     }
 
     private fun assertNotificationScheduled(
