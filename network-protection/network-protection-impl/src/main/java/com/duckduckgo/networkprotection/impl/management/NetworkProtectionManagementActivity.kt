@@ -96,8 +96,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         bindViews()
         intent.getActivityParams(NetworkProtectionManagementScreenAndEnable::class.java)?.enable?.let { shouldEnable ->
             if (shouldEnable) {
-                // we don't do it quitely because we do want to trigger the listener
-                binding.netpToggle.setIsChecked(true)
+                checkVPNPermission()
             }
         }
 
