@@ -49,9 +49,9 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Experiment: Change push notification audience, timing and cadence
-            Variant(key = "zv", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zx", weight = 1.0, features = listOf(CompetitiveCopy), filterBy = { isEnglishLocale() }),
-            Variant(key = "zy", weight = 1.0, features = listOf(SetupCopy), filterBy = { isEnglishLocale() }),
+            Variant(key = "zv", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zx", weight = 0.0, features = listOf(CompetitiveCopy), filterBy = { isEnglishLocale() }),
+            Variant(key = "zy", weight = 0.0, features = listOf(SetupCopy), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
