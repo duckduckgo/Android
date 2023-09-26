@@ -20,18 +20,34 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types.newParameterizedType
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [AnrEntity::class],
 )
 @TypeConverters(AnrTypeConverter::class)
 abstract class AnrsDatabase : RoomDatabase() {
     abstract fun arnDao(): AnrDao
+
+    companion object {
+
+        private val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `anr_entity` ADD COLUMN `webView` TEXT NOT NULL DEFAULT \"unknown\"")
+            }
+        }
+
+        val ALL_MIGRATIONS: List<Migration>
+            get() = listOf(
+                MIGRATION_1_TO_2,
+            )
+    }
 }
 
 object AnrTypeConverter {
