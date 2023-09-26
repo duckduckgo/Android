@@ -78,11 +78,11 @@ class RealSyncPixels @Inject constructor(
     }
 
     override fun fireEncryptFailurePixel() {
-        // pixel.fire(SyncPixelName.SYNC_ENCRYPT_FAILURE)
+        pixel.fire(SyncPixelName.SYNC_ENCRYPT_FAILURE)
     }
 
     override fun fireDecryptFailurePixel() {
-        // pixel.fire(SyncPixelName.SYNC_DECRYPT_FAILURE)
+        pixel.fire(SyncPixelName.SYNC_DECRYPT_FAILURE)
     }
 
     override fun fireCountLimitPixel(feature: String) {
