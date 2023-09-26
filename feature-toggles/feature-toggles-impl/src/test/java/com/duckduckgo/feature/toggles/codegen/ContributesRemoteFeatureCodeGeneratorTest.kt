@@ -54,11 +54,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     fun setup() {
 //        provider = FakeProvider(appBuildConfig)
         whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        whenever(appBuildConfig.variantName).thenReturn("")
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
+            appVariantProvider = { appBuildConfig.variantName },
         ).build().create(TestTriggerFeature::class.java)
     }
 
@@ -1078,11 +1080,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        assertEquals(emptyList<Toggle.State.Variant>(), testFeature.fooFeature().getRawStoredState()!!.variants)
+        assertEquals(emptyList<Toggle.State.Target>(), testFeature.fooFeature().getRawStoredState()!!.targets)
     }
 
     @Test
     fun `test variant parsing`() {
+        whenever(appBuildConfig.variantName).thenReturn("mc")
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1097,14 +1100,20 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         "features": {
                             "fooFeature": {
                                 "state": "enabled",
-                                "variants": [
+                                "targets": [
                                     {
-                                        "name": "ma",
-                                        "weight": 1.0
+                                        "variantKey": "ma"
                                     },
                                     {
-                                        "name": "mb",
-                                        "weight": 1.0
+                                        "variantKey": "mb"
+                                    }
+                                ]
+                            },
+                            "variantFeature": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
                                     }
                                 ]
                             }
@@ -1115,13 +1124,20 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         assertTrue(testFeature.self().isEnabled())
-        assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
         assertEquals(
             listOf(
-                Toggle.State.Variant("ma", 1.0),
-                Toggle.State.Variant("mb", 1.0),
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("mb"),
             ),
-            testFeature.fooFeature().getRawStoredState()!!.variants,
+            testFeature.fooFeature().getRawStoredState()!!.targets,
+        )
+        assertTrue(testFeature.variantFeature().isEnabled())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc"),
+            ),
+            testFeature.variantFeature().getRawStoredState()!!.targets,
         )
     }
 

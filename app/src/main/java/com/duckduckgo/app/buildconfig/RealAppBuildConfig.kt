@@ -18,16 +18,20 @@ package com.duckduckgo.app.buildconfig
 
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealAppBuildConfig @Inject constructor() : AppBuildConfig {
+class RealAppBuildConfig @Inject constructor(
+    private val variantManager: Lazy<VariantManager>, // break any possible DI dependency cycle
+) : AppBuildConfig {
     override val isDebug: Boolean = BuildConfig.DEBUG
     override val applicationId: String = BuildConfig.APPLICATION_ID
     override val buildType: String = BuildConfig.BUILD_TYPE
@@ -56,4 +60,7 @@ class RealAppBuildConfig @Inject constructor() : AppBuildConfig {
     override val isDefaultVariantForced: Boolean = BuildConfig.FORCE_DEFAULT_VARIANT
     override val deviceLocale: Locale
         get() = Locale.getDefault()
+
+    override val variantName: String
+        get() = variantManager.get().getVariant().key
 }

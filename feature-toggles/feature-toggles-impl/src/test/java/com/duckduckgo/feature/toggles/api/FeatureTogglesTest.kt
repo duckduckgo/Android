@@ -31,14 +31,17 @@ class FeatureTogglesTest {
 
     private lateinit var feature: TestFeature
     private lateinit var provider: FakeProvider
+    private lateinit var variantProvider: FakeAppVariantProvider
     private lateinit var toggleStore: FakeToggleStore
 
     @Before
     fun setup() {
         provider = FakeProvider()
+        variantProvider = FakeAppVariantProvider()
         toggleStore = FakeToggleStore()
         feature = FeatureToggles.Builder()
             .store(toggleStore)
+            .appVariantProvider { variantProvider.variant }
             .appVersionProvider { provider.version }
             .flavorNameProvider { provider.flavorName }
             .featureName("test")
@@ -342,6 +345,83 @@ class FeatureTogglesTest {
         toggleStore.set("test_enabledByDefault", state.copy(enable = false))
         assertFalse(feature.enabledByDefault().isEnabled())
     }
+
+    @Test
+    fun whenNoMatchingVariantThenFeatureIsDisabled() {
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(Toggle.State.Target("ma")),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertFalse(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenMatchingVariantThenReturnFeatureState() {
+        variantProvider.variant = "ma"
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(Toggle.State.Target(variantProvider.variant)),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertTrue(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenMultipleNotMatchingVariantThenReturnFeatureState() {
+        variantProvider.variant = "zz"
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("mb"),
+            ),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertFalse(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun whenAnyMatchingVariantThenReturnFeatureState() {
+        variantProvider.variant = "zz"
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+            targets = listOf(
+                Toggle.State.Target("ma"),
+                Toggle.State.Target("zz"),
+            ),
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertTrue(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
+    }
 }
 
 interface TestFeature {
@@ -372,4 +452,8 @@ interface TestFeature {
 private class FakeProvider {
     var version = Int.MAX_VALUE
     var flavorName = ""
+}
+
+private class FakeAppVariantProvider {
+    var variant = ""
 }
