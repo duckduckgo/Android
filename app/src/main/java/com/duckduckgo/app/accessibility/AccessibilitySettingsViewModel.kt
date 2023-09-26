@@ -101,7 +101,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
     fun onVoiceSearchChanged(checked: Boolean) {
         voiceSearchRepository.setVoiceSearchUserEnabled(checked)
         if (checked) {
-            voiceSearchRepository.resetCounters()
+            voiceSearchRepository.resetVoiceSearchDismissed()
         }
         viewModelScope.launch {
             viewState.emit(

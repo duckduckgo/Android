@@ -85,15 +85,6 @@ class RealVoiceSearchRepositoryTest {
 
         assertEquals(1, testee.countVoiceSearchDismissed())
     }
-
-    @Test
-    fun whenDeclineMicAccessDialogThenWasNoMicAccessDialogAlreadyDismissedShouldBeTrue() {
-        assertFalse(testee.wasNoMicAccessDialogAlreadyDismissed())
-
-        testee.declineNoMicAccessDialog()
-
-        assertTrue(testee.wasNoMicAccessDialogAlreadyDismissed())
-    }
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
@@ -102,7 +93,6 @@ class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var availabilityLogged: Boolean = false
     override var isVoiceSearchEnabled: Boolean = false
     override var countVoiceSearchDismissed: Int = 0
-    override var noMicAccessDialogDeclined: Boolean = false
 }
 
 class FakeVoiceSearchStatusListener : VoiceSearchStatusListener {
