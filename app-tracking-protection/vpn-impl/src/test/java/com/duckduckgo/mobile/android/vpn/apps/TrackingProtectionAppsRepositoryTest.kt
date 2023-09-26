@@ -23,8 +23,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.FakeAppTrackerRepository
 import com.duckduckgo.networkprotection.api.NetworkProtectionExclusionList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,14 +45,12 @@ class TrackingProtectionAppsRepositoryTest {
 
     private val packageManager: PackageManager = mock()
     private val appTrackerRepository = FakeAppTrackerRepository()
-    private val appTpFeatureConfig: AppTpFeatureConfig = mock()
     private val networkProtectionExclusionList: NetworkProtectionExclusionList = mock()
 
     private lateinit var trackingProtectionAppsRepository: TrackingProtectionAppsRepository
 
     @Before
     fun setup() {
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(false)
         whenever(packageManager.getInstalledApplications(PackageManager.GET_META_DATA)).thenReturn(INSTALLED_APPS.asApplicationInfo())
         whenever(packageManager.getApplicationLabel(any())).thenReturn("App Name")
         appTrackerRepository.appExclusionList = EXCLUSION_LIST.toMutableMap()
@@ -66,7 +62,6 @@ class TrackingProtectionAppsRepositoryTest {
                 packageManager,
                 appTrackerRepository,
                 coroutineRule.testDispatcherProvider,
-                appTpFeatureConfig,
                 networkProtectionExclusionList,
             )
     }
@@ -76,7 +71,7 @@ class TrackingProtectionAppsRepositoryTest {
         val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
 
         assertEquals(
-            listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"),
+            listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"),
             exclusionList,
         )
     }
@@ -127,7 +122,7 @@ class TrackingProtectionAppsRepositoryTest {
 
         val protectionState = trackingProtectionAppsRepository.getAppProtectionStatus("com.example.game")
 
-        assertEquals(ProtectionState.UNPROTECTED, protectionState)
+        assertEquals(ProtectionState.PROTECTED, protectionState)
     }
 
     @Test
@@ -168,7 +163,7 @@ class TrackingProtectionAppsRepositoryTest {
 
         val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
 
-        assertEquals(listOf("com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"), exclusionList)
+        assertEquals(listOf("com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"), exclusionList)
     }
 
     @Test
@@ -194,7 +189,6 @@ class TrackingProtectionAppsRepositoryTest {
                 "com.example.app2",
                 "com.example.app3",
                 "com.example.app5",
-                "com.example.game",
                 "com.example.system",
                 "com.duckduckgo.mobile",
             ),
@@ -209,7 +203,7 @@ class TrackingProtectionAppsRepositoryTest {
         val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
 
         assertEquals(
-            listOf("com.example.app1", "com.example.app3", "com.example.app5", "com.example.game", "com.example.system", "com.duckduckgo.mobile"),
+            listOf("com.example.app1", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"),
             exclusionList,
         )
     }
@@ -226,7 +220,7 @@ class TrackingProtectionAppsRepositoryTest {
                     "com.example.app4" to false,
                     "com.example.app5" to true,
                     "com.example.app6" to false,
-                    "com.example.game" to true,
+                    "com.example.game" to false,
                     "com.example.system.overriden" to false,
                 ),
                 this.awaitItem().map { it.packageName to it.isExcluded },
@@ -279,38 +273,6 @@ class TrackingProtectionAppsRepositoryTest {
         }
     }
 
-    @Test
-    fun whenProtectGamesFeatureEnabledThenRemoveGamesFromExclusionList() = runTest {
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
-
-        val exclusionList = trackingProtectionAppsRepository.getExclusionAppsList()
-
-        assertEquals(listOf("com.example.app2", "com.example.app3", "com.example.app5", "com.example.system", "com.duckduckgo.mobile"), exclusionList)
-    }
-
-    @Test
-    fun whenProtectGamesFeatureEnabledThenShowGamesAsProtectedInProtectionInfo() = runTest {
-        whenever(appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)).thenReturn(true)
-        whenever(networkProtectionExclusionList.isExcluded(any())).thenReturn(false)
-
-        trackingProtectionAppsRepository.getAppsAndProtectionInfo().test {
-            assertEquals(
-                listOf(
-                    "com.example.app1" to false,
-                    "com.example.app2" to true,
-                    "com.example.app3" to true,
-                    "com.example.app4" to false,
-                    "com.example.app5" to true,
-                    "com.example.app6" to false,
-                    "com.example.game" to false,
-                    "com.example.system.overriden" to false,
-                ),
-                this.awaitItem().map { it.packageName to it.isExcluded },
-            )
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
     private fun List<String>.asApplicationInfo(): List<ApplicationInfo> {
         return this.map {
             ApplicationInfo()
@@ -330,7 +292,7 @@ class TrackingProtectionAppsRepositoryTest {
             "com.example.app4",
             "com.example.app5",
             "com.example.app6",
-            "com.example.game", // should be automatically be added to exclusion list
+            "com.example.game", // it's a game and should be protected by default
             "com.example.system", // should be automatically be added to exclusion list
             "com.example.system.overriden",
             "com.duckduckgo.mobile", // should be automatically be added to exclusion list
