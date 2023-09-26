@@ -27,8 +27,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.exclusion.AppCategoryDetector
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -47,11 +45,9 @@ import logcat.logcat
 )
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
-    private val appCategoryDetector: AppCategoryDetector,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
