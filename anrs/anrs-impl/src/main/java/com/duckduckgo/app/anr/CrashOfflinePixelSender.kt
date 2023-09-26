@@ -21,6 +21,7 @@ import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
 import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
@@ -31,6 +32,7 @@ import logcat.logcat
 class CrashOfflinePixelSender @Inject constructor(
     private val uncaughtExceptionDao: UncaughtExceptionDao,
     private val pixelSender: PixelSender,
+    private val webViewVersionProvider: WebViewVersionProvider,
 ) : OfflinePixel {
     override fun send(): Completable {
         return Completable.defer {
@@ -48,6 +50,7 @@ class CrashOfflinePixelSender @Inject constructor(
                         EXCEPTION_STACK_TRACE to ss,
                         EXCEPTION_APP_VERSION to exception.version,
                         EXCEPTION_TIMESTAMP to exception.timestamp,
+                        EXCEPTION_WEBVIEW_VERSION to webViewVersionProvider.getFullVersion(),
                     )
 
                 val pixel =
@@ -70,5 +73,6 @@ class CrashOfflinePixelSender @Inject constructor(
         private const val EXCEPTION_STACK_TRACE = "ss"
         private const val EXCEPTION_APP_VERSION = "v"
         private const val EXCEPTION_TIMESTAMP = "t"
+        private const val EXCEPTION_WEBVIEW_VERSION = "webView"
     }
 }

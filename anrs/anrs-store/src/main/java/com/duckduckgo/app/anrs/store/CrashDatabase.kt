@@ -18,12 +18,28 @@ package com.duckduckgo.app.anrs.store
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [ExceptionEntity::class],
 )
 abstract class CrashDatabase : RoomDatabase() {
     abstract fun uncaughtExceptionDao(): UncaughtExceptionDao
+
+    companion object {
+
+        private val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `uncaught_exception_entity` ADD COLUMN `webView` TEXT NOT NULL DEFAULT \"unknown\"")
+            }
+        }
+
+        val ALL_MIGRATIONS: List<Migration>
+            get() = listOf(
+                MIGRATION_1_TO_2,
+            )
+    }
 }

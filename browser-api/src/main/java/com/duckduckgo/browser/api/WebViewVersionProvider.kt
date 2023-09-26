@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.anrs.store
+package com.duckduckgo.browser.api
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+interface WebViewVersionProvider {
+    companion object {
+        const val WEBVIEW_UNKNOWN_VERSION = "unknown"
+    }
 
-@Entity(tableName = "uncaught_exception_entity")
-data class ExceptionEntity(
-    @PrimaryKey val hash: String,
-    val shortName: String,
-    val processName: String,
-    val message: String,
-    val stackTrace: String,
-    val version: String,
-    val timestamp: String,
-    val webView: String,
-)
+    /**
+     * Returns the full version of WebView or unknown if unable to get it
+     * @returns a string [String] with the full version of WebView
+     */
+    fun getFullVersion(): String
+
+    /**
+     * Returns the major version of WebView or unknown if unable to get it
+     * @returns a string [String] with the major version of WebView
+     */
+    fun getMajorVersion(): String
+}

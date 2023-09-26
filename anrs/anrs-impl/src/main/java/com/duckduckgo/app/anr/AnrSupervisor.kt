@@ -21,6 +21,7 @@ import android.os.Handler
 import android.os.Looper
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -57,6 +58,7 @@ internal fun Any.wait(timeout: Long = 0) = (this as Object).wait(timeout)
 internal fun Any.notifyAll() = (this as Object).notifyAll()
 
 class AnrSupervisorRunnable @Inject constructor(
+    private val webViewVersionProvider: WebViewVersionProvider,
     anrsDatabase: AnrsDatabase,
 ) : Runnable {
 
@@ -89,7 +91,7 @@ class AnrSupervisorRunnable @Inject constructor(
                         val e = AnrException(handler.looper.thread)
                         logcat { "ANR Detected: ${e.threadStateMap}" }
 
-                        anrDao.insert(e.asAnrData().asAnrEntity())
+                        anrDao.insert(e.asAnrData(webViewVersionProvider.getFullVersion()).asAnrEntity())
 
                         // wait until thread responds again
                         callback.wait()
