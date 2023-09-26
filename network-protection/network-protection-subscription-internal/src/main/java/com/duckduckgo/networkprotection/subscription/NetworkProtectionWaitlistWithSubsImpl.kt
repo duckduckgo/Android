@@ -31,9 +31,11 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionParams
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 @ContributesBinding(
     AppScope::class,
@@ -43,17 +45,24 @@ class NetworkProtectionWaitlistWithSubsImpl @Inject constructor(
     private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val appBuildConfig: AppBuildConfig,
+    private val subscriptions: Subscriptions,
 ) : NetworkProtectionWaitlist {
 
     override fun getState(): NetPWaitlistState {
         if (isTreated()) {
-            return if (netPWaitlistRepository.getAuthenticationToken() == null) {
+            return if (!hasValidNetPEntitlements()) {
+                NotUnlocked
+            } else if (netPWaitlistRepository.getAuthenticationToken() == null) {
                 VerifySubscription
             } else {
                 InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
             }
         }
         return NotUnlocked
+    }
+
+    private fun hasValidNetPEntitlements(): Boolean {
+        return runBlocking { subscriptions.hasEntitlement(NETP_ENTITLEMENT) }
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams {
@@ -70,4 +79,8 @@ class NetworkProtectionWaitlistWithSubsImpl @Inject constructor(
     }
 
     private fun isTreated(): Boolean = appBuildConfig.isDebug
+
+    companion object {
+        private const val NETP_ENTITLEMENT = "Dummy"
+    }
 }
