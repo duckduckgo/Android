@@ -19,10 +19,10 @@ package com.duckduckgo.app.pixels
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
-import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*

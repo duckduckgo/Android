@@ -16,19 +16,11 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.app.browser.WebViewVersionProvider.Companion.WEBVIEW_UNKNOWN_VERSION
+import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.api.WebViewVersionProvider.Companion.WEBVIEW_UNKNOWN_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-
-interface WebViewVersionProvider {
-    companion object {
-        const val WEBVIEW_UNKNOWN_VERSION = "unknown"
-    }
-
-    fun getFullVersion(): String
-    fun getMajorVersion(): String
-}
 
 @ContributesBinding(AppScope::class)
 class DefaultWebViewVersionProvider @Inject constructor(
@@ -48,5 +40,5 @@ class DefaultWebViewVersionProvider @Inject constructor(
     private fun String.mapNonIntegerToUnknown() =
         if (isNotBlank() && all(Char::isDigit)) this else WEBVIEW_UNKNOWN_VERSION
 
-    private fun String.mapEmptyToUnknown() = if (isBlank()) WEBVIEW_UNKNOWN_VERSION else this
+    private fun String.mapEmptyToUnknown() = ifBlank { WEBVIEW_UNKNOWN_VERSION }
 }

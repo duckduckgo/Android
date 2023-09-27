@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Генериране на личен Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Блокиране на имейл тракерите и скриване на адреса</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате данни за вход?</string>
+    <string name="autofillDisableAutofillPromptMessage">Можете да деактивирате тази функция по всяко време в Настройки.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Продължаване на запазването</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Забрани</string>
 
 </resources>

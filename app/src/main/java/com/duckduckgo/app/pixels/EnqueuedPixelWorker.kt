@@ -20,13 +20,13 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn

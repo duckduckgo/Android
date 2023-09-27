@@ -635,10 +635,6 @@
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Просмотр</string>
     <string name="autofillLoginSavedSnackbarMessage">Логин сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Логин обновлен</string>
-    <string name="autofillDisableAutofillPromptTitle">Сохранять логины в дальнейшем?</string>
-    <string name="autofillDisableAutofillPromptMessage">Вы всегда можете изменить свой выбор в «Настройках».</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Сохранять</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Отключить</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Хотите получить уведомление, когда настанет ваша очередь?</string>

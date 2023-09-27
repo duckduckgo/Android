@@ -17,11 +17,11 @@
 package com.duckduckgo.autofill.impl.ui
 
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.impl.email.EmailAutofillTooltipFragment
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
@@ -55,7 +55,12 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment {
-        return AutofillUpdatingExistingCredentialsDialogFragment.instance(url, credentials, tabId, CredentialUpdateType.Password)
+        return AutofillUpdatingExistingCredentialsDialogFragment.instance(
+            url,
+            credentials,
+            tabId,
+            CredentialUpdateType.Password,
+        )
     }
 
     override fun autofillSavingUpdateUsernameDialog(
@@ -63,7 +68,12 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment {
-        return AutofillUpdatingExistingCredentialsDialogFragment.instance(url, credentials, tabId, CredentialUpdateType.Username)
+        return AutofillUpdatingExistingCredentialsDialogFragment.instance(
+            url,
+            credentials,
+            tabId,
+            CredentialUpdateType.Username,
+        )
     }
 
     override fun autofillGeneratePasswordDialog(

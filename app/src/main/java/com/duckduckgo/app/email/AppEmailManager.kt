@@ -25,6 +25,7 @@ import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -51,10 +52,17 @@ class AppEmailManager @Inject constructor(
     private val pixel: Pixel,
 ) : EmailManager, BrowserFeatureStateReporterPlugin {
 
-    private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
+    private val isSignedInStateFlow = MutableStateFlow(false)
     override fun signedInFlow(): StateFlow<Boolean> = isSignedInStateFlow.asStateFlow()
 
     override fun getAlias(): String? = consumeAlias()
+
+    init {
+        // first call to isSignedIn() can be expensive and cause ANRs if done on main thread, so we do it on a background thread
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(isSignedIn())
+        }
+    }
 
     override fun isSignedIn(): Boolean {
         return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()

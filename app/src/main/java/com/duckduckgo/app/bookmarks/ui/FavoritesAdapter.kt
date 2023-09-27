@@ -66,10 +66,6 @@ class FavoritesAdapter(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.favoriteItems.clear().also { this.favoriteItems.addAll(generatedList) }
         diffResult.dispatchUpdatesTo(this)
-
-        if (favoriteItems.isEmpty()) {
-            return
-        }
     }
 
     private fun generateNewList(value: List<FavoriteItemTypes>): List<FavoriteItemTypes> {

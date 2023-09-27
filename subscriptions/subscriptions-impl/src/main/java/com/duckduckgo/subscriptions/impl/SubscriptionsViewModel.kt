@@ -83,7 +83,7 @@ class SubscriptionsViewModel @Inject constructor(
 
     fun buySubscription(activity: Activity, productDetails: ProductDetails, offerToken: String, isReset: Boolean = false) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (val response = subscriptionsManager.getSubscriptionData()) {
+            when (val response = subscriptionsManager.prePurchaseFlow()) {
                 is Success -> {
                     val billingParams = billingFlowParamsBuilder(
                         productDetails = productDetails,
@@ -106,7 +106,7 @@ class SubscriptionsViewModel @Inject constructor(
 
     fun recoverSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (val response = subscriptionsManager.getSubscriptionData()) {
+            when (val response = subscriptionsManager.recoverSubscriptionFromStore()) {
                 is Success -> {
                     logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
                 }

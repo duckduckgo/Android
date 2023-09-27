@@ -16,7 +16,13 @@
 
 package com.duckduckgo.autofill.impl.pixel
 
+import com.duckduckgo.app.global.plugins.pixel.PixelRequiringDataCleaningPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ALIAS
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
 
 enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName {
     AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN("m_autofill_logins_save_login_inline_displayed"),
@@ -55,4 +61,22 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
     AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED("m_autofill_logins_settings_enabled"),
     AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED("m_autofill_logins_settings_disabled"),
+
+    EMAIL_USE_ALIAS("email_filled_random"),
+    EMAIL_USE_ADDRESS("email_filled_main"),
+    EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
+}
+
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelRequiringDataCleaningPlugin::class,
+)
+object AutofillPixelsRequiringDataCleaning : PixelRequiringDataCleaningPlugin {
+    override fun names(): List<String> {
+        return listOf(
+            EMAIL_USE_ALIAS.pixelName,
+            EMAIL_USE_ADDRESS.pixelName,
+            EMAIL_TOOLTIP_DISMISSED.pixelName,
+        )
+    }
 }

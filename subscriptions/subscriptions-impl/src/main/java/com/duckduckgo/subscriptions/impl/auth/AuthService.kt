@@ -34,6 +34,9 @@ interface AuthService {
 
     @GET("https://quackdev.duckduckgo.com/api/auth/validate-token")
     suspend fun validateToken(@Header("Authorization") authorization: String): ValidateTokenResponse
+
+    @GET("https://quackdev.duckduckgo.com/api/auth/access-token")
+    suspend fun accessToken(@Header("Authorization") authorization: String): AccessTokenResponse
 }
 
 data class StoreLoginBody(
@@ -41,6 +44,10 @@ data class StoreLoginBody(
     @field:Json(name = "signed_data") val signedData: String,
     @field:Json(name = "package_name") val packageName: String,
     val store: String = "google_play_store",
+)
+
+data class AccessTokenResponse(
+    @field:Json(name = "access_token") val accessToken: String,
 )
 
 data class StoreLoginResponse(

@@ -74,7 +74,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     lateinit var dispatchers: DispatcherProvider
 
     lateinit var bookmarksAdapter: BookmarksAdapter
-    lateinit var favoritesAdapter: FavoritesAdapter
+    private var favoritesAdapter: FavoritesAdapter? = null
     lateinit var bookmarkFoldersAdapter: BookmarkFoldersAdapter
     lateinit var searchListener: BookmarksEntityQueryListener
 
@@ -174,7 +174,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ) { viewState ->
             viewState?.let { state ->
                 if (parentId == SavedSitesNames.BOOKMARKS_ROOT) {
-                    favoritesAdapter.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
+                    favoritesAdapter?.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
                 }
                 bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
                 bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
@@ -289,7 +289,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun initializeSearchBar() {
-        searchListener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
+        searchListener = BookmarksEntityQueryListener(viewModel, favoritesAdapter, bookmarksAdapter, bookmarkFoldersAdapter)
         searchMenuItem?.setOnMenuItemClickListener {
             showSearchBar()
             return@setOnMenuItemClickListener true

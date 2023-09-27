@@ -631,10 +631,6 @@
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Προβολή</string>
     <string name="autofillLoginSavedSnackbarMessage">Η σύνδεση αποθηκεύτηκε</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Η σύνδεση ενημερώθηκε</string>
-    <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε τις συνδέσεις;</string>
-    <string name="autofillDisableAutofillPromptMessage">Μπορείτε να απενεργοποιήσετε τη λειτουργία αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Συνεχίστε την αποθήκευση</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Απενεργοποίηση</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Θα θέλατε να σας στείλουμε ειδοποίηση για το πότε θα είναι η σειρά σας;</string>

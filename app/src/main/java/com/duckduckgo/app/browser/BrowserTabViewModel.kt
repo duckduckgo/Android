@@ -57,8 +57,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
-import com.duckduckgo.app.browser.autofill.AutofillFireproofDialogSuppressor
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -81,7 +79,6 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting.ALWAYS
@@ -115,10 +112,11 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -201,8 +199,6 @@ class BrowserTabViewModel @Inject constructor(
     EditSavedSiteListener,
     DeleteBookmarkListener,
     UrlExtractionListener,
-    AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
-    AutofillCredentialsSelectionResultHandler.CredentialInjector,
     ViewModel(),
     NavigationHistoryListener {
 
@@ -448,11 +444,6 @@ class BrowserTabViewModel @Inject constructor(
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
 
-        class InjectCredentials(
-            val url: String,
-            val credentials: LoginCredentials,
-        ) : Command()
-
         class CancelIncomingAutofillRequest(val url: String) : Command()
         object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
@@ -475,10 +466,7 @@ class BrowserTabViewModel @Inject constructor(
             val messageResourceId: Int,
         ) : Command()
 
-        class AcceptGeneratedPassword(val url: String) : Command()
-        class RejectGeneratedPassword(val url: String) : Command()
-
-        data class WebViewError(val errorType: WebViewErrorResponse) : Command()
+        data class WebViewError(val errorType: WebViewErrorResponse, val url: String) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -2735,40 +2723,13 @@ class BrowserTabViewModel @Inject constructor(
 
     /**
      * API called after user selected to autofill a private alias into a form
-
-     * Consumes the alias and injects it into the current page
-     * Will also automatically save a login for this site if saving logins is enabled
      */
-    fun consumeAlias(originalUrl: String) {
-        emailManager.getAlias()?.let {
-            command.postValue(InjectEmailAddress(duckAddress = it, originalUrl = originalUrl, autoSaveLogin = true))
-            pixel.enqueueFire(
-                AppPixelName.EMAIL_USE_ALIAS,
-                mapOf(
-                    PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
-                ),
-            )
-            emailManager.setNewLastUsedDate()
-        }
+    fun usePrivateDuckAddress(originalUrl: String, duckAddress: String) {
+        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = true))
     }
 
-    fun useAddress(originalUrl: String) {
-        emailManager.getEmailAddress()?.let {
-            command.postValue(InjectEmailAddress(duckAddress = it, originalUrl = originalUrl, autoSaveLogin = false))
-            pixel.enqueueFire(
-                AppPixelName.EMAIL_USE_ADDRESS,
-                mapOf(
-                    PixelParameter.COHORT to emailManager.getCohort(),
-                    PixelParameter.LAST_USED_DAY to emailManager.getLastUsedDate(),
-                ),
-            )
-            emailManager.setNewLastUsedDate()
-        }
-    }
-
-    fun cancelAutofillTooltip() {
-        pixel.enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(PixelParameter.COHORT to emailManager.getCohort()))
+    fun usePersonalDuckAddress(originalUrl: String, duckAddress: String) {
+        command.postValue(InjectEmailAddress(duckAddress = duckAddress, originalUrl = originalUrl, autoSaveLogin = false))
     }
 
     fun download(pendingFileDownload: PendingFileDownload) {
@@ -2824,34 +2785,8 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 
-    override fun shareCredentialsWithPage(
-        originalUrl: String,
-        credentials: LoginCredentials,
-    ) {
-        command.postValue(InjectCredentials(originalUrl, credentials))
-    }
-
-    override fun returnNoCredentialsWithPage(originalUrl: String) {
+    fun returnNoCredentialsWithPage(originalUrl: String) {
         command.postValue(CancelIncomingAutofillRequest(originalUrl))
-    }
-
-    override suspend fun saveCredentials(
-        url: String,
-        credentials: LoginCredentials,
-    ): LoginCredentials? {
-        return withContext(appCoroutineScope.coroutineContext) {
-            autofillStore.saveCredentials(url, credentials)
-        }
-    }
-
-    override suspend fun updateCredentials(
-        url: String,
-        credentials: LoginCredentials,
-        updateType: CredentialUpdateType,
-    ): LoginCredentials? {
-        return withContext(appCoroutineScope.coroutineContext) {
-            autofillStore.updateCredentials(url, credentials, updateType)
-        }
     }
 
     fun onConfigurationChanged() {
@@ -2876,9 +2811,10 @@ class BrowserTabViewModel @Inject constructor(
         return false
     }
 
-    override fun onReceivedError(errorType: WebViewErrorResponse) {
-        browserViewState.value = currentBrowserViewState().copy(browserError = errorType)
-        command.postValue(WebViewError(errorType))
+    override fun onReceivedError(errorType: WebViewErrorResponse, url: String) {
+        browserViewState.value =
+            currentBrowserViewState().copy(browserError = errorType, showPrivacyShield = false, showDaxIcon = false, showSearchIcon = false)
+        command.postValue(WebViewError(errorType, url))
     }
 
     fun onAutofillMenuSelected() {
@@ -2916,14 +2852,6 @@ class BrowserTabViewModel @Inject constructor(
                 messageResourceId = R.string.autofillLoginUpdatedSnackbarMessage,
             )
         }
-    }
-
-    fun acceptGeneratedPassword(originalUrl: String) {
-        command.postValue(AcceptGeneratedPassword(originalUrl))
-    }
-
-    fun rejectGeneratedPassword(originalUrl: String) {
-        command.postValue(RejectGeneratedPassword(originalUrl))
     }
 
     private fun defaultMediaSize(): PrintAttributes.MediaSize {

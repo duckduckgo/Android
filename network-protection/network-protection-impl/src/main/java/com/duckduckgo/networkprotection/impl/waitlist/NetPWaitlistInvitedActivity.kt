@@ -34,7 +34,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.InBeta
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
@@ -135,7 +135,7 @@ class NetPWaitlistInvitedActivity : DuckDuckGoActivity() {
         when (command) {
             is EnterInviteCode -> openRedeemCode()
             is OpenTermsScreen -> openTermsScreen()
-            is OpenNetP -> openNetP()
+            is OpenNetP -> openAndEnableNetP()
         }
     }
 
@@ -147,8 +147,8 @@ class NetPWaitlistInvitedActivity : DuckDuckGoActivity() {
         startTermsForResult.launch(globalActivityStarter.startIntent(this, NetPTermsScreenNoParams))
     }
 
-    private fun openNetP() {
-        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams)
+    private fun openAndEnableNetP() {
+        globalActivityStarter.start(this, NetworkProtectionManagementScreenAndEnable(true))
         finish()
     }
 

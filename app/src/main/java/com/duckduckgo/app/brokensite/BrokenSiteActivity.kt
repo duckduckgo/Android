@@ -23,9 +23,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder

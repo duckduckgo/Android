@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generera privat Duck Address</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blockera e-postspårare och dölj din adress</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Vill du fortsätta att spara inloggningar?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kan inaktivera det här när som helst i inställningarna.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Fortsätt att spara</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Inaktivera</string>
 
 </resources>

@@ -19,11 +19,17 @@ package com.duckduckgo.subscriptions.api
 interface Subscriptions {
 
     /**
-     * This method returns a sealed class with the PAT for the authenticated user or an error if it doesn't exist
+     * This method returns a sealed class with the long-lived PAT for the authenticated user or an error if it doesn't exist
      * or any errors arise.
      * @return [PatResult]
      */
     suspend fun getPAT(): PatResult
+
+    /**
+     * This method returns a [true] if a  given [product] can be found in the entitlements list or [false] otherwise
+     * @return [Boolean]
+     */
+    suspend fun hasEntitlement(product: String): Boolean
 }
 
 /**

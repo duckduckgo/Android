@@ -631,10 +631,6 @@
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visualizza</string>
     <string name="autofillLoginSavedSnackbarMessage">Dati di accesso salvati</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Dati di accesso aggiornati</string>
-    <string name="autofillDisableAutofillPromptTitle">Vuoi continuare a salvare i dati di accesso?</string>
-    <string name="autofillDisableAutofillPromptMessage">Puoi disattivare questa funzione in qualsiasi momento in Impostazioni.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Continua a salvare</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Disabilita</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vuoi ricevere una notifica quando è il tuo turno?</string>

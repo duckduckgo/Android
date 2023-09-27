@@ -18,11 +18,11 @@ package com.duckduckgo.app.survey.api
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

@@ -40,7 +40,10 @@ class AnrOfflinePixelSender @Inject constructor(
                 val ss = Base64.encodeToString(it.stackTrace.joinToString("\n").toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
                 return@defer pixelSender.sendPixel(
                     AnrPixelName.ANR_PIXEL.pixelName,
-                    mapOf("stackTrace" to ss),
+                    mapOf(
+                        ANR_STACKTRACE to ss,
+                        ANR_WEBVIEW_VERSION to it.webView,
+                    ),
                     mapOf(),
                 ).doOnComplete {
                     anrRepository.removeMostRecentAnr()
@@ -48,6 +51,11 @@ class AnrOfflinePixelSender @Inject constructor(
             }
             return@defer complete()
         }
+    }
+
+    companion object {
+        const val ANR_STACKTRACE = "stackTrace"
+        const val ANR_WEBVIEW_VERSION = "webView"
     }
 }
 

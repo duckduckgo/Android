@@ -116,5 +116,9 @@
     <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generuoti privatų „Duck“ adresą</string>
     <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokuoti el. pašto stebėjimo priemones ir slėpti adresą</string>
 
+    <string name="autofillDisableAutofillPromptTitle">Ar norite toliau įrašyti prisijungimus?</string>
+    <string name="autofillDisableAutofillPromptMessage">Tai galite bet kada išjungti nustatymuose.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Toliau įrašyti</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Išjungti</string>
 
 </resources>

@@ -60,7 +60,6 @@ class AppTpFeatureConfigImplTest {
             when (setting) {
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.RestartOnConnectivityLoss -> assertTrue(config.isEnabled(setting))
             }
