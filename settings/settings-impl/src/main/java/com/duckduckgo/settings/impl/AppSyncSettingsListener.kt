@@ -25,7 +25,7 @@ import timber.log.*
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class SyncSettingListener @Inject constructor(
+class AppSyncSettingsListener @Inject constructor(
     private val syncMetadataDao: SettingsSyncMetadataDao,
 ) : SyncSettingsListener {
     override fun onSettingChanged(settingKey: String) {

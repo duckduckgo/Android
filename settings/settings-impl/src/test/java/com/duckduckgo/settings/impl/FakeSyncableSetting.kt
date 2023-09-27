@@ -32,7 +32,7 @@ open class FakeSyncableSetting : SyncableSetting {
         return true
     }
 
-    override fun mergeRemote(value: String?): Boolean {
+    override fun deduplicate(value: String?): Boolean {
         this.value = value
         return true
     }

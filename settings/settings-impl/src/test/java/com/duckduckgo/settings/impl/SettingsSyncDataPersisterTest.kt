@@ -66,7 +66,7 @@ class SettingsSyncDataPersisterTest {
     }
 
     @Test
-    fun whenPersistChangesDeduplicationWithdValueThenCallMergeWithValue() {
+    fun whenPersistChangesDeduplicationWithdValueThenCallDeduplicateWithValue() {
         val result = testee.persist(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
@@ -76,11 +76,11 @@ class SettingsSyncDataPersisterTest {
         )
 
         assertTrue(result is Success)
-        verify(duckAddressSetting).mergeRemote("fake_value")
+        verify(duckAddressSetting).deduplicate("fake_value")
     }
 
     @Test
-    fun whenPersistChangesDeduplicationWithDeletedValueThenCallMergeWithNull() {
+    fun whenPersistChangesDeduplicationWithDeletedValueThenCallDeduplicateWithNull() {
         val result = testee.persist(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
@@ -90,7 +90,7 @@ class SettingsSyncDataPersisterTest {
         )
 
         assertTrue(result is Success)
-        verify(duckAddressSetting).mergeRemote(null)
+        verify(duckAddressSetting).deduplicate(null)
     }
 
     @Test

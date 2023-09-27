@@ -71,8 +71,8 @@ class SettingsSyncDataPersister @Inject constructor(
         val response = runCatching {
             updatesAdapter.fromJson(changes.jsonString)!!
         }.getOrElse {
-            Timber.i("Sync-Settings: process() error parsing credentials ${it.message}")
-            return SyncMergeResult.Error(reason = "Error parsing credentials ${it.message}")
+            Timber.i("Sync-Settings: process() error parsing settings ${it.message}")
+            return SyncMergeResult.Error(reason = "Error parsing settings ${it.message}")
         }
 
         val result = processEntries(response.settings, syncableSettings, conflictResolution)
@@ -98,7 +98,7 @@ class SettingsSyncDataPersister @Inject constructor(
     }
 
     private fun processEntries(
-        settings: CredentialsSyncEntries,
+        settings: SettingsSyncEntries,
         syncableSettings: Collection<SyncableSetting>,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
@@ -109,10 +109,10 @@ class SettingsSyncDataPersister @Inject constructor(
             when (conflictResolution) {
                 SyncConflictResolution.DEDUPLICATION -> {
                     val valueUpdated = if (entry.isDeleted()) {
-                        syncableFeature.mergeRemote(null)
+                        syncableFeature.deduplicate(null)
                     } else {
                         val decryptedValue = entry.value.takeUnless { it.isNullOrEmpty() }?.let { syncCrypto.decrypt(it) }
-                        syncableFeature.mergeRemote(decryptedValue)
+                        syncableFeature.deduplicate(decryptedValue)
                     }
                     if (valueUpdated) {
                         settingsSyncMetadataDao.addOrUpdate(
@@ -160,17 +160,17 @@ class SettingsSyncDataPersister @Inject constructor(
         companion object {
             private val moshi = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory()).build()
-            val updatesAdapter: JsonAdapter<CredentialsSyncRemoteUpdates> =
-                moshi.adapter(CredentialsSyncRemoteUpdates::class.java)
+            val updatesAdapter: JsonAdapter<SettingsSyncRemoteUpdates> =
+                moshi.adapter(SettingsSyncRemoteUpdates::class.java)
         }
     }
 }
 
-data class CredentialsSyncRemoteUpdates(
-    val settings: CredentialsSyncEntries,
+data class SettingsSyncRemoteUpdates(
+    val settings: SettingsSyncEntries,
 )
 
-data class CredentialsSyncEntries(
+data class SettingsSyncEntries(
     val entries: List<SettingEntryResponse>,
     val last_modified: String,
 )

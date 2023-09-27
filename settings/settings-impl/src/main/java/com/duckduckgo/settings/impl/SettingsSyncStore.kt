@@ -39,8 +39,8 @@ class RealSettingsSyncStore @Inject constructor(private val context: Context) : 
         get() = preferences.getString(KEY_START_TIMESTAMP, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_START_TIMESTAMP, value) }
     override var clientModifiedSince: String
-        get() = preferences.getString(KEY_END_TIMESTAMP, "0") ?: "0"
-        set(value) = preferences.edit(true) { putString(KEY_END_TIMESTAMP, value) }
+        get() = preferences.getString(KEY_CLIENT_MODIFIED_SINCE, "0") ?: "0"
+        set(value) = preferences.edit(true) { putString(KEY_CLIENT_MODIFIED_SINCE, value) }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -49,6 +49,6 @@ class RealSettingsSyncStore @Inject constructor(private val context: Context) : 
         const val FILENAME = "com.duckduckgo.settings.sync"
         private const val KEY_MODIFIED_SINCE = "KEY_MODIFIED_SINCE"
         private const val KEY_START_TIMESTAMP = "KEY_START_TIMESTAMP"
-        private const val KEY_END_TIMESTAMP = "KEY_END_TIMESTAMP"
+        private const val KEY_CLIENT_MODIFIED_SINCE = "KEY_CLIENT_MODIFIED_SINCE"
     }
 }

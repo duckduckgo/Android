@@ -30,7 +30,7 @@ class StoreModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAutofillDatabase(context: Context): SettingsDatabase {
+    fun provideSettingsDatabase(context: Context): SettingsDatabase {
         return Room.databaseBuilder(context, SettingsDatabase::class.java, "settings.db")
             .fallbackToDestructiveMigration()
             .addMigrations(*ALL_MIGRATIONS)

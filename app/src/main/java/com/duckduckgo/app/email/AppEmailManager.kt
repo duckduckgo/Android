@@ -28,7 +28,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.settings.api.*
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -47,7 +46,7 @@ import timber.log.Timber
 class AppEmailManager @Inject constructor(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
-    private val emailSettings: EmailSync,
+    private val emailSync: EmailSync,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
@@ -63,7 +62,7 @@ class AppEmailManager @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(isSignedIn())
         }
-        emailSettings.registerToRemoteChanges {
+        emailSync.registerToRemoteChanges {
             refreshEmailState()
         }
     }
@@ -84,7 +83,7 @@ class AppEmailManager @Inject constructor(
             isSignedInStateFlow.emit(isSignedIn())
             generateNewAlias()
             pixel.fire(EMAIL_ENABLED)
-            emailSettings.onSettingChanged()
+            emailSync.onSettingChanged()
         }
     }
 
@@ -93,7 +92,7 @@ class AppEmailManager @Inject constructor(
             emailDataStore.clearEmailData()
             isSignedInStateFlow.emit(false)
             pixel.fire(EMAIL_DISABLED)
-            emailSettings.onSettingChanged()
+            emailSync.onSettingChanged()
         }
     }
 

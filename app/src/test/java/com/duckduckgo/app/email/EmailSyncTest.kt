@@ -57,44 +57,44 @@ class EmailSyncTest {
     }
 
     @Test
-    fun whenMergeRemoteAddressWithSameLocalAddressThenDoNothing() {
+    fun whenDeduplicateRemoteAddressWithSameLocalAddressThenDoNothing() {
         whenever(emailDataStoreMock.emailUsername).thenReturn("username")
         whenever(emailDataStoreMock.emailToken).thenReturn("token")
 
-        testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
+        testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
         verify(emailDataStoreMock).emailUsername = "email"
         verify(emailDataStoreMock).emailToken = "token"
     }
 
     @Test
-    fun whenMergeRemoteAddressWithDifferentLocalAddressThenRemoteWins() {
+    fun whenDeduplicateRemoteAddressWithDifferentLocalAddressThenRemoteWins() {
         whenever(emailDataStoreMock.emailUsername).thenReturn("username2")
         whenever(emailDataStoreMock.emailToken).thenReturn("token2")
 
-        testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
+        testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
         verify(emailDataStoreMock).emailUsername = "email"
         verify(emailDataStoreMock).emailToken = "token"
     }
 
     @Test
-    fun whenMergeRemoteAddressWithNoLocalAccountThenStoreRemote() {
+    fun whenDeduplicateRemoteAddressWithNoLocalAccountThenStoreRemote() {
         whenever(emailDataStoreMock.emailUsername).thenReturn(null)
         whenever(emailDataStoreMock.emailToken).thenReturn(null)
 
-        testee.mergeRemote("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
+        testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
 
         verify(emailDataStoreMock).emailUsername = "email"
         verify(emailDataStoreMock).emailToken = "token"
     }
 
     @Test
-    fun whenMergeNullAddresThenDoNothing() {
+    fun whenDeduplicateNullAddresThenDoNothing() {
         whenever(emailDataStoreMock.emailUsername).thenReturn("username")
         whenever(emailDataStoreMock.emailToken).thenReturn("token")
 
-        testee.mergeRemote(null)
+        testee.deduplicate(null)
 
         verify(emailDataStoreMock, times(0)).emailToken
         verify(emailDataStoreMock, times(0)).emailUsername

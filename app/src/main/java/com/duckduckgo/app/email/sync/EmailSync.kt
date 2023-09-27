@@ -63,7 +63,7 @@ class EmailSync @Inject constructor(
         }
     }
 
-    override fun mergeRemote(value: String?): Boolean {
+    override fun deduplicate(value: String?): Boolean {
         Timber.i("Sync-Settings: mergeRemote($value)")
         val duckAddressSetting = runCatching { adapter.fromJson(value) }.getOrNull()
         if (duckAddressSetting != null) {
