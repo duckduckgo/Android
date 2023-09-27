@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.subscription
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistManager
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.NoValidPAT
@@ -51,6 +52,7 @@ class RealNetpSubscriptionManager @Inject constructor(
     private val service: NetworkProtectionAuthService,
     private val dispatcherProvider: DispatcherProvider,
     private val netPWaitlistRepository: NetPWaitlistRepository,
+    private val netPWaitlistManager: NetPWaitlistManager,
     private val subscriptions: Subscriptions,
 ) : NetpSubscriptionManager {
     private val state: MutableStateFlow<NetpAuthorizationStatus> = MutableStateFlow(Unknown)
@@ -67,6 +69,7 @@ class RealNetpSubscriptionManager @Inject constructor(
                     service.authorize(NetPAuthorizeRequest(pat.pat)).also {
                         netPWaitlistRepository.setAuthenticationToken(it.token)
                         logcat { "Netp auth: Token received" }
+                        netPWaitlistManager.upsertState()
                     }
                     state.emit(Success)
                 } else {

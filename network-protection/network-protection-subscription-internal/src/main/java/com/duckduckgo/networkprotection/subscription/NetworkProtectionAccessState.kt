@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.subscription
 
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -31,9 +32,12 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.duckduckgo.networkprotection.subscription.ui.NetpVerifySubscriptionParams
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(
     AppScope::class,
@@ -43,17 +47,25 @@ class NetworkProtectionWaitlistWithSubsImpl @Inject constructor(
     private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val appBuildConfig: AppBuildConfig,
+    private val subscriptions: Subscriptions,
+    private val dispatcherProvider: DispatcherProvider,
 ) : NetworkProtectionWaitlist {
 
-    override fun getState(): NetPWaitlistState {
+    override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
-            return if (netPWaitlistRepository.getAuthenticationToken() == null) {
+            return@withContext if (!hasValidNetPEntitlements()) {
+                NotUnlocked
+            } else if (netPWaitlistRepository.getAuthenticationToken() == null) {
                 VerifySubscription
             } else {
                 InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
             }
         }
-        return NotUnlocked
+        return@withContext NotUnlocked
+    }
+
+    private fun hasValidNetPEntitlements(): Boolean {
+        return runBlocking { subscriptions.hasEntitlement(NETP_ENTITLEMENT) }
     }
 
     override suspend fun getScreenForCurrentState(): ActivityParams {
@@ -70,4 +82,8 @@ class NetworkProtectionWaitlistWithSubsImpl @Inject constructor(
     }
 
     private fun isTreated(): Boolean = appBuildConfig.isDebug
+
+    companion object {
+        private const val NETP_ENTITLEMENT = "Dummy"
+    }
 }
