@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
@@ -77,7 +78,7 @@ class SavedSitesSyncPersister @Inject constructor(
 
             if (conflictResolution == DEDUPLICATION) {
                 // first sync has a special case, bookmarks and favorites that were added previously to sync need to be updated to lastModified
-                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.serverModifiedSince, savedSitesSyncStore.startTimeStamp)
+                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.clientModifiedSince, DatabaseDateFormatter.iso8601())
             }
         }
 
