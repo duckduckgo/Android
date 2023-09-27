@@ -2575,7 +2575,7 @@ class BrowserTabFragment :
     ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
-            subfolder = Environment.DIRECTORY_PICTURES,
+            subfolder = Environment.DIRECTORY_DOWNLOADS,
         )
 
         if (hasWriteStoragePermission()) {
