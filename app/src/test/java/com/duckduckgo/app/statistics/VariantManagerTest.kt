@@ -17,8 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.CompetitiveCopy
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SetupCopy
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NoEngagementNotifications
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -56,7 +55,7 @@ class VariantManagerTest {
 
     @Test
     fun pushNotificationControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zv" }
+        val variant = variants.first { it.key == "mc" }
 
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
@@ -65,20 +64,11 @@ class VariantManagerTest {
 
     @Test
     fun pushNotificationCompetitiveCopyExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zx" }
+        val variant = variants.first { it.key == "md" }
 
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(CompetitiveCopy))
-    }
-
-    @Test
-    fun pushNotificationSetupCopyExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zy" }
-
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(SetupCopy))
+        assertTrue(variant.hasFeature(NoEngagementNotifications))
     }
 
     @Suppress("SameParameterValue")
