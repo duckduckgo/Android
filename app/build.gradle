@@ -302,6 +302,9 @@ dependencies {
     implementation project(':user-agent-api')
     implementation project(':user-agent-impl')
 
+    implementation project(':js-messaging-api')
+    implementation project(':js-messaging-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
