@@ -79,6 +79,7 @@ class RealNetPWaitlistManagerTest {
             networkProtectionWaitlist,
             netPWaitlistService,
             coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
     }
 
