@@ -27,6 +27,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -42,9 +43,11 @@ class SavedSitesDataCleaner @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         // https://app.asana.com/0/69071770703008/1204375817149200/f
-        if (!deviceSyncState.isUserSignedInOnDevice()) {
-            coroutineScope.launch(dispatcherProvider.io()) {
-                savedSitesRepository.pruneDeleted()
+        coroutineScope.launch {
+            withContext(dispatcherProvider.io()) {
+                if (!deviceSyncState.isUserSignedInOnDevice()) {
+                    savedSitesRepository.pruneDeleted()
+                }
             }
         }
     }
