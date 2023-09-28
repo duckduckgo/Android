@@ -22,12 +22,14 @@ interface NetworkProtectionWaitlist {
 
     /**
      * Returns the state of the NetP waitlist
+     * The caller DOES NOT need to specify the dispatcher when calling this method
      */
-    fun getState(): NetPWaitlistState
+    suspend fun getState(): NetPWaitlistState
 
     /**
      * Call this method to get the [ActivityParams] corresponding to the activity to launch for the current
      * state of the waitlist beta
+     * The caller DOES NOT need to specify the dispatcher when calling this method
      *
      * @return the [ActivityParams] for the activity to launch that corresponds to the current waitlist beta
      */

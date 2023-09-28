@@ -23,6 +23,7 @@ import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
@@ -39,6 +40,7 @@ interface NetpCohortStore {
     scope = AppScope::class,
     boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
 )
+@SingleInstanceIn(AppScope::class)
 class RealNetpCohortStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetpCohortStore, NetPFeatureRemover.NetPStoreRemovalPlugin {

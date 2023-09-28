@@ -31,6 +31,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.asLog
@@ -58,7 +59,7 @@ class RealNetPWaitlistManager @Inject constructor(
 ) : NetPWaitlistManager {
 
     private val state: MutableStateFlow<NetPWaitlistState> =
-        MutableStateFlow(networkProtectionWaitlist.getState())
+        MutableStateFlow(runBlocking { networkProtectionWaitlist.getState() })
 
     override fun getState(): Flow<NetPWaitlistState> {
         return state.asStateFlow()
