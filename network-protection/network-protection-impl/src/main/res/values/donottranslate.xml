@@ -178,7 +178,7 @@
     <string name="netpFaqAnswerNine">Network Protection is free to use while in beta. Eventually it will be offered as a paid service.</string>
 
     <!-- Terms -->
-    <string name="netpTermsAgreeAndClose">Agree and Close</string>
+    <string name="netpTermsAgreeAndClose">Agree and Enable VPN</string>
     <string name="netpTermsTitle">Terms and Privacy Policy</string>
     <string name="netpTermsHeadline">Terms of Service</string>
     <string name="netpPrivacyPolicyHeadline">Privacy Policy</string>
