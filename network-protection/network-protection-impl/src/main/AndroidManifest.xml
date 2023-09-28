@@ -61,6 +61,16 @@
             android:label="@string/netpTermsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="false" />
+        <activity
+            android:name=".settings.NetPVpnSettingsActivity"
+            android:label="@string/netpVpnSettingsTitle"
+            android:parentActivityName=".management.NetworkProtectionManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".settings.NetPNotificationSettingsActivity"
+            android:label="@string/netpVpnNotificationSettingsTitle"
+            android:parentActivityName=".management.NetworkProtectionManagementActivity"
+            android:exported="false" />
         <receiver
             android:name=".notification.NetPEnableReceiver"
             android:enabled="false"

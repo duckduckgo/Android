@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -32,6 +33,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
@@ -58,6 +60,9 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ConnectionState
 import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagementViewModel.ViewState
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
+import com.duckduckgo.networkprotection.impl.settings.NetPNotificationSettingsScreenNoParams
+import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
+import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -72,6 +77,9 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var netPRemoteFeature: NetPRemoteFeature
 
     private val binding: ActivityNetpManagementBinding by viewBinding()
     private val viewModel: NetworkProtectionManagementViewModel by bindViewModel()
@@ -119,6 +127,14 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             globalActivityStarter.start(this, NetPAppExclusionListNoParams)
         }
 
+        binding.settings.settingsVpn.setClickListener {
+            globalActivityStarter.start(this, NetPVpnSettingsScreenNoParams)
+        }
+
+        binding.settings.settingsVpnNotifications.setClickListener {
+            globalActivityStarter.start(this, NetPNotificationSettingsScreenNoParams)
+        }
+
         binding.about.aboutVpn.setClickListener {
             globalActivityStarter.start(this, NetPAboutVPNScreenNoParams)
         }
@@ -126,6 +142,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         binding.about.aboutFaq.setClickListener {
             globalActivityStarter.start(this, NetPFaqsScreenNoParams)
         }
+
+        val showVpnSettings = netPRemoteFeature.showVpnSettings().isEnabled() || appBuildConfig.isInternalBuild()
+        binding.settings.settingsVpn.isVisible = showVpnSettings
+        binding.settings.settingsVpnNotifications.isVisible = showVpnSettings
     }
 
     private fun observeViewModel() {

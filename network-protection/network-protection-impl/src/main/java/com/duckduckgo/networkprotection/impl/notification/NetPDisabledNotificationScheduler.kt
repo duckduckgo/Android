@@ -20,10 +20,13 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -37,6 +40,9 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val netPDisabledNotificationBuilder: NetPDisabledNotificationBuilder,
     private val networkProtectionState: NetworkProtectionState,
+    private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
@@ -97,11 +103,14 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     private fun showDisabledNotification() {
-        logcat { "Showing disabled notification for NetP" }
-        notificationManager.notify(
-            NETP_REMINDER_NOTIFICATION_ID,
-            netPDisabledNotificationBuilder.buildDisabledNotification(context),
-        )
+        coroutineScope.launch(dispatcherProvider.io()) {
+            logcat { "Showing disabled notification for NetP" }
+            if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
+            notificationManager.notify(
+                NETP_REMINDER_NOTIFICATION_ID,
+                netPDisabledNotificationBuilder.buildDisabledNotification(context),
+            )
+        }
     }
 
     private suspend fun onVPNRevoked() {
@@ -113,11 +122,14 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     private fun showRevokedNotification() {
-        logcat { "Showing disabled by vpn notification for NetP" }
-        notificationManager.notify(
-            NETP_REMINDER_NOTIFICATION_ID,
-            netPDisabledNotificationBuilder.buildDisabledByVpnNotification(context),
-        )
+        coroutineScope.launch(dispatcherProvider.io()) {
+            logcat { "Showing disabled by vpn notification for NetP" }
+            if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
+            notificationManager.notify(
+                NETP_REMINDER_NOTIFICATION_ID,
+                netPDisabledNotificationBuilder.buildDisabledByVpnNotification(context),
+            )
+        }
     }
 
     private fun enableReminderReceiver() {

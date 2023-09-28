@@ -19,16 +19,20 @@ package com.duckduckgo.networkprotection.store.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import com.duckduckgo.networkprotection.store.remote_config.NetPConfigToggle
+import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         NetPManuallyExcludedApp::class,
+        NetPConfigToggle::class,
     ],
 )
 abstract class NetPDatabase : RoomDatabase() {
     abstract fun exclusionListDao(): NetPExclusionListDao
+    abstract fun configTogglesDao(): NetPConfigTogglesDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration>
