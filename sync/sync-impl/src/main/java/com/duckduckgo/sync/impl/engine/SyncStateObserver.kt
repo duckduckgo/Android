@@ -47,8 +47,8 @@ class SyncStateObserver @Inject constructor(
             .drop(1) // we only want to listen for changes here
             .distinctUntilChanged()
             .onEach { signedIn ->
-                Timber.i("SyncStateObserver: isSignedInFlow: $signedIn")
                 if (!signedIn) {
+                    Timber.i("Sync disabled, notify engine")
                     syncEngine.onSyncDisabled()
                 }
             }
