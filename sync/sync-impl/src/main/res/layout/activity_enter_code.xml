@@ -38,7 +38,7 @@
         <FrameLayout
             android:id="@+id/enterCodeContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="@dimen/keyline_7"
             android:layout_marginBottom="@dimen/keyline_6"
             android:layout_marginStart="@dimen/keyline_6"
@@ -54,12 +54,14 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:textAlignment="center"
+                android:gravity="center"
                 android:text="@string/sync_enter_code_hint"
                 app:textType="secondary"
                 app:typography="body1" />
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/pastedCode"
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:typography="body1_mono" />

@@ -71,6 +71,10 @@
         app:primaryText="@string/sync_setup_single_device_primary_cta_title"
         app:secondaryText="@string/sync_setup_single_device_primary_cta_subtitle"/>
 
+    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         android:id="@+id/sync_setup_recover_data"
         android:layout_width="match_parent"
