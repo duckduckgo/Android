@@ -23,6 +23,7 @@ import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncableType
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
@@ -87,6 +88,24 @@ class AppSyncApiClient @Inject constructor(
         return when (type) {
             BOOKMARKS -> getBookmarks(type, token, since)
             CREDENTIALS -> getCredentials(type, token, since)
+            SETTINGS -> getSettings(type, token, since)
+        }
+    }
+
+    private fun getSettings(type: SyncableType, token: String, since: String): Result<SyncChangesResponse> {
+        return when (val result = syncApi.getSettings(token, since)) {
+            is Result.Error -> {
+                if (result.code == API_CODE.NOT_MODIFIED.code) {
+                    Result.Success(SyncChangesResponse.empty(type))
+                } else {
+                    Result.Error(result.code, result.reason)
+                }
+            }
+
+            is Result.Success -> {
+                val remoteChanges = mapResponse(type, result.data)
+                Result.Success(remoteChanges)
+            }
         }
     }
 
