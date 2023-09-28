@@ -18,9 +18,7 @@ package com.duckduckgo.sync.impl.engine
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChangesRequest
-import com.duckduckgo.sync.api.engine.SyncChangesResponse
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
@@ -63,6 +61,7 @@ class AppSyncApiClient @Inject constructor(
         Timber.d("Sync-Feature: patch data generated $updates")
         return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
+                result.removeKeysIfInvalid()
                 result
             }
 
@@ -98,6 +97,7 @@ class AppSyncApiClient @Inject constructor(
                 if (result.code == API_CODE.NOT_MODIFIED.code) {
                     Result.Success(SyncChangesResponse.empty(type))
                 } else {
+                    result.removeKeysIfInvalid()
                     Result.Error(result.code, result.reason)
                 }
             }
@@ -122,7 +122,10 @@ class AppSyncApiClient @Inject constructor(
                         syncPixels.fireCountLimitPixel(BOOKMARKS.toString())
                         Result.Error(result.code, result.reason)
                     }
-                    else -> Result.Error(result.code, result.reason)
+                    else -> {
+                        result.removeKeysIfInvalid()
+                        Result.Error(result.code, result.reason)
+                    }
                 }
             }
 
@@ -146,7 +149,10 @@ class AppSyncApiClient @Inject constructor(
                         syncPixels.fireCountLimitPixel(CREDENTIALS.toString())
                         Result.Error(result.code, result.reason)
                     }
-                    else -> Result.Error(result.code, result.reason)
+                    else -> {
+                        result.removeKeysIfInvalid()
+                        Result.Error(result.code, result.reason)
+                    }
                 }
             }
 
@@ -171,5 +177,11 @@ class AppSyncApiClient @Inject constructor(
         val jsonString = response.toString()
         Timber.d("Sync-Feature: $type response mapped to $jsonString")
         return SyncChangesResponse(type, jsonString)
+    }
+
+    private fun Result.Error.removeKeysIfInvalid() {
+        if (code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
+            syncStore.clearAll()
+        }
     }
 }

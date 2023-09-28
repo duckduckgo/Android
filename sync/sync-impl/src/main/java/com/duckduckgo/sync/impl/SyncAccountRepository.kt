@@ -201,7 +201,7 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override fun removeAccount() {
-        onSyncDisabled()
+        clearSyncData()
     }
 
     override fun logout(deviceId: String): Result<Boolean> {
@@ -225,7 +225,7 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Result.Success -> {
                 if (logoutThisDevice) {
-                    onSyncDisabled()
+                    clearSyncData()
                 }
                 Result.Success(true)
             }
@@ -242,7 +242,7 @@ class AppSyncAccountRepository @Inject constructor(
             }
 
             is Result.Success -> {
-                onSyncDisabled()
+                clearSyncData()
                 Result.Success(true)
             }
         }
@@ -334,13 +334,12 @@ class AppSyncAccountRepository @Inject constructor(
 
     private fun Error.removeKeysIfInvalid() {
         if (code == INVALID_LOGIN_CREDENTIALS.code) {
-            onSyncDisabled()
+            clearSyncData()
         }
     }
 
-    private fun onSyncDisabled() {
+    private fun clearSyncData() {
         syncStore.clearAll()
-        syncEngine.onSyncDisabled()
     }
 
     private class Adapters {
