@@ -70,7 +70,7 @@ class FavoritesWidgetService : RemoteViewsService() {
         )
 
         private val faviconItemSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon).toInt()
-        private val faviconItemCornerRadius = context.resources.getDimension(CommonR.dimen.mediumShapeCornerRadius).toInt()
+        private val faviconItemCornerRadius = com.duckduckgo.mobile.android.R.dimen.searchWidgetFavoritesCornerRadius
 
         private val maxItems: Int
             get() {
@@ -94,11 +94,11 @@ class FavoritesWidgetService : RemoteViewsService() {
                 val bitmap = runBlocking {
                     faviconManager.loadFromDiskWithParams(
                         url = it.url,
-                        cornerRadius = faviconItemCornerRadius,
+                        cornerRadius = context.resources.getDimension(faviconItemCornerRadius).toInt(),
                         width = faviconItemSize,
                         height = faviconItemSize,
                     )
-                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty(), cornerRadius = com.duckduckgo.mobile.android.R.dimen.mediumShapeCornerRadius).toBitmap(faviconItemSize, faviconItemSize)
+                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty(), cornerRadius = faviconItemCornerRadius).toBitmap(faviconItemSize, faviconItemSize)
                 }
                 WidgetFavorite(it.title, it.url, bitmap)
             }
