@@ -41,12 +41,6 @@ constructor(
 
     private val isSignedInStateFlow: MutableSharedFlow<Boolean> = MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-    init {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            isSignedInStateFlow.emit(isSignedIn())
-        }
-    }
-
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
         return sharedPrefsProv.getSharedPrefs(FILENAME)
