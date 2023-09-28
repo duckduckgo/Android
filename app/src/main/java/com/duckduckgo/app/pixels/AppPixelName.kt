@@ -248,6 +248,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     EMAIL_ENABLED("email_enabled"),
     EMAIL_DISABLED("email_disabled"),
+    DUCK_EMAIL_OVERRIDE_PIXEL("m_sync_duck_address_override"),
 
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
     EMAIL_DID_SHOW_WAITLIST_DIALOG("email_did_show_waitlist_dialog"),

@@ -18,6 +18,7 @@ package com.duckduckgo.app.email.sync
 
 import com.duckduckgo.app.email.db.*
 import com.duckduckgo.app.email.sync.Adapters.Companion.adapter
+import com.duckduckgo.app.pixels.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.settings.api.*
@@ -74,7 +75,7 @@ class EmailSync @Inject constructor(
             if (!emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()) {
                 if (duckUsername != emailDataStore.emailUsername) {
                     storeNewCredentials(duckUsername, personalAccessToken)
-                    pixel.fire(DUCK_EMAIL_OVERRIDE_PIXEL)
+                    pixel.fire(AppPixelName.DUCK_EMAIL_OVERRIDE_PIXEL)
                     return true
                 }
             } else {
@@ -102,7 +103,6 @@ class EmailSync @Inject constructor(
 
     companion object {
         const val DUCK_EMAIL_SETTING = "email_protection_generation"
-        const val DUCK_EMAIL_OVERRIDE_PIXEL = "m_sync_duck_address_override"
     }
 }
 

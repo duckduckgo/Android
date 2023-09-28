@@ -60,7 +60,7 @@ class AppEmailManagerTest {
     private val mockEmailService: EmailService = mock()
     private val mockEmailDataStore: EmailDataStore = FakeEmailDataStore()
     private val mockSyncSettingsListener = mock<SyncSettingsListener>()
-    private val emailSyncableSetting = EmailSync(mockEmailDataStore, mockSyncSettingsListener)
+    private val emailSyncableSetting = EmailSync(mockEmailDataStore, mockSyncSettingsListener, mock())
     private val mockPixel: Pixel = mock()
     lateinit var testee: AppEmailManager
 

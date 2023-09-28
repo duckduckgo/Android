@@ -2,6 +2,8 @@ package com.duckduckgo.app.email
 
 import com.duckduckgo.app.email.db.*
 import com.duckduckgo.app.email.sync.*
+import com.duckduckgo.app.pixels.*
+import com.duckduckgo.app.statistics.pixels.*
 import com.duckduckgo.settings.api.*
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -14,8 +16,9 @@ class EmailSyncTest {
 
     private val emailDataStoreMock = mock<EmailDataStore>()
     private val syncSettingsListenerMock = mock<SyncSettingsListener>()
+    private val pixelMock = mock<Pixel>()
 
-    private val testee = EmailSync(emailDataStoreMock, syncSettingsListenerMock)
+    private val testee = EmailSync(emailDataStoreMock, syncSettingsListenerMock, pixelMock)
 
     @Test
     fun whenUserSignedInThenReturnAccountInfo() {
@@ -76,6 +79,16 @@ class EmailSyncTest {
 
         verify(emailDataStoreMock).emailUsername = "email"
         verify(emailDataStoreMock).emailToken = "token"
+    }
+
+    @Test
+    fun whenDeduplicateRemoteAddressWithDifferentLocalAddressThenPixelEvent() {
+        whenever(emailDataStoreMock.emailUsername).thenReturn("username2")
+        whenever(emailDataStoreMock.emailToken).thenReturn("token2")
+
+        testee.deduplicate("{\"username\":\"email\",\"personal_access_token\":\"token\"}")
+
+        verify(pixelMock).fire(AppPixelName.DUCK_EMAIL_OVERRIDE_PIXEL)
     }
 
     @Test
