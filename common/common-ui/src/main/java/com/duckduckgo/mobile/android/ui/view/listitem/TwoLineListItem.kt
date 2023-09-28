@@ -115,6 +115,8 @@ class TwoLineListItem @JvmOverloads constructor(
                     hideTrailingItems()
                 }
             }
+            val switchEnabled = getBoolean(R.styleable.TwoLineListItem_switchEnabled, true)
+            setSwitchEnabled(switchEnabled)
 
             recycle()
         }

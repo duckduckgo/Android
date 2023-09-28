@@ -276,6 +276,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 quietlySetIsChecked(true, null)
                 isEnabled = false
             }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithSwitchDisabledChecked).apply {
+                quietlySetIsChecked(true, null)
+            }
         }
     }
 
