@@ -98,7 +98,7 @@ class FavoritesWidgetService : RemoteViewsService() {
                         width = faviconItemSize,
                         height = faviconItemSize,
                     )
-                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty()).toBitmap(faviconItemSize, faviconItemSize)
+                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty(), cornerRadius = com.duckduckgo.mobile.android.R.dimen.mediumShapeCornerRadius).toBitmap(faviconItemSize, faviconItemSize)
                 }
                 WidgetFavorite(it.title, it.url, bitmap)
             }
