@@ -75,11 +75,6 @@ class SavedSitesSyncPersister @Inject constructor(
 
         if (result is Success) {
             pruneDeletedObjects()
-
-            if (conflictResolution == DEDUPLICATION) {
-                // first sync has a special case, bookmarks and favorites that were added previously to sync need to be updated to lastModified
-                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.clientModifiedSince, DatabaseDateFormatter.iso8601())
-            }
         }
 
         return result
@@ -114,7 +109,7 @@ class SavedSitesSyncPersister @Inject constructor(
             Timber.d("Sync-Bookmarks: merging completed, no entries to merge")
             Success(false)
         } else {
-            algorithm.processEntries(bookmarks, conflictResolution)
+            algorithm.processEntries(bookmarks, conflictResolution, savedSitesSyncStore.clientModifiedSince)
         }
     }
 

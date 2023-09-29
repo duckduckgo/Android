@@ -43,6 +43,7 @@ interface SavedSitesSyncPersisterAlgorithm {
     fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
+        lastModified: String
     ): SyncMergeResult
 }
 
@@ -58,6 +59,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     override fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
+        lastModified: String
     ): SyncMergeResult {
         var orphans = false
 
@@ -82,7 +84,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             if (repository.getFolder(folderId) != null) {
                 processIds.add(folderId)
             }
-            processFolder(folderId, SavedSitesNames.BOOKMARKS_ROOT, bookmarks.entries, bookmarks.last_modified, processIds, conflictResolution)
+            processFolder(folderId, SavedSitesNames.BOOKMARKS_ROOT, bookmarks.entries, lastModified, processIds, conflictResolution)
         }
 
         // 2. All bookmarks without a parent in the payload
@@ -98,7 +100,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 processIds,
                 bookmarks.entries,
                 SavedSitesNames.BOOKMARKS_ROOT,
-                bookmarks.last_modified,
+                lastModified,
             )
         }
 
@@ -109,7 +111,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         // Favourites
         if (allResponseIds.contains(SavedSitesNames.FAVORITES_ROOT)) {
             Timber.d("Sync-Bookmarks: favourites root found, traversing from there")
-            processFavouritesFolder(conflictResolution, bookmarks.entries, bookmarks.last_modified)
+            processFavouritesFolder(conflictResolution, bookmarks.entries, lastModified)
             processIds.add(SavedSitesNames.FAVORITES_ROOT)
         }
 
