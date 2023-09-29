@@ -28,6 +28,7 @@ import com.duckduckgo.networkprotection.impl.waitlist.store.FakeNetPWaitlistRepo
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -69,13 +70,16 @@ class RealNetPWaitlistManagerTest {
 
         MockitoAnnotations.openMocks(this)
 
-        whenever(networkProtectionWaitlist.getState()).thenReturn(NetPWaitlistState.NotUnlocked)
+        runBlocking {
+            whenever(networkProtectionWaitlist.getState()).thenReturn(NetPWaitlistState.NotUnlocked)
+        }
         testee = RealNetPWaitlistManager(
             mockWgVpnControllerService,
             netPWaitlistRepository,
             networkProtectionWaitlist,
             netPWaitlistService,
             coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
         )
     }
 

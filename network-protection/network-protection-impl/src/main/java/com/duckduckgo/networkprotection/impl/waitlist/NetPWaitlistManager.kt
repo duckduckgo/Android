@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
@@ -28,9 +29,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.asLog
@@ -55,17 +57,31 @@ class RealNetPWaitlistManager @Inject constructor(
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val netPWaitlistService: NetPWaitlistService,
     private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : NetPWaitlistManager {
 
-    private val state: MutableStateFlow<NetPWaitlistState> =
-        MutableStateFlow(networkProtectionWaitlist.getState())
+    // A state flow behaves identically to a shared flow when it is created with the following parameters
+    // See https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-state-flow/
+    // See also https://github.com/Kotlin/kotlinx.coroutines/issues/2515
+    //
+    // WARNING: only use _state to emit values, for anything else use getState()
+    private val _state: MutableSharedFlow<NetPWaitlistState> = MutableSharedFlow(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
+    init {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            _state.tryEmit(networkProtectionWaitlist.getState())
+        }
+    }
 
     override fun getState(): Flow<NetPWaitlistState> {
-        return state.asStateFlow()
+        return _state.distinctUntilChanged()
     }
 
     override suspend fun getStateSync(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
-        return@withContext state.value
+        return@withContext getState().first()
     }
 
     override suspend fun joinWaitlist() = withContext(dispatcherProvider.io()) {
@@ -93,7 +109,7 @@ class RealNetPWaitlistManager @Inject constructor(
         }
 
         updateState()
-        state.value
+        getState().first()
     }
 
     override suspend fun redeemCode(inviteCode: String): RedeemCodeResult {
@@ -124,7 +140,7 @@ class RealNetPWaitlistManager @Inject constructor(
     }
 
     private suspend fun updateState() {
-        state.emit(networkProtectionWaitlist.getState())
+        _state.emit(networkProtectionWaitlist.getState())
     }
 }
 

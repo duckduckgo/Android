@@ -21,7 +21,6 @@ import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface NetPWaitlistDataStore {
@@ -35,7 +34,6 @@ interface NetPWaitlistDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class NetPWaitlistDataStoreSharedPreferences @Inject constructor(
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : NetPWaitlistDataStore {

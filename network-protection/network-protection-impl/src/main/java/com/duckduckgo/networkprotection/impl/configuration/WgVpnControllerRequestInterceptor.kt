@@ -24,6 +24,7 @@ import com.duckduckgo.networkprotection.impl.BuildConfig
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -45,7 +46,8 @@ class WgVpnControllerRequestInterceptor @Inject constructor(
             logcat { "Adding Authorization Bearer token to request $url" }
             newRequest.addHeader(
                 name = "Authorization",
-                value = "bearer ${netpWaitlistRepository.getAuthenticationToken()}",
+                // this runBlocking is fine as we're already in a background thread
+                value = "bearer ${runBlocking { netpWaitlistRepository.getAuthenticationToken() }}",
             )
 
             if (appBuildConfig.isInternalBuild()) {

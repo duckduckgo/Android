@@ -40,16 +40,16 @@ class RealNetPWaitlistRepositoryTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        testee = RealNetPWaitlistRepository(fakeNetPWaitlistDataStore, coroutineRule.testDispatcherProvider)
+        testee = RealNetPWaitlistRepository(fakeNetPWaitlistDataStore, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
     }
 
     @Test
-    fun whenAuthTokenNotSetGetTokenReturnsNull() {
+    fun whenAuthTokenNotSetGetTokenReturnsNull() = runTest {
         assertNull(testee.getAuthenticationToken())
     }
 
     @Test
-    fun whenAuthTokenSetGetTokenReturnsToken() {
+    fun whenAuthTokenSetGetTokenReturnsToken() = runTest {
         testee.setAuthenticationToken(fakeToken)
         assertEquals(fakeToken, testee.getAuthenticationToken())
     }
