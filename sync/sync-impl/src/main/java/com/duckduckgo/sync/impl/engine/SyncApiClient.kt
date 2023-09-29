@@ -61,7 +61,6 @@ class AppSyncApiClient @Inject constructor(
         Timber.d("Sync-Feature: patch data generated $updates")
         return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
-                result.removeKeysIfInvalid()
                 result
             }
 
@@ -97,7 +96,6 @@ class AppSyncApiClient @Inject constructor(
                 if (result.code == API_CODE.NOT_MODIFIED.code) {
                     Result.Success(SyncChangesResponse.empty(type))
                 } else {
-                    result.removeKeysIfInvalid()
                     Result.Error(result.code, result.reason)
                 }
             }
@@ -123,7 +121,6 @@ class AppSyncApiClient @Inject constructor(
                         Result.Error(result.code, result.reason)
                     }
                     else -> {
-                        result.removeKeysIfInvalid()
                         Result.Error(result.code, result.reason)
                     }
                 }
@@ -150,7 +147,6 @@ class AppSyncApiClient @Inject constructor(
                         Result.Error(result.code, result.reason)
                     }
                     else -> {
-                        result.removeKeysIfInvalid()
                         Result.Error(result.code, result.reason)
                     }
                 }
@@ -177,11 +173,5 @@ class AppSyncApiClient @Inject constructor(
         val jsonString = response.toString()
         Timber.d("Sync-Feature: $type response mapped to $jsonString")
         return SyncChangesResponse(type, jsonString)
-    }
-
-    private fun Result.Error.removeKeysIfInvalid() {
-        if (code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
-            syncStore.clearAll()
-        }
     }
 }

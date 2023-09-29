@@ -24,7 +24,6 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
 import com.duckduckgo.sync.crypto.AccountKeys
 import com.duckduckgo.sync.crypto.LoginKeys
 import com.duckduckgo.sync.crypto.SyncLib
-import com.duckduckgo.sync.impl.API_CODE.INVALID_LOGIN_CREDENTIALS
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -40,7 +39,6 @@ interface SyncAccountRepository {
     fun isSignedIn(): Boolean
     fun processCode(stringCode: String): Result<Boolean>
     fun getAccountInfo(): AccountInfo
-    fun removeAccount()
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
@@ -86,7 +84,6 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (result) {
             is Error -> {
-                result.removeKeysIfInvalid()
                 result
             }
 
@@ -200,10 +197,6 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun removeAccount() {
-        clearSyncData()
-    }
-
     override fun logout(deviceId: String): Result<Boolean> {
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "Token Empty")
@@ -219,13 +212,12 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (val result = syncApi.logout(token, deviceId)) {
             is Error -> {
-                result.removeKeysIfInvalid()
                 result
             }
 
             is Result.Success -> {
                 if (logoutThisDevice) {
-                    clearSyncData()
+                    syncStore.clearAll()
                 }
                 Result.Success(true)
             }
@@ -237,12 +229,11 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (val result = syncApi.deleteAccount(token)) {
             is Error -> {
-                result.removeKeysIfInvalid()
                 result
             }
 
             is Result.Success -> {
-                clearSyncData()
+                syncStore.clearAll()
                 Result.Success(true)
             }
         }
@@ -270,7 +261,6 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (val result = syncApi.getDevices(token)) {
             is Error -> {
-                result.removeKeysIfInvalid()
                 result
             }
 
@@ -317,7 +307,6 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (result) {
             is Error -> {
-                result.removeKeysIfInvalid()
                 result
             }
 
@@ -330,16 +319,6 @@ class AppSyncAccountRepository @Inject constructor(
                 Result.Success(true)
             }
         }
-    }
-
-    private fun Error.removeKeysIfInvalid() {
-        if (code == INVALID_LOGIN_CREDENTIALS.code) {
-            clearSyncData()
-        }
-    }
-
-    private fun clearSyncData() {
-        syncStore.clearAll()
     }
 
     private class Adapters {

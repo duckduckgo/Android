@@ -21,7 +21,6 @@ import com.duckduckgo.app.di.*
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.lifecycle.*
 import com.duckduckgo.di.scopes.*
-import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
@@ -34,7 +33,7 @@ import timber.log.*
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
-class SyncStateObserver @Inject constructor(
+class SyncAccountDisabledObserver @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val syncStore: SyncStore,
     private val syncEngine: SyncEngine,

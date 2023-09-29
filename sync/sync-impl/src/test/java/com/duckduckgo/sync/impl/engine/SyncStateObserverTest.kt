@@ -18,7 +18,7 @@ class SyncStateObserverTest {
     private val syncEngine: SyncEngine = mock()
     private val syncStore: SyncStore = mock<SyncStore>()
 
-    private val testee = SyncStateObserver(
+    private val testee = SyncAccountDisabledObserver(
         appCoroutineScope = coroutineTestRule.testScope,
         syncStore = syncStore,
         syncEngine = syncEngine,
