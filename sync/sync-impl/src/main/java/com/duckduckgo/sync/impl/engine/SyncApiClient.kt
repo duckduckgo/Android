@@ -18,9 +18,7 @@ package com.duckduckgo.sync.impl.engine
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChangesRequest
-import com.duckduckgo.sync.api.engine.SyncChangesResponse
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
 import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
@@ -122,7 +120,9 @@ class AppSyncApiClient @Inject constructor(
                         syncPixels.fireCountLimitPixel(BOOKMARKS.toString())
                         Result.Error(result.code, result.reason)
                     }
-                    else -> Result.Error(result.code, result.reason)
+                    else -> {
+                        Result.Error(result.code, result.reason)
+                    }
                 }
             }
 
@@ -146,7 +146,9 @@ class AppSyncApiClient @Inject constructor(
                         syncPixels.fireCountLimitPixel(CREDENTIALS.toString())
                         Result.Error(result.code, result.reason)
                     }
-                    else -> Result.Error(result.code, result.reason)
+                    else -> {
+                        Result.Error(result.code, result.reason)
+                    }
                 }
             }
 

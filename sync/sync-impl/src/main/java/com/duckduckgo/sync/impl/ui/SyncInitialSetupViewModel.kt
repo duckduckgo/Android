@@ -30,6 +30,7 @@ import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnect
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
+import com.duckduckgo.sync.store.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -45,6 +46,7 @@ class SyncInitialSetupViewModel
 @Inject
 constructor(
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncStore: SyncStore,
     private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -95,7 +97,7 @@ constructor(
 
     fun onResetClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            syncAccountRepository.removeAccount()
+            syncStore.clearAll()
             updateViewState()
         }
     }
