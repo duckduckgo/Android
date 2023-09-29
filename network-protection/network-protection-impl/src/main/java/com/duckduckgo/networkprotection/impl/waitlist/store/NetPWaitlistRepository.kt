@@ -16,16 +16,19 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface NetPWaitlistRepository {
-    fun getAuthenticationToken(): String?
+    suspend fun getAuthenticationToken(): String?
     fun setAuthenticationToken(authToken: String)
     suspend fun getWaitlistToken(): String?
     suspend fun setWaitlistToken(token: String)
@@ -46,12 +49,17 @@ interface NetPWaitlistRepository {
 class RealNetPWaitlistRepository @Inject constructor(
     private val dataStore: NetPWaitlistDataStore,
     private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : NetPWaitlistRepository, NetPFeatureRemover.NetPStoreRemovalPlugin {
 
-    override fun getAuthenticationToken(): String? = dataStore.authToken
+    override suspend fun getAuthenticationToken(): String? = withContext(dispatcherProvider.io()) {
+        dataStore.authToken
+    }
 
     override fun setAuthenticationToken(authToken: String) {
-        dataStore.authToken = authToken
+        coroutineScope.launch(dispatcherProvider.io()) {
+            dataStore.authToken = authToken
+        }
     }
 
     override suspend fun getWaitlistToken(): String? = withContext(dispatcherProvider.io()) {
