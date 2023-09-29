@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.waitlist
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
@@ -38,6 +39,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @ContributesBinding(AppScope::class)
@@ -47,12 +49,13 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
     private val netPWaitlistRepository: NetPWaitlistRepository,
     private val networkProtectionState: NetworkProtectionState,
     private val networkProtectionPixels: NetworkProtectionPixels,
+    private val dispatcherProvider: DispatcherProvider,
 ) : NetworkProtectionWaitlist {
-    override fun getState(): NetPWaitlistState {
+    override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
             networkProtectionPixels.waitlistBetaIsEnabled()
 
-            return if (didJoinBeta()) {
+            return@withContext if (didJoinBeta()) {
                 InBeta(netPWaitlistRepository.didAcceptWaitlistTerms())
             } else if (didJoinWaitlist()) {
                 JoinedWaitlist
@@ -61,11 +64,11 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
             }
         }
 
-        return NotUnlocked
+        return@withContext NotUnlocked
     }
 
-    override suspend fun getScreenForCurrentState(): ActivityParams {
-        return when (getState()) {
+    override suspend fun getScreenForCurrentState(): ActivityParams = withContext(dispatcherProvider.io()) {
+        return@withContext when (getState()) {
             is InBeta -> {
                 if (netPWaitlistRepository.didAcceptWaitlistTerms() || networkProtectionState.isOnboarded()) {
                     NetworkProtectionManagementScreenNoParams
@@ -77,7 +80,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
         }
     }
 
-    private fun isTreated(): Boolean {
+    private suspend fun isTreated(): Boolean {
         if (appBuildConfig.isInternalBuild()) {
             // internal users are always treated
             return true
@@ -91,7 +94,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
         return netPRemoteFeature.isWaitlistEnabled() && netPRemoteFeature.isWaitlistActive()
     }
 
-    private fun didJoinBeta(): Boolean = netPWaitlistRepository.getAuthenticationToken() != null
+    private suspend fun didJoinBeta(): Boolean = netPWaitlistRepository.getAuthenticationToken() != null
 
     private fun didJoinWaitlist(): Boolean {
         return runBlocking { netPWaitlistRepository.getWaitlistToken() != null }

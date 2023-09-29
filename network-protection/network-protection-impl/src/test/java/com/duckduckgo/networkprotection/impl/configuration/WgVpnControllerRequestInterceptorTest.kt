@@ -25,7 +25,11 @@ class WgVpnControllerRequestInterceptorTest {
 
     @Before
     fun setup() {
-        netPWaitlistRepository = RealNetPWaitlistRepository(FakeNetPWaitlistDataStore(), coroutineRule.testDispatcherProvider)
+        netPWaitlistRepository = RealNetPWaitlistRepository(
+            FakeNetPWaitlistDataStore(),
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
+        )
 
         interceptor = WgVpnControllerRequestInterceptor(
             netPWaitlistRepository,

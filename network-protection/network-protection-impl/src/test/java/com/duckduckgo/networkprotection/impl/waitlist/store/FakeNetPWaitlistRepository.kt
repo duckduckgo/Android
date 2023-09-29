@@ -21,7 +21,7 @@ class FakeNetPWaitlistRepository : NetPWaitlistRepository {
     private var waitlistToken: String? = null
     private var timestamp: Int = -1
     private var acceptedTerms: Boolean = false
-    override fun getAuthenticationToken(): String? = token
+    override suspend fun getAuthenticationToken(): String? = token
 
     override fun setAuthenticationToken(authToken: String) {
         token = authToken

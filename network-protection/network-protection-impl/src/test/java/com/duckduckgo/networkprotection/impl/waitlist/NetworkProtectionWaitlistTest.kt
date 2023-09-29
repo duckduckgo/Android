@@ -58,22 +58,23 @@ class NetworkProtectionWaitlistTest {
             netPWaitlistRepository,
             networkProtectionState,
             networkProtectionPixels,
+            coroutinesTestRule.testDispatcherProvider,
         )
     }
 
     @Test
-    fun whenStartingInternalStateIsPendingInviteCode() {
+    fun whenStartingInternalStateIsPendingInviteCode() = runTest {
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertEquals(PendingInviteCode, networkProtectionWaitlist.getState())
     }
 
     @Test
-    fun whenStartingNonInternalStateIsLocked() {
+    fun whenStartingNonInternalStateIsLocked() = runTest {
         assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
     }
 
     @Test
-    fun whenInBetaAndTermsAcceptedThenInBetaTermsAccepted() {
+    fun whenInBetaAndTermsAcceptedThenInBetaTermsAccepted() = runTest {
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
         netPWaitlistRepository.acceptWaitlistTerms()
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
@@ -82,7 +83,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenAuthTokenSetStateIsInBeta() {
+    fun whenAuthTokenSetStateIsInBeta() = runTest {
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
@@ -126,7 +127,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenFeatureAndSubFeatureNotTreatedAndAuthTokenSetStateInBeta() {
+    fun whenFeatureAndSubFeatureNotTreatedAndAuthTokenSetStateInBeta() = runTest {
         netPWaitlistRepository.setAuthenticationToken("fakeToken")
         assertEquals(InBeta(false), networkProtectionWaitlist.getState())
     }
@@ -159,7 +160,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenNotTreatedAndAuthTokenExistsThenReturnWaitlistState() {
+    fun whenNotTreatedAndAuthTokenExistsThenReturnWaitlistState() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
         netPWaitlistRepository.setAuthenticationToken("token")
@@ -168,7 +169,7 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenNotTreatedAndWaitlistBetaFinishedAndAuthTokenExistsThenReturnNotUnlocked() {
+    fun whenNotTreatedAndWaitlistBetaFinishedAndAuthTokenExistsThenReturnNotUnlocked() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.waitlistBetaActive().setEnabled(Toggle.State(enable = false))
