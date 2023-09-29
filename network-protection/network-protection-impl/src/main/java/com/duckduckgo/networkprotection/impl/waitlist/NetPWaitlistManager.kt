@@ -63,23 +63,25 @@ class RealNetPWaitlistManager @Inject constructor(
     // A state flow behaves identically to a shared flow when it is created with the following parameters
     // See https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-state-flow/
     // See also https://github.com/Kotlin/kotlinx.coroutines/issues/2515
-    private val state: MutableSharedFlow<NetPWaitlistState> = MutableSharedFlow(
+    //
+    // WARNING: only use _state to emit values, for anything else use getState()
+    private val _state: MutableSharedFlow<NetPWaitlistState> = MutableSharedFlow(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
-            state.tryEmit(networkProtectionWaitlist.getState())
+            _state.tryEmit(networkProtectionWaitlist.getState())
         }
     }
 
     override fun getState(): Flow<NetPWaitlistState> {
-        return state.distinctUntilChanged()
+        return _state.distinctUntilChanged()
     }
 
     override suspend fun getStateSync(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
-        return@withContext state.first()
+        return@withContext getState().first()
     }
 
     override suspend fun joinWaitlist() = withContext(dispatcherProvider.io()) {
@@ -107,7 +109,7 @@ class RealNetPWaitlistManager @Inject constructor(
         }
 
         updateState()
-        state.first()
+        getState().first()
     }
 
     override suspend fun redeemCode(inviteCode: String): RedeemCodeResult {
@@ -138,7 +140,7 @@ class RealNetPWaitlistManager @Inject constructor(
     }
 
     private suspend fun updateState() {
-        state.emit(networkProtectionWaitlist.getState())
+        _state.emit(networkProtectionWaitlist.getState())
     }
 }
 
