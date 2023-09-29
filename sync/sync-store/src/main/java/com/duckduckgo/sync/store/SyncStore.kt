@@ -4,8 +4,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 interface SyncStore {
@@ -38,10 +39,9 @@ constructor(
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
-    private val isSignedInStateFlow = MutableStateFlow(false)
+    private val isSignedInStateFlow: MutableSharedFlow<Boolean> = MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     init {
-        // first call to isSignedIn() can be expensive and cause ANRs if done on main thread, so we do it on a background thread
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(isSignedIn())
         }
