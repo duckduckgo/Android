@@ -21,7 +21,6 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.annotation.DimenRes
-import androidx.annotation.IntegerRes
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri

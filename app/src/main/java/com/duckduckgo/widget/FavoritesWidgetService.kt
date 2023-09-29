@@ -98,7 +98,11 @@ class FavoritesWidgetService : RemoteViewsService() {
                         width = faviconItemSize,
                         height = faviconItemSize,
                     )
-                        ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty(), cornerRadius = faviconItemCornerRadius).toBitmap(faviconItemSize, faviconItemSize)
+                        ?: generateDefaultDrawable(
+                            context = context,
+                            domain = it.url.extractDomain().orEmpty(),
+                            cornerRadius = faviconItemCornerRadius,
+                        ).toBitmap(faviconItemSize, faviconItemSize)
                 }
                 WidgetFavorite(it.title, it.url, bitmap)
             }
