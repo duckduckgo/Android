@@ -103,6 +103,8 @@ class OneLineListItem @JvmOverloads constructor(
                     hideTrailingItems()
                 }
             }
+            val switchEnabled = getBoolean(R.styleable.OneLineListItem_switchEnabled, true)
+            setSwitchEnabled(switchEnabled)
 
             recycle()
         }
