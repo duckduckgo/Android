@@ -19,10 +19,10 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NotificationSchedulingBugFix
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NoEngagementNotifications
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import java.util.*
+import java.util.Locale
 import timber.log.Timber
 
 @WorkerThread
@@ -30,7 +30,7 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object NotificationSchedulingBugFix : VariantFeature()
+        object NoEngagementNotifications : VariantFeature()
     }
 
     companion object {
@@ -46,9 +46,9 @@ interface VariantManager {
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
-            // Experiment: Increase retention through push notification bug fix
-            Variant(key = "zp", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "zq", weight = 1.0, features = listOf(NotificationSchedulingBugFix), filterBy = { noFilter() }),
+            // Experiment: Remove engagement notifications
+            Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "md", weight = 1.0, features = listOf(NoEngagementNotifications), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -179,7 +179,7 @@ class ExperimentationVariantManager(
     }
 }
 
-fun VariantManager.isNotificationSchedulingBugFixEnabled() = this.getVariant().hasFeature(NotificationSchedulingBugFix)
+fun VariantManager.isNoEngagementNotificationEnabled() = this.getVariant().hasFeature(NoEngagementNotifications)
 
 /**
  * A variant which can be used for experimentation.

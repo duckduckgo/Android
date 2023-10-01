@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NoEngagementNotifications
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -50,6 +51,24 @@ class VariantManagerTest {
                 fail("Duplicate variant name found: ${it.key}")
             }
         }
+    }
+
+    @Test
+    fun pushNotificationControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "mc" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun pushNotificationCompetitiveCopyExperimentalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "md" }
+
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(NoEngagementNotifications))
     }
 
     @Suppress("SameParameterValue")

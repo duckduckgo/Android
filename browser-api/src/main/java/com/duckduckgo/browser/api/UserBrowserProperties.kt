@@ -29,5 +29,7 @@ interface UserBrowserProperties {
     fun emailEnabled(): Boolean
     fun searchCount(): Long
     fun widgetAdded(): Boolean
-    fun appTpOnboarded(): Boolean
+    suspend fun appTpOnboarded(): Boolean
+
+    suspend fun networkProtectionOnboarded(): Boolean
 }

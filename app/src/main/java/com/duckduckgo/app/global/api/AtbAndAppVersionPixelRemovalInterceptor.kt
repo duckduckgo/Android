@@ -16,9 +16,10 @@
 
 package com.duckduckgo.app.global.api
 
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelRequiringDataCleaningPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
@@ -32,7 +33,14 @@ import okhttp3.Response
     scope = AppScope::class,
     boundType = PixelInterceptorPlugin::class,
 )
-class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
+class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor(
+    private val pixelsPlugin: PluginPoint<PixelRequiringDataCleaningPlugin>,
+) : Interceptor, PixelInterceptorPlugin {
+
+    val pixels: Set<String> by lazy {
+        pixelsPlugin.getPlugins().flatMap { it.names() }.toSet()
+    }
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
@@ -55,14 +63,15 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor() : Intercepto
     private fun isInPixelsList(pixel: String): Boolean {
         return pixels.firstOrNull { pixel.startsWith(it) } != null
     }
+}
 
-    companion object {
-        // list of pixels (pixel name or prefix) for which we'll remove the ATB and App version information
-        @VisibleForTesting
-        internal val pixels = listOf(
-            AppPixelName.EMAIL_TOOLTIP_DISMISSED.pixelName,
-            AppPixelName.EMAIL_USE_ALIAS.pixelName,
-            AppPixelName.EMAIL_USE_ADDRESS.pixelName,
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PixelRequiringDataCleaningPlugin::class,
+)
+object PixelInterceptorPixelsRequiringDataCleaning : PixelRequiringDataCleaningPlugin {
+    override fun names(): List<String> {
+        return listOf(
             AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
             StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName,
             "m_atp_unprotected_apps_bucket_",

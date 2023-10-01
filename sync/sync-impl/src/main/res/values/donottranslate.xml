@@ -17,6 +17,12 @@
 <resources>
     <!-- Internal Setting -->
     <string name="sync_internal_activity_label">Sync Setup Internal</string>
+    <string name="sync_internal_environment_header">Environment Settings</string>
+    <string name="sync_internal_environment_title">Use Dev Environment?</string>
+    <string name="sync_internal_environment_subtitle_prod">https://sync.duckduckgo.com</string>
+    <string name="sync_internal_environment_subtitle_dev">https://dev-sync-use.duckduckgo.com</string>
+    <string name="sync_internal_account_header">Account Settings</string>
+
     <string name="userIdSectionHeader">User ID</string>
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
@@ -95,5 +101,9 @@
     <string name="sync_show_code_copy">Copy Code</string>
     <string name="sync_show_code_copy_hint">Use this code after choosing "Manually Enter Code" during sync setup on a second device</string>
     <string name="sync_code_copied_message">Recovery Code Copied</string>
+    <string name="sync_camera_permission_required">Camera Permission is Required</string>
+    <string name="sync_camera_unavailable">Camera Unavailable</string>
+    <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
+    <string name="sync_go_to_settings">Go to Settings</string>
 
 </resources>

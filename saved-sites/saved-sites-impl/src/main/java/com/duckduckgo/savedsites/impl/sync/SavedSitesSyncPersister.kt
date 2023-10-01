@@ -45,12 +45,12 @@ class SavedSitesSyncPersister @Inject constructor(
     override fun persist(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         return if (changes.type == BOOKMARKS) {
             Timber.d("Sync-Feature: received remote changes, merging with resolution $conflictResolution")
             val result = process(changes, conflictResolution)
             Timber.d("Sync-Feature: merging bookmarks finished with $result")
-            Success(true)
+            result
         } else {
             Timber.d("Sync-Feature: no bookmarks to merge")
             Success(false)
@@ -64,7 +64,7 @@ class SavedSitesSyncPersister @Inject constructor(
     fun process(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         val result = when (val validation = validateChanges(changes)) {
             is SyncDataValidationResult.Error -> SyncMergeResult.Error(reason = validation.reason)
             is SyncDataValidationResult.Success -> processEntries(validation.data, conflictResolution)
@@ -107,7 +107,7 @@ class SavedSitesSyncPersister @Inject constructor(
     private fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-    ): SyncMergeResult<Boolean> {
+    ): SyncMergeResult {
         Timber.d("Sync-Feature: updating bookmarks last_modified to ${bookmarks.last_modified}")
         savedSitesSyncStore.modifiedSince = bookmarks.last_modified
 

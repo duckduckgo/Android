@@ -27,7 +27,7 @@ interface TrackerListService {
     fun tds(): Call<TdsJson>
 
     @GET("/contentblocking/trackers-unprotected-temporary.txt")
-    fun temporaryWhitelist(): Call<String>
+    fun temporaryAllowList(): Call<String>
 }
 
 const val TDS_URL = "https://staticcdn.duckduckgo.com/trackerblocking/v5/"

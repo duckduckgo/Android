@@ -468,8 +468,8 @@
         <item quantity="one"><![CDATA[ e <b>mais %1$d</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
         <item quantity="other"><![CDATA[ e<b>%1$doutros</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ estava a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ estava a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
         <item quantity="other"><![CDATA[ estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">A aplicação pode fechar para aplicar as alterações. Volte depois de admirar o seu belo e novo ícone.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Sites desprotegidos</string>
+    <string name="manageAllowlist">Sites desprotegidos</string>
     <string name="reportBrokenSite">Denunciar site danificado</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Editar</string>
     <string name="dialogSaveAction">Guardar</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Sites desprotegidos</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Sites desprotegidos</string>
     <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>
     <string name="disablePrivacyProtection">Desativar Proteção de Privacidade</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Mais opções para o site desprotegido %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Quer mesmo remover &lt;b&gt;%1$s&lt;/b&gt; da lista de sites desprotegidos?</string>
-    <string name="whitelistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
-    <string name="whitelistNoEntries">Proteção de Privacidade ativa para todos os sites</string>
-    <string name="whitelistDomainHint">www.exemplo.com</string>
-    <string name="whitelistFormatError">Digite um domínio como <b>exemplo.com</b> e tente de novo</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Mais opções para o site desprotegido %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Quer mesmo remover &lt;b&gt;%1$s&lt;/b&gt; da lista de sites desprotegidos?</string>
+    <string name="allowlistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
+    <string name="allowlistNoEntries">Proteção de Privacidade ativa para todos os sites</string>
+    <string name="allowlistDomainHint">www.exemplo.com</string>
+    <string name="allowlistFormatError">Digite um domínio como <b>exemplo.com</b> e tente de novo</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Sites desprotegidos</string>
+    <string name="settingsPrivacyProtectionAllowlist">Sites desprotegidos</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sites com barreira de segurança</string>
@@ -625,20 +625,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Novo endereço copiado para a área de transferência</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Use %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Bloqueia rastreadores de e-mail</string>
-    <string name="autofillTooltipGenerateAddress">Gerar um Duck Address Privado</string>
-    <string name="autofillTooltipGenerateAddressDescription">Bloqueia rastreadores de e-mail e oculta o seu endereço</string>
     <string name="newEmailAliasMenuTitle">Gerar Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visualizar</string>
     <string name="autofillLoginSavedSnackbarMessage">Início de sessão guardado</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Início de sessão atualizado</string>
-    <string name="autofillDisableAutofillPromptTitle">Pretendes continuar a guardar inícios de sessão?</string>
-    <string name="autofillDisableAutofillPromptMessage">Podes desativar isto em qualquer altura nas Definições.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Continuar a guardar</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Desativar</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Gostaria que lhe enviássemos uma notificação quando chegar a sua vez?</string>
@@ -759,4 +751,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Arraste para baixo a partir da parte superior e toque no botão de retrocesso para sair do ecrã completo</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Fechar todos os separadores?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Tens a certeza de que pretendes fechar todos os separadores?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Cancelar</string>
+    <string name="closeAppTabsConfirmationDialogClose">Fechar</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Eliminar este marcador?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Vai eliminar o seu marcador para &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Eliminar este favorito?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Vai eliminar o seu favorito para &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Eliminar esta pasta de marcadores?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Vai eliminar a pasta de marcadores &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Cancelar</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Eliminar</string>
 </resources>

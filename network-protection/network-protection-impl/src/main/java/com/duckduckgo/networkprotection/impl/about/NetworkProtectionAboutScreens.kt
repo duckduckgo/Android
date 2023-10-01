@@ -27,3 +27,8 @@ object NetPAboutVPNScreenNoParams : ActivityParams
  * Use this model to launch the "Network Protection FAQs" screen
  */
 object NetPFaqsScreenNoParams : ActivityParams
+
+/**
+ * Use this model to launch the "Network Protection" terms and conditions screen
+ */
+object NetPTermsScreenNoParams : ActivityParams

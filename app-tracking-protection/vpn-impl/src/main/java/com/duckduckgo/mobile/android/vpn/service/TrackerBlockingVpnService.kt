@@ -551,12 +551,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
+        // Set the state to DISABLED here, then call the on stop/failure callbacks
+        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
+
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
-
-        // Set the state to DISABLED here, then call the on stop/failure callbacks
-        vpnServiceStateStatsDao.insert(createVpnState(state = VpnServiceState.DISABLED, stopReason = reason))
 
         stopForeground(true)
         stopSelf()
@@ -683,8 +683,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 
     companion object {
-        const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
-
         const val VPN_REMINDER_NOTIFICATION_ID = 999
         const val VPN_FOREGROUND_SERVICE_ID = 200
 

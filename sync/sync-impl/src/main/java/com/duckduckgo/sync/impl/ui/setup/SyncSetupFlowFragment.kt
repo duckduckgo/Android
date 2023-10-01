@@ -27,6 +27,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentSyncSetupBinding
@@ -92,6 +94,7 @@ class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             InitialSetupScreen -> {
+                binding.closeIcon.show()
                 binding.contentIllustration.setImageResource(R.drawable.ic_sync_128)
                 binding.contentTitle.text = getString(R.string.sync_enable_sync_title)
                 binding.contentBody.text = getString(R.string.sync_enable_sync_content)
@@ -105,6 +108,7 @@ class SyncSetupFlowFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
                 }
             }
             SyncAnotherDeviceScreen -> {
+                binding.closeIcon.hide()
                 binding.contentIllustration.setImageResource(R.drawable.ic_connect_device_128)
                 binding.contentTitle.text = getString(R.string.sync_another_device_title)
                 binding.contentBody.text = getString(R.string.sync_another_device_content)

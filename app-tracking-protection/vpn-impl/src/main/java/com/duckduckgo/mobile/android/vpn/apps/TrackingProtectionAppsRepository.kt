@@ -25,8 +25,6 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.P
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.UNPROTECTED
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.UNPROTECTED_THROUGH_NETP
 import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -80,7 +78,6 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
     private val networkProtectionExclusionList: NetworkProtectionExclusionList,
 ) : TrackingProtectionAppsRepository, SystemAppOverridesProvider {
 
@@ -165,10 +162,6 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             return !userExcludedApp.isProtected
         }
 
-        if (appInfo.isGame() && !appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)) {
-            return true
-        }
-
         return ddgExclusionList.any { it.packageId == appInfo.packageName }
     }
 
@@ -183,9 +176,6 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             return TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON
         }
         if (ddgExclusionList.any { it.packageId == appInfo.packageName }) {
-            return TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
-        }
-        if (appInfo.isGame() && !appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)) {
             return TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON
         }
         return TrackingProtectionAppInfo.NO_ISSUES

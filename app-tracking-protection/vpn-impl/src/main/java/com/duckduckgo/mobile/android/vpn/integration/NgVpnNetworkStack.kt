@@ -19,16 +19,14 @@ package com.duckduckgo.mobile.android.vpn.integration
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
-import com.duckduckgo.mobile.android.vpn.network.DnsProvider
+import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
 import com.squareup.anvil.annotations.ContributesBinding
@@ -60,16 +58,14 @@ class NgVpnNetworkStack @Inject constructor(
     private val runtime: Runtime,
     private val appTrackerDetector: AppTrackerDetector,
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
-    private val dnsProvider: DnsProvider,
+    private val appTpLocalFeature: AppTpLocalFeature,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
     private var jniContext = 0L
     private val jniLock = Any()
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
-    private val isInterceptDnsRequestsEnabled: Boolean
-        get() = appTpFeatureConfig.isEnabled(AppTpSetting.InterceptDnsRequests)
 
     override val name: String = AppTpVpnFeature.APPTP_VPN.featureName
 
@@ -97,12 +93,7 @@ class NgVpnNetworkStack @Inject constructor(
                 InetAddress.getByName("10.0.0.2") to 32,
                 InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
             ),
-            dns = mutableSetOf<InetAddress>().apply {
-                if (isInterceptDnsRequestsEnabled && dnsProvider.getPrivateDns().isEmpty()) {
-                    logcat { "Adding System defined DNS" }
-                    addAll(dnsProvider.getSystemDns())
-                }
-            }.toSet(),
+            dns = emptySet(),
             routes = emptyMap(),
             appExclusionList = trackingProtectionAppsRepository.getExclusionAppsList().toSet(),
         ),
@@ -192,7 +183,8 @@ class NgVpnNetworkStack @Inject constructor(
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
         if (tunnelThread == null) {
             logcat { "Start native runtime" }
-            val level = if (appBuildConfig.isDebug || appBuildConfig.isInternalBuild()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
+            val level = if (appBuildConfig.isDebug || appTpLocalFeature.verboseLogging().isEnabled()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
+
             vpnNetwork.start(jniContext, level)
 
             tunnelThread = Thread {
@@ -225,9 +217,15 @@ class NgVpnNetworkStack @Inject constructor(
             while (thread != null && thread.isAlive) {
                 try {
                     logcat { "Joining tunnel thread context $jniContext" }
-                    thread.join()
+                    thread.join(5000)
+
+                    // Check if we timed out and are stuck
+                    if (thread.isAlive) {
+                        logcat { "Timed out waiting for tunnel thread" }
+                        deviceShieldPixels.reportTunnelThreadStopTimeout()
+                    }
                 } catch (t: InterruptedException) {
-                    logcat { "Joined tunnel thread" }
+                    logcat { "Interrupted while waiting" }
                 }
                 thread = tunnelThread
             }

@@ -67,13 +67,19 @@ class WebViewLongPressHandler @Inject constructor(
         when (longPressTargetType) {
             WebView.HitTestResult.IMAGE_TYPE -> {
                 if (isLinkSupported(longPressTargetUrl)) {
-                    addImageMenuOptions(menu)
+                    addDownloadImageMenuOptions(menu)
+                    if (!URLUtil.isDataUrl(longPressTargetUrl)) {
+                        addImageMenuOptions(menu)
+                    }
                 }
             }
             WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE -> {
                 if (isLinkSupported(longPressTargetUrl)) {
-                    addImageMenuOptions(menu)
-                    addLinkMenuOptions(menu)
+                    addDownloadImageMenuOptions(menu)
+                    if (!URLUtil.isDataUrl(longPressTargetUrl)) {
+                        addImageMenuOptions(menu)
+                        addLinkMenuOptions(menu)
+                    }
                 }
             }
             WebView.HitTestResult.SRC_ANCHOR_TYPE -> {
@@ -92,8 +98,11 @@ class WebViewLongPressHandler @Inject constructor(
         }
     }
 
-    private fun addImageMenuOptions(menu: ContextMenu) {
+    private fun addDownloadImageMenuOptions(menu: ContextMenu) {
         menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, R.string.downloadImage)
+    }
+
+    private fun addImageMenuOptions(menu: ContextMenu) {
         menu.add(0, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, R.string.openImageInNewTab)
     }
 

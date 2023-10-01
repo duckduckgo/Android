@@ -468,7 +468,7 @@
         <item quantity="one"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
         <item quantity="other"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
         <item quantity="other"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
     </plurals>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Uygulama, değişiklikleri uygulamak için kapanabilir. Yeni simgenize hayran olduktan sonra tekrar gelin.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Korumasız Siteler</string>
+    <string name="manageAllowlist">Korumasız Siteler</string>
     <string name="reportBrokenSite">Hatalı Siteyi Bildirin</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Düzenle</string>
     <string name="dialogSaveAction">Kaydet</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Korumasız Siteler</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Korumasız Siteler</string>
     <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Korumasız %1$s sitesi için diğer seçenekler</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
-    <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanmayacaktır.</string>
-    <string name="whitelistNoEntries">Gizlilik Koruması tüm siteler için etkin</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Lütfen <b>example.com</b> gibi bir alan adı girip tekrar deneyin</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Korumasız %1$s sitesi için diğer seçenekler</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
+    <string name="allowlistExplanation">Bu siteler için Gizlilik Koruması uygulanmayacaktır.</string>
+    <string name="allowlistNoEntries">Gizlilik Koruması tüm siteler için etkin</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Lütfen <b>example.com</b> gibi bir alan adı girip tekrar deneyin</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Korumasız Siteler</string>
+    <string name="settingsPrivacyProtectionAllowlist">Korumasız Siteler</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Korumalı Siteler</string>
@@ -625,20 +625,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Yeni adres panoya kopyalandı</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">%1$s kullan</string>
-    <string name="autofillTooltipUseYourAliasDescription">E-posta izleyicileri engeller</string>
-    <string name="autofillTooltipGenerateAddress">Özel Duck Address Oluştur</string>
-    <string name="autofillTooltipGenerateAddressDescription">E-posta izleyicileri engeller ve adresinizi gizler</string>
     <string name="newEmailAliasMenuTitle">Duck Address Oluştur</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Görüntüle</string>
     <string name="autofillLoginSavedSnackbarMessage">Giriş kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Giriş güncellendi</string>
-    <string name="autofillDisableAutofillPromptTitle">Giriş bilgilerini kaydetmeye devam etmek istiyor musunuz?</string>
-    <string name="autofillDisableAutofillPromptMessage">Bunu dilediğiniz zaman Ayarlar\'dan devre dışı bırakabilirsiniz.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Kaydetmeye Devam Et</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Devre dışı bırak</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Sıra size geldiğinde size bir bildirim göndermemizi ister misiniz?</string>
@@ -759,4 +751,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Tam ekrandan çıkmak için yukarıdan aşağı sürükleyin ve geri düğmesine dokunun</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Tüm sekmeler kapatılsın mı?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Tüm sekmeleri kapatmak istediğinizden emin misiniz?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Vazgeç</string>
+    <string name="closeAppTabsConfirmationDialogClose">Kapat</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Bu yer işareti silinsin mi?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için yer işaretinizi siler.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Bu favori silinsin mi?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için favorinizi silecektir.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Bu yer işareti klasörü silinsin mi?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; yer işareti klasörünüzü silecektir.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Vazgeç</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Sil</string>
 </resources>

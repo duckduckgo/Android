@@ -32,7 +32,7 @@ import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetPWaitlistScreenNoParams
+import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -108,7 +108,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     private fun launchNetPWaitlist() {
-        globalActivityStarter.start(this, NetPWaitlistScreenNoParams)
+        globalActivityStarter.start(this, NetPWaitlistInvitedScreenNoParams)
     }
 
     private fun processCommand(it: Command) {

@@ -118,7 +118,7 @@ interface Toggle {
 
     /**
      * The usage of this API is only useful for internal/dev settings/features
-     * If you find yourself having to call this method in production code, then YOUR DOING SOMETHING WRONG
+     * If you find yourself having to call this method in production code, then YOU'RE DOING SOMETHING WRONG
      *
      * @param state update the stored [State] of the feature flag
      */
@@ -126,7 +126,11 @@ interface Toggle {
 
     /**
      * The usage of this API is only useful for internal/dev settings/features
-     * If you find yourself having to call this method in production code, then YOUR DOING SOMETHING WRONG
+     * If you find yourself having to call this method in production code, then YOU'RE DOING SOMETHING WRONG
+     * The raw state is the stored state. [isEnabled] method takes the raw state and computes whether the feature should be enabled or disabled.
+     * eg. by factoring in [State.minSupportedVersion] amongst others.
+     *
+     * You should never use individual properties on that raw state, eg. [State.enable] to decide whether the feature is enabled/disabled.
      *
      * @return the raw [State] store for this feature flag.
      */
@@ -161,10 +165,14 @@ internal class ToggleImpl constructor(
     private val appVersionProvider: () -> Int,
 ) : Toggle {
     override fun isEnabled(): Boolean {
+        fun evaluateLocalEnable(state: State): Boolean {
+            return state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
+        }
+
         return store.get(key)?.let { state ->
             state.remoteEnableState?.let { remoteState ->
-                remoteState && state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
-            } ?: defaultValue
+                remoteState && evaluateLocalEnable(state)
+            } ?: evaluateLocalEnable(state)
         } ?: return defaultValue
     }
 
@@ -206,7 +214,14 @@ internal class ToggleImpl constructor(
         val rolloutStep = state.rolloutStep
 
         // there is no rollout, return whatever the previous state was
-        if (state.rollout.isNullOrEmpty()) return state
+        if (state.rollout.isNullOrEmpty()) {
+            // when there is no rollout we don't continue calculating the state
+            // however, if remote config has an enable value, ie. remoteEnableState we need to honour it
+            // that covers eg. the fresh installed case
+            return state.remoteEnableState?.let { remoteEnabledValue ->
+                state.copy(enable = remoteEnabledValue)
+            } ?: state
+        }
 
         val sortedRollout = state.rollout.sorted().filter { it in 0.0..100.0 }
         if (sortedRollout.isEmpty()) return state

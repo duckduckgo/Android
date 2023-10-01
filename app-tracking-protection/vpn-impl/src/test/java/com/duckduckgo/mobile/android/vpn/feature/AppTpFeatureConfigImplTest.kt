@@ -29,9 +29,9 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class AppTpFeatureConfigImplTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -58,12 +58,10 @@ class AppTpFeatureConfigImplTest {
     fun whenDbTablesAreEmptyThenReturnToggleDefaultValue() {
         AppTpSetting.values().forEach { setting ->
             when (setting) {
-                AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.InterceptDnsRequests -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.ProtectGames -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
+                AppTpSetting.RestartOnConnectivityLoss -> assertTrue(config.isEnabled(setting))
             }
         }
     }
@@ -127,35 +125,27 @@ class AppTpFeatureConfigImplTest {
     fun whenInternalBuildThenProperlyHandleManualOverrides() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        config.setEnabled(AppTpSetting.InterceptDnsRequests, true, isManualOverride = true)
-        config.setEnabled(AppTpSetting.InterceptDnsRequests, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.CPUMonitoring, true, isManualOverride = true)
+        config.setEnabled(AppTpSetting.CPUMonitoring, false, isManualOverride = true)
 
         config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
-
-        assertFalse(config.isEnabled(AppTpSetting.InterceptDnsRequests))
+        assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
         assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
-        assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 
     @Test
     fun whenNotInternalBuildThenAlwaysOverride() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        config.setEnabled(AppTpSetting.InterceptDnsRequests, true, isManualOverride = true)
-        config.setEnabled(AppTpSetting.InterceptDnsRequests, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.CPUMonitoring, true, isManualOverride = true)
+        config.setEnabled(AppTpSetting.CPUMonitoring, false, isManualOverride = true)
 
         config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
         config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.PrivateDnsSupport, false, isManualOverride = false)
-
-        assertFalse(config.isEnabled(AppTpSetting.InterceptDnsRequests))
+        assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
         assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
-        assertFalse(config.isEnabled(AppTpSetting.PrivateDnsSupport))
     }
 }

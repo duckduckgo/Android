@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Omogući Email Protection</annotation> za upravljanje adresama Duck Address na ovom uređaju.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">Odabir adrese e-pošte</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blokiranje alata za praćenje e-pošte</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generiraj privatnu adresu Duck Address</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blokiraj praćenje e-pošte i sakrij adresu</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Želiš li nastaviti spremati prijave?</string>
+    <string name="autofillDisableAutofillPromptMessage">Ovo možeš onemogućiti u svakom trenutku u Postavkama.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Nastavi spremati</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Onemogući</string>
 
 </resources>

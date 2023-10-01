@@ -29,6 +29,7 @@ import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -89,7 +90,7 @@ class RealAmpLinks @Inject constructor(
         return false
     }
 
-    fun extractCanonical(url: String): String? {
+    private fun extractCanonical(url: String): String? {
         val ampFormat = urlIsExtractableAmpLink(url) ?: return null
         val matchResult = ampFormat.find(url) ?: return null
 
@@ -102,6 +103,21 @@ class RealAmpLinks @Inject constructor(
             destinationUrl = "https://$destinationUrl"
         }
         return destinationUrl
+    }
+
+    override fun processDestinationUrl(initialUrl: String, extractedUrl: String?): String {
+        return if (extractedUrl != null && isValidDestinationUrl(extractedUrl)) {
+            lastAmpLinkInfo = AmpLinkInfo(ampLink = initialUrl)
+            Timber.d("AMP link detection: Success! Loading extracted URL: $extractedUrl")
+            extractedUrl
+        } else {
+            Timber.d("AMP link detection: Failed! Loading initial URL: $initialUrl")
+            initialUrl
+        }
+    }
+
+    private fun isValidDestinationUrl(extractedUrl: String): Boolean {
+        return !isAnException(extractedUrl) && (extractedUrl.startsWith("http") || extractedUrl.startsWith("https"))
     }
 
     private fun urlIsExtractableAmpLink(url: String): Regex? {

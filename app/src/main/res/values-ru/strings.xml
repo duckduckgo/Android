@@ -470,8 +470,8 @@
         <item quantity="many"><![CDATA[ и <b>еще %1$d сервисов</b> пытались вести за вами слежку.<br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
         <item quantity="other"><![CDATA[ и <b>еще %1$d сервиса</b> пытались вести за вами слежку.<br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ пытался вести за вами слежку. <br/><br/>Но мы его заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ пытался вести за вами слежку. <br/><br/>Но мы его заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
         <item quantity="few"><![CDATA[ пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
         <item quantity="many"><![CDATA[ пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
         <item quantity="other"><![CDATA[ пытались вести за вами слежку. <br/><br/>Но мы их заблокировали!<br/><br/> ☝️ Заходя на новый сайт, вы всегда можете проверить, шпионит ли он за вами: просто загляните в адресную строку.]]></item>
@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Приложение может закрыться, чтобы применить изменения. Возвращайтесь, когда налюбуетесь своим новым значком.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Незащищенные сайты</string>
+    <string name="manageAllowlist">Незащищенные сайты</string>
     <string name="reportBrokenSite">Сообщить о неработающем сайте</string>
 
     <!-- Dialogs -->
@@ -523,19 +523,19 @@
     <string name="dialogEditTitle">Редактировать</string>
     <string name="dialogSaveAction">Сохранить</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Незащищенные сайты</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Незащищенные сайты</string>
     <string name="enablePrivacyProtection">Включить защиту конфиденциальности</string>
     <string name="disablePrivacyProtection">Отключить защиту конфиденциальности</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Дополнительные параметры для незащищенного сайта %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Вы точно хотите удалить &lt;b&gt;%1$s&lt;/b&gt; из списка незащищенных сайтов?</string>
-    <string name="whitelistExplanation">Сайты без защиты конфиденциальности.</string>
-    <string name="whitelistNoEntries">Защита конфиденциальности включена на всех сайтах</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Введите доменное имя, например, <b>example.com</b> и повторите попытку</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Дополнительные параметры для незащищенного сайта %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Вы точно хотите удалить &lt;b&gt;%1$s&lt;/b&gt; из списка незащищенных сайтов?</string>
+    <string name="allowlistExplanation">Сайты без защиты конфиденциальности.</string>
+    <string name="allowlistNoEntries">Защита конфиденциальности включена на всех сайтах</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Введите доменное имя, например, <b>example.com</b> и повторите попытку</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Незащищенные сайты</string>
+    <string name="settingsPrivacyProtectionAllowlist">Незащищенные сайты</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Огнеупорные сайты</string>
@@ -629,20 +629,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Новый адрес скопирован в буфер обмена</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Использовать %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Блокирует почтовые трекеры</string>
-    <string name="autofillTooltipGenerateAddress">Создать адрес на Duck</string>
-    <string name="autofillTooltipGenerateAddressDescription">Блокирует почтовые трекеры и скрывает ваш адрес</string>
     <string name="newEmailAliasMenuTitle">Создать адрес Duck</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Просмотр</string>
     <string name="autofillLoginSavedSnackbarMessage">Логин сохранен</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Логин обновлен</string>
-    <string name="autofillDisableAutofillPromptTitle">Сохранять логины в дальнейшем?</string>
-    <string name="autofillDisableAutofillPromptMessage">Вы всегда можете изменить свой выбор в «Настройках».</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Сохранять</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Отключить</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Хотите получить уведомление, когда настанет ваша очередь?</string>
@@ -767,4 +759,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Чтобы выйти из полноэкранного режима, потяните верхний край экрана вниз и нажмите кнопку «Назад».</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Закрыть все вкладки?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Вы точно хотите закрыть все вкладки?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Отменить</string>
+    <string name="closeAppTabsConfirmationDialogClose">Закрыть</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Удалить эту закладку?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Закладка на &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Удалить сайт из избранного?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Сайт &lt;b&gt;%1$s&lt;/b&gt; будет удален из избранного.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Удалить эту папку с закладками?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Папка &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Отменить</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Удалить</string>
 </resources>

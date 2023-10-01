@@ -8,12 +8,16 @@ apply from: "$rootDir/code-formatting.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
-    CI_HOME_DIR="${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
+    CI_HOME_DIR = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
 }
 
 android {
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+        if (project.hasProperty('internal-testing')) {
+            applicationId "com.quackquackgo.mobile"
+        } else {
+            applicationId "com.duckduckgo.mobile.android"
+        }
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
@@ -68,7 +72,9 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
+            if (!project.hasProperty('internal-testing')) {
+                applicationIdSuffix ".debug"
+            }
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",
@@ -266,6 +272,9 @@ dependencies {
     implementation project(':sync-store')
     implementation project(':sync-lib')
 
+    implementation project(':settings-api')
+    implementation project(':settings-impl')
+
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')
     implementation project(':request-filterer-store')
@@ -282,6 +291,22 @@ dependencies {
     implementation project(':installation-impl')
 
     implementation project(':internal-features-api')
+
+    implementation project(':web-compat-impl')
+    implementation project(':web-compat-store')
+
+    if (project.hasProperty('internal-testing')) {
+        implementation project(':subscriptions-api')
+        implementation project(':subscriptions-impl')
+        implementation project(':subscriptions-store')
+        internalImplementation project(':subscriptions-internal')
+    }
+
+    implementation project(':user-agent-api')
+    implementation project(':user-agent-impl')
+
+    implementation project(':js-messaging-api')
+    implementation project(':js-messaging-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
@@ -307,6 +332,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
@@ -347,6 +373,7 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
     androidTestImplementation AndroidX.work.testing
+    testImplementation AndroidX.work.testing
     implementation AndroidX.work.rxJava2
 
     // Dagger
@@ -438,4 +465,14 @@ tasks.register('jvm_tests') {
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
+}
+
+tasks.register('releaseTestLocal', Exec) {
+    commandLine 'maestro', 'test', '--include-tags', 'releaseTest', '../.maestro'
+    dependsOn 'installPlayRelease'
+}
+
+tasks.register('releaseTestCloud', Exec) {
+    commandLine 'maestro', 'cloud', '--include-tags', 'releaseTest', "build/outputs/apk/play/release/duckduckgo-${buildVersionName()}-play-release.apk", '../.maestro'
+    dependsOn 'assemblePlayRelease'
 }

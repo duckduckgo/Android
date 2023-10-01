@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Ota käyttöön Email Protection</annotation> hallitaksesi Duck Address -osoitetta tällä laitteessa.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">Valitse sähköpostiosoite</string>
+    <string name="autofillTooltipUseYourAliasDescription">Estä sähköpostin seurantaohjelmat</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Luo yksityinen Duck Address</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Estä sähköpostin seurantaohjelmat ja piilota osoite</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Haluatko jatkaa kirjautumistietojen tallentamista?</string>
+    <string name="autofillDisableAutofillPromptMessage">Voit poistaa sen käytöstä milloin vain asetuksissa.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Jatka tallentamista</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Poista käytöstä</string>
 
 </resources>

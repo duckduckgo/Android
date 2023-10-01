@@ -24,7 +24,7 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isNotificationSchedulingBugFixEnabled
+import com.duckduckgo.app.statistics.isNoEngagementNotificationEnabled
 import com.duckduckgo.di.scopes.AppScope
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -49,40 +49,13 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
-        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
-
-        if (variantManager.isNotificationSchedulingBugFixEnabled()) {
-            scheduleUnusedAppNotificationsWithBugFix()
-        } else {
+        if (!variantManager.isNoEngagementNotificationEnabled()) {
+            workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
             scheduleUnusedAppNotifications()
         }
     }
 
     private suspend fun scheduleUnusedAppNotifications() {
-        when {
-            privacyNotification.canShow() -> {
-                scheduleNotification(
-                    OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
-                    PRIVACY_DELAY_DURATION_IN_DAYS,
-                    TimeUnit.DAYS,
-                    UNUSED_APP_WORK_REQUEST_TAG,
-                )
-            }
-
-            clearDataNotification.canShow() -> {
-                scheduleNotification(
-                    OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
-                    CLEAR_DATA_DELAY_DURATION_IN_DAYS,
-                    TimeUnit.DAYS,
-                    UNUSED_APP_WORK_REQUEST_TAG,
-                )
-            }
-
-            else -> Timber.v("Notifications not enabled for this variant")
-        }
-    }
-
-    private suspend fun scheduleUnusedAppNotificationsWithBugFix() {
         if (privacyNotification.canShow()) {
             scheduleNotification(
                 OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),

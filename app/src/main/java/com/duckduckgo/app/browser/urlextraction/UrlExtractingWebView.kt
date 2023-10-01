@@ -21,7 +21,7 @@ import android.content.Context
 import android.webkit.WebSettings
 import android.webkit.WebView
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.user.agent.api.UserAgentProvider
 
 @SuppressLint("SetJavaScriptEnabled", "ViewConstructor")
 class UrlExtractingWebView(

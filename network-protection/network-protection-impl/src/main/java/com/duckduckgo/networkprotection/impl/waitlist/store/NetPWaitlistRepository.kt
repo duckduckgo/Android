@@ -16,40 +16,77 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 interface NetPWaitlistRepository {
-    fun getAuthenticationToken(): String?
+    suspend fun getAuthenticationToken(): String?
     fun setAuthenticationToken(authToken: String)
-    fun getState(isInternalBuild: Boolean): NetPWaitlistState
+    suspend fun getWaitlistToken(): String?
+    suspend fun setWaitlistToken(token: String)
+    suspend fun getWaitlistTimestamp(): Int
+    suspend fun setWaitlistTimestamp(timestamp: Int)
+    fun acceptWaitlistTerms()
+    fun didAcceptWaitlistTerms(): Boolean
 }
 
-class RealNetPWaitlistRepository(
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = NetPWaitlistRepository::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
+)
+class RealNetPWaitlistRepository @Inject constructor(
     private val dataStore: NetPWaitlistDataStore,
-) : NetPWaitlistRepository {
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+) : NetPWaitlistRepository, NetPFeatureRemover.NetPStoreRemovalPlugin {
 
-    override fun getAuthenticationToken(): String? = dataStore.authToken
+    override suspend fun getAuthenticationToken(): String? = withContext(dispatcherProvider.io()) {
+        dataStore.authToken
+    }
 
     override fun setAuthenticationToken(authToken: String) {
-        dataStore.authToken = authToken
+        coroutineScope.launch(dispatcherProvider.io()) {
+            dataStore.authToken = authToken
+        }
     }
 
-    override fun getState(isInternalBuild: Boolean): NetPWaitlistState {
-        if (isInternalBuild) {
-            return if (didJoinBeta()) {
-                // internal users bypass easter egg
-                NetPWaitlistState.InBeta
-            } else {
-                NetPWaitlistState.PendingInviteCode
-            }
-        }
-
-        if (didJoinBeta()) {
-            return NetPWaitlistState.InBeta
-        }
-
-        return NetPWaitlistState.NotUnlocked
+    override suspend fun getWaitlistToken(): String? = withContext(dispatcherProvider.io()) {
+        return@withContext dataStore.waitlistToken
     }
 
-    private fun didJoinBeta(): Boolean = dataStore.authToken != null
+    override suspend fun setWaitlistToken(token: String) = withContext(dispatcherProvider.io()) {
+        dataStore.waitlistToken = token
+    }
+
+    override suspend fun getWaitlistTimestamp(): Int = withContext(dispatcherProvider.io()) {
+        return@withContext dataStore.waitlistTimestamp
+    }
+
+    override suspend fun setWaitlistTimestamp(timestamp: Int) = withContext(dispatcherProvider.io()) {
+        dataStore.waitlistTimestamp = timestamp
+    }
+
+    override fun acceptWaitlistTerms() {
+        dataStore.didAcceptedTerms = true
+    }
+
+    override fun didAcceptWaitlistTerms(): Boolean {
+        return dataStore.didAcceptedTerms
+    }
+
+    override fun clearStore() {
+        dataStore.clear()
+    }
 }

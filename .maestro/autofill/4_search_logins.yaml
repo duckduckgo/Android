@@ -1,0 +1,22 @@
+appId: com.duckduckgo.mobile.android
+---
+- tapOn:
+    id: searchLogins
+
+- assertVisible: user
+
+- tapOn:
+    id: omnibarTextInput
+- inputText: "no match"
+
+- assertVisible: "No results for.*"
+
+- eraseText
+
+- tapOn:
+      id: omnibarTextInput
+- inputText: "192"
+
+- assertVisible: 192.168.0.100
+
+- tapOn: "Navigate up"

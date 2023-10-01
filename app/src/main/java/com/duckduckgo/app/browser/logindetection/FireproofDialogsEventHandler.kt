@@ -79,7 +79,7 @@ class BrowserTabFireproofDialogsEventHandler(
         pixel.fire(AppPixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS, mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()))
         if (allowUserToDisableFireproofLoginActive()) {
             if (shouldAskToDisableFireproofLogin()) {
-                event.value = Event.AskToDisableLoginDetection
+                emitEvent(Event.AskToDisableLoginDetection)
             } else {
                 userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_LOGIN_DIALOG_DISMISSED)
             }

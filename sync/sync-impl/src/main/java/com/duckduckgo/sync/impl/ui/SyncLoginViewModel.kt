@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.LoginSucess
-import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadQRCode
 import com.duckduckgo.sync.impl.ui.SyncLoginViewModel.Command.ReadTextCode
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -42,16 +41,9 @@ class SyncLoginViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     sealed class Command {
-        object ReadQRCode : Command()
         object ReadTextCode : Command()
         object LoginSucess : Command()
         object Error : Command()
-    }
-
-    fun onReadQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(ReadQRCode)
-        }
     }
 
     fun onReadTextCodeClicked() {
@@ -66,9 +58,9 @@ class SyncLoginViewModel @Inject constructor(
         }
     }
 
-    fun onConnectQRScanned(qrCode: String) {
+    fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.login(qrCode)
+            val result = syncAccountRepository.processCode(qrCode)
             if (result is Error) {
                 command.send(Command.Error)
             } else {

@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Активирайте Email Protection</annotation>, за да управлявате един или няколко Duck Address на това устройство.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">Изберете имейл адрес</string>
+    <string name="autofillTooltipUseYourAliasDescription">Блокиране на имейл тракери</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Генериране на личен Duck Address</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Блокиране на имейл тракерите и скриване на адреса</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате данни за вход?</string>
+    <string name="autofillDisableAutofillPromptMessage">Можете да деактивирате тази функция по всяко време в Настройки.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Продължаване на запазването</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Забрани</string>
 
 </resources>

@@ -23,9 +23,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
@@ -46,6 +46,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private val brokenSites
         get() = binding.contentBrokenSites
+
+    private var submitted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +82,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
+        val categories = viewModel.shuffledCategories.map { getString(it.category) }.toTypedArray()
 
         brokenSites.categoriesSelection.onAction {
             RadioListAlertDialogBuilder(this)
@@ -106,9 +108,12 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 .show()
         }
         brokenSites.submitButton.setOnClickListener {
-            val webViewVersion = webViewVersionProvider.getFullVersion()
-            val description = brokenSites.brokenSiteFormFeedbackInput.text
-            viewModel.onSubmitPressed(webViewVersion, description)
+            if (!submitted) {
+                val webViewVersion = webViewVersionProvider.getFullVersion()
+                val description = brokenSites.brokenSiteFormFeedbackInput.text
+                viewModel.onSubmitPressed(webViewVersion, description)
+                submitted = true
+            }
         }
     }
 

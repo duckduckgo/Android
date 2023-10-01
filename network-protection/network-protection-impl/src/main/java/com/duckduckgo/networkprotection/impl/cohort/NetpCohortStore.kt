@@ -20,7 +20,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
@@ -33,9 +35,13 @@ interface NetpCohortStore {
     scope = AppScope::class,
     boundType = NetpCohortStore::class,
 )
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = NetPFeatureRemover.NetPStoreRemovalPlugin::class,
+)
 class RealNetpCohortStore @Inject constructor(
     private val sharedPreferencesProvider: VpnSharedPreferencesProvider,
-) : NetpCohortStore {
+) : NetpCohortStore, NetPFeatureRemover.NetPStoreRemovalPlugin {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     private val preferences: SharedPreferences by lazy {
@@ -57,5 +63,9 @@ class RealNetpCohortStore @Inject constructor(
     companion object {
         private const val FILENAME = "com.duckduckgo.networkprotection.cohort.prefs.v1"
         private const val KEY_COHORT_LOCAL_DATE = "KEY_COHORT_LOCAL_DATE"
+    }
+
+    override fun clearStore() {
+        preferences.edit { clear() }
     }
 }

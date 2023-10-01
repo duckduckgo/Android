@@ -468,7 +468,7 @@
         <item quantity="one"><![CDATA[ och <b>%1$d annan</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
         <item quantity="other"><![CDATA[ och <b>%1$d andra</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
         <item quantity="other"><![CDATA[ försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
     </plurals>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Appen kanske måste stängas för att tillämpa ändringar. Kom tillbaka när du har tillämpat din nya ikon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Oskyddade webbplatser</string>
+    <string name="manageAllowlist">Oskyddade webbplatser</string>
     <string name="reportBrokenSite">Rapportera skadad webbplats</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Redigera</string>
     <string name="dialogSaveAction">Spara</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Oskyddade webbplatser</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Fler alternativ för den oskyddade webbplatsen %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt; från de oskyddade webbplatserna?</string>
-    <string name="whitelistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
-    <string name="whitelistNoEntries">Integritetsskydd aktiverat för alla webbplatser</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Ange en domän som <b>example.com</b> och försök igen</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Fler alternativ för den oskyddade webbplatsen %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt; från de oskyddade webbplatserna?</string>
+    <string name="allowlistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
+    <string name="allowlistNoEntries">Integritetsskydd aktiverat för alla webbplatser</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Ange en domän som <b>example.com</b> och försök igen</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Oskyddade webbplatser</string>
+    <string name="settingsPrivacyProtectionAllowlist">Oskyddade webbplatser</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>
@@ -625,20 +625,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Ny adress har kopierats till Urklipp</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Använd %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blockerar e-postspårare</string>
-    <string name="autofillTooltipGenerateAddress">Generera privat Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blockerar e-postspårare och döljer din adress</string>
     <string name="newEmailAliasMenuTitle">Generera en Duck-adress</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Visa</string>
     <string name="autofillLoginSavedSnackbarMessage">Inloggning sparad</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Inloggning uppdaterad</string>
-    <string name="autofillDisableAutofillPromptTitle">Vill du fortsätta att spara inloggningar?</string>
-    <string name="autofillDisableAutofillPromptMessage">Du kan inaktivera det här när som helst i inställningarna.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Fortsätt att spara</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Inaktivera</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vill du att vi ska skicka ett meddelande när det är din tur?</string>
@@ -759,4 +751,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Dra nedåt från toppen och tryck på bakåtknappen för att lämna helskärmsläget</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Stäng alla flikar?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Är du säker på att du vill stänga alla flikar?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Avbryt</string>
+    <string name="closeAppTabsConfirmationDialogClose">Stäng</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Vill du radera det här bokmärket?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ditt bokmärke för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Vill du radera den här favoriten?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din favoritmarkering av &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Vill du radera den här bokmärkesmappen?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din bokmärkesmapp för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Avbryt</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Ta bort</string>
 </resources>

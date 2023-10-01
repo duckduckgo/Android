@@ -16,23 +16,41 @@
 
 package com.duckduckgo.app.settings
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.app.settings.CheckListItem.CheckItemStatus
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.CONNECTING
+import com.duckduckgo.networkprotection.api.NetworkProtectionState.ConnectionState.DISCONNECTED
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.sync.api.DeviceSyncState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -41,24 +59,29 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+@SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val appTrackingProtection: AppTrackingProtection,
     private val pixel: Pixel,
-    private val appBuildConfig: AppBuildConfig,
     private val emailManager: EmailManager,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val networkProtectionState: NetworkProtectionState,
     private val deviceSyncState: DeviceSyncState,
-    private val netpWaitlistRepository: NetPWaitlistRepository,
+    private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
-) : ViewModel() {
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
+    private val appInstallStore: AppInstallStore,
+) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val showDefaultBrowserSetting: Boolean = false,
@@ -68,10 +91,18 @@ class SettingsViewModel @Inject constructor(
         val emailAddress: String? = null,
         val showAutofill: Boolean = false,
         val showSyncSetting: Boolean = false,
-        val networkProtectionStateEnabled: Boolean = false,
-        val networkProtectionWaitlistState: NetPWaitlistState = NetPWaitlistState.NotUnlocked,
+        val networkProtectionEntryState: NetPEntryState = Hidden,
         val isAutoconsentEnabled: Boolean = false,
     )
+
+    sealed class NetPEntryState {
+        object Hidden : NetPEntryState()
+        object Pending : NetPEntryState()
+        data class ShowState(
+            val icon: CheckItemStatus,
+            @StringRes val subtitle: Int,
+        ) : NetPEntryState()
+    }
 
     sealed class Command {
         object LaunchDefaultBrowser : Command()
@@ -81,8 +112,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchAccessibilitySettings : Command()
         object LaunchAddHomeScreenWidget : Command()
         object LaunchAppTPTrackersScreen : Command()
-        object LaunchNetPManagementScreen : Command()
-        object LaunchNetPWaitlist : Command()
+        data class LaunchNetPWaitlist(val screen: ActivityParams) : Command()
         object LaunchAppTPOnboarding : Command()
         object LaunchMacOs : Command()
         object LaunchWindows : Command()
@@ -94,17 +124,60 @@ class SettingsViewModel @Inject constructor(
         object LaunchPermissionsScreen : Command()
         object LaunchAppearanceScreen : Command()
         object LaunchAboutScreen : Command()
+        data class ShowDefaultBrowserDialog(val intent: Intent) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
+    private val appTPPollJob = ConflatedJob()
 
     init {
         pixel.fire(SETTINGS_OPENED)
     }
 
-    fun start() {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        start()
+        startPollingAppTPState()
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        appTPPollJob.cancel()
+    }
+
+    private suspend fun getNetworkProtectionEntryState(networkProtectionConnectionState: ConnectionState): NetPEntryState {
+        return when (val networkProtectionWaitlistState = networkProtectionWaitlist.getState()) {
+            is NetPWaitlistState.InBeta -> {
+                if (networkProtectionWaitlistState.termsAccepted || networkProtectionState.isOnboarded()) {
+                    val subtitle = when (networkProtectionConnectionState) {
+                        CONNECTED -> R.string.netpSettingsConnected
+                        CONNECTING -> R.string.netpSettingsConnecting
+                        else -> R.string.netpSettingsDisconnected
+                    }
+
+                    val netPItemStatus = if (networkProtectionConnectionState != DISCONNECTED) {
+                        CheckListItem.CheckItemStatus.ENABLED
+                    } else {
+                        CheckListItem.CheckItemStatus.WARNING
+                    }
+
+                    ShowState(
+                        icon = netPItemStatus,
+                        subtitle = subtitle,
+                    )
+                } else {
+                    Pending
+                }
+            }
+            NetPWaitlistState.NotUnlocked -> Hidden
+            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
+        }
+    }
+
+    @VisibleForTesting
+    internal fun start() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
 
         viewModelScope.launch {
@@ -117,11 +190,21 @@ class SettingsViewModel @Inject constructor(
                     emailAddress = emailManager.getEmailAddress(),
                     showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen(),
                     showSyncSetting = deviceSyncState.isFeatureEnabled(),
-                    networkProtectionStateEnabled = networkProtectionState.isRunning(),
-                    networkProtectionWaitlistState = netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()),
+                    networkProtectionEntryState = (if (networkProtectionState.isRunning()) CONNECTED else DISCONNECTED).run {
+                        getNetworkProtectionEntryState(this)
+                    },
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                 ),
             )
+            networkProtectionState.getConnectionStateFlow()
+                .onEach {
+                    viewState.emit(
+                        currentViewState().copy(
+                            networkProtectionEntryState = getNetworkProtectionEntryState(it),
+                        ),
+                    )
+                }.flowOn(dispatcherProvider.main())
+                .launchIn(viewModelScope)
         }
     }
 
@@ -129,15 +212,13 @@ class SettingsViewModel @Inject constructor(
     // We need to fix this. This logic as inside the start method but it messes with the unit tests
     // because when doing runningBlockingTest {} there is no delay and the tests crashes because this
     // becomes a while(true) without any delay
-    fun startPollingVpnState() {
-        viewModelScope.launch(dispatcherProvider.io()) {
+    private fun startPollingAppTPState() {
+        appTPPollJob += viewModelScope.launch(dispatcherProvider.io()) {
             while (isActive) {
                 val isDeviceShieldEnabled = appTrackingProtection.isRunning()
-                val isNetPEnabled = networkProtectionState.isRunning()
                 viewState.value = currentViewState().copy(
                     appTrackingProtectionOnboardingShown = appTrackingProtection.isOnboarded(),
                     appTrackingProtectionEnabled = isDeviceShieldEnabled,
-                    networkProtectionStateEnabled = isNetPEnabled,
                 )
                 delay(1_000)
             }
@@ -220,21 +301,22 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAppTPSettingClicked() {
-        if (appTrackingProtection.isOnboarded()) {
-            viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
-        } else {
-            viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+        viewModelScope.launch {
+            if (appTrackingProtection.isOnboarded()) {
+                command.send(Command.LaunchAppTPTrackersScreen)
+            } else {
+                command.send(Command.LaunchAppTPOnboarding)
+            }
+            pixel.fire(SETTINGS_APPTP_PRESSED)
         }
-        pixel.fire(SETTINGS_APPTP_PRESSED)
     }
 
     fun onNetPSettingClicked() {
-        if (netpWaitlistRepository.getState(appBuildConfig.isInternalBuild()) == NetPWaitlistState.InBeta) {
-            viewModelScope.launch { command.send(Command.LaunchNetPManagementScreen) }
-        } else {
-            viewModelScope.launch { command.send(Command.LaunchNetPWaitlist) }
+        viewModelScope.launch {
+            val screen = networkProtectionWaitlist.getScreenForCurrentState()
+            command.send(Command.LaunchNetPWaitlist(screen))
+            pixel.fire(SETTINGS_NETP_PRESSED)
         }
-        pixel.fire(SETTINGS_NETP_PRESSED)
     }
 
     private fun currentViewState(): ViewState {
@@ -261,11 +343,39 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_APPEARANCE_PRESSED)
     }
 
-    fun onLaunchedFromNotification(pixelName: String) {
+    fun onLaunchedFromNotification(pixelName: String, context: Context) {
+        if (pixelName == DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION) {
+            launchSetAsDefaultBrowserOption(context)
+        }
         pixel.fire(pixelName)
+    }
+
+    private fun launchSetAsDefaultBrowserOption(context: Context) {
+        if (defaultRoleBrowserDialog.shouldShowDialog()) {
+            val intent = defaultRoleBrowserDialog.createIntent(context)
+            if (intent != null) {
+                viewModelScope.launch { command.send(Command.ShowDefaultBrowserDialog(intent)) }
+            } else {
+                viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
+                appInstallStore.setDefaultBrowserFromNotification = true
+            }
+        } else {
+            viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
+            appInstallStore.setDefaultBrowserFromNotification = true
+        }
+    }
+
+    fun onDefaultBrowserSetFromDialog(ddgSetAsDefault: Boolean) {
+        defaultRoleBrowserDialog.dialogShown()
+        appInstallStore.defaultBrowser = ddgSetAsDefault
+        if (ddgSetAsDefault) {
+            viewModelScope.launch { viewState.emit(currentViewState().copy(isAppDefaultBrowser = true)) }
+            pixel.fire(DEFAULT_BROWSER_SET_FROM_NOTIFICATION)
+        }
     }
 
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
+        const val DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION = "mnot_l_DefaultBrowser"
     }
 }

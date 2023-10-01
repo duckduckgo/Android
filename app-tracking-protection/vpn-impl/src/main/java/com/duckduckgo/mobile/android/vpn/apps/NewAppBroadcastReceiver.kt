@@ -27,10 +27,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
-import com.duckduckgo.mobile.android.vpn.exclusion.AppCategoryDetector
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -49,11 +45,9 @@ import logcat.logcat
 )
 class NewAppBroadcastReceiver @Inject constructor(
     private val applicationContext: Context,
-    private val appCategoryDetector: AppCategoryDetector,
     private val appTrackerRepository: AppTrackerRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
@@ -71,7 +65,7 @@ class NewAppBroadcastReceiver @Inject constructor(
 
         val pendingResult = goAsync()
         goAsync(pendingResult) {
-            if (isGame(packageName) || isInExclusionList(packageName)) {
+            if (isInExclusionList(packageName)) {
                 logcat { "Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn" }
                 vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
             } else {
@@ -93,10 +87,6 @@ class NewAppBroadcastReceiver @Inject constructor(
 
     private fun unregister() {
         kotlin.runCatching { applicationContext.unregisterReceiver(this) }
-    }
-
-    private fun isGame(packageName: String): Boolean {
-        return appCategoryDetector.getAppCategory(packageName) is AppCategory.Game && !appTpFeatureConfig.isEnabled(AppTpSetting.ProtectGames)
     }
 
     @WorkerThread

@@ -59,7 +59,7 @@ class VpnEnabledNotificationBuilder {
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnEnabledNotificationContent.title)
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+                .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setContentIntent(vpnEnabledNotificationContent.onNotificationPressIntent)
                 .setCustomContentView(notificationLayout)
@@ -77,12 +77,11 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_trackers)
+            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnNotification.title)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationMessage, vpnNotification.message)
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+                .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setContentIntent(vpnNotification.onNotificationPressIntent)
                 .setCustomContentView(notificationLayout)

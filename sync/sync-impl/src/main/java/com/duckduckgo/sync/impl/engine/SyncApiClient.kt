@@ -18,13 +18,14 @@ package com.duckduckgo.sync.impl.engine
 
 import androidx.annotation.VisibleForTesting
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncChangesRequest
-import com.duckduckgo.sync.api.engine.SyncChangesResponse
-import com.duckduckgo.sync.api.engine.SyncableType
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
+import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
+import com.duckduckgo.sync.api.engine.SyncableType.SETTINGS
 import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
+import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -44,6 +45,7 @@ interface SyncApiClient {
 class AppSyncApiClient @Inject constructor(
     private val syncStore: SyncStore,
     private val syncApi: SyncApi,
+    private val syncPixels: SyncPixels,
 ) : SyncApiClient {
 
     override fun patch(changes: SyncChangesRequest): Result<SyncChangesResponse> {
@@ -64,7 +66,7 @@ class AppSyncApiClient @Inject constructor(
 
             is Result.Success -> {
                 if (result.data == null) {
-                    Result.Success(SyncChangesResponse.empty())
+                    Result.Success(SyncChangesResponse.empty(changes.type))
                 } else {
                     val remoteChanges = mapResponse(changes.type, result.data)
                     Result.Success(remoteChanges)
@@ -83,6 +85,25 @@ class AppSyncApiClient @Inject constructor(
 
         return when (type) {
             BOOKMARKS -> getBookmarks(type, token, since)
+            CREDENTIALS -> getCredentials(type, token, since)
+            SETTINGS -> getSettings(type, token, since)
+        }
+    }
+
+    private fun getSettings(type: SyncableType, token: String, since: String): Result<SyncChangesResponse> {
+        return when (val result = syncApi.getSettings(token, since)) {
+            is Result.Error -> {
+                if (result.code == API_CODE.NOT_MODIFIED.code) {
+                    Result.Success(SyncChangesResponse.empty(type))
+                } else {
+                    Result.Error(result.code, result.reason)
+                }
+            }
+
+            is Result.Success -> {
+                val remoteChanges = mapResponse(type, result.data)
+                Result.Success(remoteChanges)
+            }
         }
     }
 
@@ -93,10 +114,41 @@ class AppSyncApiClient @Inject constructor(
     ): Result<SyncChangesResponse> {
         return when (val result = syncApi.getBookmarks(token, since)) {
             is Result.Error -> {
-                if (result.code == API_CODE.NOT_MODIFIED.code) {
-                    Result.Success(SyncChangesResponse.empty())
-                } else {
-                    Result.Error(result.code, result.reason)
+                when (result.code) {
+                    API_CODE.NOT_MODIFIED.code -> Result.Success(SyncChangesResponse.empty(type))
+                    API_CODE.COUNT_LIMIT.code -> {
+                        syncPixels.fireCountLimitPixel(BOOKMARKS.toString())
+                        Result.Error(result.code, result.reason)
+                    }
+                    else -> {
+                        Result.Error(result.code, result.reason)
+                    }
+                }
+            }
+
+            is Result.Success -> {
+                val remoteChanges = mapResponse(type, result.data)
+                Result.Success(remoteChanges)
+            }
+        }
+    }
+
+    private fun getCredentials(
+        type: SyncableType,
+        token: String,
+        since: String,
+    ): Result<SyncChangesResponse> {
+        return when (val result = syncApi.getCredentials(token, since)) {
+            is Result.Error -> {
+                when (result.code) {
+                    API_CODE.NOT_MODIFIED.code -> Result.Success(SyncChangesResponse.empty(type))
+                    API_CODE.COUNT_LIMIT.code -> {
+                        syncPixels.fireCountLimitPixel(CREDENTIALS.toString())
+                        Result.Error(result.code, result.reason)
+                    }
+                    else -> {
+                        Result.Error(result.code, result.reason)
+                    }
                 }
             }
 

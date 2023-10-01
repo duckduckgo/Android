@@ -25,8 +25,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.sync.algorithm.isDeleted
 import com.duckduckgo.sync.api.SyncCrypto
-import com.duckduckgo.sync.api.engine.SyncChangesRequest
-import com.duckduckgo.sync.api.engine.SyncableDataProvider
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -201,13 +200,19 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChangesRequest {
+        val modifiedSince = if (savedSitesSyncStore.modifiedSince == "0") {
+            ModifiedSince.FirstSync
+        } else {
+            ModifiedSince.Timestamp(savedSitesSyncStore.modifiedSince)
+        }
+
         return if (updates.isEmpty()) {
-            SyncChangesRequest(BOOKMARKS, "", savedSitesSyncStore.modifiedSince)
+            SyncChangesRequest(BOOKMARKS, "", modifiedSince)
         } else {
             val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
             val patch = SyncBookmarksRequest(bookmarkUpdates, DatabaseDateFormatter.iso8601())
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
-            SyncChangesRequest(BOOKMARKS, allDataJSON, savedSitesSyncStore.modifiedSince)
+            SyncChangesRequest(BOOKMARKS, allDataJSON, modifiedSince)
         }
     }
 

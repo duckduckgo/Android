@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
+import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -68,13 +69,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         override fun bind(component: Component) {
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
-                illustration = R.drawable.ic_announce,
+                topIllustration = R.drawable.ic_announce,
                 title = "Big Single  Message",
                 subtitle = "Body text goes here. This component has one button",
                 action = "Primary",
             )
             val bigTwoActionsMessage = Message(
-                illustration = R.drawable.ic_ddg_announce,
+                topIllustration = R.drawable.ic_ddg_announce,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons",
                 action = "Primary",
@@ -82,7 +83,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val bigTwoActionsUpdateMessage = Message(
-                illustration = R.drawable.ic_app_update,
+                topIllustration = R.drawable.ic_app_update,
                 title = "Big Two Actions Message",
                 subtitle = "Body text goes here. This component has two buttons and showcases and app update",
                 action = "Primary",
@@ -90,9 +91,17 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             )
 
             val mediumMessage = Message(
-                illustration = R.drawable.ic_critical_update,
+                topIllustration = R.drawable.ic_critical_update,
                 title = "Big Single  Message",
                 subtitle = "Body text goes here. This component has one button",
+            )
+
+            val promoSingleMessage = Message(
+                middleIllustration = R.drawable.desktop_promo_artwork,
+                title = "Promo Single Action Message",
+                subtitle = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
+                promoAction = "Promo Link",
+                messageType = REMOTE_PROMO_MESSAGE,
             )
 
             view.findViewById<MessageCta>(R.id.small_remote_message).apply {
@@ -113,6 +122,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.big_two_actions_update_remote_message).apply {
                 setMessage(bigTwoActionsUpdateMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
+                setMessage(promoSingleMessage)
             }
         }
     }
@@ -147,9 +160,19 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
             }
 
-            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithImage).apply {
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithSmallImage).apply {
                 setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
-                setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Small Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithMediumImage).apply {
+                setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Medium Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<OneLineListItem>(R.id.oneLineListItemWithLargeImage).apply {
+                setClickListener { Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
             view.findViewById<OneLineListItem>(R.id.oneLineListItemWithTrailingIcon).apply {
@@ -199,9 +222,21 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
-            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithImageAndTrailingIcon).apply {
+            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithSmallImageAndTrailingIcon).apply {
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
-                setLeadingIconClickListener { Snackbar.make(view, "Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Small Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithMediumImageAndTrailingIcon).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Medium Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
+                setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithLargeImageAndTrailingIcon).apply {
+                setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
+                setLeadingIconClickListener { Snackbar.make(view, "Large Leading Icon clicked", Snackbar.LENGTH_SHORT).show() }
                 setTrailingIconClickListener { Snackbar.make(view, "Overflow menu clicked", Snackbar.LENGTH_SHORT).show() }
             }
 
@@ -240,6 +275,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setClickListener { Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show() }
                 quietlySetIsChecked(true, null)
                 isEnabled = false
+            }
+
+            view.findViewById<TwoLineListItem>(R.id.twoLineSwitchListItemWithSwitchDisabledChecked).apply {
+                quietlySetIsChecked(true, null)
             }
         }
     }

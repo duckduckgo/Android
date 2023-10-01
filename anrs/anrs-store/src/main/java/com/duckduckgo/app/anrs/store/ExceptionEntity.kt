@@ -28,4 +28,5 @@ data class ExceptionEntity(
     val stackTrace: String,
     val version: String,
     val timestamp: String,
+    val webView: String,
 )

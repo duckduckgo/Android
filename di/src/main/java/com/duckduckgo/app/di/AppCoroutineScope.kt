@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.di
 
-import javax.inject.Scope
+import javax.inject.Qualifier
 
 /** Identifies a coroutine scope type that is scope to the app lifecycle */
-@Scope
+@Qualifier
 @MustBeDocumented
-@Retention(AnnotationRetention.RUNTIME)
+@Retention(AnnotationRetention.BINARY)
 annotation class AppCoroutineScope

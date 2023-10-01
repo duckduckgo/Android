@@ -226,7 +226,7 @@
 
         <activity
             android:name=".BrowserActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
             android:label="@string/appDescription"
             android:launchMode="singleTask"
@@ -366,9 +366,9 @@
             android:label="@string/changeIconActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.privacy.ui.WhitelistActivity"
+            android:name="com.duckduckgo.app.privacy.ui.AllowListActivity"
             android:exported="false"
-            android:label="@string/whitelistActivityTitle"
+            android:label="@string/allowlistActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"
@@ -511,6 +511,10 @@
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".remotemessage.SharePromoLinkRMFBroadCastReceiver"
+            android:exported="false" />
 
     </application>
 

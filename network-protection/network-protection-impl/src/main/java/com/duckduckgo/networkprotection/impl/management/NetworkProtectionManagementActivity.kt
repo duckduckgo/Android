@@ -40,7 +40,9 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.networkprotection.api.NetPAppExclusionListNoParams
+import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenAndEnable
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.about.NetPAboutVPNScreenNoParams
@@ -62,6 +64,7 @@ import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(NetworkProtectionManagementScreenNoParams::class)
+@ContributeToActivityStarter(NetworkProtectionManagementScreenAndEnable::class)
 class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -91,6 +94,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         bindViews()
+        intent.getActivityParams(NetworkProtectionManagementScreenAndEnable::class.java)?.enable?.let { shouldEnable ->
+            if (shouldEnable) {
+                checkVPNPermission()
+            }
+        }
 
         observeViewModel()
         lifecycle.addObserver(viewModel)
@@ -203,6 +211,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
         netpStatusImage.setImageResource(R.drawable.illustration_vpn_off)
+        netpToggle.quietlySetChecked(true)
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOff)
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
         netpToggle.isEnabled = false

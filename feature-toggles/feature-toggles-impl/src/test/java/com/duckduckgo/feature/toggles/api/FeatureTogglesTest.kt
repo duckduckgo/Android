@@ -63,7 +63,7 @@ class FeatureTogglesTest {
     @Test
     fun whenEnabledByDefaultAndSetDisabledThenReturnDisabled() {
         feature.enabledByDefault().setEnabled(Toggle.State(enable = false))
-        assertFalse(feature.disableByDefault().isEnabled())
+        assertFalse(feature.enabledByDefault().isEnabled())
     }
 
     @Test(expected = IllegalStateException::class)
@@ -286,6 +286,23 @@ class FeatureTogglesTest {
         feature.self().setEnabled(state)
         assertTrue(feature.self().isEnabled())
         assertEquals(expected, toggleStore.get("test"))
+    }
+
+    @Test
+    fun whenAppUpdateThenEvaluatePreviousState() {
+        // when remoteEnableState is null it means app update
+        val state = Toggle.State(
+            remoteEnableState = null,
+            enable = true,
+        )
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_disableByDefault", state)
+        assertTrue(feature.disableByDefault().isEnabled())
+
+        // Use directly the store because setEnabled() populates the local state when the remote state is null
+        toggleStore.set("test_enabledByDefault", state.copy(enable = false))
+        assertFalse(feature.enabledByDefault().isEnabled())
     }
 }
 

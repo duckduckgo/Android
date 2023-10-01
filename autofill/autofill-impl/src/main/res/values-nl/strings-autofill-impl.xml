@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Schakel Email Protection in</annotation> om Duck Adresses op dit apparaat te beheren.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">E-mailadres selecteren</string>
+    <string name="autofillTooltipUseYourAliasDescription">E-mailtrackers blokkeren</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Privé-Duck Address genereren</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-mailtrackers blokkeren en adres verbergen</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Wil je aanmeldgegevens blijven opslaan?</string>
+    <string name="autofillDisableAutofillPromptMessage">Je kunt dit op elk moment uitschakelen in de instellingen.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Blijf opslaan</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Uitschakelen</string>
 
 </resources>

@@ -19,13 +19,14 @@ package com.duckduckgo.app.dev.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -43,6 +44,7 @@ class DevSettingsViewModel @Inject constructor(
     private val userAgentProvider: UserAgentProvider,
     private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val surveyEndpointDataStore: SurveyEndpointDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -50,6 +52,7 @@ class DevSettingsViewModel @Inject constructor(
         val startupTraceEnabled: Boolean = false,
         val overrideUA: Boolean = false,
         val userAgent: String = "",
+        val useSandboxSurvey: Boolean = false,
     )
 
     sealed class Command {
@@ -70,6 +73,7 @@ class DevSettingsViewModel @Inject constructor(
                     startupTraceEnabled = startupTraces.isTraceEnabled,
                     overrideUA = devSettingsDataStore.overrideUA,
                     userAgent = userAgentProvider.userAgent("", false),
+                    useSandboxSurvey = surveyEndpointDataStore.useSurveyCustomEnvironmentUrl,
                 ),
             )
         }
@@ -104,6 +108,13 @@ class DevSettingsViewModel @Inject constructor(
         devSettingsDataStore.overrideUA = enabled
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(overrideUA = enabled))
+        }
+    }
+
+    fun onSandboxSurveyToggled(enabled: Boolean) {
+        surveyEndpointDataStore.useSurveyCustomEnvironmentUrl = enabled
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(useSandboxSurvey = enabled))
         }
     }
 

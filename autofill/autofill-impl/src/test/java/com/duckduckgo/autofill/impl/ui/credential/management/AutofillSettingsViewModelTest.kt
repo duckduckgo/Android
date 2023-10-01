@@ -19,9 +19,9 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
@@ -86,6 +86,7 @@ class AutofillSettingsViewModelTest {
         emailManager = emailManager,
         duckAddressStatusRepository = duckAddressStatusRepository,
         duckAddressIdentifier = duckAddressIdentifier,
+        syncEngine = mock(),
     )
 
     @Before

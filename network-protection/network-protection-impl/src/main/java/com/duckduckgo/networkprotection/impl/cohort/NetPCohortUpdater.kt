@@ -18,10 +18,9 @@ package com.duckduckgo.networkprotection.impl.cohort
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -33,13 +32,21 @@ import org.threeten.bp.LocalDate
     boundType = VpnServiceCallbacks::class,
 )
 class NetPCohortUpdater @Inject constructor(
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
     private val cohortStore: NetpCohortStore,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        attemptToSetNetPCohort(coroutineScope)
+    }
+
+    override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
+        attemptToSetNetPCohort(coroutineScope)
+    }
+
+    private fun attemptToSetNetPCohort(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)) {
+            if (networkProtectionState.isEnabled()) {
                 // skip if already stored
                 cohortStore.cohortLocalDate?.let { return@launch }
 

@@ -43,5 +43,15 @@ dependencies {
 }
 
 android {
-  namespace 'com.duckduckgo.autofill.store'
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+    namespace 'com.duckduckgo.autofill.store'
 }

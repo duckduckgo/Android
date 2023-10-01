@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.global.api
 
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.global.plugins.pixel.PixelRequiringDataCleaningPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import org.junit.Assert.assertEquals
@@ -27,7 +29,13 @@ class AtbAndAppVersionPixelRemovalInterceptorTest {
 
     @Before
     fun setup() {
-        pixelRemovalInterceptor = AtbAndAppVersionPixelRemovalInterceptor()
+        pixelRemovalInterceptor = AtbAndAppVersionPixelRemovalInterceptor(
+            pixelsPlugin = object : PluginPoint<PixelRequiringDataCleaningPlugin> {
+                override fun getPlugins(): Collection<PixelRequiringDataCleaningPlugin> {
+                    return listOf(PixelInterceptorPixelsRequiringDataCleaning)
+                }
+            },
+        )
     }
 
     @Test
@@ -37,7 +45,7 @@ class AtbAndAppVersionPixelRemovalInterceptorTest {
 
         (appPixelNames + deviceShieldPixelNames).forEach { pixelName ->
             val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
-            val removalExpected = AtbAndAppVersionPixelRemovalInterceptor.pixels.firstOrNull { pixelName.startsWith(it) } != null
+            val removalExpected = PixelInterceptorPixelsRequiringDataCleaning.names().firstOrNull { pixelName.startsWith(it) } != null
 
             val interceptedUrl = pixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
             assertEquals(removalExpected, interceptedUrl.queryParameter("atb") == null)

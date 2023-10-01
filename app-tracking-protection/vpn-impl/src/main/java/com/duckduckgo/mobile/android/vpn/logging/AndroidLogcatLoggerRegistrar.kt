@@ -21,6 +21,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.AndroidLogcatLogger
@@ -38,6 +39,7 @@ import logcat.logcat
 )
 class AndroidLogcatLoggerRegistrar @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
+    private val appTpLocalFeature: AppTpLocalFeature,
 ) : VpnProcessLifecycleObserver, MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -45,7 +47,7 @@ class AndroidLogcatLoggerRegistrar @Inject constructor(
     }
 
     override fun onVpnProcessCreated() {
-        if (appBuildConfig.isDebug) {
+        if (appBuildConfig.isDebug || appTpLocalFeature.verboseLogging().isEnabled()) {
             LogcatLogger.install(AndroidLogcatLogger(LogPriority.DEBUG))
             logcat { "Registering LogcatLogger" }
         }

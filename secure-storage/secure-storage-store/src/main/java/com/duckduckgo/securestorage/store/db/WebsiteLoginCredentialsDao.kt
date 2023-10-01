@@ -47,4 +47,7 @@ interface WebsiteLoginCredentialsDao {
 
     @Query("DELETE FROM website_login_credentials WHERE id = :id")
     fun delete(id: Long)
+
+    @Query("select * from website_login_credentials where domain is null OR domain = ''")
+    fun websiteLoginCredentialsWithoutDomain(): Flow<List<WebsiteLoginCredentialsEntity>>
 }

@@ -470,8 +470,8 @@
         <item quantity="many"><![CDATA[ i <b>%1$d drugih</b> te pokušalo te ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
         <item quantity="other"><![CDATA[ i <b>%1$d drugih</b> pokušalo te ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
         <item quantity="few"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
         <item quantity="many"><![CDATA[ te pokušalo pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
         <item quantity="other"><![CDATA[ te pokušalo pratiti ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Aplikacija se može zatvoriti radi primjene promjena. Vrati se nakon što si se divio/la svojoj lijepoj novoj ikoni.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Nezaštićena web-mjesta</string>
+    <string name="manageAllowlist">Nezaštićena web-mjesta</string>
     <string name="reportBrokenSite">Prijavi neispravno web-mjesto</string>
 
     <!-- Dialogs -->
@@ -523,19 +523,19 @@
     <string name="dialogEditTitle">Uredi</string>
     <string name="dialogSaveAction">Spremi</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Nezaštićena web-mjesta</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Nezaštićena web-mjesta</string>
     <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
     <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Jesi li siguran/na da želiš ukloniti &lt;b&gt;%1$s&lt;/b&gt; iz nezaštićenih web-mjesta?</string>
-    <string name="whitelistExplanation">Zaštita privatnosti neće poboljšati ova mrežna mjesta.</string>
-    <string name="whitelistNoEntries">Zaštita privatnosti omogućena za sva web-mjesta</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Unesite domenu kao <b>example.com</b> i pokušajte ponovo</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Jesi li siguran/na da želiš ukloniti &lt;b&gt;%1$s&lt;/b&gt; iz nezaštićenih web-mjesta?</string>
+    <string name="allowlistExplanation">Zaštita privatnosti neće poboljšati ova mrežna mjesta.</string>
+    <string name="allowlistNoEntries">Zaštita privatnosti omogućena za sva web-mjesta</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Unesite domenu kao <b>example.com</b> i pokušajte ponovo</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Nezaštićena web-mjesta</string>
+    <string name="settingsPrivacyProtectionAllowlist">Nezaštićena web-mjesta</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zaštićena web-mjesta</string>
@@ -629,20 +629,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nova adresa kopirana je u međuspremnik</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Upotrijebite %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blokira programe za praćenje e-pošte</string>
-    <string name="autofillTooltipGenerateAddress">Generiraj privatnu adresu Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blokira programe za praćenje e-pošte i skriva vašu adresu</string>
     <string name="newEmailAliasMenuTitle">Generiraj Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Pregled</string>
     <string name="autofillLoginSavedSnackbarMessage">Prijava je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Prijava je ažurirana</string>
-    <string name="autofillDisableAutofillPromptTitle">Želiš li nastaviti spremati prijave?</string>
-    <string name="autofillDisableAutofillPromptMessage">Ovo možeš onemogućiti u svakom trenutku u Postavkama.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Nastavi spremati</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Onemogući</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Želite li da vam pošaljemo obavijest kad dođete na red?</string>
@@ -767,4 +759,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Povucite prema dolje s vrha i dodirnite gumb za natrag kako biste izašli iz prikaza preko cijelog zaslona</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Želiš li zatvoriti sve kartice?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Jesi li siguran da želiš zatvoriti sve kartice?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Odustani</string>
+    <string name="closeAppTabsConfirmationDialogClose">Zatvori</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Izbrisati ovu knjižnu oznaku?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ovo će izbrisati tvoju oznaku za &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Želiš li izbrisati ovaj favorit?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ovo će izbrisati tvoj favorit: &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Želiš li izbrisati ovu mapu knjižnih oznaka?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ovo će izbrisati tvoju mapu knjižnih oznaka: &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Odustani</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
 </resources>

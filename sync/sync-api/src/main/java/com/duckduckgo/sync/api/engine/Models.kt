@@ -18,42 +18,66 @@ package com.duckduckgo.sync.api.engine
 
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 
-data class SyncChangesRequest(val type: SyncableType, val jsonString: String, val modifiedSince: String) {
+sealed class ModifiedSince(open val value: String) {
+    object FirstSync : ModifiedSince(value = "0")
+    data class Timestamp(override val value: String) : ModifiedSince(value)
+}
+
+// TODO: https://app.asana.com/0/0/1204958251694095/f
+data class SyncChangesRequest(
+    val type: SyncableType,
+    val jsonString: String,
+    val modifiedSince: ModifiedSince,
+) {
 
     fun isEmpty(): Boolean {
         return this.jsonString.isEmpty()
     }
+
+    fun isFirstSync(): Boolean {
+        return this.modifiedSince is ModifiedSince.FirstSync
+    }
+
     companion object {
         fun empty(): SyncChangesRequest {
-            return SyncChangesRequest(BOOKMARKS, "", "")
+            return SyncChangesRequest(BOOKMARKS, "", ModifiedSince.FirstSync)
         }
     }
 }
 
-data class SyncChangesResponse(val type: SyncableType, val jsonString: String) {
+data class SyncChangesResponse(
+    val type: SyncableType,
+    val jsonString: String,
+) {
 
     companion object {
-        fun empty(): SyncChangesResponse {
-            return SyncChangesResponse(BOOKMARKS, "")
+        fun empty(type: SyncableType): SyncChangesResponse {
+            return SyncChangesResponse(type, "")
         }
     }
 }
 
 enum class SyncableType(val field: String) {
     BOOKMARKS("bookmarks"),
+    CREDENTIALS("credentials"),
+    SETTINGS("settings"),
 }
 
-sealed class SyncMergeResult<out R> {
+// TODO: document api, when is it expected each case? https://app.asana.com/0/0/1204958251694095/f
+sealed class SyncMergeResult {
 
-    data class Success<out T>(val data: T) : SyncMergeResult<T>()
+    data class Success(
+        val orphans: Boolean = false,
+    ) : SyncMergeResult()
+
     data class Error(
         val code: Int = -1,
         val reason: String,
-    ) : SyncMergeResult<Nothing>()
+    ) : SyncMergeResult()
 
     override fun toString(): String {
         return when (this) {
-            is Success<*> -> "Success[data=$data]"
+            is Success -> "Success[orphans=$orphans]"
             is Error -> "Error[exception=$code, $reason]"
         }
     }

@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
+import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment.EditBookmarkFolderListener
@@ -55,7 +56,7 @@ class BookmarksViewModel @Inject constructor(
     private val pixel: Pixel,
     private val syncEngine: SyncEngine,
     private val dispatcherProvider: DispatcherProvider,
-) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, ViewModel() {
+) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkListener, ViewModel() {
 
     data class ViewState(
         val enableSearch: Boolean = false,
@@ -65,7 +66,7 @@ class BookmarksViewModel @Inject constructor(
     )
 
     sealed class Command {
-        class OpenSavedSite(val savedSite: SavedSite) : Command()
+        class OpenSavedSite(val savedSiteUrl: String) : Command()
         class ConfirmDeleteSavedSite(val savedSite: SavedSite) : Command()
         class ShowEditSavedSite(val savedSite: SavedSite) : Command()
         class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
@@ -110,11 +111,15 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
+    override fun onSavedSiteDeleted(savedSite: SavedSite) {
+        onDeleteSavedSiteRequested(savedSite)
+    }
+
     fun onSelected(savedSite: SavedSite) {
         if (savedSite is Favorite) {
             pixel.fire(AppPixelName.FAVORITE_BOOKMARKS_ITEM_PRESSED)
         }
-        command.value = OpenSavedSite(savedSite)
+        command.value = OpenSavedSite(savedSite.url)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
@@ -186,10 +191,12 @@ class BookmarksViewModel @Inject constructor(
     fun fetchAllBookmarksAndFolders() {
         viewModelScope.launch(dispatcherProvider.io()) {
             val favorites = savedSitesRepository.getFavoritesSync()
-            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null).map { it.bookmarkFolder }
+            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
+                .map { it.bookmarkFolder }
+                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
             val bookmarks = savedSitesRepository.getBookmarksTree()
             withContext(dispatcherProvider.main()) {
-                onSavedSitesItemsChanged(emptyList(), bookmarks, folders)
+                onSavedSitesItemsChanged(favorites, bookmarks, folders)
             }
         }
     }
@@ -208,6 +215,10 @@ class BookmarksViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             savedSitesRepository.update(bookmarkFolder)
         }
+    }
+
+    override fun onDeleteBookmarkFolderRequestedFromEdit(bookmarkFolder: BookmarkFolder) {
+        onDeleteBookmarkFolderRequested(bookmarkFolder)
     }
 
     fun onBookmarkFolderDeleted(bookmarkFolder: BookmarkFolder) {
@@ -238,20 +249,13 @@ class BookmarksViewModel @Inject constructor(
         )
     }
 
-    private fun onBookmarkItemsChanged(
-        bookmarks: List<Bookmark>,
-        bookmarkFolders: List<BookmarkFolder>,
-    ) {
-        viewState.value = viewState.value?.copy(
-            bookmarks = bookmarks,
-            bookmarkFolders = bookmarkFolders,
-            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH,
-        )
-    }
-
     fun insertDeletedFolderBranch(folderBranch: FolderBranch) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             savedSitesRepository.insertFolderBranch(folderBranch)
         }
+    }
+
+    fun onBookmarkFoldersActivityResult(savedSiteUrl: String) {
+        command.value = OpenSavedSite(savedSiteUrl)
     }
 }

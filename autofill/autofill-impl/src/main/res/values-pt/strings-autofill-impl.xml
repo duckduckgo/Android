@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Ativa a Email Protection</annotation> para gerires os Duck Addresses neste dispositivo.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">Seleciona o endereço de e-mail</string>
+    <string name="autofillTooltipUseYourAliasDescription">Bloquear rastreadores de e-mail</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Gerar um Duck Address Privado</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquear rastreadores de e-mail e ocultar endereço</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Pretendes continuar a guardar inícios de sessão?</string>
+    <string name="autofillDisableAutofillPromptMessage">Podes desativar isto em qualquer altura nas Definições.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuar a guardar</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Desativar</string>
 
 </resources>

@@ -79,7 +79,7 @@ class SurveyNotificationSchedulerImpl @Inject constructor(
         unit: TimeUnit,
         tag: String,
     ) {
-        Timber.v("Scheduling notification for $duration")
+        Timber.v("Scheduling notification in $duration $unit")
         val request = builder
             .addTag(tag)
             .setInitialDelay(duration, unit)

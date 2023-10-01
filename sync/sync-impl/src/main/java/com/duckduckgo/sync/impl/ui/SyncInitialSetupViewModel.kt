@@ -25,10 +25,12 @@ import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
+import com.duckduckgo.sync.store.*
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -44,6 +46,8 @@ class SyncInitialSetupViewModel
 @Inject
 constructor(
     private val syncAccountRepository: SyncAccountRepository,
+    private val syncStore: SyncStore,
+    private val syncEnvDataStore: SyncInternalEnvDataStore,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -63,6 +67,8 @@ constructor(
         val protectedEncryptionKey: String = "",
         val passwordHash: String = "",
         val connectedDevices: List<ConnectedDevice> = emptyList(),
+        val useDevEnvironment: Boolean = false,
+        val environment: String = "",
     )
 
     sealed class Command {
@@ -70,6 +76,12 @@ constructor(
         object ReadQR : Command()
         object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
+    }
+
+    init {
+        viewModelScope.launch(dispatchers.io()) {
+            updateViewState()
+        }
     }
 
     fun onCreateAccountClicked() {
@@ -85,7 +97,7 @@ constructor(
 
     fun onResetClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            syncAccountRepository.removeAccount()
+            syncStore.clearAll()
             updateViewState()
         }
     }
@@ -108,6 +120,13 @@ constructor(
                 command.send(Command.ShowMessage("$result"))
             }
             getConnectedDevices()
+        }
+    }
+
+    fun onEnvironmentChanged(devEnvironment: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            syncEnvDataStore.useSyncDevEnvironment = devEnvironment
+            updateViewState()
         }
     }
 
@@ -164,6 +183,8 @@ constructor(
                 token = syncAccountRepository.latestToken(),
                 primaryKey = accountInfo.primaryKey,
                 secretKey = accountInfo.secretKey,
+                useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
+                environment = syncEnvDataStore.syncEnvironmentUrl,
             ),
         )
     }
@@ -183,7 +204,7 @@ constructor(
 
     fun onQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.login(contents)
+            val result = syncAccountRepository.processCode(contents)
             if (result is Error) {
                 command.send(Command.ShowMessage("$result"))
             }
@@ -193,7 +214,7 @@ constructor(
 
     fun onConnectQRScanned(contents: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val result = syncAccountRepository.connectDevice(contents)
+            val result = syncAccountRepository.processCode(contents)
             when (result) {
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))

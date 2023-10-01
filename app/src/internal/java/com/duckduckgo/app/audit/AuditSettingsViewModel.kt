@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class AuditSettingsViewModel @Inject constructor(
-    private val userAllowListDao: UserWhitelistDao,
+    private val userAllowListDao: UserAllowListDao,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -90,15 +90,15 @@ class AuditSettingsViewModel @Inject constructor(
         const val STEP_1 = "https://cnn.com"
         const val STEP_2 = "https://gizmodo.com"
         const val STEP_3 = "https://httpbin.org/basic-auth/u/pw"
-        const val REQUEST_BLOCKING = "https://privacy-test-pages.glitch.me/privacy-protections/request-blocking/?run"
-        const val HTTPS_UPGRADES = "http://privacy-test-pages.glitch.me/privacy-protections/https-upgrades/?run"
-        const val FIRE_BUTTON_STORE = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?store"
-        const val FIRE_BUTTON_RETRIEVE = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?retrive"
-        const val COOKIES_3P_STORE = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?store"
-        const val COOKIES_3P_RETRIEVE = "https://privacy-test-pages.glitch.me/privacy-protections/storage-blocking/?retrive"
-        const val GPC = "https://privacy-test-pages.glitch.me/privacy-protections/gpc/?run"
+        const val REQUEST_BLOCKING = "https://privacy-test-pages.site/privacy-protections/request-blocking/?run"
+        const val HTTPS_UPGRADES = "http://privacy-test-pages.site/privacy-protections/https-upgrades/?run"
+        const val FIRE_BUTTON_STORE = "https://privacy-test-pages.site/privacy-protections/storage-blocking/?store"
+        const val FIRE_BUTTON_RETRIEVE = "https://privacy-test-pages.site/privacy-protections/storage-blocking/?retrive"
+        const val COOKIES_3P_STORE = "https://privacy-test-pages.site/privacy-protections/storage-blocking/?store"
+        const val COOKIES_3P_RETRIEVE = "https://privacy-test-pages.site/privacy-protections/storage-blocking/?retrive"
+        const val GPC = "https://privacy-test-pages.site/privacy-protections/gpc/?run"
         const val GPC_OTHER = "https://global-privacy-control.glitch.me/"
-        const val SURROGATES = "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/"
-        val domainsUsed = listOf("privacy-test-pages.glitch.me", "privacy-test-pages.glitch.me")
+        const val SURROGATES = "https://privacy-test-pages.site/privacy-protections/surrogates/"
+        val domainsUsed = listOf("privacy-test-pages.site", "privacy-test-pages.site")
     }
 }

@@ -28,14 +28,13 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
@@ -60,6 +59,8 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -93,7 +94,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val resourceSurrogates = ResourceSurrogatesImpl()
 
     private var webView: WebView = mock()
-    private val mockUserWhitelistDao: UserWhitelistDao = mock()
+    private val mockUserAllowListDao: UserAllowListDao = mock()
     private val mockContentBlocking: ContentBlocking = mock()
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private var mockWebTrackersBlockedDao: WebTrackersBlockedDao = mock()
@@ -104,14 +105,13 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider(
+    private val userAgentProvider: UserAgentProvider = RealUserAgentProvider(
         { "" },
         mock(),
         provideUserAgentOverridePluginPoint(),
         fakeUserAgent,
         fakeToggle,
         fakeUserAllowListRepository,
-        coroutinesTestRule.testDispatcherProvider,
     )
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
@@ -212,7 +212,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         trackerDetector =
             TrackerDetectorImpl(
                 entityLookup,
-                mockUserWhitelistDao,
+                mockUserAllowListDao,
                 mockContentBlocking,
                 mockTrackerAllowlist,
                 mockWebTrackersBlockedDao,

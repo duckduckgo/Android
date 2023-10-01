@@ -48,7 +48,7 @@ class WebTrackingProtectionViewModel @Inject constructor(
     sealed class Command {
         class LaunchLearnMoreWebPage(val url: String = LEARN_MORE_URL) : Command()
         object LaunchGlobalPrivacyControl : Command()
-        object LaunchWhitelist : Command()
+        object LaunchAllowList : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -77,9 +77,9 @@ class WebTrackingProtectionViewModel @Inject constructor(
         pixel.fire(AppPixelName.SETTINGS_GPC_PRESSED)
     }
 
-    fun onManageWhitelistSelected() {
-        viewModelScope.launch { command.send(Command.LaunchWhitelist) }
-        pixel.fire(AppPixelName.SETTINGS_MANAGE_WHITELIST)
+    fun onManageAllowListSelected() {
+        viewModelScope.launch { command.send(Command.LaunchAllowList) }
+        pixel.fire(AppPixelName.SETTINGS_MANAGE_ALLOWLIST)
     }
 
     companion object {

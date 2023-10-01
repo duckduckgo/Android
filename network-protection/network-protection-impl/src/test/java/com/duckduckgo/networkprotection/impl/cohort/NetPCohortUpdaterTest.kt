@@ -17,8 +17,7 @@
 package com.duckduckgo.networkprotection.impl.cohort
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -39,7 +38,7 @@ class NetPCohortUpdaterTest {
     var coroutineRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+    private lateinit var networkProtectionState: NetworkProtectionState
 
     @Mock
     private lateinit var cohortStore: NetpCohortStore
@@ -48,12 +47,12 @@ class NetPCohortUpdaterTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = NetPCohortUpdater(vpnFeaturesRegistry, cohortStore, coroutineRule.testDispatcherProvider)
+        testee = NetPCohortUpdater(networkProtectionState, cohortStore, coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenNetPIsNotRegisteredThenDoNothingWithCohort() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(false)
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
 
         testee.onVpnStarted(coroutineRule.testScope)
 
@@ -62,7 +61,7 @@ class NetPCohortUpdaterTest {
 
     @Test
     fun whenNetPIsRegisteredAndCohortNotSetThenUpdateCohort() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(cohortStore.cohortLocalDate).thenReturn(null)
 
         testee.onVpnStarted(coroutineRule.testScope)
@@ -71,11 +70,35 @@ class NetPCohortUpdaterTest {
     }
 
     @Test
-    fun whenNetPIsRegisteredAndCohortetThenDoNothingWithCohort() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+    fun whenNetPIsRegisteredAndCohortSetThenDoNothingWithCohort() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
         whenever(cohortStore.cohortLocalDate).thenReturn(LocalDate.of(2023, 1, 1))
 
         testee.onVpnStarted(coroutineRule.testScope)
+
+        verify(cohortStore).cohortLocalDate
+        verifyNoMoreInteractions(cohortStore)
+    }
+
+    @Test
+    fun whenNetPIsEnabledOnReconfigureAndCohortNotYetSetThenUpdateCohort() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+        whenever(cohortStore.cohortLocalDate).thenReturn(null)
+        testee.onVpnStarted(coroutineRule.testScope)
+        verifyNoInteractions(cohortStore)
+
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        testee.onVpnReconfigured(coroutineRule.testScope)
+
+        verify(cohortStore).cohortLocalDate = any()
+    }
+
+    @Test
+    fun whenNetPIsEnabledOnReconfigureAndCohortSetThenDoNothingWithCohort() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+        whenever(cohortStore.cohortLocalDate).thenReturn(LocalDate.of(2023, 1, 1))
+
+        testee.onVpnReconfigured(coroutineRule.testScope)
 
         verify(cohortStore).cohortLocalDate
         verifyNoMoreInteractions(cohortStore)

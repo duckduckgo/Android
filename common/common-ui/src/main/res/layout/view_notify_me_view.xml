@@ -24,8 +24,8 @@
         android:id="@+id/notifyMeCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_4"
         android:visibility="gone"
+        android:layout_margin="@dimen/keyline_4"
         app:cardElevation="@dimen/keyline_1"
         tools:visibility="visible">
 

@@ -85,10 +85,10 @@
                 tools:secondaryText="Enabled" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/whitelist"
+                android:id="@+id/allowlist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/settingsPrivacyProtectionWhitelist" />
+                app:primaryText="@string/settingsPrivacyProtectionAllowlist" />
 
         </LinearLayout>
     </ScrollView>

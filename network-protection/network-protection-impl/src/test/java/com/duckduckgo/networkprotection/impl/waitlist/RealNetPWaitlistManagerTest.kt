@@ -17,26 +17,29 @@
 package com.duckduckgo.networkprotection.impl.waitlist
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import app.cash.turbine.test
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState
 import com.duckduckgo.networkprotection.impl.configuration.NetPRedeemCodeError
 import com.duckduckgo.networkprotection.impl.configuration.NetPRedeemCodeResponse
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
+import com.duckduckgo.networkprotection.impl.waitlist.store.FakeNetPWaitlistRepository
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -44,14 +47,18 @@ import retrofit2.Response
 @RunWith(AndroidJUnit4::class)
 class RealNetPWaitlistManagerTest {
 
+    private val coroutineRule = CoroutineTestRule()
+
     @Mock
     private lateinit var mockWgVpnControllerService: WgVpnControllerService
 
-    @Mock
-    private lateinit var mockNetPWaitlistRepository: NetPWaitlistRepository
+    private lateinit var netPWaitlistRepository: NetPWaitlistRepository
 
     @Mock
-    private lateinit var mockAppBuildConfig: AppBuildConfig
+    private lateinit var networkProtectionWaitlist: NetworkProtectionWaitlist
+
+    @Mock
+    private lateinit var netPWaitlistService: NetPWaitlistService
 
     private val redeemErrorAdapter = Moshi.Builder().build().adapter(NetPRedeemCodeError::class.java)
 
@@ -59,24 +66,31 @@ class RealNetPWaitlistManagerTest {
 
     @Before
     fun before() {
+        netPWaitlistRepository = FakeNetPWaitlistRepository()
+
         MockitoAnnotations.openMocks(this)
 
-        testee = RealNetPWaitlistManager(mockWgVpnControllerService, mockNetPWaitlistRepository, mockAppBuildConfig)
+        runBlocking {
+            whenever(networkProtectionWaitlist.getState()).thenReturn(NetPWaitlistState.NotUnlocked)
+        }
+        testee = RealNetPWaitlistManager(
+            mockWgVpnControllerService,
+            netPWaitlistRepository,
+            networkProtectionWaitlist,
+            netPWaitlistService,
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
+        )
     }
 
     @Test
-    fun whenGetStateReturnStateFromRepo() {
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
+    fun whenGetStateReturnStateFromRepo() = runTest {
+        whenever(networkProtectionWaitlist.getState()).thenReturn(NetPWaitlistState.NotUnlocked)
 
-        assertEquals(NetPWaitlistState.NotUnlocked, testee.getState())
-    }
-
-    @Test
-    fun whenGetTokenReturnsTokenFromRepo() {
-        val token = "fake_token"
-        whenever(mockNetPWaitlistRepository.getAuthenticationToken()).thenReturn(token)
-
-        assertEquals(token, testee.getAuthenticationToken())
+        testee.getState().test {
+            assertEquals(NetPWaitlistState.NotUnlocked, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -85,8 +99,7 @@ class RealNetPWaitlistManagerTest {
         whenever(mockWgVpnControllerService.redeemCode(any())).thenReturn(token)
 
         assertEquals(RedeemCodeResult.Redeemed, testee.redeemCode("fake_code"))
-
-        verify(mockNetPWaitlistRepository).setAuthenticationToken(token.token)
+        assertEquals(netPWaitlistRepository.getAuthenticationToken(), token.token)
     }
 
     @Test
@@ -96,7 +109,7 @@ class RealNetPWaitlistManagerTest {
 
         assertEquals(RedeemCodeResult.InvalidCode, testee.redeemCode("fake_code"))
 
-        verifyNoInteractions(mockNetPWaitlistRepository)
+        assertNull(netPWaitlistRepository.getAuthenticationToken())
     }
 
     @Test
@@ -106,7 +119,7 @@ class RealNetPWaitlistManagerTest {
 
         assertEquals(RedeemCodeResult.Failure, testee.redeemCode("fake_code"))
 
-        verifyNoInteractions(mockNetPWaitlistRepository)
+        assertNull(netPWaitlistRepository.getAuthenticationToken())
     }
 
     @Test
@@ -116,7 +129,7 @@ class RealNetPWaitlistManagerTest {
 
         assertEquals(RedeemCodeResult.InvalidCode, testee.redeemCode("fake_code"))
 
-        verifyNoInteractions(mockNetPWaitlistRepository)
+        assertNull(netPWaitlistRepository.getAuthenticationToken())
     }
 
     @Test
@@ -125,7 +138,32 @@ class RealNetPWaitlistManagerTest {
 
         assertEquals(RedeemCodeResult.Failure, testee.redeemCode("fake_code"))
 
-        verifyNoInteractions(mockNetPWaitlistRepository)
+        assertNull(netPWaitlistRepository.getAuthenticationToken())
+    }
+
+    @Test
+    fun whenUserDidNotJoinWaitlistThenDoNotCheckWaitlistStatus() = runTest {
+        testee.upsertState()
+
+        verify(netPWaitlistService, never()).waitlistStatus()
+    }
+
+    @Test
+    fun whenUserIsInBetaThenDoNotCheckWaitlistStatus() = runTest {
+        netPWaitlistRepository.setAuthenticationToken("token")
+        netPWaitlistRepository.setWaitlistToken("token")
+
+        testee.upsertState()
+
+        verify(netPWaitlistService, never()).waitlistStatus()
+    }
+
+    @Test
+    fun whenUserJoinWaitlistAndNotInBetaThenCheckWaitlistStatus() = runTest {
+        netPWaitlistRepository.setWaitlistToken("token")
+        testee.upsertState()
+
+        verify(netPWaitlistService, times(1)).waitlistStatus()
     }
 
     private fun convertToHTTPResponse(jsonResponse: String): Response<String> {

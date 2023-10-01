@@ -470,8 +470,8 @@
         <item quantity="many"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="other"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="few"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="many"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="other"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Programėlė gali būti uždaryta, kad būtų pritaikyti pakeitimai. Grįžkite pasigrožėję savo gražia nauja piktograma.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Neapsaugotos svetainės</string>
+    <string name="manageAllowlist">Neapsaugotos svetainės</string>
     <string name="reportBrokenSite">Pranešti apie sugadintą svetainę</string>
 
     <!-- Dialogs -->
@@ -523,19 +523,19 @@
     <string name="dialogEditTitle">Redaguoti</string>
     <string name="dialogSaveAction">Išsaugoti</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
-    <string name="whitelistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
-    <string name="whitelistNoEntries">Privatumo apsauga įjungta visose svetainėse</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Įveskite domeną, pavyzdžiui, <b>example.com</b>, ir bandykite dar kartą</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Ar tikrai norite pašalinti &lt;b&gt;%1$s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
+    <string name="allowlistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
+    <string name="allowlistNoEntries">Privatumo apsauga įjungta visose svetainėse</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Įveskite domeną, pavyzdžiui, <b>example.com</b>, ir bandykite dar kartą</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Neapsaugotos svetainės</string>
+    <string name="settingsPrivacyProtectionAllowlist">Neapsaugotos svetainės</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Apsaugoti svetaines</string>
@@ -629,20 +629,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Naujas adresas nukopijuotas į jūsų iškarpinę</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Naudoti %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blokuoja el. pašto sekimo priemones</string>
-    <string name="autofillTooltipGenerateAddress">Generuoti privatų „Duck“ adresą</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blokuoja el. pašto sekimo priemones ir slepia jūsų adresą</string>
     <string name="newEmailAliasMenuTitle">Sukurkite „Duck“ adresą</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Peržiūrėti</string>
     <string name="autofillLoginSavedSnackbarMessage">Prisijungimas išsaugotas</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Prisijungimas atnaujintas</string>
-    <string name="autofillDisableAutofillPromptTitle">Ar norite toliau įrašyti prisijungimus?</string>
-    <string name="autofillDisableAutofillPromptMessage">Tai galite bet kada išjungti nustatymuose.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Toliau įrašyti</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Išjungti</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Ar norėtumėte, kad atsiųstume jums pranešimą, kai ateis jūsų eilė?</string>
@@ -767,4 +759,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Vilkite žemyn iš viršaus ir bakstelėkite grįžties mygtuką, kad išeitumėte iš viso ekrano režimo</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Uždaryti visus skirtukus?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Ar tikrai norite uždaryti visus skirtukus?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Atšaukti</string>
+    <string name="closeAppTabsConfirmationDialogClose">Uždaryti</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Ištrinti šią žymę?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymę.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Ištrinti šį parankinį?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; parankinį.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Ištrinti šį žymių aplanką?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymių aplanką.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Atšaukti</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
 </resources>

@@ -202,7 +202,7 @@ class AppExclusionListAdapter(val listener: ExclusionListListener) : RecyclerVie
         ) {
             val appIcon = itemView.context.packageManager.safeGetApplicationIcon(app.packageName)
 
-            binding.exclusionItem.apply {
+            binding.root.apply {
                 appIcon?.let { setLeadingIconDrawable(it) }
 
                 setPrimaryText(app.name)

@@ -43,8 +43,8 @@ class AppLifecycleSyncObserver @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        if (deviceSyncState.isUserSignedInOnDevice()) {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (deviceSyncState.isUserSignedInOnDevice()) {
                 Timber.d("Sync-Feature: App started, triggering sync")
                 syncEngine.triggerSync(APP_OPEN)
             }

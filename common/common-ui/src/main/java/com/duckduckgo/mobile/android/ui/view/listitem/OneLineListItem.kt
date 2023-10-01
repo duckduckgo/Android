@@ -17,30 +17,46 @@
 package com.duckduckgo.mobile.android.ui.view.listitem
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import android.text.TextUtils.TruncateAt
 import android.util.AttributeSet
 import android.view.View
-import android.widget.CompoundButton.OnCheckedChangeListener
-import androidx.annotation.ColorRes
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
+import android.widget.ImageView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewOneLineListItemBinding
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.ui.view.recursiveEnable
-import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.view.SwitchView
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class OneLineListItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.oneLineListItemStyle,
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : DaxListItem(context, attrs, defStyleAttr) {
 
     private val binding: ViewOneLineListItemBinding by viewBinding()
+    override val primaryText: DaxTextView
+        get() = binding.primaryText
+
+    override val secondaryText: DaxTextView?
+        get() = null
+    override val leadingIcon: ImageView
+        get() = binding.leadingIcon
+    override val leadingIconContainer: View
+        get() = binding.leadingIconBackground
+    override val trailingIcon: ImageView
+        get() = binding.trailingIcon
+    override val trailingIconContainer: View
+        get() = binding.trailingIconContainer
+    override val trailingSwitch: SwitchView
+        get() = binding.trailingSwitch
+
+    override val betaPill: ImageView?
+        get() = null
+
+    override val itemContainer: View
+        get() = binding.itemContainer
+
+    override val verticalPadding: Int
+        get() = R.dimen.oneLineItemVerticalPadding
 
     init {
         context.obtainStyledAttributes(
@@ -50,26 +66,29 @@ class OneLineListItem @JvmOverloads constructor(
             R.style.Widget_DuckDuckGo_OneLineListItem,
         ).apply {
 
-            binding.primaryText.text = getString(R.styleable.OneLineListItem_primaryText)
+            setPrimaryText(getString(R.styleable.OneLineListItem_primaryText))
 
             if (hasValue(R.styleable.OneLineListItem_primaryTextColorOverlay)) {
-                binding.primaryText.setTextColor(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
+                setPrimaryTextColorStateList(getColorStateList(R.styleable.OneLineListItem_primaryTextColorOverlay))
             }
 
             val truncated = getBoolean(R.styleable.OneLineListItem_primaryTextTruncated, false)
-            if (truncated) {
-                binding.primaryText.maxLines = 1
-                binding.primaryText.ellipsize = TruncateAt.END
-            }
+            setPrimaryTextTruncation(truncated)
 
             if (hasValue(R.styleable.OneLineListItem_leadingIcon)) {
                 setLeadingIconDrawable(getDrawable(R.styleable.OneLineListItem_leadingIcon)!!)
             } else {
-                binding.leadingIconBackground.gone()
+                setLeadingIconVisibility(false)
             }
 
             if (hasValue(R.styleable.OneLineListItem_leadingIconBackground)) {
-                setLeadingIconBackgroundType(getInt(R.styleable.OneLineListItem_leadingIconBackground, 0))
+                val type = ImageBackground.from(getInt(R.styleable.OneLineListItem_leadingIconBackground, 0))
+                setLeadingIconBackgroundType(type)
+            }
+
+            if (hasValue(R.styleable.OneLineListItem_leadingIconSize)) {
+                val imageSize = LeadingIconSize.from(getInt(R.styleable.OneLineListItem_leadingIconSize, 1))
+                setLeadingIconSize(imageSize)
             }
 
             val showTrailingIcon = hasValue(R.styleable.OneLineListItem_trailingIcon)
@@ -77,125 +96,17 @@ class OneLineListItem @JvmOverloads constructor(
             when {
                 showSwitch -> showSwitch()
                 showTrailingIcon -> {
-                    binding.trailingIcon.setImageDrawable(getDrawable(R.styleable.OneLineListItem_trailingIcon))
+                    setTrailingIconDrawable(getDrawable(R.styleable.OneLineListItem_trailingIcon)!!)
                     showTrailingIcon()
                 }
                 else -> {
-                    binding.trailingIconContainer.gone()
-                    binding.trailingSwitch.gone()
+                    hideTrailingItems()
                 }
             }
+            val switchEnabled = getBoolean(R.styleable.OneLineListItem_switchEnabled, true)
+            setSwitchEnabled(switchEnabled)
 
             recycle()
         }
-    }
-
-    /** Sets the item title */
-    fun setPrimaryText(title: String) {
-        binding.primaryText.text = title
-    }
-
-    /** Sets title text color */
-    fun setPrimaryTextColor(@ColorRes colorRes: Int) {
-        binding.primaryText.setTextColor(ContextCompat.getColorStateList(context, colorRes))
-    }
-
-    /** Sets the leading icon image resource */
-    fun setLeadingIcon(idRes: Int) {
-        binding.leadingIcon.setImageResource(idRes)
-        binding.leadingIconBackground.show()
-    }
-
-    /** Sets the item image resource */
-    fun setLeadingIconDrawable(drawable: Drawable) {
-        binding.leadingIcon.setImageDrawable(drawable)
-        binding.leadingIconBackground.show()
-    }
-
-    /** Sets visibility of the item image resource to GONE */
-    fun hideLeadingIcon() = binding.leadingIconBackground.gone()
-
-    fun leadingIcon() = binding.leadingIcon
-
-    /** Sets the trailing icon image resource */
-    fun setTrailingIcon(idRes: Int) {
-        binding.trailingIcon.setImageResource(idRes)
-        binding.trailingIcon.show()
-    }
-
-    /** Sets the item image content description */
-    fun setLeadingIconContentDescription(description: String) {
-        binding.leadingIcon.contentDescription = description
-    }
-
-    /** Sets the item click listener */
-    fun setClickListener(onClick: () -> Unit) {
-        binding.itemContainer.setOnClickListener { onClick() }
-    }
-
-    /** Sets the item overflow menu click listener */
-    fun setLeadingIconClickListener(onClick: (View) -> Unit) {
-        binding.leadingIcon.setOnClickListener { onClick(binding.leadingIcon) }
-    }
-
-    /** Sets the background image type */
-    fun setLeadingIconBackgroundType(value: Int) {
-        if (value == 0) {
-            binding.leadingIconBackground.setBackgroundResource(android.R.color.transparent)
-        }
-        if (value == 1) {
-            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_circular_background)
-        }
-        if (value == 2) {
-            binding.leadingIconBackground.setBackgroundResource(R.drawable.list_item_image_round_background)
-        }
-        binding.leadingIconBackground.show()
-    }
-
-    /** Sets the item overflow menu click listener */
-    fun setTrailingIconClickListener(onClick: (View) -> Unit) {
-        binding.trailingIconContainer.setOnClickListener { onClick(binding.trailingIcon) }
-    }
-
-    /** Sets the trailing image content description */
-    fun setTrailingContentDescription(description: String) {
-        binding.leadingIcon.contentDescription = description
-    }
-
-    /** Sets the checked change listener for the switch */
-    fun setOnCheckedChangeListener(onCheckedChangeListener: OnCheckedChangeListener) {
-        binding.trailingSwitch.setOnCheckedChangeListener(onCheckedChangeListener)
-    }
-
-    /** Sets the Switch Visible */
-    fun showSwitch() {
-        binding.trailingIconContainer.gone()
-        binding.trailingSwitch.show()
-    }
-
-    /** Sets the Trailing Icon Visible */
-    fun showTrailingIcon() {
-        binding.trailingIconContainer.show()
-        binding.trailingSwitch.gone()
-    }
-
-    /** Sets the switch value */
-    fun setIsChecked(isChecked: Boolean) {
-        binding.trailingSwitch.isChecked = isChecked
-    }
-
-    /** Sets the switch as enabled or not */
-    override fun setEnabled(enabled: Boolean) {
-        setEnabledOpacity(enabled)
-        recursiveEnable(enabled)
-        super.setEnabled(enabled)
-    }
-
-    /** Allows to set a new value to the switch, without triggering the onChangeListener */
-    fun quietlySetIsChecked(
-        newCheckedState: Boolean,
-        changeListener: OnCheckedChangeListener?,
-    ) {
-        binding.trailingSwitch.quietlySetIsChecked(newCheckedState, changeListener)
     }
 }

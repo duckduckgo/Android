@@ -17,8 +17,12 @@
 package com.duckduckgo.networkprotection.impl.about
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.core.text.HtmlCompat
+import androidx.core.text.toHtml
+import androidx.core.text.toSpanned
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ItemAboutQaBinding
@@ -35,8 +39,14 @@ internal class AboutQAItemView @JvmOverloads constructor(
             R.styleable.AboutQAItemView,
         ).apply {
             binding.aboutQuestion.text = getText(R.styleable.AboutQAItemView_question)
-            binding.aboutAnswer.text = getText(R.styleable.AboutQAItemView_answer)
+            if (hasValue(R.styleable.AboutQAItemView_answer)) {
+                binding.aboutAnswer.text = HtmlCompat.fromHtml(
+                    getText(R.styleable.AboutQAItemView_answer).toSpanned().toHtml(),
+                    HtmlCompat.FROM_HTML_MODE_LEGACY,
+                )
+            }
             recycle()
         }
+        binding.aboutAnswer.movementMethod = LinkMovementMethod.getInstance()
     }
 }

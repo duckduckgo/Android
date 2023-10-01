@@ -16,12 +16,14 @@
 
 package com.duckduckgo.app.settings
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -42,6 +44,10 @@ import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
+import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.ShowState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -58,9 +64,7 @@ import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.networkprotection.api.NetPWaitlistScreenNoParams
-import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
@@ -105,6 +109,11 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
+    private var defaultBrowserLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        val isBrowserSetAsDefault: Boolean = result.resultCode == Activity.RESULT_OK
+        viewModel.onDefaultBrowserSetFromDialog(isBrowserSetAsDefault)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -113,18 +122,12 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         configureInternalFeatures()
+        lifecycle.addObserver(viewModel)
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
-            viewModel.onLaunchedFromNotification(it)
+            viewModel.onLaunchedFromNotification(it, this)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        viewModel.start()
-        viewModel.startPollingVpnState()
     }
 
     private fun configureUiEventHandlers() {
@@ -179,7 +182,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
                     )
-                    updateNetPSettings(it.networkProtectionStateEnabled, it.networkProtectionWaitlistState)
+                    updateNetPSettings(it.networkProtectionEntryState)
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
@@ -233,8 +236,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchAutofillSettings -> launchAutofillSettings()
             is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchAppTPTrackersScreen -> launchAppTPTrackersScreen()
-            is Command.LaunchNetPManagementScreen -> launchNetpManagementScreen()
-            is Command.LaunchNetPWaitlist -> launchNetpWaitlist()
+            is Command.LaunchNetPWaitlist -> launchNetpWaitlist(it.screen)
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
             is Command.LaunchEmailProtection -> launchEmailProtectionScreen(it.url)
             is Command.LaunchEmailProtectionNotSupported -> launchEmailProtectionNotSupported()
@@ -249,8 +251,13 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             is Command.LaunchAboutScreen -> launchAboutScreen()
+            is Command.ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
             null -> TODO()
         }
+    }
+
+    private fun showDefaultBrowserDialog(intent: Intent) {
+        defaultBrowserLauncher.launch(intent)
     }
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
@@ -290,29 +297,19 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateNetPSettings(networkProtectionState: Boolean, networkProtectionWaitlistState: NetPWaitlistState) {
+    private fun updateNetPSettings(networkProtectionEntryState: NetPEntryState) {
         with(viewsPrivacy) {
-            when (networkProtectionWaitlistState) {
-                NetPWaitlistState.InBeta -> {
-                    netpPSetting.show()
-                    when (networkProtectionState) {
-                        true -> R.string.netpSettingsConnected
-                        false -> R.string.netpSettingsDisconnected
-                    }.run {
-                        netpPSetting.setSecondaryText(getString(this))
-                    }
-                    val netPItemStatus = if (networkProtectionState) {
-                        CheckListItem.CheckItemStatus.ENABLED
-                    } else {
-                        CheckListItem.CheckItemStatus.WARNING
-                    }
-                    netpPSetting.setItemStatus(netPItemStatus)
-                }
-                NetPWaitlistState.NotUnlocked -> netpPSetting.gone()
-                NetPWaitlistState.CodeRedeemed, NetPWaitlistState.PendingInviteCode -> {
+            when (networkProtectionEntryState) {
+                Hidden -> netpPSetting.gone()
+                Pending -> {
                     netpPSetting.show()
                     netpPSetting.setSecondaryText(getString(R.string.netpSettingsNeverEnabled))
                     netpPSetting.setItemStatus(CheckListItem.CheckItemStatus.DISABLED)
+                }
+                is ShowState -> {
+                    netpPSetting.show()
+                    netpPSetting.setSecondaryText(getString(networkProtectionEntryState.subtitle))
+                    netpPSetting.setItemStatus(networkProtectionEntryState.icon)
                 }
             }
         }
@@ -368,14 +365,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, AppTrackerActivityWithEmptyParams, options)
     }
 
-    private fun launchNetpManagementScreen() {
+    private fun launchNetpWaitlist(screen: ActivityParams) {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, NetworkProtectionManagementScreenNoParams, options)
-    }
-
-    private fun launchNetpWaitlist() {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        globalActivityStarter.start(this, NetPWaitlistScreenNoParams, options)
+        globalActivityStarter.start(this, screen, options)
     }
 
     private fun launchAppTPOnboardingScreen() {

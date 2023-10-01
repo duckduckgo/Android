@@ -75,6 +75,11 @@ class RemoteMessagingModel @Inject constructor(
         return remoteMessage.content.getSecondaryAction()
     }
 
+    fun onActionClicked(remoteMessage: RemoteMessage): Action? {
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, remoteMessage.asPixelParams())
+        return remoteMessage.content.getAction()
+    }
+
     private fun Content.getPrimaryAction(): Action? {
         return when (this) {
             is Content.BigSingleAction -> {
@@ -96,5 +101,14 @@ class RemoteMessagingModel @Inject constructor(
         }
     }
 
-    private fun RemoteMessage.asPixelParams(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to this.id)
+    private fun Content.getAction(): Action? {
+        return when (this) {
+            is Content.PromoSingleAction -> {
+                this.action
+            }
+            else -> null
+        }
+    }
+
+    private fun RemoteMessage.asPixelParams(): Map<String, String> = mapOf(Pixel.PixelParameter.MESSAGE_SHOWN to this.id)
 }

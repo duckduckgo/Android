@@ -18,19 +18,14 @@ package com.duckduckgo.networkprotection.impl.di
 
 import android.content.Context
 import androidx.room.Room
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.networkprotection.impl.R
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistDataStoreSharedPreferences
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
-import com.duckduckgo.networkprotection.impl.waitlist.store.RealNetPWaitlistRepository
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
-import com.duckduckgo.networkprotection.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -39,17 +34,12 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class DataModule {
+object DataModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideNetworkProtectionRepository(
         vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetworkProtectionRepository = RealNetworkProtectionRepository(RealNetworkProtectionPrefs(vpnSharedPreferencesProvider))
-
-    @Provides
-    fun provideNetPWaitlistRepository(
-        vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
-    ): NetPWaitlistRepository = RealNetPWaitlistRepository(NetPWaitlistDataStoreSharedPreferences(vpnSharedPreferencesProvider))
+    ): NetworkProtectionPrefs = RealNetworkProtectionPrefs(vpnSharedPreferencesProvider)
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -71,7 +61,7 @@ class DataModule {
 }
 
 @Module
-@ContributesTo(ActivityScope::class)
+@ContributesTo(AppScope::class)
 object NetPBreakageCategoriesModule {
     @Provides
     @NetpBreakageCategories

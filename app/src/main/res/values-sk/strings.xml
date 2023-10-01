@@ -470,7 +470,7 @@
         <item quantity="many"><![CDATA[ a <b>ďalší (%1$d)</b> sa vás tu pokúsili sledovať. <br/><br/>Boli zablokovaní!<br/><br/> ☝️Môžete skontrolovať panel s adresou a zistiť, kto sa vás snaží sledovať, keď navštívite novú webovú stránku.️]]></item>
         <item quantity="other"><![CDATA[ a <b>%1$d ďalších</b> sa vás tu pokúsilo sledovať. <br/><br/>Boli zablokovaní!<br/><br/> ☝️Môžete skontrolovať panel s adresou a zistiť, kto sa vás snaží sledovať, keď navštívite novú webovú stránku.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ sa vás tu pokúsil sledovať. <br/><br/>Bolo to zablokované!<br/><br/> ☝️Môžete skontrolovať panel s adresou a zistiť, kto sa vás snaží sledovať, keď navštívite novú webovú stránku.️]]></item>
         <item quantity="few"><![CDATA[ sa vás tu pokúsili sledovať. <br/><br/>Bolo to zablokované!<br/><br/> ☝️Môžete skontrolovať panel s adresou a zistiť, kto sa vás snaží sledovať, keď navštívite novú webovú stránku.️]]></item>
         <item quantity="many"><![CDATA[ sa vás tu pokúsilo sledovať. <br/><br/>Bolo to zablokované!<br/><br/> ☝️Môžete skontrolovať panel s adresou a zistiť, kto sa vás snaží sledovať, keď navštívite novú webovú stránku.️]]></item>
@@ -515,7 +515,7 @@
     <string name="changeIconDialogMessage">Pri použití zmien sa aplikácia môže zavrieť. Po nadšení zo svojej novej peknej ikony sa vráťte späť.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Nezabezpečené webové stránky</string>
+    <string name="manageAllowlist">Nezabezpečené webové stránky</string>
     <string name="reportBrokenSite">Nahlásiť nefunkčný web</string>
 
     <!-- Dialogs -->
@@ -523,19 +523,19 @@
     <string name="dialogEditTitle">Upraviť</string>
     <string name="dialogSaveAction">Uložiť</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Nezabezpečené webové stránky</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Nezabezpečené webové stránky</string>
     <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
     <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Viac možností pre nezabezpečené webové stránky %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt; z nezabezpečených webových stránok?</string>
-    <string name="whitelistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
-    <string name="whitelistNoEntries">Ochrana súkromia je zapnutá pre všetky webové stránky</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Zadajte doménu, napríklad <b>example.com</b>, a skúste to znova</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Viac možností pre nezabezpečené webové stránky %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt; z nezabezpečených webových stránok?</string>
+    <string name="allowlistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
+    <string name="allowlistNoEntries">Ochrana súkromia je zapnutá pre všetky webové stránky</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Zadajte doménu, napríklad <b>example.com</b>, a skúste to znova</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Nezabezpečené webové stránky</string>
+    <string name="settingsPrivacyProtectionAllowlist">Nezabezpečené webové stránky</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zabezpečené stránky</string>
@@ -629,20 +629,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nová adresa bola skopírovaná do schránky</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Použiť %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blokuje e mailové trackery</string>
-    <string name="autofillTooltipGenerateAddress">Generovať súkromnú adresu Duck</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blokuje e mailové trackery a skryje vašu adresu</string>
     <string name="newEmailAliasMenuTitle">Generovanie adresy Duck</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Zobraziť</string>
     <string name="autofillLoginSavedSnackbarMessage">Prihlasovacie údaje sa uložili</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Prihlasovacie údaje sa aktualizovali</string>
-    <string name="autofillDisableAutofillPromptTitle">Chcete naďalej ukladať prihlasovacie údaje?</string>
-    <string name="autofillDisableAutofillPromptMessage">Túto funkciu môžete kedykoľvek vypnúť v Nastaveniach.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Pokračovať v ukladaní</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Zakázať</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Chcete, aby sme vám poslali upozornenie, keď na vás príde rad?</string>
@@ -767,4 +759,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Potiahnutím nadol z hora a ťuknutím na tlačidlo späť opustíte zobrazenie na celú obrazovku</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Zatvoriť všetky karty?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Naozaj chcete zatvoriť všetky karty?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Zrušiť</string>
+    <string name="closeAppTabsConfirmationDialogClose">Zatvoriť</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Chcete zmazať túto záložku?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Týmto sa zmaže vaša záložka pre &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Chcete zmazať túto obľúbenú položku?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Týmto sa zmaže vaša obľúbená položka pre &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Chcete zmazať tento priečinok so záložkami?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Týmto sa zmaže priečinok so záložkami &lt;b&gt;%1$s&lt;/b&gt; .</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Zrušiť</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Odstrániť</string>
 </resources>

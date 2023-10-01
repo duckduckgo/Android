@@ -22,7 +22,6 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
@@ -37,6 +36,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 

@@ -44,20 +44,15 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
-import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -68,7 +63,6 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.di.scopes.AppScope
@@ -76,19 +70,17 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.FileDownloadCallback
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
-import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import javax.inject.Named
-import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 
 @Module
@@ -114,7 +106,6 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         urlExtractor: DOMUrlExtractor,
-        contentScopeScripts: ContentScopeScripts,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -125,7 +116,6 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             urlExtractor,
-            contentScopeScripts,
         )
     }
 
@@ -180,28 +170,6 @@ class BrowserModule {
         trackingParameters: TrackingParameters,
         appBuildConfig: AppBuildConfig,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, appBuildConfig)
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun userAgentProvider(
-        @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
-        deviceInfo: DeviceInfo,
-        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
-        userAgent: UserAgent,
-        toggle: FeatureToggle,
-        userAllowListRepository: UserAllowListRepository,
-        dispatcher: DispatcherProvider,
-    ): UserAgentProvider {
-        return UserAgentProvider(
-            defaultUserAgent,
-            deviceInfo,
-            userAgentInterceptorPluginPoint,
-            userAgent,
-            toggle,
-            userAllowListRepository,
-            dispatcher,
-        )
-    }
 
     @Provides
     fun webViewRequestInterceptor(

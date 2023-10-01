@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Email Protection aktivieren</annotation>, um Duck Address auf diesem Gerät zu verwalten.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">E-Mail-Adresse auswählen</string>
+    <string name="autofillTooltipUseYourAliasDescription">E-Mail-Tracker blockieren</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Private Duck-Adresse generieren</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-Mail-Tracker blockieren &amp; Adresse verbergen</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Möchtest du weiterhin Anmeldedaten speichern?</string>
+    <string name="autofillDisableAutofillPromptMessage">Du kannst dies jederzeit in den Einstellungen deaktivieren.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Weiterhin speichern</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Deaktivieren</string>
 
 </resources>

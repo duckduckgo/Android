@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.viewbinding.ViewBinding
-import com.duckduckgo.mobile.android.R.style
 import com.duckduckgo.mobile.android.databinding.DialogCustomAlertBinding
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -95,7 +94,7 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         val binding: DialogCustomAlertBinding = DialogCustomAlertBinding.inflate(LayoutInflater.from(context))
         binding.customDialogContent.addView(customBinding?.root)
 
-        val dialogBuilder = MaterialAlertDialogBuilder(context, style.Widget_DuckDuckGo_Dialog)
+        val dialogBuilder = MaterialAlertDialogBuilder(context)
             .setView(binding.root)
             .apply {
                 setCancelable(false)

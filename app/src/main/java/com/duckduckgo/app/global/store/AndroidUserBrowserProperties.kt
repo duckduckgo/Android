@@ -16,16 +16,17 @@
 
 package com.duckduckgo.app.global.store
 
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import java.util.*
 
@@ -38,6 +39,7 @@ class AndroidUserBrowserProperties(
     private val searchCountDao: SearchCountDao,
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val appTrackingProtection: AppTrackingProtection,
+    private val networkProtectionState: NetworkProtectionState,
 ) : UserBrowserProperties {
     override fun appTheme(): DuckDuckGoTheme {
         return themingDataStore.theme
@@ -75,7 +77,11 @@ class AndroidUserBrowserProperties(
         return widgetCapabilities.hasInstalledWidgets
     }
 
-    override fun appTpOnboarded(): Boolean {
+    override suspend fun appTpOnboarded(): Boolean {
         return appTrackingProtection.isOnboarded()
+    }
+
+    override suspend fun networkProtectionOnboarded(): Boolean {
+        return networkProtectionState.isOnboarded()
     }
 }

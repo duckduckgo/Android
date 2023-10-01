@@ -24,12 +24,12 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityWebviewBinding
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)

@@ -18,4 +18,20 @@
 <resources>
     <string name="atp_ExcludedReasonExcludedThroughNetP">Manually disabled in Network Protection</string>
     <string name="atp_CompanyDetailsBannerForUnprotectedThroughNetP">Protection has been manually disabled for this app through Network Protection. To re-enable, configure in <annotation type="manage_app_exclusion_link">Network Protection</annotation>.</string>
+
+    <!-- Silent notifications -->
+    <string name="vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlockedNoLocation">Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).</string>
+    <string name="vpn_SilentNotificationTitleAppTPAndNetpEnabledNoneBlocked" instruction="Placeholder is location of server with format City,Country.">Device traffic routing through &lt;b>%1$s&lt;/b>. No tracking attempts blocked in apps (past hour).</string>
+    <plurals name="vpn_SilentNotificationTitleAppTPAndNetpEnabledBlocked">
+        <item quantity="one" instruction="Placeholder 1 is location of server with format City,Country. Placeholder 2 is a number">Device traffic routing through &lt;b>%1$s&lt;/b>. Tracking attempts blocked in &lt;b>%2$s app&lt;/b> (past hour).</item>
+        <item quantity="other" instruction="Placeholder 1 is location of server with format City,Country. Placeholder 2 is a number">Device traffic routing through &lt;b>%1$s&lt;/b>. Tracking attempts blocked across &lt;b>%2$s apps&lt;/b> (past hour).</item>
+    </plurals>
+    <plurals name="vpn_SilentNotificationTitleAppTPAndNetpEnabledBlockedNoLocation">
+        <item quantity="one" instruction="Placeholder is a number">Device traffic routing through the VPN. Tracking attempts blocked in &lt;b>%1$s app&lt;/b> (past hour).</item>
+        <item quantity="other" instruction="´Placeholder is a number">Device traffic routing through the VPN. Tracking attempts blocked across &lt;b>%1$s apps&lt;/b> (past hour).</item>
+    </plurals>
+
+    <!-- Lockdown notification -->
+    <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for Network Protection.</string>
+    <string name="vpn_LockdownNotificationTextWithNetPAndAppTPEnabled">Action required! Change an Android setting to use Network Protection and App Tracking Protection.</string>
 </resources>

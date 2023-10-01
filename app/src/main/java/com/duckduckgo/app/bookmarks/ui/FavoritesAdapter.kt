@@ -66,10 +66,6 @@ class FavoritesAdapter(
         val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.favoriteItems.clear().also { this.favoriteItems.addAll(generatedList) }
         diffResult.dispatchUpdatesTo(this)
-
-        if (favoriteItems.isEmpty()) {
-            return
-        }
     }
 
     private fun generateNewList(value: List<FavoriteItemTypes>): List<FavoriteItemTypes> {
@@ -203,7 +199,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
             loadFavicon(favorite.url, listItem.leadingIcon())
 
-            listItem.setTrailingIcon(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
+            listItem.setTrailingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_menu_vertical_24)
             listItem.setTrailingIconClickListener { anchor ->
                 showOverFlowMenu(anchor, favorite)
             }

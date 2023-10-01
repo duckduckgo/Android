@@ -1,13 +1,10 @@
 appId: com.duckduckgo.mobile.android
+tags:
+    - privacyTest
 ---
 - launchApp:
     clearState: true
-- assertVisible:
-    text: ".*Not to worry! Searching and browsing privately.*"
-- tapOn: "let's do it!"
-- tapOn: "cancel"
-- assertVisible:
-    text: ".*I'll also upgrade the security of your connection if possible.*"
+- runFlow: ../shared/onboarding.yaml
 - inputText: "https://www.search-company.site/#ad-id-5"
 - pressKey: Enter
 - assertVisible:

@@ -27,12 +27,12 @@ class ActionAdapter constructor(
     private val actionMappers: Set<MessageActionMapperPlugin>,
 ) {
     @ToJson fun actionToJson(model: Action): ActionJson {
-        return ActionJson(model.actionType, model.value)
+        return ActionJson(model.actionType, model.value, model.additionalParameters)
     }
 
     @FromJson fun actionFromJson(json: ActionJson): Action {
         val type = mapTypeBackwardsCompatible(json.actionType)
-        val jsonAction = JsonMessageAction(type, json.value)
+        val jsonAction = JsonMessageAction(type, json.value, json.additionalParameters)
         actionMappers.forEach {
             val action = it.evaluate(jsonAction)
             if (action != null) return action
@@ -55,6 +55,7 @@ class ActionAdapter constructor(
     class ActionJson(
         val actionType: String,
         val value: String,
+        val additionalParameters: Map<String, String>? = null,
     )
 
     private enum class OldActionType {

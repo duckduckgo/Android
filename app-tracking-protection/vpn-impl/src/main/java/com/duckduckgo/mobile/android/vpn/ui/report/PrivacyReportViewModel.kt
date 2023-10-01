@@ -63,13 +63,12 @@ class PrivacyReportViewModel @Inject constructor(
     }
 
     private suspend fun shouldShowCTA(): Boolean {
-        val isFeatureRemoved = withContext(dispatchers.io()) {
-            vpnFeatureRemover.isFeatureRemoved()
-        }
-        if (isFeatureRemoved) {
-            return false
-        } else {
-            return vpnStore.didShowOnboarding()
+        return withContext(dispatchers.io()) {
+            if (vpnFeatureRemover.isFeatureRemoved()) {
+                false
+            } else {
+                vpnStore.didShowOnboarding()
+            }
         }
     }
 

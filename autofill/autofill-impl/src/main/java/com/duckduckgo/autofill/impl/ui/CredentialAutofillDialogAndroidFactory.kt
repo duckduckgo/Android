@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.impl.email.EmailAutofillTooltipFragment
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
@@ -54,7 +55,12 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment {
-        return AutofillUpdatingExistingCredentialsDialogFragment.instance(url, credentials, tabId, CredentialUpdateType.Password)
+        return AutofillUpdatingExistingCredentialsDialogFragment.instance(
+            url,
+            credentials,
+            tabId,
+            CredentialUpdateType.Password,
+        )
     }
 
     override fun autofillSavingUpdateUsernameDialog(
@@ -62,7 +68,12 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
         credentials: LoginCredentials,
         tabId: String,
     ): DialogFragment {
-        return AutofillUpdatingExistingCredentialsDialogFragment.instance(url, credentials, tabId, CredentialUpdateType.Username)
+        return AutofillUpdatingExistingCredentialsDialogFragment.instance(
+            url,
+            credentials,
+            tabId,
+            CredentialUpdateType.Username,
+        )
     }
 
     override fun autofillGeneratePasswordDialog(
@@ -72,5 +83,17 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
         tabId: String,
     ): DialogFragment {
         return AutofillUseGeneratedPasswordDialogFragment.instance(url, username, generatedPassword, tabId)
+    }
+
+    override fun autofillEmailProtectionEmailChooserDialog(
+        url: String,
+        personalDuckAddress: String,
+        tabId: String,
+    ): DialogFragment {
+        return EmailAutofillTooltipFragment.instance(
+            personalDuckAddress = personalDuckAddress,
+            url = url,
+            tabId = tabId,
+        )
     }
 }

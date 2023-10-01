@@ -468,7 +468,7 @@
         <item quantity="one"><![CDATA[ και <b>%1$d άλλος</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
         <item quantity="other"><![CDATA[ και <b>%1$d άλλοι</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
         <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
     </plurals>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Η εφαρμογή μπορεί να κλείσει για να εφαρμοστούν οι αλλαγές. Επιστρέψτε αφού θαυμάσετε το νέο σας όμορφο εικονίδιο.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Μη προστατευόμενοι ιστότοποι</string>
+    <string name="manageAllowlist">Μη προστατευόμενοι ιστότοποι</string>
     <string name="reportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Επεξεργασία</string>
     <string name="dialogSaveAction">Αποθήκευση</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
-    <string name="whitelistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
-    <string name="whitelistNoEntries">Η προστασία προσωπικών δεδομένων είναι ενεργοποιημένη για όλους τους ιστότοπους</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Εισαγάγετε ένα πεδίο τομέα όπως το <b>example.com</b> και προσπαθήστε ξανά</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
+    <string name="allowlistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
+    <string name="allowlistNoEntries">Η προστασία προσωπικών δεδομένων είναι ενεργοποιημένη για όλους τους ιστότοπους</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Εισαγάγετε ένα πεδίο τομέα όπως το <b>example.com</b> και προσπαθήστε ξανά</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Μη προστατευόμενοι ιστότοποι</string>
+    <string name="settingsPrivacyProtectionAllowlist">Μη προστατευόμενοι ιστότοποι</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ασφαλείς ιστότοποι</string>
@@ -625,20 +625,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Έγινε αντιγραφή νέας διεύθυνσης στο πρόχειρό σας</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Χρησιμοποιήστε τη διεύθυνση %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Αποκλείει τις εφαρμογές παρακολούθησης email</string>
-    <string name="autofillTooltipGenerateAddress">Δημιουργήστε ιδιωτική Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Αποκλείει εφαρμογές παρακολούθησης email και αποκρύπτει τη διεύθυνσή σας</string>
     <string name="newEmailAliasMenuTitle">Δημιουργήστε Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Προβολή</string>
     <string name="autofillLoginSavedSnackbarMessage">Η σύνδεση αποθηκεύτηκε</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Η σύνδεση ενημερώθηκε</string>
-    <string name="autofillDisableAutofillPromptTitle">Θέλετε να συνεχίσετε να αποθηκεύετε τις συνδέσεις;</string>
-    <string name="autofillDisableAutofillPromptMessage">Μπορείτε να απενεργοποιήσετε τη λειτουργία αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Συνεχίστε την αποθήκευση</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Απενεργοποίηση</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Θα θέλατε να σας στείλουμε ειδοποίηση για το πότε θα είναι η σειρά σας;</string>
@@ -759,4 +751,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Σύρετε προς τα κάτω από την κορυφή και πατήστε το κουμπί επιστροφής για να εξέλθετε από την πλήρη οθόνη</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Κλείσιμο όλων των καρτελών;</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Θέλετε σίγουρα να κλείσετε όλες τις καρτέλες;</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Ακύρωση</string>
+    <string name="closeAppTabsConfirmationDialogClose">Κλείσιμο</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Διαγραφή αυτού του σελιδοδείκτη;</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Η ενέργεια αυτή θα διαγράψει τον σελιδοδείκτη σας &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Να γίνει διαγραφή αυτού του αγαπημένου;</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Αυτό θα διαγράψει τα αγαπημένα σας για τον ιστότοπο &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Να γίνει διαγραφή αυτού του φακέλου σελιδοδεικτών;</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Αυτό θα διαγράψει τον φάκελο σελιδοδεικτών του ιστότοπου &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Ακύρωση</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Διαγραφή</string>
 </resources>

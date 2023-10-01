@@ -24,7 +24,8 @@
     android:paddingStart="@dimen/keyline_4"
     android:paddingTop="@dimen/keyline_2"
     android:paddingEnd="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingBottom="@dimen/keyline_2"
+    android:minHeight="@dimen/twoLineItemHeight">
 
     <ImageView
         android:id="@+id/leadingIcon"

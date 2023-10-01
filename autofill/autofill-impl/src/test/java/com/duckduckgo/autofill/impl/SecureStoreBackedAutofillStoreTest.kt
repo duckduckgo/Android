@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
-import com.duckduckgo.autofill.api.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.ExactMatch
@@ -27,10 +26,14 @@ import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UrlOnlyMatch
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMatch
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.UsernameMissing
-import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
-import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
+import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
+import com.duckduckgo.autofill.sync.SyncCredentialsListener
+import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
@@ -298,6 +301,7 @@ class SecureStoreBackedAutofillStoreTest {
         setupTesteeWithAutofillAvailable()
         val url = "example.com"
         val credentials = LoginCredentials(
+            id = 1L,
             domain = url,
             username = "username1",
             password = "password",
@@ -481,6 +485,7 @@ class SecureStoreBackedAutofillStoreTest {
             autofillPrefsStore = autofillPrefsStore,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             autofillUrlMatcher = autofillUrlMatcher,
+            syncCredentialsListener = SyncCredentialsListener(CredentialsSyncMetadata(inMemoryAutofillDatabase().credentialsSyncDao())),
         )
     }
 
@@ -524,8 +529,12 @@ class SecureStoreBackedAutofillStoreTest {
         override suspend fun addWebsiteLoginDetailsWithCredentials(
             websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials,
         ): WebsiteLoginDetailsWithCredentials {
-            credentials.add(websiteLoginDetailsWithCredentials)
-            return websiteLoginDetailsWithCredentials
+            val id = websiteLoginDetailsWithCredentials.details.id ?: (credentials.size.toLong() + 1)
+            val credentialWithId: WebsiteLoginDetailsWithCredentials = websiteLoginDetailsWithCredentials.copy(
+                details = websiteLoginDetailsWithCredentials.details.copy(id = id),
+            )
+            credentials.add(credentialWithId)
+            return credentialWithId
         }
 
         override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> {

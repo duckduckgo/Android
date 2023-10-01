@@ -20,6 +20,8 @@ import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.notification.NotificationRegistrar.NotificationId
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.survey.model.Survey.Status.DONE
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -39,6 +41,7 @@ class SurveyRepositoryImpl @Inject constructor(
     private val surveyDao: SurveyDao,
     private val userBrowserProperties: UserBrowserProperties,
     private val notificationManager: NotificationManagerCompat,
+    private val appBuildConfig: AppBuildConfig,
 ) : SurveyRepository {
 
     override fun isUserEligibleForSurvey(survey: Survey): Boolean {
@@ -46,7 +49,7 @@ class SurveyRepositoryImpl @Inject constructor(
             return false
         }
 
-        val eligibleLocale = ALLOWED_LOCALES.contains(Locale.getDefault())
+        val eligibleLocale = ALLOWED_LOCALES.contains(appBuildConfig.deviceLocale)
         return validDaysInstalled(survey) && eligibleLocale
     }
 
@@ -67,12 +70,16 @@ class SurveyRepositoryImpl @Inject constructor(
     }
 
     override fun shouldShowSurvey(survey: Survey): Boolean {
-        return remainingDaysForShowingSurvey(survey) == 0L
+        return remainingDaysForShowingSurvey(survey) == 0L && survey.status != DONE
     }
 
     private fun validDaysInstalled(survey: Survey): Boolean {
         if (survey.daysInstalled == null && userBrowserProperties.daysSinceInstalled() < SURVEY_DEFAULT_MIN_DAYS_INSTALLED) {
             return false
+        }
+        // Case for targeting all users
+        if (survey.daysInstalled == SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED) {
+            return true
         }
         if ((survey.daysInstalled ?: 0) - userBrowserProperties.daysSinceInstalled() < 0) {
             return false
@@ -90,7 +97,7 @@ class SurveyRepositoryImpl @Inject constructor(
 
     companion object {
         private val ALLOWED_LOCALES = listOf(Locale.US, Locale.UK, Locale.CANADA)
-        const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
-        const val SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED = -1
+        private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
+        private const val SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED = -1
     }
 }

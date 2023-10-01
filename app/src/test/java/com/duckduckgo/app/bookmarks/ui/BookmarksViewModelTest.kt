@@ -169,6 +169,17 @@ class BookmarksViewModelTest {
     }
 
     @Test
+    fun whenBookmarkDeletedThenConfirmDeleteSavedSiteCommandAndRepositoryIsUpdated() = runTest {
+        testee.onSavedSiteDeleted(bookmark)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertNotNull(commandCaptor.value)
+        assertTrue(commandCaptor.value is BookmarksViewModel.Command.ConfirmDeleteSavedSite)
+        verify(faviconManager).deletePersistedFavicon(bookmark.url)
+        verify(savedSitesRepository).delete(bookmark)
+    }
+
+    @Test
     fun whenSavedSiteSelectedThenOpenCommand() {
         testee.onSelected(bookmark)
 
@@ -243,11 +254,11 @@ class BookmarksViewModelTest {
 
         verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
-        assertEquals(emptyList<BookmarkEntity>(), viewStateCaptor.allValues[0].bookmarks)
+        assertEquals(emptyList<Bookmark>(), viewStateCaptor.allValues[0].bookmarks)
         assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
-        assertEquals(emptyList<Favorite>(), viewStateCaptor.allValues[1].favorites)
+        assertEquals(listOf(favorite), viewStateCaptor.allValues[1].favorites)
         assertEquals(listOf(bookmark, bookmark, bookmark), viewStateCaptor.allValues[1].bookmarks)
         assertEquals(listOf(bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[1].bookmarkFolders)
         assertEquals(true, viewStateCaptor.allValues[1].enableSearch)
@@ -319,5 +330,15 @@ class BookmarksViewModelTest {
         testee.insertDeletedFolderBranch(folderBranch)
 
         verify(savedSitesRepository).insertFolderBranch(folderBranch)
+    }
+
+    @Test
+    fun whenOnBookmarkFoldersActivityResultCalledThenOpenSavedSiteCommandSent() {
+        val savedSiteUrl = "https://www.example.com"
+
+        testee.onBookmarkFoldersActivityResult(savedSiteUrl)
+
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(savedSiteUrl, (commandCaptor.value as BookmarksViewModel.Command.OpenSavedSite).savedSiteUrl)
     }
 }

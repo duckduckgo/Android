@@ -25,9 +25,10 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,7 +38,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -54,9 +54,6 @@ internal class AboutDuckDuckGoViewModelTest {
     private lateinit var testee: AboutDuckDuckGoViewModel
 
     @Mock
-    private lateinit var mockNetPWaitlistRepository: NetPWaitlistRepository
-
-    @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
 
     @Mock
@@ -65,6 +62,9 @@ internal class AboutDuckDuckGoViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var networkProtectionWaitlist: NetworkProtectionWaitlist
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -72,10 +72,12 @@ internal class AboutDuckDuckGoViewModelTest {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
+        runBlocking {
+            whenever(networkProtectionWaitlist.getState()).thenReturn(NotUnlocked)
+        }
 
         testee = AboutDuckDuckGoViewModel(
-            mockNetPWaitlistRepository,
+            networkProtectionWaitlist,
             mockAppBuildConfig,
             mockVariantManager,
             mockPixel,
@@ -88,7 +90,6 @@ internal class AboutDuckDuckGoViewModelTest {
             val value = awaitItem()
 
             assertEquals("name (1)", value.version)
-            assertEquals(NetPWaitlistState.NotUnlocked, value.networkProtectionWaitlistState)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -120,8 +121,6 @@ internal class AboutDuckDuckGoViewModelTest {
 
     @Test
     fun whenVersionClickedAndNetPWaitlistStateIsOtherThanNotUnlockedThenNoCommandIsSentAndPixelNotSent() = runTest {
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.InBeta)
-
         testee.commands().test {
             testee.onVersionClicked()
             verify(mockPixel, never()).fire(AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
@@ -132,8 +131,6 @@ internal class AboutDuckDuckGoViewModelTest {
 
     @Test
     fun whenVersionClickedLessThanMaxTimesAndNetPWaitlistStateIsNotUnlockedThenNoCommandIsSentAndPixelNotSent() = runTest {
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
-
         testee.commands().test {
             testee.onVersionClicked()
             verify(mockPixel, never()).fire(AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
@@ -143,15 +140,12 @@ internal class AboutDuckDuckGoViewModelTest {
     }
 
     @Test
-    fun whenVersionClickedMaxTimesAndNetPWaitlistStateIsNotUnlockedThenCommandShowNetPUnlockedSnackbarIsSentAndCounterResetAndPixelSent() = runTest {
-        whenever(mockNetPWaitlistRepository.getState(any())).thenReturn(NetPWaitlistState.NotUnlocked)
-
+    fun whenVersionClickedMaxTimesCounterResetAndPixelSent() = runTest {
         testee.commands().test {
             for (i in 1..MAX_EASTER_EGG_COUNT) {
                 testee.onVersionClicked()
             }
 
-            assertEquals(Command.ShowNetPUnlockedSnackbar, awaitItem())
             assertTrue(testee.hasResetNetPEasterEggCounter())
             verify(mockPixel).fire(AppPixelName.SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
 
@@ -172,19 +166,7 @@ internal class AboutDuckDuckGoViewModelTest {
     }
 
     @Test
-    fun whenOnNetPUnlockedActionClickedThenCommandLaunchNetPWaitlistIsSent() = runTest {
-        testee.commands().test {
-            testee.onNetPUnlockedActionClicked()
-
-            assertEquals(Command.LaunchNetPWaitlist, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenResetNetPEasterEggCounterIsCalledThenNetPEasterEggCounterIsZero() = runTest {
+    fun whenResetNetPEasterEggCounterIsCalledThenEasterEggCounterIsZero() = runTest {
         testee.onVersionClicked()
         assertFalse(testee.hasResetNetPEasterEggCounter())
 

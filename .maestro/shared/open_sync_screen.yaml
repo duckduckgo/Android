@@ -1,0 +1,8 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn: "Settings"
+- tapOn:
+      id: "com.duckduckgo.mobile.android:id/item_container"
+      index: 8

@@ -18,14 +18,18 @@ package com.duckduckgo.autofill.impl.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.autofill.api.encoding.UrlUnicodeNormalizer
-import com.duckduckgo.autofill.api.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.autofill.store.CredentialsSyncMetadataDao
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
@@ -33,7 +37,6 @@ import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
-import com.duckduckgo.autofill.store.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -79,4 +82,18 @@ class AutofillModule {
     ): AutofillFeatureRepository {
         return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
     }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesCredentialsSyncDao(
+        database: AutofillDatabase,
+    ): CredentialsSyncMetadataDao {
+        return database.credentialsSyncDao()
+    }
 }
+
+/**
+ * Used to generate a plugin point for autofill result handlers
+ */
+@ContributesPluginPoint(scope = AppScope::class, boundType = AutofillFragmentResultsPlugin::class)
+interface UnusedAutofillResultPlugin

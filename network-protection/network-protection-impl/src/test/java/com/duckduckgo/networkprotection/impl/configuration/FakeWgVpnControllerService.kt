@@ -55,6 +55,7 @@ private val SERVERS_JSON = """
                 "server": {
                   "name": "egress.usw.1",
                   "attributes": {
+                    "city": "Newark",
                     "country": "us",
                     "latitude": 33.9192,
                     "longitude": -118.4165,

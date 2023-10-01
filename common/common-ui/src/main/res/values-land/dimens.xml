@@ -17,4 +17,7 @@
 
 <resources>
     <dimen name="homeTabDdgLogoTopMargin">80dp</dimen>
+
+    <!-- Dialogs -->
+    <dimen name="dialogRadioGroupHeightMax">160dp</dimen>
 </resources>

@@ -137,7 +137,7 @@ class SyncedDeviceViewHolder(
             if (thisDevice) {
                 binding.localSyncDevice.show()
                 binding.remoteSyncDevice.gone()
-                binding.localSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
+                binding.localSyncDevice.setLeadingIconResource(deviceType.type().asDrawableRes())
                 binding.localSyncDevice.setPrimaryText(deviceName)
                 binding.localSyncDevice.setSecondaryText(context.getString(R.string.sync_device_this_device_hint))
                 binding.localSyncDevice.setTrailingIconClickListener {
@@ -146,7 +146,7 @@ class SyncedDeviceViewHolder(
             } else {
                 binding.localSyncDevice.gone()
                 binding.remoteSyncDevice.show()
-                binding.remoteSyncDevice.setLeadingIcon(deviceType.type().asDrawableRes())
+                binding.remoteSyncDevice.setLeadingIconResource(deviceType.type().asDrawableRes())
                 binding.remoteSyncDevice.setPrimaryText(deviceName)
                 binding.remoteSyncDevice.setTrailingIconClickListener {
                     showRemoteOverFlowMenu(it, syncDevice)

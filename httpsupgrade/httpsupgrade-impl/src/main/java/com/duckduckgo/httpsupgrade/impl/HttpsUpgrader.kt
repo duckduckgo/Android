@@ -78,7 +78,7 @@ class HttpsUpgraderImpl @Inject constructor(
         }
 
         if (bloomFalsePositiveDao.contains(host)) {
-            logcat { "$host is in https whitelist and so not upgradable" }
+            logcat { "$host is in https allowlist and so not upgradable" }
             return false
         }
 

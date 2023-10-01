@@ -44,7 +44,7 @@ class UserAllowListRepositoryTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
-    private lateinit var dao: UserWhitelistDao
+    private lateinit var dao: UserAllowListDao
     private lateinit var repository: UserAllowListRepository
 
     @ExperimentalCoroutinesApi
@@ -54,8 +54,8 @@ class UserAllowListRepositoryTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        dao = db.userWhitelistDao()
-        repository = RealUserAllowListRepository(db, TestScope(), coroutineRule.testDispatcherProvider)
+        dao = db.userAllowListDao()
+        repository = RealUserAllowListRepository(dao, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @After
@@ -64,7 +64,7 @@ class UserAllowListRepositoryTest {
     }
 
     @Test
-    fun whenDbContainsUserWhiteListedDomainsThenUpdateUserWhiteList() {
+    fun whenDbContainsUserAllowListedDomainsThenUpdateUserAllowList() {
         assertEquals(0, repository.domainsInUserAllowList().size)
         dao.insert("example.com")
         assertEquals(1, repository.domainsInUserAllowList().size)
@@ -72,13 +72,13 @@ class UserAllowListRepositoryTest {
     }
 
     @Test
-    fun whenDbContainsUserWhiteListedDomainThenIsUrlInAllowListReturnsTrue() {
+    fun whenDbContainsUserAllowListedDomainThenIsUrlInAllowListReturnsTrue() {
         dao.insert("example.com")
         assertTrue(repository.isUrlInUserAllowList("https://example.com"))
     }
 
     @Test
-    fun whenDbDoesNotContainUserWhiteListedDomainThenIsUrlInAllowListReturnsFalse() {
+    fun whenDbDoesNotContainUserAllowListedDomainThenIsUrlInAllowListReturnsFalse() {
         dao.insert("example.com")
         assertFalse(repository.isUrlInUserAllowList("https://foo.com"))
     }

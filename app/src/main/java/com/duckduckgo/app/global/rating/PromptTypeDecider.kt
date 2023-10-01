@@ -49,11 +49,6 @@ class InitialPromptTypeDecider(
                 return@withContext ShowEnjoymentPrompt(PromptCount.first())
             }
 
-            if (secondaryPromptDecider.shouldShowPrompt()) {
-                Timber.i("Will show app enjoyment prompt for second time")
-                return@withContext ShowEnjoymentPrompt(PromptCount.second())
-            }
-
             Timber.i("Decided not to show any app enjoyment prompts")
             return@withContext ShowNothing
         }

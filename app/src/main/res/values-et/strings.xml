@@ -468,7 +468,7 @@
         <item quantity="one"><![CDATA[ ja <b>%1$d teine</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin tema!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d teised</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ üritas sind siin jälitada. <br/><br/>Blokeerisin tema!<br/><br/> ☝️Võid vaadata URL-i riba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
         <item quantity="other"><![CDATA[ üritas sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata URL-i riba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
     </plurals>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Rakendus võib muudatuste salvestamiseks sulguda. Tule pärast oma kena uue ikooni imetlemist tagasi.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Kaitseta saidid</string>
+    <string name="manageAllowlist">Kaitseta saidid</string>
     <string name="reportBrokenSite">Teata mittetoimivast saidist</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Redigeeri</string>
     <string name="dialogSaveAction">Salvesta</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Kaitseta saidid</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>
     <string name="disablePrivacyProtection">Keela privaatsuse kaitse</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Oled kindel, et soovid eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
-    <string name="whitelistExplanation">Nendele saitidele ei laiene privaatsuse kaitse.</string>
-    <string name="whitelistNoEntries">Privaatsuse kaitse on lubatud kõigil saitidel</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Sisesta domeen <b>example.com</b> kujul ja proovi uuesti</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Oled kindel, et soovid eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
+    <string name="allowlistExplanation">Nendele saitidele ei laiene privaatsuse kaitse.</string>
+    <string name="allowlistNoEntries">Privaatsuse kaitse on lubatud kõigil saitidel</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Sisesta domeen <b>example.com</b> kujul ja proovi uuesti</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Kaitseta saidid</string>
+    <string name="settingsPrivacyProtectionAllowlist">Kaitseta saidid</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tulekindlad veebisaidid</string>
@@ -625,20 +625,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Uus aadress kopeeriti teie lõikelauale</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Kasutage %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blokeerib e-posti jälgijad</string>
-    <string name="autofillTooltipGenerateAddress">Loo privaatne Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blokeerib e-posti jälgijad ja peidab teie aadressi</string>
     <string name="newEmailAliasMenuTitle">Loo Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Kuva</string>
     <string name="autofillLoginSavedSnackbarMessage">Sisselogimisandmed salvestatud</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Sisselogimisandmed värskendatud</string>
-    <string name="autofillDisableAutofillPromptTitle">Kas soovid sisselogimisandmete salvestamist jätkata?</string>
-    <string name="autofillDisableAutofillPromptMessage">Saad selle igal ajal sätetes keelata.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Jätka salvestamist</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Keela</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Kas soovite, et me saadame teile teavituse, kui on teie kord?</string>
@@ -759,4 +751,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Lohista ülevalt alla ja puuduta nuppu Tagasi, et täisekraanvaatest väljuda</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Kas sulgeda kõik vahekaardid?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Kas soovite kindlasti kõik vahekaardid sulgeda?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Loobu</string>
+    <string name="closeAppTabsConfirmationDialogClose">Sulge</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Kas kustutada see järjehoidja?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">See kustutab sinu järjehoidja &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Kas kustutada see lemmik?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">See kustutab saidi &lt;b&gt;%1$s&lt;/b&gt; sinu lemmikute hulgast.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Kas kustutada see järjehoidjate kaust?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">See kustutab sinu järjehoidjate kausta &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Loobu</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Kustuta</string>
 </resources>

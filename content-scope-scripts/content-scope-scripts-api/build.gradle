@@ -17,26 +17,14 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.squareup.anvil'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':di')
-    implementation project(':common-utils')
-    api project(':feature-toggles-api')
-
-    anvil project(':anvil-compiler')
-    implementation project(':anvil-annotations')
-
-    implementation Google.dagger
     implementation AndroidX.core.ktx
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.contentscopescripts.api'
 }

@@ -20,7 +20,7 @@
 
     <application>
         <activity
-            android:name=".ui.SyncInitialSetupActivity"
+            android:name=".ui.SyncInternalSettingsActivity"
             android:exported="false"
             android:label="@string/sync_internal_activity_label"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
@@ -42,14 +42,16 @@
             android:exported="false"
             android:label="@string/login_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"/>
+            android:parentActivityName=".ui.setup.SetupAccountActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".ui.SyncConnectActivity"
             android:exported="false"
             android:label="@string/connect_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
-            android:parentActivityName=".ui.setup.SetupAccountActivity"/>
+            android:parentActivityName=".ui.setup.SetupAccountActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".ui.ShowQRCodeActivity"

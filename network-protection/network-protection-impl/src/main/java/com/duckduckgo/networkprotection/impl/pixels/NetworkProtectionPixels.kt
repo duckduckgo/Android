@@ -21,49 +21,7 @@ import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_CONFLICT_SHOWN
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_CONFLICT_SHOWN_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_OPEN_SETTINGS_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_SHOWN
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_LOCKDOWN_SHOWN_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_OPEN_SETTINGS
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_OPEN_SETTINGS_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_SHOWN
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ALWAYSON_PROMOTION_SHOWN_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_DISABLE_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_APP_ADDED
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_APP_REMOVED
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_LAUNCH_BREAKAGE_REPORT_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_RESTORE_DEFAULTS
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_RESTORE_DEFAULTS_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SHOWN
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SHOWN_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_EXCLUSION_LIST_SKIP_REPORT_AFTER_EXCLUDING_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_FAQS_SHOWN
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_FAQS_SHOWN_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_INFO_VPN_SHOWN
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_INFO_VPN_SHOWN_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_LATENCY_REPORT
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_REKEY_COMPLETED_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONFLICT_SHOWN
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONFLICT_SHOWN_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_CONNECTIVITY_LOST_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_VPN_RECONNECT_FAILED_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_CANT_START_WG_BACKEND
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_CANT_START_WG_BACKEND_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY_DAILY
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_INVALID_STATE
-import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_WG_ERROR_INVALID_STATE_DAILY
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -225,6 +183,43 @@ interface NetworkProtectionPixels {
      * count -> fire a pixel on every call
      */
     fun reportFaqsShown()
+
+    /**
+     * This fun will fire two pixels when the NetP Terms and Conditions screen is shown
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportTermsShown()
+
+    /**
+     * This fun will fire two pixels when the NetP Terms and Conditions screen are accepted
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun reportTermsAccepted()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun waitlistNotificationShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun waitlistNotificationCancelled()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     *
+     * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
+     */
+    fun waitlistBetaIsEnabled()
 }
 
 @ContributesBinding(AppScope::class)
@@ -357,6 +352,31 @@ class RealNetworkProtectionPixel @Inject constructor(
         firePixel(NETP_FAQS_SHOWN)
     }
 
+    override fun reportTermsShown() {
+        tryToFireDailyPixel(NETP_TERMS_SHOWN_DAILY)
+        firePixel(NETP_TERMS_SHOWN)
+    }
+
+    override fun reportTermsAccepted() {
+        tryToFireDailyPixel(NETP_TERMS_ACCEPTED_DAILY)
+        firePixel(NETP_TERMS_ACCEPTED)
+    }
+
+    override fun waitlistNotificationShown() {
+        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_SHOWN_DAILY)
+        firePixel(NETP_WAITLIST_NOTIFICATION_SHOWN)
+    }
+
+    override fun waitlistNotificationCancelled() {
+        tryToFireDailyPixel(NETP_WAITLIST_NOTIFICATION_CANCELLED_DAILY)
+        firePixel(NETP_WAITLIST_NOTIFICATION_CANCELLED)
+    }
+
+    override fun waitlistBetaIsEnabled() {
+        tryToFireDailyPixel(NETP_WAITLIST_BETA_ENABLED_DAILY)
+        firePixel(NETP_WAITLIST_BETA_ENABLED)
+    }
+
     private fun firePixel(
         p: NetworkProtectionPixelNames,
         payload: Map<String, String> = emptyMap(),
@@ -400,6 +420,22 @@ class RealNetworkProtectionPixel @Inject constructor(
                 this.pixel.fire(pixelName, payload)
                     .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
             }
+        }
+    }
+
+    private fun tryToFireUniquePixel(
+        pixel: NetworkProtectionPixelNames,
+        tag: String? = null,
+        payload: Map<String, String> = emptyMap(),
+    ) {
+        val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
+
+        if (didExecuteAlready) return
+
+        if (pixel.enqueue) {
+            this.pixel.enqueueFire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        } else {
+            this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
         }
     }
 

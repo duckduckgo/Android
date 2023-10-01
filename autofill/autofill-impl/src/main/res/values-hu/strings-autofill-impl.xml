@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated.">Az eszközön található Duck-cím kezeléséhez <annotation type="enable_duck_address">engedélyezd az e-mail-védelmet</annotation>.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">E-mail-cím kiválasztása</string>
+    <string name="autofillTooltipUseYourAliasDescription">E-mail-nyomkövetők blokkolása</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Privát Duck-cím létrehozása</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">E-mail-nyomkövetők blokkolása, és a cím elrejtése</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Továbbra is el szeretnéd menteni a bejelentkezéseket?</string>
+    <string name="autofillDisableAutofillPromptMessage">Ez bármikor kikapcsolható a beállításokban.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Mentés folytatása</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Letiltás</string>
 
 </resources>

@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -24,6 +25,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import org.json.JSONObject
 import retrofit2.Response
+import timber.log.Timber
 
 interface SyncApi {
     fun createAccount(
@@ -71,10 +73,23 @@ interface SyncApi {
         token: String,
         since: String,
     ): Result<JSONObject>
+
+    fun getCredentials(
+        token: String,
+        since: String,
+    ): Result<JSONObject>
+
+    fun getSettings(
+        token: String,
+        since: String,
+    ): Result<JSONObject>
 }
 
 @ContributesBinding(AppScope::class)
-class SyncServiceRemote @Inject constructor(private val syncService: SyncService) : SyncApi {
+class SyncServiceRemote @Inject constructor(
+    private val syncService: SyncService,
+    private val syncStore: SyncStore,
+) : SyncApi {
     override fun createAccount(
         userID: String,
         hashedPassword: String,
@@ -226,14 +241,17 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         token: String,
         updates: JSONObject,
     ): Result<JSONObject> {
+        Timber.i("Sync-service: patch request $updates")
         val response = runCatching {
             val patchCall = syncService.patch("Bearer $token", updates)
             patchCall.execute()
         }.getOrElse { throwable ->
+            Timber.i("Sync-service: error ${throwable.localizedMessage}")
             return Result.Error(reason = throwable.message.toString())
         }
 
         return onSuccess(response) {
+            Timber.i("Sync-service: patch response: $it")
             val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
             Result.Success(data)
         }
@@ -260,6 +278,54 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
         }
     }
 
+    override fun getCredentials(
+        token: String,
+        since: String,
+    ): Result<JSONObject> {
+        Timber.i("Sync-service: get credentials since servertime $since")
+        val response = runCatching {
+            val patchCall = if (since.isNotEmpty()) {
+                syncService.credentialsSince("Bearer $token", since)
+            } else {
+                syncService.credentials("Bearer $token")
+            }
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            Timber.i("Sync-service: patch response: ${throwable.localizedMessage}")
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Timber.i("Sync-service: get credentials response: $it")
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            Result.Success(data)
+        }
+    }
+
+    override fun getSettings(
+        token: String,
+        since: String,
+    ): Result<JSONObject> {
+        Timber.i("Sync-settings: get settings since servertime $since")
+        val response = runCatching {
+            val patchCall = if (since.isNotEmpty()) {
+                syncService.settingsSince("Bearer $token", since)
+            } else {
+                syncService.settings("Bearer $token")
+            }
+            patchCall.execute()
+        }.getOrElse { throwable ->
+            Timber.i("Sync-service: patch response: ${throwable.localizedMessage}")
+            return Result.Error(reason = throwable.message.toString())
+        }
+
+        return onSuccess(response) {
+            Timber.i("Sync-service: get settings response: $it")
+            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            Result.Success(data)
+        }
+    }
+
     private fun <T, R> onSuccess(
         response: Response<T?>,
         onSuccess: (T?) -> Result<R>,
@@ -268,14 +334,25 @@ class SyncServiceRemote @Inject constructor(private val syncService: SyncService
             if (response.isSuccessful) {
                 return onSuccess(response.body())
             } else {
-                return response.errorBody()?.let { errorBody ->
-                    val error = Adapters.errorResponseAdapter.fromJson(errorBody.string()) ?: throw IllegalArgumentException("Can't parse body")
+                val error = response.errorBody()?.let { errorBody ->
+                    val error = Adapters.errorResponseAdapter.fromJson(errorBody.string())
+                        ?: throw IllegalArgumentException("Can't parse body")
                     val code = if (error.code == -1) response.code() else error.code
                     Result.Error(code, error.error)
                 } ?: Result.Error(code = response.code(), reason = response.message().toString())
+                error.removeKeysIfInvalid()
+                return error
             }
         }.getOrElse {
-            return Result.Error(response.code(), reason = response.message())
+            val result = Result.Error(response.code(), reason = response.message())
+            result.removeKeysIfInvalid()
+            return result
+        }
+    }
+
+    private fun Result.Error.removeKeysIfInvalid() {
+        if (code == API_CODE.INVALID_LOGIN_CREDENTIALS.code) {
+            syncStore.clearAll()
         }
     }
 

@@ -19,6 +19,7 @@ package com.duckduckgo.app.anr
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.anrs.store.AnrEntity
 import com.duckduckgo.app.anrs.store.ExceptionEntity
+import logcat.asLog
 import okio.ByteString.Companion.encode
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -36,6 +37,7 @@ internal data class AnrData(
     val lineNumber: Int,
     val stackTrace: ArrayList<String>,
     val timeStamp: String = FORMATTER_SECONDS.format(LocalDateTime.now()),
+    val webView: String,
 )
 
 internal fun AnrData.asAnrEntity(): AnrEntity {
@@ -47,25 +49,28 @@ internal fun AnrData.asAnrEntity(): AnrEntity {
         lineNumber = lineNumber,
         stackTrace = stackTrace,
         timestamp = timeStamp,
+        webView = webView,
     )
 }
 
-internal fun Throwable.asAnrData(): AnrData {
+internal fun Throwable.asAnrData(webView: String): AnrData {
     return AnrData(
         name = this.toString().replace(": $message", "", true),
         message = message,
         stackTrace = stackTrace.asStringArray(),
         file = stackTrace.getOrNull(0)?.fileName,
         lineNumber = stackTrace.getOrNull(0)?.lineNumber ?: Int.MIN_VALUE,
+        webView = webView,
     )
 }
 
 internal fun CrashLogger.Crash.asCrashEntity(
     appVersion: String,
     processName: String,
+    webView: String,
 ): ExceptionEntity {
     val timestamp = FORMATTER_SECONDS.format(LocalDateTime.now())
-    val stacktrace = this.t.stackTrace.asStringArray().toString()
+    val stacktrace = this.t.asLog()
     return ExceptionEntity(
         hash = (stacktrace + timestamp).encode().md5().hex(),
         shortName = this.shortName,
@@ -74,6 +79,7 @@ internal fun CrashLogger.Crash.asCrashEntity(
         stackTrace = stacktrace,
         version = appVersion,
         timestamp = timestamp,
+        webView = webView,
     )
 }
 

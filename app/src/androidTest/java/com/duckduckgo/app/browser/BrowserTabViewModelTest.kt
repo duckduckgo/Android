@@ -56,7 +56,6 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.autofill.AutofillFireproofDialogSuppressor
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -80,7 +79,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -103,10 +101,10 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -124,10 +122,11 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
-import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -265,7 +264,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserStageStore: UserStageStore
 
     @Mock
-    private lateinit var mockUserWhitelistDao: UserWhitelistDao
+    private lateinit var mockUserAllowListDao: UserAllowListDao
 
     @Mock
     private lateinit var mockContentBlocking: ContentBlocking
@@ -432,7 +431,7 @@ class BrowserTabViewModelTest {
             surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
-            userWhitelistDao = mockUserWhitelistDao,
+            userAllowListDao = mockUserAllowListDao,
             settingsDataStore = mockSettingsStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
@@ -443,7 +442,7 @@ class BrowserTabViewModelTest {
             surveyRepository = mockSurveyRepository,
         )
 
-        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
+        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserAllowListDao, mockContentBlocking, TestScope())
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
@@ -453,7 +452,7 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(mockUserAllowListDao.contains(anyString())).thenReturn(false)
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
@@ -463,7 +462,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             siteFactory = siteFactory,
             tabRepository = mockTabRepository,
-            userWhitelistDao = mockUserWhitelistDao,
+            userAllowListDao = mockUserAllowListDao,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
@@ -495,7 +494,7 @@ class BrowserTabViewModelTest {
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             ampLinks = mockAmpLinks,
-            remoteMessagingModel = remoteMessagingModel,
+            remoteMessagingModel = { remoteMessagingModel },
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
@@ -673,6 +672,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenBookmarkDeletedThenFaviconDeletedAndRepositoryIsUpdated() = runTest {
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
+
+        testee.onSavedSiteDeleted(bookmark)
+
+        verify(mockFaviconManager).deletePersistedFavicon(bookmark.url)
+        verify(mockSavedSitesRepository).delete(bookmark)
+    }
+
+    @Test
     fun whenBookmarkAddedThenRepositoryIsUpdatedAndUserNotified() = runTest {
         val url = "http://www.example.com"
         val title = "A title"
@@ -715,7 +725,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeletedThenRepositoryUpdated() = runTest {
+    fun whenDeleteQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() = runTest {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
 
         testee.deleteQuickAccessItem(savedSite)
@@ -724,8 +734,26 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessInsertedThenRepositoryUpdated() {
+    fun whenInsertQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
+
+        testee.insertQuickAccessItem(savedSite)
+
+        verify(mockSavedSitesRepository).insert(savedSite)
+    }
+
+    @Test
+    fun whenDeleteQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() = runTest {
+        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
+
+        testee.deleteQuickAccessItem(savedSite)
+
+        verify(mockSavedSitesRepository).delete(savedSite)
+    }
+
+    @Test
+    fun whenInsertQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() {
+        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
 
         testee.insertQuickAccessItem(savedSite)
 
@@ -1636,18 +1664,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+    fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenSiteAddedToAllowListAndPixelSentAndPageRefreshed() = runTest {
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
+        verify(mockUserAllowListDao).insert(UserAllowListedDomain("www.example.com"))
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+    fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenShowDisabledConfirmationMessage() = runTest {
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
@@ -1656,18 +1684,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+    fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenSiteRemovedFromAllowListAndPixelSentAndPageRefreshed() = runTest {
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
-        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        verify(mockUserAllowListDao).delete(UserAllowListedDomain("www.example.com"))
+        verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
         verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
-    fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+    fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenShowDisabledConfirmationMessage() = runTest {
+        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
@@ -2502,7 +2530,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserBrowsingPressesBackThenCannotWhitelist() {
+    fun whenUserBrowsingPressesBackThenCannotAllowList() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
         assertFalse(browserViewState().canChangePrivacyProtection)
@@ -2546,7 +2574,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserBrowsingPressesBackAndForwardThenCanWhitelist() {
+    fun whenUserBrowsingPressesBackAndForwardThenCanAllowList() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         testee.onUserPressedBack()
         testee.onUserPressedForward()
@@ -3447,10 +3475,10 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
         whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
 
-        testee.consumeAlias("")
+        testee.consumeAliasAndCopyToClipboard()
 
         verify(mockPixel).enqueueFire(
-            AppPixelName.EMAIL_USE_ALIAS,
+            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD,
             mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
         )
     }
@@ -3487,7 +3515,7 @@ class BrowserTabViewModelTest {
     fun whenConsumeAliasThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
-        testee.consumeAlias("")
+        testee.usePrivateDuckAddress("", "alias")
 
         assertCommandIssued<Command.InjectEmailAddress> {
             assertEquals("alias", this.duckAddress)
@@ -3495,70 +3523,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenConsumeAliasThenPixelSent() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
-
-        testee.consumeAlias("")
-
-        verify(mockPixel).enqueueFire(
-            AppPixelName.EMAIL_USE_ALIAS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
-        )
-    }
-
-    @Test
-    fun whenConsumeAliasThenSetNewLastUsedDateCalled() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-
-        testee.consumeAlias("")
-
-        verify(mockEmailManager).setNewLastUsedDate()
-    }
-
-    @Test
-    fun whenCancelAutofillTooltipThenPixelSent() {
-        whenever(mockEmailManager.getAlias()).thenReturn("alias")
-        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-
-        testee.cancelAutofillTooltip()
-
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_TOOLTIP_DISMISSED, mapOf(Pixel.PixelParameter.COHORT to "cohort"))
-    }
-
-    @Test
     fun whenUseAddressThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.useAddress("")
+        testee.usePersonalDuckAddress("", "address")
 
         assertCommandIssued<Command.InjectEmailAddress> {
             assertEquals("address", this.duckAddress)
         }
-    }
-
-    @Test
-    fun whenUseAddressThenPixelSent() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
-        whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-        whenever(mockEmailManager.getLastUsedDate()).thenReturn("2021-01-01")
-
-        testee.useAddress("")
-
-        verify(mockPixel).enqueueFire(
-            AppPixelName.EMAIL_USE_ADDRESS,
-            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"),
-        )
-    }
-
-    @Test
-    fun whenUseAddressThenSetNewLastUsedDateCalled() {
-        whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
-
-        testee.useAddress("")
-
-        verify(mockEmailManager).setNewLastUsedDate()
     }
 
     @Test
@@ -3697,7 +3669,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsWhitelistedIsTrue() {
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsAllowListedIsTrue() {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
         assertTrue(browserViewState().isPrivacyProtectionEnabled)
@@ -3985,20 +3957,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlExtractedAndIsNotNullThenIssueLoadExtractedUrlCommandWithExtractedUrl() {
+    fun whenUrlExtractedThenIssueLoadExtractedUrlCommand() {
+        whenever(mockAmpLinks.processDestinationUrl(anyString(), anyOrNull())).thenReturn("http://example.com")
         testee.onUrlExtracted("http://foo.com", "http://example.com")
-        verify(mockAmpLinks).lastAmpLinkInfo = AmpLinkInfo(ampLink = "http://foo.com")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
         assertEquals("http://example.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
-    }
-
-    @Test
-    fun whenUrlExtractedAndIsNullThenIssueLoadExtractedUrlCommandWithInitialUrl() {
-        testee.onUrlExtracted("http://foo.com", null)
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
-        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
     }
 
     @Test
@@ -4026,8 +3990,8 @@ class BrowserTabViewModelTest {
         testee.onMessageShown()
 
         verify(mockRemoteMessagingRepository).markAsShown(remoteMessage)
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("cta" to "id1"))
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("message" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4039,7 +4003,7 @@ class BrowserTabViewModelTest {
         testee.onMessageCloseButtonClicked()
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4051,7 +4015,7 @@ class BrowserTabViewModelTest {
         testee.onMessagePrimaryButtonClicked()
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4063,7 +4027,19 @@ class BrowserTabViewModelTest {
         testee.onMessageSecondaryButtonClicked()
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
-        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("message" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessageActionButtonClickedThenFirePixelAndDontDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageActionButtonClicked()
+
+        verify(mockRemoteMessagingRepository, never()).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_ACTION_CLICKED, mapOf("message" to "id1"))
     }
 
     @Test
@@ -4168,23 +4144,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenShareCredentialsWithPageThenEmitInjectCredentialsCommand() = runTest {
-        val url = "originalurl.com"
-        val credentials = LoginCredentials(
-            id = 1,
-            domain = url,
-            username = "tester",
-            password = "test123",
-        )
-        testee.shareCredentialsWithPage(url, credentials)
-
-        assertCommandIssued<Command.InjectCredentials> {
-            assertEquals(url, this.url)
-            assertEquals(credentials, this.credentials)
-        }
-    }
-
-    @Test
     fun whenReturnNoCredentialsWithPageThenEmitCancelIncomingAutofillRequestCommand() = runTest {
         val url = "originalurl.com"
         testee.returnNoCredentialsWithPage(url)
@@ -4192,34 +4151,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.CancelIncomingAutofillRequest> {
             assertEquals(url, this.url)
         }
-    }
-
-    @Test
-    fun whenSaveCredentialsThenSaveCredentialsInAutofillStore() = runTest {
-        val url = "originalurl.com"
-        val credentials = LoginCredentials(
-            id = 1,
-            domain = url,
-            username = "tester",
-            password = "test123",
-        )
-        testee.saveCredentials(url, credentials)
-
-        verify(mockAutofillStore).saveCredentials(url, credentials)
-    }
-
-    @Test
-    fun whenUpdateCredentialsThenUpdateCredentialsInAutofillStore() = runTest {
-        val url = "originalurl.com"
-        val credentials = LoginCredentials(
-            id = 1,
-            domain = url,
-            username = "tester",
-            password = "test123",
-        )
-        testee.updateCredentials(url, credentials, CredentialUpdateType.Password)
-
-        verify(mockAutofillStore).updateCredentials(url, credentials, CredentialUpdateType.Password)
     }
 
     @Test
@@ -4394,6 +4325,28 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNoTabsThenActiveTabReturnsFalse() {
         assertFalse(testee.isActiveTab())
+    }
+
+    @Test
+    fun whenUrlIsUpdatedWithDifferentHostThenForceUpdateShouldBeTrue() {
+        val originalUrl = "http://www.example.com/"
+        loadUrl(originalUrl, isBrowserShowing = true)
+        updateUrl(originalUrl, "http://twitter.com/explore", true)
+
+        assertTrue(omnibarViewState().forceExpand)
+    }
+
+    @Test
+    fun whenUrlIsUpdateButSameHostThenForceUpdateShouldBeFalse() = runTest {
+        val originalUrl = "https://www.example.com/search/sss#search=1~grid~0~25"
+        loadUrl(originalUrl, isBrowserShowing = true)
+        updateUrl(
+            originalUrl,
+            "https://www.example.com/search/sss#search=1~grid~0~28",
+            true,
+        )
+
+        assertFalse(omnibarViewState().forceExpand)
     }
 
     private fun aCredential(): LoginCredentials {

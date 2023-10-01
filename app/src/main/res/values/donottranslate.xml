@@ -28,8 +28,20 @@
     <string name="netpSettingsTitle">Network Protection</string>
     <string name="netpSettingsNeverEnabled">Secure your network connection</string>
     <string name="netpSettingsConnected">Enabled</string>
+    <string name="netpSettingsConnecting">Connecting…</string>
     <string name="netpSettingsDisconnected">Disabled</string>
     <string name="netpUnlockedSnackbar">You\'ve unlocked a beta feature!</string>
     <string name="netpUnlockedSnackbarAction">Open</string>
 
+    <!-- Set As Default Notification Experiment -->
+    <string name="setAsDefaultCompetitiveCopyNotificationTitle">Search like nobody’s watching 👀</string>
+    <string name="setAsDefaultCompetitiveCopyNotificationDescription">Google tracks you, we don\'t. Make DuckDuckGo your default browser today.</string>
+    <string name="setAsDefaultSetupCopyNotificationTitle">Almost there! 🚀</string>
+    <string name="setAsDefaultSetupCopyNotificationDescription">More privacy, faster page loads, and cleaner search results are just a tap away. Make DuckDuckGo your default browser today.</string>
+
+    <!-- Sasquatch -->
+    <string name="webViewErrorTitle">DuckDuckGo can\'t load this page</string>
+    <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
+    <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
+    <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
 </resources>

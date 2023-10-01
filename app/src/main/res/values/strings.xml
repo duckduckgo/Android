@@ -469,7 +469,7 @@
         <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
@@ -512,7 +512,7 @@
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Unprotected Sites</string>
+    <string name="manageAllowlist">Unprotected Sites</string>
     <string name="reportBrokenSite">Report Broken Site</string>
 
     <!-- Dialogs -->
@@ -520,19 +520,19 @@
     <string name="dialogEditTitle">Edit</string>
     <string name="dialogSaveAction">Save</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Unprotected Sites</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Are you sure you want to remove &lt;b>%1$s&lt;/b> from Unprotected Sites?</string>
-    <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection.</string>
-    <string name="whitelistNoEntries">Privacy Protection enabled for all sites</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Please enter a domain like <b>example.com</b> and try again</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">More options for unprotected site %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Are you sure you want to remove &lt;b>%1$s&lt;/b> from Unprotected Sites?</string>
+    <string name="allowlistExplanation">These sites will not be enhanced by Privacy Protection.</string>
+    <string name="allowlistNoEntries">Privacy Protection enabled for all sites</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Please enter a domain like <b>example.com</b> and try again</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
+    <string name="settingsPrivacyProtectionAllowlist">Unprotected Sites</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
@@ -626,20 +626,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Use %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blocks email trackers</string>
-    <string name="autofillTooltipGenerateAddress">Generate Private Duck Address</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Generate Duck Address</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">View</string>
     <string name="autofillLoginSavedSnackbarMessage">Login saved</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Login updated</string>
-    <string name="autofillDisableAutofillPromptTitle">Do you want to keep saving Logins?</string>
-    <string name="autofillDisableAutofillPromptMessage">You can disable this at any time in Settings.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Keep Saving</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Disable</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
@@ -760,4 +752,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Drag down from the top and tap the back button to exit full screen</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Close all tabs?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Are you sure you want to close all tabs?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Cancel</string>
+    <string name="closeAppTabsConfirmationDialogClose">Close</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Delete this bookmark?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">This will delete your bookmark for &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Delete this favorite?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your favorite for &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Delete this bookmark folder?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your &lt;b>%1$s&lt;/b> bookmark folder.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
 </resources>

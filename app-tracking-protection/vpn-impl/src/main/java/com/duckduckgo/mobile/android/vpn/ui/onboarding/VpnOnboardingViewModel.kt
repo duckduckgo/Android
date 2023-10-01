@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
@@ -45,7 +46,7 @@ class VpnOnboardingViewModel @Inject constructor(
     private val vpnDetector: ExternalVpnDetector,
     private val vpnStateMonitor: VpnStateMonitor,
     private val appTPOnboardingAnimationHelper: AppTPOnboardingResourceHelper,
-    private val appCoroutineScope: CoroutineScope,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 

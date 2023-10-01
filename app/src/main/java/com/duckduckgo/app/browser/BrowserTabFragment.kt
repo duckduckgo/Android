@@ -20,6 +20,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
+import android.app.PendingIntent
 import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -88,8 +89,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
+import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
@@ -119,6 +120,7 @@ import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelp
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -129,14 +131,12 @@ import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsFileActions
-import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
@@ -147,6 +147,7 @@ import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.disableAnimation
@@ -174,6 +175,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillEventListener
+import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
@@ -181,8 +184,10 @@ import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
+import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
@@ -197,9 +202,6 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
-import com.duckduckgo.mobile.android.ui.view.DaxDialog
-import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
-import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
@@ -213,6 +215,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -232,7 +235,8 @@ class BrowserTabFragment :
     CoroutineScope,
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
-    SitePermissionsGrantedListener {
+    SitePermissionsGrantedListener,
+    AutofillEventListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -357,7 +361,7 @@ class BrowserTabFragment :
     lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
 
     @Inject
-    lateinit var autofillCredentialsSelectionResultHandler: AutofillCredentialsSelectionResultHandler
+    lateinit var duckAddressInjectedResultHandler: DuckAddressLoginCreator
 
     @Inject
     lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
@@ -415,6 +419,9 @@ class BrowserTabFragment :
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
+    @Inject
+    lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
+
     private var isActiveTab: Boolean = false
 
     private val downloadMessagesJob = ConflatedJob()
@@ -453,6 +460,9 @@ class BrowserTabFragment :
 
     private val newBrowserTab
         get() = binding.includeNewBrowserTab
+
+    private val errorView
+        get() = binding.includeErrorView
 
     private val daxDialogCta
         get() = binding.includeNewBrowserTab.includeDaxDialogCta
@@ -638,8 +648,6 @@ class BrowserTabFragment :
 
     private var automaticFireproofDialog: DaxAlertDialog? = null
 
-    private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
-
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -709,6 +717,7 @@ class BrowserTabFragment :
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
+            dialog.deleteBookmarkListener = viewModel
         }
     }
 
@@ -941,6 +950,7 @@ class BrowserTabFragment :
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
+        errorView.errorLayout.gone()
     }
 
     private fun showBrowser() {
@@ -948,6 +958,23 @@ class BrowserTabFragment :
         binding.browserLayout.show()
         webView?.show()
         webView?.onResume()
+        errorView.errorLayout.gone()
+    }
+
+    private fun showError(errorType: WebViewErrorResponse, url: String?) {
+        binding.browserLayout.gone()
+        newBrowserTab.newTabLayout.gone()
+        omnibar.appBarLayout.setExpanded(true)
+        omnibar.shieldIcon.isInvisible = true
+        webView?.onPause()
+        webView?.hide()
+        errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
+        if (appTheme.isLightModeEnabled()) {
+            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
+        } else {
+            errorView.yetiIcon?.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
+        }
+        errorView.errorLayout.show()
     }
 
     fun submitQuery(query: String) {
@@ -966,6 +993,42 @@ class BrowserTabFragment :
 
     fun onRefreshRequested() {
         viewModel.onRefreshRequested()
+    }
+
+    override fun onAutofillStateChange() {
+        viewModel.onRefreshRequested()
+    }
+
+    override fun onRejectGeneratedPassword(originalUrl: String) {
+        rejectGeneratedPassword(originalUrl)
+    }
+
+    override fun onAcceptGeneratedPassword(originalUrl: String) {
+        acceptGeneratedPassword(originalUrl)
+    }
+
+    override fun onUseEmailProtectionPrivateAlias(originalUrl: String, duckAddress: String) {
+        viewModel.usePrivateDuckAddress(originalUrl, duckAddress)
+    }
+
+    override fun onUseEmailProtectionPersonalAddress(originalUrl: String, duckAddress: String) {
+        viewModel.usePersonalDuckAddress(originalUrl, duckAddress)
+    }
+
+    override fun onSavedCredentials(credentials: LoginCredentials) {
+        viewModel.onShowUserCredentialsSaved(credentials)
+    }
+
+    override fun onUpdatedCredentials(credentials: LoginCredentials) {
+        viewModel.onShowUserCredentialsUpdated(credentials)
+    }
+
+    override fun onNoCredentialsChosenForAutofill(originalUrl: String) {
+        viewModel.returnNoCredentialsWithPage(originalUrl)
+    }
+
+    override fun onShareCredentialsForAutofill(originalUrl: String, selectedCredentials: LoginCredentials) {
+        injectAutofillCredentials(originalUrl, selectedCredentials)
     }
 
     fun refresh() {
@@ -1062,6 +1125,7 @@ class BrowserTabFragment :
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url)
+            is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> {
                 launchFilePicker(it)
@@ -1134,9 +1198,6 @@ class BrowserTabFragment :
             )
 
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
-            is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
-            is Command.AcceptGeneratedPassword -> acceptGeneratedPassword(it.url)
-            is Command.RejectGeneratedPassword -> rejectGeneratedPassword(it.url)
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen()
             is Command.EditWithSelectedQuery -> {
@@ -1159,6 +1220,7 @@ class BrowserTabFragment :
                 includeShortcutToViewCredential = it.includeShortcutToViewCredential,
             )
 
+            is Command.WebViewError -> showError(it.errorType, it.url)
             else -> {
                 // NO OP
             }
@@ -1198,12 +1260,11 @@ class BrowserTabFragment :
 
             emailInjector.injectAddressInEmailField(it, alias, it.url)
 
-            launch(dispatchers.io()) {
-                autofillCredentialsSelectionResultHandler.processPrivateDuckAddressInjectedEvent(
+            if (autoSaveLogin) {
+                duckAddressInjectedResultHandler.createLoginForPrivateDuckAddress(
                     duckAddress = alias,
                     tabId = tabId,
                     originalUrl = originalUrl,
-                    autoSaveLogin = autoSaveLogin,
                 )
             }
         }
@@ -1885,7 +1946,8 @@ class BrowserTabFragment :
             override fun onBackKey(): Boolean {
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
-                return true
+                //  Allow the event to be handled by the next receiver.
+                return false
             }
         }
 
@@ -1987,48 +2049,18 @@ class BrowserTabFragment :
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
         browserAutofill.addJsInterface(it, autofillCallback, tabId)
 
-        setFragmentResultListener(CredentialAutofillPickerDialog.resultKey(tabId)) { _, result ->
-            launch(dispatchers.io()) {
-                autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this@BrowserTabFragment, viewModel)
-            }
-        }
-
-        setFragmentResultListener(CredentialSavePickerDialog.resultKeyUserChoseToSaveCredentials(tabId)) { _, result ->
-            launch(dispatchers.io()) {
-                autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)?.let {
-                    viewModel.onShowUserCredentialsSaved(it)
+        autofillFragmentResultListeners.getPlugins().forEach { plugin ->
+            setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
+                context?.let {
+                    plugin.processResult(
+                        result = result,
+                        context = it,
+                        tabId = tabId,
+                        fragment = this@BrowserTabFragment,
+                        autofillCallback = this@BrowserTabFragment,
+                    )
                 }
             }
-        }
-
-        setFragmentResultListener(CredentialSavePickerDialog.resultKeyShouldPromptToDisableAutofill(tabId)) { _, _ ->
-            launch(dispatchers.io()) {
-                this@BrowserTabFragment.context?.let {
-                    autofillCredentialsSelectionResultHandler.processPromptToDisableAutofill(this@BrowserTabFragment.requireContext(), viewModel)
-                }
-            }
-        }
-
-        setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyCredentialUpdated(tabId)) { _, result ->
-            launch(dispatchers.io()) {
-                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)?.let {
-                    viewModel.onShowUserCredentialsUpdated(it)
-                }
-            }
-        }
-
-        setFragmentResultListener(UseGeneratedPasswordDialog.resultKey(tabId)) { _, result ->
-            launch(dispatchers.io()) {
-                autofillCredentialsSelectionResultHandler.processGeneratePasswordResult(result, viewModel, tabId)
-            }
-        }
-
-        setFragmentResultListener(CredentialSavePickerDialog.resultKeyPromptDismissed(tabId)) { _, _ ->
-            autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptDismissed()
-        }
-
-        setFragmentResultListener(CredentialUpdateExistingCredentialsDialog.resultKeyPromptDismissed(tabId)) { _, _ ->
-            autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptDismissed()
         }
     }
 
@@ -2077,8 +2109,6 @@ class BrowserTabFragment :
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
-        autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptShown()
-
         val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
@@ -2090,8 +2120,6 @@ class BrowserTabFragment :
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
-        autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptShown()
-
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdatePasswordDialog(url, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
     }
@@ -2102,8 +2130,6 @@ class BrowserTabFragment :
     ) {
         val url = webView?.url ?: return
         if (url != currentUrl) return
-
-        autofillCredentialsSelectionResultHandler.processSaveOrUpdatePromptShown()
 
         val dialog = credentialAutofillDialogFactory.autofillSavingUpdateUsernameDialog(url, credentials, tabId)
         showDialogHidingPrevious(dialog, CredentialUpdateExistingCredentialsDialog.TAG)
@@ -2287,6 +2313,7 @@ class BrowserTabFragment :
         )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
+        addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
@@ -2328,24 +2355,14 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionEnabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
-        ).apply {
-            setAction(R.string.undoSnackbarAction) {
-                viewModel.onEnablePrivacyProtectionSnackbarUndoClicked(domain)
-            }
-            show()
-        }
+        ).show()
     }
 
     private fun privacyProtectionDisabledConfirmation(domain: String) {
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
-        ).apply {
-            setAction(R.string.undoSnackbarAction) {
-                viewModel.onDisablePrivacyProtectionSnackbarUndoClicked(domain)
-            }
-            show()
-        }
+        ).show()
     }
 
     private fun launchSharePageChooser(url: String) {
@@ -2355,6 +2372,27 @@ class BrowserTabFragment :
         }
         try {
             startActivity(Intent.createChooser(intent, null))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
+    }
+
+    private fun launchSharePromoRMFPageChooser(url: String, shareTitle: String) {
+        val share = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, url)
+            putExtra(Intent.EXTRA_TITLE, shareTitle)
+            type = "text/plain"
+        }
+
+        val pi = PendingIntent.getBroadcast(
+            requireContext(),
+            0,
+            Intent(requireContext(), SharePromoLinkRMFBroadCastReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        try {
+            startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }
@@ -2494,7 +2532,6 @@ class BrowserTabFragment :
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
-        emailAutofillTooltipDialog?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
         super.onDestroy()
@@ -2538,7 +2575,7 @@ class BrowserTabFragment :
     ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
-            subfolder = Environment.DIRECTORY_PICTURES,
+            subfolder = Environment.DIRECTORY_DOWNLOADS,
         )
 
         if (hasWriteStoragePermission()) {
@@ -2712,14 +2749,13 @@ class BrowserTabFragment :
     private fun showEmailTooltip(address: String) {
         context?.let {
             val url = webView?.url ?: return
-            val isShowing: Boolean? = emailAutofillTooltipDialog?.isShowing
-            if (isShowing != true) {
-                emailAutofillTooltipDialog = EmailAutofillTooltipFragment(context = it, address = address)
-                emailAutofillTooltipDialog?.show()
-                emailAutofillTooltipDialog?.setOnCancelListener { viewModel.cancelAutofillTooltip() }
-                emailAutofillTooltipDialog?.useAddress = { viewModel.useAddress(url) }
-                emailAutofillTooltipDialog?.usePrivateAlias = { viewModel.consumeAlias(url) }
-            }
+
+            val dialog = credentialAutofillDialogFactory.autofillEmailProtectionEmailChooserDialog(
+                url = url,
+                personalDuckAddress = address,
+                tabId = tabId,
+            )
+            showDialogHidingPrevious(dialog, EmailProtectionChooserDialog.TAG, url)
         }
     }
 
@@ -3013,7 +3049,9 @@ class BrowserTabFragment :
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibar.omnibarTextInput.setText(viewState.omnibarText)
-                    omnibar.appBarLayout.setExpanded(true, true)
+                    if (viewState.forceExpand) {
+                        omnibar.appBarLayout.setExpanded(true, true)
+                    }
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibar.omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
@@ -3122,14 +3160,25 @@ class BrowserTabFragment :
         fun renderBrowserViewState(viewState: BrowserViewState) {
             renderIfChanged(viewState, lastSeenBrowserViewState) {
                 val browserShowing = viewState.browserShowing
-
                 val browserShowingChanged = viewState.browserShowing != lastSeenBrowserViewState?.browserShowing
+                val errorChanged = viewState.browserError != lastSeenBrowserViewState?.browserError
+
                 lastSeenBrowserViewState = viewState
                 if (browserShowingChanged) {
                     if (browserShowing) {
                         showBrowser()
                     } else {
                         showHome()
+                    }
+                } else if (errorChanged) {
+                    if (viewState.browserError != OMITTED) {
+                        showError(viewState.browserError, webView?.url)
+                    } else {
+                        if (browserShowing) {
+                            showBrowser()
+                        } else {
+                            showHome()
+                        }
                     }
                 }
 
@@ -3250,6 +3299,9 @@ class BrowserTabFragment :
                 }
                 newBrowserTab.messageCta.onSecondaryActionClicked {
                     viewModel.onMessageSecondaryButtonClicked()
+                }
+                newBrowserTab.messageCta.onPromoActionClicked {
+                    viewModel.onMessageActionButtonClicked()
                 }
             }
         }

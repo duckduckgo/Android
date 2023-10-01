@@ -468,7 +468,7 @@
         <item quantity="one"><![CDATA[ og <b>%1$d anden</b> forsøgte at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere adresselinjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
         <item quantity="other"><![CDATA[ og <b>%1$d andre</b> forsøgte at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere adresselinjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
         <item quantity="one"><![CDATA[ prøvede at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
         <item quantity="other"><![CDATA[ prøvede at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
     </plurals>
@@ -511,7 +511,7 @@
     <string name="changeIconDialogMessage">Det er muligt at appen lukker for at anvende ændringer. Kom tilbage, når du har beundret dit smukke nye ikon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Ubeskyttede websteder</string>
+    <string name="manageAllowlist">Ubeskyttede websteder</string>
     <string name="reportBrokenSite">Rapporter ødelagt websted</string>
 
     <!-- Dialogs -->
@@ -519,19 +519,19 @@
     <string name="dialogEditTitle">Rediger</string>
     <string name="dialogSaveAction">Gem</string>
 
-    <!-- Whitelist -->
-    <string name="whitelistActivityTitle">Ubeskyttede websteder</string>
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Ubeskyttede websteder</string>
     <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
     <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
-    <string name="whitelistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede websteder?</string>
-    <string name="whitelistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
-    <string name="whitelistNoEntries">Databeskyttelse aktiveret for alle websteder</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Indtast et domæne såsom <b>eksempel.dk</b> og prøv igen</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Flere indstillinger for ubeskyttet websted %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Er du sikker på, at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede websteder?</string>
+    <string name="allowlistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
+    <string name="allowlistNoEntries">Databeskyttelse aktiveret for alle websteder</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">Indtast et domæne såsom <b>eksempel.dk</b> og prøv igen</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Ubeskyttede websteder</string>
+    <string name="settingsPrivacyProtectionAllowlist">Ubeskyttede websteder</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsikre websteder</string>
@@ -625,20 +625,12 @@
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Ny adresse kopieret til din udklipsholder</string>
-    <string name="autofillTooltipUseYourAlias" instruction="Placeholder is an alias previously saved by the user">Brug %1$s</string>
-    <string name="autofillTooltipUseYourAliasDescription">Blokerer e-mailtrackere</string>
-    <string name="autofillTooltipGenerateAddress">Opret privat Duck-adresse</string>
-    <string name="autofillTooltipGenerateAddressDescription">Blokerer e-mailtrackere og skjuler din adresse</string>
     <string name="newEmailAliasMenuTitle">Generér Duck-adresse</string>
 
     <!-- Autofill -->
     <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Se</string>
     <string name="autofillLoginSavedSnackbarMessage">Login er gemt</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Login er opdateret</string>
-    <string name="autofillDisableAutofillPromptTitle">Vil du fortsat gemme logins?</string>
-    <string name="autofillDisableAutofillPromptMessage">Du kan til enhver tid deaktivere automatisk udfyldning i Indstillinger.</string>
-    <string name="autofillDisableAutofillPromptPositiveButton">Fortsæt med at gemme</string>
-    <string name="autofillDisableAutofillPromptNegativeButton">Deaktiver</string>
 
     <!-- Waitlist Notification -->
     <string name="waitlistNotificationDialogDescription">Vil du have os til at sende dig en meddelelse, når det er din tur?</string>
@@ -759,4 +751,20 @@
 
     <!-- Full screen message-->
     <string name="fullScreenMessage">Træk ned fra toppen og tryk på tilbage-knappen for at forlade fuld skærm</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle" instruction="Dialog title for deleting all open tabs">Luk alle faner?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Er du sikker på, at du vil lukke alle faner?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Annuller</string>
+    <string name="closeAppTabsConfirmationDialogClose">Luk</string>
+
+    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
+    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Vil du slette dette bogmærke?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Dette vil slette dit bogmærke for &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Slet denne favorit?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dette vil slette &lt;b&gt;%1$s&lt;/b&gt; fra favoritter.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Slet denne bogmærkemappe?</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dette vil slette bogmærkemappen &lt;b&gt;%1$s&lt;/b&gt;.</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Annuller</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Slet</string>
 </resources>

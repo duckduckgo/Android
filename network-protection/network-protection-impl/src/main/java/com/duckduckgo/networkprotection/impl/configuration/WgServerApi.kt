@@ -16,7 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
@@ -91,13 +90,11 @@ class RealWgServerApi @Inject constructor(
         val serverAttributes = ServerAttributes(this)
 
         return if (serverAttributes.country != null && serverAttributes.city != null) {
-            "${serverAttributes.city}, ${serverAttributes.country!!.getDisplayableCountry()}"
+            "${serverAttributes.city}, ${serverAttributes.country!!.uppercase()}"
         } else {
             null
         }
     }
-
-    private fun String.getDisplayableCountry(): String = Locale("", this).displayCountry.lowercase().capitalizeFirstLetter()
 
     private data class ServerAttributes(val map: Map<String, Any?>) {
         // withDefault wraps the map to return null for missing keys
@@ -111,7 +108,8 @@ class RealWgServerApi @Inject constructor(
 interface WgServerDebugProvider {
     suspend fun getSelectedServerName(): String? = null
 
-    suspend fun cacheServers(servers: List<Server>) { /* noop */ }
+    suspend fun cacheServers(servers: List<Server>) { /* noop */
+    }
 
     suspend fun fetchServers(): List<Server> = emptyList()
 }

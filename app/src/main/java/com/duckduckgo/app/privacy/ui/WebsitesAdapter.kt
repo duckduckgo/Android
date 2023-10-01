@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewListItemDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewListItemEmptyHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class WebsitesAdapter(
-    private val viewModel: WhitelistViewModel,
+    private val viewModel: AllowListViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
 ) : RecyclerView.Adapter<WebsiteViewHolder>() {
@@ -59,7 +59,7 @@ class WebsitesAdapter(
 
     private fun getWebsiteItemPosition(position: Int) = position - itemsOnTopOfList()
 
-    var entries: List<UserWhitelistedDomain> = emptyList()
+    var entries: List<UserAllowListedDomain> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -95,17 +95,17 @@ class WebsitesAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): WebsiteViewHolder {
-        Timber.d("Whitelist: onCreateViewHolder $viewType ")
+        Timber.d("AllowList: onCreateViewHolder $viewType ")
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
                 val binding = ViewListItemDescriptionBinding.inflate(inflater, parent, false)
-                binding.websiteDescription.setText(R.string.whitelistExplanation)
+                binding.websiteDescription.setText(R.string.allowlistExplanation)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewSectionHeaderBinding.inflate(inflater, parent, false)
-                binding.sectionHeader.setText(R.string.settingsPrivacyProtectionWhitelist)
+                binding.sectionHeader.setText(R.string.settingsPrivacyProtectionAllowlist)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             SITE_ENTRY -> {
@@ -120,7 +120,7 @@ class WebsitesAdapter(
             }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewListItemEmptyHintBinding.inflate(inflater, parent, false)
-                binding.listItemEmptyHintTitle.setText(R.string.whitelistNoEntries)
+                binding.listItemEmptyHintTitle.setText(R.string.allowlistNoEntries)
                 WebsiteViewHolder.SimpleViewHolder(binding.root)
             }
             else -> throw IllegalArgumentException("viewType not found")
@@ -146,15 +146,15 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
     class WebsiteItemViewHolder(
         private val layoutInflater: LayoutInflater,
         private val binding: RowOneLineListItemBinding,
-        private val viewModel: WhitelistViewModel,
+        private val viewModel: AllowListViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager,
     ) : WebsiteViewHolder(binding.root) {
 
         private val context: Context = binding.root.context
-        private lateinit var entity: UserWhitelistedDomain
+        private lateinit var entity: UserAllowListedDomain
 
-        fun bind(entity: UserWhitelistedDomain) {
+        fun bind(entity: UserAllowListedDomain) {
             val listItem = binding.root
             this.entity = entity
 
@@ -182,7 +182,7 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
 
         private fun showOverFlowMenu(
             anchor: View,
-            entity: UserWhitelistedDomain,
+            entity: UserAllowListedDomain,
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView

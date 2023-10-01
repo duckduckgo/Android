@@ -23,10 +23,10 @@ import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
-import com.duckduckgo.networkprotection.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

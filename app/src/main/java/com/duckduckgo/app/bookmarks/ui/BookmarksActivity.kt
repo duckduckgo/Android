@@ -25,15 +25,17 @@ import android.text.SpannableString
 import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
+import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.plurals
 import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
@@ -62,6 +64,7 @@ import java.util.*
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
+@ContributeToActivityStarter(BookmarksScreenNoParams::class)
 class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -71,7 +74,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     lateinit var dispatchers: DispatcherProvider
 
     lateinit var bookmarksAdapter: BookmarksAdapter
-    lateinit var favoritesAdapter: FavoritesAdapter
+    private var favoritesAdapter: FavoritesAdapter? = null
     lateinit var bookmarkFoldersAdapter: BookmarkFoldersAdapter
     lateinit var searchListener: BookmarksEntityQueryListener
 
@@ -88,6 +91,15 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
     private val searchBar
         get() = binding.searchBar
+
+    private val startBookmarkFoldersActivityForResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.getStringExtra(SAVED_SITE_URL_EXTRA)?.let {
+                    viewModel.onBookmarkFoldersActivityResult(it)
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -162,7 +174,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ) { viewState ->
             viewState?.let { state ->
                 if (parentId == SavedSitesNames.BOOKMARKS_ROOT) {
-                    favoritesAdapter.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
+                    favoritesAdapter?.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
                 }
                 bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
                 bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
@@ -175,7 +187,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ) {
             when (it) {
                 is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
-                is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSite)
+                is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSiteUrl)
                 is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
                 is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
                 is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
@@ -277,7 +289,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun initializeSearchBar() {
-        searchListener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
+        searchListener = BookmarksEntityQueryListener(viewModel, favoritesAdapter, bookmarksAdapter, bookmarkFoldersAdapter)
         searchMenuItem?.setOnMenuItemClickListener {
             showSearchBar()
             return@setOnMenuItemClickListener true
@@ -321,10 +333,13 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val dialog = EditSavedSiteDialogFragment.instance(savedSite, getParentFolderId(), getParentFolderName())
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
+        dialog.deleteBookmarkListener = viewModel
     }
 
-    private fun openSavedSite(savedSite: SavedSite) {
-        startActivity(BrowserActivity.intent(this, savedSite.url))
+    private fun openSavedSite(url: String) {
+        val resultValue = Intent()
+        resultValue.putExtra(SAVED_SITE_URL_EXTRA, url)
+        setResult(RESULT_OK, resultValue)
         finish()
     }
 
@@ -354,7 +369,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun openBookmarkFolder(bookmarkFolder: BookmarkFolder) {
-        startActivity(intent(this, bookmarkFolder))
+        startBookmarkFoldersActivityForResult.launch(intent(this, bookmarkFolder))
     }
 
     private fun editBookmarkFolder(bookmarkFolder: BookmarkFolder) {
@@ -403,6 +418,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         with(supportFragmentManager) {
             findFragmentByTag(EDIT_BOOKMARK_FRAGMENT_TAG)?.let { dialog ->
                 (dialog as EditSavedSiteDialogFragment).listener = viewModel
+                dialog.deleteBookmarkListener = viewModel
             }
             findFragmentByTag(ADD_BOOKMARK_FOLDER_FRAGMENT_TAG)?.let { dialog ->
                 (dialog as AddBookmarkFolderDialogFragment).listener = viewModel
@@ -422,6 +438,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        const val SAVED_SITE_URL_EXTRA = "SAVED_SITE_URL_EXTRA"
+
         fun intent(
             context: Context,
             bookmarkFolder: BookmarkFolder? = null,

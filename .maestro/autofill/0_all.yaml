@@ -1,0 +1,12 @@
+appId: com.duckduckgo.mobile.android
+name: Autofill - Run all tests
+---
+- launchApp:
+    clearState: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: 1_autofill_shown_in_overflow.yaml
+
+  # Everything below requires a device has device-level authentication set (e.g., a PIN/Password etc...)
+- runFlow: 2_autofill_reach_creds_management.yaml
+- runFlow: 3_autofill_manually_add_cred.yaml
+- runFlow: 4_search_logins.yaml

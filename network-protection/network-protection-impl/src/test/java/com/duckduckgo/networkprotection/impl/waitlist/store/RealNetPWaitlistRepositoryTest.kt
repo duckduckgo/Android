@@ -16,15 +16,19 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist.store
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.fakes.FakeNetPWaitlistDataStore
-import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistState
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RealNetPWaitlistRepositoryTest {
+
+    private val coroutineRule = CoroutineTestRule()
 
     private val fakeNetPWaitlistDataStore = FakeNetPWaitlistDataStore()
 
@@ -36,40 +40,31 @@ class RealNetPWaitlistRepositoryTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        testee = RealNetPWaitlistRepository(fakeNetPWaitlistDataStore)
+        testee = RealNetPWaitlistRepository(fakeNetPWaitlistDataStore, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
     }
 
     @Test
-    fun whenStartingInternalStateIsPendingInviteCode() {
-        assertEquals(NetPWaitlistState.PendingInviteCode, testee.getState(true))
-    }
-
-    @Test
-    fun whenStartingInternalAndAuthTokenStateIsInBeta() {
-        testee.setAuthenticationToken(fakeToken)
-        assertEquals(NetPWaitlistState.InBeta, testee.getState(true))
-    }
-
-    @Test
-    fun whenStartingNonInternalStateIsLocked() {
-        assertEquals(NetPWaitlistState.NotUnlocked, testee.getState(false))
-    }
-
-    @Test
-    fun whenAuthTokenSetStateIsInBeta() {
-        testee.setAuthenticationToken(fakeToken)
-        assertEquals(NetPWaitlistState.InBeta, testee.getState(true))
-        assertEquals(NetPWaitlistState.InBeta, testee.getState(false))
-    }
-
-    @Test
-    fun whenAuthTokenNotSetGetTokenReturnsNull() {
+    fun whenAuthTokenNotSetGetTokenReturnsNull() = runTest {
         assertNull(testee.getAuthenticationToken())
     }
 
     @Test
-    fun whenAuthTokenSetGetTokenReturnsToken() {
+    fun whenAuthTokenSetGetTokenReturnsToken() = runTest {
         testee.setAuthenticationToken(fakeToken)
         assertEquals(fakeToken, testee.getAuthenticationToken())
+    }
+
+    @Test
+    fun whenClearStoreThenClearData() = runTest {
+        testee.setAuthenticationToken(fakeToken)
+        testee.setWaitlistToken(fakeToken)
+        testee.setWaitlistTimestamp(11)
+        testee.acceptWaitlistTerms()
+
+        testee.clearStore()
+        assertNotEquals(fakeToken, testee.getAuthenticationToken())
+        assertNotEquals(fakeToken, testee.getWaitlistToken())
+        assertNotEquals(11, testee.getWaitlistTimestamp())
+        assertFalse(testee.didAcceptWaitlistTerms())
     }
 }

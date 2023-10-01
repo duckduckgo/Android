@@ -59,6 +59,7 @@
     <attr name="daxColorContainerDisabled" format="color"/>
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
+    <attr name="daxLogoTitleText" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorButtonPrimaryContainer" format="color"/>

@@ -111,5 +111,14 @@
 
     <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Activează Email Protection</annotation> pentru a gestiona adresele Duck Address pe acest dispozitiv.</string>
 
+    <string name="autofill_email_protection_choose_email_dialog_title">Selectează adresa de e-mail</string>
+    <string name="autofillTooltipUseYourAliasDescription">Blochează tehnologiile de urmărire din e-mail</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Generează o Duck Address privată</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Blochează tehnologiile de urmărire din e-mailuri și ascunde adresa</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Vrei să salvezi în continuare datele de conectare?</string>
+    <string name="autofillDisableAutofillPromptMessage">Poți dezactiva oricând acest lucru din Setări.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuă să salvezi</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Dezactivează</string>
 
 </resources>

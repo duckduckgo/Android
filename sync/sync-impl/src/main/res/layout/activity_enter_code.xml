@@ -26,21 +26,31 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar"/>
 
+    <View
+        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/contentBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:background="?attr/daxColorSurface"/>
+
     <FrameLayout
         android:id="@+id/enterCodeContainer"
-        android:layout_width="310dp"
-        android:layout_height="214dp"
-        app:layout_constraintTop_toBottomOf="@+id/includeToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/contentBackground"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="@dimen/keyline_6"
-        android:layout_marginBottom="@dimen/keyline_6"
+        app:layout_constraintBottom_toTopOf="@id/loadingIndicatorContainer"
+        android:layout_margin="@dimen/keyline_6"
         app:layout_constraintEnd_toEndOf="parent">
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/enterCodeHint"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            app:typography="caption"
+            app:typography="body1"
             app:textType="secondary"
             android:text="@string/sync_enter_code_hint"/>
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -54,10 +64,11 @@
         android:id="@+id/loadingIndicatorContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/enterCodeContainer"
+        app:layout_constraintBottom_toTopOf="@id/pasteCodeButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
+        android:layout_margin="@dimen/keyline_4"
         android:orientation="horizontal"
         android:visibility="invisible">
 
@@ -84,21 +95,15 @@
         android:id="@+id/errorAuthStateHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/enterCodeContainer"
+        app:layout_constraintBottom_toTopOf="@id/pasteCodeButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
         app:typography="caption"
         app:textType="secondary"
+        android:layout_margin="@dimen/keyline_4"
         android:visibility="invisible"
         android:text="@string/sync_enter_code_invalid"/>
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/hintBarrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="errorAuthStateHint,loadingIndicatorContainer" />
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
         android:id="@+id/pasteCodeButton"
@@ -106,11 +111,13 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hintBarrier"
-        app:icon="@drawable/ic_copy"
+        app:layout_constraintBottom_toBottomOf="@id/contentBackground"
+        app:icon="@drawable/ic_paste"
         android:gravity="center"
         app:buttonSize="small"
-        android:layout_margin="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_6"
         android:layout_gravity="center"
         android:text="@string/sync_enter_code_paste"/>
 

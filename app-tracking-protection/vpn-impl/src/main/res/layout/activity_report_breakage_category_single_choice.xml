@@ -49,7 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/atp_ReportBreakageCategoriesHint"
-                    app:editable="false"
+                    app:clickable="true"
                     app:endIcon="@drawable/ic_chevron_down_24_small"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
@@ -70,8 +70,7 @@
                     android:layout_marginTop="@dimen/keyline_4"
                     android:hint="@string/atp_ReportBreakageFormInputHint"
                     app:editable="true"
-                    app:type="multi_line"
-                    android:minLines="3"/>
+                    app:type="form_mode" />
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                     android:id="@+id/appBreakageFormDisclaimer"

@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
@@ -46,10 +47,11 @@ class SurveyAvailableNotification @Inject constructor(
     private val context: Context,
     private val notificationDao: NotificationDao,
 ) : SchedulableNotification {
-    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-    val today: String? = formatter.format((Date()))
+    private val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-    override val id = "com.duckduckgo.survey.availablesurvey$today"
+    // ensure id is computed every time the caller gets it
+    override val id
+        get() = "com.duckduckgo.survey.availablesurvey${formatter.format((Date()))}"
 
     override suspend fun canShow(): Boolean {
         return !notificationDao.exists(id)
@@ -81,7 +83,7 @@ class AvailableSurveyNotificationPlugin @Inject constructor(
     private val schedulableNotification: SurveyAvailableNotification,
     private val taskStackBuilderFactory: TaskStackBuilderFactory,
     private val pixel: Pixel,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val surveyRepository: SurveyRepository,
 ) : SchedulableNotificationPlugin {

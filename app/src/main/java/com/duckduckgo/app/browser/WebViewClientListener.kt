@@ -37,7 +37,11 @@ interface WebViewClientListener {
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
-    fun onSitePermissionRequested(request: PermissionRequest, sitePermissionsAllowedToAsk: Array<String>)
+    fun onSitePermissionRequested(
+        request: PermissionRequest,
+        sitePermissionsAllowedToAsk: Array<String>,
+    )
+
     fun onSiteLocationPermissionRequested(
         origin: String,
         callback: GeolocationPermissions.Callback,
@@ -90,4 +94,5 @@ interface WebViewClientListener {
     fun prefetchFavicon(url: String)
     fun linkOpenedInNewTab(): Boolean
     fun isActiveTab(): Boolean
+    fun onReceivedError(errorType: WebViewErrorResponse, url: String)
 }

@@ -16,16 +16,24 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
+import android.content.Context
+import android.os.PowerManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
 import javax.inject.Inject
+import javax.inject.Provider
+import javax.inject.Qualifier
 import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class DeviceInfoCollector @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
+    @InternalApi private val isIgnoringBatteryOptimizations: Provider<Boolean>,
 ) : VpnStateCollectorPlugin {
     override val collectorName: String
         get() = "deviceInfo"
@@ -34,6 +42,27 @@ class DeviceInfoCollector @Inject constructor(
         return JSONObject().apply {
             put("buildFlavor", appBuildConfig.flavor.toString())
             put("os", appBuildConfig.sdkInt)
+            put("batteryOptimizations", (!isIgnoringBatteryOptimizations.get()).toString())
         }
+    }
+}
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class InternalApi
+
+@Module
+@ContributesTo(VpnScope::class)
+object DeviceInfoCollectorModule {
+    @Provides
+    @InternalApi
+    // this convenience class is just to allow testing
+    fun provideIsIgnoringBatteryOptimizations(context: Context): Boolean {
+        return runCatching {
+            context.packageName?.let {
+                val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+                powerManager.isIgnoringBatteryOptimizations(context.packageName)
+            } ?: false
+        }.getOrDefault(false)
     }
 }
