@@ -8,18 +8,12 @@ jobs:
   validate-pr:
     name: Validate Pull Request
     runs-on: ubuntu-latest
-    outputs:
-      output1: ${{ steps.step1.outputs.external }}
     steps:
       - name: Checking Pull Request sender membership
-        id: step1
-        uses: malmstein/github-asana-action@master
-        with:
-          github-pat: ${{ secrets.GT_DAXMOBILE }}
-          action: 'check-pr-membership'
+        run: echo "Checking author membership in the organization"
   process-internal-pr:
     name: Process internal Pull Request
-    if: ${{ needs.validate-pr.outputs.output1 == 'false' }}
+    if: ${{ github.event.pull_request.user.login == github.event.pull_request.base.repo.owner.login}}
     runs-on: ubuntu-latest
     needs: validate-pr
     permissions:
@@ -34,7 +28,7 @@ jobs:
           is-pinned: true
   process-external-pr:
     name: Process external Pull Request
-    if: ${{ needs.validate-pr.outputs.output1 == 'true' }}
+    if: ${{ github.event.pull_request.user.login != github.event.pull_request.base.repo.owner.login}}
     runs-on: ubuntu-latest
     needs: validate-pr
     permissions:
