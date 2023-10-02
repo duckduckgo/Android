@@ -19,6 +19,8 @@ package com.duckduckgo.app.statistics.pixels
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
@@ -26,6 +28,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
@@ -34,17 +38,23 @@ import org.threeten.bp.format.DateTimeFormatter
 class FeatureRetentionPixelSender @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     private val plugins: PluginPoint<BrowserFeatureStateReporterPlugin>,
 ) : RefreshRetentionAtbPlugin {
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(PIXELS_PREF_FILE, Context.MODE_PRIVATE) }
 
     override fun onSearchRetentionAtbRefreshed() {
-        tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
+        coroutineScope.launch(dispatcherProvider.io()) {
+            tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
+        }
     }
 
     override fun onAppRetentionAtbRefreshed() {
-        tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
+        coroutineScope.launch(dispatcherProvider.io()) {
+            tryToFireDailyPixel(StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName)
+        }
     }
 
     private fun tryToFireDailyPixel(

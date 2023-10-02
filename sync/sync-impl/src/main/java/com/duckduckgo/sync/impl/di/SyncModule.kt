@@ -52,7 +52,7 @@ object SyncStoreModule {
     fun providesSyncStore(
         sharedPrefsProvider: SharedPrefsProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
     ): SyncStore {
         return SyncSharedPrefsStore(sharedPrefsProvider, appCoroutineScope, dispatcherProvider)
     }
