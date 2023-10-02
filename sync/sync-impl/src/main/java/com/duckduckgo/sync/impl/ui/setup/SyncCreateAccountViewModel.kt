@@ -21,13 +21,12 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Result.Error
+import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AbortFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.AskSyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.FinishSetupFlow
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.Command.SyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
+import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -38,64 +37,49 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
-class SyncSetupFlowViewModel @Inject constructor(
+class SyncCreateAccountViewModel @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val viewState = MutableStateFlow(ViewState())
 
-    fun viewState(viewMode: ViewMode): Flow<ViewState> = viewState.onStart {
-        viewState.emit(ViewState(viewMode = viewMode))
-    }
+    private val viewState = MutableStateFlow(ViewState())
+    fun viewState(): Flow<ViewState> = viewState.onStart { createAccount() }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    sealed class Command {
+        object FinishSetupFlow : Command()
+        object AbortFlow : Command()
+        object Error : Command()
+    }
+
     data class ViewState(
-        val viewMode: ViewMode = SyncAnotherDeviceScreen,
+        val viewMode: ViewMode = CreatingAccount,
     )
 
     sealed class ViewMode {
-        object SyncAnotherDeviceScreen : ViewMode()
-        object InitialSetupScreen : ViewMode()
+        object CreatingAccount : ViewMode()
+        object SignedIn : ViewMode()
     }
 
-    sealed class Command {
-        object AskSyncAnotherDevice : Command()
-        object RecoverSyncData : Command()
-        object SyncAnotherDevice : Command()
-        object FinishSetupFlow : Command()
-        object AbortFlow : Command()
-    }
+    private fun createAccount() = viewModelScope.launch(dispatchers.io()) {
+        viewState.emit(ViewState(CreatingAccount))
+        when (syncAccountRepository.createAccount()) {
+            is Error -> {
+                command.send(Command.Error)
+            }
 
-    fun onTurnOnSyncClicked() {
-        viewModelScope.launch {
-            command.send(AskSyncAnotherDevice)
+            is Success -> {
+                viewState.emit(ViewState(SignedIn))
+            }
         }
     }
 
-    fun onRecoverYourSyncDataClicked() {
-        viewModelScope.launch {
-            command.send(RecoverSyncData)
-        }
-    }
-
-    fun onSyncAnotherDeviceClicked() {
-        viewModelScope.launch {
-            command.send(SyncAnotherDevice)
-        }
-    }
-
-    fun onNotNowClicked() {
+    fun onNextClicked() {
         viewModelScope.launch {
             command.send(FinishSetupFlow)
-        }
-    }
-
-    fun onCloseClicked() {
-        viewModelScope.launch {
-            command.send(AbortFlow)
         }
     }
 }

@@ -33,14 +33,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.duckduckgo.mobile.android.ui.view.button.IconButton
-            android:id="@+id/close_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/keyline_4"
-            android:background="?selectableItemBackground"
-            app:srcCompat="@drawable/ic_close_24"/>
-
     </LinearLayout>
 
     <ScrollView
@@ -50,7 +42,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintBottom_toTopOf="@+id/footer_primary_button"
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:fadeScrollbars="false"
         android:scrollbars="vertical">
@@ -65,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/ic_sync_128"
+                android:src="@drawable/ic_sync_start_128"
                 android:layout_gravity="center_horizontal"
                 tools:ignore="ContentDescription"/>
 
@@ -77,7 +68,6 @@
                 android:layout_marginStart="@dimen/keyline_5"
                 android:layout_marginEnd="@dimen/keyline_5"
                 android:gravity="center"
-                app:textType="secondary"
                 app:typography="h1"
                 android:text="@string/sync_enable_sync_title"/>
 
@@ -90,33 +80,49 @@
                 app:textType="primary"
                 app:typography="body1"
                 android:text="@string/sync_enable_sync_content"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/sync_enable_options"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/sync_setup_option_bookmarks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:leadingIconBackground="circular"
+                app:leadingIcon="@drawable/ic_image_24"
+                app:showSwitch="true"
+                app:primaryText="@string/sync_enable_option_favicons_title"
+                app:secondaryText="@string/sync_enable_option_favicons_subtitle"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/sync_setup_option_favourites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:leadingIconBackground="circular"
+                app:leadingIcon="@drawable/ic_sync_device_all_24"
+                app:showSwitch="true"
+                app:primaryText="@string/sync_enable_option_favorites_title"
+                app:secondaryText="@string/sync_enable_option_favorites_subtitle"/>
+
         </LinearLayout>
     </ScrollView>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-        android:id="@+id/footer_primary_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
-        app:buttonSize="large"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/footer_secondary_button"
-        android:text="@string/sync_enable_sync_primary_button"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
-        android:id="@+id/footer_secondary_button"
+        android:id="@+id/footer_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:layout_marginBottom="@dimen/keyline_4"
+        android:text="@string/sync_enable_sync_next_button"
         app:buttonSize="large"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/sync_enable_sync_secondary_button"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

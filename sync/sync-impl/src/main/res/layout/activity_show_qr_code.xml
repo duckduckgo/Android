@@ -22,56 +22,53 @@
     android:layout_height="wrap_content" xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?attr/daxColorSurface"
+        android:orientation="vertical"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
     <include
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar"/>
 
-    <View
-        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:id="@+id/contentBackground"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1"
-        android:background="?attr/daxColorSurface"/>
-
     <ImageView
         android:id="@+id/qrCodeImageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:layout_marginVertical="@dimen/keyline_6"
-        app:layout_constraintTop_toTopOf="@id/contentBackground"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/copyCodeButton"
+        android:layout_margin="@dimen/keyline_6"
         android:visibility="gone"
-        tools:ignore="ContentDescription"/>
-
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
-        android:id="@+id/copyCodeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/copyCodeButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/contentBackground"
-        android:gravity="center"
-        app:buttonSize="small"
-        app:icon="@drawable/ic_copy"
-        android:layout_marginBottom="@dimen/keyline_6"
-        android:layout_marginStart="@dimen/keyline_5"
-        android:layout_marginEnd="@dimen/keyline_5"
-        android:layout_gravity="center"
-        android:text="@string/sync_connect_copy_code"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
+    </LinearLayout>
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        android:id="@+id/showQRCodeHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/contentBackground"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout"
         app:typography="body1"
         android:layout_margin="@dimen/keyline_4"
         android:text="@string/sync_connect_scan_qr_hint"/>
 
+    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        android:id="@+id/copyCodeButton"
+        app:layout_constraintTop_toBottomOf="@+id/showQRCodeHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        app:leadingIcon="@drawable/ic_keyboard_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/sync_connect_copy_code" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

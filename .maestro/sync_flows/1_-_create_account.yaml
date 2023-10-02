@@ -8,9 +8,11 @@ tags:
 - runFlow: ../shared/onboarding.yaml
 - runFlow: ../shared/open_sync_screen.yaml
 - tapOn:
-      id: "com.duckduckgo.mobile.android:id/trailingSwitch"
-- tapOn: "Turn On Sync"
-- tapOn: "Not Now"
-- tapOn: "Not Now"
+    id: "com.duckduckgo.mobile.android:id/item_container"
+    index: 2
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/footer_button"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/footer_next_button"
 - assertVisible:
-      id: "com.duckduckgo.mobile.android:id/qrCodeImageView"
+    id: "com.duckduckgo.mobile.android:id/qrCodeImageView"

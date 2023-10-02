@@ -66,7 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/ic_sync_success_128"
+                android:src="@drawable/ic_sync_start_128"
                 android:layout_gravity="center_horizontal"
                 tools:ignore="ContentDescription"/>
 
@@ -80,18 +80,7 @@
                 android:gravity="center"
                 app:textType="primary"
                 app:typography="h1"
-                android:text="@string/sync_enable_sync_title"/>
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/connected_device_item"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="Android"
-                android:layout_marginTop="@dimen/keyline_5"
-                android:layout_marginStart="@dimen/keyline_5"
-                android:layout_marginEnd="@dimen/keyline_5"
-                app:leadingIcon="@drawable/ic_device_mobile_24"
-                app:leadingIconBackground="circular"/>
+                android:text="@string/sync_connected_device_title"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/content_body"
@@ -102,7 +91,34 @@
                 app:textType="primary"
                 app:typography="body1"
                 android:text="@string/sync_connected_device_hint"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/sync_enable_options"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/sync_connected_option_bookmarks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:leadingIconBackground="circular"
+                app:leadingIcon="@drawable/ic_image_24"
+                app:showSwitch="true"
+                app:primaryText="@string/sync_enable_option_favicons_title"
+                app:secondaryText="@string/sync_enable_option_favicons_subtitle"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/sync_connected_option_favourites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:leadingIconBackground="circular"
+                app:leadingIcon="@drawable/ic_sync_device_all_24"
+                app:showSwitch="true"
+                app:primaryText="@string/sync_enable_option_favorites_title"
+                app:secondaryText="@string/sync_enable_option_favorites_subtitle"/>
+
         </LinearLayout>
+
     </ScrollView>
 
     <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
