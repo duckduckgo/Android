@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
@@ -81,12 +80,6 @@ class SyncCreateAccountViewModel @Inject constructor(
     fun onNextClicked() {
         viewModelScope.launch {
             command.send(FinishSetupFlow)
-        }
-    }
-
-    fun onCloseClicked() {
-        viewModelScope.launch {
-            command.send(AbortFlow)
         }
     }
 }

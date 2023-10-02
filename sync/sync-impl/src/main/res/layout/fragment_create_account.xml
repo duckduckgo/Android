@@ -33,15 +33,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.duckduckgo.mobile.android.ui.view.button.IconButton
-            android:id="@+id/close_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/keyline_4"
-            android:visibility="invisible"
-            android:background="?selectableItemBackground"
-            app:srcCompat="@drawable/ic_close_24"/>
-
     </LinearLayout>
 
     <ScrollView

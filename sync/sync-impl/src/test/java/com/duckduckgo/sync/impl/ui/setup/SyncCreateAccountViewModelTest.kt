@@ -20,7 +20,6 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.FinishSetupFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
@@ -81,17 +80,6 @@ class SyncCreateAccountViewModelTest {
         testee.commands().test {
             val command = awaitItem()
             Assert.assertTrue(command is FinishSetupFlow)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenCloseClickedThenEmitFinishSetupCommand() = runTest {
-        testee.onCloseClicked()
-
-        testee.commands().test {
-            val command = awaitItem()
-            Assert.assertTrue(command is AbortFlow)
             cancelAndIgnoreRemainingEvents()
         }
     }

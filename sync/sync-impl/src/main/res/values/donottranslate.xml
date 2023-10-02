@@ -67,7 +67,7 @@
 
     <string name="synced_devices_section_title">Synced Devices</string>
     <string name="sync_new_device_section_title">Sync New Device</string>
-    <string name="sync_new_device_hint">Go to Settings > Sync in the DuckDuckGo App on a different device and scan to connect instantly.</string>
+    <string name="sync_new_device_hint">Go to Settings > Sync &amp; Back Up in the DuckDuckGo App on a different device and scan to connect instantly.</string>
     <string name="sync_show_text_code_item">Show Text Code</string>
     <string name="sync_show_qr_code_item">Scan QR Code</string>
     <string name="sync_save_recovery_code_item">Save Recovery PDF</string>
@@ -120,4 +120,5 @@
     <string name="sync_camera_unavailable">Camera Unavailable</string>
     <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
     <string name="sync_go_to_settings">Go to Settings</string>
+    <string name="sync_general_error">Something went wrong</string>
 </resources>

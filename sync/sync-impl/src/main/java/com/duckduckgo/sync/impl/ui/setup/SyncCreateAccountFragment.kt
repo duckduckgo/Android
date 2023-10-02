@@ -29,7 +29,7 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.databinding.FragmentSyncSetupBinding
+import com.duckduckgo.sync.impl.databinding.FragmentCreateAccountBinding
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.AbortFlow
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Error
@@ -37,16 +37,17 @@ import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.Command.Fini
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.CreatingAccount
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewMode.SignedIn
 import com.duckduckgo.sync.impl.ui.setup.SyncCreateAccountViewModel.ViewState
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
-class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_sync_setup) {
+class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_account) {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val binding: FragmentSyncSetupBinding by viewBinding()
+    private val binding: FragmentCreateAccountBinding by viewBinding()
 
     private val viewModel: SyncCreateAccountViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[SyncCreateAccountViewModel::class.java]
@@ -65,9 +66,6 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_sync_setu
     }
 
     private fun configureListeners() {
-        binding.closeIcon.setOnClickListener {
-            viewModel.onCloseClicked()
-        }
         binding.footerButton.setOnClickListener {
             viewModel.onNextClicked()
         }
@@ -111,6 +109,7 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_sync_setu
 
             FinishSetupFlow -> listener?.launchFinishSetupFlow()
             Error -> {
+                Snackbar.make(binding.root, R.string.sync_general_error, Snackbar.LENGTH_LONG).show()
             }
         }
     }
