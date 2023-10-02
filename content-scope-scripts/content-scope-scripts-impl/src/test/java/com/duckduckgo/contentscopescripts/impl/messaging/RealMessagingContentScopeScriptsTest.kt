@@ -17,11 +17,15 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -31,7 +35,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class RealMessagingContentScopeScriptsTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
     private val mockMessageHandlerPlugins: PluginPoint<MessageHandlerPlugin> = mock()
@@ -41,11 +49,17 @@ class RealMessagingContentScopeScriptsTest {
 
     @Before
     fun setUp() {
-        messagingContentScopeScripts = RealMessagingContentScopeScripts(mockCoreContentScopeScripts, mockMessageHandlerPlugins)
+        messagingContentScopeScripts =
+            RealMessagingContentScopeScripts(
+                mockCoreContentScopeScripts,
+                mockMessageHandlerPlugins,
+                coroutineTestRule.testScope,
+                coroutineTestRule.testDispatcherProvider,
+            )
     }
 
     @Test
-    fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
+    fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() = runTest {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
         whenever(mockCoreContentScopeScripts.getScript()).thenReturn(coreContentScopeJs)
         messagingContentScopeScripts.injectContentScopeScripts(mockWebView)
@@ -63,7 +77,7 @@ class RealMessagingContentScopeScriptsTest {
     }
 
     @Test
-    fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
+    fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() = runTest {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(false)
         messagingContentScopeScripts.injectContentScopeScripts(mockWebView)
 

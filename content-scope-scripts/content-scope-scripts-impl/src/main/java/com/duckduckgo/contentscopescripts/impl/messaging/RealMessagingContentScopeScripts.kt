@@ -17,6 +17,8 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
@@ -26,12 +28,17 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealMessagingContentScopeScripts @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val messageHandlerPlugins: PluginPoint<MessageHandlerPlugin>,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : ContentScopeScripts {
 
     private val messageSecret = getSecret()
@@ -47,8 +54,14 @@ class RealMessagingContentScopeScripts @Inject constructor(
     }
 
     override fun injectContentScopeScripts(webView: WebView) {
-        if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${getScript()}", null)
+        coroutineScope.launch(dispatchers.io()) {
+            if (coreContentScopeScripts.isEnabled()) {
+                val script = getScript()
+
+                withContext(dispatchers.main()) {
+                    webView.evaluateJavascript("javascript:$script", null)
+                }
+            }
         }
     }
 
