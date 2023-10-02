@@ -24,8 +24,10 @@ interface VoiceSearchDataStore {
     var permissionDeclinedForever: Boolean
     var userAcceptedRationaleDialog: Boolean
     var availabilityLogged: Boolean
-    var isVoiceSearchEnabled: Boolean
     var countVoiceSearchDismissed: Int
+
+    fun isVoiceSearchEnabled(default: Boolean): Boolean
+    fun setVoiceSearchEnabled(value: Boolean)
 }
 
 class SharedPreferencesVoiceSearchDataStore constructor(
@@ -60,11 +62,13 @@ class SharedPreferencesVoiceSearchDataStore constructor(
             updateValue(KEY_VOICE_SEARCH_AVAILABILITY_LOGGED, value)
         }
 
-    override var isVoiceSearchEnabled: Boolean
-        get() = preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, false)
-        set(value) {
-            updateValue(KEY_VOICE_SEARCH_ENABLED, value)
-        }
+    override fun isVoiceSearchEnabled(default: Boolean): Boolean {
+        return preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, default)
+    }
+
+    override fun setVoiceSearchEnabled(value: Boolean) {
+        updateValue(KEY_VOICE_SEARCH_ENABLED, value)
+    }
 
     override var countVoiceSearchDismissed: Int
         get() = preferences.getInt(KEY_VOICE_SEARCH_DISMISSED, 0)

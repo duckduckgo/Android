@@ -63,11 +63,11 @@ class RealVoiceSearchRepositoryTest {
 
     @Test
     fun whenSetVoiceSearchEnabledThenIsVoiceSearchEnabledShouldBeTrue() {
-        assertFalse(testee.isVoiceSearchUserEnabled())
+        assertFalse(testee.isVoiceSearchUserEnabled(false))
 
         testee.setVoiceSearchUserEnabled(true)
 
-        assertTrue(testee.isVoiceSearchUserEnabled())
+        assertTrue(testee.isVoiceSearchUserEnabled(false))
     }
 
     @Test
@@ -91,8 +91,17 @@ class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var permissionDeclinedForever: Boolean = false
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
-    override var isVoiceSearchEnabled: Boolean = false
     override var countVoiceSearchDismissed: Int = 0
+
+    private var _voiceSearchEnabled = false
+
+    override fun isVoiceSearchEnabled(default: Boolean): Boolean {
+        return _voiceSearchEnabled
+    }
+
+    override fun setVoiceSearchEnabled(value: Boolean) {
+        _voiceSearchEnabled = value
+    }
 }
 
 class FakeVoiceSearchStatusListener : VoiceSearchStatusListener {

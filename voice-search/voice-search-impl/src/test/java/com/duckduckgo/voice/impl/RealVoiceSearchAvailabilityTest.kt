@@ -28,6 +28,9 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class RealVoiceSearchAvailabilityTest {
@@ -217,6 +220,26 @@ class RealVoiceSearchAvailabilityTest {
         assertFalse(result)
     }
 
+    @Test
+    fun whenModelIsPixel6ThenDefaultUserSettingsTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(model = "Pixel 6", manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+
+        testee.isVoiceSearchAvailable
+
+        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(true))
+    }
+
+    @Test
+    fun whenModelIsPixel5ThenDefaultUserSettingsFalse() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(model = "Pixel 5", manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+
+        testee.isVoiceSearchAvailable
+
+        verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(false))
+    }
+
     private fun setupRemoteConfig(voiceSearchEnabled: Boolean, minSdk: Int?, excludedManufacturers: Array<String>) {
         whenever(voiceSearchFeature.self()).thenReturn(
             object : Toggle {
@@ -237,13 +260,19 @@ class RealVoiceSearchAvailabilityTest {
         whenever(voiceSearchFeatureRepository.manufacturerExceptions).thenReturn(CopyOnWriteArrayList(excludedManufacturers.map { Manufacturer(it) }))
     }
 
-    private fun setupDeviceConfig(manufacturer: String, sdkInt: Int, languageTag: String, isOnDeviceSpeechRecognitionAvailable: Boolean) {
+    private fun setupDeviceConfig(
+        model: String = "",
+        manufacturer: String,
+        sdkInt: Int,
+        languageTag: String,
+        isOnDeviceSpeechRecognitionAvailable: Boolean,
+    ) {
         whenever(configProvider.get()).thenReturn(
-            VoiceSearchAvailabilityConfig(manufacturer, sdkInt, languageTag, isOnDeviceSpeechRecognitionAvailable),
+            VoiceSearchAvailabilityConfig(model, manufacturer, sdkInt, languageTag, isOnDeviceSpeechRecognitionAvailable),
         )
     }
 
     private fun setupUserSettings(enabled: Boolean) {
-        whenever(voiceSearchRepository.isVoiceSearchUserEnabled()).thenReturn(enabled)
+        whenever(voiceSearchRepository.isVoiceSearchUserEnabled(any())).thenReturn(enabled)
     }
 }
