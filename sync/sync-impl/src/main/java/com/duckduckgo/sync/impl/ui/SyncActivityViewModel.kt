@@ -110,10 +110,12 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private suspend fun initViewStateThisDeviceState() {
-        val state = if (!syncAccountRepository.isSignedIn()) {
-            signedOutState()
-        } else {
-            signedInState()
+        val state = withContext(dispatchers.io()) {
+            if (!syncAccountRepository.isSignedIn()) {
+                signedOutState()
+            } else {
+                signedInState()
+            }
         }
 
         viewState.value = state
