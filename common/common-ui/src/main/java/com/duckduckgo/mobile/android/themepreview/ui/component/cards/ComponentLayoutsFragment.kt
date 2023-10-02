@@ -17,10 +17,11 @@
 package com.duckduckgo.mobile.android.themepreview.ui.component.cards
 
 import com.duckduckgo.mobile.android.themepreview.ui.component.Component
+import com.duckduckgo.mobile.android.themepreview.ui.component.Component.EXPANDABLE_LAYOUT
 import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
-class ComponentCardsFragment : ComponentFragment() {
+class ComponentLayoutsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.CARD)
+        return listOf(EXPANDABLE_LAYOUT, Component.CARD)
     }
 }

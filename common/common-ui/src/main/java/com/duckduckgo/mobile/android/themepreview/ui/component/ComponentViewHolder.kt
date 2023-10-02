@@ -22,11 +22,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
+import com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableLayout
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -318,6 +320,15 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class ExpandableComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_expandable_layout)) {
+        override fun bind(component: Component) {
+            view.findViewById<DaxExpandableLayout>(R.id.expandable1).apply {
+                this.parentLayout.setOnClickListener { toggleLayout() }
+                spinnerDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_down_24)
+            }
+        }
+    }
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -340,6 +351,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
                 Component.CARD -> CardComponentViewHolder(parent)
+                Component.EXPANDABLE_LAYOUT -> ExpandableComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }

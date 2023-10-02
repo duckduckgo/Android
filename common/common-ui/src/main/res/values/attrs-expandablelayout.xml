@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="DaxExpandableLayout">
+    <attr name="expandable_isExpanded" format="boolean" />
+    <attr name="expandable_parentLayout" format="reference" />
+    <attr name="expandable_secondLayout" format="reference" />
+    <attr name="expandable_duration" format="integer" />
+    <attr name="expandable_spinner" format="integer" />
+    <attr name="expandable_showSpinner" format="boolean" />
+    <attr name="expandable_spinner_animate" format="boolean" />
+    <attr name="expandable_spinner_rotation" format="integer" />
+    <attr name="expandable_spinner_size" format="dimension" />
+    <attr name="expandable_spinner_margin" format="dimension" />
+    <attr name="expandable_spinner_color" format="color" />
+    <attr name="expandable_spinner_gravity" format="enum">
+      <enum name="start" value="0" />
+      <enum name="end" value="1" />
+    </attr>
+    <attr name="expandable_animation" format="enum">
+      <enum name="normal" value="0" />
+      <enum name="accelerate" value="1" />
+      <enum name="bounce" value="2" />
+      <enum name="overshoot" value="3" />
+    </attr>
+  </declare-styleable>
+</resources>

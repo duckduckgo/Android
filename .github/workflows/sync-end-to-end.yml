@@ -53,6 +53,16 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
+      - name: Execute Script
+        uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
+        with:
+          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
+          name: ${{ github.sha }}
+          app-file: apk/release.apk
+          android-api-level: 30
+          workspace: .maestro
+          include-tags: syncTest
+
       - name: Sync Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
         with:
@@ -60,6 +70,7 @@ jobs:
           name: ${{ github.sha }}
           app-file: apk/release.apk
           android-api-level: 30
+          env: recovertCo
           workspace: .maestro
           include-tags: syncTest
 
