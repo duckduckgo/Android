@@ -61,7 +61,7 @@ class SharedPreferencesVoiceSearchDataStore constructor(
         }
 
     override var isVoiceSearchEnabled: Boolean
-        get() = preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, true)
+        get() = preferences.getBoolean(KEY_VOICE_SEARCH_ENABLED, false)
         set(value) {
             updateValue(KEY_VOICE_SEARCH_ENABLED, value)
         }
