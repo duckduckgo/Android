@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.fakes
 
-import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistDataStore
+import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore
 
 class FakeNetPWaitlistDataStore(
     override var settingUnlocked: Boolean = false,

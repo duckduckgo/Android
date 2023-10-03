@@ -31,6 +31,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.JoinedWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.PendingInviteCode
+import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.VerifySubscription
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
@@ -76,7 +77,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
                     NetPWaitlistInvitedScreenNoParams
                 }
             }
-            JoinedWaitlist, NotUnlocked, PendingInviteCode -> NetPWaitlistScreenNoParams
+            JoinedWaitlist, NotUnlocked, PendingInviteCode, VerifySubscription -> NetPWaitlistScreenNoParams
         }
     }
 
