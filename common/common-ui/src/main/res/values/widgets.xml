@@ -389,7 +389,7 @@
     <style name="Widget.DuckDuckGo.VerticalDivider">
         <item name="android:layout_width">@dimen/verticalDividerWidth</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:background">?attr/daxColorLines</item>
+        <item name="android:background">?attr/daxColorContainer</item>
     </style>
 
     <style name="Widget.DuckDuckGo.ListDivider" parent="Widget.MaterialComponents.MaterialDivider">
@@ -401,6 +401,12 @@
     <style name="Widget.DuckDuckGo.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorSurface</item>
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+    </style>
+
+    <!-- Expandable Menu Item Items -->
+    <style name="Widget.DuckDuckGo.DaxExpandableItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
     <!-- Styles for Feature Specific Widgets -->

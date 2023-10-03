@@ -19,8 +19,9 @@ package com.duckduckgo.mobile.android.ui.view.expand
 import android.view.View
 
 /** Interface definition for a callback to be invoked when a [ExpandableLayout] is expanded or collapsed. */
-fun interface OnExpandListener {
+interface OnBindListener {
 
-  /** Invoked when the [ExpandableLayout] is expanded or collapsed. */
-  fun onExpand(isExpanded: Boolean)
+    /** Invoked when the [ExpandableLayout] is expanded or collapsed. */
+    fun onBindParentLayout(view: View)
+    fun onBindChildLayout(view: View)
 }

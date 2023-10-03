@@ -5,11 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:orientation="vertical"
-    android:paddingStart="16dp"
-    android:paddingTop="26dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="20dp">
+    android:orientation="vertical">
 
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/hiddenText"
