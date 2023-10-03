@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.net.URI
 import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -40,7 +41,8 @@ class ApiDevPrivacyConfigInterceptor @Inject constructor(
         val url = chain.request().url
         val storedUrl = devSettingsDataStore.remotePrivacyConfigUrl
         val isCustomSettingEnabled = devSettingsDataStore.useCustomPrivacyConfigUrl
-        val canUrlBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl)
+        val validHost = runCatching { URI(storedUrl).host.isNotEmpty() }.getOrDefault(false)
+        val canUrlBeChanged = isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl) && validHost
 
         if (url.toString().contains(PRIVACY_REMOTE_CONFIG_URL) && canUrlBeChanged) {
             request.url(storedUrl!!)
