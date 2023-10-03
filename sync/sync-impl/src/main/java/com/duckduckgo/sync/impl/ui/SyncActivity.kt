@@ -18,8 +18,6 @@ package com.duckduckgo.sync.impl.ui
 
 import android.app.Activity
 import android.os.Bundle
-import android.widget.CompoundButton
-import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -41,18 +39,24 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.ShareAction
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.CONNECT_CODE
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.EnterTextCode
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ScanQRCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowTextCode
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
+import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
+import com.duckduckgo.sync.impl.ui.setup.LoginContract
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
@@ -86,17 +90,24 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var shareAction: ShareAction
 
-    private val deviceSyncStatusToggleListener: OnCheckedChangeListener = object : OnCheckedChangeListener {
-        override fun onCheckedChanged(
-            buttonView: CompoundButton?,
-            isChecked: Boolean,
-        ) {
-            viewModel.onToggleClicked(isChecked)
+    private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
+        if (resultOk) {
+            viewModel.onLoginSuccess()
+        }
+    }
+
+    private val enterCodeLauncher = registerForActivityResult(
+        EnterCodeContract(),
+    ) { resultOk ->
+        if (resultOk) {
+            viewModel.onLoginSuccess()
         }
     }
 
     private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
-        // no-op
+        if (resultOk) {
+            viewModel.onLoginSuccess()
+        }
     }
 
     var launcher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -113,6 +124,8 @@ class SyncActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         registerForPermission()
+
+        setupClickListeners()
         setupRecyclerView()
     }
 
@@ -122,8 +135,46 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun setupClickListeners() {
+        binding.viewSyncDisabled.syncSetupScanQr.setClickListener {
+            viewModel.onScanQRCodeClicked()
+        }
+
+        binding.viewSyncDisabled.syncSetupEnterText.setClickListener {
+            viewModel.onEnterTextCodeClicked()
+        }
+
+        binding.viewSyncDisabled.syncSetupInitializeSync.setClickListener {
+            viewModel.onInitializeSync()
+        }
+
+        binding.viewSyncDisabled.syncSetupRecoverData.setClickListener {
+            viewModel.onRecoverYourSyncedData()
+        }
+
+        binding.viewSyncEnabled.disableSyncButton.setClickListener {
+            viewModel.onTurnOffClicked()
+        }
+
+        binding.viewSyncEnabled.saveRecoveryCodeItem.setOnClickListener {
+            viewModel.onSaveRecoveryCodeClicked()
+        }
+
+        binding.viewSyncEnabled.deleteAccountButton.setOnClickListener {
+            viewModel.onDeleteAccountClicked()
+        }
+
+        binding.viewSyncEnabled.scanQrCodeItem.setOnClickListener {
+            viewModel.onScanQRCodeClicked()
+        }
+
+        binding.viewSyncEnabled.showTextCodeItem.setOnClickListener {
+            viewModel.onShowTextCodeClicked()
+        }
+    }
+
     private fun setupRecyclerView() {
-        with(binding.syncedDevicesRecyclerView) {
+        with(binding.viewSyncEnabled.syncedDevicesRecyclerView) {
             adapter = syncedDevicesAdapter
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         }
@@ -140,21 +191,18 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            LaunchDeviceSetupFlow -> {
-                launcher.launch(SetupAccountActivity.intentStartSetupFlow(this))
-            }
-
-            is ScanQRCode -> {
-                connectFlow.launch(null)
-            }
-
+            is ScanQRCode -> connectFlow.launch(null)
+            is EnterTextCode -> enterCodeLauncher.launch(CONNECT_CODE)
+            is CreateAccount -> launcher.launch(SetupAccountActivity.intentSetupFlow(this))
+            is RecoverSyncData -> loginFlow.launch(null)
+            is DeviceConnected -> launcher.launch(SetupAccountActivity.intentDeviceConnectedFlow(this))
             is AskTurnOffSync -> askTurnOffsync(it.device)
-            AskDeleteAccount -> askDeleteAccount()
+            is AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
                 shareAction.shareFile(this@SyncActivity, it.recoveryCodePDFFile)
             }
 
-            CheckIfUserHasStoragePermission -> {
+            is CheckIfUserHasStoragePermission -> {
                 storagePermission.invokeOrRequestPermission {
                     viewModel.generateRecoveryCode(this@SyncActivity)
                 }
@@ -162,9 +210,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskRemoveDevice -> askRemoveDevice(it.device)
             is AskEditDevice -> askEditDevice(it.device)
-            ShowTextCode -> {
-                startActivity(ShowCodeActivity.intent(this))
-            }
+            is ShowTextCode -> startActivity(ShowCodeActivity.intent(this))
         }
     }
 
@@ -242,31 +288,15 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.deviceSyncStatusToggle.quietlySetIsChecked(viewState.syncToggleState, deviceSyncStatusToggleListener)
         binding.viewSwitcher.displayedChild = if (viewState.showAccount) 1 else 0
 
         if (viewState.showAccount) {
             if (viewState.loginQRCode != null) {
-                binding.qrCodeImageView.show()
-                binding.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
-            }
-
-            binding.saveRecoveryCodeItem.setOnClickListener {
-                viewModel.onSaveRecoveryCodeClicked()
-            }
-
-            binding.deleteAccountButton.setOnClickListener {
-                viewModel.onDeleteAccountClicked()
-            }
-
-            binding.scanQrCodeItem.setOnClickListener {
-                viewModel.onScanQRCodeClicked()
-            }
-
-            binding.showTextCodeItem.setOnClickListener {
-                viewModel.onShowTextCodeClicked()
+                binding.viewSyncEnabled.qrCodeImageView.show()
+                binding.viewSyncEnabled.qrCodeImageView.setImageBitmap(viewState.loginQRCode)
             }
         }
+
         syncedDevicesAdapter.updateData(viewState.syncedDevices)
     }
 }

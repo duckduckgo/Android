@@ -31,20 +31,15 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.InitialSetupScreen
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupFlowViewModel.ViewMode.SyncAnotherDeviceScreen
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -55,24 +50,12 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
 
     private lateinit var screen: Screen
 
-    private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSucess()
-        }
-    }
-
-    private val connectFlow = registerForActivityResult(ConnectFlowContract()) { resultOk ->
-        if (resultOk) {
-            viewModel.onLoginSucess()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            screen = savedInstanceState.getSerializable(SETUP_ACCOUNT_SCREEN_EXTRA) as Screen
+        screen = if (savedInstanceState != null) {
+            savedInstanceState.getSerializable(SETUP_ACCOUNT_SCREEN_EXTRA) as Screen
         } else {
-            screen = intent.getSerializableExtra(SETUP_ACCOUNT_SCREEN_EXTRA) as? Screen ?: SETUP
+            intent.getSerializableExtra(SETUP_ACCOUNT_SCREEN_EXTRA) as? Screen ?: DEVICE_SYNCED
         }
         setContentView(binding.root)
         observeUiEvents()
@@ -115,27 +98,11 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 setResult(Activity.RESULT_CANCELED)
                 finish()
             }
-            RecoverSyncData -> loginFlow.launch(null)
-            SyncAnotherDevice -> connectFlow.launch(null)
         }
     }
 
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
-            AskSyncAnotherDevice -> {
-                screen = SETUP
-                supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SyncSetupFlowFragment.instance(SyncAnotherDeviceScreen), TAG_ENABLE_SYNC)
-                }
-            }
-
-            TurnOnSync -> {
-                screen = SETUP
-                supportFragmentManager.commitNow {
-                    replace(id.fragment_container_view, SyncSetupFlowFragment.instance(InitialSetupScreen), TAG_ENABLE_SYNC)
-                }
-            }
-
             AskSaveRecoveryCode -> {
                 screen = RECOVERY_CODE
                 supportFragmentManager.commitNow {
@@ -143,47 +110,48 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
                 }
             }
 
-            DeviceConnected -> {
-                screen = DEVICE_CONNECTED
+            DeviceSynced -> {
+                screen = DEVICE_SYNCED
                 supportFragmentManager.commitNow {
                     replace(id.fragment_container_view, SyncDeviceConnectedFragment.instance(), TAG_DEVICE_CONNECTED)
+                }
+            }
+
+            CreateAccount -> {
+                screen = SYNC_SETUP
+                supportFragmentManager.commitNow {
+                    replace(id.fragment_container_view, SyncCreateAccountFragment.instance(), TAG_SYNC_SETUP)
                 }
             }
         }
     }
 
-    override fun askSyncAnotherDevice() {
-        viewModel.onAskSyncAnotherDevice()
-    }
-
-    override fun recoverYourSyncedData() {
-        viewModel.onRecoverYourSyncedData()
-    }
-
-    override fun syncAnotherDevice() {
-        viewModel.onSyncAnotherDevice()
-    }
-
     override fun launchFinishSetupFlow() {
-        viewModel.finishSetupFlow()
+        viewModel.onSetupComplete()
     }
 
     companion object {
-        private const val TAG_ENABLE_SYNC = "tag_enable_sync"
+        private const val TAG_SYNC_SETUP = "tag_sync_setup"
         private const val TAG_RECOVER_ACCOUNT = "tag_recover_account"
         private const val TAG_DEVICE_CONNECTED = "tag_device_connected"
 
         enum class Screen {
-            SETUP,
+            SYNC_SETUP,
             RECOVERY_CODE,
-            DEVICE_CONNECTED,
+            DEVICE_SYNCED,
         }
 
         const val SETUP_ACCOUNT_SCREEN_EXTRA = "SETUP_ACCOUNT_SCREEN_EXTRA"
 
-        internal fun intentStartSetupFlow(context: Context): Intent {
+        internal fun intentSetupFlow(context: Context): Intent {
             return Intent(context, SetupAccountActivity::class.java).apply {
-                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, SETUP)
+                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, SYNC_SETUP)
+            }
+        }
+
+        internal fun intentDeviceConnectedFlow(context: Context): Intent {
+            return Intent(context, SetupAccountActivity::class.java).apply {
+                putExtra(SETUP_ACCOUNT_SCREEN_EXTRA, DEVICE_SYNCED)
             }
         }
     }

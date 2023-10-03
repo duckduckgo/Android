@@ -16,14 +16,12 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
-import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncAccountRepository
-import com.duckduckgo.sync.impl.asDrawableRes
 import com.duckduckgo.sync.impl.ui.setup.SyncDeviceConnectedViewModel.Command.FinishSetupFlow
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -44,19 +42,21 @@ class SyncDeviceConnectedViewModel @Inject constructor(
     private val viewState = MutableStateFlow<ViewState?>(null)
 
     fun viewState(): Flow<ViewState> = viewState.filterNotNull().onStart {
-        val result = syncAccountRepository.getThisConnectedDevice() ?: throw IllegalStateException("This connected device not found")
-        emit(ViewState(result.deviceType.type().asDrawableRes(), result.deviceName))
+        signedInStateOrError()
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow()
-
-    data class ViewState(
-        @DrawableRes val deviceType: Int,
-        val deviceName: String,
-    )
+    data class ViewState(val deviceName: String)
 
     sealed class Command {
         object FinishSetupFlow : Command()
+        object Error : Command()
+    }
+
+    private suspend fun signedInStateOrError() {
+        syncAccountRepository.getThisConnectedDevice()?.let {
+            viewState.emit(ViewState(deviceName = it.deviceName))
+        } ?: command.send(Command.Error)
     }
 
     fun onNextClicked() {

@@ -37,7 +37,8 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
-import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchDeviceSetupFlow
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CreateAccount
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
@@ -109,10 +110,12 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     private suspend fun initViewStateThisDeviceState() {
-        val state = if (!syncAccountRepository.isSignedIn()) {
-            signedOutState()
-        } else {
-            signedInState()
+        val state = withContext(dispatchers.io()) {
+            if (!syncAccountRepository.isSignedIn()) {
+                signedOutState()
+            } else {
+                signedInState()
+            }
         }
 
         viewState.value = state
@@ -127,8 +130,11 @@ class SyncActivityViewModel @Inject constructor(
 
     sealed class Command {
         object ScanQRCode : Command()
+        object EnterTextCode : Command()
+        object CreateAccount : Command()
+        object RecoverSyncData : Command()
         object ShowTextCode : Command()
-        object LaunchDeviceSetupFlow : Command()
+        object DeviceConnected : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
@@ -137,17 +143,50 @@ class SyncActivityViewModel @Inject constructor(
         data class AskEditDevice(val device: ConnectedDevice) : Command()
     }
 
-    fun onToggleClicked(isChecked: Boolean) {
+    fun onScanQRCodeClicked() {
         viewModelScope.launch {
-            viewState.value = viewState.value.toggle(isChecked)
-            when (isChecked) {
-                true -> command.send(LaunchDeviceSetupFlow)
-                false -> {
-                    syncAccountRepository.getThisConnectedDevice()?.let {
-                        command.send(AskTurnOffSync(it))
-                    } ?: showAccountDetailsIfNeeded()
-                }
-            }
+            command.send(Command.ScanQRCode)
+        }
+    }
+
+    fun onEnterTextCodeClicked() {
+        viewModelScope.launch {
+            command.send(Command.EnterTextCode)
+        }
+    }
+
+    fun onInitializeSync() {
+        viewModelScope.launch {
+            viewState.value = viewState.value.toggle(true)
+            command.send(CreateAccount)
+        }
+    }
+
+    fun onRecoverYourSyncedData() {
+        viewModelScope.launch {
+            command.send(Command.RecoverSyncData)
+        }
+    }
+
+    fun onLoginSuccess() {
+        viewModelScope.launch {
+            command.send(Command.DeviceConnected)
+        }
+    }
+
+    fun onTurnOffClicked() {
+        viewModelScope.launch {
+            syncAccountRepository.getThisConnectedDevice()?.let {
+                command.send(AskTurnOffSync(it))
+            } ?: showAccountDetailsIfNeeded()
+
+            viewState.value = viewState.value.toggle(false)
+        }
+    }
+
+    fun onShowTextCodeClicked() {
+        viewModelScope.launch {
+            command.send(Command.ShowTextCode)
         }
     }
 
@@ -270,18 +309,6 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeviceConnected() {
         viewModelScope.launch {
             fetchRemoteDevices()
-        }
-    }
-
-    fun onScanQRCodeClicked() {
-        viewModelScope.launch {
-            command.send(Command.ScanQRCode)
-        }
-    }
-
-    fun onShowTextCodeClicked() {
-        viewModelScope.launch {
-            command.send(Command.ShowTextCode)
         }
     }
 

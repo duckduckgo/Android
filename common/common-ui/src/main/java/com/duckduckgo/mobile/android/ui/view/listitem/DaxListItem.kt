@@ -176,6 +176,16 @@ abstract class DaxListItem(
         trailingSwitch.show()
     }
 
+    fun setSwitchEnabled(enabled: Boolean) {
+        if (enabled) {
+            trailingSwitch.setEnabledOpacity(true)
+            trailingSwitch.isEnabled = true
+        } else {
+            trailingSwitch.setEnabledOpacity(false)
+            trailingSwitch.isEnabled = false
+        }
+    }
+
     /** Sets the trailing icon Visible */
     fun showTrailingIcon() {
         trailingIconContainer.show()

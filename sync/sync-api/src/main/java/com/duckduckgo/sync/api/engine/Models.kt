@@ -60,6 +60,7 @@ data class SyncChangesResponse(
 enum class SyncableType(val field: String) {
     BOOKMARKS("bookmarks"),
     CREDENTIALS("credentials"),
+    SETTINGS("settings"),
 }
 
 // TODO: document api, when is it expected each case? https://app.asana.com/0/0/1204958251694095/f

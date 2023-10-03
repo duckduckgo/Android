@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
@@ -81,6 +82,7 @@ fun generateDefaultDrawable(
     context: Context,
     domain: String,
     overridePlaceholderCharacter: String? = null,
+    @DimenRes cornerRadius: Int = CommonR.dimen.keyline_0,
 ): Drawable {
     return object : Drawable() {
         private val baseHost: String = domain.toUri().baseHost ?: ""
@@ -92,8 +94,6 @@ fun generateDefaultDrawable(
                 }
                 return baseHost.firstOrNull()?.toString()?.uppercase(Locale.getDefault()) ?: ""
             }
-
-        private val faviconDefaultCornerRadius = context.resources.getDimension(CommonR.dimen.mediumShapeCornerRadius)
         private val faviconDefaultSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon)
 
         private val palette = listOf(
@@ -131,7 +131,7 @@ fun generateDefaultDrawable(
             textPaint.typeface = Typeface.DEFAULT_BOLD
             val textWidth: Float = textPaint.measureText(letter) * 0.5f
             val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
-            val radius = (bounds.width() * faviconDefaultCornerRadius) / faviconDefaultSize
+            val radius = (bounds.width() * context.resources.getDimension(cornerRadius)) / faviconDefaultSize
             canvas.drawRoundRect(0f, 0f, bounds.width().toFloat(), bounds.height().toFloat(), radius, radius, backgroundPaint)
             canvas.drawText(letter, centerX - textWidth, centerY + textBaseLineHeight, textPaint)
         }

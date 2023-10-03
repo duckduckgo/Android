@@ -1,0 +1,40 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+android {
+    namespace 'com.duckduckgo.networkprotection.subscription'
+    lintOptions {
+        baseline file("lint-baseline.xml")
+    }
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+}
+
+dependencies {
+    anvil project(':anvil-compiler')
+    implementation project(':app-build-config-api')
+    implementation project(':anvil-annotations')
+    implementation project(':common-ui')
+    implementation project(':common-utils')
+    implementation project(':di')
+    implementation project(':navigation-api')
+    implementation project(':network-protection-api')
+    implementation project(':network-protection-impl')
+    implementation project(':subscriptions-api')
+
+    implementation AndroidX.appCompat
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation Google.android.material
+    implementation Google.dagger
+    implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.retrofit
+    implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.logcat:logcat:_"
+}

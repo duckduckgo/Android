@@ -42,8 +42,8 @@ class SavedSitesDataCleaner @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
         // https://app.asana.com/0/69071770703008/1204375817149200/f
-        if (!deviceSyncState.isUserSignedInOnDevice()) {
-            coroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (!deviceSyncState.isUserSignedInOnDevice()) {
                 savedSitesRepository.pruneDeleted()
             }
         }

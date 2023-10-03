@@ -147,9 +147,14 @@ object TestSyncFixtures {
         invalidCodeErr,
         "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
     )
+    val getDevicesBodyInvalidCodeResponse: Response<DeviceResponse> = Response.error(
+        wrongCredentialsCodeErr,
+        "{\"error\":\"$invalidMessageErr\"}".toResponseBody(),
+    )
 
     val getDevicesSuccess = Result.Success(listOfDevices)
     val getDevicesError = Result.Error(code = invalidCodeErr, reason = invalidMessageErr)
+    val invalidCredentialsError = Result.Error(code = wrongCredentialsCodeErr, reason = invalidMessageErr)
     val connectedDevice = ConnectedDevice(thisDevice = true, deviceName = deviceName, deviceId = deviceId, deviceType = deviceType)
     val listOfConnectedDevices = listOf(connectedDevice)
 

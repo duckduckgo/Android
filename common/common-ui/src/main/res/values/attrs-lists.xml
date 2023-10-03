@@ -29,6 +29,7 @@
     <attr name="trailingIcon" format="integer"/>
     <attr name="showBetaPill" format="boolean"/>
     <attr name="showSwitch" format="boolean"/>
+    <attr name="switchEnabled" format="boolean"/>
     <attr name="leadingIconBackground">
         <!-- No background. -->
         <enum name="none" value="0" />
@@ -64,6 +65,7 @@
         <attr name="leadingIconSize"/>
         <attr name="trailingIcon"/>
         <attr name="showSwitch"/>
+        <attr name="switchEnabled"/>
     </declare-styleable>
 
     <!--Two Line Item view-->
@@ -79,6 +81,7 @@
         <attr name="trailingIcon"/>
         <attr name="showBetaPill"/>
         <attr name="showSwitch"/>
+        <attr name="switchEnabled"/>
     </declare-styleable>
 
 </resources>

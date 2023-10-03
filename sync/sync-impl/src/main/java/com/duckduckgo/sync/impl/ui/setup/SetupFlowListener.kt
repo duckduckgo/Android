@@ -17,8 +17,5 @@
 package com.duckduckgo.sync.impl.ui.setup
 
 interface SetupFlowListener {
-    fun askSyncAnotherDevice()
-    fun recoverYourSyncedData()
-    fun syncAnotherDevice()
     fun launchFinishSetupFlow()
 }

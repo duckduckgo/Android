@@ -23,18 +23,21 @@
             android:name=".ui.SyncInternalSettingsActivity"
             android:exported="false"
             android:label="@string/sync_internal_activity_label"
+            android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
 
         <activity
             android:name=".ui.SyncActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
+            android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
 
         <activity
             android:name=".ui.setup.SetupAccountActivity"
             android:exported="false"
             android:label="@string/sync_screen_title"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ui.SyncActivity"/>
 
         <activity
@@ -58,6 +61,7 @@
             android:exported="false"
             android:label="@string/show_qr_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
 
         <activity
@@ -65,12 +69,14 @@
             android:exported="false"
             android:label="@string/enter_code_screen_title"
             android:theme="@style/Theme.DuckDuckGo.Dark"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ui.setup.SetupAccountActivity"/>
 
         <activity
             android:name=".ui.ShowCodeActivity"
             android:exported="false"
             android:label="@string/show_code_screen_title"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ui.SyncActivity"/>
 
         <activity

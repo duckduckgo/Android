@@ -41,6 +41,52 @@ interface UserAgent {
      * otherwise.
      */
     fun isADefaultException(url: String): Boolean
+
+    /**
+     * This method returns the default user agent policy [DefaultPolicy]
+     * @return the default policy [DefaultPolicy]
+     */
+    fun defaultPolicy(): DefaultPolicy
+
+    /**
+     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
+     * DDG default sites list
+     * @return a `true` if the given [url] is in the DDG default sites list and `false` otherwise.
+     */
+    fun isADdgDefaultSite(url: String): Boolean
+
+    /**
+     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
+     * DDG fixed sites list
+     * @return a `true` if the given [url] is in the DDG fixed sites list and `false` otherwise.
+     */
+    fun isADdgFixedSite(url: String): Boolean
+
+    /**
+     * This method returns `true` or `false` depending if the closest user agent policy is enabled or not
+     * @return a `true` if the closest user agent is enabled and `false` otherwise.
+     */
+    fun closestUserAgentEnabled(): Boolean
+
+    /**
+     * This method returns `true` or `false` depending if the DDG fixed user agent policy is enabled or not
+     * @return a `true` if the DDG fixed user agent is enabled and `false` otherwise.
+     */
+    fun ddgFixedUserAgentEnabled(): Boolean
+
+    /**
+     * This method takes a [version] and returns `true` or `false` depending if the [version] is in the
+     * closest user agent versions list
+     * @return a `true` if the given [version] is in the closest user agent versions and `false` otherwise.
+     */
+    fun isClosestUserAgentVersion(version: String): Boolean
+
+    /**
+     * This method takes a [version] and returns `true` or `false` depending if the [version] is in the
+     * ddg fixed user agent versions list
+     * @return a `true` if the given [version] is in the ddg fixed user agent versions and `false` otherwise.
+     */
+    fun isDdgFixedUserAgentVersion(version: String): Boolean
 }
 
 /** Public data class for User Agent Exceptions */
@@ -48,3 +94,8 @@ data class UserAgentException(
     val domain: String,
     val reason: String,
 )
+
+/** Public enum class for the default policy */
+enum class DefaultPolicy {
+    DDG, DDG_FIXED, CLOSEST
+}

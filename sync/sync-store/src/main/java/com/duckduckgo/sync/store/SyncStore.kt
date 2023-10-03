@@ -2,9 +2,11 @@ package com.duckduckgo.sync.store
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 interface SyncStore {
@@ -32,11 +34,18 @@ class SyncSharedPrefsStore
 constructor(
     private val sharedPrefsProv: SharedPrefsProvider,
     private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SyncStore {
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
-    private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
+    private val isSignedInStateFlow: MutableSharedFlow<Boolean> = MutableSharedFlow(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    init {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            isSignedInStateFlow.emit(isSignedIn())
+        }
+    }
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {

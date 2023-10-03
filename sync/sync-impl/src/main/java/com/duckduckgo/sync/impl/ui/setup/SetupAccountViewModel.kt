@@ -23,16 +23,13 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_CONNECTED
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.DEVICE_SYNCED
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_SETUP
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.Close
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.RecoverSyncData
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.Command.SyncAnotherDevice
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSaveRecoveryCode
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.AskSyncAnotherDevice
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceConnected
-import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.TurnOnSync
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.CreateAccount
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountViewModel.ViewMode.DeviceSynced
 import javax.inject.*
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -55,9 +52,9 @@ class SetupAccountViewModel @Inject constructor(
     fun viewState(screen: Screen): Flow<ViewState> = viewState.onStart {
         if (!initialStateProcessed) {
             val viewMode = when (screen) {
-                SETUP -> TurnOnSync
+                SYNC_SETUP -> CreateAccount
+                DEVICE_SYNCED -> DeviceSynced
                 RECOVERY_CODE -> AskSaveRecoveryCode
-                DEVICE_CONNECTED -> DeviceConnected
             }
             viewState.emit(ViewState(viewMode))
             initialStateProcessed = true
@@ -67,65 +64,28 @@ class SetupAccountViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     data class ViewState(
-        val viewMode: ViewMode = TurnOnSync,
+        val viewMode: ViewMode = DeviceSynced,
     )
 
     sealed class ViewMode {
-        object TurnOnSync : ViewMode()
-        object AskSyncAnotherDevice : ViewMode()
+        object CreateAccount : ViewMode()
         object AskSaveRecoveryCode : ViewMode()
-        object DeviceConnected : ViewMode()
+        object DeviceSynced : ViewMode()
     }
 
     sealed class Command {
         object Close : Command()
-        object RecoverSyncData : Command()
-        object SyncAnotherDevice : Command()
     }
 
     fun onBackPressed() {
         viewModelScope.launch {
-            when (viewState.value.viewMode) {
-                AskSyncAnotherDevice -> {
-                    viewState.emit(ViewState(viewMode = TurnOnSync))
-                }
-
-                TurnOnSync, AskSaveRecoveryCode, DeviceConnected -> {
-                    viewModelScope.launch {
-                        command.send(Close)
-                    }
-                }
-            }
+            command.send(Close)
         }
     }
 
-    fun onAskSyncAnotherDevice() {
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = AskSyncAnotherDevice))
-        }
-    }
-
-    fun finishSetupFlow() {
+    fun onSetupComplete() {
         viewModelScope.launch {
             viewState.emit(ViewState(viewMode = AskSaveRecoveryCode))
-        }
-    }
-
-    fun onRecoverYourSyncedData() {
-        viewModelScope.launch {
-            command.send(RecoverSyncData)
-        }
-    }
-
-    fun onLoginSucess() {
-        viewModelScope.launch {
-            viewState.emit(ViewState(viewMode = DeviceConnected))
-        }
-    }
-
-    fun onSyncAnotherDevice() {
-        viewModelScope.launch {
-            command.send(SyncAnotherDevice)
         }
     }
 }

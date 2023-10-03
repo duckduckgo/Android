@@ -172,7 +172,7 @@ class SettingsViewModel @Inject constructor(
                 }
             }
             NetPWaitlistState.NotUnlocked -> Hidden
-            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist -> Pending
+            NetPWaitlistState.PendingInviteCode, NetPWaitlistState.JoinedWaitlist, NetPWaitlistState.VerifySubscription -> Pending
         }
     }
 
