@@ -32,6 +32,7 @@ dependencies {
     implementation project(':user-agent-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
+    implementation project(':statistics')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat

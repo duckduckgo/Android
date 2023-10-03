@@ -32,13 +32,16 @@ import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllo
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
+import com.duckduckgo.privacy.config.store.features.useragent.UserAgentSitesDao
+import com.duckduckgo.privacy.config.store.features.useragent.UserAgentStatesDao
+import com.duckduckgo.privacy.config.store.features.useragent.UserAgentVersionsDao
 
 @TypeConverters(
     RuleTypeConverter::class,
 )
 @Database(
     exportSchema = true,
-    version = 14,
+    version = 15,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -55,6 +58,9 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
         TrackingParameterEntity::class,
         TrackingParameterExceptionEntity::class,
         UserAgentExceptionEntity::class,
+        UserAgentSitesEntity::class,
+        UserAgentStatesEntity::class,
+        UserAgentVersionsEntity::class,
     ],
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
@@ -70,6 +76,9 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun ampLinksDao(): AmpLinksDao
     abstract fun trackingParametersDao(): TrackingParametersDao
     abstract fun userAgentDao(): UserAgentDao
+    abstract fun userAgentSitesDao(): UserAgentSitesDao
+    abstract fun userAgentStatesDao(): UserAgentStatesDao
+    abstract fun userAgentVersionsDao(): UserAgentVersionsDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {

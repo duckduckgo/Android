@@ -21,6 +21,9 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UserAgentExceptionEntity
+import com.duckduckgo.privacy.config.store.UserAgentSitesEntity
+import com.duckduckgo.privacy.config.store.UserAgentStatesEntity
+import com.duckduckgo.privacy.config.store.UserAgentVersionsEntity
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import org.junit.Assert.*
 import org.junit.Before
@@ -83,12 +86,23 @@ class UserAgentPluginTest {
     fun whenFeatureNameMatchesUserAgentThenUpdateAllExistingExceptions() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/useragent.json")
         val exceptionsCaptor = argumentCaptor<List<UserAgentExceptionEntity>>()
+        val sitesCaptor = argumentCaptor<List<UserAgentSitesEntity>>()
+        val statesCaptor = argumentCaptor<UserAgentStatesEntity>()
+        val versionsCaptor = argumentCaptor<List<UserAgentVersionsEntity>>()
 
         testee.store(FEATURE_NAME_VALUE, jsonString)
 
-        verify(mockUserAgentRepository).updateAll(exceptionsCaptor.capture())
+        verify(mockUserAgentRepository).updateAll(
+            exceptionsCaptor.capture(),
+            sitesCaptor.capture(),
+            statesCaptor.capture(),
+            versionsCaptor.capture(),
+        )
 
         val exceptions = exceptionsCaptor.firstValue
+        val sites = sitesCaptor.firstValue
+        val states = statesCaptor.firstValue
+        val versions = versionsCaptor.firstValue
 
         val default = exceptions.first { it.domain == "default.com" }
         val application = exceptions.first { it.domain == "application.com" }
@@ -114,6 +128,18 @@ class UserAgentPluginTest {
 
         assertTrue(versionApplication.omitApplication)
         assertTrue(versionApplication.omitVersion)
+
+        val defaultSite = sites.first { it.domain == "defaultsite.com" }
+        val fixedSite = sites.first { it.domain == "fixedsite.com" }
+
+        assertTrue(defaultSite.ddgDefaultSite)
+        assertTrue(fixedSite.ddgFixedSite)
+
+        assertTrue(states.closestUserAgent)
+        assertTrue(states.ddgFixedUserAgent)
+
+        assertEquals(versions.filter { it.closestUserAgent }.map { it.version }, listOf("123", "456"))
+        assertEquals(versions.filter { it.ddgFixedUserAgent }.map { it.version }, listOf("789", "321"))
     }
 
     companion object {
