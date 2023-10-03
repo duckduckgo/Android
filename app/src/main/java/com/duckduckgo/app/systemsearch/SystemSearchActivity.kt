@@ -106,6 +106,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             showOmnibar()
+            updateVoiceSearchVisibility()
             val searchQuery = omnibarTextInput.text.toString()
             binding.clearTextButton.isVisible = searchQuery.isNotEmpty()
             viewModel.userUpdatedQuery(omnibarTextInput.text.toString())
@@ -278,6 +279,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun updateVoiceSearchVisibility() {
+        val searchQuery = omnibarTextInput.text.toString()
+        voiceSearch.isVisible =
+            voiceSearchAvailability.shouldShowVoiceSearch(true, omnibarTextInput.text.toString(), omnibarTextInput.text.toString().isNotEmpty(), "")
+        binding.clearTextButton.isVisible = searchQuery.isNotEmpty()
+    }
+
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
         val dialog = EditSavedSiteDialogFragment.instance(savedSite)
         dialog.show(supportFragmentManager, "EDIT_BOOKMARK")
@@ -344,6 +352,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 omnibarTextInput.removeTextChangedListener(textChangeWatcher)
                 omnibarTextInput.setText("")
                 omnibarTextInput.addTextChangedListener(textChangeWatcher)
+                updateVoiceSearchVisibility()
             }
             is LaunchDuckDuckGo -> {
                 launchDuckDuckGo()
@@ -370,7 +379,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 confirmDeleteSavedSite(command.savedSite)
             }
             is UpdateVoiceSearch -> {
-                configureVoiceSearch()
+                updateVoiceSearchVisibility()
             }
         }
     }
