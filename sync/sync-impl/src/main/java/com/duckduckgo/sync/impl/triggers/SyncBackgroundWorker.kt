@@ -79,13 +79,11 @@ class SyncBackgroundWorkerScheduler @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        coroutineScope.launch {
-            withContext(dispatcherProvider.io()) {
-                if (deviceSyncState.isUserSignedInOnDevice()) {
-                    scheduleBackgroundSync()
-                } else {
-                    workManager.cancelAllWorkByTag(BACKGROUND_SYNC_WORKER_TAG)
-                }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (deviceSyncState.isUserSignedInOnDevice()) {
+                scheduleBackgroundSync()
+            } else {
+                workManager.cancelAllWorkByTag(BACKGROUND_SYNC_WORKER_TAG)
             }
         }
     }
