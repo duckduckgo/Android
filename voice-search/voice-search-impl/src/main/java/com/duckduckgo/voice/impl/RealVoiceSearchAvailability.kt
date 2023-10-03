@@ -55,15 +55,19 @@ class RealVoiceSearchAvailability @Inject constructor(
     private fun hasValidLocale(localeLanguageTag: String) = localeLanguageTag == LANGUAGE_TAG_ENG_US
 
     override fun shouldShowVoiceSearch(
-        isEditing: Boolean,
+        hasFocus: Boolean,
+        query: String,
+        hasQueryChanged: Boolean,
         urlLoaded: String,
     ): Boolean {
         // Show microphone icon only when:
-        // - user is editing the address bar OR
-        // - address bar is empty (initial state / new tab) OR
-        // - DDG SERP is shown OR (address bar doesn't contain a website)
+        // - omnibar is focused and query hasn't changed
+        // - omnibar is focused and query is empty
+        // - DDG SERP is shown and query hasn't changed
         return if (isVoiceSearchAvailable) {
-            isEditing || urlLoaded.isEmpty() || urlLoaded.startsWith(URL_DDG_SERP)
+            hasFocus && query.isNotBlank() && !hasQueryChanged ||
+                query.isBlank() && hasFocus ||
+                (urlLoaded.startsWith(URL_DDG_SERP) && (!hasQueryChanged || !hasFocus))
         } else {
             false
         }
