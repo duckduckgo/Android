@@ -25,6 +25,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
@@ -34,6 +35,8 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -70,14 +73,18 @@ class SyncBackgroundWorker(
 class SyncBackgroundWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val deviceSyncState: DeviceSyncState,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        if (deviceSyncState.isUserSignedInOnDevice()) {
-            scheduleBackgroundSync()
-        } else {
-            workManager.cancelAllWorkByTag(BACKGROUND_SYNC_WORKER_TAG)
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (deviceSyncState.isUserSignedInOnDevice()) {
+                scheduleBackgroundSync()
+            } else {
+                workManager.cancelAllWorkByTag(BACKGROUND_SYNC_WORKER_TAG)
+            }
         }
     }
 
