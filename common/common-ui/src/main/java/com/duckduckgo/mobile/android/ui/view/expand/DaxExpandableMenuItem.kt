@@ -170,7 +170,7 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
     fun hidePrimaryButton() {
         binding.daxExpandableMenuItemPrimaryButton.gone()
     }
-    
+
     override fun onFinishInflate() {
         super.onFinishInflate()
 
