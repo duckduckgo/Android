@@ -17,8 +17,6 @@
 package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -28,9 +26,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.CheckListItem.CheckItemStatus
 import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
@@ -79,8 +75,6 @@ class SettingsViewModel @Inject constructor(
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val dispatcherProvider: DispatcherProvider,
     private val autoconsent: Autoconsent,
-    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val appInstallStore: AppInstallStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -124,7 +118,6 @@ class SettingsViewModel @Inject constructor(
         object LaunchPermissionsScreen : Command()
         object LaunchAppearanceScreen : Command()
         object LaunchAboutScreen : Command()
-        data class ShowDefaultBrowserDialog(val intent: Intent) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -343,39 +336,11 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_APPEARANCE_PRESSED)
     }
 
-    fun onLaunchedFromNotification(pixelName: String, context: Context) {
-        if (pixelName == DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION) {
-            launchSetAsDefaultBrowserOption(context)
-        }
+    fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)
-    }
-
-    private fun launchSetAsDefaultBrowserOption(context: Context) {
-        if (defaultRoleBrowserDialog.shouldShowDialog()) {
-            val intent = defaultRoleBrowserDialog.createIntent(context)
-            if (intent != null) {
-                viewModelScope.launch { command.send(Command.ShowDefaultBrowserDialog(intent)) }
-            } else {
-                viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
-                appInstallStore.setDefaultBrowserFromNotification = true
-            }
-        } else {
-            viewModelScope.launch { command.send(Command.LaunchDefaultBrowser) }
-            appInstallStore.setDefaultBrowserFromNotification = true
-        }
-    }
-
-    fun onDefaultBrowserSetFromDialog(ddgSetAsDefault: Boolean) {
-        defaultRoleBrowserDialog.dialogShown()
-        appInstallStore.defaultBrowser = ddgSetAsDefault
-        if (ddgSetAsDefault) {
-            viewModelScope.launch { viewState.emit(currentViewState().copy(isAppDefaultBrowser = true)) }
-            pixel.fire(DEFAULT_BROWSER_SET_FROM_NOTIFICATION)
-        }
     }
 
     companion object {
         const val EMAIL_PROTECTION_URL = "https://duckduckgo.com/email"
-        const val DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION = "mnot_l_DefaultBrowser"
     }
 }

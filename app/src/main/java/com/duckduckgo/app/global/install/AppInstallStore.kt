@@ -36,8 +36,6 @@ interface AppInstallStore : MainProcessLifecycleObserver {
 
     var newDefaultBrowserDialogCount: Int
 
-    var setDefaultBrowserFromNotification: Boolean
-
     fun hasInstallTimestampRecorded(): Boolean
 }
 
@@ -62,10 +60,6 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, 0)
         set(defaultBrowser) = preferences.edit { putInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, defaultBrowser) }
 
-    override var setDefaultBrowserFromNotification: Boolean
-        get() = preferences.getBoolean(KEY_SET_DEFAULT_BROWSER_FROM_NOTIFICATION, false)
-        set(openFromNotification) = preferences.edit { putBoolean(KEY_SET_DEFAULT_BROWSER_FROM_NOTIFICATION, openFromNotification) }
-
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
@@ -84,7 +78,6 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
         const val KEY_WIDGET_INSTALLED = "KEY_WIDGET_INSTALLED"
         const val KEY_DEFAULT_BROWSER = "KEY_DEFAULT_BROWSER"
-        const val KEY_SET_DEFAULT_BROWSER_FROM_NOTIFICATION = "SET_DEFAULT_BROWSER_FROM_NOTIFICATION"
         private const val ROLE_MANAGER_BROWSER_DIALOG_KEY = "ROLE_MANAGER_BROWSER_DIALOG_KEY"
     }
 }

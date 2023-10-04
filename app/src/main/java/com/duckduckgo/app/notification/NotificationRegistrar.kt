@@ -63,7 +63,7 @@ class NotificationRegistrar @Inject constructor(
         const val Article = 103 // 102 was used for the search notification hence using 103 moving forward
         const val AppFeature = 104
         const val SurveyAvailable = 109 // 105 to 108 were already used previously
-        const val DefaultBrowser = 110
+        // 110 was already used previously
     }
 
     object ChannelType {
