@@ -92,11 +92,15 @@ class UserAgentPlugin @Inject constructor(
             }
 
             val userAgentStates = userAgentFeature?.settings?.let { settings ->
-                UserAgentStatesEntity(
-                    defaultPolicy = settings.defaultPolicy,
-                    closestUserAgent = settings.closestUserAgent.state == "enabled",
-                    ddgFixedUserAgent = settings.ddgFixedUserAgent.state == "enabled",
-                )
+                if (settings.defaultPolicy == null || settings.closestUserAgent == null || settings.ddgFixedUserAgent == null) {
+                    null
+                } else {
+                    UserAgentStatesEntity(
+                        defaultPolicy = settings.defaultPolicy,
+                        closestUserAgent = settings.closestUserAgent.state == "enabled",
+                        ddgFixedUserAgent = settings.ddgFixedUserAgent.state == "enabled",
+                    )
+                }
             }
 
             userAgentRepository.updateAll(userAgentExceptions, userAgentSites, userAgentStates, userAgentVersions)
