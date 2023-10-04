@@ -29,11 +29,11 @@ data class UserAgentExceptionJson(
 )
 
 data class UserAgentSettings(
-    val defaultPolicy: String,
+    val defaultPolicy: String?,
     val ddgDefaultSites: List<DdgDefaultSite>,
     val ddgFixedSites: List<DdgFixedSite>,
-    val closestUserAgent: ClosestUserAgent,
-    val ddgFixedUserAgent: DdgFixedUserAgent,
+    val closestUserAgent: ClosestUserAgent?,
+    val ddgFixedUserAgent: DdgFixedUserAgent?,
     val omitApplicationSites: List<UserAgentExceptionJson>,
     val omitVersionSites: List<UserAgentExceptionJson>,
 )
