@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Sätted</string>
     <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsAutofillLoginsSetting">Sisesta sisselogimisandmed automaatselt</string>
-    <string name="settingsSyncSetting">Sünkrooni</string>
+    <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
