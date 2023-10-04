@@ -6,6 +6,7 @@ tags:
     clearState: true
     stopApp: true
 - runFlow: ../sync_flows/1_-_create_account.yaml
+- runScript: create_account.js
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/item_container"
     index: 2
