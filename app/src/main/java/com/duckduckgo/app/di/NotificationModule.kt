@@ -75,13 +75,11 @@ object NotificationModule {
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        variantManager: VariantManager,
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
-            variantManager,
         )
     }
 
