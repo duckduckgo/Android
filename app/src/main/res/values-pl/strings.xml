@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Ustawienia</string>
     <string name="settingsPermissionsSetting">Uprawnienia</string>
     <string name="settingsAutofillLoginsSetting">Autouzupełnianie logowania</string>
-    <string name="settingsSyncSetting">Synchronizacja</string>
+    <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
 
     <!-- Private Search -->
