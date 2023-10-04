@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
@@ -48,6 +49,7 @@ constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStore: SyncStore,
     private val syncEnvDataStore: SyncInternalEnvDataStore,
+    private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -219,6 +221,7 @@ constructor(
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))
                 }
+
                 is Success -> {
                     command.send(Command.ShowMessage("${result.data}"))
                     updateViewState()
@@ -234,6 +237,7 @@ constructor(
                     command.send(ShowMessage("$qrCodeResult"))
                     return@launch
                 }
+
                 is Success -> qrCodeResult.data
             }
             updateViewState()
@@ -245,6 +249,7 @@ constructor(
                     is Error -> {
                         command.send(Command.ShowMessage("$result"))
                     }
+
                     is Success -> {
                         command.send(Command.ShowMessage(result.data.toString()))
                         polling = false
@@ -260,6 +265,13 @@ constructor(
             viewModelScope.launch(dispatchers.io()) {
                 command.send(ReadConnectQR)
             }
+        }
+    }
+
+    fun copyRecoveryCode(recoveryCode: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            clipboard.copyToClipboard(recoveryCode)
+            command.send(ShowMessage(recoveryCode))
         }
     }
 }
