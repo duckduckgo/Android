@@ -30,16 +30,13 @@ import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.migration.AppDatabaseBookmarksMigrationCallback
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.store.*
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
-import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
-import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
-import junit.framework.Assert.assertFalse
-import junit.framework.Assert.assertTrue
+import junit.framework.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -75,6 +72,22 @@ class BookmarksMigrationTest {
         savedSitesRelationsDao = appDatabase.syncRelationsDao()
     }
 
+    @After
+    fun tearDown() {
+        appDatabase.close()
+    }
+
+    @Test
+    fun whenMigrationRunsThenAllFormFactorFavoriteFoldersCreated() {
+        whenMigrationApplied()
+
+        val allFolders = appDatabase.syncEntitiesDao().allEntitiesByTypeSync(EntityType.FOLDER)
+
+        Assert.assertNotNull(allFolders.find { it.entityId == SavedSitesNames.FAVORITES_ROOT })
+        Assert.assertNotNull(allFolders.find { it.entityId == SavedSitesNames.FAVORITES_MOBILE_ROOT })
+        Assert.assertNotNull(allFolders.find { it.entityId == SavedSitesNames.FAVORITES_DESKTOP_ROOT })
+    }
+
     @Test
     fun whenFavoritesExistThenMigrationIsSuccessful() = runTest {
         val totalFavorites = 10
@@ -82,10 +95,10 @@ class BookmarksMigrationTest {
         whenMigrationApplied()
 
         val relations = savedSitesRelationsDao.relations()
-        assertTrue(relations.size == totalFavorites * 2)
+        assertEquals(relations.size, totalFavorites * DEVICE_ROOT_FOLDERS)
 
         val entities = savedSitesEntitiesDao.entities()
-        assertTrue(entities.size == totalFavorites + 2)
+        assertEquals(entities.size, totalFavorites + ROOT_FOLDERS)
     }
 
     @Test
@@ -109,7 +122,7 @@ class BookmarksMigrationTest {
     }
 
     @Test
-    fun whenBookmarksWithFoldersExistThenMigrationIsSuccessful() {
+    fun whenBookmarksWithFoldersExistThenMigrationIsSuccessful() = runTest {
         val totalFolder = 10
         val bookmarksPerFolder = 5
         createFoldersTree(totalFolder, bookmarksPerFolder)
@@ -123,17 +136,20 @@ class BookmarksMigrationTest {
         assertTrue(savedSitesRelationsDao.hasRelations())
 
         val entities = savedSitesEntitiesDao.entities()
-        assertTrue(entities.size == totalFolder + bookmarksPerFolder + totalFavorites + ROOT_FOLDERS)
+        assertTrue(entities.size == totalFolder + (totalFolder * bookmarksPerFolder) + totalFavorites + ROOT_FOLDERS)
 
         val relations = (savedSitesRelationsDao.relations())
-        assertTrue(relations.size == totalFolder + bookmarksPerFolder + totalFavorites + totalFavorites)
+        assertTrue(relations.size == totalFolder + (totalFolder * bookmarksPerFolder) + (totalFavorites * DEVICE_ROOT_FOLDERS))
     }
 
     @Test
-    fun whenBookmarksWithFoldersAndFavoritesExistThenMigrationIsSuccessful() {
+    fun whenBookmarksWithFoldersAndFavoritesExistThenMigrationIsSuccessful() = runTest {
         val totalFolder = 10
         val bookmarksPerFolder = 5
         createFoldersTree(totalFolder, bookmarksPerFolder)
+
+        assertEquals(10, bookmarkFoldersDao.getBookmarkFoldersSync().size)
+        assertEquals(50, bookmarksDao.getBookmarks().first().size)
 
         whenMigrationApplied()
 
@@ -141,10 +157,10 @@ class BookmarksMigrationTest {
         assertTrue(savedSitesRelationsDao.hasRelations())
 
         val entities = savedSitesEntitiesDao.entities()
-        assertTrue(entities.size == totalFolder + bookmarksPerFolder + ROOT_FOLDERS)
+        assertEquals(entities.size, totalFolder + (totalFolder * bookmarksPerFolder) + ROOT_FOLDERS)
 
         val relations = (savedSitesRelationsDao.relations())
-        assertTrue(relations.size == totalFolder + bookmarksPerFolder) // total folder + root folder
+        assertEquals(relations.size, totalFolder + (totalFolder * bookmarksPerFolder))
     }
 
     @Test
@@ -157,8 +173,8 @@ class BookmarksMigrationTest {
         // only one entity migrated
         assertTrue(savedSitesEntitiesDao.entities().size == 1 + ROOT_FOLDERS)
 
-        // two relations migrated, one for bookmarks and another for favorites
-        assertTrue(savedSitesRelationsDao.relations().size == 2)
+        // relations migrated, one for bookmarks and another for favorites
+        assertTrue(savedSitesRelationsDao.relations().size == 1 * DEVICE_ROOT_FOLDERS)
 
         val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
@@ -177,8 +193,13 @@ class BookmarksMigrationTest {
 
         whenMigrationApplied()
 
-        assertTrue(savedSitesEntitiesDao.entities().size == ROOT_FOLDERS + 2)
-        assertTrue(savedSitesRelationsDao.relations().size == ROOT_FOLDERS + 1)
+        val bookmarksMigrated = 2
+        val favoritesMigrated = 1
+        assertEquals(savedSitesEntitiesDao.entities().size, ROOT_FOLDERS + bookmarksMigrated)
+        assertEquals(
+            savedSitesRelationsDao.relations().size,
+            (bookmarksMigrated * BOOKMARK_ROOT_FOLDERS) + (favoritesMigrated * FAVORITES_DEVICE_ROOT_FOLDERS),
+        )
 
         val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
@@ -222,7 +243,7 @@ class BookmarksMigrationTest {
     ) {
         val bookmarks = mutableListOf<BookmarkEntity>()
         for (index in 1..total) {
-            bookmarks.add(BookmarkEntity(index.toLong(), "Bookmark$index", "http://bookmark$index.com", bookmarkFolderId))
+            bookmarks.add(BookmarkEntity("$index$bookmarkFolderId".toLong(), "Bookmark$index", "http://bookmark$index.com", bookmarkFolderId))
         }
         bookmarksDao.insertList(bookmarks)
     }
@@ -248,6 +269,10 @@ class BookmarksMigrationTest {
     }
 
     companion object {
-        const val ROOT_FOLDERS = 2
+        const val BOOKMARK_ROOT_FOLDERS = 1
+        const val FAVORITES_DEVICE_ROOT_FOLDERS = 2
+        const val DEVICE_ROOT_FOLDERS = FAVORITES_DEVICE_ROOT_FOLDERS + BOOKMARK_ROOT_FOLDERS
+        const val FAVORITES_ROOT_FOLDERS = 3
+        const val ROOT_FOLDERS = FAVORITES_ROOT_FOLDERS + BOOKMARK_ROOT_FOLDERS
     }
 }
