@@ -29,6 +29,7 @@ import dagger.Lazy
 import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
+import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppDatabaseBookmarksMigrationCallback(
@@ -40,6 +41,7 @@ class AppDatabaseBookmarksMigrationCallback(
 
     override fun onOpen(db: SupportSQLiteDatabase) {
         ioThread {
+            Timber.i("CRIS: Running bookmarks migration")
             runMigration()
         }
     }
@@ -61,6 +63,16 @@ class AppDatabaseBookmarksMigrationCallback(
             if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_ROOT) == null) {
                 syncEntitiesDao().insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER, lastModified = null))
             }
+            if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT) == null) {
+                syncEntitiesDao().insert(
+                    Entity(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_MOBILE_NAME, "", FOLDER, lastModified = null),
+                )
+            }
+            if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT) == null) {
+                syncEntitiesDao().insert(
+                    Entity(SavedSitesNames.FAVORITES_DESKTOP_ROOT, SavedSitesNames.FAVORITES_MOBILE_NAME, "", FOLDER, lastModified = null),
+                )
+            }
         }
     }
 
@@ -81,10 +93,12 @@ class AppDatabaseBookmarksMigrationCallback(
                 val existingBookmark = syncEntitiesDao().entityByUrl(it.url)
                 if (existingBookmark != null) {
                     favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = existingBookmark.entityId))
+                    favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_MOBILE_NAME, entityId = existingBookmark.entityId))
                 } else {
                     val entity = Entity(UUID.randomUUID().toString(), it.title, it.url, BOOKMARK)
                     entitiesMigration.add(entity)
                     favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = entity.entityId))
+                    favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_MOBILE_ROOT, entityId = entity.entityId))
                     favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = entity.entityId))
                 }
             }
