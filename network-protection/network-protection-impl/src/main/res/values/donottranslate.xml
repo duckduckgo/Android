@@ -120,6 +120,22 @@
     <!-- Manage -->
     <string name="netpManagementManageHeader">Manage</string>
     <string name="netpManagementManageItemExclusion">Having issues with an app?</string>
+    <string name="netpManagementVpnSettings">VPN Settings</string>
+    <string name="netpManagementVpnNotificationSettings">VPN Notifications</string>
+
+    <!-- VPN settings -->
+    <string name="netpVpnSettingKillSwitch">Always On</string>
+    <string name="netpVpnSettingAlwaysOn">Always On</string>
+    <string name="netpVpnSettingAlwaysOnByline">Automatically restore a VPN connection after interruption</string>
+    <string name="netpVpnSettingExcludeLocalNetworks">Exclude Local Networks</string>
+    <string name="netpVpnSettingExcludeLocalNetworksByline">Let local traffic bypass the VPN and connect to devices on your local network, like a printer</string>
+    <string name="netpVpnSettingDnsLeak">Network Protection prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
+
+    <!-- VPN Notification settings -->
+    <string name="netpVpnSettingNotificationEnabled">VPN Enabled</string>
+    <string name="netpVpnSettingNotificationEnabledByline">Display a persistent notification when the VPN is active</string>
+    <string name="netpVpnSettingNotificationAlert">VPN Alerts</string>
+    <string name="netpVpnSettingNotificationAlertByline">Get notified if your connection drops or VPN status changes</string>
 
     <!-- Exclusion list -->
     <string name="netpExclusionListTitle">Manage Apps</string>
@@ -180,6 +196,8 @@
     <!-- Terms -->
     <string name="netpTermsAgreeAndClose">Agree and Enable VPN</string>
     <string name="netpTermsTitle">Terms and Privacy Policy</string>
+    <string name="netpVpnSettingsTitle">VPN Settings</string>
+    <string name="netpVpnNotificationSettingsTitle">VPN Notifications</string>
     <string name="netpTermsHeadline">Terms of Service</string>
     <string name="netpPrivacyPolicyHeadline">Privacy Policy</string>
 

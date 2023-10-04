@@ -39,4 +39,10 @@ interface NetPRemoteFeature {
      */
     @Toggle.DefaultValue(true)
     fun waitlistBetaActive(): Toggle
+
+    /**
+     * When `true` it will show the VPN settings in the NetP management screen.
+     */
+    @Toggle.DefaultValue(false)
+    fun showVpnSettings(): Toggle
 }

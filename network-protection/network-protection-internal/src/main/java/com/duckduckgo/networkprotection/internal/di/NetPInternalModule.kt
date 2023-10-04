@@ -36,6 +36,7 @@ object NetPInternalModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
+    @InternalNetPConfigTogglesDao
     fun provideNetPConfigTogglesDao(netPInternalConfigDatabase: NetPInternalConfigDatabase): NetPConfigTogglesDao {
         return netPInternalConfigDatabase.configTogglesDao()
     }
