@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Nastavenia</string>
     <string name="settingsPermissionsSetting">Oprávnenia</string>
     <string name="settingsAutofillLoginsSetting">Automatické vyplňovanie prihlasovacích údajov</string>
-    <string name="settingsSyncSetting">Synchronizácia</string>
+    <string name="settingsSyncSetting">Synchronizácia a zálohovanie</string>
     <string name="settingsFireButton">Tlačidlo Fire</string>
 
     <!-- Private Search -->
