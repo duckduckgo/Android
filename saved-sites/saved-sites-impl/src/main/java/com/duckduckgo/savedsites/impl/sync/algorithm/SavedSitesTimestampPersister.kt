@@ -22,6 +22,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
@@ -32,6 +33,7 @@ import timber.log.Timber
 @Named("timestampStrategy")
 class SavedSitesTimestampPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
+    private val syncSavedSitesRepository: SyncSavedSitesRepository,
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
@@ -92,16 +94,17 @@ class SavedSitesTimestampPersister @Inject constructor(
 
     override fun processFavourite(
         favourite: Favorite,
+        favoriteFolder: String,
     ) {
-        val storedFavourite = savedSitesRepository.getFavoriteById(favourite.id)
+        val storedFavourite = syncSavedSitesRepository.getFavoriteById(favourite.id, favoriteFolder)
         if (storedFavourite != null) {
             if (favourite.isDeleted()) {
                 Timber.d("Sync-Bookmarks-Persister: remote favourite ${favourite.id} deleted, deleting local favourite")
-                savedSitesRepository.delete(favourite)
+                syncSavedSitesRepository.delete(favourite, favoriteFolder)
             } else {
                 if (favourite.modifiedAfter(storedFavourite.lastModified)) {
                     Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} modified after local favourite, replacing content")
-                    savedSitesRepository.replaceFavourite(favourite, favourite.id)
+                    syncSavedSitesRepository.replaceFavourite(favourite, favourite.id, favoriteFolder)
                 } else {
                     Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} modified before local favourite, nothing to do")
                 }
@@ -111,7 +114,7 @@ class SavedSitesTimestampPersister @Inject constructor(
                 Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} not present locally but was deleted, nothing to do")
             } else {
                 Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} not present locally, inserting")
-                savedSitesRepository.insert(favourite)
+                syncSavedSitesRepository.insert(favourite, favoriteFolder)
             }
         }
     }

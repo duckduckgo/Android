@@ -42,13 +42,6 @@ interface SavedSitesRepository {
     /**
      * Returns all [Bookmark] and [BookmarkFolder] inside a folder
      * @param folderId the id of the folder.
-     * @return [Flow] [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
-     */
-    fun getFolderContent(folderId: String): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
-
-    /**
-     * Returns all [Bookmark] and [BookmarkFolder] inside a folder
-     * @param folderId the id of the folder.
      * @return [Pair] of [Bookmark] and [BookmarkFolder] inside a folder
      */
     fun getFolderContentSync(folderId: String): Pair<List<Bookmark>, List<BookmarkFolder>>
@@ -290,18 +283,6 @@ interface SavedSitesRepository {
     )
 
     /**
-     * Replaces an existing [Favorite]
-     * Used when syncing data from the backend
-     * There are scenarios when a duplicate remote favourite has to be replace the local one
-     * @param favorite the favourite to replace locally
-     * @param localId the local Id to be replaced
-     */
-    fun replaceFavourite(
-        favorite: Favorite,
-        localId: String,
-    )
-
-    /**
      * Returns a [BookmarkFolder] based on its id
      * @param folderId of the [BookmarkFolder]
      * @return [BookmarkFolder] if exists, or null if doesn't
@@ -368,4 +349,6 @@ interface SavedSitesRepository {
      * Updates entity [entityId] to a modified date of [modifiedSince]
      */
     fun updateModifiedSince(entityId: String, modifiedSince: String)
+
+    suspend fun test()
 }
