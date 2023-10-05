@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Nastavitve</string>
     <string name="settingsPermissionsSetting">Dovoljenja</string>
     <string name="settingsAutofillLoginsSetting">Samodejno izpolnjevanje obrazcev za prijavo</string>
-    <string name="settingsSyncSetting">Sinhronizacija</string>
+    <string name="settingsSyncSetting">Sinhronizacija in varnostno kopiranje</string>
     <string name="settingsFireButton">Gumb Fire Button</string>
 
     <!-- Private Search -->
