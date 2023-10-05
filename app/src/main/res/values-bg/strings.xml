@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsAutofillLoginsSetting">Автоматично попълване на данни за вход</string>
-    <string name="settingsSyncSetting">Синхронизиране</string>
+    <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -769,6 +769,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Изтрий</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Добавяне на опция за гласово търсене към адресната лента</string>
+    <string name="accessibilityVoiceSearchSubtitle">Добавете опция за поверително гласово търсене към адресната лента. Звукът не се съхранява и не се споделя с никого, включително с DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Поверително гласово търсене</string>
 </resources>
