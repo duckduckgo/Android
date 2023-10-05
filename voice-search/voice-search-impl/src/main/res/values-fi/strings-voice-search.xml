@@ -28,8 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Jotta voit käyttää äänihakua DuckDuckGossa, salli mikrofonin käyttö järjestelmäasetuksissa.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Asetukset</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofonin käyttöoikeus vaaditaan</string>
-    <string name="voiceSearchRemovePositiveButton">Poista äänihaku</string>
-    <string name="voiceSearchRemoveTitle">Poistetaanko äänihakuvaihtoehto osoitepalkista?</string>
+    <string name="voiceSearchRemovePositiveButton">Poista</string>
+    <string name="voiceSearchRemoveTitle">Poistetaanko yksityinen äänihakuvaihtoehto osoitepalkista?</string>
     <string name="voiceSearchRemoveSubtitle">Voit hallita tätä ja muita esteettömyysasetuksia Asetuksissa.</string>
     <string name="voiceSearchTitle">Äänihaku</string>
 </resources>
