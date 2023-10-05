@@ -770,6 +770,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Add Voice Search option to the address bar</string>
+    <string name="accessibilityVoiceSearchSubtitle">Add Private Voice Search option to the address bar. Audio is not stored or shared with anyone, including DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Private Voice Search</string>
 </resources>
