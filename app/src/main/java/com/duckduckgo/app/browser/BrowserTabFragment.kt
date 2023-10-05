@@ -3071,6 +3071,7 @@ class BrowserTabFragment :
                 }
 
                 renderVoiceSearch(viewState)
+                omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
             }
         }
 
@@ -3240,6 +3241,8 @@ class BrowserTabFragment :
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = true
             }
+
+            omnibar.spacer.isVisible = viewState.showClearButton && lastSeenOmnibarViewState?.showVoiceSearch ?: false
 
             decorator.updateToolbarActionsVisibility(viewState)
         }
