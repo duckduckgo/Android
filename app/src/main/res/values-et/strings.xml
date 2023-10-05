@@ -769,6 +769,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Kustuta</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale häälotsingu valik</string>
+    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
     <string name="accessibilityVoiceSearchTitle">Privaatne häälotsing</string>
 </resources>
