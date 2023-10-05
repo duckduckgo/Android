@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.view.text.TextInput.Action
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
@@ -37,7 +36,6 @@ import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
-import com.google.android.material.snackbar.Snackbar
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.ScanContract
