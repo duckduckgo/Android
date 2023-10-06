@@ -43,7 +43,7 @@ jobs:
           path: 'package.json'
           prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
 
-      - run: echo ${{steps.latest-release.outputs.propStr}}
+      - run: echo ${{steps.latest-release.outputs.prop}}
 
       - name: Split version code
         uses: winterjung/split@v2
