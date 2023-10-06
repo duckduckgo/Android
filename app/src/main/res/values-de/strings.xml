@@ -769,6 +769,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Löschen</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Option Sprachsuche zur Adressleiste hinzufügen</string>
+    <string name="accessibilityVoiceSearchSubtitle">Füge die Option „Private Sprachsuche“ zur Adressleiste hinzu.Audio wird weder gespeichert noch an Dritte weitergegeben, auch nicht an DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Private Sprachsuche</string>
 </resources>
