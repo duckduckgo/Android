@@ -46,10 +46,10 @@ jobs:
       - run: echo ${{steps.latest-release.outputs.propStr}}
 
       - name: Split version code
-        uses: xom9ikk/split@v1
+        uses: xom9ikk/split@v2
         id: split
         with:
-          string: ${{steps.latest-release.outputs.propStr}}
+          msg: ${{steps.latest-release.outputs.propStr}}
           separator: #
           limit: -1
 
