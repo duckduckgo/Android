@@ -57,7 +57,7 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.extract-release-version.outputs._1}}
         id: create-pr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v5.0.2
         with:
           base: "develop"
           title: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
