@@ -50,11 +50,8 @@ jobs:
           string: ${{steps.find-latest-release.outputs.prop}}
           split-by: '#'
 
-      - name: Show release version
-        env:
-          RELEASE_VERSION: ${{ steps.extract-release-version._1}}
-        id: split
-        run: echo "::set-output name=fragment::${RELEASE_VERSION}"
+      - run: |
+          echo "${{ steps.extract-release-version.outputs._1}}"
 
 #      - name: Create Pull Request in Android repo
 #        if: ${{ steps.update-check.outcome == 'failure' }}
