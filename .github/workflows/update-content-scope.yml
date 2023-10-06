@@ -37,7 +37,6 @@ jobs:
 #        run: npm update
 
       - name: Find latest release version of Content Scope scripts
-        if: ${{ steps.update-check.outcome == 'failure' }}
         id: latest-release
         uses: notiz-dev/github-action-json-property@release
         with:
