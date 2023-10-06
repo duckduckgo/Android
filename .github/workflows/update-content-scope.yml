@@ -43,17 +43,13 @@ jobs:
           path: 'package.json'
           prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
 
-      - run: echo ${{steps.latest-release.outputs.prop}}
-
-      - name: Split version code
-        uses: winterjung/split@v2
+      - uses: rishabhgupta/split-by@v1
         id: split
         with:
-          msg: ${{steps.latest-release.outputs.propStr}}
-          separator: github:duckduckgo/content-scope-scripts#
-          maxsplit: -1
-
-      - run: echo ${{ steps.split.outputs._1 }}
+          string: ${{steps.latest-release.outputs.prop}}
+          split-by: '#'
+      - run: |
+          echo "${{ steps.split.outputs._1}}"
 
 #      - name: Find latest release version of Content Scope scripts
 #        if: ${{ steps.update-check.outcome == 'failure' }}
