@@ -49,7 +49,7 @@ jobs:
         env:
           RELEASE_VERSION: ${{steps.latest-release.outputs.propStr}}
         id: split
-        run: echo "::set-output name=version::${RELEASE_VERSION##*#}"
+        run: echo "{version}={RELEASE_VERSION##*#}" >> $GITHUB_OUTPUT
 
       - name: Echo result variable
         run: |
