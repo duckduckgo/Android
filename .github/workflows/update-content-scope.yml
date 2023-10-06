@@ -41,9 +41,9 @@ jobs:
         uses: notiz-dev/github-action-json-property@release
         with:
           path: 'package.json'
-          prop_path: 'version'
+          prop_path: 'dependencies.content-scope-scripts'
 
-      - run: echo ${{steps.format_script.outputs.prop}}
+      - run: echo ${{steps.latest-release.outputs.prop}}
 
 #      - name: Find latest release version of Content Scope scripts
 #        if: ${{ steps.update-check.outcome == 'failure' }}
