@@ -51,7 +51,7 @@ jobs:
         with:
           msg: ${{steps.latest-release.outputs.propStr}}
           separator: #
-          limit: -1
+          maxsplit: -1
 
       - run: echo ${{ steps.split.outputs._0 }}
 
