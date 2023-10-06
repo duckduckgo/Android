@@ -824,6 +824,15 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = HideKeyboard
         }
+
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
+                hasFocus = currentOmnibarViewState().isEditing,
+                query = currentOmnibarViewState().omnibarText,
+                hasQueryChanged = false,
+                urlLoaded = url ?: "",
+            ),
+        )
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
