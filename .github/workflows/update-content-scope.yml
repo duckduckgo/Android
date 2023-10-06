@@ -45,15 +45,15 @@ jobs:
 
       - run: echo ${{steps.latest-release.outputs.propStr}}
 
-      - name: Split release version
-        env:
-          RELEASE_VERSION: ${{steps.latest-release.outputs.propStr}}
+      - name: Split version code
+        uses: xom9ikk/split@v1
         id: split
-        run: echo "{version}={RELEASE_VERSION##*#}" >> $GITHUB_OUTPUT
+        with:
+          string: ${{steps.latest-release.outputs.propStr}}
+          separator: #
+          limit: -1
 
-      - name: Echo result variable
-        run: |
-          echo ${{ steps.split.outputs.version }}
+      - run: echo ${{ steps.split.outputs._0 }}
 
 #      - name: Find latest release version of Content Scope scripts
 #        if: ${{ steps.update-check.outcome == 'failure' }}
