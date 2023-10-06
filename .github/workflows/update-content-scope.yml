@@ -41,7 +41,7 @@ jobs:
         uses: notiz-dev/github-action-json-property@release
         with:
           path: 'package.json'
-          prop_path: '@duckduckgo/content-scope-scripts'
+          prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
 
       - run: echo ${{steps.latest-release.outputs.prop}}
 
