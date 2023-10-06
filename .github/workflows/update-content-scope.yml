@@ -20,21 +20,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install npm-check-updates
-        run: npm install -g npm-check-updates
-
-      - name: Check for updates
-        id: update-check
-        continue-on-error: true
-        run: ncu @duckduckgo/content-scope-scripts --errorLevel 2
-
-      - name: Update content scope scripts
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        run: ncu @duckduckgo/content-scope-scripts -u
-
-      - name: Install package
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        run: npm update
+#      - name: Install npm-check-updates
+#        run: npm install -g npm-check-updates
+#
+#      - name: Check for updates
+#        id: update-check
+#        continue-on-error: true
+#        run: ncu @duckduckgo/content-scope-scripts --errorLevel 2
+#
+#      - name: Update content scope scripts
+#        if: ${{ steps.update-check.outcome == 'failure' }}
+#        run: ncu @duckduckgo/content-scope-scripts -u
+#
+#      - name: Install package
+#        if: ${{ steps.update-check.outcome == 'failure' }}
+#        run: npm update
 
       - name: Find latest release version of Content Scope scripts
         if: ${{ steps.update-check.outcome == 'failure' }}
@@ -42,9 +42,9 @@ jobs:
         uses: notiz-dev/github-action-json-property@release
         with:
           path: 'package.json'
-          prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
+          prop_path: 'version'
 
-      - run: echo ${{steps.format_script.outputs.propStr}}
+      - run: echo ${{steps.format_script.outputs.prop}}
 
 #      - name: Find latest release version of Content Scope scripts
 #        if: ${{ steps.update-check.outcome == 'failure' }}
