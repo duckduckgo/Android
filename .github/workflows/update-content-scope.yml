@@ -46,7 +46,7 @@ jobs:
       - run: echo ${{steps.latest-release.outputs.propStr}}
 
       - name: Split version code
-        uses: xom9ikk/split@v2
+        uses: winterjung/split@v2
         id: split
         with:
           msg: ${{steps.latest-release.outputs.propStr}}
