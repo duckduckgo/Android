@@ -45,4 +45,10 @@ interface NetPRemoteFeature {
      */
     @Toggle.DefaultValue(false)
     fun showVpnSettings(): Toggle
+
+    /**
+     * Whenever `true`, NetP will
+     */
+    @Toggle.DefaultValue(false)
+    fun retryOnConnectivityLoss(): Toggle
 }
