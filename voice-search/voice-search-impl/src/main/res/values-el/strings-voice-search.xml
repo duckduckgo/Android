@@ -28,8 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Για να χρησιμοποιήσετε τη Φωνητική αναζήτηση στο DuckDuckGo, πρέπει να ενεργοποιήσετε την πρόσβαση στο μικρόφωνο από τις ρυθμίσεις του συστήματος.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Ρυθμίσεις</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Απαιτείται πρόσβαση στο μικρόφωνο</string>
-    <string name="voiceSearchRemovePositiveButton">Αφαίρεση Φωνητικής αναζήτησης</string>
-    <string name="voiceSearchRemoveTitle">Κατάργηση της επιλογής Φωνητική αναζήτηση από τη γραμμή διευθύνσεων;</string>
+    <string name="voiceSearchRemovePositiveButton">Αφαίρεση</string>
+    <string name="voiceSearchRemoveTitle">Κατάργηση της επιλογής Ιδιωτική φωνητική αναζήτηση από τη γραμμή διευθύνσεων;</string>
     <string name="voiceSearchRemoveSubtitle">Μπορείτε πάντα να διαχειρίζεστε αυτές και άλλες προτιμήσεις προσβασιμότητας από τις Ρυθμίσεις.</string>
     <string name="voiceSearchTitle">Φωνητική αναζήτηση</string>
 </resources>
