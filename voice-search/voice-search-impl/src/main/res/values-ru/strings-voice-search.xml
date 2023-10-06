@@ -28,8 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Чтобы применить голосовой поиск в DuckDuckGo, включите доступ к микрофону в настройках системы.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Настройки</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Требуется доступ к микрофону</string>
-    <string name="voiceSearchRemovePositiveButton">Убрать голосовой поиск</string>
-    <string name="voiceSearchRemoveTitle">Убрать голосовой поиск из адресной строки?</string>
+    <string name="voiceSearchRemovePositiveButton">Удалить</string>
+    <string name="voiceSearchRemoveTitle">Убрать частный голосовой поиск из адресной строки?</string>
     <string name="voiceSearchRemoveSubtitle">Это и другие предпочтения можно всегда изменить в «Настройках».</string>
     <string name="voiceSearchTitle">Голосовой поиск</string>
 </resources>
