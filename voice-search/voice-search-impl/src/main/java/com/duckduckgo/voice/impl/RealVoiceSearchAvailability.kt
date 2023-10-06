@@ -63,10 +63,12 @@ class RealVoiceSearchAvailability @Inject constructor(
         // Show microphone icon only when:
         // - omnibar is focused and query hasn't changed
         // - omnibar is focused and query is empty
+        // - url loaded is empty and query hasn't changed
         // - DDG SERP is shown and query hasn't changed
         return if (isVoiceSearchAvailable) {
             hasFocus && query.isNotBlank() && !hasQueryChanged ||
                 query.isBlank() && hasFocus ||
+                urlLoaded.isEmpty() && !hasQueryChanged ||
                 (urlLoaded.startsWith(URL_DDG_SERP) && (!hasQueryChanged || !hasFocus))
         } else {
             false

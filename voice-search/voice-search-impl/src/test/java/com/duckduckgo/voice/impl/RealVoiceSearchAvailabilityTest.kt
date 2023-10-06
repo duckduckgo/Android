@@ -55,7 +55,6 @@ class RealVoiceSearchAvailabilityTest {
         testee = RealVoiceSearchAvailability(configProvider, voiceSearchFeature, voiceSearchFeatureRepository, voiceSearchRepository)
     }
 
-    //region isVoiceSearchSupported
     @Test
     fun whenDeviceHasValidConfigThenIsVoiceSearchSupportedTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
@@ -109,9 +108,7 @@ class RealVoiceSearchAvailabilityTest {
 
         assertFalse(testee.isVoiceSearchSupported)
     }
-    //endregion
 
-    //region shouldShowVoiceSearch
     @Test
     fun whenVoiceSearchNotSupportedThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
@@ -275,6 +272,22 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
+    fun whenVoiceSearchSupportedAndUrlEmptyWithNoFocusThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = false,
+            query = "",
+            urlLoaded = "",
+            hasQueryChanged = false,
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
     fun whenFeatureIsDisabledThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = false, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
@@ -354,9 +367,6 @@ class RealVoiceSearchAvailabilityTest {
         assertTrue(result)
     }
 
-    //endregion
-
-    //region isVoiceSearchAvailable default user settings
     @Test
     fun whenModelIsPixel6ThenDefaultUserSettingsTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
@@ -378,9 +388,7 @@ class RealVoiceSearchAvailabilityTest {
 
         verify(voiceSearchRepository).isVoiceSearchUserEnabled(eq(false))
     }
-    //endregion
 
-    //region Auxiliary methods
     private fun setupRemoteConfig(voiceSearchEnabled: Boolean, minSdk: Int?, excludedManufacturers: Array<String>) {
         whenever(voiceSearchFeature.self()).thenReturn(
             object : Toggle {
@@ -415,5 +423,4 @@ class RealVoiceSearchAvailabilityTest {
     private fun setupUserSettings(enabled: Boolean) {
         whenever(voiceSearchRepository.isVoiceSearchUserEnabled(any())).thenReturn(enabled)
     }
-    //endregion
 }
