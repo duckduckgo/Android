@@ -28,8 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">For å bruke talesøk i DuckDuckGo må du aktivere mikrofontilgang i systeminnstillingene.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Innstillinger</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofontilgang kreves</string>
-    <string name="voiceSearchRemovePositiveButton">Fjern talesøk</string>
-    <string name="voiceSearchRemoveTitle">Vil du fjerne talesøkalternativet fra adressefeltet?</string>
+    <string name="voiceSearchRemovePositiveButton">Fjern</string>
+    <string name="voiceSearchRemoveTitle">Vil du fjerne alternativet privat talesøk fra adressefeltet?</string>
     <string name="voiceSearchRemoveSubtitle">Du kan alltid administrere dette og andre tilgjengelighetsinnstillinger i Innstillinger.</string>
     <string name="voiceSearchTitle">Talesøk</string>
 </resources>
