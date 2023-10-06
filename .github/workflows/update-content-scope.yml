@@ -15,11 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
+#      - name: Checkout repository
+#        uses: actions/checkout@v3
+#        with:
+#          submodules: recursive
+#
 #      - name: Install npm-check-updates
 #        run: npm install -g npm-check-updates
 #
@@ -36,33 +36,30 @@ jobs:
 #        if: ${{ steps.update-check.outcome == 'failure' }}
 #        run: npm update
 
-      - name: Find latest release version of Content Scope scripts
-        id: latest-release
+      - name: Find latest release version of Content Scope scripts in package.json
+        id: find-latest-release
         uses: notiz-dev/github-action-json-property@release
         with:
           path: 'package.json'
           prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
 
-      - uses: rishabhgupta/split-by@v1
-        id: split
+      - name: Extract release version
+        uses: rishabhgupta/split-by@v1
+        id: extract-release-version
         with:
-          string: ${{steps.latest-release.outputs.prop}}
+          string: ${{steps.find-latest-release.outputs.prop}}
           split-by: '#'
-      - run: |
-          echo "${{ steps.split.outputs._1}}"
 
-#      - name: Find latest release version of Content Scope scripts
-#        if: ${{ steps.update-check.outcome == 'failure' }}
-#        id: latest-release
-#        uses: malmstein/github-asana-action@master
-#        with:
-#          github-pat: ${{ secrets.GT_DAXMOBILE }}
-#          github-repository: 'content-scope-scripts'
-#          github-org: 'duckduckgo'
-#          action: 'get-latest-repo-release'
+      - name: Show release version
+        env:
+          RELEASE_VERSION: ${{ steps.extract-release-version._1}}
+        id: split
+        run: echo "::set-output name=fragment::${RELEASE_VERSION}"
 
 #      - name: Create Pull Request in Android repo
 #        if: ${{ steps.update-check.outcome == 'failure' }}
+#        env:
+#          RELEASE_VERSION: ${{steps.find-latest-release.outputs.prop}}
 #        id: create-pr
 #        uses: peter-evans/create-pull-request@v5
 #        with:
