@@ -17,7 +17,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/expandable1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -26,24 +25,55 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?selectableItemBackground"
+            android:paddingStart="@dimen/keyline_2"
+            android:paddingEnd="@dimen/keyline_2"
+            android:paddingTop="@dimen/keyline_1"
             android:orientation="horizontal">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                android:id="@+id/daxExpandableMenuItemHeader"
+            <FrameLayout
+                android:id="@+id/daxExpandable_menu_item_icon_background"
+                android:layout_width="@dimen/listItemImageContainerSize"
+                android:layout_height="@dimen/listItemImageContainerSize"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/daxExpandable_menu_item_icon"
+                    android:layout_width="@dimen/listItemImageSmallSize"
+                    android:layout_height="@dimen/listItemImageSmallSize"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_arrow_right_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </FrameLayout>
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/daxExpandable_menu_item_primary_text"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                app:leadingIcon="@drawable/ic_reload_24"
-                app:primaryText="Sync" />
+                android:textColor="@color/primary_text_color_selector"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/daxExpandable_menu_item_icon_background"
+                app:layout_constraintTop_toTopOf="parent"
+                app:typography="body1"
+                tools:ignore="InvalidColorAttribute"
+                tools:text="Title" />
 
             <FrameLayout
                 android:id="@+id/daxExpandableMenuItemExpanderLayout"
-                android:layout_width="@dimen/listItemTrailingIconWidth"
-                android:layout_height="@dimen/listItemTrailingIconWidth">
+                android:layout_width="@dimen/listItemImageContainerSize"
+                android:layout_height="@dimen/listItemImageContainerSize"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/daxExpandableMenuItemExpander"
@@ -56,15 +86,16 @@
 
             </FrameLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <FrameLayout
             android:id="@+id/daxExpandableLayoutContent"
+            android:paddingStart="@dimen/keyline_4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:padding="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -74,16 +105,18 @@
                     android:id="@+id/daxExpandableMenuItemSecondaryText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:textType="secondary"
+                    android:layout_marginBottom="@dimen/keyline_4"
                     android:text="@string/text_dialog_message" />
 
                 <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
                     android:id="@+id/daxExpandableMenuItemPrimaryButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_marginBottom="@dimen/keyline_4"
                     android:layout_gravity="start"
                     android:text="Primary"
-                    app:buttonSize="large" />
+                    app:buttonSize="small" />
 
             </LinearLayout>
 

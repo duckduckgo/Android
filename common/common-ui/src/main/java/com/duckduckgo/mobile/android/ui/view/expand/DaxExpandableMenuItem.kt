@@ -39,14 +39,12 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class DaxExpandableMenuItem @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.daxExpandableMenuItemStyle
+    defStyleAttr: Int = R.attr.daxExpandableMenuItemStyle,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewExpandableMenuItemBinding by viewBinding()
 
-    private lateinit var headerView: View
-    private lateinit var expandedContentView: ViewGroup
-    private lateinit var arrow: View
+    private var expandedChangedListener: OnExpandedChangedListener? = null
 
     private var expanded = false
     private var animating = false
@@ -56,12 +54,12 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
         duration = animDuration
         addUpdateListener {
             val progress = it.animatedValue as Float
-            val wrapContentHeight = expandedContentView.measureWrapContentHeight()
-            expandedContentView.updateLayoutParams {
+            val wrapContentHeight = binding.daxExpandableLayoutContent.measureWrapContentHeight()
+            binding.daxExpandableLayoutContent.updateLayoutParams {
                 height = (wrapContentHeight * progress).toInt()
             }
 
-            arrow.rotation = progress * 180
+            binding.daxExpandableMenuItemExpander.rotation = progress * 180
         }
         addListener(
             object : AnimatorListenerAdapter() {
@@ -83,7 +81,7 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
             attrs,
             R.styleable.DaxExpandableMenuItem,
             0,
-            R.style.Widget_DuckDuckGo_DaxExpandableItem
+            R.style.Widget_DuckDuckGo_DaxExpandableItem,
         ).apply {
             setPrimaryText(getString(R.styleable.DaxExpandableMenuItem_primaryText))
 
@@ -123,7 +121,12 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
 
     /** Sets the primary text title */
     fun setPrimaryText(title: String?) {
-        binding.daxExpandableMenuItemHeader.setPrimaryText(title)
+        binding.daxExpandableMenuItemPrimaryText.text = title
+    }
+
+    /** Sets primary text color */
+    fun setPrimaryTextColor(stateList: ColorStateList?) {
+        binding.daxExpandableMenuItemPrimaryText.setTextColor(stateList)
     }
 
     /** Sets the secondary text title */
@@ -133,27 +136,29 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
 
     /** Sets the leading icon image drawable */
     fun setLeadingIconDrawable(drawable: Drawable) {
-        binding.daxExpandableMenuItemHeader.setLeadingIconDrawable(drawable)
+        binding.daxExpandableMenuItemIcon.setImageDrawable(drawable)
     }
 
     /** Sets the leading icon image visibility */
     fun setLeadingIconVisibility(visible: Boolean) {
-        binding.daxExpandableMenuItemHeader.setLeadingIconVisibility(visible)
-    }
-
-    /** Sets the leading icon background image type */
-    fun setLeadingIconSize(imageSize: LeadingIconSize) {
-        binding.daxExpandableMenuItemHeader.setLeadingIconSize(imageSize)
-    }
-
-    /** Sets primary text color */
-    fun setPrimaryTextColor(stateList: ColorStateList?) {
-        binding.daxExpandableMenuItemHeader.setPrimaryTextColorStateList(stateList)
+        if (visible) {
+            binding.daxExpandableMenuItemIconBackground.show()
+        } else {
+            binding.daxExpandableMenuItemIconBackground.gone()
+        }
     }
 
     /** Sets the leading icon background image type */
     fun setLeadingIconBackgroundType(type: ImageBackground) {
-        binding.daxExpandableMenuItemHeader.setLeadingIconBackgroundType(type)
+        binding.daxExpandableMenuItemIconBackground.setBackgroundResource(ImageBackground.background(type))
+        setLeadingIconVisibility(true)
+    }
+
+    /** Sets the leading icon background image type */
+    fun setLeadingIconSize(imageSize: LeadingIconSize) {
+        val size = resources.getDimensionPixelSize(LeadingIconSize.dimension(imageSize))
+        binding.daxExpandableMenuItemIcon.layoutParams.width = size
+        binding.daxExpandableMenuItemIcon.layoutParams.height = size
     }
 
     /** Sets the text for the primary button */
@@ -171,32 +176,32 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
         binding.daxExpandableMenuItemPrimaryButton.gone()
     }
 
+    fun setExpandedChangeListener(listener: OnExpandedChangedListener) {
+        expandedChangedListener = listener
+    }
+
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        headerView = binding.daxExpandableMenuItemHeader
-        expandedContentView = binding.daxExpandableLayoutContent
-        arrow = binding.daxExpandableMenuItemExpander
-
         if (expanded) {
-            arrow.rotation = 180f
+            binding.daxExpandableMenuItemExpander.rotation = 180f
         } else {
-            expandedContentView.updateLayoutParams {
+            binding.daxExpandableLayoutContent.updateLayoutParams {
                 height = 0
             }
-            arrow.rotation = 0f
+            binding.daxExpandableMenuItemExpander.rotation = 0f
         }
 
         // headerView.setOnClickListener {
         //     toggle()
         // }
 
-        arrow.setOnClickListener {
+        binding.daxExpandableMenuItemExpander.setOnClickListener {
             toggle()
         }
     }
 
-    private fun toggle(){
+    fun toggle() {
         when {
             animating -> {
                 expandAnimator.reverse()
@@ -206,11 +211,13 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
             expanded -> {
                 expandAnimator.reverse()
                 expanded = false
+                expandedChangedListener?.onExpandedChange(this, false)
             }
 
             else -> {
                 expandAnimator.start()
                 expanded = true
+                expandedChangedListener?.onExpandedChange(this, true)
             }
         }
     }

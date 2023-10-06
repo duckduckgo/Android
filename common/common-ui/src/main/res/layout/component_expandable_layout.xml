@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         app:primaryText="Expandable Layout"/>
 
-    <LinearLayout
+    <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
@@ -80,7 +80,7 @@
             app:secondaryText="Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
             app:primaryButtonText="Go to Sync Settings"/>
 
-    </LinearLayout>
+    </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
 
 
 

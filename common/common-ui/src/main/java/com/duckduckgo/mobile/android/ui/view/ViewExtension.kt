@@ -157,7 +157,6 @@ fun View.setEnabledOpacity(enabled: Boolean) {
     }
 }
 
-
 /** dp size to px size. */
 internal fun View.dp2Px(dp: Int): Float {
     val scale = resources.displayMetrics.density
@@ -190,7 +189,7 @@ internal inline fun View.updateLayoutParams(block: ViewGroup.LayoutParams.() -> 
  **/
 private inline fun <reified T : ViewGroup.LayoutParams> updateLayoutParam(
     view: View,
-    block: T.() -> Unit
+    block: T.() -> Unit,
 ) {
     val params = view.layoutParams as T
     block(params)
