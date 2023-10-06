@@ -769,6 +769,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Poista</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Lisää äänihakuvaihtoehto osoitepalkkiin</string>
+    <string name="accessibilityVoiceSearchSubtitle">Lisää yksityinen äänihakuvaihtoehto osoitepalkkiin. Ääntä ei tallenneta eikä jaeta kenellekään, edes DuckDuckGolle.</string>
     <string name="accessibilityVoiceSearchTitle">Yksityinen äänihaku</string>
 </resources>
