@@ -26,7 +26,6 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 data class VoiceSearchAvailabilityConfig(
-    val deviceModel: String,
     val deviceManufacturer: String,
     val sdkInt: Int,
     val languageTag: String,
@@ -45,7 +44,6 @@ class DefaultVoiceSearchAvailabilityConfigProvider @Inject constructor(
 
     @SuppressLint("NewApi")
     override fun get(): VoiceSearchAvailabilityConfig = VoiceSearchAvailabilityConfig(
-        deviceModel = appBuildConfig.model,
         deviceManufacturer = appBuildConfig.manufacturer,
         sdkInt = appBuildConfig.sdkInt,
         languageTag = appBuildConfig.deviceLocale.toLanguageTag(),

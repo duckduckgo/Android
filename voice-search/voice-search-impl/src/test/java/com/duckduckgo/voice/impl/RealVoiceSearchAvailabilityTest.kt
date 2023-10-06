@@ -223,7 +223,8 @@ class RealVoiceSearchAvailabilityTest {
     @Test
     fun whenModelIsPixel6ThenDefaultUserSettingsTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
-        setupDeviceConfig(model = "Pixel 6", manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
 
         testee.isVoiceSearchAvailable
 
@@ -231,9 +232,10 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenModelIsPixel5ThenDefaultUserSettingsFalse() {
+    fun whenDeviceHadNotPreviouslyAcceptedVoiceRationaleThenDefaultUserSettingsFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
-        setupDeviceConfig(model = "Pixel 5", manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
 
         testee.isVoiceSearchAvailable
 
@@ -261,14 +263,13 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     private fun setupDeviceConfig(
-        model: String = "",
         manufacturer: String,
         sdkInt: Int,
         languageTag: String,
         isOnDeviceSpeechRecognitionAvailable: Boolean,
     ) {
         whenever(configProvider.get()).thenReturn(
-            VoiceSearchAvailabilityConfig(model, manufacturer, sdkInt, languageTag, isOnDeviceSpeechRecognitionAvailable),
+            VoiceSearchAvailabilityConfig(manufacturer, sdkInt, languageTag, isOnDeviceSpeechRecognitionAvailable),
         )
     }
 

@@ -36,8 +36,6 @@ class RealVoiceSearchAvailability @Inject constructor(
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
     }
 
-    private val allowList = listOf("pixel 6", "pixel 6 pro")
-
     override val isVoiceSearchSupported: Boolean
         get() = configProvider.get().run {
             voiceSearchFeature.self().isEnabled() &&
@@ -48,8 +46,7 @@ class RealVoiceSearchAvailability @Inject constructor(
         }
 
     override val isVoiceSearchAvailable: Boolean
-        get() = isVoiceSearchSupported &&
-            (voiceSearchRepository.isVoiceSearchUserEnabled(allowList.contains(configProvider.get().deviceModel.lowercase())))
+        get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
 
     private fun hasValidVersion(sdkInt: Int) = voiceSearchFeatureRepository.minVersion?.let { minVersion ->
         sdkInt >= minVersion
