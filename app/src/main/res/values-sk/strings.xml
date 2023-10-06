@@ -777,6 +777,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Odstrániť</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Pridať do panela s adresou možnosť Hlasové vyhľadávanie</string>
+    <string name="accessibilityVoiceSearchSubtitle">Do panela s adresou pridajte možnosť Súkromné hlasové vyhľadávanie. Zvuk sa neukladá ani sa s nikým nezdieľa, a to vrátane DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Súkromné hlasové vyhľadávanie</string>
 </resources>
