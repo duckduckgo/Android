@@ -50,10 +50,10 @@ jobs:
         id: split
         with:
           msg: ${{steps.latest-release.outputs.propStr}}
-          separator: #
+          separator: github:duckduckgo/content-scope-scripts#
           maxsplit: -1
 
-      - run: echo ${{ steps.split.outputs._0 }}
+      - run: echo ${{ steps.split.outputs._1 }}
 
 #      - name: Find latest release version of Content Scope scripts
 #        if: ${{ steps.update-check.outcome == 'failure' }}
