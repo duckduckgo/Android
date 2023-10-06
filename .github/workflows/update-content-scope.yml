@@ -43,7 +43,17 @@ jobs:
           path: 'package.json'
           prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
 
-      - run: echo ${{steps.latest-release.outputs.prop}}
+      - run: echo ${{steps.latest-release.outputs.propStr}}
+
+      - name: Split release version
+        env:
+          RELEASE_VERSION: ${{steps.latest-release.outputs.propStr}}
+        id: split
+        run: echo "::set-output name=version::${RELEASE_VERSION##*#}"
+
+      - name: Echo result variable
+        run: |
+          echo ${{ steps.split.outputs.version }}
 
 #      - name: Find latest release version of Content Scope scripts
 #        if: ${{ steps.update-check.outcome == 'failure' }}
