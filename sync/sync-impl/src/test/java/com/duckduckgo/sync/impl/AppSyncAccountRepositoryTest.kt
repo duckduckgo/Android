@@ -56,6 +56,7 @@ import com.duckduckgo.sync.crypto.DecryptResult
 import com.duckduckgo.sync.crypto.EncryptResult
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.store.SyncStore
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -80,12 +81,13 @@ class AppSyncAccountRepositoryTest {
     private var syncApi: SyncApi = mock()
     private var syncStore: SyncStore = mock()
     private var syncEngine: SyncEngine = mock()
+    private var syncPixels: SyncPixels = mock()
 
     private lateinit var syncRepo: SyncAccountRepository
 
     @Before
     fun before() {
-        syncRepo = AppSyncAccountRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine)
+        syncRepo = AppSyncAccountRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine, syncPixels)
     }
 
     @Test
@@ -118,6 +120,7 @@ class AppSyncAccountRepositoryTest {
 
         assertEquals(accountCreatedFailDupUser, result)
         verifyNoInteractions(syncStore)
+        verify(syncPixels).fireSyncAccountErrorPixel(result as Result.Error)
     }
 
     @Test
@@ -132,6 +135,7 @@ class AppSyncAccountRepositoryTest {
         assertTrue(result is Result.Error)
         verifyNoInteractions(syncApi)
         verifyNoInteractions(syncStore)
+        verify(syncPixels).fireSyncAccountErrorPixel(result as Result.Error)
     }
 
     @Test
@@ -227,6 +231,7 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertTrue(result is Result.Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(result as Result.Error)
     }
 
     @Test
@@ -236,9 +241,10 @@ class AppSyncAccountRepositoryTest {
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(validLoginKeys)
         whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
 
-        val result = syncRepo.processCode(jsonRecoveryKey)
+        val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertTrue(result is Result.Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(result as Result.Error)
     }
 
     @Test
@@ -252,6 +258,7 @@ class AppSyncAccountRepositoryTest {
         val result = syncRepo.processCode(jsonRecoveryKeyEncoded)
 
         assertTrue(result is Result.Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(result as Result.Error)
     }
 
     @Test
@@ -298,11 +305,13 @@ class AppSyncAccountRepositoryTest {
     fun getConnectedDevicesFailsThenReturnError() {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.deviceId).thenReturn(deviceId)
+        whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesError)
 
         val result = syncRepo.getConnectedDevices()
 
         assertTrue(result is Result.Error)
+        verify(syncPixels).fireSyncAccountErrorPixel(result as Result.Error)
     }
 
     @Test

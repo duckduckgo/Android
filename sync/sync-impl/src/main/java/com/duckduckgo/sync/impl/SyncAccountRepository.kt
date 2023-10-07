@@ -16,21 +16,18 @@
 
 package com.duckduckgo.sync.impl
 
-import androidx.annotation.WorkerThread
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.api.engine.SyncEngine
+import androidx.annotation.*
+import com.duckduckgo.di.scopes.*
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
-import com.duckduckgo.sync.crypto.AccountKeys
-import com.duckduckgo.sync.crypto.LoginKeys
-import com.duckduckgo.sync.crypto.SyncLib
+import com.duckduckgo.sync.crypto.*
 import com.duckduckgo.sync.impl.Result.Error
-import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import com.duckduckgo.sync.impl.pixels.*
+import com.duckduckgo.sync.store.*
+import com.squareup.anvil.annotations.*
+import com.squareup.moshi.*
+import dagger.*
 import javax.inject.*
 
 interface SyncAccountRepository {
@@ -59,13 +56,18 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,
     private val syncEngine: SyncEngine,
+    private val syncPixels: SyncPixels,
 ) : SyncAccountRepository {
 
     override fun createAccount(): Result<Boolean> {
         val userId = syncDeviceIds.userId()
 
         val account: AccountKeys = nativeLib.generateAccountKeys(userId = userId)
-        if (account.result != 0L) return Error(code = account.result.toInt(), reason = "Account keys failed")
+        if (account.result != 0L) {
+            return Error(code = account.result.toInt(), reason = "Create Account: keys failed").also {
+                syncPixels.fireSyncAccountErrorPixel(it)
+            }
+        }
 
         val deviceId = syncDeviceIds.deviceId()
         val deviceName = syncDeviceIds.deviceName()
@@ -84,6 +86,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (result) {
             is Error -> {
+                syncPixels.fireSyncAccountErrorPixel(result)
                 result
             }
 
@@ -158,7 +161,9 @@ class AppSyncAccountRepository @Inject constructor(
 
         val linkingQRCode = Adapters.recoveryCodeAdapter.toJson(
             LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
-        ) ?: return Error(reason = "Error generating Linking Code")
+        ) ?: return Error(reason = "Error generating Linking Code").also {
+            syncPixels.fireSyncAccountErrorPixel(it)
+        }
 
         return Result.Success(linkingQRCode.encodeB64())
     }
@@ -175,7 +180,11 @@ class AppSyncAccountRepository @Inject constructor(
         val recoverKey = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey = primaryKey, userId = userId)))
         val seal = nativeLib.seal(recoverKey, connectKeys.secretKey)
 
-        return syncApi.connect(token = token, deviceId = connectKeys.deviceId, publicKey = seal)
+        val result = syncApi.connect(token = token, deviceId = connectKeys.deviceId, publicKey = seal)
+        if (result is Error) {
+            syncPixels.fireSyncAccountErrorPixel(result)
+        }
+        return result
     }
 
     override fun pollConnectionKeys(): Result<Boolean> {
@@ -189,7 +198,8 @@ class AppSyncAccountRepository @Inject constructor(
 
             is Result.Success -> {
                 val sealOpen = nativeLib.sealOpen(result.data, syncStore.primaryKey!!, syncStore.secretKey!!)
-                val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery ?: return Error(reason = "Error reading json")
+                val recoveryCode = Adapters.recoveryCodeAdapter.fromJson(sealOpen)?.recovery
+                    ?: return Error(reason = "Error reading json")
                 syncStore.userId = recoveryCode.userId
                 syncStore.primaryKey = recoveryCode.primaryKey
                 return performLogin(recoveryCode.userId, deviceId, syncDeviceIds.deviceName(), recoveryCode.primaryKey)
@@ -205,13 +215,16 @@ class AppSyncAccountRepository @Inject constructor(
 
         val deviceId = if (logoutThisDevice) {
             syncStore.deviceId.takeUnless { it.isNullOrEmpty() }
-                ?: return Error(reason = "Device Id Empty")
+                ?: return Error(reason = "Logout: Device Id Empty").also {
+                    syncPixels.fireSyncAccountErrorPixel(it)
+                }
         } else {
             deviceId
         }
 
         return when (val result = syncApi.logout(token, deviceId)) {
             is Error -> {
+                syncPixels.fireSyncAccountErrorPixel(result)
                 result
             }
 
@@ -229,6 +242,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (val result = syncApi.deleteAccount(token)) {
             is Error -> {
+                syncPixels.fireSyncAccountErrorPixel(result)
                 result
             }
 
@@ -261,6 +275,7 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (val result = syncApi.getDevices(token)) {
             is Error -> {
+                syncPixels.fireSyncAccountErrorPixel(result)
                 result
             }
 
@@ -292,7 +307,11 @@ class AppSyncAccountRepository @Inject constructor(
         primaryKey: String,
     ): Result<Boolean> {
         val preLogin: LoginKeys = nativeLib.prepareForLogin(primaryKey)
-        if (preLogin.result != 0L) return Error(code = preLogin.result.toInt(), reason = "Login account keys failed")
+        if (preLogin.result != 0L) {
+            return Error(code = preLogin.result.toInt(), reason = "Login account keys failed").also {
+                syncPixels.fireSyncAccountErrorPixel(it)
+            }
+        }
 
         val deviceType = syncDeviceIds.deviceType()
         val encryptedDeviceType = nativeLib.encryptData(deviceType.deviceFactor, preLogin.primaryKey).encryptedData
@@ -307,12 +326,17 @@ class AppSyncAccountRepository @Inject constructor(
 
         return when (result) {
             is Error -> {
+                syncPixels.fireSyncAccountErrorPixel(result)
                 result
             }
 
             is Result.Success -> {
                 val decryptResult = nativeLib.decrypt(result.data.protected_encryption_key, preLogin.stretchedPrimaryKey)
-                if (decryptResult.result != 0L) return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed")
+                if (decryptResult.result != 0L) {
+                    return Error(code = decryptResult.result.toInt(), reason = "Decrypt failed").also {
+                        syncPixels.fireSyncAccountErrorPixel(it)
+                    }
+                }
                 syncStore.storeCredentials(userId, deviceId, deviceName, preLogin.primaryKey, decryptResult.decryptedData, result.data.token)
                 syncEngine.triggerSync(ACCOUNT_LOGIN)
 
