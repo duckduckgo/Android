@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -27,7 +28,7 @@ interface SyncPixels {
 
     fun fireOrphanPresentPixel(feature: String)
 
-    fun firePersisterErrorPixel(feature: String)
+    fun firePersisterErrorPixel(feature: String, mergeError: SyncMergeResult.Error)
 
     fun fireEncryptFailurePixel()
 
@@ -68,11 +69,13 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun firePersisterErrorPixel(feature: String) {
+    override fun firePersisterErrorPixel(feature: String, mergeError: SyncMergeResult.Error) {
         pixel.fire(
             SyncPixelName.SYNC_PERSISTER_FAILURE,
             mapOf(
                 SyncPixelParameters.FEATURE to feature,
+                SyncPixelParameters.ERROR_CODE to mergeError.code.toString(),
+                SyncPixelParameters.ERROR_REASON to mergeError.reason,
             ),
         )
     }
@@ -119,4 +122,6 @@ object SyncPixelParameters {
     const val ATTEMPTS = "attempts"
     const val RATE = "rate"
     const val FEATURE = "feature"
+    const val ERROR_CODE = "code"
+    const val ERROR_REASON = "reason"
 }
