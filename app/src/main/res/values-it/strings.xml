@@ -769,6 +769,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Cancella</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Aggiungi l\'opzione di ricerca vocale alla barra degli indirizzi</string>
+    <string name="accessibilityVoiceSearchSubtitle">Aggiungi l\'opzione di ricerca vocale alla barra degli indirizzi. L\'audio non viene memorizzato né condiviso, nemmeno con DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Ricerca vocale privata</string>
 </resources>
