@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.mobile.android.vpn.prefs
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.content.SharedPreferences
+import com.duckduckgo.app.global.api.InMemorySharedPreferences
 
-dependencies {
-    implementation project(':vpn-api')
-    implementation project(':common-test')
-    implementation Kotlin.stdlib.jdk7
-    implementation KotlinX.coroutines.core
-}
-android {
-  namespace 'com.duckduckgo.mobile.android.vpn.api.test'
+class FakeVpnSharedPreferencesProvider : VpnSharedPreferencesProvider {
+    override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {
+        return InMemorySharedPreferences()
+    }
 }

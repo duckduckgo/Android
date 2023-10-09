@@ -56,6 +56,12 @@
         >
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/connection_class"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpDevSettingConnectionQuality" />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                 android:id="@+id/internalIp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
