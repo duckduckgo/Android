@@ -42,7 +42,6 @@ import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -64,8 +63,6 @@ class AndroidNotificationSchedulerTest {
 
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
-    private val defaultBrowserNotification: SchedulableNotification = mock()
-    private val mockVariantManager: VariantManager = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var workManager: WorkManager
@@ -74,13 +71,11 @@ class AndroidNotificationSchedulerTest {
     @Before
     fun before() {
         initializeWorkManager()
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
 
         testee = NotificationScheduler(
             workManager,
             clearNotification,
             privacyNotification,
-            mockVariantManager,
         )
     }
 
@@ -133,30 +128,6 @@ class AndroidNotificationSchedulerTest {
         testee.scheduleNextNotification()
 
         assertNoNotificationScheduled()
-    }
-
-    @Test
-    fun givenControlVariantWhenClearNotificationAndPrivacyNotificationCanShowThenBothNotificationsAreScheduled() = runTest {
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
-    }
-
-    @Test
-    fun givenNoEngagementNotificationsVariantThenBothNotificationsAreNotScheduled() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "md" })
-
-        whenever(defaultBrowserNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-
-        testee.scheduleNextNotification()
-
-        assertNotificationNotScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
-        assertNotificationNotScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
     }
 
     private fun assertNotificationScheduled(

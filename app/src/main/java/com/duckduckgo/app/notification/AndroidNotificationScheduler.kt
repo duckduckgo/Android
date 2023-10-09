@@ -23,8 +23,6 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isNoEngagementNotificationEnabled
 import com.duckduckgo.di.scopes.AppScope
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -41,7 +39,6 @@ class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
-    private val variantManager: VariantManager,
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
@@ -49,10 +46,9 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
-        if (!variantManager.isNoEngagementNotificationEnabled()) {
-            workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
-            scheduleUnusedAppNotifications()
-        }
+        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
+
+        scheduleUnusedAppNotifications()
     }
 
     private suspend fun scheduleUnusedAppNotifications() {
