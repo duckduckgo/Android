@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl
+package com.duckduckgo.subscriptions.impl.ui
 
 import android.os.Bundle
 import android.view.Menu
@@ -28,20 +28,28 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.Command
-import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.Command.ErrorMessage
-import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.R.id
+import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.billing.getPrice
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsBinding
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsViewModel.Command.ErrorMessage
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsViewModel.PurchaseStateView
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionsViewModel.ViewState
 import javax.inject.Inject
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SubscriptionsScreenWithEmptyParams::class)
@@ -56,12 +64,10 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private var bottomSheet: ActionBottomSheetDialog? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.start()
-        viewModel.viewState().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             if (it.subscriptionDetails != null) {
                 renderProducts(it)
             }
@@ -70,6 +76,10 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
             } else {
                 renderNotSubscribed()
             }
+        }.launchIn(lifecycleScope)
+
+        viewModel.currentPurchaseViewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+            renderPurchase(it.purchaseState)
         }.launchIn(lifecycleScope)
 
         viewModel.commands()
@@ -81,56 +91,31 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
 
         binding.recoverSubscriptionButton.setOnClickListener {
-            val builder = ActionBottomSheetDialog.Builder(this)
-                .setTitle("Recover subscription")
-                .setPrimaryItem("Use Google Play Account", R.drawable.ic_platform_macos_16)
-                .setSecondaryItem("Use Email", R.drawable.ic_email_16)
-                .addEventListener(
-                    object : ActionBottomSheetDialog.EventListener() {
-                        override fun onPrimaryItemClicked() {
-                            viewModel.recoverSubscription()
-                            bottomSheet?.dismiss()
-                        }
-
-                        override fun onSecondaryItemClicked() {
-                            launchRecoverScreen()
-                            bottomSheet?.dismiss()
-                        }
-                    },
-                )
-            bottomSheet = ActionBottomSheetDialog(builder)
-            bottomSheet?.show()
-        }
-
-        binding.addDevices.setOnClickListener {
-            globalActivityStarter.start(
-                this,
-                SubscriptionsWebViewActivityWithParams(
-                    url = "https://abrown.duckduckgo.com/subscriptions/add-email",
-                    "Add Devices",
-                ),
-            )
-        }
-
-        binding.manageAccountButton.setOnClickListener {
-            globalActivityStarter.start(
-                this,
-                SubscriptionsWebViewActivityWithParams(
-                    url = "https://abrown.duckduckgo.com/subscriptions/manage",
-                    "Manage Account",
-                ),
-            )
+            globalActivityStarter.start(this, RestoreSubscriptionScreenWithEmptyParams)
         }
     }
 
-    private fun launchRecoverScreen() {
-        globalActivityStarter.start(
-            this,
-            SubscriptionsWebViewActivityWithParams(
-                url = "https://abrown.duckduckgo.com/subscriptions/activate",
-                "Recover Subscription",
-            ),
-        )
+    private fun renderPurchase(purchaseState: PurchaseStateView) {
+        when (purchaseState) {
+            is PurchaseStateView.InProgress -> {
+                binding.container.gone()
+                binding.progress.show()
+            }
+            is PurchaseStateView.Inactive -> {
+                binding.container.show()
+                binding.progress.gone()
+            }
+            is PurchaseStateView.Success -> {
+                binding.container.show()
+                binding.progress.gone()
+                onPurchaseSuccess()
+            }
+            is PurchaseStateView.Failure -> {
+                binding.container.show()
+                binding.progress.gone()
+                onPurchaseFailure(purchaseState.message)
+            }
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -142,14 +127,10 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
     private fun renderNotSubscribed() {
         binding.purchaseDetails.text = "You are not subscribed yet"
         binding.recoverSubscriptionButton.show()
-        binding.addDevices.hide()
-        binding.manageAccountButton.hide()
     }
     private fun renderSubscribed() {
         binding.purchaseDetails.text = "You are subscribed!! Enjoy!!"
         binding.recoverSubscriptionButton.hide()
-        binding.addDevices.show()
-        binding.manageAccountButton.show()
     }
 
     private fun renderProducts(state: ViewState) {
@@ -176,6 +157,43 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun onPurchaseSuccess() {
+        TextAlertDialogBuilder(this)
+            .setTitle("You're all set.")
+            .setMessage("Your purchase was successful")
+            .setPositiveButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        globalActivityStarter.start(this@SubscriptionsActivity, SubscriptionsSettingsScreenWithEmptyParams)
+                        finish()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun onPurchaseFailure(message: String) {
+        TextAlertDialogBuilder(this)
+            .setTitle("Something went wrong :(")
+            .setMessage(message)
+            .setDestructiveButtons(true)
+            .setPositiveButton(string.ok)
+            .setNegativeButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        // NOOP
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        // NOOP
+                    }
+                },
+            )
+            .show()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(com.duckduckgo.subscriptions.impl.R.menu.menu_subscriptions_activity, menu)
         return true
@@ -183,12 +201,14 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            com.duckduckgo.subscriptions.impl.R.id.signOut -> {
+            id.signOut -> {
                 viewModel.signOut()
                 true
             }
-            com.duckduckgo.subscriptions.impl.R.id.forceNewAccount -> {
-                val viewState = viewModel.viewState().value
+            id.forceNewAccount -> {
+                val viewState = runBlocking {
+                    viewModel.viewState.last()
+                }
                 viewModel.buySubscription(
                     this@SubscriptionsActivity,
                     viewState.subscriptionDetails!!,

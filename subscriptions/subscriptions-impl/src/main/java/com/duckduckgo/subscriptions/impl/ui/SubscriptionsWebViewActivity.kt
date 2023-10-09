@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl
+package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle

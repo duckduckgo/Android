@@ -18,16 +18,36 @@
     package="com.duckduckgo.subscriptions.impl">
     <application android:supportsRtl="true">
         <activity
-                android:name="com.duckduckgo.subscriptions.impl.SubscriptionsActivity"
+                android:name=".ui.SubscriptionsActivity"
                 android:exported="false"
-                android:label="Subscriptions"
+                android:label="Subscriptions Internal"
                 android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
                 android:screenOrientation="portrait" />
         <activity
-                android:name="com.duckduckgo.subscriptions.impl.SubscriptionsWebViewActivity"
+                android:name=".ui.SubscriptionsWebViewActivity"
                 android:exported="false"
                 android:label="Subscriptions"
-                android:parentActivityName="com.duckduckgo.subscriptions.impl.SubscriptionsActivity"
+                android:parentActivityName="com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity"
+                android:screenOrientation="portrait" />
+        <activity
+                android:name=".ui.SubscriptionSettingsActivity"
+                android:exported="false"
+                android:label="Subscription Settings"
+                android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+                android:screenOrientation="portrait" />
+
+        <activity
+                android:name=".ui.AddDeviceActivity"
+                android:exported="false"
+                android:label="Add Device"
+                android:parentActivityName=".ui.SubscriptionSettingsActivity"
+                android:screenOrientation="portrait" />
+
+        <activity
+                android:name=".ui.RestoreSubscriptionActivity"
+                android:exported="false"
+                android:label="Activate Subscription"
+                android:parentActivityName=".ui.SubscriptionsActivity"
                 android:screenOrientation="portrait" />
     </application>
 </manifest>

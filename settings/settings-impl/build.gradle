@@ -35,11 +35,17 @@ dependencies {
     implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':di')
+    implementation project(path: ':subscriptions-impl')
+    implementation project(path: ':navigation-api')
+    implementation project(path: ':internal-features-api')
+    implementation project(path: ':common-utils')
     implementation project(path: ':settings-api')
 
     implementation Kotlin.stdlib.jdk7
+    implementation KotlinX.coroutines.core
     implementation AndroidX.core.ktx
-    
+    implementation "com.squareup.logcat:logcat:_"
+
     // Dagger
     implementation Google.dagger
 }

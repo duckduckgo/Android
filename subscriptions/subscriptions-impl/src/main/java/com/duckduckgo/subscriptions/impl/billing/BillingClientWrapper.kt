@@ -20,7 +20,6 @@ import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClient.ProductType
@@ -30,7 +29,6 @@ import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetailsResult
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
@@ -43,6 +41,10 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Inactive
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -59,6 +61,13 @@ interface BillingClientWrapper {
     val products: Map<String, ProductDetails>
     val purchases: Flow<List<Purchase>>
     val purchaseHistory: List<PurchaseHistoryRecord>
+    val purchaseState: Flow<PurchaseState>
+    fun billingFlowParamsBuilder(
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+        isReset: Boolean,
+    ): BillingFlowParams.Builder
     fun launchBillingFlow(activity: Activity, params: BillingFlowParams)
 }
 
@@ -72,6 +81,10 @@ class RealBillingClientWrapper @Inject constructor(
 ) : BillingClientWrapper, MainProcessLifecycleObserver {
 
     private var billingFlowInProcess = false
+
+    // PurchaseState
+    private val _purchaseState = MutableStateFlow<PurchaseState>(Inactive)
+    override val purchaseState = _purchaseState.asStateFlow()
 
     // New Subscription ProductDetails
     override val products = mutableMapOf<String, ProductDetails>()
@@ -87,9 +100,10 @@ class RealBillingClientWrapper @Inject constructor(
             if (billingResult.responseCode == BillingResponseCode.OK && !purchases.isNullOrEmpty()) {
                 processPurchases(purchases)
             } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
+                _purchaseState.value = Canceled
                 // Handle an error caused by a user cancelling the purchase flow.
             } else {
-                // Handle any other error codes.
+                _purchaseState.value = Canceled
             }
             billingFlowInProcess = false
         }
@@ -132,39 +146,20 @@ class RealBillingClientWrapper @Inject constructor(
         }
         val billingFlow = billingClient.launchBillingFlow(activity, params)
         if (billingFlow.responseCode == BillingResponseCode.OK) {
+            _purchaseState.value = InProgress
             billingFlowInProcess = true
         } else {
-            // Handle billing failure
+            _purchaseState.value = Canceled
         }
     }
 
     private fun processPurchases(purchases: List<Purchase>) {
         // Post new purchase List to _purchases
         _purchases.value = purchases
-
         // Then, handle the purchases
         for (purchase in purchases) {
-            if (purchase.purchaseState == PurchaseState.PURCHASED) {
-                // ToDo check with BE
-                acknowledgePurchase(purchase)
-            }
-        }
-    }
-
-    private fun acknowledgePurchase(purchase: Purchase?) {
-        purchase?.let {
-            if (!it.isAcknowledged) {
-                val params = AcknowledgePurchaseParams.newBuilder()
-                    .setPurchaseToken(it.purchaseToken)
-                    .build()
-
-                billingClient.acknowledgePurchase(
-                    params,
-                ) { billingResult ->
-                    if (billingResult.responseCode == BillingResponseCode.OK && it.purchaseState == PurchaseState.PURCHASED) {
-                        // Handle success
-                    }
-                }
+            if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                _purchaseState.value = Purchased
             }
         }
     }
@@ -247,7 +242,7 @@ class RealBillingClientWrapper @Inject constructor(
         ) { billingResult, purchaseList ->
             if (billingResult.responseCode == BillingResponseCode.OK) {
                 if (purchaseList.isNotEmpty()) {
-                    _purchases.value = purchaseList.filter { it.purchaseState == PurchaseState.PURCHASED }
+                    _purchases.value = purchaseList.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED }
                 } else {
                     _purchases.value = emptyList()
                 }
@@ -275,6 +270,26 @@ class RealBillingClientWrapper @Inject constructor(
         }
     }
 
+    override fun billingFlowParamsBuilder(
+        productDetails: ProductDetails,
+        offerToken: String,
+        externalId: String,
+        isReset: Boolean,
+    ): BillingFlowParams.Builder {
+        val finalId = if (isReset) "randomId" else externalId
+        return BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(
+                listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .setOfferToken(offerToken)
+                        .build(),
+                ),
+            )
+            .setObfuscatedAccountId(finalId)
+            .setObfuscatedProfileId(finalId)
+    }
+
     companion object {
         // List of subscriptions
         const val BASIC_SUBSCRIPTION = "bundle_1"
@@ -284,4 +299,11 @@ class RealBillingClientWrapper @Inject constructor(
         const val YEARLY_PLAN = "test-bundle-1-plan"
         const val MONTHLY_PLAN = "test-bundle-2-plan"
     }
+}
+
+sealed class PurchaseState {
+    object InProgress : PurchaseState()
+    object Purchased : PurchaseState()
+    object Canceled : PurchaseState()
+    object Inactive : PurchaseState()
 }
