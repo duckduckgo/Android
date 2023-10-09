@@ -1,7 +1,6 @@
 package com.duckduckgo.subscriptions.impl.repository
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import app.cash.turbine.test
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.android.billingclient.api.Purchase
@@ -10,10 +9,9 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.BASIC_SUBSCRIPTION
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,121 +28,40 @@ class RealSubscriptionsRepositoryTest {
     private lateinit var repository: RealSubscriptionsRepository
     private val billingClient: BillingClientWrapper = mock()
 
-    @Test
-    fun whenPurchasesContainsSubscriptionReturnTrue() = runTest {
-        whenever(billingClient.purchases).thenReturn(flowOf(listOf(purchaseWithSubscription())))
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
-
-        repository.hasSubscription.test {
-            assertTrue(awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPurchasesDoesNotContainSubscriptionReturnFalse() = runTest {
-        whenever(billingClient.purchases).thenReturn(flowOf(listOf(purchaseWithoutSubscription())))
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
-
-        repository.hasSubscription.test {
-            assertFalse(awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPurchasesEmptyReturnFalse() = runTest {
-        whenever(billingClient.purchases).thenReturn(flowOf(listOf()))
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
-
-        repository.hasSubscription.test {
-            assertFalse(awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
+    @Before
+    fun before() {
+        repository = RealSubscriptionsRepository(billingClient)
     }
 
     @Test
     fun whenProductDetailsExistAndMatchBasicSubscriptionIdThenReturnIt() = runTest {
-        emitProducts(BASIC_SUBSCRIPTION)
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        givenProductExist(BASIC_SUBSCRIPTION)
 
-        repository.subscriptionDetails.test {
-            assertTrue(awaitItem().productId == BASIC_SUBSCRIPTION)
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertTrue(repository.subscriptionDetails()?.productId == BASIC_SUBSCRIPTION)
     }
 
     @Test
     fun whenProductDetailsDoNotExistThenExpectNoEvents() = runTest {
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
-
-        repository.subscriptionDetails.test {
-            expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertNull(repository.subscriptionDetails())
     }
 
     @Test
     fun whenProductDetailsExistAndDoNotMatchBasicSubscriptionIdThenExpectNoEvents() = runTest {
-        emitProducts("test")
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        givenProductExist("test")
 
-        repository.subscriptionDetails.test {
-            expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertNull(repository.subscriptionDetails())
     }
 
     @Test
     fun whenSubscriptionDetailsExistThenReturnMapById() = runTest {
-        emitProducts(BASIC_SUBSCRIPTION)
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
+        givenProductExist(BASIC_SUBSCRIPTION)
 
-        repository.offerDetails.test {
-            assertTrue(awaitItem().size == 1)
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertTrue(repository.offerDetail().size == 1)
     }
 
     @Test
     fun whenSubscriptionDetailsDoNotExistThenMapEmpty() = runTest {
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
-
-        repository.offerDetails.test {
-            assertTrue(awaitItem().isEmpty())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPurchaseRecordHistoryContainsSubscriptionsReturnMostRecent() = runTest {
-        val testFlow: MutableStateFlow<List<PurchaseHistoryRecord>> = MutableStateFlow(listOf())
-        val firstPurchase = purchaseRecordWithSubscription(1)
-        val lastPurchase = purchaseRecordWithSubscription(2)
-        whenever(billingClient.products).thenReturn(flowOf())
-        whenever(billingClient.purchaseHistory).thenReturn(testFlow)
-        testFlow.emit(listOf(firstPurchase, lastPurchase))
-
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
-
-        repository.lastPurchaseHistoryRecord.test {
-            assertTrue(awaitItem()?.purchaseTime == 2L)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPurchaseRecordHistoryEmptyReturnNull() = runTest {
-        val testFlow: MutableStateFlow<List<PurchaseHistoryRecord>> = MutableStateFlow(listOf())
-        whenever(billingClient.products).thenReturn(flowOf())
-        whenever(billingClient.purchaseHistory).thenReturn(testFlow)
-
-        repository = RealSubscriptionsRepository(billingClient, coroutineRule.testDispatcherProvider, coroutineRule.testScope)
-
-        repository.lastPurchaseHistoryRecord.test {
-            assertNull(awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertTrue(repository.offerDetail().isEmpty())
     }
 
     private fun getProductDetails(productId: String = BASIC_SUBSCRIPTION): ProductDetails {
@@ -157,10 +74,9 @@ class RealSubscriptionsRepositoryTest {
         whenever(productDetails.subscriptionOfferDetails).thenReturn(listOf(subscriptionOfferDetails))
         return productDetails
     }
-    private suspend fun emitProducts(productId: String = BASIC_SUBSCRIPTION) {
-        val testFlow: MutableStateFlow<Map<String, ProductDetails>> = MutableStateFlow(mapOf())
-        whenever(billingClient.products).thenReturn(testFlow)
-        testFlow.emit(mapOf(productId to getProductDetails(productId)))
+    private fun givenProductExist(productId: String = BASIC_SUBSCRIPTION) {
+        val testMap: Map<String, ProductDetails> = mapOf(productId to getProductDetails(productId))
+        whenever(billingClient.products).thenReturn(testMap)
     }
 
     private fun purchaseWithSubscription(): Purchase {

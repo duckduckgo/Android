@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.js.messaging.impl
+package com.duckduckgo.subscriptions.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.js.messaging.api.JsMessageHandlerPlugin
+import android.graphics.Bitmap
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import com.duckduckgo.di.scopes.ActivityScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = JsMessageHandlerPlugin::class,
-)
-@Suppress("unused")
-interface JsMessageHandlerPluginPoint
+@ContributesBinding(ActivityScope::class)
+class SubscriptionsWebViewClient @Inject constructor() : WebViewClient() {
+
+    override fun onPageStarted(
+        view: WebView?,
+        url: String?,
+        favicon: Bitmap?,
+    ) {
+        super.onPageStarted(view, url, favicon)
+    }
+}

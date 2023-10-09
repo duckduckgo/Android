@@ -32,9 +32,15 @@ interface AuthService {
     @POST("https://quackdev.duckduckgo.com/api/auth/store-login")
     suspend fun storeLogin(@Body storeLoginBody: StoreLoginBody): StoreLoginResponse
 
+    /**
+     * Validate token takes either an access token or an auth token
+     */
     @GET("https://quackdev.duckduckgo.com/api/auth/validate-token")
     suspend fun validateToken(@Header("Authorization") authorization: String): ValidateTokenResponse
 
+    /**
+     * Exchanges an auth token for an access token
+     */
     @GET("https://quackdev.duckduckgo.com/api/auth/access-token")
     suspend fun accessToken(@Header("Authorization") authorization: String): AccessTokenResponse
 }
@@ -70,10 +76,10 @@ data class ValidateTokenResponse(
 data class AccountResponse(
     val email: String,
     @field:Json(name = "external_id") val externalId: String,
-    val entitlements: List<EntitlementsResponse>,
+    val entitlements: List<Entitlement>,
 )
 
-data class EntitlementsResponse(
+data class Entitlement(
     val id: String,
     val name: String,
     val product: String,

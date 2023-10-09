@@ -20,7 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PatResult.Failure
 import com.duckduckgo.subscriptions.api.PatResult.Success
-import com.duckduckgo.subscriptions.impl.auth.EntitlementsResponse
+import com.duckduckgo.subscriptions.impl.auth.Entitlement
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -48,17 +48,15 @@ class RealSubscriptionsTest {
 
     @Test
     fun whenSubscriptionDataSucceedsThenReturnSuccess() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsDataResult.Success("externalId", "pat", emptyList()),
-        )
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
         val result = subscriptions.getPAT()
         assertTrue(result is Success)
-        assertEquals("pat", (result as Success).pat)
+        assertEquals("accessToken", (result as Success).pat)
     }
 
     @Test
     fun whenSubscriptionDataFailsThenReturnFailure() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(SubscriptionsDataResult.Failure("error"))
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure("error"))
         val result = subscriptions.getPAT()
         assertTrue(result is Failure)
         assertEquals("error", (result as Failure).message)
@@ -67,14 +65,14 @@ class RealSubscriptionsTest {
     @Test
     fun whenSubscriptionDataHasEntitlementThenReturnTrue() = runTest {
         whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(
-            SubscriptionsDataResult.Success("externalId", "pat", listOf(EntitlementsResponse("id", "name", "product"))),
+            SubscriptionsData.Success("email", "externalId", listOf(Entitlement("id", "name", "product"))),
         )
         assertTrue(subscriptions.hasEntitlement("product"))
     }
 
     @Test
     fun whenSubscriptionDataFailsThenReturnFalse() = runTest {
-        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(SubscriptionsDataResult.Failure("error"))
+        whenever(mockSubscriptionsManager.getSubscriptionData()).thenReturn(SubscriptionsData.Failure("error"))
 
         assertFalse(subscriptions.hasEntitlement("product"))
     }
