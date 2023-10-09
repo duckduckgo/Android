@@ -769,6 +769,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Slet</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Tilføj stemmesøgningsmulighed til adresselinjen</string>
+    <string name="accessibilityVoiceSearchSubtitle">Tilføj privat stemmesøgningsmulighed til adresselinjen Lyden bliver ikke gemt eller delt med nogen, heller ikke DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privat stemmesøgning</string>
 </resources>
