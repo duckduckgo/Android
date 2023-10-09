@@ -777,6 +777,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Smazat</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Přidej si na adresní řádek funkci hlasového vyhledávání</string>
+    <string name="accessibilityVoiceSearchSubtitle">Přidej si na adresní řádek funkci soukromého hlasového vyhledávání. Zvuk nikde neukládáme a s nikým ho nesdílíme. Ani DuckDuckGo se k němu nedostane.</string>
     <string name="accessibilityVoiceSearchTitle">Soukromé hlasové vyhledávání</string>
 </resources>
