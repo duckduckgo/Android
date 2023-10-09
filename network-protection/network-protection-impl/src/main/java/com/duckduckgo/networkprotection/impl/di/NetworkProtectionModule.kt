@@ -27,6 +27,7 @@ import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
+import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStore
 import com.duckduckgo.networkprotection.store.waitlist.NetPWaitlistDataStoreSharedPreferences
 import com.squareup.anvil.annotations.ContributesTo
@@ -80,6 +81,13 @@ object NetPBreakageCategoriesModule {
             add(AppBreakageCategory("featurerequest", context.getString(R.string.netpReportBreakageCategoryFeatureRequest)))
             add(AppBreakageCategory("other", context.getString(R.string.netpReportBreakageCategoryOther)))
         }
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    @ProdNetPConfigTogglesDao
+    fun provideNetPConfigTogglesDao(netpDatabase: NetPDatabase): NetPConfigTogglesDao {
+        return netpDatabase.configTogglesDao()
     }
 }
 

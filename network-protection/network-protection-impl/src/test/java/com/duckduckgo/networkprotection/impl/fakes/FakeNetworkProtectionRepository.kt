@@ -31,11 +31,6 @@ class FakeNetworkProtectionRepository : NetworkProtectionRepository {
         set(value) {
             _reconnectStatus = value
         }
-    override var reconnectAttemptCount: Int
-        get() = _reconnectAttemptCount
-        set(value) {
-            _reconnectAttemptCount = value
-        }
     override var privateKey: String?
         get() = null
         set(_) {}

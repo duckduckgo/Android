@@ -43,28 +43,36 @@ jobs:
         if: ${{ steps.update-check.outcome == 'failure' }}
         run: copy-files-from-to
 
-      - name: Find latest release version of reference tests
+      - name: Find latest release version of Content Scope scripts in package.json
         if: ${{ steps.update-check.outcome == 'failure' }}
-        id: latest-release
-        uses: malmstein/github-asana-action@master
+        id: find-latest-release
+        uses: notiz-dev/github-action-json-property@release
         with:
-          github-pat: ${{ secrets.GT_DAXMOBILE }}
-          github-repository: 'privacy-reference-tests'
-          github-org: 'duckduckgo'
-          action: 'get-latest-repo-release'
+          path: 'package.json'
+          prop_path: 'dependencies.@duckduckgo/privacy-reference-tests'
+
+      - name: Extract release version
+        if: ${{ steps.update-check.outcome == 'failure' }}
+        uses: rishabhgupta/split-by@v1
+        id: extract-release-version
+        with:
+          string: ${{steps.find-latest-release.outputs.prop}}
+          split-by: '#'
 
       - name: Create Pull Request in Android repo
         if: ${{ steps.update-check.outcome == 'failure' }}
+        env:
+          RELEASE_VERSION: ${{ steps.extract-release-version.outputs._1}}
         id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
           base: "develop"
-          title: Update reference tests to version ${{ steps.latest-release.outputs.version }}
+          title: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
           author: daxmobile <daxmobile@users.noreply.github.com>
           token: ${{ secrets.GT_DAXMOBILE }}
-          commit-message: Update content scope scripts to version ${{ steps.latest-release.outputs.version }}
+          commit-message: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
           labels: reference tests, automated pr
-          branch: automated/update-ref-tests-dependencies-${{ steps.latest-release.outputs.version }}
+          branch: automated/update-ref-tests-dependencies-${{ steps.extract-release-version.outputs._1}}
           body: |
             - Automated reference tests dependency update
             
@@ -81,7 +89,7 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: Update reference tests to version ${{ steps.latest-release.outputs.version }}
+          asana-task-name: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
           asana-task-description: |
             Reference tests have been updated and a PR created.
             

@@ -56,9 +56,9 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface BillingClientWrapper {
-    val products: Flow<Map<String, ProductDetails>>
+    val products: Map<String, ProductDetails>
     val purchases: Flow<List<Purchase>>
-    val purchaseHistory: Flow<List<PurchaseHistoryRecord>>
+    val purchaseHistory: List<PurchaseHistoryRecord>
     fun launchBillingFlow(activity: Activity, params: BillingFlowParams)
 }
 
@@ -74,17 +74,14 @@ class RealBillingClientWrapper @Inject constructor(
     private var billingFlowInProcess = false
 
     // New Subscription ProductDetails
-    private val _products = MutableStateFlow<Map<String, ProductDetails>>(emptyMap())
-    override val products = _products.asStateFlow()
+    override val products = mutableMapOf<String, ProductDetails>()
 
     // Current Purchases
     private val _purchases = MutableStateFlow<List<Purchase>>(listOf())
     override val purchases = _purchases.asStateFlow()
 
     // Purchase History
-    private val _purchaseHistory = MutableStateFlow<List<PurchaseHistoryRecord>>(listOf())
-    override val purchaseHistory = _purchaseHistory.asStateFlow()
-
+    override val purchaseHistory = mutableListOf<PurchaseHistoryRecord>()
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->
             if (billingResult.responseCode == BillingResponseCode.OK && !purchases.isNullOrEmpty()) {
@@ -183,6 +180,8 @@ class RealBillingClientWrapper @Inject constructor(
                             queryPurchaseHistory()
                             getSubscriptions()
                         }
+                    } else {
+                        logcat { "Service error" }
                     }
                 }
                 override fun onBillingServiceDisconnected() {
@@ -228,7 +227,8 @@ class RealBillingClientWrapper @Inject constructor(
                         it.productId
                     }
                 }
-                _products.value = newMap
+                products.clear()
+                newMap.toMap(products)
             }
             else -> {
                 logcat { "onProductDetailsResponse: $responseCode $debugMessage" }
@@ -267,9 +267,10 @@ class RealBillingClientWrapper @Inject constructor(
         )
         if (billingResult.responseCode == BillingResponseCode.OK) {
             if (purchaseList?.isNotEmpty() == true) {
-                _purchaseHistory.value = purchaseList
+                purchaseHistory.clear()
+                purchaseHistory.addAll(purchaseList)
             } else {
-                _purchaseHistory.value = emptyList()
+                purchaseHistory.clear()
             }
         }
     }
@@ -282,7 +283,5 @@ class RealBillingClientWrapper @Inject constructor(
         // List of plans
         const val YEARLY_PLAN = "test-bundle-1-plan"
         const val MONTHLY_PLAN = "test-bundle-2-plan"
-        const val UK_PLAN = "test-bundle-uk-plan"
-        const val NETHERLANDS_PLAN = "test-bundle-ne-plan"
     }
 }

@@ -27,16 +27,16 @@ class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : Subscriptions {
     override suspend fun getPAT(): PatResult {
-        return when (val result = subscriptionsManager.getSubscriptionData()) {
-            is SubscriptionsDataResult.Success -> PatResult.Success(result.pat)
-            is SubscriptionsDataResult.Failure -> PatResult.Failure(result.message)
+        return when (val result = subscriptionsManager.getAccessToken()) {
+            is AccessToken.Success -> PatResult.Success(result.accessToken)
+            is AccessToken.Failure -> PatResult.Failure(result.message)
         }
     }
 
     override suspend fun hasEntitlement(product: String): Boolean {
         return when (val result = subscriptionsManager.getSubscriptionData()) {
-            is SubscriptionsDataResult.Success -> return result.entitlements.firstOrNull { it.product == product } != null
-            is SubscriptionsDataResult.Failure -> false
+            is SubscriptionsData.Success -> return result.entitlements.firstOrNull { it.product == product } != null
+            is SubscriptionsData.Failure -> false
         }
     }
 }

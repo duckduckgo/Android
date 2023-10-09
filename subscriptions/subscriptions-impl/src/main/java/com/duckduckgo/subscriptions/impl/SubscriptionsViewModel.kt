@@ -25,20 +25,20 @@ import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Failure
-import com.duckduckgo.subscriptions.impl.SubscriptionsDataResult.Success
+import com.duckduckgo.subscriptions.impl.SubscriptionsData.Failure
+import com.duckduckgo.subscriptions.impl.SubscriptionsData.Success
 import com.duckduckgo.subscriptions.impl.SubscriptionsViewModel.Command.ErrorMessage
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.MONTHLY_PLAN
-import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.NETHERLANDS_PLAN
-import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.UK_PLAN
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.YEARLY_PLAN
 import com.duckduckgo.subscriptions.impl.repository.SubscriptionsRepository
+import com.duckduckgo.subscriptions.store.AuthDataStore
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,35 +50,59 @@ class SubscriptionsViewModel @Inject constructor(
     private val billingClientWrapper: BillingClientWrapper,
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptionsManager: SubscriptionsManager,
-    subscriptionsRepository: SubscriptionsRepository,
+    private val subscriptionsRepository: SubscriptionsRepository,
+    private val authDataStore: AuthDataStore,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    private val viewState = MutableStateFlow(ViewState())
+
+    fun viewState(): StateFlow<ViewState> {
+        return viewState
+    }
+
     data class ViewState(
+        val isUserAuthenticated: Boolean? = false,
         val hasSubscription: Boolean? = false,
         val subscriptionDetails: ProductDetails? = null,
         val yearlySubscription: SubscriptionOfferDetails? = null,
         val monthlySubscription: SubscriptionOfferDetails? = null,
-        val ukSubscription: SubscriptionOfferDetails? = null,
-        val netherlandsSubscription: SubscriptionOfferDetails? = null,
     )
 
-    val subscriptionsFlow = combine(
-        subscriptionsRepository.subscriptionDetails,
-        subscriptionsRepository.offerDetails,
-        subscriptionsRepository.hasSubscription,
-        subscriptionsManager.isSignedIn,
-    ) { subscriptionDetails, offerDetails, hasSubscription, isSignedIn ->
-        ViewState(
-            hasSubscription = hasSubscription && isSignedIn,
-            subscriptionDetails = subscriptionDetails,
-            yearlySubscription = offerDetails[YEARLY_PLAN],
-            monthlySubscription = offerDetails[MONTHLY_PLAN],
-            ukSubscription = offerDetails[UK_PLAN],
-            netherlandsSubscription = offerDetails[NETHERLANDS_PLAN],
-        )
+    fun start() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            subscriptionsManager.isSignedIn.collect {
+                viewState.emit(
+                    viewState.value.copy(
+                        isUserAuthenticated = it,
+                        hasSubscription = subscriptionsManager.hasSubscription(),
+                        subscriptionDetails = subscriptionsRepository.subscriptionDetails(),
+                        yearlySubscription = subscriptionsRepository.offerDetail()[YEARLY_PLAN],
+                        monthlySubscription = subscriptionsRepository.offerDetail()[MONTHLY_PLAN],
+                    ),
+                )
+            }
+        }
+
+        viewModelScope.launch(dispatcherProvider.io()) {
+            billingClientWrapper.purchases.collect {
+                it.lastOrNull()?.let {
+                    viewState.emit(
+                        viewState.value.copy(
+                            hasSubscription = subscriptionsManager.hasSubscription(),
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    fun signOut() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            subscriptionsManager.signOut()
+        }
     }
 
     fun buySubscription(activity: Activity, productDetails: ProductDetails, offerToken: String, isReset: Boolean = false) {

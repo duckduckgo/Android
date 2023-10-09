@@ -19,7 +19,6 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.NoEngagementNotifications
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.Locale
@@ -29,9 +28,7 @@ import timber.log.Timber
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature {
-        object NoEngagementNotifications : VariantFeature()
-    }
+    sealed class VariantFeature
 
     companion object {
 
@@ -45,10 +42,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-
-            // Experiment: Remove engagement notifications
-            Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "md", weight = 1.0, features = listOf(NoEngagementNotifications), filterBy = { noFilter() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -178,8 +171,6 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 }
-
-fun VariantManager.isNoEngagementNotificationEnabled() = this.getVariant().hasFeature(NoEngagementNotifications)
 
 /**
  * A variant which can be used for experimentation.

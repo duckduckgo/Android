@@ -17,7 +17,9 @@
 package com.duckduckgo.networkprotection.impl.reconnect
 
 import android.content.Context
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.alerts.reconnect.NetPReconnectNotifications
@@ -27,19 +29,22 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.ReconnectingFailed
+import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
+import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
 class NetpVpnConnectivityLossListenerPluginTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -55,12 +60,20 @@ class NetpVpnConnectivityLossListenerPluginTest {
 
     @Mock
     private lateinit var netpPixels: NetworkProtectionPixels
+
+    private val stopWatch = mock<StopWatch>()
+
+    private lateinit var netPRemoteFeature: NetPRemoteFeature
+
     private lateinit var repository: NetworkProtectionRepository
     private lateinit var testee: NetpVpnConnectivityLossListenerPlugin
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        netPRemoteFeature = FakeNetPRemoteFeatureFactory.create()
+        netPRemoteFeature.retryOnConnectivityLoss().setEnabled(Toggle.State(enable = true))
+
         repository = FakeNetworkProtectionRepository()
         testee = NetpVpnConnectivityLossListenerPlugin(
             vpnFeaturesRegistry,
@@ -68,7 +81,10 @@ class NetpVpnConnectivityLossListenerPluginTest {
             reconnectNotifications,
             context,
             coroutineRule.testDispatcherProvider,
-        ) { netpPixels }
+            { netpPixels },
+            netPRemoteFeature,
+            { stopWatch },
+        )
     }
 
     @Test
@@ -83,17 +99,31 @@ class NetpVpnConnectivityLossListenerPluginTest {
     }
 
     @Test
-    fun whenOnVpnConnectivityLossCalledTwiceThenGiveUpRecoveringAndUnregisterNetp() = runTest {
+    fun whenOnVpnConnectivityLossAndReachedMaxAttemptsThenGiveUpRecoveringAndUnregisterNetp() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
-        repository.reconnectAttemptCount = 1
+        whenever(stopWatch.elapsedRealtime()).thenReturn(TimeUnit.MINUTES.toMillis(1) + 1)
+        testee.onVpnConnectivityLoss(coroutineRule.testScope)
         testee.onVpnConnectivityLoss(coroutineRule.testScope)
 
         assertEquals(ReconnectingFailed, repository.reconnectStatus)
-        assertEquals(0, repository.reconnectAttemptCount)
         verify(netpPixels).reportVpnReconnectFailed()
-        verify(reconnectNotifications).clearNotifications()
+        verify(reconnectNotifications, times(2)).clearNotifications()
         verify(reconnectNotifications).launchReconnectionFailedNotification(context)
         verify(vpnFeaturesRegistry).unregisterFeature(NetPVpnFeature.NETP_VPN)
+    }
+
+    @Test
+    fun whenOnVpnConnectivityLossAndDidNotReachedMaxAttemptsThenRetry() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)).thenReturn(true)
+        whenever(stopWatch.elapsedRealtime()).thenReturn(TimeUnit.MINUTES.toMillis(1))
+        testee.onVpnConnectivityLoss(coroutineRule.testScope)
+        testee.onVpnConnectivityLoss(coroutineRule.testScope)
+
+        assertEquals(Reconnecting, repository.reconnectStatus)
+        verify(netpPixels, never()).reportVpnReconnectFailed()
+        verify(reconnectNotifications, times(2)).clearNotifications()
+        verify(reconnectNotifications, never()).launchReconnectionFailedNotification(context)
+        verify(vpnFeaturesRegistry, never()).unregisterFeature(NetPVpnFeature.NETP_VPN)
     }
 
     @Test
@@ -125,7 +155,6 @@ class NetpVpnConnectivityLossListenerPluginTest {
         testee.onVpnConnected(coroutineRule.testScope)
 
         assertEquals(NotReconnecting, repository.reconnectStatus)
-        assertEquals(0, repository.reconnectAttemptCount)
         verify(reconnectNotifications).clearNotifications()
         verifyNoInteractions(netpPixels)
     }
@@ -137,7 +166,6 @@ class NetpVpnConnectivityLossListenerPluginTest {
         testee.onVpnConnected(coroutineRule.testScope)
 
         assertEquals(NotReconnecting, repository.reconnectStatus)
-        assertEquals(0, repository.reconnectAttemptCount)
         verifyNoInteractions(reconnectNotifications)
         verifyNoInteractions(netpPixels)
     }
@@ -149,7 +177,6 @@ class NetpVpnConnectivityLossListenerPluginTest {
         testee.onVpnConnectivityLoss(coroutineRule.testScope)
 
         assertEquals(NotReconnecting, repository.reconnectStatus)
-        assertEquals(0, repository.reconnectAttemptCount)
         verifyNoInteractions(reconnectNotifications)
         verifyNoInteractions(netpPixels)
     }

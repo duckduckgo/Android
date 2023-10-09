@@ -18,31 +18,72 @@ package com.duckduckgo.js.messaging.api
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import androidx.annotation.MainThread
 import org.json.JSONObject
 
-/**
- * Handler to be used in all plugins
- */
-interface JsMessageHandler {
+interface JsMessaging {
+
     /**
-     * Method to process all messages
+     * Method to register the JS interface to the webView instance
      */
-    fun process(message: String, context: String, secret: String, callback: String, webView: WebView)
+    fun register(webView: WebView, jsMessageCallback: JsMessageCallback?)
+
+    /**
+     * JS Interface to process a message
+     */
+    @JavascriptInterface
+    fun process(message: String, secret: String)
 
     /**
      * Method to send a subscription event
      */
-    @MainThread
-    fun sendSubscriptionEvent(subscriptionEvent: SubscriptionEvent, callback: String, secret: String, webView: WebView)
+    fun sendSubscriptionEvent()
+
+    /**
+     * Context name
+     */
+    val context: String
+
+    /**
+     * Name of the JS callback
+     */
+    val callbackName: String
+
+    /**
+     * Secret to use in the JS code
+     */
+    val secret: String
+
+    /**
+     * List of domains where the interface can be added
+     */
+    val allowedDomains: List<String>
 }
 
-interface JsMessageHandlerPlugin {
+abstract class JsMessageCallback(val callback: Any) {
+    abstract fun process(method: String)
+}
+
+/**
+ * Handler to be used in all plugins
+ */
+interface JsMessageHelper {
+    /**
+     * Method to process all messages
+     */
+    fun sendJsResponse(jsRequestResponse: JsRequestResponse, callbackName: String, secret: String, webView: WebView)
+
+    /**
+     * Method to send a subscription event.
+     */
+    fun sendSubscriptionEvent(subscriptionEvent: SubscriptionEvent, callbackName: String, secret: String, webView: WebView)
+}
+
+interface JsMessageHandler {
     /**
      * This method processes a [JsMessage] and can return a JsRequestResponse to reply to the message if needed
      * @return `JsRequestResponse` or `null`
      */
-    fun process(jsMessage: JsMessage, secret: String, callback: String, webView: WebView): JsRequestResponse?
+    fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse?
 
     /**
      * List of domains where we can process the message
@@ -87,37 +128,3 @@ sealed class JsRequestResponse {
 }
 
 data class SubscriptionEvent(val context: String, val featureName: String, val subscriptionName: String, val params: JSONObject?)
-
-interface JsMessaging {
-
-    /**
-     * JS Interface to process a message
-     */
-    @JavascriptInterface
-    fun process(message: String, secret: String)
-
-    /**
-     * Method to register the JS Interface
-     */
-    fun registerJsInterface()
-
-    /**
-     * Method to send a subscription event
-     */
-    fun sendSubscriptionEvent()
-
-    /**
-     * Context name
-     */
-    val context: String
-
-    /**
-     * Name of the callback
-     */
-    val callback: String
-
-    /**
-     * Secret to use in the JS code
-     */
-    val secret: String
-}

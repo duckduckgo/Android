@@ -31,7 +31,6 @@ import javax.inject.Inject
 
 interface NetworkProtectionRepository {
     var reconnectStatus: ReconnectStatus
-    var reconnectAttemptCount: Int
     var privateKey: String?
     val lastPrivateKeyUpdateTimeInMillis: Long
     var enabledTimeInMillis: Long
@@ -143,12 +142,6 @@ class RealNetworkProtectionRepository @Inject constructor(
             }.also {
                 networkProtectionPrefs.putInt(KEY_WG_RECONNECT_STATUS, it)
             }
-        }
-
-    override var reconnectAttemptCount: Int
-        get() = networkProtectionPrefs.getInt(KEY_WG_RECONNECT_COUNT, 0)
-        set(value) {
-            networkProtectionPrefs.putInt(KEY_WG_RECONNECT_COUNT, value)
         }
 
     companion object {
