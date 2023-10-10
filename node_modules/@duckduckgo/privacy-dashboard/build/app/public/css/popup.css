@@ -3152,7 +3152,7 @@ body.environment--macos, body.environment--browser, body.environment--windows, b
   background: #ccdaff;
 }
 .body--theme-dark .note--nested--alt {
-  background: rgba(204, 218, 255, 0.18);
+  background: rgba(85, 127, 243, 0.18);
 }
 
 .note--key-insight {
