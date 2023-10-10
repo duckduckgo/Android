@@ -153,6 +153,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
             remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
             remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
+            remoteViews.setOnClickPendingIntent(R.id.logo, buildBrowserActivityPendingIntent(context))
 
             voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
@@ -282,6 +283,12 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromFavWidget(context)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun buildBrowserActivityPendingIntent(context: Context): PendingIntent {
+        val intent = BrowserActivity.intent(context)
+        val pendingIntentFlags = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+        return PendingIntent.getActivity(context, 0, intent, pendingIntentFlags)
     }
 
     private fun buildOnboardingPendingIntent(

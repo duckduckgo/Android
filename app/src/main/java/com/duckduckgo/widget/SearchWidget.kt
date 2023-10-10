@@ -21,9 +21,11 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -32,6 +34,7 @@ import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import javax.inject.Inject
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
@@ -49,6 +52,9 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
 
     @Inject
     lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     override fun onReceive(
         context: Context,
@@ -109,6 +115,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
         val views = RemoteViews(context.packageName, layoutId)
         views.setViewVisibility(R.id.searchInputBox, if (shouldShowHint) View.VISIBLE else View.INVISIBLE)
         views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
+        views.setOnClickPendingIntent(R.id.logo, buildBrowserActivityPendingIntent(context))
 
         voiceSearchWidgetConfigurator.configureVoiceSearch(context, views, false)
         appWidgetManager.updateAppWidget(appWidgetId, views)
@@ -121,6 +128,12 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromWidget(context)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun buildBrowserActivityPendingIntent(context: Context): PendingIntent {
+        val intent = BrowserActivity.intent(context)
+        val pendingIntentFlags = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
+        return PendingIntent.getActivity(context, 0, intent, pendingIntentFlags)
     }
 
     override fun onDeleted(
