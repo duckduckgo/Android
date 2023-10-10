@@ -777,6 +777,6 @@
     <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
 
     <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Dodaj opciju glasovnog pretraživanja u adresnu traku</string>
+    <string name="accessibilityVoiceSearchSubtitle">Dodaj opciju privatnog glasovnog pretraživanja na adresnu traku. Zvuk se ne pohranjuje i ne dijeli ni s kim, uključujući DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Privatno glasovno pretraživanje</string>
 </resources>
