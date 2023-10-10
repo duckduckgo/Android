@@ -73,6 +73,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var consentManaged: Boolean = false
     private var consentOptOutFailed: Boolean = false
     private var consentSelfTestFailed: Boolean = false
+    private var params: Array<out String> = emptyArray()
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -90,6 +91,7 @@ class BrokenSiteViewModel @Inject constructor(
         consentManaged: Boolean,
         consentOptOutFailed: Boolean,
         consentSelfTestFailed: Boolean,
+        params: Array<out String>,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -99,6 +101,7 @@ class BrokenSiteViewModel @Inject constructor(
         this.consentManaged = consentManaged
         this.consentOptOutFailed = consentOptOutFailed
         this.consentSelfTestFailed = consentSelfTestFailed
+        this.params = params
     }
 
     fun setCategories(categoryList: List<BrokenSiteCategory>): MutableList<BrokenSiteCategory> {
@@ -135,9 +138,19 @@ class BrokenSiteViewModel @Inject constructor(
             }
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+
+            val pixelParams = mutableMapOf(
+                Pixel.PixelParameter.URL to brokenSite.siteUrl,
+            )
+
+            // add any additional params - for example, from the privacy dashboard
+            params.forEach {
+                pixelParams[it] = true.toString()
+            }
+
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
-                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
+                pixelParams,
             )
         }
         command.value = Command.ConfirmAndFinish

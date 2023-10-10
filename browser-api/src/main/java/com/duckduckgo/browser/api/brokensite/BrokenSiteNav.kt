@@ -36,9 +36,10 @@ data class BrokenSiteData(
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
     val consentSelfTestFailed: Boolean,
+    val params: List<String>,
 ) {
     companion object {
-        fun fromSite(site: Site?): BrokenSiteData {
+        fun fromSite(site: Site?, params: List<String> = emptyList()): BrokenSiteData {
             val events = site?.trackingEvents
             val blockedTrackers = events?.filter { it.status == TrackerStatus.BLOCKED }
                 ?.map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
@@ -59,6 +60,7 @@ data class BrokenSiteData(
                 consentManaged = consentManaged,
                 consentOptOutFailed = consentOptOutFailed,
                 consentSelfTestFailed = consentSelfTestFailed,
+                params = params,
             )
         }
     }
