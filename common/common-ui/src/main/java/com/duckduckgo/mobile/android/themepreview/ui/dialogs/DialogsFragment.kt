@@ -186,6 +186,24 @@ class DialogsFragment : Fragment() {
             }
         }
 
+        view.findViewById<Button>(R.id.textAlertDialogOneButton)?.let {
+            it.setOnClickListener {
+                TextAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.text_dialog_title)
+                    .setMessage(R.string.text_dialog_message)
+                    .setCancellable(true)
+                    .setPositiveButton(R.string.text_dialog_positive)
+                    .addEventListener(
+                        object : TextAlertDialogBuilder.EventListener() {
+                            override fun onPositiveButtonClicked() {
+                                Snackbar.make(it, "Positive Button Clicked", Snackbar.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
+                    .show()
+            }
+        }
+
         view.findViewById<Button>(R.id.stackedAlertDialogWithImageButton)?.let {
             it.setOnClickListener {
                 StackedAlertDialogBuilder(requireContext())

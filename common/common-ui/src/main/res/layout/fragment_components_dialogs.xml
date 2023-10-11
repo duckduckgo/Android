@@ -65,6 +65,14 @@
             android:layout_height="wrap_content" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+                android:id="@+id/textAlertDialogOneButton"
+                app:buttonSize="large"
+                android:text="Text Alert Dialog With One Button"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
             app:buttonSize="large"
             android:id="@+id/stackedAlertDialogWithImageButton"
             android:layout_width="match_parent"
