@@ -95,4 +95,6 @@ interface WebViewClientListener {
     fun linkOpenedInNewTab(): Boolean
     fun isActiveTab(): Boolean
     fun onReceivedError(errorType: WebViewErrorResponse, url: String)
+    fun recordErrorCode(error: String)
+    fun recordHttpErrorCode(statusCode: Int)
 }

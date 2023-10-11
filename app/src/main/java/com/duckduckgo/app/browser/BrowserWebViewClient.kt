@@ -416,6 +416,9 @@ class BrowserWebViewClient @Inject constructor(
             if (parsedError != OMITTED && request?.isForMainFrame == true) {
                 webViewClientListener?.onReceivedError(parsedError, request.url.toString())
             }
+            if (request?.isForMainFrame == true) {
+                webViewClientListener?.recordErrorCode(it.errorCode.asStringErrorCode())
+            }
         }
         super.onReceivedError(view, request, error)
     }
@@ -443,6 +446,38 @@ class BrowserWebViewClient @Inject constructor(
         view?.url?.let {
             // We call this for any url but it will only be processed for an internal tester verification url
             internalTestUserChecker.verifyVerificationErrorReceived(it)
+        }
+        if (request?.isForMainFrame == true) {
+            errorResponse?.let {
+                webViewClientListener?.recordHttpErrorCode(it.statusCode)
+            }
+        }
+    }
+
+    private fun Int.asStringErrorCode(): String {
+        return when (this) {
+            ERROR_AUTHENTICATION -> "ERROR_AUTHENTICATION"
+            ERROR_BAD_URL -> "ERROR_BAD_URL"
+            ERROR_CONNECT -> "ERROR_CONNECT"
+            ERROR_FAILED_SSL_HANDSHAKE -> "ERROR_FAILED_SSL_HANDSHAKE"
+            ERROR_FILE -> "ERROR_FILE"
+            ERROR_FILE_NOT_FOUND -> "ERROR_FILE_NOT_FOUND"
+            ERROR_HOST_LOOKUP -> "ERROR_HOST_LOOKUP"
+            ERROR_IO -> "ERROR_IO"
+            ERROR_PROXY_AUTHENTICATION -> "ERROR_PROXY_AUTHENTICATION"
+            ERROR_REDIRECT_LOOP -> "ERROR_REDIRECT_LOOP"
+            ERROR_TIMEOUT -> "ERROR_TIMEOUT"
+            ERROR_TOO_MANY_REQUESTS -> "ERROR_TOO_MANY_REQUESTS"
+            ERROR_UNKNOWN -> "ERROR_UNKNOWN"
+            ERROR_UNSAFE_RESOURCE -> "ERROR_UNSAFE_RESOURCE"
+            ERROR_UNSUPPORTED_AUTH_SCHEME -> "ERROR_UNSUPPORTED_AUTH_SCHEME"
+            ERROR_UNSUPPORTED_SCHEME -> "ERROR_UNSUPPORTED_SCHEME"
+            SAFE_BROWSING_THREAT_BILLING -> "SAFE_BROWSING_THREAT_BILLING"
+            SAFE_BROWSING_THREAT_MALWARE -> "SAFE_BROWSING_THREAT_MALWARE"
+            SAFE_BROWSING_THREAT_PHISHING -> "SAFE_BROWSING_THREAT_PHISHING"
+            SAFE_BROWSING_THREAT_UNKNOWN -> "SAFE_BROWSING_THREAT_UNKNOWN"
+            SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE -> "SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE"
+            else -> "ERROR_OTHER"
         }
     }
 }

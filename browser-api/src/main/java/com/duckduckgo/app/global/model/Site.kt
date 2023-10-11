@@ -50,6 +50,8 @@ interface Site {
     val entity: Entity?
     var certificate: SslCertificate?
     val trackingEvents: List<TrackingEvent>
+    val errorCodeEvents: List<String>
+    val httpErrorCodeEvents: List<Int>
     val trackerCount: Int
     val otherDomainsLoadedCount: Int
     val specialDomainsLoadedCount: Int
@@ -57,6 +59,8 @@ interface Site {
     val allTrackersBlocked: Boolean
     val surrogates: List<SurrogateResponse>
     fun trackerDetected(event: TrackingEvent)
+    fun onHttpErrorDetected(errorCode: Int)
+    fun onErrorDetected(error: String)
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
     fun surrogateDetected(surrogate: SurrogateResponse)
 

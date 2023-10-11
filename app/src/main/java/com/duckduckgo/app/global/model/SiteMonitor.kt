@@ -72,6 +72,8 @@ class SiteMonitor(
     override var certificate: SslCertificate? = null
 
     override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
+    override val errorCodeEvents = CopyOnWriteArrayList<String>()
+    override val httpErrorCodeEvents = CopyOnWriteArrayList<Int>()
 
     override val surrogates = CopyOnWriteArrayList<SurrogateResponse>()
 
@@ -99,8 +101,6 @@ class SiteMonitor(
         get() = trackingEvents.none { it.status == TrackerStatus.USER_ALLOWED }
 
     private var fullSiteDetailsAvailable: Boolean = false
-
-    private var currentProtection: PrivacyShield = PrivacyShield.UNKNOWN
 
     private val isHttps = https != HttpsStatus.NONE
 
@@ -135,6 +135,14 @@ class SiteMonitor(
 
     override fun trackerDetected(event: TrackingEvent) {
         trackingEvents.add(event)
+    }
+
+    override fun onErrorDetected(error: String) {
+        errorCodeEvents.add(error)
+    }
+
+    override fun onHttpErrorDetected(errorCode: Int) {
+        httpErrorCodeEvents.add(errorCode)
     }
 
     override fun privacyProtection(): PrivacyShield {

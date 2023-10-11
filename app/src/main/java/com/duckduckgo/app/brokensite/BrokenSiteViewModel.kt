@@ -74,6 +74,8 @@ class BrokenSiteViewModel @Inject constructor(
     private var consentOptOutFailed: Boolean = false
     private var consentSelfTestFailed: Boolean = false
     private var params: Array<out String> = emptyArray()
+    private var errorCodes: String = ""
+    private var httpErrorCodes: String = ""
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -92,6 +94,8 @@ class BrokenSiteViewModel @Inject constructor(
         consentOptOutFailed: Boolean,
         consentSelfTestFailed: Boolean,
         params: Array<out String>,
+        errorCodes: String,
+        httpErrorCodes: String,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -102,6 +106,8 @@ class BrokenSiteViewModel @Inject constructor(
         this.consentOptOutFailed = consentOptOutFailed
         this.consentSelfTestFailed = consentSelfTestFailed
         this.params = params
+        this.errorCodes = errorCodes
+        this.httpErrorCodes = httpErrorCodes
     }
 
     fun setCategories(categoryList: List<BrokenSiteCategory>): MutableList<BrokenSiteCategory> {
@@ -176,6 +182,8 @@ class BrokenSiteViewModel @Inject constructor(
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
             consentSelfTestFailed = consentSelfTestFailed,
+            errorCodes = errorCodes,
+            httpErrorCodes = httpErrorCodes,
         )
     }
 

@@ -2817,6 +2817,14 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(WebViewError(errorType, url))
     }
 
+    override fun recordErrorCode(error: String) {
+        site?.onErrorDetected(error)
+    }
+
+    override fun recordHttpErrorCode(statusCode: Int) {
+        site?.onHttpErrorDetected(statusCode)
+    }
+
     fun onAutofillMenuSelected() {
         command.value = LaunchAutofillSettings
     }
