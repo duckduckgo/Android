@@ -52,6 +52,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
+import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
@@ -63,6 +64,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.settings.api.SubsSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
@@ -95,6 +97,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
+    @Inject
+    lateinit var subsSettingsPlugin: DaggerMap<Int, SubsSettingsPlugin>
+
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
 
@@ -107,6 +112,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
+    private val viewsSubs
+        get() = binding.includeSettings.settingsSectionPro
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -115,6 +123,7 @@ class SettingsActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         configureInternalFeatures()
+        configureSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
 
@@ -148,6 +157,18 @@ class SettingsActivity : DuckDuckGoActivity() {
         with(viewsMore) {
             macOsSetting.setClickListener { viewModel.onMacOsSettingClicked() }
             windowsSetting.setClickListener { viewModel.windowsSettingClicked() }
+        }
+    }
+
+    private fun configureSettings() {
+        if (subsSettingsPlugin.isEmpty()) {
+            viewsSubs.gone()
+        } else {
+            subsSettingsPlugin.keys.toSortedSet().forEach {
+                subsSettingsPlugin[it]?.let { plugin ->
+                    viewsSubs.addView(plugin.getView(this))
+                }
+            }
         }
     }
 

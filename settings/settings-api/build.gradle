@@ -17,32 +17,18 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'com.squareup.anvil'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-android {
-    namespace 'com.duckduckgo.subscriptions.internal'
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
-}
-
-
 dependencies {
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
-
-    implementation project(path: ':di')
-    implementation project(path: ':subscriptions-impl')
-    implementation project(path: ':navigation-api')
-    implementation project(path: ':internal-features-api')
+    implementation project(':navigation-api')
 
     implementation Kotlin.stdlib.jdk7
-
     implementation AndroidX.core.ktx
-    
-    // Dagger
-    implementation Google.dagger
 }
+
+android {
+    namespace 'com.duckduckgo.settings.api'
+}
+
