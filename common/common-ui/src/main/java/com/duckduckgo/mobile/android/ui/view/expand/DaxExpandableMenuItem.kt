@@ -163,7 +163,7 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
 
     /** Sets the text for the primary button */
     fun setPrimaryButtonText(text: String?) {
-        binding.daxExpandableMenuItemPrimaryButton.text = title
+        binding.daxExpandableMenuItemPrimaryButton.text = text
     }
 
     /** Sets the primary button click listener */
