@@ -84,9 +84,10 @@ class PrivacyDashboardRendererTest {
 
         testee.render(aViewState())
 
-        verify(spyWebView, times(7)).evaluateJavascript(captor.capture(), eq(null))
+        verify(spyWebView, times(8)).evaluateJavascript(captor.capture(), eq(null))
 
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeLocale") })
+        assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeFeatureSettings") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeProtectionStatus") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeParentEntity") })
         assertNotNull(captor.allValues.find { it.startsWith("javascript:onChangeCertificateData") })
