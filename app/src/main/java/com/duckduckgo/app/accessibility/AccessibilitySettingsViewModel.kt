@@ -56,7 +56,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom,
                     showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled(),
+                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 ),
             )
         }
@@ -106,7 +106,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled(),
+                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 ),
             )
         }
