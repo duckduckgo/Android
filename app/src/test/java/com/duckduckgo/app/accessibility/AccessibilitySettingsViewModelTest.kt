@@ -71,8 +71,8 @@ class AccessibilitySettingsViewModelTest {
         whenever(accessibilitySettings.overrideSystemFontSize).thenReturn(true)
         whenever(accessibilitySettings.appFontSize).thenReturn(150f)
         whenever(accessibilitySettings.forceZoom).thenReturn(true)
-        whenever(voiceSearchRepository.isVoiceSearchUserEnabled()).thenReturn(true)
         whenever(voiceSearchAvailability.isVoiceSearchSupported).thenReturn(true)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
         testee.start()
 
@@ -154,7 +154,7 @@ class AccessibilitySettingsViewModelTest {
     @Test
     fun whenVoiceSearchEnabledThenViewStateEmitted() = runTest {
         val viewState = defaultViewState()
-        whenever(voiceSearchRepository.isVoiceSearchUserEnabled()).thenReturn(true)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
         testee.onVoiceSearchChanged(true)
 

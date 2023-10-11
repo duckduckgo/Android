@@ -25,7 +25,7 @@ interface VoiceSearchRepository {
     fun getHasPermissionDeclinedForever(): Boolean
     fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
-    fun isVoiceSearchUserEnabled(): Boolean
+    fun isVoiceSearchUserEnabled(default: Boolean): Boolean
     fun setVoiceSearchUserEnabled(enabled: Boolean)
     fun countVoiceSearchDismissed(): Int
     fun dismissVoiceSearch()
@@ -54,10 +54,10 @@ class RealVoiceSearchRepository constructor(
 
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
 
-    override fun isVoiceSearchUserEnabled(): Boolean = dataStore.isVoiceSearchEnabled
+    override fun isVoiceSearchUserEnabled(default: Boolean): Boolean = dataStore.isVoiceSearchEnabled(default)
 
     override fun setVoiceSearchUserEnabled(enabled: Boolean) {
-        dataStore.isVoiceSearchEnabled = enabled
+        dataStore.setVoiceSearchEnabled(enabled)
         voiceSearchStatusListener.voiceSearchStatusChanged()
     }
 

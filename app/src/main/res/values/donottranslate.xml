@@ -46,6 +46,6 @@
     <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
 
 <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Add Voice Search option to the address bar</string>
+    <string name="accessibilityVoiceSearchSubtitle">Add Private Voice Search option to the address bar. Audio is not stored or shared with anyone, including DuckDuckGo.</string>
     <string name="accessibilityVoiceSearchTitle">Private Voice Search</string>
 </resources>
