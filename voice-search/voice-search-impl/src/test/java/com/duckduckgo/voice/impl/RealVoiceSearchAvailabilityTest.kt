@@ -23,7 +23,8 @@ import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import java.util.concurrent.CopyOnWriteArrayList
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -115,7 +116,9 @@ class RealVoiceSearchAvailabilityTest {
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
-            isEditing = true,
+            hasFocus = true,
+            query = "",
+            hasQueryChanged = false,
             urlLoaded = "https://duckduckgo.com/?q=hello",
         )
 
@@ -123,27 +126,15 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenVoiceSearchSupportedAndIsEditingUrlThenShouldShowVoiceSearchTrue() {
-        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
-        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
-        setupUserSettings(true)
-
-        val result = testee.shouldShowVoiceSearch(
-            isEditing = true,
-            urlLoaded = "www.fb.com",
-        )
-
-        assertTrue(result)
-    }
-
-    @Test
-    fun whenVoiceSearchSupportedAndIsEditingUrlAndUserDisabledThenShouldShowVoiceSearchTrue() {
+    fun whenVoiceSearchSupportedAndIsEditingUrlAndUserDisabledThenShouldShowVoiceSearchFalse() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
         setupUserSettings(false)
 
         val result = testee.shouldShowVoiceSearch(
-            isEditing = true,
+            hasFocus = true,
+            query = "",
+            hasQueryChanged = false,
             urlLoaded = "www.fb.com",
         )
 
@@ -151,27 +142,65 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenVoiceSearchSupportedAndIsEditingSERPThenShouldShowVoiceSearchTrue() {
+    fun whenVoiceSearchSupportedAndIsEditingUrlWithUnchangedQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
-            isEditing = true,
-            urlLoaded = "https://duckduckgo.com/?q=hello",
+            hasFocus = true,
+            query = "http://www.fb.com",
+            hasQueryChanged = false,
+            urlLoaded = "http://www.fb.com",
         )
 
         assertTrue(result)
     }
 
     @Test
-    fun whenVoiceSearchSupportedAndUrlShownInAddressBarThenShouldShowVoiceSearchFalse() {
+    fun whenVoiceSearchSupportedAndIsEditingUrlWithEmptyQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
-            isEditing = false,
+            hasFocus = true,
+            query = "",
+            hasQueryChanged = true,
+            urlLoaded = "http://www.fb.com",
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndIsEditingUrlWithChangedQueryThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = true,
+            query = "http://www.fb.com",
+            hasQueryChanged = true,
+            urlLoaded = "http://www.fb.com",
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithNoFocusThenShouldShowVoiceSearchFalse() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = false,
+            query = "",
+            hasQueryChanged = false,
             urlLoaded = "www.fb.com",
         )
 
@@ -179,17 +208,51 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
-    fun whenVoiceSearchSupportedAndSERPShownThenShouldShowVoiceSearchTrue() {
+    fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithFocusAndEmptyUnchangedQueryThenShouldShowVoiceSearchTrue() {
         setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
         setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
-            isEditing = false,
-            urlLoaded = "https://duckduckgo.com/?q=hello",
+            hasFocus = true,
+            query = "",
+            hasQueryChanged = false,
+            urlLoaded = "www.fb.com",
         )
 
         assertTrue(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithFocusAndEmptyChangedQueryThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = true,
+            query = "",
+            hasQueryChanged = true,
+            urlLoaded = "www.fb.com",
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndUrlShownInAddressBarWithFocusAndNonEmptyChangedQueryThenShouldShowVoiceSearchFalse() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = true,
+            query = "duck",
+            hasQueryChanged = true,
+            urlLoaded = "www.fb.com",
+        )
+
+        assertFalse(result)
     }
 
     @Test
@@ -199,8 +262,26 @@ class RealVoiceSearchAvailabilityTest {
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
-            isEditing = false,
+            hasFocus = true,
+            query = "",
             urlLoaded = "",
+            hasQueryChanged = false,
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndUrlEmptyWithNoFocusThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = false,
+            query = "",
+            urlLoaded = "",
+            hasQueryChanged = false,
         )
 
         assertTrue(result)
@@ -213,11 +294,77 @@ class RealVoiceSearchAvailabilityTest {
         setupUserSettings(true)
 
         val result = testee.shouldShowVoiceSearch(
-            isEditing = false,
+            hasFocus = false,
+            query = "",
+            hasQueryChanged = false,
             urlLoaded = "",
         )
 
         assertFalse(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndSERPShownThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = false,
+            query = "",
+            hasQueryChanged = false,
+            urlLoaded = "https://duckduckgo.com/?q=hello",
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndIsEditingSERPWithUnchangedQueryThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = true,
+            query = "duck",
+            hasQueryChanged = false,
+            urlLoaded = "https://duckduckgo.com/?q=hello",
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndIsEditingSERPWithChangedQueryThenShouldShowVoiceSearchFalse() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = true,
+            query = "duck",
+            hasQueryChanged = true,
+            urlLoaded = "https://duckduckgo.com/?q=hello",
+        )
+
+        assertFalse(result)
+    }
+
+    @Test
+    fun whenVoiceSearchSupportedAndIsEditingSERPWithEmptyQueryThenShouldShowVoiceSearchTrue() {
+        setupRemoteConfig(voiceSearchEnabled = true, minSdk = 30, excludedManufacturers = emptyArray())
+        setupDeviceConfig(manufacturer = "Google", sdkInt = 31, languageTag = "en-US", isOnDeviceSpeechRecognitionAvailable = true)
+        setupUserSettings(true)
+
+        val result = testee.shouldShowVoiceSearch(
+            hasFocus = true,
+            query = "",
+            hasQueryChanged = true,
+            urlLoaded = "https://duckduckgo.com/?q=hello",
+        )
+
+        assertTrue(result)
     }
 
     @Test
