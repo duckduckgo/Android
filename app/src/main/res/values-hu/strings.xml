@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Beállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
     <string name="settingsAutofillLoginsSetting">Bejelentkezési adatok automatikus kitöltése</string>
-    <string name="settingsSyncSetting">Szinkronizálás</string>
+    <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
 
     <!-- Private Search -->
@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ez törli a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőmappát.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Mégsem</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Törlés</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Privát beszédhangalapú keresési opció hozzáadása a címsorhoz. A hangot nem tároljuk és nem osztjuk meg senkivel, még a DuckDuckGóval sem.</string>
+    <string name="accessibilityVoiceSearchTitle">Privát beszédhangalapú keresés</string>
 </resources>

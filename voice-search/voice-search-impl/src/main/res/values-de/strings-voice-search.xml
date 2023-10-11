@@ -17,6 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="voiceSearchError">Etwas ist schiefgelaufen. Bitte versuche es zu einem späteren Zeitpunkt erneut.</string>
     <string name="voiceSearchIconContentDescription">Sprachsuche</string>
     <string name="voiceSearchListening">Sprich jetzt</string>
     <string name="voiceSearchListeningFooter">Audio wird auf dem Gerät verarbeitet. Es wird weder gespeichert noch an Dritte weitergegeben, auch nicht an DuckDuckGo.</string>
@@ -27,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Um die Sprachsuche in DuckDuckGo zu verwenden, musst du den Mikrofonzugriff in den Systemeinstellungen aktivieren.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Einstellungen</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofonzugriff erforderlich</string>
+    <string name="voiceSearchRemovePositiveButton">Entfernen</string>
+    <string name="voiceSearchRemoveTitle">Option „Private Sprachsuche“ aus der Adressleiste entfernen?</string>
+    <string name="voiceSearchRemoveSubtitle">Du kannst diese und andere Barrierefreiheitseinstellungen jederzeit in den Einstellungen verwalten.</string>
     <string name="voiceSearchTitle">Sprachsuche</string>
 </resources>

@@ -17,6 +17,7 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="voiceSearchError">Noget gik galt. Prøv igen senere.</string>
     <string name="voiceSearchIconContentDescription">Stemmesøgning</string>
     <string name="voiceSearchListening">Tal nu</string>
     <string name="voiceSearchListeningFooter">Lyden behandles på enheden. Den hverken gemmes eller deles med nogen, inklusive DuckDuckGo.</string>
@@ -27,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Hvis du vil bruge stemmesøgning i DuckDuckGo, skal du aktivere mikrofonadgang i systemindstillingerne.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Indstillinger</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofonadgang påkrævet</string>
+    <string name="voiceSearchRemovePositiveButton">Fjern</string>
+    <string name="voiceSearchRemoveTitle">Vil du fjerne privat stemmesøgningmuligheden fra adresselinjen?</string>
+    <string name="voiceSearchRemoveSubtitle">Du kan altid administrere dette og andre tilgængelighedspræferencer i Indstillinger.</string>
     <string name="voiceSearchTitle">Stemmesøgning</string>
 </resources>

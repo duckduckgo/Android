@@ -29,6 +29,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -67,9 +68,14 @@ class MicrophonePermissionRequestTest {
     @Test
     fun whenPermissionRequestResultIsTrueThenInvokeOnPermissionsGranted() {
         var permissionGranted = false
-        testee.registerResultsCallback(mock(), mock()) {
-            permissionGranted = true
-        }
+        testee.registerResultsCallback(
+            mock(),
+            mock(),
+            onPermissionsGranted = {
+                permissionGranted = true
+            },
+            mock(),
+        )
 
         val lastKnownRequest = activityResultLauncherWrapper.lastKnownRequest as ActivityResultLauncherWrapper.Request.Permission
         lastKnownRequest.onResult(true)
@@ -81,7 +87,7 @@ class MicrophonePermissionRequestTest {
     fun whenPermissionRequestResultIsFalseThenOnPermissionsGrantedNotInvokedAndDeclinePermissionForever() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(false)
         var permissionGranted = false
-        testee.registerResultsCallback(mock(), mock()) {
+        testee.registerResultsCallback(mock(), mock(), mock()) {
             permissionGranted = true
         }
 
@@ -96,7 +102,7 @@ class MicrophonePermissionRequestTest {
     fun whenPermissionRequestResultIsFalseThenOnPermissionsGrantedNotInvoked() {
         whenever(permissionRationale.shouldShow(any())).thenReturn(true)
         var permissionGranted = false
-        testee.registerResultsCallback(mock(), mock()) {
+        testee.registerResultsCallback(mock(), mock(), mock()) {
             permissionGranted = true
         }
 
@@ -111,7 +117,7 @@ class MicrophonePermissionRequestTest {
     fun whenPermissionDeclinedForeverThenLaunchNoMicAccessDialog() {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(true)
 
-        testee.registerResultsCallback(mock(), mock()) { }
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock())
 
         assertFalse(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
@@ -119,11 +125,22 @@ class MicrophonePermissionRequestTest {
     }
 
     @Test
+    fun whenLaunchNoMicAccessDialogDeclinedThenShowRemoveVoiceSearchDialog() {
+        whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(true)
+
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
+        testee.launch(mock())
+        voiceSearchPermissionDialogsLauncher.boundNoMicAccessDialogDeclined.invoke()
+
+        assertTrue(voiceSearchPermissionDialogsLauncher.removeVoiceSearchDialogShown)
+    }
+
+    @Test
     fun whenRationalDialogNotYetAcceptedThenLaunchRationalDialog() {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
 
-        testee.registerResultsCallback(mock(), mock()) { }
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock())
 
         assertTrue(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
@@ -135,7 +152,7 @@ class MicrophonePermissionRequestTest {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
 
-        testee.registerResultsCallback(mock(), mock()) { }
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock())
 
         assertFalse(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
@@ -147,7 +164,7 @@ class MicrophonePermissionRequestTest {
     fun whenRationalDialogShownThenRationalAcceptedInvokedThenFilePixelAndLaunchPermission() {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-        testee.registerResultsCallback(mock(), mock()) { }
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock())
 
         voiceSearchPermissionDialogsLauncher.boundOnRationaleAccepted.invoke()
@@ -161,11 +178,42 @@ class MicrophonePermissionRequestTest {
     fun whenRationalDialogShownThenRationalCancelledInvokedThenFilePixelAndLaunchPermission() {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
-        testee.registerResultsCallback(mock(), mock()) { }
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
         testee.launch(mock())
 
         voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
+    }
+
+    @Test
+    fun whenRationalDialogShownThenRationalCancelledThenShowRemoveVoiceSearchDialog() {
+        whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
+        testee.registerResultsCallback(mock(), mock(), mock()) { }
+        testee.launch(mock())
+
+        voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
+
+        assertTrue(voiceSearchPermissionDialogsLauncher.removeVoiceSearchDialogShown)
+    }
+
+    @Test
+    fun whenNoMicAccessDialogAcceptedThenDisableVoiceSearch() {
+        var disableVoiceSearch = false
+        whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
+        whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
+        testee.registerResultsCallback(mock(), mock(), mock()) {
+            disableVoiceSearch = true
+        }
+        testee.launch(mock())
+
+        voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
+        voiceSearchPermissionDialogsLauncher.boundRemoveVoiceSearchAccepted.invoke()
+
+        verify(voiceSearchRepository).setVoiceSearchUserEnabled(eq(false))
+
+        assertTrue(voiceSearchPermissionDialogsLauncher.removeVoiceSearchDialogShown)
+        assertTrue(disableVoiceSearch)
     }
 }

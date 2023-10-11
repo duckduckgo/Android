@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Iestatījumi</string>
     <string name="settingsPermissionsSetting">Atļaujas</string>
     <string name="settingsAutofillLoginsSetting">Automātiski aizpildīt pieteikšanās datus</string>
-    <string name="settingsSyncSetting">Sinhronizēt</string>
+    <string name="settingsSyncSetting">Sinhronizācija un dublēšana</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -771,4 +771,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tādējādi tiks dzēsta tava &lt;b&gt;%1$s&lt;/b&gt; grāmatzīmju mape.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Atcelt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Dzēst</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Pievienot adreses joslai opciju \"Privātā meklēšana ar balsi\". Audioieraksti netiek saglabāti un kopīgoti ar citiem, pat ne ar DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchTitle">Privātā balss meklēšana</string>
 </resources>

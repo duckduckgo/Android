@@ -19,6 +19,8 @@ package com.duckduckgo.app.accessibility
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -37,8 +39,10 @@ class AccessibilitySettingsViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
+    private val voiceSearchRepository: VoiceSearchRepository = mock()
+    private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val accessibilitySettings: AccessibilitySettingsDataStore = mock()
-    private val testee = AccessibilitySettingsViewModel(accessibilitySettings)
+    private val testee = AccessibilitySettingsViewModel(accessibilitySettings, voiceSearchAvailability, voiceSearchRepository)
 
     @Test
     fun whenViewModelCreatedThenDefaultViewStateEmitted() = runTest {
@@ -46,6 +50,8 @@ class AccessibilitySettingsViewModelTest {
             overrideSystemFontSize = false,
             appFontSize = 100f,
             forceZoom = false,
+            voiceSearchEnabled = false,
+            showVoiceSearch = false,
         )
         testee.viewState().test {
             assertEquals(viewState, awaitItem())
@@ -59,10 +65,14 @@ class AccessibilitySettingsViewModelTest {
             overrideSystemFontSize = true,
             appFontSize = 150f,
             forceZoom = true,
+            voiceSearchEnabled = true,
+            showVoiceSearch = true,
         )
         whenever(accessibilitySettings.overrideSystemFontSize).thenReturn(true)
         whenever(accessibilitySettings.appFontSize).thenReturn(150f)
         whenever(accessibilitySettings.forceZoom).thenReturn(true)
+        whenever(voiceSearchAvailability.isVoiceSearchSupported).thenReturn(true)
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
 
         testee.start()
 
@@ -139,6 +149,31 @@ class AccessibilitySettingsViewModelTest {
 
         verify(accessibilitySettings).appFontSize = 150f
         verify(accessibilitySettings).appFontSize
+    }
+
+    @Test
+    fun whenVoiceSearchEnabledThenViewStateEmitted() = runTest {
+        val viewState = defaultViewState()
+        whenever(voiceSearchAvailability.isVoiceSearchAvailable).thenReturn(true)
+
+        testee.onVoiceSearchChanged(true)
+
+        testee.viewState().test {
+            assertEquals(viewState.copy(voiceSearchEnabled = true), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVoiceSearchEnabledThenSettingsUpdated() = runTest {
+        testee.onVoiceSearchChanged(true)
+        verify(voiceSearchRepository).setVoiceSearchUserEnabled(true)
+    }
+
+    @Test
+    fun whenVoiceSearchDisabledThenSettingsUpdated() = runTest {
+        testee.onVoiceSearchChanged(false)
+        verify(voiceSearchRepository).setVoiceSearchUserEnabled(false)
     }
 
     private fun defaultViewState() = AccessibilitySettingsViewModel.ViewState()

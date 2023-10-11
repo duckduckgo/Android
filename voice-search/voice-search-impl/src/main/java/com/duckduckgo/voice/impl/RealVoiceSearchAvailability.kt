@@ -16,44 +16,60 @@
 
 package com.duckduckgo.voice.impl
 
-import android.os.Build
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
+import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealVoiceSearchAvailability @Inject constructor(
     private val configProvider: VoiceSearchAvailabilityConfigProvider,
+    private val voiceSearchFeature: VoiceSearchFeature,
+    private val voiceSearchFeatureRepository: VoiceSearchFeatureRepository,
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : VoiceSearchAvailability {
     companion object {
         private const val LANGUAGE_TAG_ENG_US = "en-US"
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
     }
 
-    private val allowList = listOf("pixel 6", "pixel 6 pro")
-
     override val isVoiceSearchSupported: Boolean
         get() = configProvider.get().run {
-            hasValidDevice(deviceModel.lowercase()) && hasValidVersion(sdkInt) && isOnDeviceSpeechRecognitionSupported && hasValidLocale(languageTag)
+            voiceSearchFeature.self().isEnabled() &&
+                hasValidVersion(sdkInt) &&
+                isOnDeviceSpeechRecognitionSupported &&
+                hasValidLocale(languageTag) &&
+                voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
         }
 
-    private fun hasValidDevice(model: String) = allowList.contains(model)
+    override val isVoiceSearchAvailable: Boolean
+        get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
 
-    private fun hasValidVersion(sdkInt: Int) = sdkInt >= Build.VERSION_CODES.S
+    private fun hasValidVersion(sdkInt: Int) = voiceSearchFeatureRepository.minVersion?.let { minVersion ->
+        sdkInt >= minVersion
+    } ?: true
 
     private fun hasValidLocale(localeLanguageTag: String) = localeLanguageTag == LANGUAGE_TAG_ENG_US
 
     override fun shouldShowVoiceSearch(
-        isEditing: Boolean,
+        hasFocus: Boolean,
+        query: String,
+        hasQueryChanged: Boolean,
         urlLoaded: String,
     ): Boolean {
         // Show microphone icon only when:
-        // - user is editing the address bar OR
-        // - address bar is empty (initial state / new tab) OR
-        // - DDG SERP is shown OR (address bar doesn't contain a website)
-        return if (isVoiceSearchSupported) {
-            isEditing || urlLoaded.isEmpty() || urlLoaded.startsWith(URL_DDG_SERP)
+        // - omnibar is focused and query hasn't changed
+        // - omnibar is focused and query is empty
+        // - url loaded is empty and query hasn't changed
+        // - DDG SERP is shown and query hasn't changed
+        return if (isVoiceSearchAvailable) {
+            hasFocus && query.isNotBlank() && !hasQueryChanged ||
+                query.isBlank() && hasFocus ||
+                urlLoaded.isEmpty() && !hasQueryChanged ||
+                (urlLoaded.startsWith(URL_DDG_SERP) && (!hasQueryChanged || !hasFocus))
         } else {
             false
         }
