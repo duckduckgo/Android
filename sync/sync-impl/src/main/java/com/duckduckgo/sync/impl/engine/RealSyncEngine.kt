@@ -218,9 +218,8 @@ class RealSyncEngine @Inject constructor(
                         syncPixels.fireOrphanPresentPixel(remoteChanges.type.toString())
                     }
                 }
-
-                else -> {
-                    syncPixels.firePersisterErrorPixel(remoteChanges.type.toString())
+                is SyncMergeResult.Error -> {
+                    syncPixels.firePersisterErrorPixel(remoteChanges.type.toString(), result)
                 }
             }
         }
