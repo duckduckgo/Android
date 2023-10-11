@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_2"
         android:background="@drawable/background_expandable_menu"
         android:orientation="vertical">
 
