@@ -16,18 +16,13 @@
 
 package com.duckduckgo.app.settings
 
-import android.content.Context
-import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
-import com.duckduckgo.app.settings.SettingsViewModel.Companion
 import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
 import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Hidden
 import com.duckduckgo.app.settings.SettingsViewModel.NetPEntryState.Pending
@@ -97,12 +92,6 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockAutoconsent: Autoconsent
 
-    @Mock
-    private lateinit var mockDefaultRoleBrowserDialog: DefaultRoleBrowserDialog
-
-    @Mock
-    private lateinit var mockAppInstallStore: AppInstallStore
-
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -130,8 +119,6 @@ class SettingsViewModelTest {
             networkProtectionWaitlist,
             coroutineTestRule.testDispatcherProvider,
             mockAutoconsent,
-            mockDefaultRoleBrowserDialog,
-            mockAppInstallStore,
         )
 
         runTest {
@@ -358,67 +345,10 @@ class SettingsViewModelTest {
     @Test
     fun whenOnLaunchedFromNotificationCalledWithPixelNameThePixelFired() {
         val pixelName = "pixel_name"
-        val mockContext: Context = mock()
-        testee.onLaunchedFromNotification(pixelName, mockContext)
+        testee.onLaunchedFromNotification(pixelName)
 
         verify(mockPixel).fire(pixelName)
     }
-
-    @Test
-    fun givenDefaultBrowserPixelWhenOnLaunchedFromNotificationCalledAndBrowserDialogShouldShowAndRoleIntentIsNotNullThenLaunchRoleBrowserDialog() =
-        runTest {
-            val pixelName = SettingsViewModel.DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION
-            val mockContext: Context = mock()
-            val mockBrowserDialogIntent: Intent = mock()
-            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-            whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(mockBrowserDialogIntent)
-
-            testee.onLaunchedFromNotification(pixelName, mockContext)
-
-            testee.commands().test {
-                assertEquals(Command.ShowDefaultBrowserDialog(mockBrowserDialogIntent), awaitItem())
-                verify(mockPixel).fire(pixelName)
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun givenDefaultBrowserPixelWhenOnLaunchedFromNotificationCalledAndBrowserRoleIntentIsNullThenLaunchDefaultBrowserMenu() =
-        runTest {
-            val pixelName = SettingsViewModel.DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION
-            val mockContext: Context = mock()
-            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-            whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
-
-            testee.onLaunchedFromNotification(pixelName, mockContext)
-
-            testee.commands().test {
-                assertEquals(Command.LaunchDefaultBrowser, awaitItem())
-                verify(mockAppInstallStore).setDefaultBrowserFromNotification = true
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-
-    @Test
-    fun givenDefaultBrowserPixelWhenOnLaunchedFromNotificationCalledAndBrowserDialogShouldNotShowThenLaunchDefaultBrowserMenu() =
-        runTest {
-            val pixelName = Companion.DEFAULT_BROWSER_LAUNCHED_FROM_NOTIFICATION
-            val mockContext: Context = mock()
-            val mockBrowserDialogIntent: Intent = mock()
-            whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
-            whenever(mockDefaultRoleBrowserDialog.createIntent(mockContext)).thenReturn(null)
-
-            testee.onLaunchedFromNotification(pixelName, mockContext)
-
-            testee.commands().test {
-                assertEquals(Command.LaunchDefaultBrowser, awaitItem())
-                verify(mockAppInstallStore).setDefaultBrowserFromNotification = true
-
-                cancelAndConsumeRemainingEvents()
-            }
-        }
 
     @Test
     fun whenPrivateSearchSettingClickedThenEmitCommandLaunchPrivateSearchWebPageAndPixelFired() = runTest {
