@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpVpnSettingsBinding
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -36,6 +37,7 @@ import javax.inject.Inject
 class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityNetpVpnSettingsBinding by viewBinding()
 
@@ -54,6 +56,10 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
         binding.alwaysOn.setOnClickListener {
             openVPNSettings()
+        }
+
+        binding.geoswitching.setOnClickListener {
+            globalActivityStarter.start(this, NetpGeoswitchingScreenNoParams)
         }
     }
 
