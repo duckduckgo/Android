@@ -277,6 +277,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         } else {
             voiceSearch.visibility = View.GONE
         }
+        binding.spacer.isVisible = voiceSearch.isVisible && binding.clearTextButton.isVisible
     }
 
     private fun updateVoiceSearchVisibility() {
@@ -284,6 +285,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         voiceSearch.isVisible =
             voiceSearchAvailability.shouldShowVoiceSearch(true, omnibarTextInput.text.toString(), omnibarTextInput.text.toString().isNotEmpty(), "")
         binding.clearTextButton.isVisible = searchQuery.isNotEmpty()
+        binding.spacer.isVisible = voiceSearch.isVisible && binding.clearTextButton.isVisible
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
