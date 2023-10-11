@@ -60,7 +60,6 @@ interface Pixel {
         const val MESSAGE_SHOWN = "message"
         const val ACTION_SUCCESS = "success"
         const val SYNC = "sync"
-        const val DASHBOARD_TOGGLE_HIGHLIGHT = "dashboard_highlighted_toggle"
     }
 
     object PixelValues {

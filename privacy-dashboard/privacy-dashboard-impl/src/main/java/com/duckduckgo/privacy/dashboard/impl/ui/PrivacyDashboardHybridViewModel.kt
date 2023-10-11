@@ -23,9 +23,9 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.DASHBOARD_TOGGLE_HIGHLIGHT
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_REMOVE
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
@@ -168,7 +168,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     enum class LayoutType(val value: String) {
         DEFAULT("default"),
         HIGHLIGHTED_PROTECTIONS_TOGGLE("highlighted-protections-toggle"),
-        ;
     }
 
     data class PrimaryScreenSettings(
@@ -208,34 +207,32 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     }
 
     private fun pixelParamList(): List<String> {
-        // we're only running for english speaking users initially.
-        val isEnglish: Boolean = Locale.getDefault().language == Locale.ENGLISH.language
-        if (!isEnglish) return emptyList()
-
-        // if protectionToggleHighlightActive is not enabled, send no params
-        if (!privacyDashboardRemoteFeature.highlightedProtectionsToggle().isEnabled()) return emptyList()
-
+        val viewState = viewState.value ?: return emptyList()
+        if (viewState.remoteFeatureSettings.primaryScreen.layout == LayoutType.DEFAULT.value) return emptyList()
         // otherwise, send the pixel param
-        return listOf(PixelParameter.DASHBOARD_TOGGLE_HIGHLIGHT)
+        return listOf(DASHBOARD_TOGGLE_HIGHLIGHT.pixelName)
     }
 
     private fun pixelParamMap(): Map<String, String> {
         return pixelParamList().associateWith { true.toString() }
     }
 
-    private suspend fun updateSite(site: Site) {
-        suspend fun createRemoteFeatureSettingsViewState() = withContext(dispatcher.io()) {
-            val layout = if (privacyDashboardRemoteFeature.highlightedProtectionsToggle().isEnabled()) {
-                LayoutType.HIGHLIGHTED_PROTECTIONS_TOGGLE.value
-            } else {
-                LayoutType.DEFAULT.value
-            }
-            return@withContext RemoteFeatureSettingsViewState(
-                primaryScreen = PrimaryScreenSettings(
-                    layout = layout,
-                ),
-            )
+    private suspend fun createRemoteFeatureSettingsViewState() = withContext(dispatcher.io()) {
+        val altLayoutEnabled = privacyDashboardRemoteFeature.highlightedProtectionsToggle().isEnabled()
+        val isEnglish = Locale.getDefault().language == Locale.ENGLISH.language
+        val primaryLayout = if (altLayoutEnabled && isEnglish) {
+            LayoutType.HIGHLIGHTED_PROTECTIONS_TOGGLE.value
+        } else {
+            LayoutType.DEFAULT.value
         }
+        return@withContext RemoteFeatureSettingsViewState(
+            primaryScreen = PrimaryScreenSettings(
+                layout = primaryLayout,
+            ),
+        )
+    }
+
+    private suspend fun updateSite(site: Site) {
         val remoteFeatureSettings = createRemoteFeatureSettingsViewState()
         withContext(dispatcher.main()) {
             viewState.emit(
