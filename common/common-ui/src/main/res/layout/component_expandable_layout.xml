@@ -47,7 +47,7 @@
             app:primaryText="Google Play"
             app:leadingIcon="@drawable/ic_dax_icon"
             app:leadingIconSize="small"
-            app:secondaryText="Privacy Pro is available on any device signed in to your Google Play Store account."/>
+            app:secondaryText="This is a test."/>
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
@@ -62,7 +62,7 @@
             app:primaryText="Email"
             app:leadingIcon="@drawable/ic_email_16"
             app:leadingIconSize="small"
-            app:secondaryText="Add an email address to activate your subscription on your other devices. We’ll only use this address to verify your subscription."
+            app:secondaryText="This is a test."
             app:primaryButtonText="Add Email"/>
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
@@ -78,7 +78,7 @@
             app:primaryText="Sync"
             app:leadingIcon="@drawable/ic_globe_gray_16dp"
             app:leadingIconSize="small"
-            app:secondaryText="Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
+            app:secondaryText="This is a test."
             app:primaryButtonText="Go to Sync Settings"/>
 
     </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
