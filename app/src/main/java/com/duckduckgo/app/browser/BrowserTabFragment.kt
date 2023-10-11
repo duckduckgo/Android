@@ -191,6 +191,7 @@ import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
+import com.duckduckgo.autofill.api.systemautofill.SystemAutofillUsageMonitor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
@@ -236,7 +237,8 @@ class BrowserTabFragment :
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
-    AutofillEventListener {
+    AutofillEventListener,
+    SystemAutofillListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -389,6 +391,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var contentScopeScripts: ContentScopeScripts
+
+    @Inject
+    lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -2062,6 +2067,8 @@ class BrowserTabFragment :
                 }
             }
         }
+
+        it.systemAutofillListener = this
     }
 
     private fun injectAutofillCredentials(
@@ -3565,5 +3572,9 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
+    }
+
+    override fun systemAutofillPerformed() {
+        systemAutofillUsageMonitor.onSystemAutofillUsed()
     }
 }

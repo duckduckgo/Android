@@ -65,6 +65,8 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
     EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
+
+    SYSTEM_AUTOFILL_USED("m_autofill_system_autofillservice_autofilled"),
 }
 
 @ContributesMultibinding(
