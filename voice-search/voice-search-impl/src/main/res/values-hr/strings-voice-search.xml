@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Za korištenje glasovnog pretraživanja u DuckDuckGou, moraš omogućiti pristup mikrofonu u postavkama sustava.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Postavke</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Potreban je pristup mikrofonu</string>
+    <string name="voiceSearchRemovePositiveButton">Ukloni</string>
+    <string name="voiceSearchRemoveTitle">Ukloniti opciju privatnog glasovnog pretraživanja iz adresne trake?</string>
+    <string name="voiceSearchRemoveSubtitle">Ovim i drugim postavkama pristupačnosti uvijek možeš upravljati putem Postavki.</string>
     <string name="voiceSearchTitle">Glasovno pretraživanje</string>
 </resources>

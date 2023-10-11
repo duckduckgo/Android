@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Ak chcete používať hlasové vyhľadávanie v službe DuckDuckGo, musíte v nastaveniach systému povoliť prístup k mikrofónu.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Nastavenia</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Vyžaduje sa prístup k mikrofónu</string>
+    <string name="voiceSearchRemovePositiveButton">Odstrániť</string>
+    <string name="voiceSearchRemoveTitle">Odstrániť možnosť Súkromné hlasové vyhľadávanie z panela s adresou?</string>
+    <string name="voiceSearchRemoveSubtitle">Tieto a ďalšie nastavenia prístupnosti môžete vždy spravovať v Nastaveniach.</string>
     <string name="voiceSearchTitle">Hlasové vyhľadávanie</string>
 </resources>

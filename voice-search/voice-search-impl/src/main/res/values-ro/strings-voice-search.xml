@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Pentru a utiliza căutarea vocală în DuckDuckGo, trebuie să activezi accesul la microfon din setările sistemului.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Setări</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Este necesar accesul la microfon</string>
+    <string name="voiceSearchRemovePositiveButton">Elimină</string>
+    <string name="voiceSearchRemoveTitle">Elimini opțiunea Căutare vocală privată din bara de adrese?</string>
+    <string name="voiceSearchRemoveSubtitle">Puteți gestiona oricând această preferință de accesibilitate și altele din Setări.</string>
     <string name="voiceSearchTitle">Căutare vocală</string>
 </resources>

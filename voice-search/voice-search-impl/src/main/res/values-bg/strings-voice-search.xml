@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">За да използвате гласовото търсене в DuckDuckGo, трябва да разрешите достъпа до микрофона в системните настройки.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Настройки</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Изисква се достъп до микрофона</string>
+    <string name="voiceSearchRemovePositiveButton">Премахване</string>
+    <string name="voiceSearchRemoveTitle">Премахване на опцията за поверително гласово търсене от адресната лента?</string>
+    <string name="voiceSearchRemoveSubtitle">Винаги можете да управлявате тези и други предпочитания за достъпност в „Настройки“.</string>
     <string name="voiceSearchTitle">Гласово търсене</string>
 </resources>

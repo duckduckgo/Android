@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">DuckDuckGo häälotsingu kasutamiseks pead süsteemiseadetes lubama mikrofonipääsu.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Sätted</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Vajalik juurdepääs mikrofonile</string>
+    <string name="voiceSearchRemovePositiveButton">Eemaldage</string>
+    <string name="voiceSearchRemoveTitle">Kas eemaldada privaatse häälotsingu valik aadressiribalt?</string>
+    <string name="voiceSearchRemoveSubtitle">Seda ja muid juurdepääsetavuse eelistusi saad alati muuta seadetes.</string>
     <string name="voiceSearchTitle">Häälotsing</string>
 </resources>

@@ -28,5 +28,8 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">DuckDuckGo\'da Sesli Aramayı kullanmak için sistem ayarlarında Mikrofon erişimini etkinleştirmeniz gerekir.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Ayarlar</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Mikrofon Erişimi Gerekli</string>
+    <string name="voiceSearchRemovePositiveButton">Kaldır</string>
+    <string name="voiceSearchRemoveTitle">Gizli Sesli Arama seçeneği adres çubuğundan kaldırılsın mı?</string>
+    <string name="voiceSearchRemoveSubtitle">Bu ve diğer erişilebilirlik tercihlerini her zaman Ayarlar\'dan yönetebilirsiniz.</string>
     <string name="voiceSearchTitle">Sesli arama</string>
 </resources>
