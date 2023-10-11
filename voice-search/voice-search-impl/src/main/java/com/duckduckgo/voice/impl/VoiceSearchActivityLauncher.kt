@@ -84,36 +84,36 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     } else {
                         onEvent(Event.SearchCancelled)
                     }
-                } else if (code == VOICE_SEARCH_ERROR) {
-                    pixel.fire(
-                        pixel = VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
-                        parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName, "error" to data),
-                    )
-                    activity.window?.decorView?.rootView?.let {
-                        val snackbar = Snackbar.make(it, activity.getString(string.voiceSearchError), Snackbar.LENGTH_LONG)
-                        snackbar.view.translationY =
-                            if (VERSION.SDK_INT >= VERSION_CODES.R) {
-                                (-activity.window.decorView.rootWindowInsets.getInsets(WindowInsets.Type.systemBars()).bottom).toFloat()
-                            } else {
-                                (-activity.window.decorView.rootWindowInsets.systemWindowInsetBottom).toFloat()
-                            }
-                        snackbar.show()
-                    }
                 } else {
-                    onEvent(Event.SearchCancelled)
+                    if (code == VOICE_SEARCH_ERROR) {
+                        pixel.fire(
+                            pixel = VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName, "error" to data),
+                        )
+                        activity.window?.decorView?.rootView?.let {
+                            val snackbar = Snackbar.make(it, activity.getString(string.voiceSearchError), Snackbar.LENGTH_LONG)
+                            snackbar.view.translationY =
+                                if (VERSION.SDK_INT >= VERSION_CODES.R) {
+                                    (-activity.window.decorView.rootWindowInsets.getInsets(WindowInsets.Type.systemBars()).bottom).toFloat()
+                                } else {
+                                    (-activity.window.decorView.rootWindowInsets.systemWindowInsetBottom).toFloat()
+                                }
+                            snackbar.show()
+                        }
+                    } else {
+                        onEvent(Event.SearchCancelled)
+                    }
+                    voiceSearchRepository.dismissVoiceSearch()
+                    if (voiceSearchRepository.countVoiceSearchDismissed() >= SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES) {
+                        permissionRequest.showRemoveVoiceSearchDialog(
+                            activity,
+                            onRemoveVoiceSearch = {
+                                voiceSearchRepository.setVoiceSearchUserEnabled(false)
+                                onEvent(VoiceSearchDisabled)
+                            },
+                        )
+                    }
                 }
-
-                voiceSearchRepository.dismissVoiceSearch()
-                if (voiceSearchRepository.countVoiceSearchDismissed() >= SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES) {
-                    permissionRequest.showRemoveVoiceSearchDialog(
-                        activity,
-                        onRemoveVoiceSearch = {
-                            voiceSearchRepository.setVoiceSearchUserEnabled(false)
-                            onEvent(VoiceSearchDisabled)
-                        },
-                    )
-                }
-
                 activity.window?.decorView?.rootView?.let {
                     blurRenderer.removeBlur(it)
                 }

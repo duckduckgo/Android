@@ -63,11 +63,11 @@ class RealVoiceSearchRepositoryTest {
 
     @Test
     fun whenSetVoiceSearchEnabledThenIsVoiceSearchEnabledShouldBeTrue() {
-        assertFalse(testee.isVoiceSearchUserEnabled())
+        assertFalse(testee.isVoiceSearchUserEnabled(false))
 
         testee.setVoiceSearchUserEnabled(true)
 
-        assertTrue(testee.isVoiceSearchUserEnabled())
+        assertTrue(testee.isVoiceSearchUserEnabled(false))
     }
 
     @Test
@@ -85,24 +85,23 @@ class RealVoiceSearchRepositoryTest {
 
         assertEquals(1, testee.countVoiceSearchDismissed())
     }
-
-    @Test
-    fun whenDeclineMicAccessDialogThenWasNoMicAccessDialogAlreadyDismissedShouldBeTrue() {
-        assertFalse(testee.wasNoMicAccessDialogAlreadyDismissed())
-
-        testee.declineNoMicAccessDialog()
-
-        assertTrue(testee.wasNoMicAccessDialogAlreadyDismissed())
-    }
 }
 
 class FakeVoiceSearchDataStore : VoiceSearchDataStore {
     override var permissionDeclinedForever: Boolean = false
     override var userAcceptedRationaleDialog: Boolean = false
     override var availabilityLogged: Boolean = false
-    override var isVoiceSearchEnabled: Boolean = false
     override var countVoiceSearchDismissed: Int = 0
-    override var noMicAccessDialogDeclined: Boolean = false
+
+    private var _voiceSearchEnabled = false
+
+    override fun isVoiceSearchEnabled(default: Boolean): Boolean {
+        return _voiceSearchEnabled
+    }
+
+    override fun setVoiceSearchEnabled(value: Boolean) {
+        _voiceSearchEnabled = value
+    }
 }
 
 class FakeVoiceSearchStatusListener : VoiceSearchStatusListener {

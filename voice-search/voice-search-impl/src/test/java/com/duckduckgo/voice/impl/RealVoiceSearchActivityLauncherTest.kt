@@ -183,6 +183,7 @@ class RealVoiceSearchActivityLauncherTest {
         lastKnownRequest.onResult(Activity.RESULT_OK, "Result")
 
         verify(voiceSearchRepository).resetVoiceSearchDismissed()
+        verify(voiceSearchRepository, never()).dismissVoiceSearch()
     }
 
     @Test

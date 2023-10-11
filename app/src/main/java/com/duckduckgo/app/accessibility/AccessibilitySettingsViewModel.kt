@@ -56,7 +56,7 @@ class AccessibilitySettingsViewModel @Inject constructor(
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom,
                     showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
-                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled(),
+                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 ),
             )
         }
@@ -101,12 +101,12 @@ class AccessibilitySettingsViewModel @Inject constructor(
     fun onVoiceSearchChanged(checked: Boolean) {
         voiceSearchRepository.setVoiceSearchUserEnabled(checked)
         if (checked) {
-            voiceSearchRepository.resetCounters()
+            voiceSearchRepository.resetVoiceSearchDismissed()
         }
         viewModelScope.launch {
             viewState.emit(
                 currentViewState().copy(
-                    voiceSearchEnabled = voiceSearchRepository.isVoiceSearchUserEnabled(),
+                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 ),
             )
         }
