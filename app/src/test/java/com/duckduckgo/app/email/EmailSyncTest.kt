@@ -4,7 +4,7 @@ import com.duckduckgo.app.email.db.*
 import com.duckduckgo.app.email.sync.*
 import com.duckduckgo.app.pixels.*
 import com.duckduckgo.app.statistics.pixels.*
-import com.duckduckgo.settings.api.*
+import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.junit.*

@@ -21,7 +21,8 @@ import com.duckduckgo.app.email.sync.Adapters.Companion.adapter
 import com.duckduckgo.app.pixels.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.*
-import com.duckduckgo.settings.api.*
+import com.duckduckgo.sync.settings.api.SyncSettingsListener
+import com.duckduckgo.sync.settings.api.SyncableSetting
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
