@@ -126,6 +126,7 @@ class SyncActivityViewModel @Inject constructor(
         val showAccount: Boolean = false,
         val loginQRCode: Bitmap? = null,
         val syncedDevices: List<SyncDeviceListItem> = emptyList(),
+        val favoritesUnified: Boolean = false,
     )
 
     sealed class Command {
