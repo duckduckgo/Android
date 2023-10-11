@@ -28,6 +28,13 @@ import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import dagger.*
+import com.duckduckgo.sync.store.SyncStore
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import dagger.SingleInstanceIn
+import timber.log.Timber
 import javax.inject.*
 
 interface SyncAccountRepository {
@@ -93,6 +100,7 @@ class AppSyncAccountRepository @Inject constructor(
             is Result.Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
                 syncEngine.triggerSync(ACCOUNT_CREATION)
+                Timber.d("Sync-Account: recovery code is ${getRecoveryCode()}")
                 Result.Success(true)
             }
         }
