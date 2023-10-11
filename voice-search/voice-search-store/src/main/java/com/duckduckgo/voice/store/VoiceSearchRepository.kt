@@ -25,15 +25,11 @@ interface VoiceSearchRepository {
     fun getHasPermissionDeclinedForever(): Boolean
     fun getHasAcceptedRationaleDialog(): Boolean
     fun getHasLoggedAvailability(): Boolean
-    fun isVoiceSearchUserEnabled(): Boolean
+    fun isVoiceSearchUserEnabled(default: Boolean): Boolean
     fun setVoiceSearchUserEnabled(enabled: Boolean)
-    fun wasNoMicAccessDialogAlreadyDismissed(): Boolean
-    fun declineNoMicAccessDialog()
     fun countVoiceSearchDismissed(): Int
     fun dismissVoiceSearch()
     fun resetVoiceSearchDismissed()
-
-    fun resetCounters()
 }
 
 class RealVoiceSearchRepository constructor(
@@ -58,19 +54,12 @@ class RealVoiceSearchRepository constructor(
 
     override fun getHasLoggedAvailability(): Boolean = dataStore.availabilityLogged
 
-    override fun isVoiceSearchUserEnabled(): Boolean = dataStore.isVoiceSearchEnabled
+    override fun isVoiceSearchUserEnabled(default: Boolean): Boolean = dataStore.isVoiceSearchEnabled(default)
 
     override fun setVoiceSearchUserEnabled(enabled: Boolean) {
-        dataStore.isVoiceSearchEnabled = enabled
+        dataStore.setVoiceSearchEnabled(enabled)
         voiceSearchStatusListener.voiceSearchStatusChanged()
     }
-
-    override fun declineNoMicAccessDialog() {
-        dataStore.noMicAccessDialogDeclined = true
-    }
-
-    override fun wasNoMicAccessDialogAlreadyDismissed(): Boolean =
-        dataStore.noMicAccessDialogDeclined
 
     override fun countVoiceSearchDismissed(): Int {
         return dataStore.countVoiceSearchDismissed
@@ -82,14 +71,5 @@ class RealVoiceSearchRepository constructor(
 
     override fun resetVoiceSearchDismissed() {
         dataStore.countVoiceSearchDismissed = 0
-    }
-
-    override fun resetCounters() {
-        resetNoMicAccessDialog()
-        resetVoiceSearchDismissed()
-    }
-
-    private fun resetNoMicAccessDialog() {
-        dataStore.noMicAccessDialogDeclined = false
     }
 }

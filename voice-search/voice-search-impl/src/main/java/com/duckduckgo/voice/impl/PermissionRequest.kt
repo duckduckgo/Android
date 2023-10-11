@@ -81,13 +81,7 @@ class MicrophonePermissionRequest @Inject constructor(
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
                 activity,
                 { activity.launchDuckDuckGoSettings() },
-                {
-                    if (voiceSearchRepository.wasNoMicAccessDialogAlreadyDismissed()) {
-                        showRemoveVoiceSearchDialog(activity)
-                    } else {
-                        voiceSearchRepository.declineNoMicAccessDialog()
-                    }
-                },
+                { showRemoveVoiceSearchDialog(activity) },
             )
         } else {
             if (voiceSearchRepository.getHasAcceptedRationaleDialog()) {
@@ -117,11 +111,7 @@ class MicrophonePermissionRequest @Inject constructor(
 
     private fun handleRationaleCancelled(context: Context) {
         pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
-        if (voiceSearchRepository.wasNoMicAccessDialogAlreadyDismissed()) {
-            showRemoveVoiceSearchDialog(context)
-        } else {
-            voiceSearchRepository.declineNoMicAccessDialog()
-        }
+        showRemoveVoiceSearchDialog(context)
     }
 
     private fun showRemoveVoiceSearchDialog(context: Context) {
