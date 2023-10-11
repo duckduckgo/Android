@@ -162,7 +162,7 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
     }
 
     /** Sets the text for the primary button */
-    fun setPrimaryButtonText(title: String?) {
+    fun setPrimaryButtonText(text: String?) {
         binding.daxExpandableMenuItemPrimaryButton.text = title
     }
 
