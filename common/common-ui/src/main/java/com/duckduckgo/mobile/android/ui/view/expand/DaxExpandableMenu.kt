@@ -55,7 +55,11 @@ class DaxExpandableMenu @JvmOverloads constructor(
                     toggleExpandedStateForView(expandedId)
                 }
             }
-            expandedId = view.id
+            expandedId = if (expanded) {
+                view.id
+            } else {
+                -1
+            }
         }
     }
 }
