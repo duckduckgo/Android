@@ -19,6 +19,7 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AskForDefaultBrowserMoreThanOnce
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.Locale
@@ -28,7 +29,9 @@ import timber.log.Timber
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature
+    sealed class VariantFeature {
+        object AskForDefaultBrowserMoreThanOnce : VariantFeature()
+    }
 
     companion object {
 
@@ -42,6 +45,10 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+
+            // Experiment: Ask for Default Browser More Than Once
+            Variant(key = "zh", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zj", weight = 1.0, features = listOf(AskForDefaultBrowserMoreThanOnce), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(

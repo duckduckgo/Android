@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AskForDefaultBrowserMoreThanOnce
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -40,6 +41,23 @@ class VariantManagerTest {
         val variant = variants.first { it.key == "se" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
+    }
+
+    // AskForDefaultBrowserMoreThanOnce
+
+    @Test
+    fun askForDefaultBrowserMoreThanOnceVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "zh" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun askForDefaultBrowserMoreThanOnceVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zj" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(AskForDefaultBrowserMoreThanOnce))
     }
 
     @Test
