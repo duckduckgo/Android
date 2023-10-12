@@ -87,7 +87,8 @@ class RealPrivacyConfigDownloaderTest {
                     version = 1,
                     readme = "readme",
                     features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-                    unprotectedTemporaryList,
+                    unprotectedTemporary = unprotectedTemporaryList,
+                    variantManager = VARIANT_MANAGER_JSON,
                 ),
             )
         }
@@ -97,5 +98,6 @@ class RealPrivacyConfigDownloaderTest {
         private const val FEATURE_NAME = "test"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
         val unprotectedTemporaryList = listOf(FeatureException("example.com", "reason"))
+        private val VARIANT_MANAGER_JSON = null
     }
 }

@@ -24,6 +24,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.app.statistics.api.PrivacyVariantManagerPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -63,6 +64,7 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
+    private val variantManagerPluginPoint = FakePrivacyVariantManagerPluginPoint(listOf(FakePrivacyVariantManagerPlugin()))
     private lateinit var sharedPreferences: SharedPreferences
 
     private val context = RuntimeEnvironment.getApplication()
@@ -79,6 +81,7 @@ class RealPrivacyConfigPersisterTest {
         testee =
             RealPrivacyConfigPersister(
                 pluginPoint,
+                variantManagerPluginPoint,
                 mockTogglesRepository,
                 unprotectedTemporaryRepository,
                 privacyRepository,
@@ -217,7 +220,8 @@ class RealPrivacyConfigPersisterTest {
             version = 2,
             readme = "readme",
             features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-            unprotectedTemporaryList,
+            unprotectedTemporary = unprotectedTemporaryList,
+            variantManager = VARIANT_MANAGER_JSON,
         )
     }
 
@@ -242,9 +246,25 @@ class RealPrivacyConfigPersisterTest {
             PrivacyFeatureName.GpcFeatureName.value
     }
 
+    class FakePrivacyVariantManagerPluginPoint(private val plugins: List<PrivacyVariantManagerPlugin>) : PluginPoint<PrivacyVariantManagerPlugin> {
+        override fun getPlugins(): Collection<PrivacyVariantManagerPlugin> {
+            return plugins
+        }
+    }
+
+    class FakePrivacyVariantManagerPlugin : PrivacyVariantManagerPlugin {
+
+        override fun store(
+            jsonString: String,
+        ): Boolean {
+            return true
+        }
+    }
+
     companion object {
         private const val FEATURE_NAME = "gpc"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
         val unprotectedTemporaryList = listOf(FeatureException("example.com", "reason"))
+        private val VARIANT_MANAGER_JSON = null
     }
 }

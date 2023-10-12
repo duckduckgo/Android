@@ -85,6 +85,7 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
 
         testee = RealPrivacyConfigPersister(
             referenceTestUtilities.getPrivacyFeaturePluginPoint(),
+            referenceTestUtilities.getPrivacyVariantManagerPluginPoint(),
             mockTogglesRepository,
             referenceTestUtilities.unprotectedTemporaryRepository,
             referenceTestUtilities.privacyRepository,

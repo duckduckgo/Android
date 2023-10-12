@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.statistics.api.PrivacyVariantManagerPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.drm.DrmPlugin
@@ -86,6 +87,10 @@ class ReferenceTestUtilities(
 
     fun getPrivacyFeaturePluginPoint(): PluginPoint<PrivacyFeaturePlugin> {
         return FakePrivacyFeaturePluginPoint(getPrivacyFeaturePlugins())
+    }
+
+    fun getPrivacyVariantManagerPluginPoint(): PluginPoint<PrivacyVariantManagerPlugin> {
+        return mock()
     }
 
     internal class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>) :
