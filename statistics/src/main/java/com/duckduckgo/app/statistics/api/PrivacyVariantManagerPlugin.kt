@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.models
+package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import org.json.JSONObject
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
 
-data class JsonPrivacyConfig(
-    val version: Long,
-    val readme: String,
-    val features: Map<String, JSONObject?>,
-    val unprotectedTemporary: List<FeatureException>,
-    val variantManager: JSONObject?,
-)
+/**
+ * Implement this interface and contribute it as a multibinding to get called upon downloading remote privacy config
+ */
+
+@ContributesPluginPoint(AppScope::class)
+interface PrivacyVariantManagerPlugin {
+
+    /**
+     * @return `true` when the feature was stored, otherwise `false`
+     */
+    fun store(jsonString: String): Boolean
+}
