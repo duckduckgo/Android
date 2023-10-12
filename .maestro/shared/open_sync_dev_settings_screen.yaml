@@ -1,0 +1,9 @@
+appId: com.duckduckgo.mobile.android.debug
+---
+- tapOn:
+  id: "com.duckduckgo.mobile.android.debug:id/browserMenuImageView"
+- tapOn: "Settings"
+- scrollUntilVisible:
+   element: "Sync Dev Settings"
+   direction: DOWN
+- tapOn: "Sync Dev Settings"
