@@ -20,12 +20,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
-import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
@@ -58,16 +53,12 @@ class RealSyncEngine @Inject constructor(
 ) : SyncEngine {
 
     override fun triggerSync(trigger: SyncTrigger) {
-        Timber.d("Sync-Feature: petition to sync now trigger: $trigger")
+        Timber.i("Sync-Feature: petition to sync now trigger: $trigger")
         if (syncStore.isSignedIn()) {
             Timber.d("Sync-Feature: sync enabled, triggering operation: $trigger")
             when (trigger) {
                 BACKGROUND_SYNC -> scheduleSync(trigger)
-                APP_OPEN -> performSync(trigger)
-                FEATURE_READ -> performSync(trigger)
-                DATA_CHANGE -> performSync(trigger)
-                ACCOUNT_CREATION -> sendLocalData()
-                ACCOUNT_LOGIN -> performSync(trigger)
+                else -> performSync(trigger)
             }
         } else {
             Timber.d("Sync-Feature: sync disabled, nothing to do")
@@ -110,6 +101,7 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Feature: sync is not in progress, starting to sync")
             syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
+            Timber.i("Sync-Feature: getChanges - performSync")
             val changes = getChanges()
             performFirstSync(changes.filter { it.isFirstSync() })
             performRegularSync(changes.filter { !it.isFirstSync() })
@@ -122,10 +114,10 @@ class RealSyncEngine @Inject constructor(
     private fun performRegularSync(regularSyncChanges: List<SyncChangesRequest>) {
         regularSyncChanges.forEach { changes ->
             if (changes.isEmpty()) {
-                Timber.d("Sync-Feature: no changes to sync for $changes, asking for remote changes")
+                Timber.i("Sync-Feature: no changes to sync for $changes, asking for remote changes")
                 getRemoteChanges(changes, TIMESTAMP)
             } else {
-                Timber.d("Sync-Feature: $changes changes to update $changes")
+                Timber.i("Sync-Feature: $changes changes to update $changes")
                 patchLocalChanges(changes, TIMESTAMP)
             }
         }
@@ -135,7 +127,7 @@ class RealSyncEngine @Inject constructor(
         val types = firstSyncChanges.map { it.type }
 
         firstSyncChanges.forEach { changes ->
-            Timber.d("Sync-Feature: first sync for ${changes.type}, asking for remote changes")
+            Timber.i("Sync-Feature: first sync for ${changes.type}, asking for remote changes")
             getRemoteChanges(changes, DEDUPLICATION)
         }
 
@@ -172,12 +164,10 @@ class RealSyncEngine @Inject constructor(
     ) {
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
-                Timber.d("Sync-Feature: patch failed ${result.reason}")
                 syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
             }
 
             is Success -> {
-                Timber.d("Sync-Feature: patch success")
                 persistChanges(result.data, conflictResolution)
             }
         }
@@ -187,15 +177,12 @@ class RealSyncEngine @Inject constructor(
         changes: SyncChangesRequest,
         conflictResolution: SyncConflictResolution,
     ) {
-        Timber.d("Sync-Feature: asking for remote changes since $changes.modifiedSince.value")
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince.value)) {
             is Error -> {
-                Timber.d("Sync-Feature: get failed ${result.reason}")
                 syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
             }
 
             is Success -> {
-                Timber.d("Sync-Feature: get success ${result.data}")
                 persistChanges(result.data, conflictResolution)
             }
         }

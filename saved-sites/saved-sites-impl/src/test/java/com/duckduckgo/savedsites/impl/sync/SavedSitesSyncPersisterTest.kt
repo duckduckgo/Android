@@ -77,7 +77,7 @@ class SavedSitesSyncPersisterTest {
 
     @Test
     fun whenProcessingDataInEmptyDBThenResultIsSuccess() {
-        whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(Success(true))
+        whenever(persisterAlgorithm.processEntries(any(), any(), any())).thenReturn(Success(true))
         whenever(store.serverModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
         val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
@@ -97,7 +97,7 @@ class SavedSitesSyncPersisterTest {
 
     @Test
     fun whenMergingWithDeletedDataThenResultIsSuccess() {
-        whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(Success(true))
+        whenever(persisterAlgorithm.processEntries(any(), any(), any())).thenReturn(Success(true))
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_deleted_entries.json")
         val deletedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
         val result = syncPersister.process(deletedChanges, TIMESTAMP)

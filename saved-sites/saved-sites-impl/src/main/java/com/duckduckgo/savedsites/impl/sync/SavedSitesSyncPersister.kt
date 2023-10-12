@@ -16,7 +16,6 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
@@ -26,7 +25,6 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
-import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
@@ -52,7 +50,6 @@ class SavedSitesSyncPersister @Inject constructor(
             Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
             result
         } else {
-            Timber.d("Sync-Bookmarks: no bookmarks to merge for ${changes.type}")
             Success(false)
         }
     }

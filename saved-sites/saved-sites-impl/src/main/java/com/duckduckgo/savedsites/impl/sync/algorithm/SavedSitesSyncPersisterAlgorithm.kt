@@ -43,7 +43,7 @@ interface SavedSitesSyncPersisterAlgorithm {
     fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-        lastModified: String
+        lastModified: String,
     ): SyncMergeResult
 }
 
@@ -59,7 +59,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
     override fun processEntries(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
-        lastModified: String
+        lastModified: String,
     ): SyncMergeResult {
         var orphans = false
 

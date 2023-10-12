@@ -34,8 +34,8 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
-import timber.log.Timber
 import javax.inject.*
+import timber.log.Timber
 
 interface SyncAccountRepository {
 

@@ -70,7 +70,6 @@ class RealSyncStateMonitor @Inject constructor(
                     SUCCESS -> SyncState.READY
                     FAIL -> FAILED
                 }
-                Timber.d("Sync-Feature: Sync in $state state")
                 state
             }
         } else {

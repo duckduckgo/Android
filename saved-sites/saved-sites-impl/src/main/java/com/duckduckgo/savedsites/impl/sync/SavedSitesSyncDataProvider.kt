@@ -41,6 +41,8 @@ class SavedSitesSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
 
     override fun getChanges(): SyncChangesRequest {
+        // startTimestamp is later than the last modified date
+        // so changes that happened before won't be provided
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
         val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
             allContent()
@@ -50,9 +52,17 @@ class SavedSitesSyncDataProvider @Inject constructor(
         return formatUpdates(updates)
     }
 
+    // PATCH - request changes
+    // startTimestamp - now
+    // changesSince(clientModifiedTimestamp)
+
+    // STORE changes -> after patch / after get
+    // serverTimeStamp = BE timestamp
+    // clientTimestamp = startTimestamp
+
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
-        Timber.d("Sync-Bookmarks: generating changes since $since")
+        Timber.i("Sync-Bookmarks: generating changes since $since")
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         // we start adding individual folders that have been modified
@@ -83,7 +93,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     @VisibleForTesting
     fun allContent(): List<SyncBookmarkEntry> {
-        Timber.d("Sync-Bookmarks: generating all content")
+        Timber.i("Sync-Bookmarks: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
 
