@@ -24,10 +24,9 @@ interface Drm {
      * @return an `Array<String>` if the given [url] is in the eme list and an empty array
      * otherwise.
      */
-    fun getDrmPermissionsForRequest(
+    fun isDrmAllowedForUrl(
         url: String,
-        resources: Array<String>,
-    ): Array<String>
+    ): Boolean
 }
 
 /** Public data class for Drm Exceptions */
