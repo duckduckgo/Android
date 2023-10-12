@@ -289,6 +289,8 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = arrayOf("dashboard_highlighted_toggle"),
+            errorCodes = "",
+            httpErrorCodes = "",
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")

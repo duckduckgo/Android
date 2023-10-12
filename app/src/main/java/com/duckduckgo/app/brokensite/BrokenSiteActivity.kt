@@ -74,8 +74,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val consentOptOutFailed = intent.getBooleanExtra(CONSENT_OPT_OUT_FAILED_EXTRA, false)
         val consentSelfTestFailed = intent.getBooleanExtra(CONSENT_SELF_TEST_FAILED_EXTRA, false)
         val params = intent.getStringArrayExtra(BOOLEAN_PARAMS).orEmpty()
-        val errorCodes = intent.getStringExtra(ERROR_CODES)
-        val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES)
+        val errorCodes = intent.getStringExtra(ERROR_CODES).orEmpty()
+        val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -86,8 +86,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             consentOptOutFailed = consentOptOutFailed,
             consentSelfTestFailed = consentSelfTestFailed,
             params = params,
-            errorCodes = errorCodes.orEmpty(),
-            httpErrorCodes = httpErrorCodes.orEmpty(),
+            errorCodes = errorCodes,
+            httpErrorCodes = httpErrorCodes,
         )
     }
 
@@ -179,7 +179,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val CONSENT_SELF_TEST_FAILED_EXTRA = "CONSENT_SELF_TEST_FAILED_EXTRA"
         private const val BOOLEAN_PARAMS = "BOOLEAN_PARAMS"
         private const val ERROR_CODES = "ERROR_CODES"
-        private const val HTTP_ERROR_CODES = "ERROR_CODES"
+        private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
 
         fun intent(
             context: Context,
