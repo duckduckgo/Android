@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.mobile.android.vpn">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -101,6 +100,12 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
+        <!-- This is the Worker Service where VPN workers need to bind into -->
+        <service
+            android:name="androidx.work.multiprocess.RemoteWorkerService"
+            android:exported="false"
+            android:process=":vpn" />
 
         <receiver
             android:name=".service.VpnReminderReceiver"

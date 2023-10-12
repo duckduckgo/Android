@@ -72,7 +72,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     override fun onMainProcessCreate() {
         configureLogging()
-        Timber.d("onMainProcessCreate $currentProcessName")
+        Timber.d("onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}")
 
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
@@ -94,7 +94,8 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
-            Timber.d("Init for secondary process $shortProcessName")
+            configureLogging()
+            Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
             configureDependencyInjection()
             configureUncaughtExceptionHandlerVpn()
             initializeDateLibrary()
