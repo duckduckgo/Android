@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel.WgTunnelData
 import com.squareup.anvil.annotations.ContributesBinding
@@ -48,6 +49,7 @@ fun Map<InetAddress, Int>.toCidrString(): Set<String> {
 class RealWgTunnel @Inject constructor(
     private val deviceKeys: DeviceKeys,
     private val wgServerApi: WgServerApi,
+    private val crashLogger: CrashLogger,
 ) : WgTunnel {
 
     override suspend fun establish(): WgTunnelData? {
@@ -80,6 +82,7 @@ class RealWgTunnel @Inject constructor(
                 }
         } catch (e: Throwable) {
             logcat(LogPriority.ERROR) { "Error getting WgTunnelData: ${e.asLog()}" }
+            crashLogger.logCrash(CrashLogger.Crash(shortName = "m_netp_ev_key_registration_error", t = e))
             null
         }
     }
