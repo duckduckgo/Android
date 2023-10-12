@@ -1,0 +1,26 @@
+appId: com.duckduckgo.mobile.android.debug
+tags:
+  - syncTest
+env:
+  CODE: eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiMGFjZjk1MGItNTVhZS00OTMzLWEzYWUtOTUwOTllODJmZjFlIiwicHJpbWFyeV9rZXkiOiJDSldXVjNzNEI1akRQcUJCUnBLamxvQy8zY3hiVTFObWwydmVUdHNzY3IwPSJ9fQ==
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: ../shared/open_sync_dev_settings_screen.yaml
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/internal_edit_text"
+- inputText: ${CODE}
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/sync_recovery_code_cta"
+- tapOn:
+    id: "com.duckduckgo.mobile.android.debug:id/trailingSwitch"
+- tapOn: "Navigate up"
+- scrollUntilVisible:
+    element: "Sync & Backup"
+    direction: UP
+- tapOn: "Sync & Backup"
+- tapOn: "Recover Data"
+- tapOn: "Enter Text Code"
+- tapOn: "Paste Code"

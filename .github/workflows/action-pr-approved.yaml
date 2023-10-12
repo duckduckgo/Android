@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update Asana task -> PR approved
-        uses: malmstein/github-asana-action@master
+        uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           trigger-phrase: "Task/Issue URL:"
