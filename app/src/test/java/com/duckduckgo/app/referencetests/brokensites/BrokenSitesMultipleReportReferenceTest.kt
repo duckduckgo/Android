@@ -20,8 +20,6 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -30,6 +28,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -37,9 +36,6 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.net.URLEncoder
-import java.util.*
-import java.util.regex.Pattern
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -57,6 +53,9 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
+import java.net.URLEncoder
+import java.util.*
+import java.util.regex.Pattern
 
 @ExperimentalCoroutinesApi
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -143,7 +142,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             whenever(mockGpc.isEnabled()).thenReturn(report.gpcEnabled)
             whenever(mockTdsMetadataDao.eTag()).thenReturn(report.blocklistVersion)
             whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
-            whenever(mockVariantManager.getVariant()).thenReturn(Variant("g", 1.0, emptyList()) { true })
+            whenever(mockVariantManager.getVariantKey()).thenReturn("g")
             whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(
                 PrivacyConfigData(version = report.remoteConfigVersion ?: "v", eTag = report.remoteConfigEtag ?: "e"),
             )

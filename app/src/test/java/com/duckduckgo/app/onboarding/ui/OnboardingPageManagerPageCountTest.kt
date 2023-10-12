@@ -18,7 +18,6 @@ package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
-import com.duckduckgo.app.statistics.Variant
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -58,7 +57,7 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
 
     companion object {
 
-        private val otherVariant = Variant(key = "variant", features = listOf(), filterBy = { true })
+        private const val otherVariant = "variant"
 
         @JvmStatic
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
@@ -81,6 +80,6 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     data class TestCase(
         val defaultBrowserPage: Boolean,
         val expectedPageCount: Int,
-        val variant: Variant,
+        val variantKey: String,
     )
 }

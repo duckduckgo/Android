@@ -19,9 +19,9 @@ package com.duckduckgo.app.global.store
 import android.content.Context
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
+import com.duckduckgo.experiments.api.VariantManager
 import timber.log.Timber
 
 class AndroidAppProperties(
@@ -44,7 +44,7 @@ class AndroidAppProperties(
     }
 
     override fun expVariant(): String {
-        return variantManager.getVariant().key
+        return variantManager.getVariantKey().orEmpty()
     }
 
     override fun installedGPlay(): Boolean {

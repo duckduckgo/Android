@@ -154,7 +154,6 @@ import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -306,9 +305,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var previewPersister: WebViewPreviewPersister
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var loginDetector: DOMLoginDetector
