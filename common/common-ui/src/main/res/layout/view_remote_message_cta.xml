@@ -55,31 +55,17 @@
         app:typography="h3"
         tools:text="Placeholder Title" />
 
-    <ImageView
-        android:id="@+id/middleIllustration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_3"
-        android:layout_marginBottom="@dimen/keyline_2"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/messageSubtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/messageTitle"
-        tools:src="@drawable/desktop_promo_artwork" />
-
     <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
         android:id="@+id/messageSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/keyline_1"
         android:layout_marginEnd="@dimen/keyline_4"
         android:gravity="center"
-        app:layout_constraintBottom_toTopOf="@id/barrierButtons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/middleIllustration"
+        app:layout_constraintTop_toBottomOf="@+id/messageTitle"
         app:typography="body2"
         tools:text="Body text goes here. This component can be used with one or two buttons." />
 
@@ -95,7 +81,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_1"
-        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/secondaryActionButton"
@@ -107,7 +93,7 @@
         android:id="@+id/secondaryActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_3"
         android:layout_marginEnd="@dimen/keyline_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/primaryActionButton"
