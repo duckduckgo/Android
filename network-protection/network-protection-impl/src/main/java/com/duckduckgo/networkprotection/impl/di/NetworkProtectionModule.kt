@@ -67,9 +67,10 @@ object DataModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideNetPGeoswitchingRepository(
+        database: NetPDatabase,
         networkProtectionPrefs: NetworkProtectionPrefs,
     ): NetPGeoswitchingRepository {
-        return RealNetPGeoswitchingRepository(networkProtectionPrefs)
+        return RealNetPGeoswitchingRepository(networkProtectionPrefs, database.geoswitchingDao())
     }
 }
 
