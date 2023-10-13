@@ -36,7 +36,7 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingL
 
 class NetpGeoswitchingAdapter constructor(
     initialSelectedCountryCode: String?,
-    private val onItemMenuClicked: (Map<String, Boolean>) -> Unit,
+    private val onItemMenuClicked: (String, List<String>) -> Unit,
     private val onCountrySelected: (String) -> Unit,
     private val onNearestAvailableSelected: () -> Unit,
 ) : ListAdapter<GeoswitchingListItem, ViewHolder>(GeoswitchingDiffCallback()) {
@@ -141,7 +141,7 @@ class NetpGeoswitchingAdapter constructor(
     private class CountryViewHolder(
         private val binding: ItemGeoswitchingCountryBinding,
         private val listener: OnCheckedChangeListener,
-        private val onItemMenuClicked: (Map<String, Boolean>) -> Unit,
+        private val onItemMenuClicked: (String, List<String>) -> Unit,
         private val onCountrySelected: (String) -> Unit
     ) : ViewHolder(binding.root) {
         fun bind(
@@ -159,7 +159,7 @@ class NetpGeoswitchingAdapter constructor(
                     setSecondaryText(it)
                     trailingIconContainer.show()
                     setTrailingIconClickListener {
-                        onItemMenuClicked(countryItem.cities)
+                        onItemMenuClicked(countryItem.countryTitle, countryItem.cities)
                     }
                 } ?: {
                     secondaryText.gone()
@@ -194,7 +194,7 @@ sealed class GeoswitchingListItem {
         val countryEmoji: String,
         val countryTitle: String,
         val countrySubtitle: String?,
-        val cities: Map<String, Boolean>
+        val cities: List<String>
     ) : GeoswitchingListItem()
 }
 
