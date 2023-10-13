@@ -76,8 +76,7 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/atp_SettingsTitle"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled"
-        app:showBetaPill="true" />
+        app:secondaryText="@string/atp_SettingsDeviceShieldDisabled" />
 
     <com.duckduckgo.app.settings.CheckListItem
         android:id="@+id/netpPSetting"
