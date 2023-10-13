@@ -27,8 +27,8 @@ import androidx.annotation.UiThread
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_BOOKMARKS_EXTRA
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
@@ -123,10 +123,7 @@ class AppShortcutCreator @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun buildBookmarksShortcut(context: Context): ShortcutInfo {
-        val bookmarksActivity = BrowserActivity.intent(context).also {
-            it.action = Intent.ACTION_VIEW
-            it.putExtra(LAUNCH_BOOKMARKS_EXTRA, true)
-        }
+        val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
 
         val stackBuilder = TaskStackBuilder.create(context).addNextIntentWithParentStack(bookmarksActivity)
 

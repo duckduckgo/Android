@@ -176,10 +176,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
-
-        if (intent.getBooleanExtra(LAUNCH_BOOKMARKS_EXTRA, false)) {
-            launchBookmarks()
-        }
     }
 
     override fun onStop() {
@@ -562,7 +558,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
-        const val LAUNCH_BOOKMARKS_EXTRA = "LAUNCH_BOOKMARKS_EXTRA"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
