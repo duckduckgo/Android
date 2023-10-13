@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,18 @@
 
 package com.duckduckgo.privacy.dashboard.impl.pixels
 
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
 
-enum class PrivacyDashboardPixels(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
-    PRIVACY_DASHBOARD_OPENED("mp"),
-    PRIVACY_DASHBOARD_ALLOWLIST_ADD("mp_wla"),
-    PRIVACY_DASHBOARD_ALLOWLIST_REMOVE("mp_wlr"),
-    DASHBOARD_TOGGLE_HIGHLIGHT("dashboard_highlighted_toggle"),
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "privacyDashboard",
+)
+interface PrivacyDashboardRemoteFeature {
+    @Toggle.DefaultValue(false)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(false)
+    fun highlightedProtectionsToggle(): Toggle
 }

@@ -69,6 +69,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val consentManaged = intent.getBooleanExtra(CONSENT_MANAGED_EXTRA, false)
         val consentOptOutFailed = intent.getBooleanExtra(CONSENT_OPT_OUT_FAILED_EXTRA, false)
         val consentSelfTestFailed = intent.getBooleanExtra(CONSENT_SELF_TEST_FAILED_EXTRA, false)
+        val params = intent.getStringArrayExtra(BOOLEAN_PARAMS).orEmpty()
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -78,6 +79,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
             consentSelfTestFailed = consentSelfTestFailed,
+            params = params,
         )
     }
 
@@ -165,6 +167,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val CONSENT_MANAGED_EXTRA = "CONSENT_MANAGED_EXTRA"
         private const val CONSENT_OPT_OUT_FAILED_EXTRA = "CONSENT_OPT_OUT_FAILED_EXTRA"
         private const val CONSENT_SELF_TEST_FAILED_EXTRA = "CONSENT_SELF_TEST_FAILED_EXTRA"
+        private const val BOOLEAN_PARAMS = "BOOLEAN_PARAMS"
 
         fun intent(
             context: Context,
@@ -179,6 +182,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(CONSENT_MANAGED_EXTRA, data.consentManaged)
             intent.putExtra(CONSENT_OPT_OUT_FAILED_EXTRA, data.consentOptOutFailed)
             intent.putExtra(CONSENT_SELF_TEST_FAILED_EXTRA, data.consentSelfTestFailed)
+            intent.putExtra(BOOLEAN_PARAMS, data.params.toTypedArray())
             return intent
         }
     }
