@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.installer
+package com.duckduckgo.installation.impl.installer
 
 import android.annotation.SuppressLint
 import android.content.Context
