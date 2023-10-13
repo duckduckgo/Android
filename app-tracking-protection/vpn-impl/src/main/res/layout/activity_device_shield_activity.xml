@@ -51,15 +51,6 @@
                     app:sharedPrefsKeyForDismiss="key_component_dismissed_in_apptp" />
 
                 <com.duckduckgo.mobile.android.ui.view.InfoPanel
-                    android:id="@+id/deviceShieldTrackerLabelEnabled"
-                    style="@style/Widget.DuckDuckGo.InfoPanel"
-                    android:layout_margin="@dimen/keyline_4"
-                    android:visibility="gone"
-                    app:panelBackground="@drawable/info_panel_tooltip_background"
-                    app:panelDrawable="@drawable/ic_info_panel_info"
-                    app:panelText="@string/atp_ActivityEnabledBannerLabel" />
-
-                <com.duckduckgo.mobile.android.ui.view.InfoPanel
                     android:id="@+id/deviceShieldTrackerLabelDisabled"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
                     android:layout_margin="@dimen/keyline_4"
@@ -73,6 +64,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/keyline_4"
                     android:src="@drawable/apptp_shield_enabled"/>
 
                 <com.duckduckgo.mobile.android.ui.view.text.DaxTextView

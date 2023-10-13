@@ -403,7 +403,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne sada</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivnost</string>
     <string name="atp_ActivityManageProtectionLabel">Imaš problema s aplikacijom?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Tijekom beta verzije, zaštita za neke aplikacije automatski je onemogućena. <annotation type="app_settings_link">Prikaži aplikacije</annotation></string>
     <string name="atp_ActivityDescription">Ovdje će se pojaviti blokirani pokušaji praćenja</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s tvoja aplikacija zaštićena je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
