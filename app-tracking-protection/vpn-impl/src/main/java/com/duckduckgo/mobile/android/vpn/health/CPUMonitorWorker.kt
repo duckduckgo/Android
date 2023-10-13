@@ -17,8 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -33,7 +33,7 @@ import logcat.logcat
 class CPUMonitorWorker(
     context: Context,
     workerParams: WorkerParameters,
-) : CoroutineWorker(context, workerParams) {
+) : RemoteCoroutineWorker(context, workerParams) {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
@@ -46,7 +46,7 @@ class CPUMonitorWorker(
     // TODO: move thresholds to remote config
     private val alertThresholds = listOf(30, 20, 10, 5).sortedDescending()
 
-    override suspend fun doWork(): Result {
+    override suspend fun doRemoteWork(): Result {
         return withContext(dispatcherProvider.io()) {
             try {
                 val avgCPUUsagePercent = cpuUsageReader.readCPUUsage()

@@ -36,6 +36,7 @@ android {
             includeAndroidResources = true
         }
     }
+    namespace 'com.duckduckgo.mobile.android.vpn'
 }
 
 dependencies {

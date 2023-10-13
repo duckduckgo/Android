@@ -20,7 +20,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.boundToVpnProcess
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -35,6 +37,7 @@ import logcat.logcat
 class AppTPCPUMonitor @Inject constructor(
     private val workManager: WorkManager,
     private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appBuildConfig: AppBuildConfig,
 ) : VpnServiceCallbacks {
 
     companion object {
@@ -46,6 +49,7 @@ class AppTPCPUMonitor @Inject constructor(
         if (appTpFeatureConfig.isEnabled(AppTpSetting.CPUMonitoring)) {
             logcat { "AppTpSetting.CPUMonitoring is enabled, starting monitoring" }
             val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(4, TimeUnit.HOURS)
+                .boundToVpnProcess(appBuildConfig.applicationId) // this worker is executed in the :vpn process
                 .setInitialDelay(10, TimeUnit.MINUTES) // let the CPU usage settle after VPN restart
                 .build()
 
