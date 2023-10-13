@@ -1,25 +1,16 @@
-<!--
-  ~ Copyright (c) 2021 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="16dp"
-    android:height="16dp"
-    android:viewportWidth="16"
-    android:viewportHeight="16">
-  <path
-      android:pathData="M3.2386,13.3333H12.1856C12.8169,13.3333 13.3334,12.817 13.3334,12.186V3.2426C13.3334,2.7321 12.7136,2.4739 12.3521,2.8353L2.8369,12.3524C2.4753,12.7138 2.7278,13.3333 3.2386,13.3333Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
+    android:width="12dp"
+    android:height="12dp"
+    android:viewportWidth="12"
+    android:viewportHeight="12">
+  <group>
+    <clip-path
+        android:pathData="M0,0h12v12H0z"/>
+    <path
+        android:pathData="M1.561,1.215C0.561,2.246 0,3.595 0,5c0,1.406 0.562,2.754 1.562,3.785a0.625,0.625 0,1 0,0.897 -0.87C1.676,7.108 1.25,6.07 1.25,5s0.426,-2.109 1.208,-2.916a0.625,0.625 0,1 0,-0.897 -0.87ZM12,5c0,-1.406 -0.56,-2.754 -1.561,-3.785a0.625,0.625 0,1 0,-0.897 0.87c0.782,0.807 1.208,1.846 1.208,2.916 0,1.069 -0.426,2.108 -1.209,2.914a0.625,0.625 0,0 0,0.897 0.871c1,-1.03 1.562,-2.379 1.562,-3.785Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
+    <path
+        android:pathData="M9.563,5a3.37,3.37 0,0 0,-0.928 -2.313,0.625 0.625,0 1,0 -0.91,0.858c0.381,0.403 0.588,0.922 0.588,1.455a2.12,2.12 0,0 1,-0.588 1.456,0.625 0.625,0 0,0 0.909,0.858A3.37,3.37 0,0 0,9.562 5ZM2.438,5c0,-0.859 0.333,-1.683 0.927,-2.313a0.625,0.625 0,1 1,0.91 0.858A2.12,2.12 0,0 0,3.687 5c0,0.533 0.207,1.052 0.588,1.456a0.625,0.625 0,0 1,-0.909 0.858A3.37,3.37 0,0 1,2.437 5ZM6.625,5.936A1.124,1.124 0,0 0,6 3.875a1.125,1.125 0,0 0,-0.625 2.06v4.44a0.625,0.625 0,1 0,1.25 0v-4.44Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
+  </group>
 </vector>
