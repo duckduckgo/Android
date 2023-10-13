@@ -58,7 +58,7 @@ jobs:
         id: sync-recovery-code
 
       - name: Sync Flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.6.0
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
@@ -67,11 +67,11 @@ jobs:
           workspace: .maestro
           include-tags: syncCriticalPathTest
           env: |
-            CODE={{ steps.sets-a-recovery-code.outputs.recovery-code }}
+            CODE={{ steps.sync-recovery-code.outputs.recovery-code }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v1.0
+        uses: malmstein/github-asana-action@master
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
