@@ -40,7 +40,6 @@ import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.ui.view.DaxDialogListener
-import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.SwitchView
 import com.duckduckgo.mobile.android.ui.view.TypewriterDaxDialog
@@ -543,8 +542,6 @@ class DeviceShieldTrackerActivity :
                 resources.getString(R.string.atp_ActivityBlockingTrackersEnabledDescription)
             binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_enabled)
             if (runningState.alwaysOnState.isAlwaysOnLockedDown()) {
-                binding.deviceShieldTrackerLabelEnabled.gone()
-
                 binding.deviceShieldTrackerLabelDisabled.apply {
                     setClickableLink(
                         OPEN_SETTINGS_ANNOTATION,
@@ -554,27 +551,11 @@ class DeviceShieldTrackerActivity :
                 }
             } else {
                 binding.deviceShieldTrackerLabelDisabled.gone()
-
-                binding.deviceShieldTrackerLabelEnabled.apply {
-                    if (bannerState is BannerState.OnboardingBanner) {
-                        setClickableLink(
-                            APPTP_SETTINGS_ANNOTATION,
-                            getText(R.string.atp_ActivityEnabledBannerLabel),
-                        ) { launchTrackingProtectionExclusionListActivity() }
-                    } else {
-                        setClickableLink(
-                            APPTP_SETTINGS_ANNOTATION,
-                            getText(R.string.atp_ActivityEnabledMoreThanADayLabel),
-                        ) { launchManageAppsProtection() }
-                    }
-                    show()
-                }
             }
         } else {
             binding.deviceShieldTrackerBlockingTrackersDescription.text =
                 resources.getString(R.string.atp_ActivityBlockingTrackersDisabledDescription)
             binding.deviceShieldTrackerShieldImage.setImageResource(R.drawable.apptp_shield_disabled)
-            binding.deviceShieldTrackerLabelEnabled.gone()
 
             val (disabledLabel, annotation) = if (runningState.stopReason == REVOKED) {
                 R.string.atp_ActivityRevokedLabel to REPORT_ISSUES_ANNOTATION

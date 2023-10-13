@@ -387,7 +387,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Şimdi Değil</string>
     <string name="atp_ActivityRecentActivityHeader">Etkinlik</string>
     <string name="atp_ActivityManageProtectionLabel">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Beta sırasında bazı uygulamalar için koruma otomatik olarak devre dışı bırakılır. <annotation type="app_settings_link">Uygulamaları Görüntüle</annotation></string>
     <string name="atp_ActivityDescription">Engellenen izleme girişimleri burada görünecek</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">Uygulamalarınızdan %1$s tanesi, kişisel bilgilerinize erişmeye çalışırken bulduğumuz gizli izleyicilerden korunuyor</item>
