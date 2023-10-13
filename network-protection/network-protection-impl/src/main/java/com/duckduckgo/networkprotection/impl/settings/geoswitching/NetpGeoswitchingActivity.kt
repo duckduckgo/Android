@@ -50,8 +50,11 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
     private fun bindViews() {
         adapter = NetpGeoswitchingAdapter(
             viewModel.getSelectedCountryCode(),
-            onItemMenuClicked = {
-
+            onItemMenuClicked = { country, cities ->
+                NetpGeoswitchingCityChoiceDialogFragment.instance(
+                    country,
+                    ArrayList(cities),
+                ).show(supportFragmentManager, TAG_DIALOG_CITY_CHOICE)
             },
             onCountrySelected = {
                 viewModel.onCountrySelected(it)
@@ -72,6 +75,10 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         adapter.submitList(viewState.items)
+    }
+
+    companion object {
+        private const val TAG_DIALOG_CITY_CHOICE = "DIALOG_CITY_CHOICE"
     }
 }
 

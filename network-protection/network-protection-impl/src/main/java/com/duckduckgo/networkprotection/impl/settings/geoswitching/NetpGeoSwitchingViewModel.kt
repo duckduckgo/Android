@@ -59,7 +59,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     } else {
                         null
                     },
-                    cities = it.cities.associateWith { false },
+                    cities = it.cities,
                 )
             }
 
