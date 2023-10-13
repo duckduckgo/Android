@@ -34,6 +34,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
@@ -105,17 +106,25 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
         savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp
 
-        if (conflictResolution == DEDUPLICATION) {
-            val modifiedSince = OffsetDateTime.parse(savedSitesSyncStore.clientModifiedSince).plusSeconds(1)
-            savedSitesRepository.updateModifiedSince(savedSitesSyncStore.clientModifiedSince, DatabaseDateFormatter.iso8601(modifiedSince))
-        }
-
-        return if (bookmarks.entries.isEmpty()) {
+        val result = if (bookmarks.entries.isEmpty()) {
             Timber.d("Sync-Bookmarks: merging completed, no entries to merge")
             Success(false)
         } else {
             algorithm.processEntries(bookmarks, conflictResolution, savedSitesSyncStore.clientModifiedSince)
         }
+
+        // it's possible that there were entities present in the device before the first sync
+        // we need to make sure that those entities are sent to the BE after all new data has been stored
+        // we do that by updating the modifiedSince date to a newer date that the last sync
+        if (conflictResolution == DEDUPLICATION) {
+            val modifiedSince = OffsetDateTime.now().plusSeconds(1)
+            savedSitesRepository.getEntitiesModifiedBefore(savedSitesSyncStore.startTimeStamp).forEach {
+                savedSitesRepository.updateModifiedSince(it, DatabaseDateFormatter.iso8601(modifiedSince))
+                Timber.d("Sync-Bookmarks: updating $it modifiedSince to $modifiedSince")
+            }
+        }
+
+        return result
     }
 
     private fun pruneDeletedObjects() {

@@ -628,7 +628,7 @@ class RealSavedSitesRepository(
     }
 
     override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
-        val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedSince(since) }
+        val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedAfter(since) }
         Timber.d("Sync-Bookmarks: folders modified since $since are ${folders.map { it.entityId }}")
         return folders.map { mapBookmarkFolder(it) }
     }
@@ -650,7 +650,7 @@ class RealSavedSitesRepository(
     }
 
     override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
-        val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedSince(since) }
+        val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedAfter(since) }
         Timber.d("Sync-Bookmarks: bookmarks modified since $since are ${bookmarks.map { it.entityId }}")
         return bookmarks.map { mapToBookmark(it)!! }
     }
@@ -663,20 +663,17 @@ class RealSavedSitesRepository(
         }
     }
 
+    override fun getEntitiesModifiedBefore(date: String): List<String> {
+        val entities = savedSitesEntitiesDao.entities().filter { it.modifiedBefore(date) }.map { it.entityId }
+        Timber.d("Sync-Bookmarks: entities modified before $date are $entities")
+        return entities
+    }
+
     override fun updateModifiedSince(
-        originalDate: String,
+        entityId: String,
         modifiedSince: String,
     ) {
-        Timber.d("Sync-Bookmarks: updating entities modified before $originalDate to $modifiedSince")
-        val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filterNot { it.modifiedSince(originalDate) }
-        bookmarks.forEach { bookmark ->
-            savedSitesEntitiesDao.updateModified(bookmark.entityId, modifiedSince)
-        }
-
-        val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filterNot { it.modifiedSince(originalDate) }
-        folders.forEach { folder ->
-            savedSitesEntitiesDao.updateModified(folder.entityId, modifiedSince)
-        }
+        savedSitesEntitiesDao.updateModified(entityId, modifiedSince)
     }
 
     private fun mapToBookmark(entity: Entity): Bookmark? {
@@ -713,13 +710,23 @@ class RealSavedSitesRepository(
     private fun Entity.mapToFavorite(index: Int = 0): Favorite =
         Favorite(this.entityId, this.title, this.url.orEmpty(), lastModified = this.lastModified, index, this.deletedFlag())
 
-    private fun Entity.modifiedSince(since: String): Boolean {
+    private fun Entity.modifiedAfter(since: String): Boolean {
         return if (this.lastModified == null) {
             false
         } else {
             val entityModified = OffsetDateTime.parse(this.lastModified)
             val sinceModified = OffsetDateTime.parse(since)
             entityModified.isAfter(sinceModified)
+        }
+    }
+
+    private fun Entity.modifiedBefore(since: String): Boolean {
+        return if (this.lastModified == null) {
+            false
+        } else {
+            val entityModified = OffsetDateTime.parse(this.lastModified)
+            val beforeModified = OffsetDateTime.parse(since)
+            entityModified.isBefore(beforeModified)
         }
     }
 

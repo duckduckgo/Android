@@ -25,14 +25,14 @@ import com.duckduckgo.sync.crypto.*
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.store.*
-import com.squareup.anvil.annotations.*
-import com.squareup.moshi.*
-import dagger.*
 import com.duckduckgo.sync.store.SyncStore
+import com.squareup.anvil.annotations.*
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.moshi.*
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dagger.*
 import dagger.SingleInstanceIn
 import javax.inject.*
 import timber.log.Timber

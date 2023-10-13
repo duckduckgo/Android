@@ -359,8 +359,13 @@ interface SavedSitesRepository {
     fun pruneDeleted()
 
     /**
-     * Updates all bookmarks and folders modified before [originalDate] to [modifiedSince]
-     * Used after first sync to ensure old data in device can be synced
+     * Returns list of [Entity] modified before [date]
+     * @return [List] of [String]
      */
-    fun updateModifiedSince(originalDate: String, modifiedSince: String)
+    fun getEntitiesModifiedBefore(date: String): List<String>
+
+    /**
+     * Updates entity [entityId] to a modified date of [modifiedSince]
+     */
+    fun updateModifiedSince(entityId: String, modifiedSince: String)
 }
