@@ -403,7 +403,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Teď ne</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
     <string name="atp_ActivityManageProtectionLabel">Máš problémy s aplikací?</string>
-    <string name="atp_ActivityEnabledBannerLabel">V beta verzi je ochrana některých aplikací automaticky zakázaná. <annotation type="app_settings_link">Zobrazit aplikace</annotation></string>
     <string name="atp_ActivityDescription">Tady se zobrazí zablokované pokusy o sledování</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s tvoje aplikace je chráněná před skrytými trackery, které se snaží získat přístup k tvým osobním údajům</item>

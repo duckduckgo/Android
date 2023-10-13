@@ -390,7 +390,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Not Now</string>
     <string name="atp_ActivityRecentActivityHeader">Activity</string>
     <string name="atp_ActivityManageProtectionLabel">Having issues with an app?</string>
-    <string name="atp_ActivityEnabledBannerLabel">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View apps</annotation></string>
     <string name="atp_ActivityDescription">Blocked tracking attempts will appear here</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s of your apps is protected from hidden trackers we find trying to access your personal info</item>

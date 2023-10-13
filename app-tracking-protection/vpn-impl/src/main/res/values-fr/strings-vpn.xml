@@ -387,7 +387,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Pas maintenant</string>
     <string name="atp_ActivityRecentActivityHeader">Activité</string>
     <string name="atp_ActivityManageProtectionLabel">Vous rencontrez des problèmes liés à une application ?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Dans la version bêta, la protection de certaines applications est automatiquement désactivée. <annotation type="app_settings_link">Afficher les applications</annotation></string>
     <string name="atp_ActivityDescription">Les tentatives de pistage bloquées apparaîtront ici</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s de vos applications est protégée contre les traqueurs cachés qui tentent d\'accéder à vos données personnelles</item>
