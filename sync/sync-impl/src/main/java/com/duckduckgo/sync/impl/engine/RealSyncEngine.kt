@@ -20,7 +20,12 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.DATA_CHANGE
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
@@ -58,7 +63,11 @@ class RealSyncEngine @Inject constructor(
             Timber.d("Sync-Feature: sync enabled, triggering operation: $trigger")
             when (trigger) {
                 BACKGROUND_SYNC -> scheduleSync(trigger)
-                else -> performSync(trigger)
+                APP_OPEN -> performSync(trigger)
+                FEATURE_READ -> performSync(trigger)
+                DATA_CHANGE -> performSync(trigger)
+                ACCOUNT_CREATION -> sendLocalData()
+                ACCOUNT_LOGIN -> performSync(trigger)
             }
         } else {
             Timber.d("Sync-Feature: sync disabled, nothing to do")

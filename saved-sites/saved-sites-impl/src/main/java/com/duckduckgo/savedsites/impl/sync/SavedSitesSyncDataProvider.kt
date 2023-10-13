@@ -49,6 +49,7 @@ class SavedSitesSyncDataProvider @Inject constructor(
         } else {
             changesSince(savedSitesSyncStore.clientModifiedSince)
         }
+        Timber.d("Sync-Bookmarks: modifiedSince changes: $updates")
         return formatUpdates(updates)
     }
 

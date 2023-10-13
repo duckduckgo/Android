@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
@@ -25,11 +26,13 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
+import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -94,13 +97,18 @@ class SavedSitesSyncPersister @Inject constructor(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
-        Timber.d("Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince} to ${bookmarks.last_modified}")
-        Timber.d(
+        Timber.i("Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince} to ${bookmarks.last_modified}")
+        Timber.i(
             "Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} to ${savedSitesSyncStore.startTimeStamp}",
         )
 
         savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
         savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp
+
+        if (conflictResolution == DEDUPLICATION) {
+            val modifiedSince = OffsetDateTime.parse(savedSitesSyncStore.clientModifiedSince).plusSeconds(1)
+            savedSitesRepository.updateModifiedSince(savedSitesSyncStore.clientModifiedSince, DatabaseDateFormatter.iso8601(modifiedSince))
+        }
 
         return if (bookmarks.entries.isEmpty()) {
             Timber.d("Sync-Bookmarks: merging completed, no entries to merge")

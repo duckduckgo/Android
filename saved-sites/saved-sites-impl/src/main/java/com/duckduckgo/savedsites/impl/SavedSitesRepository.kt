@@ -629,7 +629,7 @@ class RealSavedSitesRepository(
 
     override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
         val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedSince(since) }
-        Timber.d("Sync-Bookmarks: folders modified since $since are $folders")
+        Timber.d("Sync-Bookmarks: folders modified since $since are ${folders.map { it.entityId }}")
         return folders.map { mapBookmarkFolder(it) }
     }
 
@@ -651,7 +651,7 @@ class RealSavedSitesRepository(
 
     override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
         val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedSince(since) }
-        Timber.d("Sync-Bookmarks: bookmarks modified since $since are $bookmarks")
+        Timber.d("Sync-Bookmarks: bookmarks modified since $since are ${bookmarks.map { it.entityId }}")
         return bookmarks.map { mapToBookmark(it)!! }
     }
 
