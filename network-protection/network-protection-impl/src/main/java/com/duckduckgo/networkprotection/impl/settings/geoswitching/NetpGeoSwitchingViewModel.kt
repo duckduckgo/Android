@@ -27,24 +27,26 @@ import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingL
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.DividerItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.HeaderItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.RecommendedItem
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
 @ContributesViewModel(ActivityScope::class)
 class NetpGeoSwitchingViewModel @Inject constructor(
     private val contentProvider: GeoSwitchingContentProvider,
-    private val preferredServerLocationProvider: PreferredServerLocationProvider,
+    private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
     private val viewState = MutableStateFlow(ViewState())
-
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
 
     internal data class ViewState(
-        val items: List<GeoswitchingListItem> = emptyList()
+        val items: List<GeoswitchingListItem> = emptyList(),
     )
 
     fun initialize(context: Context) {
@@ -84,12 +86,20 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     }
 
     fun getSelectedCountryCode(): String? {
-        return preferredServerLocationProvider.getPreferredServerLocation().country
+        return runBlocking { netPGeoswitchingRepository.getUserPreferredLocation().countryCode }
     }
 
     fun onCountrySelected(countryCode: String) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (netPGeoswitchingRepository.getUserPreferredLocation().countryCode != countryCode) {
+                netPGeoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = countryCode))
+            }
+        }
     }
 
     fun onNearestAvailableCountrySelected() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            netPGeoswitchingRepository.setUserPreferredLocation(UserPreferredLocation())
+        }
     }
 }

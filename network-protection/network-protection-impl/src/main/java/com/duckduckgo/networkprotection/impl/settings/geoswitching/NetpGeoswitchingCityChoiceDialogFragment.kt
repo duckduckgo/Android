@@ -24,7 +24,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RadioGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.button.RadioButton
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.TextType
@@ -32,12 +34,22 @@ import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.H4
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.DialogGeoswitchingCityBinding
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import logcat.logcat
+import javax.inject.Inject
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @InjectWith(FragmentScope::class)
 class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomSheetDialogFragment() {
+    @Inject
+    lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
+
+    @Inject
+    lateinit var dispatcherProvider: DispatcherProvider
+
+    private var preferredCity: String? = null
     override fun getTheme(): Int = com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialogCollapsed
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -49,6 +61,7 @@ class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomShe
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        preferredCity = runBlocking { netPGeoswitchingRepository.getUserPreferredLocation().cityName }
         return DialogGeoswitchingCityBinding.inflate(inflater, container, false).apply {
             configureViews(this)
         }.root
@@ -59,11 +72,11 @@ class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomShe
         val cities = requireArguments().getStringArrayList(ARGUMENT_CITIES)
 
         dialogGeoswitchingCityBinding.countryName.text = cityName
-        dialogGeoswitchingCityBinding.recommendedCityItem.style()
+        dialogGeoswitchingCityBinding.recommendedCityItem.style(null)
 
         cities?.forEachIndexed { index, city ->
             val radioButton = RadioButton(dialogGeoswitchingCityBinding.cityRadioGroup.context, null)
-            radioButton.style()
+            radioButton.style(city)
             radioButton.id = index + 1
             val params = RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
             radioButton.layoutParams = params
@@ -72,17 +85,21 @@ class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomShe
         }
 
         dialogGeoswitchingCityBinding.cityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            if (checkedId == R.id.recommended_city_item) {
-                logcat { "KLDIMSUM: selected nearest available" }
-            } else {
-                logcat { "KLDIMSUM: selected ${cities?.get(checkedId - 1)}" }
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                val currentUserPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
+                if (checkedId == R.id.recommended_city_item) {
+                    netPGeoswitchingRepository.setUserPreferredLocation(currentUserPreferredLocation.copy(cityName = null))
+                } else {
+                    netPGeoswitchingRepository.setUserPreferredLocation(currentUserPreferredLocation.copy(cityName = cities?.get(checkedId - 1)))
+                }
             }
         }
     }
 
-    private fun RadioButton.style() {
+    private fun RadioButton.style(cityName: String?) {
         setTextAppearance(Typography.getTextAppearanceStyle(H4))
         setTextColor(ContextCompat.getColorStateList(requireContext(), TextType.getTextColorStateList(TextType.Primary)))
+        isChecked = preferredCity == cityName
     }
 
     companion object {
@@ -90,7 +107,7 @@ class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomShe
         private const val ARGUMENT_CITIES = "cities"
         fun instance(
             countryName: String,
-            cities: ArrayList<String>
+            cities: ArrayList<String>,
         ): NetpGeoswitchingCityChoiceDialogFragment {
             return NetpGeoswitchingCityChoiceDialogFragment().apply {
                 arguments = Bundle().also {
