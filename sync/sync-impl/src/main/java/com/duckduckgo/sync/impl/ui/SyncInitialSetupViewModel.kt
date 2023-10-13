@@ -23,10 +23,12 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
+import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.AuthState
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
@@ -78,6 +80,7 @@ constructor(
         object ReadQR : Command()
         object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
+        object LoginSuccess : Command()
     }
 
     init {
@@ -268,10 +271,21 @@ constructor(
         }
     }
 
-    fun copyRecoveryCode(recoveryCode: String) {
+    fun useRecoveryCode(recoveryCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            clipboard.copyToClipboard(recoveryCode)
-            command.send(ShowMessage(recoveryCode))
+            authFlow(recoveryCode)
+        }
+    }
+
+    private suspend fun authFlow(
+        pastedCode: String,
+    ) {
+        val result = syncAccountRepository.processCode(pastedCode)
+        when (result) {
+            is Result.Success -> command.send(Command.LoginSuccess)
+            is Result.Error -> {
+                command.send(ShowMessage("Something went wrong"))
+            }
         }
     }
 }

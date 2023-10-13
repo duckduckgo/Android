@@ -53,11 +53,12 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
-      - id: sets-a-recovery-code
-        name: Execute sync script to create an account
-        run: |
-          the_code=$((RANDOM))
-          echo "recovery-code=$the_code" >> "$GITHUB_OUTPUT"
+      - name: Create test account for Sync and return the recovery code
+        uses: duckduckgo/sync_crypto/action@jp/action
+        id: sync-recovery-code
+
+      - name: Show the recovery code
+        run: echo "The recovery code is ${{ steps.sync-recovery-code.outputs.recovery-code }}"
 
       - name: Sync Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
@@ -67,7 +68,7 @@ jobs:
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
-          include-tags: syncTest
+          include-tags: syncCriticalPathTest
           env: |
             CODE={{ steps.sets-a-recovery-code.outputs.recovery-code }}
 
