@@ -138,7 +138,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
             LoginSuccess -> {
                 Snackbar.make(binding.syncRecoveryCodeCta, "Login Success", Snackbar.LENGTH_SHORT).show()
             }
-
         }
     }
 
