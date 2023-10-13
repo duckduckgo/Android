@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2023 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.networkprotection.store
+
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
+
+interface NetPGeoswitchingRepository {
+
+    suspend fun getUserPreferredLocation(): UserPreferredLocation
+
+    suspend fun setUserPreferredLocation(userPreferredLocation: UserPreferredLocation)
+
+    data class UserPreferredLocation(
+        val countryCode: String? = null,
+        val cityName: String? = null,
+    )
+}
+
+class RealNetPGeoswitchingRepository constructor(
+    private val networkProtectionPrefs: NetworkProtectionPrefs,
+) : NetPGeoswitchingRepository {
+    override suspend fun getUserPreferredLocation(): UserPreferredLocation {
+        return UserPreferredLocation(
+            countryCode = networkProtectionPrefs.getString(KEY_PREFERRED_COUNTRY, null),
+            cityName = networkProtectionPrefs.getString(KEY_PREFERRED_CITY, null),
+        )
+    }
+
+    override suspend fun setUserPreferredLocation(userPreferredLocation: UserPreferredLocation) {
+        networkProtectionPrefs.putString(KEY_PREFERRED_COUNTRY, userPreferredLocation.countryCode)
+        networkProtectionPrefs.putString(KEY_PREFERRED_CITY, userPreferredLocation.cityName)
+    }
+
+    companion object {
+        private const val KEY_PREFERRED_COUNTRY = "wg_preferred_country"
+        private const val KEY_PREFERRED_CITY = "wg_preferred_city"
+    }
+}
