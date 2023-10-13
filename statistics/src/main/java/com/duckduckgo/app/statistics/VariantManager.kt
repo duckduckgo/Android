@@ -47,12 +47,24 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Experiment: Ask for Default Browser More Than Once
-            Variant(key = "zh", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zj", weight = 1.0, features = listOf(AskForDefaultBrowserMoreThanOnce), filterBy = { isEnglishLocale() }),
+            Variant(key = "zh", weight = 1.0, features = emptyList(), filterBy = { isDefaultBrowserExperimentCountry() }),
+            Variant(
+                key = "zj",
+                weight = 1.0,
+                features = listOf(AskForDefaultBrowserMoreThanOnce),
+                filterBy = { isDefaultBrowserExperimentCountry() },
+            ),
         )
 
         val REFERRER_VARIANTS = listOf(
             Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() }),
+        )
+
+        private val defaultBrowserExperimentCountries = listOf(
+            "US",
+            "CA",
+            "GB",
+            "AU",
         )
 
         private val serpRegionToggleTargetCountries = listOf(
@@ -81,6 +93,11 @@ interface VariantManager {
         private fun isEnglishLocale(): Boolean {
             val locale = Locale.getDefault()
             return locale != null && locale.language == "en"
+        }
+
+        private fun isDefaultBrowserExperimentCountry(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && locale.country in defaultBrowserExperimentCountries && locale.language == "en"
         }
 
         private fun isSerpRegionToggleCountry(): Boolean {
