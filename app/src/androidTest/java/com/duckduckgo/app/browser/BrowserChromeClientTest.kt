@@ -209,6 +209,7 @@ class BrowserChromeClientTest {
         testee.onPermissionRequest(mockPermission)
 
         verify(mockPermission, never()).grant(any())
+        verify(mockPermission).deny()
     }
 
     @ExperimentalCoroutinesApi

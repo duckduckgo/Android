@@ -43,7 +43,7 @@ class RealDrmTest {
     val testee: RealDrm = RealDrm(mockFeatureToggle, mockDrmRepository, mockUserAllowListRepository, mockUnprotectedTemporary)
 
     @Test
-    fun whenGetDrmPermissionsForRequestIfFeatureIsEnabledAndProtectedMediaIdIsRequestedThenPermissionIsReturned() {
+    fun whenIsDrmAllowedForUrlIfFeatureIsEnabledAndProtectedMediaIdIsRequestedThenTrueIsReturned() {
         giveFeatureIsEnabled()
         givenUrlIsInExceptionList()
 
@@ -52,7 +52,7 @@ class RealDrmTest {
     }
 
     @Test
-    fun whenGetDrmPermissionsForRequestIfFeatureIsEnabledAndDomainIsNotInExceptionsListThenNoPermissionsAreReturned() {
+    fun whenIsDrmAllowedForUrlIfFeatureIsEnabledAndDomainIsNotInExceptionsListThenFalseIsReturned() {
         giveFeatureIsEnabled()
         givenUrlIsNotInExceptionList()
 
@@ -61,14 +61,14 @@ class RealDrmTest {
     }
 
     @Test
-    fun whenGetDrmPermissionsForRequestIfFeatureIsDisableThenNoPermissionsAreReturned() {
+    fun whenIsDrmAllowedForUrlIfFeatureIsDisableThenFalseIsReturned() {
         val url = "https://open.spotify.com"
 
         assertFalse(testee.isDrmAllowedForUrl(url))
     }
 
     @Test
-    fun whenGetDrmPermissionsForRequestAndIsInUserAllowListThenNoPermissionsAreReturned() {
+    fun whenIsDrmAllowedForUrlAndIsInUserAllowListThenTrueIsReturned() {
         giveFeatureIsEnabled()
         givenUrlIsNotInExceptionList()
         givenUriIsInUserAllowList()
@@ -78,7 +78,7 @@ class RealDrmTest {
     }
 
     @Test
-    fun whenGetDrmPermissionsForRequestAndIsInUnprotectedTemporaryThenNoPermissionsAreReturned() {
+    fun whenIsDrmAllowedForUrlAndIsInUnprotectedTemporaryThenTrueIsReturned() {
         giveFeatureIsEnabled()
         givenUrlIsNotInExceptionList()
         givenUrlIsInUnprotectedTemporary()
