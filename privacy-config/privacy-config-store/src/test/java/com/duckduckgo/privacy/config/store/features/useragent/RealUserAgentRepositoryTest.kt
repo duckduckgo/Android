@@ -22,7 +22,7 @@ import com.duckduckgo.privacy.config.store.UserAgentExceptionEntity
 import com.duckduckgo.privacy.config.store.UserAgentSitesEntity
 import com.duckduckgo.privacy.config.store.UserAgentStatesEntity
 import com.duckduckgo.privacy.config.store.UserAgentVersionsEntity
-import com.duckduckgo.privacy.config.store.toUserAgentException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -67,7 +67,7 @@ class RealUserAgentRepositoryTest {
     @Test
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenUserAgentDaoContainsExceptions()
-        val actual = userAgentException.toUserAgentException()
+        val actual = userAgentException.toFeatureException()
         testee =
             RealUserAgentRepository(
                 mockDatabase,
@@ -92,8 +92,8 @@ class RealUserAgentRepositoryTest {
 
         assertEquals(testee.closestUserAgentState, true)
         assertEquals(testee.ddgFixedUserAgentState, true)
-        assertEquals(testee.ddgDefaultSites.first(), userAgentDefaultSiteEntity.toUserAgentException())
-        assertEquals(testee.ddgFixedSites.first(), userAgentFixedSiteEntity.toUserAgentException())
+        assertEquals(testee.ddgDefaultSites.first(), userAgentDefaultSiteEntity.toFeatureException())
+        assertEquals(testee.ddgFixedSites.first(), userAgentFixedSiteEntity.toFeatureException())
         assertEquals(testee.closestUserAgentVersions.first(), userAgentClosestVersionEntity.version)
         assertEquals(testee.ddgFixedUserAgentVersions.first(), userAgentDdgFixedVersionEntity.version)
     }

@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.store.features.contentblocking
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toContentBlockingException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -60,7 +60,7 @@ class RealContentBlockingRepositoryTest {
             )
 
         assertEquals(
-            contentBlockingException.toContentBlockingException(),
+            contentBlockingException.toFeatureException(),
             testee.exceptions.first(),
         )
     }

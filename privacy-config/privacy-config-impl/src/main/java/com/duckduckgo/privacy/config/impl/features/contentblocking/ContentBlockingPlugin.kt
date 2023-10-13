@@ -49,7 +49,7 @@ class ContentBlockingPlugin @Inject constructor(
 
             val contentBlockingFeature: ContentBlockingFeature? = jsonAdapter.fromJson(jsonString)
             contentBlockingFeature?.exceptions?.map {
-                contentBlockingExceptions.add(ContentBlockingExceptionEntity(it.domain, it.reason))
+                contentBlockingExceptions.add(ContentBlockingExceptionEntity(it.domain, it.reason.orEmpty()))
             }
             contentBlockingRepository.updateAll(contentBlockingExceptions)
             val isEnabled = contentBlockingFeature?.state == "enabled"

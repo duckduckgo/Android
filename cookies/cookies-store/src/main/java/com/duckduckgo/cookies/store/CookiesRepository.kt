@@ -17,7 +17,7 @@
 package com.duckduckgo.cookies.store
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.cookies.api.CookieException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 interface CookiesRepository {
     fun updateAll(exceptions: List<CookieExceptionEntity>, firstPartyTrackerCookiePolicy: FirstPartyCookiePolicyEntity)
     var firstPartyCookiePolicy: FirstPartyCookiePolicyEntity
-    val exceptions: List<CookieException>
+    val exceptions: List<FeatureException>
 }
 
 class RealCookieRepository constructor(
@@ -36,7 +36,7 @@ class RealCookieRepository constructor(
 
     private val cookiesDao: CookiesDao = database.cookiesDao()
 
-    override val exceptions = CopyOnWriteArrayList<CookieException>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
     override var firstPartyCookiePolicy = FirstPartyCookiePolicyEntity(threshold = DEFAULT_THRESHOLD, maxAge = DEFAULT_MAX_AGE)
 
     init {
@@ -56,7 +56,7 @@ class RealCookieRepository constructor(
     private fun loadToMemory() {
         exceptions.clear()
         cookiesDao.getAllCookieExceptions().map {
-            exceptions.add(it.toCookieException())
+            exceptions.add(it.toFeatureException())
         }
         firstPartyCookiePolicy =
             cookiesDao.getFirstPartyCookiePolicy()

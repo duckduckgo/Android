@@ -51,7 +51,7 @@ class CookiesFeaturePlugin @Inject constructor(
             val cookiesFeature: CookiesFeature? = jsonAdapter.fromJson(jsonString)
 
             val exceptions = cookiesFeature?.exceptions?.map {
-                CookieExceptionEntity(domain = it.domain, reason = it.reason)
+                CookieExceptionEntity(domain = it.domain, reason = it.reason.orEmpty())
             }.orEmpty()
 
             val maxAge = cookiesFeature?.settings?.firstPartyCookiePolicy?.maxAge ?: DEFAULT_MAX_AGE

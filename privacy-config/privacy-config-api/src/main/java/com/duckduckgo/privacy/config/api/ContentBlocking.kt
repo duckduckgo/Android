@@ -26,9 +26,3 @@ interface ContentBlocking {
      */
     fun isAnException(url: String): Boolean
 }
-
-/** Public data class for Content Blocking Exceptions */
-data class ContentBlockingException(
-    val domain: String,
-    val reason: String,
-)

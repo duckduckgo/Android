@@ -27,7 +27,6 @@ import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.cookies.api.CookieException
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.features.CookiesFeature
@@ -37,11 +36,12 @@ import com.duckduckgo.cookies.impl.features.firstparty.RealFirstPartyCookiesModi
 import com.duckduckgo.cookies.store.CookieExceptionEntity
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
-import com.duckduckgo.cookies.store.toCookieException
+import com.duckduckgo.cookies.store.toFeatureException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.Locale
@@ -195,7 +195,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
     }
 
     private fun mockPrivacyConfig() {
-        val cookieExceptions = mutableListOf<CookieException>()
+        val cookieExceptions = mutableListOf<FeatureException>()
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(JsonPrivacyConfig::class.java)
         val config: JsonPrivacyConfig? = jsonAdapter.fromJson(
             FileUtilities.loadText(
@@ -207,7 +207,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
         val cookieFeature: CookiesFeature? = cookieAdapter.fromJson(config?.features?.get("cookie").toString())
 
         cookieFeature?.exceptions?.map {
-            cookieExceptions.add(CookieExceptionEntity(it.domain, it.reason).toCookieException())
+            cookieExceptions.add(CookieExceptionEntity(it.domain, it.reason.orEmpty()).toFeatureException())
         }
 
         val policy = FirstPartyCookiePolicyEntity(
@@ -216,7 +216,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
         )
 
         val unprotectedTemporaryExceptions = config?.unprotectedTemporary?.map {
-            it.toUnprotectedTemporaryException()
+            it.toFeatureException()
         }
 
         whenever(cookiesRepository.exceptions).thenReturn(CopyOnWriteArrayList(cookieExceptions))

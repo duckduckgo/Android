@@ -67,22 +67,22 @@ class UserAgentPlugin @Inject constructor(
             val versionExceptionList = versionList subtract applicationList subtract exceptionsList
 
             defaultExceptionList.forEach {
-                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = false))
+                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason.orEmpty(), omitApplication = false, omitVersion = false))
             }
             applicationAndVersionExceptionsList.forEach {
-                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = true, omitVersion = true))
+                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason.orEmpty(), omitApplication = true, omitVersion = true))
             }
             applicationExceptionList.forEach {
-                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = true, omitVersion = false))
+                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason.orEmpty(), omitApplication = true, omitVersion = false))
             }
             versionExceptionList.forEach {
-                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = true))
+                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason.orEmpty(), omitApplication = false, omitVersion = true))
             }
             ddgDefaultSitesList.forEach {
-                userAgentSites.add(UserAgentSitesEntity(it.domain, it.reason, ddgDefaultSite = true, ddgFixedSite = false))
+                userAgentSites.add(UserAgentSitesEntity(it.domain, it.reason.orEmpty(), ddgDefaultSite = true, ddgFixedSite = false))
             }
             ddgFixedSitesList.forEach {
-                userAgentSites.add(UserAgentSitesEntity(it.domain, it.reason, ddgDefaultSite = false, ddgFixedSite = true))
+                userAgentSites.add(UserAgentSitesEntity(it.domain, it.reason.orEmpty(), ddgDefaultSite = false, ddgFixedSite = true))
             }
             closestUserAgentVersionList.forEach {
                 userAgentVersions.add(UserAgentVersionsEntity(it, closestUserAgent = true, ddgFixedUserAgent = false))

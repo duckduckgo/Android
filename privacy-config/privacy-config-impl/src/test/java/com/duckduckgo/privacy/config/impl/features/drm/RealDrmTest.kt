@@ -19,8 +19,8 @@ package com.duckduckgo.privacy.config.impl.features.drm
 import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
@@ -128,12 +128,12 @@ class RealDrmTest {
     }
 
     private fun givenUrlIsInExceptionList() {
-        val exceptions = CopyOnWriteArrayList<DrmException>().apply { add(DrmException("open.spotify.com", "my reason here")) }
+        val exceptions = CopyOnWriteArrayList<FeatureException>().apply { add(FeatureException("open.spotify.com", "my reason here")) }
         whenever(mockDrmRepository.exceptions).thenReturn(exceptions)
     }
 
     private fun givenUrlIsNotInExceptionList() {
-        whenever(mockDrmRepository.exceptions).thenReturn(CopyOnWriteArrayList<DrmException>())
+        whenever(mockDrmRepository.exceptions).thenReturn(CopyOnWriteArrayList<FeatureException>())
     }
 
     private fun givenUriIsInUserAllowList() {

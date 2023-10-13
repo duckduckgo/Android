@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.store.features.trackingparameters
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.privacy.config.api.TrackingParameterException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.store.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 interface TrackingParametersRepository {
     fun updateAll(exceptions: List<TrackingParameterExceptionEntity>, parameters: List<TrackingParameterEntity>)
-    val exceptions: List<TrackingParameterException>
+    val exceptions: List<FeatureException>
     val parameters: List<String>
 }
 
@@ -37,7 +37,7 @@ class RealTrackingParametersRepository(
 
     private val trackingParametersDao: TrackingParametersDao = database.trackingParametersDao()
 
-    override val exceptions = CopyOnWriteArrayList<TrackingParameterException>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
     override val parameters = CopyOnWriteArrayList<String>()
 
     init {
@@ -57,7 +57,7 @@ class RealTrackingParametersRepository(
     private fun loadToMemory() {
         exceptions.clear()
         trackingParametersDao.getAllExceptions().map {
-            exceptions.add(it.toTrackingParameterException())
+            exceptions.add(it.toFeatureException())
         }
 
         parameters.clear()

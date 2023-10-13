@@ -47,9 +47,6 @@ interface AmpLinks {
 /** Public data class for AMP Link Info. */
 data class AmpLinkInfo(val ampLink: String, var destinationUrl: String? = null)
 
-/** Public data class for AMP Link Exceptions. */
-data class AmpLinkException(val domain: String, val reason: String)
-
 /** Public sealed class for AMP Link Type. */
 sealed class AmpLinkType {
     class ExtractedAmpLink(val extractedUrl: String) : AmpLinkType()

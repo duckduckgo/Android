@@ -20,8 +20,8 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
-import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
 import com.duckduckgo.autoconsent.store.AutoconsentRepository
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import org.junit.Assert.*
 import org.junit.Before
@@ -47,7 +47,7 @@ class RealAutoconsentTest {
     @Before
     fun setup() {
         whenever(mockFeatureToggle.isFeatureEnabled(AutoconsentFeatureName.Autoconsent.value)).thenReturn(true)
-        whenever(mockAutoconsentRepository.exceptions).thenReturn(listOf(AutoconsentExceptionEntity("exception.com", "reason")))
+        whenever(mockAutoconsentRepository.exceptions).thenReturn(listOf(FeatureException("exception.com", "reason")))
         autoconsent = RealAutoconsent(
             pluginPoint,
             settingsRepository,

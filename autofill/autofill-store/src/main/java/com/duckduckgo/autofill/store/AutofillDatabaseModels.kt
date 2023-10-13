@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.autofill.api.AutofillException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
 @Entity(tableName = "autofill_exceptions")
 data class AutofillExceptionEntity(
@@ -26,6 +26,6 @@ data class AutofillExceptionEntity(
     val reason: String,
 )
 
-fun AutofillExceptionEntity.toAutofillException(): AutofillException {
-    return AutofillException(domain = this.domain, reason = this.reason)
+fun AutofillExceptionEntity.toFeatureException(): FeatureException {
+    return FeatureException(domain = this.domain, reason = this.reason)
 }

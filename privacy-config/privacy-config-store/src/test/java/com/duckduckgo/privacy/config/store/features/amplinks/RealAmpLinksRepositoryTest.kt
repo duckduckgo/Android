@@ -60,7 +60,7 @@ class RealAmpLinksRepositoryTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        assertEquals(ampLinkExceptionEntity.toAmpLinkException(), testee.exceptions.first())
+        assertEquals(ampLinkExceptionEntity.toFeatureException(), testee.exceptions.first())
         assertEquals(ampLinkFormatEntity.format, testee.ampLinkFormats.first().toString())
         assertEquals(ampKeywordEntity.keyword, testee.ampKeywords.first())
     }

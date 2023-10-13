@@ -17,17 +17,17 @@
 package com.duckduckgo.privacy.config.store.features.drm
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.privacy.config.api.DrmException
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toDrmException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface DrmRepository {
     fun updateAll(exceptions: List<DrmExceptionEntity>)
-    val exceptions: CopyOnWriteArrayList<DrmException>
+    val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
 class RealDrmRepository(
@@ -38,7 +38,7 @@ class RealDrmRepository(
     DrmRepository {
 
     private val drmDao: DrmDao = database.drmDao()
-    override val exceptions = CopyOnWriteArrayList<DrmException>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -54,7 +54,7 @@ class RealDrmRepository(
     private fun loadToMemory() {
         exceptions.clear()
         drmDao.getAll().map {
-            exceptions.add(it.toDrmException())
+            exceptions.add(it.toFeatureException())
         }
     }
 }

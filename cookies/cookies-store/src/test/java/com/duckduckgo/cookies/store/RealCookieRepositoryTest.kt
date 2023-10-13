@@ -54,7 +54,7 @@ class RealCookieRepositoryTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        assertEquals(cookieExceptionEntity.toCookieException(), testee.exceptions.first())
+        assertEquals(cookieExceptionEntity.toFeatureException(), testee.exceptions.first())
         assertEquals(THRESHOLD, testee.firstPartyCookiePolicy.threshold)
         assertEquals(MAX_AGE, testee.firstPartyCookiePolicy.maxAge)
     }

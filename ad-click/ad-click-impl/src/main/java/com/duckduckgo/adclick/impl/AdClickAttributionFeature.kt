@@ -16,11 +16,13 @@
 
 package com.duckduckgo.adclick.impl
 
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+
 data class AdClickAttributionFeature(
     val state: String,
     val minSupportedVersion: Int?,
     val settings: AdClickAttributionSettings,
-    val exceptions: List<AdClickAttributionException>,
+    val exceptions: List<FeatureException>,
 )
 
 data class AdClickAttributionSettings(
@@ -41,5 +43,3 @@ data class AdClickAttributionAllowlist(
     val blocklistEntry: String?,
     val host: String?,
 )
-
-data class AdClickAttributionException(val domain: String, val reason: String)

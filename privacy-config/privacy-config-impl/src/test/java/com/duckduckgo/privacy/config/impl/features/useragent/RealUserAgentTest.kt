@@ -17,11 +17,11 @@
 package com.duckduckgo.privacy.config.impl.features.useragent
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.DefaultPolicy.CLOSEST
 import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG
 import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG_FIXED
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UserAgentException
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
 import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
@@ -116,8 +116,8 @@ class RealUserAgentTest {
 
     fun whenIsDdgDefaultSiteThenReturnTrue() {
         val ddgDefaultSites =
-            CopyOnWriteArrayList<UserAgentException>().apply {
-                add(UserAgentException("example.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("example.com", "my reason here"))
             }
         whenever(mockUserAgentRepository.ddgDefaultSites).thenReturn(ddgDefaultSites)
 
@@ -126,8 +126,8 @@ class RealUserAgentTest {
 
     fun whenIsNotDdgDefaultSiteThenReturnFalse() {
         val ddgDefaultSites =
-            CopyOnWriteArrayList<UserAgentException>().apply {
-                add(UserAgentException("foo.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("foo.com", "my reason here"))
             }
         whenever(mockUserAgentRepository.ddgDefaultSites).thenReturn(ddgDefaultSites)
 
@@ -136,8 +136,8 @@ class RealUserAgentTest {
 
     fun whenIsDdgFixedSiteThenReturnTrue() {
         val ddgFixedSites =
-            CopyOnWriteArrayList<UserAgentException>().apply {
-                add(UserAgentException("example.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("example.com", "my reason here"))
             }
         whenever(mockUserAgentRepository.ddgFixedSites).thenReturn(ddgFixedSites)
 
@@ -146,8 +146,8 @@ class RealUserAgentTest {
 
     fun whenIsNotDdgFixedSiteThenReturnFalse() {
         val ddgFixedSites =
-            CopyOnWriteArrayList<UserAgentException>().apply {
-                add(UserAgentException("foo.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("foo.com", "my reason here"))
             }
         whenever(mockUserAgentRepository.ddgFixedSites).thenReturn(ddgFixedSites)
 
@@ -242,8 +242,8 @@ class RealUserAgentTest {
 
     private fun givenThereAreExceptions() {
         val exceptions =
-            CopyOnWriteArrayList<UserAgentException>().apply {
-                add(UserAgentException("example.com", "my reason here"))
+            CopyOnWriteArrayList<FeatureException>().apply {
+                add(FeatureException("example.com", "my reason here"))
             }
         whenever(mockUserAgentRepository.defaultExceptions).thenReturn(exceptions)
         whenever(mockUserAgentRepository.omitApplicationExceptions).thenReturn(exceptions)

@@ -49,7 +49,7 @@ class AutoconsentFeaturePlugin @Inject constructor(
             }.orEmpty()
 
             val exceptions = autoconsentFeature?.exceptions?.map {
-                AutoconsentExceptionEntity(domain = it.domain, reason = it.reason)
+                AutoconsentExceptionEntity(domain = it.domain, reason = it.reason.orEmpty())
             }.orEmpty()
 
             autoconsentRepository.updateAll(exceptions, disabledCmps)

@@ -29,9 +29,3 @@ interface Drm {
         resources: Array<String>,
     ): Array<String>
 }
-
-/** Public data class for Drm Exceptions */
-data class DrmException(
-    val domain: String,
-    val reason: String,
-)

@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.store.features.drm
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toDrmException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -54,7 +54,7 @@ class RealDrmRepositoryTest {
 
         testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider)
 
-        assertEquals(drmException.toDrmException(), testee.exceptions.first())
+        assertEquals(drmException.toFeatureException(), testee.exceptions.first())
     }
 
     @Test

@@ -17,6 +17,7 @@
 package com.duckduckgo.request.filterer.store
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -24,10 +25,10 @@ import kotlinx.coroutines.launch
 interface RequestFiltererRepository {
     fun updateAll(exceptions: List<RequestFiltererExceptionEntity>, settings: SettingsEntity)
     var settings: SettingsEntity
-    val exceptions: List<RequestFiltererExceptionEntity>
+    val exceptions: List<FeatureException>
 }
 
-class RealRequestFiltererRepository constructor(
+class RealRequestFiltererRepository(
     val database: RequestFiltererDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
@@ -35,7 +36,7 @@ class RealRequestFiltererRepository constructor(
 
     private val requestFiltererDao: RequestFiltererDao = database.requestFiltererDao()
 
-    override val exceptions = CopyOnWriteArrayList<RequestFiltererExceptionEntity>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
     override var settings = SettingsEntity(windowInMs = DEFAULT_WINDOW_IN_MS)
 
     init {
@@ -55,7 +56,7 @@ class RealRequestFiltererRepository constructor(
     private fun loadToMemory() {
         exceptions.clear()
         requestFiltererDao.getAllRequestFiltererExceptions().map {
-            exceptions.add(it)
+            exceptions.add(it.toFeatureException())
         }
         settings = requestFiltererDao.getSettings() ?: SettingsEntity(windowInMs = DEFAULT_WINDOW_IN_MS)
     }

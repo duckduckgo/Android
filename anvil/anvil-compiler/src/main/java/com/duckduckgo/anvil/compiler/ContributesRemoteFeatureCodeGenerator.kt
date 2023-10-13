@@ -735,11 +735,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameter("domain", String::class.asClassName())
-                    .addParameter("reason", String::class.asClassName())
+                    .addParameter("reason", String::class.asClassName().copy(nullable = true))
                     .build(),
             )
             .addProperty(PropertySpec.builder("domain", String::class.asClassName()).initializer("domain").build())
-            .addProperty(PropertySpec.builder("reason", String::class.asClassName()).initializer("reason").build())
+            .addProperty(PropertySpec.builder("reason", String::class.asClassName().copy(nullable = true)).initializer("reason").build())
             .build()
     }
 

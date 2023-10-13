@@ -24,8 +24,8 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.store.AutoconsentSettingsRepository
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 
 class FakePluginPoint : PluginPoint<MessageHandlerPlugin> {
     val plugin = FakeMessageHandlerPlugin()
@@ -59,8 +59,8 @@ class FakeUnprotected(private val exceptionList: List<String>) : UnprotectedTemp
         return exceptionList.contains(url.toUri().domain())
     }
 
-    override val unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>
-        get() = exceptionList.map { UnprotectedTemporaryException(domain = it, reason = "A reason") }
+    override val unprotectedTemporaryExceptions: List<FeatureException>
+        get() = exceptionList.map { FeatureException(domain = it, reason = "A reason") }
 }
 
 class FakeUserAllowlist(private val userAllowList: List<String>) : UserAllowListRepository {
