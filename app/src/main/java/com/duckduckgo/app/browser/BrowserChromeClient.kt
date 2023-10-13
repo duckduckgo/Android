@@ -138,10 +138,14 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        val drmPermissions = drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
-        if (drmPermissions.isNotEmpty()) {
-            request.grant(drmPermissions)
+        if (request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+            if (drm.isDrmAllowedForUrl(request.origin.toString())) {
+                request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+            } else {
+                request.deny()
+            }
         }
+
         appCoroutineScope.launch(coroutineDispatcher.io()) {
             val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissionsAllowedToAsk(request.origin.toString(), request.resources)
             if (permissionsAllowedToAsk.isNotEmpty()) {

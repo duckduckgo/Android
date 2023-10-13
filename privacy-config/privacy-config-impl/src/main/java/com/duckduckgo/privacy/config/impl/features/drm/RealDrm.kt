@@ -16,8 +16,6 @@
 
 package com.duckduckgo.privacy.config.impl.features.drm
 
-import android.net.Uri
-import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -40,25 +38,12 @@ class RealDrm @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
 ) : Drm {
 
-    override fun getDrmPermissionsForRequest(
-        url: String,
-        resources: Array<String>,
-    ): Array<String> {
-        val perms = mutableSetOf<String>()
-        if (shouldEnableDrmForUri(url.toUri())) {
-            resources.find { (it == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) }?.let {
-                perms.add(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
-            }
-        }
-        return perms.toTypedArray()
-    }
-
-    private fun shouldEnableDrmForUri(uri: Uri): Boolean {
+    override fun isDrmAllowedForUrl(url: String): Boolean {
+        val uri = url.toUri()
         val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName.value, defaultValue = true)
-        return isFeatureEnabled &&
-            domainsThatAllowDrm(uri.baseHost) &&
-            !userAllowListRepository.isUriInUserAllowList(uri) &&
-            !unprotectedTemporary.isAnException(uri.toString())
+        return (isFeatureEnabled && domainsThatAllowDrm(uri.baseHost)) ||
+            userAllowListRepository.isUriInUserAllowList(uri) ||
+            unprotectedTemporary.isAnException(uri.toString())
     }
 
     private fun domainsThatAllowDrm(host: String?): Boolean {
