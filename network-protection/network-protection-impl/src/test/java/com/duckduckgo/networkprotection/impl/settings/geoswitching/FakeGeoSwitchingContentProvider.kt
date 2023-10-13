@@ -19,14 +19,19 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider.AvailableCountry
 
 class FakeGeoSwitchingContentProvider : GeoSwitchingContentProvider {
-    override fun getContent(): List<AvailableCountry> {
+
+    override suspend fun downloadData() {}
+
+    override suspend fun getDownloadedData(): List<AvailableCountry> {
         return listOf(
             AvailableCountry(
                 countryCode = "uk",
+                countryName = "UK",
                 cities = emptyList(),
             ),
             AvailableCountry(
                 countryCode = "us",
+                countryName = "United States",
                 cities = listOf("Chicago", "El Segundo", "Newark", "Atlanta"),
             ),
         )

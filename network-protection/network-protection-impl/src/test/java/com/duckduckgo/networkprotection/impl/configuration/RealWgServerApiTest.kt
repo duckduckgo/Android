@@ -17,12 +17,15 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealWgServerApiTest {
@@ -32,6 +35,9 @@ class RealWgServerApiTest {
     private lateinit var internalWgServerDebugProvider: FakeWgServerDebugProvider
     private lateinit var productionApi: RealWgServerApi
     private lateinit var internalApi: RealWgServerApi
+
+    @Mock
+    private lateinit var geoSwitchingContentProvider: GeoSwitchingContentProvider
 
     @Before
     fun setUp() {
@@ -43,10 +49,12 @@ class RealWgServerApiTest {
         internalApi = RealWgServerApi(
             wgVpnControllerService,
             internalWgServerDebugProvider,
+            geoSwitchingContentProvider,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
+            geoSwitchingContentProvider,
         )
     }
 
@@ -132,6 +140,20 @@ class RealWgServerApiTest {
         internalApi.registerPublicKey("testpublickey")
 
         assertEquals(8, internalWgServerDebugProvider.cachedServers.size)
+    }
+
+    @Test
+    fun whenRegisterInProductionThenDownloadGeoswitchingData() = runTest {
+        productionApi.registerPublicKey("testpublickey")
+
+        verify(geoSwitchingContentProvider).downloadData()
+    }
+
+    @Test
+    fun whenRegisterInInternalThenDownloadGeoswitchingData() = runTest {
+        internalApi.registerPublicKey("testpublickey")
+
+        verify(geoSwitchingContentProvider).downloadData()
     }
 }
 

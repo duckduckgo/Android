@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.configuration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import javax.inject.Inject
@@ -42,6 +43,7 @@ interface WgServerApi {
 class RealWgServerApi @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
     private val serverDebugProvider: WgServerDebugProvider,
+    private val netGeoSwitchingContentProvider: GeoSwitchingContentProvider,
 ) : WgServerApi {
 
     override suspend fun registerPublicKey(publicKey: String): WgServerData? {
@@ -58,6 +60,8 @@ class RealWgServerApi @Inject constructor(
                     serverName == userSelectedServer
                 } ?: false
             } ?: "*"
+
+        netGeoSwitchingContentProvider.downloadData()
 
         return wgVpnControllerService.registerKey(RegisterKeyBody(publicKey = publicKey, server = selectedServer))
             .run {

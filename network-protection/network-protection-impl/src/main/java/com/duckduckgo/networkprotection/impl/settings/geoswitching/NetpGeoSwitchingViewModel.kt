@@ -57,11 +57,11 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
-            val countryItems = contentProvider.getContent().map {
+            val countryItems = contentProvider.getDownloadedData().map {
                 CountryItem(
                     countryEmoji = getEmojiForCountryCode(it.countryCode),
                     countryCode = it.countryCode,
-                    countryName = getDisplayableCountry(it.countryCode),
+                    countryName = it.countryName,
                     cities = it.cities,
                 )
             }
@@ -72,10 +72,12 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     title = R.string.netpGeoswitchingDefaultTitle,
                     subtitle = R.string.netpGeoswitchingDefaultSubtitle,
                 ),
-                DividerItem,
-                HeaderItem(R.string.netpGeoswitchingHeaderCustom),
             ).apply {
-                this.addAll(countryItems)
+                if (countryItems.isNotEmpty()) {
+                    this.add(DividerItem)
+                    this.add(HeaderItem(R.string.netpGeoswitchingHeaderCustom))
+                    this.addAll(countryItems)
+                }
             }
 
             viewState.emit(
