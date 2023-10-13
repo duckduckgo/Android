@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Alle Apps</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection erkennt und blockiert App-Tracker anderer Unternehmen, z. B. wenn Facebook versucht, dich in einer Gesundheits-App zu tracken. Unternehmen können dich weiterhin in Apps tracken, die ihnen gehören.\n\nWenn eine App nicht wie erwartet funktioniert, versuche, den Schutz für diese App zu deaktivieren.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Während der Beta-Phase deaktiviert DuckDuckGo möglicherweise den Schutz einiger Apps, um bekannte Probleme beim Laden von Inhalten zu beheben. Deine benutzerdefinierten Einstellungen werden nicht geändert, es sei denn, du stellst die Standardeinstellungen wieder her.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo deaktiviert möglicherweise den Schutz einiger Apps, um bekannte Probleme beim Laden von Inhalten zu beheben. Deine benutzerdefinierten Einstellungen werden nicht geändert, es sei denn, du stellst die Standardeinstellungen wieder her.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection ist deaktiviert</b> Hat App Tracking Protection ein Problem mit deinen Apps verursacht <annotation type="report_issues_link">Probleme melden</annotation></string>
     <string name="atp_ExcludedAppsReport">Problem mit einer anderen App melden</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuell deaktiviert</string>
@@ -387,7 +387,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Jetzt nicht</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivität</string>
     <string name="atp_ActivityManageProtectionLabel">Hast du Probleme mit einer App?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Während der Beta-Phase ist der Schutz einiger Apps automatisch deaktiviert. <annotation type="app_settings_link">Apps anzeigen</annotation></string>
     <string name="atp_ActivityDescription">Blockierte Tracking-Versuche werden hier angezeigt</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s deiner Apps ist vor versteckten Trackern geschützt, die auf deine persönlichen Daten zuzugreifen versucht</item>
