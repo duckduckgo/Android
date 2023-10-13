@@ -36,8 +36,11 @@ import javax.inject.Inject
 @ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class)
 class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var appBuildConfig: AppBuildConfig
-    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     private val binding: ActivityNetpVpnSettingsBinding by viewBinding()
 

@@ -43,9 +43,10 @@ class NetpGeoswitchingAdapter constructor(
 
     private var currentSelectedCountryCode = initialSelectedCountryCode
     private var lastCheckedRadioButton: CompoundButton? = null
-    private val listener = OnCheckedChangeListener { button, isChecked ->
-        if (isChecked) {
-            lastCheckedRadioButton?.isChecked = false
+    private val updateLastCheckedItemListener = OnCheckedChangeListener { button, isChecked ->
+        // We only want to update the state if the new button selected is not the previous one
+        if (isChecked && lastCheckedRadioButton != button) {
+            lastCheckedRadioButton?.isChecked = false // Uncheck the previously selected
             lastCheckedRadioButton = button
         }
     }
@@ -61,7 +62,7 @@ class NetpGeoswitchingAdapter constructor(
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): ViewHolder {
         return when (viewType) {
             HEADER_VIEW_TYPE -> HeaderViewHolder(
@@ -69,7 +70,7 @@ class NetpGeoswitchingAdapter constructor(
             )
             RECOMMENDED_VIEW_TYPE -> RecommendedViewHolder(
                 ItemGeoswitchingRecommendedBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                listener,
+                updateLastCheckedItemListener,
                 onNearestAvailableSelected,
             )
             DIVIDER_VIEW_TYPE -> DividerViewHolder(
@@ -77,13 +78,13 @@ class NetpGeoswitchingAdapter constructor(
             )
             COUNTRY_VIEW_TYPE -> CountryViewHolder(
                 ItemGeoswitchingCountryBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                listener,
+                updateLastCheckedItemListener,
                 onItemMenuClicked,
                 onCountrySelected,
             )
             else -> CountryViewHolder(
                 ItemGeoswitchingCountryBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-                listener,
+                updateLastCheckedItemListener,
                 onItemMenuClicked,
                 onCountrySelected,
             )
@@ -92,7 +93,7 @@ class NetpGeoswitchingAdapter constructor(
 
     override fun onBindViewHolder(
         holder: ViewHolder,
-        position: Int
+        position: Int,
     ) {
         when (holder) {
             is HeaderViewHolder -> holder.bind(getItem(position) as HeaderItem)
@@ -112,62 +113,78 @@ class NetpGeoswitchingAdapter constructor(
 
     private class RecommendedViewHolder(
         private val binding: ItemGeoswitchingRecommendedBinding,
-        private val listener: OnCheckedChangeListener,
-        private val onNearestAvailableSelected: () -> Unit
+        private val updateLastCheckedItemListener: OnCheckedChangeListener,
+        private val onNearestAvailableSelected: () -> Unit,
     ) : ViewHolder(binding.root) {
         fun bind(
             recommendedItem: RecommendedItem,
-            currentSelectedCountryCode: String?
+            currentSelectedCountryCode: String?,
         ) {
             with(binding.root) {
                 setPrimaryText(recommendedItem.title)
                 setSecondaryText(recommendedItem.subtitle)
+
+                // Sets initial state
                 if (currentSelectedCountryCode.isNullOrEmpty()) {
                     radioButton.isChecked = true
-                    listener.onCheckedChanged(radioButton, true)
+                    updateLastCheckedItemListener.onCheckedChanged(radioButton, true)
                 }
+
                 radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                    listener.onCheckedChanged(buttonView, isChecked)
+                    updateLastCheckedItemListener.onCheckedChanged(buttonView, isChecked)
                     if (isChecked) onNearestAvailableSelected()
+                }
+
+                // Automatically selects nearest available when the item is clicked
+                setClickListener {
+                    radioButton.isChecked = true
                 }
             }
         }
     }
 
-    private class DividerViewHolder(
-        binding: ItemGeoswitchingDividerBinding
-    ) : ViewHolder(binding.root)
+    private class DividerViewHolder(binding: ItemGeoswitchingDividerBinding) : ViewHolder(binding.root)
 
     private class CountryViewHolder(
         private val binding: ItemGeoswitchingCountryBinding,
-        private val listener: OnCheckedChangeListener,
+        private val updateLastCheckedItemListener: OnCheckedChangeListener,
         private val onItemMenuClicked: (String, List<String>) -> Unit,
-        private val onCountrySelected: (String) -> Unit
+        private val onCountrySelected: (String) -> Unit,
     ) : ViewHolder(binding.root) {
         fun bind(
             countryItem: CountryItem,
-            currentSelectedCountryCode: String?
+            currentSelectedCountryCode: String?,
         ) {
             with(binding.root) {
+                // Sets initial state
                 if (currentSelectedCountryCode == countryItem.countryCode) {
                     radioButton.isChecked = true
-                    listener.onCheckedChanged(radioButton, true)
+                    updateLastCheckedItemListener.onCheckedChanged(radioButton, true)
                 }
+
                 setPrimaryText(countryItem.countryTitle)
                 setLeadingEmojiIcon(countryItem.countryEmoji)
                 countryItem.countrySubtitle?.let {
                     setSecondaryText(it)
                     trailingIconContainer.show()
                     setTrailingIconClickListener {
+                        // Automatically select the country before the user can choose the specific city
+                        radioButton.isChecked = true
                         onItemMenuClicked(countryItem.countryTitle, countryItem.cities)
                     }
                 } ?: {
                     secondaryText.gone()
                     trailingIconContainer.gone()
                 }
+
                 radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                    listener.onCheckedChanged(buttonView, isChecked)
+                    updateLastCheckedItemListener.onCheckedChanged(buttonView, isChecked)
                     if (isChecked) onCountrySelected(countryItem.countryCode)
+                }
+
+                // Automatically selects the country when the item is clicked
+                setClickListener {
+                    radioButton.isChecked = true
                 }
             }
         }
@@ -194,21 +211,21 @@ sealed class GeoswitchingListItem {
         val countryEmoji: String,
         val countryTitle: String,
         val countrySubtitle: String?,
-        val cities: List<String>
+        val cities: List<String>,
     ) : GeoswitchingListItem()
 }
 
 private class GeoswitchingDiffCallback : DiffUtil.ItemCallback<GeoswitchingListItem>() {
     override fun areItemsTheSame(
         oldItem: GeoswitchingListItem,
-        newItem: GeoswitchingListItem
+        newItem: GeoswitchingListItem,
     ): Boolean {
         return oldItem == newItem
     }
 
     override fun areContentsTheSame(
         oldItem: GeoswitchingListItem,
-        newItem: GeoswitchingListItem
+        newItem: GeoswitchingListItem,
     ): Boolean {
         return oldItem == newItem
     }

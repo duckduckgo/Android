@@ -16,22 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
-import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider.AvailableCountry
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
 
-interface GeoSwitchingContentProvider {
-    fun getContent(): List<AvailableCountry>
-
-    data class AvailableCountry(
-        val countryCode: String,
-        val cities: List<String>,
-    )
-}
-
-@ContributesBinding(ActivityScope::class)
-class MockGeoSwitchingContentProvider @Inject constructor() : GeoSwitchingContentProvider {
+class FakeGeoSwitchingContentProvider : GeoSwitchingContentProvider {
     override fun getContent(): List<AvailableCountry> {
         return listOf(
             AvailableCountry(
@@ -39,28 +26,8 @@ class MockGeoSwitchingContentProvider @Inject constructor() : GeoSwitchingConten
                 cities = emptyList(),
             ),
             AvailableCountry(
-                countryCode = "fr",
-                cities = emptyList(),
-            ),
-            AvailableCountry(
                 countryCode = "us",
                 cities = listOf("Chicago", "El Segundo", "Newark", "Atlanta"),
-            ),
-            AvailableCountry(
-                countryCode = "ca",
-                cities = emptyList(),
-            ),
-            AvailableCountry(
-                countryCode = "es",
-                cities = listOf("Madrid", "Barcelona"),
-            ),
-            AvailableCountry(
-                countryCode = "de",
-                cities = emptyList(),
-            ),
-            AvailableCountry(
-                countryCode = "nl",
-                cities = emptyList(),
             ),
         )
     }
