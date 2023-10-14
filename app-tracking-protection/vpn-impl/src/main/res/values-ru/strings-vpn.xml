@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Все приложения</string>
     <string name="atp_ExcludedAppsFeature">Защита от слежки блокирует трекеры сторонних компаний (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье». Однако компании могут отслеживать вас в собственных приложениях.\n\nЕсли приложение сбоит, отключите для него защиту.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Чтобы устранить проблемы с загрузкой контента, DuckDuckGo может отключить защиту для некоторых приложений при тестировании бета-версий. Ваши собственные настройки не изменятся, если вы сами не сбросите их на значения по умолчанию.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">Чтобы устранить проблемы с загрузкой контента, DuckDuckGo может отключить защиту для некоторых приложений. Ваши собственные настройки не изменятся, если вы сами не сбросите их на значения по умолчанию.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Защита от слежки отключена</b> Она нарушает работу приложений? <annotation type="report_issues_link">Сообщите о проблемах</annotation></string>
     <string name="atp_ExcludedAppsReport">Сообщить о проблеме с другим приложением</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Выключено вручную</string>
@@ -403,7 +403,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сейчас</string>
     <string name="atp_ActivityRecentActivityHeader">Активность</string>
     <string name="atp_ActivityManageProtectionLabel">Проблемы с приложением?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Защита некоторых приложений автоматически отключается на время бета-тестирования. <annotation type="app_settings_link">Просмотреть приложения</annotation></string>
     <string name="atp_ActivityDescription">Заблокированные попытки отслеживания будут отображаться здесь</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">Мы защитили %1$s приложение от скрытых трекеров, которые пытались получить доступ к вашим личным данным</item>
