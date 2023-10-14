@@ -84,7 +84,7 @@ jobs:
       - name: Create Asana task in Android App project
         if: ${{ steps.update-check.outcome == 'failure' }}
         id: create-task
-        uses: malmstein/github-asana-action@master
+        uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -100,7 +100,7 @@ jobs:
 
       - name: Add Asana task to Release Board project
         if: ${{ steps.update-check.outcome == 'failure' }}
-        uses: malmstein/github-asana-action@master
+        uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
@@ -110,7 +110,7 @@ jobs:
 
       - name: Update PR description with Asana task
         if: ${{ steps.update-check.outcome == 'failure' }}
-        uses: malmstein/github-asana-action@master
+        uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           github-pat: ${{ secrets.GT_DAXMOBILE }}
           github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
@@ -122,7 +122,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: malmstein/github-asana-action@master
+        uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
