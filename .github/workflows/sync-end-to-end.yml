@@ -67,7 +67,7 @@ jobs:
           workspace: .maestro
           include-tags: syncCriticalPathTest
           env: |
-            CODE={{ steps.sync-recovery-code.outputs.recovery-code }}
+            CODE=${{ steps.sync-recovery-code.outputs.recovery-code }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
