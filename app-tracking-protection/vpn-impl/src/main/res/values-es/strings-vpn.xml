@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Todas las aplicaciones</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection detecta y bloquea a los rastreadores de aplicaciones de otras empresas, como cuando Facebook intenta rastrearte en una aplicación de salud. Las empresas aún pueden rastrearte en las aplicaciones de su propiedad.\n\nSi una aplicación no funciona según lo esperado, intenta desactivar la protección para esa aplicación.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Durante la versión beta, puede que DuckDuckGo desactive la protección para algunas aplicaciones para resolver problemas conocidos de la carga de contenidos. Tu configuración personalizada no cambiará, a menos que restablezcas la configuración predeterminada.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">Puede que DuckDuckGo desactive la protección para algunas aplicaciones para resolver problemas conocidos de la carga de contenidos. Tu configuración personalizada no cambiará, a menos que restablezcas la configuración predeterminada.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection está desactivada</b> ¿Ha causado App Tracking Protection un problema con tus aplicaciones? <annotation type="report_issues_link">Informa de los problemas</annotation></string>
     <string name="atp_ExcludedAppsReport">Informar de problema con otra aplicación</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Desactivado manualmente</string>
@@ -387,7 +387,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ahora no</string>
     <string name="atp_ActivityRecentActivityHeader">Actividad</string>
     <string name="atp_ActivityManageProtectionLabel">¿Tienes problemas con una aplicación?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Durante la versión beta, la protección de algunas aplicaciones se desactiva automáticamente. <annotation type="app_settings_link">Ver aplicaciones</annotation></string>
     <string name="atp_ActivityDescription">Los intentos de rastreo bloqueados aparecerán aquí</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s de tus aplicaciones está protegida contra los rastreadores ocultos que encontramos que intentan acceder a tu información personal</item>
