@@ -262,6 +262,9 @@ dependencies {
     implementation project(':element-hiding-impl')
     implementation project(':element-hiding-store')
 
+    implementation project(':navigator-interface-impl')
+    implementation project(':navigator-interface-store')
+
     implementation project(':httpsupgrade-api')
     implementation project(':httpsupgrade-impl')
     implementation project(':httpsupgrade-store')
