@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Sve aplikacije</string>
     <string name="atp_ExcludedAppsFeature">Zaštita od praćenja aplikacija (App Tracking Protection) blokira poznate alate za praćenje aplikacija drugih tvrtki, primjerice kad te Facebook pokuša pratiti u zdravstvenoj aplikaciji. Tvrtke te mogu i dalje pratiti u njihovim vlastitim aplikacijama.\n\nAko aplikacija ne radi prema očekivanjima, pokušaj onemogućiti zaštitu za tu aplikaciju.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Tijekom beta verzije, DuckDuckGo može onemogućiti zaštitu za neke aplikacije kako bi riješio poznate probleme s učitavanjem sadržaja. Tvoje prilagođene postavke neće se promijeniti osim ako ih ne vratiš na zadane postavke.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo može onemogućiti zaštitu za neke aplikacije kako bismo riješili poznate probleme s učitavanjem sadržaja. Tvoje prilagođene postavke neće se promijeniti osim ako ih ne vratiš na zadane postavke.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Zaštita od praćenja aplikacija onemogućena je</b> Je li zaštita od praćenja aplikacija uzrokovala problem s tvojim aplikacijama <annotation type="report_issues_link">Prijavljivanje problema</annotation></string>
     <string name="atp_ExcludedAppsReport">Prijavi problem s drugom aplikacijom</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručno onemogućeno</string>
@@ -403,7 +403,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne sada</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivnost</string>
     <string name="atp_ActivityManageProtectionLabel">Imaš problema s aplikacijom?</string>
-    <string name="atp_ActivityEnabledBannerLabel">Tijekom beta verzije, zaštita za neke aplikacije automatski je onemogućena. <annotation type="app_settings_link">Prikaži aplikacije</annotation></string>
     <string name="atp_ActivityDescription">Ovdje će se pojaviti blokirani pokušaji praćenja</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s tvoja aplikacija zaštićena je od skrivenih alata za praćenje koje smo otkrili da pokušavaju pristupiti tvojim osobnim podacima</item>
