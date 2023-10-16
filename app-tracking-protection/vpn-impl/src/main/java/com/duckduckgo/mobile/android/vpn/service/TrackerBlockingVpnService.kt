@@ -208,21 +208,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         flags: Int,
         startId: Int,
     ): Int {
+        fun Intent?.alwaysOnTriggered(): Boolean {
+            return runCatching {
+                (this == null || this.component == null || this.component!!.packageName != packageName)
+            }.getOrElse { false }
+        }
+
         logcat { "VPN log: onStartCommand: ${intent?.action}" }
 
-        var returnCode: Int = Service.START_NOT_STICKY
-
         when (val action = intent?.action) {
-            ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
+            null, ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
                 notifyVpnStart()
                 synchronized(this) {
                     launch(serviceDispatcher) {
                         async {
-                            startVpn()
+                            startVpn(intent.alwaysOnTriggered())
                         }.await()
                     }
                 }
-                returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
                 synchronized(this) {
@@ -245,7 +248,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             else -> logcat(ERROR) { "Unknown intent action: $action" }
         }
 
-        return returnCode
+        return Service.START_STICKY
     }
 
     internal fun configureUnderlyingNetworks() {
@@ -256,7 +259,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
     }
 
-    private suspend fun startVpn() = withContext(serviceDispatcher) {
+    private suspend fun startVpn(isAlwaysOnTriggered: Boolean = false) = withContext(serviceDispatcher) {
         suspend fun updateNetworkStackUponRestart() {
             logcat { "VPN log: updating the networking stack" }
             logcat { "VPN log: CURRENT network ${vpnNetworkStack.name}" }
@@ -347,6 +350,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
 
         alwaysOnStateJob += launch { monitorVpnAlwaysOnState() }
+        if (isAlwaysOnTriggered) {
+            logcat { "VPN log: VPN was always on triggered" }
+            deviceShieldPixels.reportVpnAlwaysOnTriggered()
+        }
     }
 
     private fun createNullRouteTempTunnel(): ParcelFileDescriptor? {
