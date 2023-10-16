@@ -54,7 +54,7 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Create test account for Sync and return the recovery code
-        uses: duckduckgo/sync_crypto/action@jp/action
+        uses: duckduckgo/sync_crypto/action@main
         id: sync-recovery-code
 
       - name: Sync Flows
