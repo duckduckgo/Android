@@ -33,6 +33,11 @@ import com.duckduckgo.autofill.api.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -58,11 +63,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillMan
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementLockedMode
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.view.SearchBar

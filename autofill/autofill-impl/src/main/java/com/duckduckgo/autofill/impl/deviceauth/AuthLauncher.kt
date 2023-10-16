@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.deviceauth.impl
+package com.duckduckgo.autofill.impl.deviceauth
 
 import android.content.Context
 import android.os.Build
@@ -25,11 +25,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.UserCancelled
+import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

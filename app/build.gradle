@@ -232,9 +232,6 @@ dependencies {
     implementation project(':secure-storage-impl')
     implementation project(':secure-storage-store')
 
-    implementation project(':device-auth-api')
-    implementation project(':device-auth-impl')
-
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
     implementation project(':ad-click-store')

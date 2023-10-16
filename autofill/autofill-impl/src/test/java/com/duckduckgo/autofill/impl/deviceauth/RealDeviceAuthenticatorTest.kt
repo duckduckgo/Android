@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.deviceauth.impl
+package com.duckduckgo.autofill.impl.deviceauth
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL_TO_USE_CREDENTIALS
+import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.Features.AUTOFILL_TO_ACCESS_CREDENTIALS
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.Features.AUTOFILL_TO_USE_CREDENTIALS
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -96,7 +96,6 @@ class RealDeviceAuthenticatorTest {
     @Test
     fun whenAuthenticateToAccessCredentialsIsCalledWithFragmentThenLaunchAuthLauncher() {
         testee.authenticate(AUTOFILL_TO_ACCESS_CREDENTIALS, fragment) {}
-
         verify(authLauncher).launch(eq(R.string.autofill_auth_text_for_access), eq(fragment), any())
     }
 
