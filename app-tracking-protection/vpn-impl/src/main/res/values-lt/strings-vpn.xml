@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Kaip tai veikia?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Apsauga nuo programėlių sekimo <b>aptinka ir blokuoja kitų įmonių programėlių sekimo priemones</b>, pavyzdžiui, kai „Facebook“ bando jus sekti sveikatos programėlėje.\n\n<b>Ji nemokama</b>, o programėlėmis galite naudotis kaip įprastai. Veikdama fone, ji padeda <b>apsaugoti jus dieną ir naktį.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kas mato jūsų duomenis?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b> Programėlių stebėjimo apsauga nėra VPN. </b> Tačiau jūsų įrenginys atpažins ją kaipo tokią. Taip yra todėl, kad jis veikia naudodamas vietinį VPN ryšį.\n\nProgramų sekimo apsauga yra kitokia. <b> Ji niekada nenukreips programos duomenų per išorinį serverį. </b><annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b> Programėlių stebėjimo apsauga nėra VPN. </b> Tačiau jūsų įrenginys atpažins ją kaipo tokią. Taip yra todėl, kad jis veikia naudodamas vietinį VPN ryšį.\n\nProgramų sekimo apsauga yra kitokia. <b> Ji niekada nenukreips programos duomenų per išorinį serverį.</b>\n\n<annotation type="learn_more_link"><b>Sužinokite daugiau</b></annotation></string>
     <string name="atp_FAQCta">DUK apie programėlių sekimo apsaugą</string>
     <string name="atp_OnboardingContinue">Tęsti</string>
     <string name="atp_OnboardingMaybeLater">Galbūt vėliau</string>
