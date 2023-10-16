@@ -166,6 +166,11 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
         binding.textAlertDialogCancelButton.isVisible = !isDestructiveVersion
         binding.textAlertDialogCancelDestructiveButton.isVisible = isDestructiveVersion
 
+        if (negativeButtonText.isEmpty()) {
+            binding.textAlertDialogCancelDestructiveButton.gone()
+            binding.textAlertDialogCancelButton.gone()
+        }
+
         if (isDestructiveVersion) {
             setButtonListener(binding.textAlertDialogPositiveDestructiveButton, positiveButtonText, dialog) { listener.onPositiveButtonClicked() }
             setButtonListener(binding.textAlertDialogCancelDestructiveButton, negativeButtonText, dialog) { listener.onNegativeButtonClicked() }
@@ -199,9 +204,6 @@ class TextAlertDialogBuilder(val context: Context) : DaxAlertDialog {
     private fun checkRequiredFieldsSet() {
         if (positiveButtonText.isEmpty()) {
             throw Exception("TextAlertDialog: You must always provide a Positive Button")
-        }
-        if (negativeButtonText.isEmpty()) {
-            throw Exception("TextAlertDialog: You must always provide a Negative Button")
         }
         if (titleText.isEmpty()) {
             throw Exception("TextAlertDialog: You must always provide a Title")

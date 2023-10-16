@@ -22,4 +22,5 @@ enum class PrivacyDashboardPixels(override val pixelName: String, val enqueue: B
     PRIVACY_DASHBOARD_OPENED("mp"),
     PRIVACY_DASHBOARD_ALLOWLIST_ADD("mp_wla"),
     PRIVACY_DASHBOARD_ALLOWLIST_REMOVE("mp_wlr"),
+    DASHBOARD_TOGGLE_HIGHLIGHT("dashboard_highlighted_toggle"),
 }

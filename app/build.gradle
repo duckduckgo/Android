@@ -271,9 +271,8 @@ dependencies {
     internalImplementation project(':sync-internal')
     implementation project(':sync-store')
     implementation project(':sync-lib')
-
-    implementation project(':settings-api')
-    implementation project(':settings-impl')
+    implementation project(':sync-settings-api')
+    implementation project(':sync-settings-impl')
 
     implementation project(':request-filterer-api')
     implementation project(':request-filterer-impl')

@@ -27,6 +27,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
+import com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -318,6 +319,16 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         }
     }
 
+    class ExpandableComponentViewHolder(parent: ViewGroup) : ComponentViewHolder(inflate(parent, R.layout.component_expandable_layout)) {
+        override fun bind(component: Component) {
+            view.findViewById<DaxExpandableMenuItem>(R.id.expandable1).apply {
+                setPrimaryButtonClickListener {
+                    Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     companion object {
         fun create(
             parent: ViewGroup,
@@ -340,6 +351,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 Component.SECTION_DIVIDER -> DividerComponentViewHolder(parent)
                 Component.CARD -> CardComponentViewHolder(parent)
+                Component.EXPANDABLE_LAYOUT -> ExpandableComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }

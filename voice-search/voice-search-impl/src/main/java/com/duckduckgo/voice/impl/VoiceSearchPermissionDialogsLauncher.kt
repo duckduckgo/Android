@@ -34,6 +34,12 @@ interface VoiceSearchPermissionDialogsLauncher {
         onRationaleAccepted: () -> Unit = {},
         onRationaleDeclined: () -> Unit = {},
     )
+
+    fun showRemoveVoiceSearchDialog(
+        context: Context,
+        onRemoveVoiceSearch: () -> Unit = {},
+        onRemoveVoiceSearchCancelled: () -> Unit = {},
+    )
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -80,6 +86,30 @@ class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSear
 
                     override fun onNegativeButtonClicked() {
                         onRationaleDeclined()
+                    }
+                },
+            )
+            .show()
+    }
+
+    override fun showRemoveVoiceSearchDialog(
+        context: Context,
+        onRemoveVoiceSearch: () -> Unit,
+        onRemoveVoiceSearchCancelled: () -> Unit,
+    ) {
+        TextAlertDialogBuilder(context)
+            .setTitle(R.string.voiceSearchRemoveTitle)
+            .setMessage(R.string.voiceSearchRemoveSubtitle)
+            .setPositiveButton(R.string.voiceSearchRemovePositiveButton)
+            .setNegativeButton(R.string.voiceSearchNegativeAction)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onRemoveVoiceSearch()
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        onRemoveVoiceSearchCancelled()
                     }
                 },
             )

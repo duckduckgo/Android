@@ -29,7 +29,7 @@ import com.duckduckgo.app.email.sync.*
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_DISABLED
 import com.duckduckgo.app.pixels.AppPixelName.EMAIL_ENABLED
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.settings.api.*
+import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first

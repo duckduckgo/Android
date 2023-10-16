@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
+import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionFailed
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionSuccess
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionTimedOut
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.VolumeUpdateReceived
@@ -47,7 +48,7 @@ class VoiceSearchViewModel @Inject constructor(
     sealed class Command {
         data class UpdateVoiceIndicator(val volume: Float) : Command()
         data class HandleSpeechRecognitionSuccess(val result: String) : Command()
-        object TerminateVoiceSearch : Command()
+        data class TerminateVoiceSearch(val error: Int) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -76,19 +77,22 @@ class VoiceSearchViewModel @Inject constructor(
                 is PartialResultReceived -> showRecognizedSpeech(it.partialResult)
                 is RecognitionSuccess -> handleSuccess(it.result)
                 is VolumeUpdateReceived -> sendCommand(UpdateVoiceIndicator(it.normalizedVolume))
-                is RecognitionTimedOut -> handleTimeOut()
+                is RecognitionFailed -> handleRecognitionFailed(it.error)
+                is RecognitionTimedOut -> handleTimeOut(it.error)
             }
         }
     }
 
-    private fun handleTimeOut() {
+    private fun handleTimeOut(error: Int) {
         if (viewState.value.result.isEmpty()) {
-            viewModelScope.launch {
-                command.send(Command.TerminateVoiceSearch)
-            }
+            viewModelScope.launch { command.send(Command.TerminateVoiceSearch(error)) }
         } else {
             handleSuccess(viewState.value.result)
         }
+    }
+
+    private fun handleRecognitionFailed(error: Int) {
+        sendCommand(Command.TerminateVoiceSearch(error))
     }
 
     fun stopVoiceSearch() {
@@ -96,9 +100,7 @@ class VoiceSearchViewModel @Inject constructor(
     }
 
     private fun sendCommand(commandToSend: Command) {
-        viewModelScope.launch {
-            command.send(commandToSend)
-        }
+        viewModelScope.launch { command.send(commandToSend) }
     }
 
     private fun handleSuccess(result: String) {

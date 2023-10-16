@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.themepreview.ui.component
 enum class Component {
     BUTTON,
     FAB,
+    EXPANDABLE_LAYOUT,
     CARD,
     TOP_APP_BAR,
     CHIP,

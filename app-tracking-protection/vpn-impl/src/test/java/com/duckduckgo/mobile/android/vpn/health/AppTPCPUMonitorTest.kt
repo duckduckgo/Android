@@ -75,12 +75,14 @@ class AppTPCPUMonitorTest {
     private val mockCPUUsageReader: CPUUsageReader = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val mockVpnRemoteConfigDatabase: VpnRemoteConfigDatabase = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun setup() {
         toggleDao = FakeToggleConfigDao()
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
         whenever(mockVpnRemoteConfigDatabase.vpnConfigTogglesDao()).thenReturn(toggleDao)
+        whenever(appBuildConfig.applicationId).thenReturn("")
 
         config = AppTpFeatureConfigImpl(
             TestScope(),
@@ -99,7 +101,7 @@ class AppTPCPUMonitorTest {
         workManager = WorkManager.getInstance(context)
         testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
 
-        cpuMonitor = AppTPCPUMonitor(workManager, config)
+        cpuMonitor = AppTPCPUMonitor(workManager, config, appBuildConfig)
     }
 
     @After

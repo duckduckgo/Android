@@ -25,6 +25,7 @@
     <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
     <string name="netpMtuSize">MTU Size</string>
     <string name="netpDevSettingInternalIP">Internal IP</string>
+    <string name="netpDevSettingConnectionQuality">Connection Quality</string>
     <string name="netpDnsCloudflareFallback">Set DNS 1.1.1.1 fallback</string>
     <string name="netpPcapRecording">Enable PCAP recording</string>
     <string name="netpForceRekey">Force Rekey</string>

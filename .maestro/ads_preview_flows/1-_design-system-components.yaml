@@ -75,7 +75,7 @@ tags:
     id: "com.duckduckgo.mobile.android:id/no_hide_button"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/primaryCta"
-- tapOn: "CARDS"
+- tapOn: "LAYOUTS"
 - tapOn: "Primary"
 - tapOn: "INTERACTIVE"
 - tapOn:
@@ -118,7 +118,7 @@ tags:
 - tapOn: "BUTTONS"
 - tapOn: "TEXT INPUT"
 - tapOn: "DIALOGS"
-- tapOn: "CARDS"
+- tapOn: "LAYOUTS"
 - tapOn: "INTERACTIVE"
 - tapOn: "MESSAGING"
 - tapOn: "LIST ITEMS"

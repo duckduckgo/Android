@@ -156,3 +156,42 @@ fun View.setEnabledOpacity(enabled: Boolean) {
         0.4f
     }
 }
+
+/** dp size to px size. */
+internal fun View.dp2Px(dp: Int): Float {
+    val scale = resources.displayMetrics.density
+    return dp * scale
+}
+
+/** dp size to px size. */
+internal fun View.dp2Px(dp: Float): Float {
+    val scale = resources.displayMetrics.density
+    return dp * scale
+}
+
+/**
+ * Executes [block] with the View's layoutParams and reassigns the layoutParams with the
+ * updated version.
+ *
+ * @see View.getLayoutParams
+ * @see View.setLayoutParams
+ **/
+internal inline fun View.updateLayoutParams(block: ViewGroup.LayoutParams.() -> Unit) {
+    updateLayoutParam(this, block)
+}
+
+/**
+ * Executes [block] with a typed version of the View's layoutParams and reassigns the
+ * layoutParams with the updated version.
+ *
+ * @see View.getLayoutParams
+ * @see View.setLayoutParams
+ **/
+private inline fun <reified T : ViewGroup.LayoutParams> updateLayoutParam(
+    view: View,
+    block: T.() -> Unit,
+) {
+    val params = view.layoutParams as T
+    block(params)
+    view.layoutParams = params
+}

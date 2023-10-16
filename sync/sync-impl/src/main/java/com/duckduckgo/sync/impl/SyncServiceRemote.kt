@@ -17,12 +17,12 @@
 package com.duckduckgo.sync.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.store.*
+import com.duckduckgo.sync.store.SyncStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import javax.inject.Inject
+import javax.inject.*
 import org.json.JSONObject
 import retrofit2.Response
 import timber.log.Timber
@@ -115,8 +115,10 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val token = response.body()?.token.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
-            val userId = response.body()?.userId.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("userId missing")
+            val token = response.body()?.token.takeUnless { it.isNullOrEmpty() }
+                ?: return@onSuccess Result.Error(reason = "CreateAccount: Token not found in Body")
+            val userId = response.body()?.userId.takeUnless { it.isNullOrEmpty() }
+                ?: return@onSuccess Result.Error(reason = "CreateAccount: userId missing in Body")
             Result.Success(
                 AccountCreatedResponse(
                     token = token,
@@ -138,7 +140,8 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val deviceIdResponse = response.body()?.deviceId.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            val deviceIdResponse =
+                response.body()?.deviceId.takeUnless { it.isNullOrEmpty() } ?: return@onSuccess Result.Error(reason = "Logout: empty body")
             Result.Success(Logout(deviceIdResponse))
         }
     }
@@ -152,7 +155,7 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val devices = response.body()?.devices?.entries ?: throw IllegalStateException("Token not found")
+            val devices = response.body()?.devices?.entries ?: return@onSuccess Result.Error(reason = "getDevices: empty body")
             Result.Success(devices)
         }
     }
@@ -183,7 +186,8 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val sealed = response.body()?.encryptedRecoveryKey.takeUnless { it.isNullOrEmpty() } ?: throw IllegalStateException("Token not found")
+            val sealed = response.body()?.encryptedRecoveryKey.takeUnless { it.isNullOrEmpty() }
+                ?: return@onSuccess Result.Error(reason = "ConnectDevice: empty body")
             Result.Success(sealed)
         }
     }
@@ -224,8 +228,9 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val token = response.body()?.token ?: throw IllegalStateException("Empty token")
-            val protectedEncryptionKey = response.body()?.protected_encryption_key ?: throw IllegalStateException("Empty PEK")
+            val token = response.body()?.token ?: return@onSuccess Result.Error(reason = "Login: empty token in Body")
+            val protectedEncryptionKey =
+                response.body()?.protected_encryption_key ?: return@onSuccess Result.Error(reason = "Login: empty PEK in Body")
 
             Result.Success(
                 LoginResponse(
@@ -252,7 +257,7 @@ class SyncServiceRemote @Inject constructor(
 
         return onSuccess(response) {
             Timber.i("Sync-service: patch response: $it")
-            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "Patch: empty Body")
             Result.Success(data)
         }
     }
@@ -273,7 +278,7 @@ class SyncServiceRemote @Inject constructor(
         }
 
         return onSuccess(response) {
-            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "GetBookmarks: empty body")
             Result.Success(data)
         }
     }
@@ -297,7 +302,7 @@ class SyncServiceRemote @Inject constructor(
 
         return onSuccess(response) {
             Timber.i("Sync-service: get credentials response: $it")
-            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "GetCredentials: empty body")
             Result.Success(data)
         }
     }
@@ -321,7 +326,7 @@ class SyncServiceRemote @Inject constructor(
 
         return onSuccess(response) {
             Timber.i("Sync-service: get settings response: $it")
-            val data = response.body() ?: throw IllegalStateException("Sync-Feature: get data not parsed")
+            val data = response.body() ?: return@onSuccess Result.Error(reason = "GetSettings: empty body")
             Result.Success(data)
         }
     }
@@ -336,7 +341,7 @@ class SyncServiceRemote @Inject constructor(
             } else {
                 val error = response.errorBody()?.let { errorBody ->
                     val error = Adapters.errorResponseAdapter.fromJson(errorBody.string())
-                        ?: throw IllegalArgumentException("Can't parse body")
+                        ?: ErrorResponse(error = "Can't parse Error body")
                     val code = if (error.code == -1) response.code() else error.code
                     Result.Error(code, error.error)
                 } ?: Result.Error(code = response.code(), reason = response.message().toString())

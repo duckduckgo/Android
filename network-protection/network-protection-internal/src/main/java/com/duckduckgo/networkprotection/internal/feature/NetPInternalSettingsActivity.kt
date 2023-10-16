@@ -33,6 +33,8 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
+import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyer
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
@@ -53,6 +55,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @InjectWith(ActivityScope::class)
 class NetPInternalSettingsActivity : DuckDuckGoActivity() {
@@ -72,6 +75,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var netPRekeyer: NetPRekeyer
 
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject lateinit var connectionQualityStore: ConnectionQualityStore
 
     private val job = ConflatedJob()
 
@@ -147,6 +152,12 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                 } else {
                     binding.internalIp.gone()
                 }
+
+                val (latency, quality) = withContext(dispatcherProvider.io()) {
+                    val latency = connectionQualityStore.getConnectionLatency()
+                    latency to latency.asConnectionQuality()
+                }
+                binding.connectionClass.setSecondaryText("${quality.emoji} $quality ($latency ms)")
 
                 delay(1_000)
             }

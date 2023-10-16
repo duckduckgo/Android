@@ -84,6 +84,8 @@
 
         <item name="cardViewStyle">@style/Widget.DuckDuckGo.CardView</item>
 
+        <item name="daxExpandableMenuItemStyle">@style/Widget.DuckDuckGo.DaxExpandableItem</item>
+
         <!-- CheckListItem Component -->
         <item name="checkListItemStyle">@style/Widget.DuckDuckGo.CheckListItem</item>
     </style>

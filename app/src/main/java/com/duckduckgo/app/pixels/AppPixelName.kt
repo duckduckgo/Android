@@ -42,7 +42,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DEFAULT_BROWSER_NOT_SET("m_db_ns"),
     DEFAULT_BROWSER_UNSET("m_db_u"),
     DEFAULT_BROWSER_DIALOG_NOT_SHOWN("m_dbd_ns"),
-    DEFAULT_BROWSER_SET_FROM_NOTIFICATION("m_default_browser_set_from_notification"),
 
     WIDGET_CTA_SHOWN("m_wc_s"),
     WIDGET_CTA_LAUNCHED("m_wc_l"),

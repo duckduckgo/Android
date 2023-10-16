@@ -78,7 +78,7 @@ class BrowserChromeClientTest {
         mockFileChooserParams = mock()
         testee.webViewClientListener = mockWebViewClientListener
         webView = TestWebView(getInstrumentation().targetContext)
-        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
+        whenever(mockDrm.isDrmAllowedForUrl(any())).thenReturn(false)
         mockSitePermissionsManager.stub { onBlocking { getSitePermissionsAllowedToAsk(any(), any()) }.thenReturn(arrayOf()) }
     }
 
@@ -192,7 +192,7 @@ class BrowserChromeClientTest {
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
-        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(permissions)
+        whenever(mockDrm.isDrmAllowedForUrl(any())).thenReturn(true)
         testee.onPermissionRequest(mockPermission)
 
         verify(mockPermission).grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
@@ -204,11 +204,12 @@ class BrowserChromeClientTest {
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
-        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
+        whenever(mockDrm.isDrmAllowedForUrl(any())).thenReturn(false)
 
         testee.onPermissionRequest(mockPermission)
 
         verify(mockPermission, never()).grant(any())
+        verify(mockPermission).deny()
     }
 
     @ExperimentalCoroutinesApi

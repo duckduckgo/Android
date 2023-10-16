@@ -45,7 +45,6 @@ class DefaultBrowserObserverTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         testee = DefaultBrowserObserver(mockDefaultBrowserDetector, mockAppInstallStore, mockPixel)
-        whenever(mockAppInstallStore.setDefaultBrowserFromNotification).thenReturn(false)
     }
 
     @Test
@@ -89,28 +88,5 @@ class DefaultBrowserObserverTest {
         testee.onResume(mockOwner)
 
         verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_UNSET)
-    }
-
-    @Test
-    fun givenLaunchedFromNotificationWhenDDGIsDefaultBrowserIfItWasNotBeforeThenFireSetPixel() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(mockAppInstallStore.defaultBrowser).thenReturn(false)
-        whenever(mockAppInstallStore.setDefaultBrowserFromNotification).thenReturn(true)
-
-        testee.onResume(mockOwner)
-
-        verify(mockPixel).fire(AppPixelName.DEFAULT_BROWSER_SET_FROM_NOTIFICATION)
-        verify(mockAppInstallStore).setDefaultBrowserFromNotification = false
-    }
-
-    @Test
-    fun givenLaunchedFromNotificationWhenDDGIsNotDefaultBrowserIfItWasBeforeThenSetDefaultBrowserFromNotificationToFalse() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockAppInstallStore.defaultBrowser).thenReturn(true)
-        whenever(mockAppInstallStore.setDefaultBrowserFromNotification).thenReturn(true)
-
-        testee.onResume(mockOwner)
-
-        verify(mockAppInstallStore).setDefaultBrowserFromNotification = false
     }
 }

@@ -173,7 +173,7 @@ class RealSyncEngine @Inject constructor(
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 Timber.d("Sync-Feature: patch failed ${result.reason}")
-                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString())
+                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
             }
 
             is Success -> {
@@ -191,7 +191,7 @@ class RealSyncEngine @Inject constructor(
         when (val result = syncApiClient.get(changes.type, changes.modifiedSince.value)) {
             is Error -> {
                 Timber.d("Sync-Feature: get failed ${result.reason}")
-                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString())
+                syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
             }
 
             is Success -> {
@@ -218,9 +218,8 @@ class RealSyncEngine @Inject constructor(
                         syncPixels.fireOrphanPresentPixel(remoteChanges.type.toString())
                     }
                 }
-
-                else -> {
-                    syncPixels.firePersisterErrorPixel(remoteChanges.type.toString())
+                is SyncMergeResult.Error -> {
+                    syncPixels.firePersisterErrorPixel(remoteChanges.type.toString(), result)
                 }
             }
         }

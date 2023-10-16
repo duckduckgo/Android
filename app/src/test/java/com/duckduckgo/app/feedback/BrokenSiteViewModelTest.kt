@@ -121,6 +121,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -157,6 +158,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -194,6 +196,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -231,6 +234,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -256,6 +260,33 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
+    fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmittedWithParams() {
+        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(AmpLinkInfo(trackingUrl, url))
+
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = arrayOf("dashboard_highlighted_toggle"),
+        )
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion", "description")
+
+        verify(mockPixel).fire(
+            AppPixelName.BROKEN_SITE_REPORTED,
+            mapOf(
+                "url" to trackingUrl,
+                "dashboard_highlighted_toggle" to true.toString(),
+            ),
+        )
+    }
+
+    @Test
     fun whenUrlIsDesktopThenSendDesktopParameter() {
         testee.setInitialBrokenSite(
             url = url,
@@ -266,6 +297,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory()
 
@@ -285,6 +317,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory()
 
@@ -305,6 +338,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory(categoryIndex)
 
@@ -324,6 +358,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -343,6 +378,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
+            params = emptyArray(),
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()

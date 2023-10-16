@@ -18,8 +18,6 @@ package com.duckduckgo.subscriptions.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.subscriptions.api.PatResult.Failure
-import com.duckduckgo.subscriptions.api.PatResult.Success
 import com.duckduckgo.subscriptions.impl.auth.Entitlement
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -47,19 +45,16 @@ class RealSubscriptionsTest {
     }
 
     @Test
-    fun whenSubscriptionDataSucceedsThenReturnSuccess() = runTest {
+    fun whenSubscriptionDataSucceedsThenReturnAccessToken() = runTest {
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success("accessToken"))
-        val result = subscriptions.getPAT()
-        assertTrue(result is Success)
-        assertEquals("accessToken", (result as Success).pat)
+        val result = subscriptions.getAccessToken()
+        assertEquals("accessToken", result)
     }
 
     @Test
-    fun whenSubscriptionDataFailsThenReturnFailure() = runTest {
+    fun whenSubscriptionDataFailsThenReturnNull() = runTest {
         whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure("error"))
-        val result = subscriptions.getPAT()
-        assertTrue(result is Failure)
-        assertEquals("error", (result as Failure).message)
+        assertNull(subscriptions.getAccessToken())
     }
 
     @Test

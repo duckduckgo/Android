@@ -191,6 +191,7 @@ import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
+import com.duckduckgo.autofill.api.systemautofill.SystemAutofillUsageMonitor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
@@ -202,6 +203,7 @@ import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText.ShowSuggestionsListener
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.StackedAlertDialogBuilder
@@ -236,7 +238,8 @@ class BrowserTabFragment :
     TrackersAnimatorListener,
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
-    AutofillEventListener {
+    AutofillEventListener,
+    SystemAutofillListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -390,6 +393,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var contentScopeScripts: ContentScopeScripts
 
+    @Inject
+    lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -500,6 +506,13 @@ class BrowserTabFragment :
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
+            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
+        }
+    }
+
+    private val showSuggestionsListener = object : ShowSuggestionsListener {
+        override fun showSuggestions() {
+            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
         }
     }
 
@@ -662,8 +675,8 @@ class BrowserTabFragment :
                     userEnteredQuery(it.result)
                     resumeWebView()
                 }
-
-                else -> resumeWebView()
+                is VoiceSearchLauncher.Event.SearchCancelled -> resumeWebView()
+                is VoiceSearchLauncher.Event.VoiceSearchDisabled -> viewModel.voiceSearchDisabled()
             }
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
@@ -2062,6 +2075,8 @@ class BrowserTabFragment :
                 }
             }
         }
+
+        it.systemAutofillListener = this
     }
 
     private fun injectAutofillCredentials(
@@ -2234,6 +2249,7 @@ class BrowserTabFragment :
     private fun addTextChangedListeners() {
         findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
         omnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
+        omnibar.omnibarTextInput.showSuggestionsListener = showSuggestionsListener
     }
 
     override fun onCreateContextMenu(
@@ -3062,6 +3078,7 @@ class BrowserTabFragment :
                 }
 
                 renderVoiceSearch(viewState)
+                omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
             }
         }
 
@@ -3231,6 +3248,8 @@ class BrowserTabFragment :
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = true
             }
+
+            omnibar.spacer.isVisible = viewState.showClearButton && lastSeenOmnibarViewState?.showVoiceSearch ?: false
 
             decorator.updateToolbarActionsVisibility(viewState)
         }
@@ -3565,5 +3584,9 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
+    }
+
+    override fun systemAutofillPerformed() {
+        systemAutofillUsageMonitor.onSystemAutofillUsed()
     }
 }

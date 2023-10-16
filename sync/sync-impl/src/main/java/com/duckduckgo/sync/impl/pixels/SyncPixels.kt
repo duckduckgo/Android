@@ -18,6 +18,8 @@ package com.duckduckgo.sync.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.api.engine.*
+import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -27,7 +29,7 @@ interface SyncPixels {
 
     fun fireOrphanPresentPixel(feature: String)
 
-    fun firePersisterErrorPixel(feature: String)
+    fun firePersisterErrorPixel(feature: String, mergeError: SyncMergeResult.Error)
 
     fun fireEncryptFailurePixel()
 
@@ -35,7 +37,14 @@ interface SyncPixels {
 
     fun fireCountLimitPixel(feature: String)
 
-    fun fireSyncAttemptErrorPixel(feature: String)
+    fun fireSyncAttemptErrorPixel(
+        feature: String,
+        result: Error,
+    )
+
+    fun fireSyncAccountErrorPixel(
+        result: Error,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -68,11 +77,13 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun firePersisterErrorPixel(feature: String) {
+    override fun firePersisterErrorPixel(feature: String, mergeError: SyncMergeResult.Error) {
         pixel.fire(
             SyncPixelName.SYNC_PERSISTER_FAILURE,
             mapOf(
                 SyncPixelParameters.FEATURE to feature,
+                SyncPixelParameters.ERROR_CODE to mergeError.code.toString(),
+                SyncPixelParameters.ERROR_REASON to mergeError.reason,
             ),
         )
     }
@@ -94,11 +105,26 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireSyncAttemptErrorPixel(feature: String) {
+    override fun fireSyncAttemptErrorPixel(
+        feature: String,
+        result: Error,
+    ) {
         pixel.fire(
             SyncPixelName.SYNC_ATTEMPT_FAILURE,
             mapOf(
                 SyncPixelParameters.FEATURE to feature,
+                SyncPixelParameters.ERROR_CODE to result.code.toString(),
+                SyncPixelParameters.ERROR_REASON to result.reason,
+            ),
+        )
+    }
+
+    override fun fireSyncAccountErrorPixel(result: Error) {
+        pixel.fire(
+            SyncPixelName.SYNC_ACCOUNT_FAILURE,
+            mapOf(
+                SyncPixelParameters.ERROR_CODE to result.code.toString(),
+                SyncPixelParameters.ERROR_REASON to result.reason,
             ),
         )
     }
@@ -112,6 +138,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_DECRYPT_FAILURE("m_sync_decrypt_failure"),
     SYNC_COUNT_LIMIT("m_sync_count_limit"),
     SYNC_ATTEMPT_FAILURE("m_sync_attempt_failure"),
+    SYNC_ACCOUNT_FAILURE("m_sync_account_failure"),
     SYNC_PERSISTER_FAILURE("m_sync_persister_failure"),
 }
 
@@ -119,4 +146,6 @@ object SyncPixelParameters {
     const val ATTEMPTS = "attempts"
     const val RATE = "rate"
     const val FEATURE = "feature"
+    const val ERROR_CODE = "code"
+    const val ERROR_REASON = "reason"
 }

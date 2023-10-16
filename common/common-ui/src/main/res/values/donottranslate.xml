@@ -22,7 +22,7 @@
     <string name="tab_title_buttons" translatable="false">Buttons</string>
     <string name="tab_title_text_input" translatable="false">Text Input</string>
     <string name="tab_title_dialogs" translatable="false">Dialogs</string>
-    <string name="tab_title_cards" translatable="false">Cards</string>
+    <string name="tab_title_layouts" translatable="false">Layouts</string>
     <string name="tab_title_component_interactive" translatable="false">Interactive</string>
     <string name="tab_title_component_messaging" translatable="false">Messaging</string>
     <string name="tab_title_component_list_items" translatable="false">List items</string>

@@ -20,7 +20,7 @@ concurrency:
 jobs:
   code_formatting:
     name: Code Formatting
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout repository
@@ -41,7 +41,7 @@ jobs:
 
   unit_tests:
     name: Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
 
     steps:
       - name: Checkout repository
@@ -73,7 +73,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
 
     steps:
       - name: Checkout repository
@@ -109,7 +109,7 @@ jobs:
           path: lint-report.zip
 
   android_tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 #https://github.com/actions/runner-images/issues/6709
     name: Android CI tests
 
     steps:

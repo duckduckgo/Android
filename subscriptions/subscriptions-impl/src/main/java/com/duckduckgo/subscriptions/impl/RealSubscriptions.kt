@@ -17,7 +17,6 @@
 package com.duckduckgo.subscriptions.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.api.PatResult
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -26,10 +25,10 @@ import javax.inject.Inject
 class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
 ) : Subscriptions {
-    override suspend fun getPAT(): PatResult {
+    override suspend fun getAccessToken(): String? {
         return when (val result = subscriptionsManager.getAccessToken()) {
-            is AccessToken.Success -> PatResult.Success(result.accessToken)
-            is AccessToken.Failure -> PatResult.Failure(result.message)
+            is AccessToken.Success -> result.accessToken
+            is AccessToken.Failure -> null
         }
     }
 

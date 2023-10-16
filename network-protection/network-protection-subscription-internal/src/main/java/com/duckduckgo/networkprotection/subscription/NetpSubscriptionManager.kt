@@ -25,7 +25,6 @@ import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.Net
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Success
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.UnableToAuthorize
 import com.duckduckgo.networkprotection.subscription.NetpSubscriptionManager.NetpAuthorizationStatus.Unknown
-import com.duckduckgo.subscriptions.api.PatResult
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -64,9 +63,9 @@ class RealNetpSubscriptionManager @Inject constructor(
     override suspend fun authorize() {
         withContext(dispatcherProvider.io()) {
             try {
-                val pat = subscriptions.getPAT()
-                if (pat is PatResult.Success) {
-                    service.authorize(NetPAuthorizeRequest(pat.pat)).also {
+                val accessToken = subscriptions.getAccessToken()
+                if (accessToken != null) {
+                    service.authorize(NetPAuthorizeRequest(accessToken)).also {
                         netPWaitlistRepository.setAuthenticationToken(it.token)
                         logcat { "Netp auth: Token received" }
                         netPWaitlistManager.upsertState()
