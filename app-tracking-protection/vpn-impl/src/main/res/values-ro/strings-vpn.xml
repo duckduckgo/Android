@@ -395,6 +395,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Nu acum</string>
     <string name="atp_ActivityRecentActivityHeader">Activitate</string>
     <string name="atp_ActivityManageProtectionLabel">Ai probleme cu o aplicație?</string>
+    <string name="atp_ActivityEnabledBannerLabel">În timpul versiunii beta, protecția pentru unele aplicații este dezactivată automat. <annotation type="app_settings_link">Vezi aplicațiile</annotation></string>
     <string name="atp_ActivityDescription">Încercările de urmărire blocate vor apărea aici</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s dintre aplicațiile tale este protejată împotriva tehnologiilor de urmărire ascunse despre care am constatat că încearcă să îți acceseze informațiile personale</item>

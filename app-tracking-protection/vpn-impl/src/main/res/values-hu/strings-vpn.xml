@@ -387,6 +387,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Most nem</string>
     <string name="atp_ActivityRecentActivityHeader">Tevékenység</string>
     <string name="atp_ActivityManageProtectionLabel">Problémáid vannak egy alkalmazással?</string>
+    <string name="atp_ActivityEnabledBannerLabel">A béta verzióban egyes alkalmazások védelme automatikusan le van tiltva. <annotation type="app_settings_link">Alkalmazások megtekintése</annotation></string>
     <string name="atp_ActivityDescription">Itt jelennek meg a blokkolt nyomkövetési kísérletek</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s alkalmazásod védve van a rejtett nyomkövetőkkel szemben, amelyekről megállapítottuk, hogy megpróbáltak hozzáférni a személyes adataidhoz</item>

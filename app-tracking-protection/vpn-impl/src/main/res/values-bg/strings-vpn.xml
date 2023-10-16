@@ -387,6 +387,7 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сега</string>
     <string name="atp_ActivityRecentActivityHeader">Дейност</string>
     <string name="atp_ActivityManageProtectionLabel">Имате проблеми с някое приложение?</string>
+    <string name="atp_ActivityEnabledBannerLabel">В бета версията защитата на някои приложения се деактивира автоматично. <annotation type="app_settings_link">Преглед на приложенията</annotation></string>
     <string name="atp_ActivityDescription">Блокираните опити за проследяване се показват тук</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s от Вашите приложения е защитено от скрити тракери, които установихме, че се опитват да получат достъп до Вашата лична информация</item>
