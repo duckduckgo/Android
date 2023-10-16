@@ -1,4 +1,4 @@
-# Installation
+# Site Permissions
 This module is responsible for managing site permissions when a website requests access to specific hardware resources. 
 Currently, it covers permissions for the microphone and camera.
 
