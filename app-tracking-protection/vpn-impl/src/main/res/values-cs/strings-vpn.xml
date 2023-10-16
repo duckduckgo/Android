@@ -141,7 +141,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Všechny aplikace</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection detekuje a blokuje trackery jiných společností, například když se tě Facebook snaží sledovat ve zdravotní aplikaci. Společnosti tě i nadále můžou sledovat v aplikacích, které samy vlastní.\n\nPokud některá aplikace nefunguje podle očekávání, zkus vypnout její ochranu.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">V betaverzi může DuckDuckGo ochranu pro některé aplikace vypnout, a vyřešit tak známé problémy s načítáním obsahu. Pokud neobnovíš výchozí nastavení, tvoje vlastní nastavení se nezmění.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo může ochranu pro některé aplikace vypnout, a vyřešit tak známé problémy s načítáním obsahu. Pokud neobnovíš výchozí nastavení, tvoje vlastní nastavení se nezmění.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection je vypnutá</b> Způsobila ti App Tracking Protection problém s aplikacemi <annotation type="report_issues_link">Nahlásit problémy</annotation></string>
     <string name="atp_ExcludedAppsReport">Nahlásit problém s jinou aplikací</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Ručně vypnuto</string>
