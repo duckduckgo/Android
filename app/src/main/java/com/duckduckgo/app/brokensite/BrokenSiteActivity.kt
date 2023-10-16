@@ -16,9 +16,12 @@
 
 package com.duckduckgo.app.brokensite
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
@@ -28,6 +31,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
@@ -107,6 +111,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                         }
                     },
                 )
+                .build()
+                .dismissOnDestroy(lifecycleOwner = this)
                 .show()
         }
         brokenSites.submitButton.setOnClickListener {
@@ -186,4 +192,16 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             return intent
         }
     }
+}
+
+private fun DaxAlertDialog.dismissOnDestroy(lifecycleOwner: LifecycleOwner): DaxAlertDialog {
+    lifecycleOwner.lifecycle.addObserver(
+        @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
+        object : DefaultLifecycleObserver {
+            override fun onDestroy(owner: LifecycleOwner) {
+                dismiss()
+            }
+        },
+    )
+    return this
 }
