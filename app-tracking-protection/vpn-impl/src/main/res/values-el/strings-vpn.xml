@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Όλες οι εφαρμογές</string>
     <string name="atp_ExcludedAppsFeature">Η Προστασία παρακολούθησης από εφαρμογές ανιχνεύει και αποκλείει εφαρμογές παρακολούθησης από άλλες εταιρείες, όπως όταν το Facebook προσπαθεί να σας παρακολουθήσει σε μια εφαρμογή υγείας. Οι εταιρείες ενδέχεται να εξακολουθούν να σας παρακολουθούν σε εφαρμογές που τους ανήκουν.\n\nΕάν μια εφαρμογή δεν λειτουργεί όπως αναμένεται, δοκιμάστε να απενεργοποιήσετε την προστασία για τη συγκεκριμένη εφαρμογή.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Κατά τη διάρκεια του beta, το DuckDuckGo ενδέχεται να απενεργοποιήσει την προστασία για ορισμένες εφαρμογές ώστε να επιλύσει γνωστά προβλήματα φόρτωσης περιεχομένου. Οι προσαρμοσμένες ρυθμίσεις σας δεν θα αλλάξουν εάν δεν κάνετε επαναφορά στις προεπιλεγμένες ρυθμίσεις.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">Το DuckDuckGo ενδέχεται να απενεργοποιήσει την προστασία για ορισμένες εφαρμογές, ώστε να επιλύσει γνωστά προβλήματα φόρτωσης περιεχομένου. Οι προσαρμοσμένες ρυθμίσεις σας δεν θα αλλάξουν εάν δεν κάνετε επαναφορά στις προεπιλεγμένες ρυθμίσεις.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Η Προστασία παρακολούθησης από εφαρμογές είναι απενεργοποιημένη</b> Προκάλεσε η Προστασία παρακολούθησης από εφαρμογές πρόβλημα στις εφαρμογές σας; <annotation type="report_issues_link">Αναφορά προβλημάτων</annotation></string>
     <string name="atp_ExcludedAppsReport">Αναφορά προβλήματος με άλλη εφαρμογή</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Μη αυτόματη απενεργοποίηση</string>
@@ -387,7 +387,6 @@
     <string name="atp_ExcludeAppsManuallyCTANotNow">Όχι τώρα</string>
     <string name="atp_ActivityRecentActivityHeader">Δραστηριότητα</string>
     <string name="atp_ActivityManageProtectionLabel">Έχετε προβλήματα με μια εφαρμογή;</string>
-    <string name="atp_ActivityEnabledBannerLabel">Κατά τη διάρκεια της έκδοσης beta, η προστασία για ορισμένες εφαρμογές απενεργοποιείται αυτόματα. <annotation type="app_settings_link">Προβολή εφαρμογών</annotation></string>
     <string name="atp_ActivityDescription">Οι αποκλεισμένες προσπάθειες παρακολούθησης θα εμφανίζονται εδώ</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
         <item quantity="one">%1$s από τις εφαρμογές σας προστατεύεται από κρυφές εφαρμογές παρακολούθησης που εντοπίζουμε να προσπαθούν να αποκτήσουν πρόσβαση στις προσωπικές πληροφορίες σας</item>
