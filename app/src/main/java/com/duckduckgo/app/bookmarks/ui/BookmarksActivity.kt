@@ -36,6 +36,7 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFr
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.plurals
 import com.duckduckgo.app.browser.databinding.ActivityBookmarksBinding
@@ -337,9 +338,13 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun openSavedSite(url: String) {
-        val resultValue = Intent()
-        resultValue.putExtra(SAVED_SITE_URL_EXTRA, url)
-        setResult(RESULT_OK, resultValue)
+        if (intent.action == Intent.ACTION_VIEW) {
+            startActivity(BrowserActivity.intent(this, url))
+        } else {
+            val resultValue = Intent()
+            resultValue.putExtra(SAVED_SITE_URL_EXTRA, url)
+            setResult(RESULT_OK, resultValue)
+        }
         finish()
     }
 
