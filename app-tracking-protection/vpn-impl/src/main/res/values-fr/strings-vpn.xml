@@ -133,7 +133,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Toutes les applications</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection détecte et bloque les traqueurs d\'applications d\'autres entreprises, comme lorsque Facebook tente de vous suivre dans une application de santé. Les entreprises restent toutefois susceptibles de vous suivre dans les applications qui leur appartiennent.\n\nSi une application ne fonctionne pas comme prévu, essayez de désactiver sa protection.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">En phase bêta, DuckDuckGo peut désactiver la protection de certaines applications afin de résoudre des problèmes identifiés de chargement de contenu. Vos paramètres personnalisés ne changeront pas à moins que vous ne rétablissiez les paramètres par défaut.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo peut désactiver la protection de certaines applications afin de résoudre des problèmes identifiés de chargement de contenu. Vos paramètres personnalisés ne changeront pas à moins que vous ne rétablissiez les paramètres par défaut.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection est désactivé</b> Vos applications ont-elles rencontré des problèmes à cause d\'App Tracking Protection ? <annotation type="report_issues_link">Signaler des problèmes</annotation></string>
     <string name="atp_ExcludedAppsReport">Signaler un problème avec une autre application</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Désactivé manuellement</string>
