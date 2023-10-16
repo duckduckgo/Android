@@ -37,6 +37,10 @@ tags:
 - tapOn: "Stacked Text Alert Dialog With 4 buttons"
 - assertVisible: "Keep Using"
 - tapOn: "Keep Using"
+- scrollUntilVisible:
+    element:
+        text: "Single Choice Alert Dialog"
+    direction: DOWN
 - tapOn: "Single Choice Alert Dialog"
 - assertVisible: "Option"
 - tapOn: "Option"
