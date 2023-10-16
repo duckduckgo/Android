@@ -37,7 +37,7 @@ class RealPrivacyConfigRepositoryTest {
 
     @Test
     fun whenInsertPrivacyConfigThenCallInsert() {
-        val privacyConfig = PrivacyConfig(id = 1, version = 1, readme = "readme", eTag = "eTag")
+        val privacyConfig = PrivacyConfig(id = 1, version = 1, readme = "readme", eTag = "eTag", timestamp = "2023-01-01")
 
         testee.insert(privacyConfig)
 

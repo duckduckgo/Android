@@ -33,6 +33,8 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 
 interface PrivacyConfigPersister {
@@ -76,7 +78,16 @@ class RealPrivacyConfigPersister @Inject constructor(
             database.runInTransaction {
                 persisterPreferences.setSignature(currentPluginHashCode)
                 privacyFeatureTogglesRepository.deleteAll()
-                privacyConfigRepository.insert(PrivacyConfig(version = jsonPrivacyConfig.version, readme = jsonPrivacyConfig.readme, eTag = eTag))
+                privacyConfigRepository.insert(
+                    PrivacyConfig(
+                        version = jsonPrivacyConfig.version,
+                        readme = jsonPrivacyConfig.readme,
+                        eTag = eTag,
+                        timestamp = FORMATTER_SECONDS.format(
+                            LocalDateTime.now(),
+                        ),
+                    ),
+                )
                 unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
@@ -98,6 +109,10 @@ class RealPrivacyConfigPersister @Inject constructor(
         edit {
             putInt(PRIVACY_SIGNATURE_KEY, value)
         }
+    }
+
+    companion object {
+        private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
     }
 }
 
