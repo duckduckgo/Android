@@ -39,14 +39,6 @@ tags:
 - tapOn: "Keep Using"
 - scrollUntilVisible:
     element:
-        text: "Single Choice Alert Dialog"
-    direction: DOWN
-- tapOn: "Single Choice Alert Dialog"
-- assertVisible: "Option"
-- tapOn: "Option"
-- tapOn: "Keep Using"
-- scrollUntilVisible:
-    element:
       text: "Promo Bottom Sheet with image"
     direction: DOWN
 - tapOn: "Action Bottom Sheet"
