@@ -137,7 +137,7 @@
     <!-- Exclusion List -->
     <string name="atp_ExclusionListActivityTitle">Visas lietotnes</string>
     <string name="atp_ExcludedAppsFeature">Lietotņu pretizsekošanas aizsardzība atklāj un bloķē citu uzņēmumu lietotņu izsekotājus, piemēram, Facebook, kad tas mēģina tevi izsekot veselības lietotnē. Uzņēmumi joprojām var izsekot tevi paši savās lietotnēs.\n\nJa kāda lietotne nedarbojas, kā paredzēts, mēģini atspējot tās aizsardzību.</string>
-    <string name="atp_ExcludedAppsEnabledLabel">Beta versijā DuckDuckGo var atspējot dažu lietotņu aizsardzību, lai atrisinātu zināmas satura ielādes problēmas. Tavi pielāgotie iestatījumi nemainīsies, ja vien neatjaunosi noklusējuma iestatījumus.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">DuckDuckGo var atspējot dažu lietotņu aizsardzību, lai atrisinātu zināmas satura ielādes problēmas. Tavi pielāgotie iestatījumi nemainīsies, ja vien neatjaunosi noklusējuma iestatījumus.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>Lietotņu pretizsekošanas aizsardzība ir atspējota</b> Vai Lietotņu pretizsekošanas aizsardzība ir apgrūtinājusi tavu lietotņu darbību? <annotation type="report_issues_link">Ziņo par problēmām</annotation></string>
     <string name="atp_ExcludedAppsReport">Ziņot par problēmu ar citu lietotni</string>
     <string name="atp_ExcludedReasonManuallyDisabled">Manuāli atspējota</string>
