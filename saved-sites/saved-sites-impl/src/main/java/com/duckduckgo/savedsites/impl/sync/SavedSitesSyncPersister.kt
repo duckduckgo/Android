@@ -86,7 +86,9 @@ class SavedSitesSyncPersister @Inject constructor(
     }
 
     private fun validateChanges(changes: SyncChangesResponse): SyncDataValidationResult<SyncBookmarkEntries> {
-        val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString) }.getOrNull()
+        val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString) }.getOrElse {
+            return SyncDataValidationResult.Error(reason = "Sync-Feature: JSON format incorrect, exception: $it")
+        }
 
         if (response == null) {
             return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect, response null")
