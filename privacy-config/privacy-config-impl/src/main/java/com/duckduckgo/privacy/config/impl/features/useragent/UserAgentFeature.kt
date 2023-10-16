@@ -16,36 +16,23 @@
 
 package com.duckduckgo.privacy.config.impl.features.useragent
 
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+
 data class UserAgentFeature(
     val state: String,
     val minSupportedVersion: Int?,
-    val exceptions: List<UserAgentExceptionJson>,
+    val exceptions: List<FeatureException>,
     val settings: UserAgentSettings,
-)
-
-data class UserAgentExceptionJson(
-    val domain: String,
-    val reason: String,
 )
 
 data class UserAgentSettings(
     val defaultPolicy: String?,
-    val ddgDefaultSites: List<DdgDefaultSite>,
-    val ddgFixedSites: List<DdgFixedSite>,
+    val ddgDefaultSites: List<FeatureException>,
+    val ddgFixedSites: List<FeatureException>,
     val closestUserAgent: ClosestUserAgent?,
     val ddgFixedUserAgent: DdgFixedUserAgent?,
-    val omitApplicationSites: List<UserAgentExceptionJson>,
-    val omitVersionSites: List<UserAgentExceptionJson>,
-)
-
-data class DdgDefaultSite(
-    val domain: String,
-    val reason: String,
-)
-
-data class DdgFixedSite(
-    val domain: String,
-    val reason: String,
+    val omitApplicationSites: List<FeatureException>,
+    val omitVersionSites: List<FeatureException>,
 )
 
 data class ClosestUserAgent(

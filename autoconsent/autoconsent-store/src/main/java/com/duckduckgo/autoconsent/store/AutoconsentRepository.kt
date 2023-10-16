@@ -17,17 +17,18 @@
 package com.duckduckgo.autoconsent.store
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface AutoconsentRepository {
     fun updateAll(exceptions: List<AutoconsentExceptionEntity>, disabledCmps: List<DisabledCmpsEntity>)
-    val exceptions: List<AutoconsentExceptionEntity>
+    val exceptions: List<FeatureException>
     val disabledCmps: List<DisabledCmpsEntity>
 }
 
-class RealAutoconsentRepository constructor(
+class RealAutoconsentRepository(
     val database: AutoconsentDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
@@ -35,7 +36,7 @@ class RealAutoconsentRepository constructor(
 
     private val autoconsentDao: AutoconsentDao = database.autoconsentDao()
 
-    override val exceptions = CopyOnWriteArrayList<AutoconsentExceptionEntity>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
     override val disabledCmps = CopyOnWriteArrayList<DisabledCmpsEntity>()
 
     init {
@@ -51,7 +52,9 @@ class RealAutoconsentRepository constructor(
 
     private fun loadToMemory() {
         exceptions.clear()
-        exceptions.addAll(autoconsentDao.getExceptions())
+        autoconsentDao.getExceptions().map {
+            exceptions.add(it.toFeatureException())
+        }
 
         disabledCmps.clear()
         disabledCmps.addAll(autoconsentDao.getDisabledCmps())

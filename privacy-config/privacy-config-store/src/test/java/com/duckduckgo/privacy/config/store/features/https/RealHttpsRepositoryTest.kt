@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.store.features.https
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toHttpsException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -65,7 +65,7 @@ class RealHttpsRepositoryTest {
                 coroutineRule.testDispatcherProvider,
             )
 
-        assertEquals(httpException.toHttpsException(), testee.exceptions.first())
+        assertEquals(httpException.toFeatureException(), testee.exceptions.first())
     }
 
     @Test

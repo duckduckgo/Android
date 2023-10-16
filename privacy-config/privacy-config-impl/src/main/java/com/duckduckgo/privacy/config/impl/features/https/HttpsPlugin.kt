@@ -49,7 +49,7 @@ class HttpsPlugin @Inject constructor(
 
             val httpsFeature: HttpsFeature? = jsonAdapter.fromJson(jsonString)
             httpsFeature?.exceptions?.map {
-                httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason))
+                httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason.orEmpty()))
             }
             httpsRepository.updateAll(httpsExceptions)
             val isEnabled = httpsFeature?.state == "enabled"

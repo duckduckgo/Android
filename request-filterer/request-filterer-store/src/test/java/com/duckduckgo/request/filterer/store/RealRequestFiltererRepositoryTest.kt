@@ -55,7 +55,7 @@ class RealRequestFiltererRepositoryTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        assertEquals(requestFiltererExceptionEntity, testee.exceptions.first())
+        assertEquals(requestFiltererExceptionEntity.toFeatureException(), testee.exceptions.first())
         assertEquals(WINDOW_IN_MS, testee.settings.windowInMs)
     }
 

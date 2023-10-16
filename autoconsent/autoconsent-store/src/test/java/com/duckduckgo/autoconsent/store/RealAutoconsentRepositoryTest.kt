@@ -54,7 +54,7 @@ class RealAutoconsentRepositoryTest {
 
         repository = RealAutoconsentRepository(mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
 
-        assertEquals(exception, repository.exceptions.first())
+        assertEquals(exception.toFeatureException(), repository.exceptions.first())
         assertEquals(disabledCmp, repository.disabledCmps.first())
     }
 

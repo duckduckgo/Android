@@ -20,11 +20,11 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -245,7 +245,7 @@ class RealContentScopeScriptsTest {
             "\$ANDROID_MESSAGING_PARAMETERS\$})"
         const val versionCode = 1234
         const val sessionKey = "5678"
-        val unprotectedTemporaryException = UnprotectedTemporaryException(domain = "example.com", reason = "reason")
-        val unprotectedTemporaryException2 = UnprotectedTemporaryException(domain = "foo.com", reason = "reason2")
+        val unprotectedTemporaryException = FeatureException(domain = "example.com", reason = "reason")
+        val unprotectedTemporaryException2 = FeatureException(domain = "foo.com", reason = "reason2")
     }
 }

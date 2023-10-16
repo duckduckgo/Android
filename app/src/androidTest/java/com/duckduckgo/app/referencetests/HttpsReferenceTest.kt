@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsEmbeddedDataPersister
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
@@ -41,7 +42,6 @@ import com.duckduckgo.httpsupgrade.store.HttpsFalsePositiveDomain
 import com.duckduckgo.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.httpsupgrade.store.HttpsUpgradeDatabase
 import com.duckduckgo.privacy.config.api.Https
-import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.https.HttpsFeature
 import com.duckduckgo.privacy.config.impl.features.https.RealHttps
@@ -51,8 +51,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.HttpsExceptionEntity
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.toHttpsException
-import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -157,7 +156,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     }
 
     private fun initialiseRemoteConfig() {
-        val httpsExceptions = mutableListOf<HttpsException>()
+        val httpsExceptions = mutableListOf<FeatureException>()
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(JsonPrivacyConfig::class.java)
         val config: JsonPrivacyConfig? =
             jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/https/config_reference.json"))
@@ -165,12 +164,12 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         val httpsFeature: HttpsFeature? = httpsAdapter.fromJson(config?.features?.get("https").toString())
 
         httpsFeature?.exceptions?.map {
-            httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason).toHttpsException())
+            httpsExceptions.add(HttpsExceptionEntity(it.domain, it.reason.orEmpty()).toFeatureException())
         }
 
         val isEnabled = httpsFeature?.state == "enabled"
         val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(
-            config?.unprotectedTemporary?.map { it.toUnprotectedTemporaryException() } ?: emptyList(),
+            config?.unprotectedTemporary?.map { it.toFeatureException() } ?: emptyList(),
         )
 
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value, isEnabled)).thenReturn(isEnabled)

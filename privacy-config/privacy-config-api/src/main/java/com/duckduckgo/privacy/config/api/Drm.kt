@@ -27,9 +27,3 @@ interface Drm {
         url: String,
     ): Boolean
 }
-
-/** Public data class for Drm Exceptions */
-data class DrmException(
-    val domain: String,
-    val reason: String,
-)

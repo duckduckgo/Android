@@ -26,12 +26,11 @@ import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.cookies.api.CookieException
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.cookies.store.FirstPartyCookiePolicyEntity
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -154,7 +153,7 @@ class RealFirstPartyCookiesModifierTest {
             givenDatabaseWithCookies((THRESHOLD + 1).toLong())
             whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(
                 listOf(
-                    UnprotectedTemporaryException(
+                    FeatureException(
                         "example.com",
                         "reason",
                     ),
@@ -182,7 +181,7 @@ class RealFirstPartyCookiesModifierTest {
         withContext(Dispatchers.Main) {
             givenDatabaseWithCookies((THRESHOLD + 1).toLong())
             whenever(mockCookiesRepository.exceptions).thenReturn(
-                listOf(CookieException(domain = "example.com", reason = "test")),
+                listOf(FeatureException(domain = "example.com", reason = "test")),
             )
             val sqlCookieRemover = givenRealFirstPartyCookiesModifier()
 

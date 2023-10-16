@@ -18,8 +18,8 @@ package com.duckduckgo.privacy.config.impl.features.unprotectedtemporary
 
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.api.UnprotectedTemporaryException
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -33,7 +33,7 @@ class RealUnprotectedTemporary @Inject constructor(private val repository: Unpro
         return matches(url)
     }
 
-    override val unprotectedTemporaryExceptions: List<UnprotectedTemporaryException>
+    override val unprotectedTemporaryExceptions: List<FeatureException>
         get() = repository.exceptions
 
     private fun matches(url: String): Boolean {

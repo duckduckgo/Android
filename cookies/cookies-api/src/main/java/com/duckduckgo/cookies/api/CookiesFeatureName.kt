@@ -20,6 +20,3 @@ package com.duckduckgo.cookies.api
 enum class CookiesFeatureName(val value: String) {
     Cookie("cookie"),
 }
-
-/** Public data class for Cookie Exceptions. */
-data class CookieException(val domain: String, val reason: String)

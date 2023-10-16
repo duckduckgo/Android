@@ -18,8 +18,8 @@ package com.duckduckgo.privacy.config.impl.referencetests.amplinks
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
@@ -86,7 +86,7 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
 
     private fun mockAmpLinks() {
         val jsonAdapter: JsonAdapter<AmpLinksFeature> = moshi.adapter(AmpLinksFeature::class.java)
-        val exceptions = CopyOnWriteArrayList<AmpLinkException>()
+        val exceptions = CopyOnWriteArrayList<FeatureException>()
         val ampLinkKeywords = CopyOnWriteArrayList<String>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             AmpKeywordReferenceTest::class.java.classLoader!!,

@@ -19,12 +19,12 @@ package com.duckduckgo.request.filterer.impl
 import android.webkit.WebResourceRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.request.filterer.api.RequestFiltererFeatureName
 import com.duckduckgo.request.filterer.impl.RequestFiltererImpl.Companion.ORIGIN
 import com.duckduckgo.request.filterer.impl.RequestFiltererImpl.Companion.REFERER
-import com.duckduckgo.request.filterer.store.RequestFiltererExceptionEntity
 import com.duckduckgo.request.filterer.store.RequestFiltererRepository
 import com.duckduckgo.request.filterer.store.SettingsEntity
 import java.util.concurrent.CopyOnWriteArrayList
@@ -81,8 +81,8 @@ class RequestFiltererImplTest {
 
     @Test
     fun whenUrlInExceptionsListThenReturnFalse() {
-        val exceptions = CopyOnWriteArrayList<RequestFiltererExceptionEntity>().apply {
-            add(RequestFiltererExceptionEntity("http://test.com", "my reason here"))
+        val exceptions = CopyOnWriteArrayList<FeatureException>().apply {
+            add(FeatureException("http://test.com", "my reason here"))
         }
 
         whenever(mockRepository.exceptions).thenReturn(exceptions)

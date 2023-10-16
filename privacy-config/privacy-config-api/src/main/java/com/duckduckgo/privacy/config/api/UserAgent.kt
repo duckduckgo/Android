@@ -89,12 +89,6 @@ interface UserAgent {
     fun isDdgFixedUserAgentVersion(version: String): Boolean
 }
 
-/** Public data class for User Agent Exceptions */
-data class UserAgentException(
-    val domain: String,
-    val reason: String,
-)
-
 /** Public enum class for the default policy */
 enum class DefaultPolicy {
     DDG, DDG_FIXED, CLOSEST

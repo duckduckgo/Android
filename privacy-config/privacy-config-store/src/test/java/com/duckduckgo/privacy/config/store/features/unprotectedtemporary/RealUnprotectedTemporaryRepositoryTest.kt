@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.store.features.unprotectedtemporary
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
-import com.duckduckgo.privacy.config.store.toUnprotectedTemporaryException
+import com.duckduckgo.privacy.config.store.toFeatureException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -65,7 +65,7 @@ class RealUnprotectedTemporaryRepositoryTest {
                 coroutineRule.testDispatcherProvider,
             )
 
-        assertEquals(unprotectedTemporaryException.toUnprotectedTemporaryException(), testee.exceptions.first())
+        assertEquals(unprotectedTemporaryException.toFeatureException(), testee.exceptions.first())
     }
 
     @Test

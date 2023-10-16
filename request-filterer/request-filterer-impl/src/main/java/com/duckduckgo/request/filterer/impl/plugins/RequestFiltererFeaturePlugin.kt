@@ -48,7 +48,7 @@ class RequestFiltererFeaturePlugin @Inject constructor(
             val requestFiltererFeature: RequestFiltererFeature? = jsonAdapter.fromJson(jsonString)
 
             val exceptions = requestFiltererFeature?.exceptions?.map {
-                RequestFiltererExceptionEntity(domain = it.domain, reason = it.reason)
+                RequestFiltererExceptionEntity(domain = it.domain, reason = it.reason.orEmpty())
             }.orEmpty()
 
             val windowInMs = requestFiltererFeature?.settings?.windowInMs ?: DEFAULT_WINDOW_IN_MS

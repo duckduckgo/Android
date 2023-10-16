@@ -32,7 +32,7 @@ class AutofillFeatureExceptionStore @Inject constructor(
 ) : FeatureExceptions.Store {
     override fun insertAll(exception: List<FeatureExceptions.FeatureException>) {
         autofillFeatureRepository.updateAllExceptions(
-            exception.map { AutofillExceptionEntity(domain = it.domain, reason = it.reason) },
+            exception.map { AutofillExceptionEntity(domain = it.domain, reason = it.reason.orEmpty()) },
         )
     }
 }

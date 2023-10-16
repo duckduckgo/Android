@@ -18,9 +18,9 @@ package com.duckduckgo.privacy.config.impl.referencetests.trackingparameters
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.TrackingParameterException
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.features.trackingparameters.RealTrackingParameters
@@ -86,7 +86,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
 
     private fun mockTrackingParameters() {
         val jsonAdapter: JsonAdapter<TrackingParametersFeature> = moshi.adapter(TrackingParametersFeature::class.java)
-        val exceptions = CopyOnWriteArrayList<TrackingParameterException>()
+        val exceptions = CopyOnWriteArrayList<FeatureException>()
         val trackingParameters = CopyOnWriteArrayList<String>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
             TrackingParameterReferenceTest::class.java.classLoader!!,

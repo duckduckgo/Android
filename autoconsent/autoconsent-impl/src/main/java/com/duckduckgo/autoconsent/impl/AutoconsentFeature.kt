@@ -16,12 +16,12 @@
 
 package com.duckduckgo.autoconsent.impl
 
-import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 
 data class AutoconsentFeature(
     val state: String,
     val minSupportedVersion: Int?,
-    val exceptions: List<AutoconsentExceptionEntity>,
+    val exceptions: List<FeatureException>,
     val settings: Settings,
 )
 

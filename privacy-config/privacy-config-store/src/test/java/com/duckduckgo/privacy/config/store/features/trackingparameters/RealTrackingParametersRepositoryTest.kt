@@ -62,7 +62,7 @@ class RealTrackingParametersRepositoryTest {
             coroutineRule.testDispatcherProvider,
         )
 
-        assertEquals(trackingParameterExceptionEntity.toTrackingParameterException(), testee.exceptions.first())
+        assertEquals(trackingParameterExceptionEntity.toFeatureException(), testee.exceptions.first())
         assertEquals(trackingParameterEntity.parameter, testee.parameters.first().toString())
     }
 
