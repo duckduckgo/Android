@@ -31,6 +31,7 @@ import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
@@ -86,21 +87,8 @@ class SavedSitesSyncPersister @Inject constructor(
     }
 
     private fun validateChanges(changes: SyncChangesResponse): SyncDataValidationResult<SyncBookmarkEntries> {
-        val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString) }.getOrElse {
+        val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString)!! }.getOrElse {
             return SyncDataValidationResult.Error(reason = "Sync-Feature: JSON format incorrect, exception: $it")
-        }
-
-        if (response == null) {
-            return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect, response null")
-        }
-
-        if (response.bookmarks == null) {
-            return SyncDataValidationResult.Error(reason = "Sync-Feature: merging failed, JSON format incorrect, bookmarks null")
-        }
-
-        if (response.bookmarks.entries == null) {
-            Timber.d("Sync-Feature: JSON has null entries, replacing with empty list")
-            return SyncDataValidationResult.Success(SyncBookmarkEntries(emptyList(), response.bookmarks.last_modified))
         }
 
         return SyncDataValidationResult.Success(response.bookmarks)
@@ -127,7 +115,8 @@ class SavedSitesSyncPersister @Inject constructor(
 
     private class Adapters {
         companion object {
-            private val moshi = Moshi.Builder().build()
+            private val moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory()).build()
             val updatesAdapter: JsonAdapter<SyncBookmarkRemoteUpdates> =
                 moshi.adapter(SyncBookmarkRemoteUpdates::class.java)
         }
