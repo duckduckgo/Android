@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.autofill
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 
 abstract class FakeAuthenticator : DeviceAuthenticator {
 

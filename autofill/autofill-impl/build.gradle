@@ -31,7 +31,6 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':autofill-api')
     implementation project(path: ':secure-storage-api')
-    implementation project(path: ':device-auth-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-store')
     implementation project(path: ':statistics')
@@ -57,7 +56,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.room.ktx
-
+    implementation AndroidX.biometric
 
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     testImplementation "org.threeten:threetenbp:_"

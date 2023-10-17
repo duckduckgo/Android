@@ -30,8 +30,8 @@ import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,36 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.deviceauth.impl
+package com.duckduckgo.autofill.impl.deviceauth
 
-import com.duckduckgo.deviceauth.api.AutofillAuthorizationGracePeriod
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import timber.log.Timber
+
+/**
+ * A grace period for autofill authorization.
+ * This is used to allow autofill authorization to be skipped for a short period of time after a successful authorization.
+ */
+interface AutofillAuthorizationGracePeriod {
+
+    /**
+     * Can be used to determine if device auth is required. If not required, it can be bypassed.
+     * @return true if authorization is required, false otherwise
+     */
+    fun isAuthRequired(): Boolean
+
+    /**
+     * Records the timestamp of a successful device authorization
+     */
+    fun recordSuccessfulAuthorization()
+
+    /**
+     * Invalidates the grace period, so that the next call to [isAuthRequired] will return true
+     */
+    fun invalidate()
+}
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)

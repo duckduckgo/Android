@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.deviceauth.impl
+package com.duckduckgo.autofill.impl.deviceauth
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
