@@ -136,6 +136,6 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     }
 
     companion object {
-        private const val GLOBAL_DECLINE_COUNT_THRESHOLD = 3
+        private const val GLOBAL_DECLINE_COUNT_THRESHOLD = 2
     }
 }
