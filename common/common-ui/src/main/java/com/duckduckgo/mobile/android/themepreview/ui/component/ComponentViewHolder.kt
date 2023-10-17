@@ -27,6 +27,7 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
+import com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
@@ -324,6 +325,23 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<DaxExpandableMenuItem>(R.id.expandable1).apply {
                 setPrimaryButtonClickListener {
                     Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+            view.findViewById<DaxExpandableMenuItem>(R.id.expandable3).customExpandedLayout?.apply {
+                findViewById<DaxButtonSecondary>(R.id.daxExpandableMenuItemSecondaryButton).apply {
+                    setOnClickListener {
+                        Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            view.findViewById<DaxExpandableMenuItem>(R.id.expandable4).apply {
+                LayoutInflater.from(context).inflate(R.layout.view_expandable_menu_item_expanded_layout_demo, this, false).apply {
+                    findViewById<DaxButtonSecondary>(R.id.daxExpandableMenuItemSecondaryButton).apply {
+                        setOnClickListener {
+                            Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
+                        }
+                    }
+                    setExpandableMenuCustomLayout(this)
                 }
             }
         }

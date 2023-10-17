@@ -62,4 +62,11 @@ class DaxExpandableMenu @JvmOverloads constructor(
             }
         }
     }
+
+    /** Builder class for creating [DaxExpandableMenu]. */
+    @DaxExpandableMenuDsl
+    class Builder(context: Context) {
+
+    }
+
 }
