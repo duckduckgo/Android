@@ -17,35 +17,14 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    kapt AndroidX.room.compiler
-
     implementation AndroidX.core.ktx
-    implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation "com.squareup.moshi:moshi-adapters:_"
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
-
-    implementation project(':voice-search-api')
-
     testImplementation Testing.junit4
 }
 android {
-    defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
-    }
-    sourceSets {
-        test.assets.srcDirs += files("$projectDir/schemas".toString())
-    }
   namespace 'com.duckduckgo.voice.store'
 }

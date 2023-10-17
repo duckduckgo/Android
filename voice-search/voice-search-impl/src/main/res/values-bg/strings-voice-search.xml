@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="voiceSearchError">Възникна някаква грешка. Моля, опитайте отново по-късно.</string>
     <string name="voiceSearchIconContentDescription">Гласово търсене</string>
     <string name="voiceSearchListening">Говорете сега</string>
     <string name="voiceSearchListeningFooter">Аудиото се обработва на устройството. То не се съхранява или споделя с никого, включително DuckDuckGo.</string>
@@ -28,8 +27,5 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">За да използвате гласовото търсене в DuckDuckGo, трябва да разрешите достъпа до микрофона в системните настройки.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Настройки</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Изисква се достъп до микрофона</string>
-    <string name="voiceSearchRemovePositiveButton">Премахване</string>
-    <string name="voiceSearchRemoveTitle">Премахване на опцията за поверително гласово търсене от адресната лента?</string>
-    <string name="voiceSearchRemoveSubtitle">Винаги можете да управлявате тези и други предпочитания за достъпност в „Настройки“.</string>
     <string name="voiceSearchTitle">Гласово търсене</string>
 </resources>

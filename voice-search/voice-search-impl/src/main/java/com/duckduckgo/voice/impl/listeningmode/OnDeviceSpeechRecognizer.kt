@@ -43,8 +43,7 @@ interface OnDeviceSpeechRecognizer {
         data class PartialResultReceived(val partialResult: String) : Event()
         data class RecognitionSuccess(val result: String) : Event()
         data class VolumeUpdateReceived(val normalizedVolume: Float) : Event()
-        data class RecognitionTimedOut(val error: Int) : Event()
-        data class RecognitionFailed(val error: Int) : Event()
+        object RecognitionTimedOut : Event()
     }
 }
 
@@ -83,11 +82,8 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
         override fun onError(error: Int) {
             when (error) {
-                SpeechRecognizer.ERROR_NO_MATCH -> _eventHandler(Event.RecognitionTimedOut(error))
-                else -> {
-                    Timber.e("SpeechRecognizer error: $error")
-                    _eventHandler(Event.RecognitionFailed(error))
-                }
+                SpeechRecognizer.ERROR_NO_MATCH -> _eventHandler(Event.RecognitionTimedOut)
+                else -> Timber.e("SpeechRecognizer error: $error")
             }
         }
 

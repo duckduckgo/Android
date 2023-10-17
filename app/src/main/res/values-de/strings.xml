@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Einstellungen</string>
     <string name="settingsPermissionsSetting">Berechtigungen</string>
     <string name="settingsAutofillLoginsSetting">Anmeldedaten automatisch ausfüllen</string>
-    <string name="settingsSyncSetting">Synchronisieren und sichern</string>
+    <string name="settingsSyncSetting">Synchronisieren</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -767,8 +767,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dadurch wird dein Lesezeichen-Ordner &lt;b&gt;%1$s&lt;/b&gt; gelöscht.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Abbrechen</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Löschen</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Füge die Option „Private Sprachsuche“ zur Adressleiste hinzu.Audio wird weder gespeichert noch an Dritte weitergegeben, auch nicht an DuckDuckGo.</string>
-    <string name="accessibilityVoiceSearchTitle">Private Sprachsuche</string>
 </resources>

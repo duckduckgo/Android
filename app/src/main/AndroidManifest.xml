@@ -505,7 +505,7 @@
         </receiver>
 
         <receiver
-            android:name="com.duckduckgo.widget.VoiceSearchWidgetUpdaterReceiver"
+            android:name="com.duckduckgo.widget.VoiceSearchWidgetUpdater"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />

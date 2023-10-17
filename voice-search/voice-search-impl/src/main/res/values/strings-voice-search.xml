@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="voiceSearchError">Something went wrong. Please try again later.</string>
     <string name="voiceSearchIconContentDescription">Voice search</string>
     <string name="voiceSearchListening">Speak Now</string>
     <string name="voiceSearchListeningFooter">Audio is processed on-device. It\'s not stored or shared with anyone, including DuckDuckGo.</string>
@@ -28,8 +27,5 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">To use Voice Search in DuckDuckGo you need to enable Microphone access in the system settings.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Settings</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Microphone Access Required</string>
-    <string name="voiceSearchRemovePositiveButton">Remove</string>
-    <string name="voiceSearchRemoveTitle">Remove Private Voice Search option from the address bar?</string>
-    <string name="voiceSearchRemoveSubtitle">You can always manage this and other accessibility preferences in Settings.</string>
     <string name="voiceSearchTitle">Voice search</string>
 </resources>

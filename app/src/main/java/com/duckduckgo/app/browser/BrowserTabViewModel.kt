@@ -824,15 +824,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = HideKeyboard
         }
-
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                hasFocus = currentOmnibarViewState().isEditing,
-                query = currentOmnibarViewState().omnibarText,
-                hasQueryChanged = false,
-                urlLoaded = url ?: "",
-            ),
-        )
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
@@ -1784,7 +1775,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
     private fun currentPrivacyShieldState(): PrivacyShieldViewState = privacyShieldViewState.value!!
 
-    fun triggerAutocomplete(
+    fun onOmnibarInputStateChanged(
         query: String,
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
@@ -1806,24 +1797,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             false
         }
-
-        autoCompleteViewState.value = currentAutoCompleteViewState()
-            .copy(
-                showSuggestions = showAutoCompleteSuggestions,
-                showFavorites = showFavoritesAsSuggestions,
-                searchResults = autoCompleteSearchResults,
-            )
-
-        if (hasFocus && autoCompleteSuggestionsEnabled) {
-            autoCompletePublishSubject.accept(query.trim())
-        }
-    }
-
-    fun onOmnibarInputStateChanged(
-        query: String,
-        hasFocus: Boolean,
-        hasQueryChanged: Boolean,
-    ) {
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
         val showPrivacyShield = !hasFocus
@@ -1832,12 +1805,9 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             isEditing = hasFocus,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                hasFocus = hasFocus,
-                query = query,
-                hasQueryChanged = hasQueryChanged,
+                isEditing = hasFocus,
                 urlLoaded = url ?: "",
             ),
-            omnibarText = query,
             forceExpand = true,
         )
 
@@ -1861,6 +1831,17 @@ class BrowserTabViewModel @Inject constructor(
         )
 
         Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
+
+        autoCompleteViewState.value = currentAutoCompleteViewState()
+            .copy(
+                showSuggestions = showAutoCompleteSuggestions,
+                showFavorites = showFavoritesAsSuggestions,
+                searchResults = autoCompleteSearchResults,
+            )
+
+        if (hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
+            autoCompletePublishSubject.accept(query.trim())
+        }
     }
 
     fun onBookmarkMenuClicked() {
@@ -2880,12 +2861,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             PrintAttributes.MediaSize.ISO_A4
         }
-    }
-
-    fun voiceSearchDisabled() {
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url ?: ""),
-        )
     }
 
     companion object {

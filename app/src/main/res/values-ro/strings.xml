@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Setări</string>
     <string name="settingsPermissionsSetting">Permisiuni</string>
     <string name="settingsAutofillLoginsSetting">Completare automată la autentificare</string>
-    <string name="settingsSyncSetting">Sincronizare și copiere de rezervă</string>
+    <string name="settingsSyncSetting">Sincronizare</string>
     <string name="settingsFireButton">Butonul Foc</string>
 
     <!-- Private Search -->
@@ -771,8 +771,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Aceasta va șterge folderul tău de marcaje &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Anulare</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Ștergere</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu DuckDuckGo.</string>
-    <string name="accessibilityVoiceSearchTitle">Căutare vocală privată</string>
 </resources>

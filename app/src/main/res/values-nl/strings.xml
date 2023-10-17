@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Instellingen</string>
     <string name="settingsPermissionsSetting">Toestemmingen</string>
     <string name="settingsAutofillLoginsSetting">Login met automatisch invullen</string>
-    <string name="settingsSyncSetting">Synchronisatie en back-up</string>
+    <string name="settingsSyncSetting">Synchroniseren</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -767,8 +767,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Hiermee verwijder je de bladwijzermap voor &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Annuleren</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Verwijderen</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Voeg de optie \'Private spraakopdracht\' toe aan de adresbalk. Audio wordt niet opgeslagen en met niemand gedeeld, ook niet met DuckDuckGo.</string>
-    <string name="accessibilityVoiceSearchTitle">Private spraakzoekopdracht</string>
 </resources>

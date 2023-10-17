@@ -46,7 +46,7 @@
             <ImageView
                 android:layout_width="@dimen/keyline_6"
                 android:layout_height="@dimen/keyline_6"
-                android:src="@drawable/ic_microphone_filled_dark"
+                android:src="@drawable/ic_microphone_dark"
                 android:layout_gravity="center"
                 tools:ignore="ContentDescription" />
 

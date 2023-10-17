@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Asetukset</string>
     <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
     <string name="settingsAutofillLoginsSetting">Täytä kirjautumistiedot automaattisesti</string>
-    <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
+    <string name="settingsSyncSetting">Synkronoi</string>
     <string name="settingsFireButton">Fire-painike</string>
 
     <!-- Private Search -->
@@ -767,8 +767,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tämä poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; kirjanmerkkikansion.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Peruuta</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Poista</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Lisää yksityinen äänihakuvaihtoehto osoitepalkkiin. Ääntä ei tallenneta eikä jaeta kenellekään, edes DuckDuckGolle.</string>
-    <string name="accessibilityVoiceSearchTitle">Yksityinen äänihaku</string>
 </resources>

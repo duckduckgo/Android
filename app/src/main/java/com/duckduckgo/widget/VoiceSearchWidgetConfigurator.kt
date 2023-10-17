@@ -33,7 +33,7 @@ class VoiceSearchWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         fromFavWidget: Boolean,
     ) {
-        if (voiceSearchAvailability.isVoiceSearchAvailable) {
+        if (voiceSearchAvailability.isVoiceSearchSupported) {
             remoteViews.setViewVisibility(R.id.voiceSearch, View.VISIBLE)
             remoteViews.setViewVisibility(R.id.search, View.GONE)
             remoteViews.setOnClickPendingIntent(R.id.voiceSearch, buildVoiceSearchPendingIntent(context, fromFavWidget))
