@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 ---
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/browserMenuImageView"

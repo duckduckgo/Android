@@ -1,4 +1,4 @@
-appId: com.duckduckgo.mobile.android.debug
+appId: com.duckduckgo.mobile.android
 ---
 - assertVisible:
     text: ".*Not to worry! Searching and browsing privately.*"

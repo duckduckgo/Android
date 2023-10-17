@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+name: "Sync Critical Path: Account can be recovered"
 tags:
   - syncCriticalPathTest
 ---
