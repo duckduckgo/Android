@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Сохранить логин</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сохранять</string>
-    <string name="saveLoginDialogSubtitle">Учетные данные надежно хранятся на вашем устройстве, а проконтролировать их можно в меню «Логины» в «Настройках».</string>
+    <string name="saveLoginDialogSubtitle">Учетные данные надежно хранятся на вашем устройстве в меню «Логины».</string>
     <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление логина: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Сохранить и заполнять автоматически</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Учетные данные надежно хранятся на вашем устройстве</string>
     <string name="credentialManagementViewMenuEdit">Редактировать</string>
     <string name="credentialManagementViewMenuDelete">Удалить</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Имя пользователя скопировано</string>
     <string name="autofillManagementPasswordCopied">Пароль скопирован</string>
 
-    <string name="autofill_password_generation_offer_title">Использовать пароль, сгенерированный DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Пароль будет сохранен в разделе «Логины».</string>
-    <string name="autofill_password_generation_offer_accept">Использовать предложенный</string>
+    <string name="autofill_password_generation_offer_title">Как насчет надежного пароля от DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Пароли надежно хранятся на вашем устройстве в меню «Логины».</string>
+    <string name="autofill_password_generation_offer_accept">Применить надежный пароль</string>
     <string name="autofill_password_generation_offer_decline">Создать собственный</string>
 
     <string name="deviceNotSupportedTitle">Устройство не поддерживается</string>
