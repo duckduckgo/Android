@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Enregistrer l\'identifiant</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Ne pas enregistrer</string>
-    <string name="saveLoginDialogSubtitle">Les identifiants sont stockés en toute sécurité sur votre appareil et peuvent être gérés à partir du menu Identifiants dans Paramètres.</string>
+    <string name="saveLoginDialogSubtitle">Les identifiants de connexion sont stockés en toute sécurité sur votre appareil dans le menu Identifiants.</string>
     <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre identifiant ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dernière mise à jour de l\'identifiant %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Enregistrer et saisir automatiquement les identifiants</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Les identifiants de connexion sont stockés en toute sécurité sur votre appareil</string>
     <string name="credentialManagementViewMenuEdit">Modifier</string>
     <string name="credentialManagementViewMenuDelete">Supprimer</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Nom d\'utilisateur copié</string>
     <string name="autofillManagementPasswordCopied">Mot de passe copié</string>
 
-    <string name="autofill_password_generation_offer_title">Utiliser le mot de passe généré par DuckDuckGo ?</string>
-    <string name="autofill_password_generation_offer_message">Le mot de passe sera enregistré dans les identifiants.</string>
-    <string name="autofill_password_generation_offer_accept">Utiliser le mot de passe généré</string>
+    <string name="autofill_password_generation_offer_title">Utiliser un mot de passe fort généré par DuckDuckGo ?</string>
+    <string name="autofill_password_generation_offer_message">Les mots de passe sont stockés en toute sécurité sur votre appareil dans le menu Identifiants.</string>
+    <string name="autofill_password_generation_offer_accept">Utiliser un mot de passe fort</string>
     <string name="autofill_password_generation_offer_decline">Créer le mien</string>
 
     <string name="deviceNotSupportedTitle">Appareil non pris en charge</string>
