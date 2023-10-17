@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Guardar inicio de sesión</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar contraseña</string>
     <string name="saveLoginDialogNotNow">No guardar</string>
-    <string name="saveLoginDialogSubtitle">Los inicios de sesión se almacenan de forma segura en tu dispositivo y se pueden administrar desde el menú de Inicios de Sesión en Ajustes.</string>
+    <string name="saveLoginDialogSubtitle">Los inicios de sesión se almacenan de forma segura en tu dispositivo en el menú Inicios de sesión.</string>
     <string name="saveLoginDialogTitle">¿Quieres que DuckDuckGo guarde tu inicio de sesión?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Más opciones</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Última actualización de inicio de sesión %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Guardar y autocompletar inicios de sesión</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Los inicios de sesión se almacenan de forma segura en tu dispositivo</string>
     <string name="credentialManagementViewMenuEdit">Editar</string>
     <string name="credentialManagementViewMenuDelete">Eliminar</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Nombre de usuario copiado</string>
     <string name="autofillManagementPasswordCopied">Contraseña copiada</string>
 
-    <string name="autofill_password_generation_offer_title">¿Usar contraseña generada por DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">La contraseña se guardará en Inicios de sesión.</string>
-    <string name="autofill_password_generation_offer_accept">Usar contraseña generada</string>
+    <string name="autofill_password_generation_offer_title">¿Usar una contraseña segura de DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Las contraseñas se almacenan de forma segura en tu dispositivo en el menú Inicios de sesión.</string>
+    <string name="autofill_password_generation_offer_accept">Usar contraseña segura</string>
     <string name="autofill_password_generation_offer_decline">Crear la mía propia</string>
 
     <string name="deviceNotSupportedTitle">Dispositivo no compatible</string>
