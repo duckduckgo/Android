@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -17,7 +17,7 @@ dependencies {
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.ktx
-    kapt AndroidX.room.compiler
+    ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
 
     // Testing dependencies

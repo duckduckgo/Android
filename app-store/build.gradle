@@ -17,7 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -31,7 +31,7 @@ dependencies {
 
     implementation "com.jakewharton.threetenabp:threetenabp:_"
 
-    kapt AndroidX.room.compiler
+    ksp AndroidX.room.compiler
 }
 android {
   namespace 'com.duckduckgo.app'
