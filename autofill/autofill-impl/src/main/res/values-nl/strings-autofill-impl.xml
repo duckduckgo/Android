@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Aanbevolen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nog geen aanmeldgegevens opgeslagen</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Aanmeldgegevens worden veilig opgeslagen op je apparaat.</string>
 
     <string name="autofillManagementAddLogin">Aanmeldgegevens toevoegen</string>
     <string name="autofillManagementSearchLogins">Aanmeldgegevens zoeken</string>

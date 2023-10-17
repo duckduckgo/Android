@@ -26,12 +26,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
             android:id="@+id/enabledToggle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             app:primaryText="@string/credentialManagementAutofillToggleLabel"
+            app:secondaryText="@string/credentialManagementAutofillToggleSubtitle"
             app:showSwitch="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

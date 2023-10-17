@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
     <string name="credentialManagementNoLoginsSavedTitle">Все още няма запазени данни за вход</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Данните за вход се съхраняват сигурно на Вашето устройство.</string>
 
     <string name="autofillManagementAddLogin">Добавяне на данни за вход</string>
     <string name="autofillManagementSearchLogins">Търсене на данни за вход</string>

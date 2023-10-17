@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Förslag</string>
     <string name="credentialManagementNoLoginsSavedTitle">Inga inloggningar sparade ännu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Inloggningar lagras säkert på din enhet.</string>
 
     <string name="autofillManagementAddLogin">Lägg till inloggning</string>
     <string name="autofillManagementSearchLogins">Sök inloggningar</string>

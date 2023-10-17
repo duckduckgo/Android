@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Forslag</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen pålogginger er lagret ennå</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Pålogginger lagres på enheten din på en sikker måte.</string>
 
     <string name="autofillManagementAddLogin">Legg til pålogging</string>
     <string name="autofillManagementSearchLogins">Søk i pålogginger</string>

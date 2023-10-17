@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
     <string name="credentialManagementNoLoginsSavedTitle">Aucun identifiant enregistré pour l\'instant</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Les identifiants de connexion sont stockés en toute sécurité sur votre appareil.</string>
 
     <string name="autofillManagementAddLogin">Ajouter un identifiant</string>
     <string name="autofillManagementSearchLogins">Recherche d\'identifiants</string>

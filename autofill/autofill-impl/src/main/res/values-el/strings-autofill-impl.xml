@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Προτεινόμενο</string>
     <string name="credentialManagementNoLoginsSavedTitle">Δεν έχουν αποθηκευτεί ακόμα στοιχεία σύνδεσης</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια στη συσκευή σας.</string>
 
     <string name="autofillManagementAddLogin">Προσθήκη στοιχείων σύνδεσης</string>
     <string name="autofillManagementSearchLogins">Αναζήτηση στοιχείων σύνδεσης</string>

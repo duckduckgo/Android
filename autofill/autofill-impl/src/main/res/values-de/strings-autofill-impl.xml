@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Die Anmeldedaten werden sicher auf deinem Gerät gespeichert.</string>
 
     <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
     <string name="autofillManagementSearchLogins">Anmeldedaten suchen</string>

@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных логинов пока нет</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Учетные данные сохранены и защищены на вашем устройстве.</string>
 
     <string name="autofillManagementAddLogin">Добавить логин</string>
     <string name="autofillManagementSearchLogins">Поиск логинов</string>

@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatím nemáš uložené žádné přihlašovací údaje</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení.</string>
 
     <string name="autofillManagementAddLogin">Přidat přihlášení</string>
     <string name="autofillManagementSearchLogins">Hledání přihlašovacích údajů</string>

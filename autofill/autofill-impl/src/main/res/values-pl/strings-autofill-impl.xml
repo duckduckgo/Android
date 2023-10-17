@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerowane</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nie zapisano jeszcze żadnych loginów</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Dane logowania są bezpiecznie przechowywane na Twoim urządzeniu.</string>
 
     <string name="autofillManagementAddLogin">Dodaj login</string>
     <string name="autofillManagementSearchLogins">Wyszukiwanie loginów</string>

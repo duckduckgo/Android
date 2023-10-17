@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Sugerat</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nu au fost salvate încă date de autentificare</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău.</string>
 
     <string name="autofillManagementAddLogin">Adaugă date de autentificare</string>
     <string name="autofillManagementSearchLogins">Date de autentificare pentru căutare</string>

@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggerimenti</string>
     <string name="credentialManagementNoLoginsSavedTitle">Non ci sono ancora dati di accesso salvati</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">I dati di accesso sono archiviati in modo sicuro sul tuo dispositivo.</string>
 
     <string name="autofillManagementAddLogin">Aggiungi dati di accesso</string>
     <string name="autofillManagementSearchLogins">Cerca dati di accesso</string>

@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Javasolt</string>
     <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett bejelentkezési adatok</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">A bejelentkezési adatokat az eszközöd biztonságosan tárolja.</string>
 
     <string name="autofillManagementAddLogin">Bejelentkezési adatok hozzáadása</string>
     <string name="autofillManagementSearchLogins">Bejelentkezési adatok keresése</string>

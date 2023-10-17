@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų prisijungimų</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai laikomi jūsų įrenginyje.</string>
 
     <string name="autofillManagementAddLogin">Pridėti prisijungimą</string>
     <string name="autofillManagementSearchLogins">Ieškoti prisijungimų</string>

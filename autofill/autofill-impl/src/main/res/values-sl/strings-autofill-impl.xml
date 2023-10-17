@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Predlagano</string>
     <string name="credentialManagementNoLoginsSavedTitle">Podatki za prijavo še niso shranjeni</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prijave so varno shranjene v vaši napravi.</string>
 
     <string name="autofillManagementAddLogin">Dodajanje podatkov za prijavo</string>
     <string name="autofillManagementSearchLogins">Iskanje podatkov za prijavo</string>

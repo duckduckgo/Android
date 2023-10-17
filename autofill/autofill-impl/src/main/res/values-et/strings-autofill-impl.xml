@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
     <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt sinu seadmesse.</string>
 
     <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>
     <string name="autofillManagementSearchLogins">Otsi sisselogimisandmeid</string>

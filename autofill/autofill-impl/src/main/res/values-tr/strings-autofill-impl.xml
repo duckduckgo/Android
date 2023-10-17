@@ -65,7 +65,6 @@
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz kaydedilmiş Giriş yok</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Giriş bilgileri cihazınızda güvenli bir şekilde saklanır.</string>
 
     <string name="autofillManagementAddLogin">Giriş Ekle</string>
     <string name="autofillManagementSearchLogins">Giriş ara</string>
