@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Ustawienia</string>
     <string name="settingsPermissionsSetting">Uprawnienia</string>
     <string name="settingsAutofillLoginsSetting">Autouzupełnianie logowania</string>
-    <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
+    <string name="settingsSyncSetting">Synchronizacja</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
 
     <!-- Private Search -->
@@ -775,8 +775,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Spowoduje to usunięcie folderu zakładek &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Anuluj</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Usuń</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Dodaj opcję prywatnego wyszukiwania głosowego do paska adresu. Dźwięk nie jest przechowywany ani udostępniany żadnym podmiotom, w tym DuckDuckGo.</string>
-    <string name="accessibilityVoiceSearchTitle">Prywatne wyszukiwanie głosowe</string>
 </resources>

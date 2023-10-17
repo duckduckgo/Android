@@ -775,8 +775,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Папка &lt;b&gt;«%1$s»&lt;/b&gt; будет удалена.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Отменить</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Удалить</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Добавить опцию «Частный голосовой поиск» в адресную строку. Ваш голосовой запрос не сохраняется и никуда не передается, даже в DuckDuckGo.</string>
-    <string name="accessibilityVoiceSearchTitle">Конфиденциальный голосовой поиск</string>
 </resources>

@@ -50,7 +50,6 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
     private val database: PrivacyConfigDatabase,
-    private val listener: PrivacyConfigUpdateListener,
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
 ) : PrivacyConfigPersister {
 
@@ -86,7 +85,6 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
             }
-            listener.privacyConfigUpdated()
         }
     }
 
