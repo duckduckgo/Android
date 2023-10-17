@@ -60,7 +60,7 @@ class RealActivityResultLauncherWrapper @Inject constructor(
     private val context: Context,
 ) : ActivityResultLauncherWrapper {
 
-    private lateinit var permissionLauncher: ActivityResultLauncher<String>
+    private var permissionLauncher: ActivityResultLauncher<String>? = null
     private lateinit var voiceSearchActivityLaucher: ActivityResultLauncher<Intent>
 
     override fun register(
@@ -103,6 +103,6 @@ class RealActivityResultLauncherWrapper @Inject constructor(
     }
 
     private fun launchPermissionRequest() {
-        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        permissionLauncher?.launch(Manifest.permission.RECORD_AUDIO)
     }
 }
