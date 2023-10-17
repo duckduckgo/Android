@@ -146,7 +146,7 @@ class AutofillDisablingDeclineCounterTest {
     }
 
     private fun configureGlobalDeclineCountAtThreshold() {
-        whenever(autofillStore.autofillDeclineCount).thenReturn(3)
+        whenever(autofillStore.autofillDeclineCount).thenReturn(2)
     }
 
     private fun assertDeclineNotRecorded() {
