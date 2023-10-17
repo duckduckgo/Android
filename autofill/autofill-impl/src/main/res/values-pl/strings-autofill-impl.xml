@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Zapisz logowanie</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginDialogNotNow">Nie zapisuj</string>
-    <string name="saveLoginDialogSubtitle">Dane logowania są bezpiecznie przechowywane na Twoim urządzeniu i można nimi zarządzać w sekcji Loginy menu Ustawienia.</string>
+    <string name="saveLoginDialogSubtitle">Loginy są bezpiecznie przechowywane na Twoim urządzeniu w menu Loginy.</string>
     <string name="saveLoginDialogTitle">Czy chcesz zapisać dane logowania w DuckDuckGo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ostatnia aktualizacja loginu: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Zapisz i autouzupełniaj loginy</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Dane logowania są bezpiecznie przechowywane na Twoim urządzeniu</string>
     <string name="credentialManagementViewMenuEdit">Edytuj</string>
     <string name="credentialManagementViewMenuDelete">Usuń</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Skopiowano nazwę użytkownika</string>
     <string name="autofillManagementPasswordCopied">Skopiowano hasło</string>
 
-    <string name="autofill_password_generation_offer_title">Użyć hasła wygenerowanego z DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Hasło zostanie zapisane w Danych logowania.</string>
-    <string name="autofill_password_generation_offer_accept">Użyj wygenerowanego hasła</string>
+    <string name="autofill_password_generation_offer_title">Użyć silnego hasła z DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Hasła są bezpiecznie przechowywane na Twoim urządzeniu w menu Loginy.</string>
+    <string name="autofill_password_generation_offer_accept">Użyj silnego hasła</string>
     <string name="autofill_password_generation_offer_decline">Utwórz własne</string>
 
     <string name="deviceNotSupportedTitle">Urządzenie nie jest obsługiwane</string>
