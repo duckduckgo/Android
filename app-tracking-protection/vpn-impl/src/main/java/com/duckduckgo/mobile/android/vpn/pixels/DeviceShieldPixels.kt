@@ -340,6 +340,8 @@ interface DeviceShieldPixels {
     fun reportErrorCreatingVpnNetworkStack()
 
     fun reportTunnelThreadStopTimeout()
+
+    fun reportVpnAlwaysOnTriggered()
 }
 
 @ContributesBinding(AppScope::class)
@@ -759,6 +761,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportTunnelThreadStopTimeout() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT)
+    }
+
+    override fun reportVpnAlwaysOnTriggered() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY)
+        firePixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED)
     }
 
     private fun firePixel(

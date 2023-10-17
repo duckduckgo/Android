@@ -51,12 +51,13 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
     }
 
     private fun String.matchesPrefix(): Boolean {
-        return (this.startsWith(ATP_PIXEL_PREFIX) || this.startsWith(NETP_PIXEL_PREFIX))
+        return (this.startsWith(ATP_PIXEL_PREFIX) || this.startsWith(NETP_PIXEL_PREFIX) || this.startsWith(VPN_PIXEL_PREFIX))
     }
 
     companion object {
         private const val ATP_PIXEL_PREFIX = "m_atp_"
         private const val NETP_PIXEL_PREFIX = "m_netp_"
+        private const val VPN_PIXEL_PREFIX = "m_vpn_"
 
         // list here the pixels that except from this interceptor
         private val PIXEL_EXCEPTIONS = listOf<String>()

@@ -206,5 +206,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT("m_atp_ev_apptp_tunnel_thread_stop_timeout_c", enqueue = true),
     ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY("m_atp_ev_apptp_tunnel_thread_stop_timeout_d", enqueue = true),
 
+    REPORT_VPN_ALWAYS_ON_TRIGGERED("m_vpn_ev_always_on_triggered_c"),
+    REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY("m_vpn_ev_always_on_triggered_d"),
+
     ;
 }
