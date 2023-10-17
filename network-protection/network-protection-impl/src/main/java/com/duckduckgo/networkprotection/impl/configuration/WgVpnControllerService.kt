@@ -16,14 +16,49 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
+import dagger.Module
+import dagger.Provides
+import java.net.Inet4Address
+import java.net.InetAddress
+import java.net.UnknownHostException
+import javax.inject.Named
+import okhttp3.Dns
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
-@ContributesServiceApi(AppScope::class)
+// TODO this is a temporary solution
+// see https://app.asana.com/0/488551667048375/1205732562346501/f
+@Module
+@ContributesTo(scope = AppScope::class)
+object WgVpnControllerServiceModule {
+    @Provides
+    fun providesWgVpnControllerService(
+        @Named(value = "api") retrofit: Retrofit,
+        @Named("api") okHttpClient: Lazy<OkHttpClient>,
+    ): WgVpnControllerService {
+        val customRetrofit = retrofit.newBuilder()
+            .callFactory {
+                okHttpClient.get().newBuilder()
+                    .dns(DnsOverride())
+                    .build()
+                    .newCall(it)
+            }
+            .build()
+
+        return customRetrofit.create(WgVpnControllerService::class.java)
+    }
+}
+
+// we don't use ContributesServiceApi for now because we need a custom okhttp client that overrides DNS
+// see https://app.asana.com/0/488551667048375/1205732562346501/f
+// @ContributesServiceApi(AppScope::class)
 interface WgVpnControllerService {
     @Headers("Content-Type: application/json")
     @POST("$NETP_ENVIRONMENT_URL/redeem")
@@ -80,3 +115,19 @@ data class Server(
     val ips: List<String>,
     val port: Long,
 )
+
+private class DnsOverride : Dns {
+    override fun lookup(hostname: String): List<InetAddress> {
+        return try {
+            InetAddress.getAllByName(hostname).toList()
+        } catch (e: NullPointerException) {
+            // This is just copied from https://github.com/square/okhttp/blob/master/okhttp/src/jvmMain/kotlin/okhttp3/Dns.kt
+            throw UnknownHostException("Broken system behaviour for dns lookup of $hostname").apply {
+                initCause(e)
+            }
+        } catch (t: UnknownHostException) {
+            // presumably the crash seeing in https://app.asana.com/0/488551667048375/1205732562346501/f. Resolve only IPv4
+            Inet4Address.getAllByName(hostname).toList()
+        }
+    }
+}
