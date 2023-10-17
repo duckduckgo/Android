@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
     <string name="settingsAutofillLoginsSetting">Girişleri Otomatik Doldur</string>
-    <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
+    <string name="settingsSyncSetting">Senkronizasyon</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -767,8 +767,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; yer işareti klasörünüzü silecektir.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Vazgeç</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Sil</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya DuckDuckGo dâhil olmak üzere kimseyle paylaşılmaz.</string>
-    <string name="accessibilityVoiceSearchTitle">Özel Sesli Arama</string>
 </resources>

@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Indstillinger</string>
     <string name="settingsPermissionsSetting">Tilladelser</string>
     <string name="settingsAutofillLoginsSetting">Automatisk udfyldning ved login</string>
-    <string name="settingsSyncSetting">Synkronisering og sikkerhedskopiering</string>
+    <string name="settingsSyncSetting">Synkronisering</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -767,8 +767,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Dette vil slette bogmærkemappen &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Annuller</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Slet</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Tilføj privat stemmesøgningsmulighed til adresselinjen Lyden bliver ikke gemt eller delt med nogen, heller ikke DuckDuckGo.</string>
-    <string name="accessibilityVoiceSearchTitle">Privat stemmesøgning</string>
 </resources>

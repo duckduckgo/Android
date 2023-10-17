@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Nustatymai</string>
     <string name="settingsPermissionsSetting">Leidimai</string>
     <string name="settingsAutofillLoginsSetting">Automatiškai užpildyti prisijungimus</string>
-    <string name="settingsSyncSetting">Sinchronizuoti ir kurti atsarginę kopiją</string>
+    <string name="settingsSyncSetting">Sinchronizuoti</string>
     <string name="settingsFireButton">Mygtukas „Fire“</string>
 
     <!-- Private Search -->
@@ -775,8 +775,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymių aplanką.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Atšaukti</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „DuckDuckGo“.</string>
-    <string name="accessibilityVoiceSearchTitle">Privati paieška balsu</string>
 </resources>

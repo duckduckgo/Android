@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Paramètres</string>
     <string name="settingsPermissionsSetting">Autorisations</string>
     <string name="settingsAutofillLoginsSetting">Saisie automatique des identifiants</string>
-    <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
+    <string name="settingsSyncSetting">Synchronisation</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -767,8 +767,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Cela supprimera votre dossier de signets &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Annuler</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Supprimer</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Ajoutez l\'option Recherche vocale privée à la barre d\'adresse. L\'audio n\'est ni stocké ni partagé avec qui que ce soit, y compris DuckDuckGo.</string>
-    <string name="accessibilityVoiceSearchTitle">Recherche vocale privée</string>
 </resources>

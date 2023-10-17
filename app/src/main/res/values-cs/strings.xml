@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
     <string name="settingsAutofillLoginsSetting">Automatické vyplňování přihlašovacích údajů</string>
-    <string name="settingsSyncSetting">Synchronizace a zálohování</string>
+    <string name="settingsSyncSetting">Synchronizace</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -775,8 +775,4 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tímhle smažeš složku záložek &lt;b&gt;%1$s&lt;/b&gt; .</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Zrušit</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Smazat</string>
-
-    <!-- Private voice search -->
-    <string name="accessibilityVoiceSearchSubtitle">Přidej si na adresní řádek funkci soukromého hlasového vyhledávání. Zvuk nikde neukládáme a s nikým ho nesdílíme. Ani DuckDuckGo se k němu nedostane.</string>
-    <string name="accessibilityVoiceSearchTitle">Soukromé hlasové vyhledávání</string>
 </resources>

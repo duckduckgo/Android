@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="voiceSearchError">Ocorreu um erro. Tenta novamente mais tarde.</string>
     <string name="voiceSearchIconContentDescription">Pesquisa por voz</string>
     <string name="voiceSearchListening">Fala agora</string>
     <string name="voiceSearchListeningFooter">O áudio é processado no dispositivo. Não foi armazenado ou partilhado com ninguém, incluindo o DuckDuckGo.</string>
@@ -28,8 +27,5 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Para usar a Pesquisa por voz no DuckDuckGo, tens de autorizar o acesso ao microfone nas definições do sistema.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Definições</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">É necessário o acesso ao microfone</string>
-    <string name="voiceSearchRemovePositiveButton">Remover</string>
-    <string name="voiceSearchRemoveTitle">Remover opção de pesquisa por voz privada da barra de endereços?</string>
-    <string name="voiceSearchRemoveSubtitle">Podes sempre gerir esta e outras preferências de acessibilidade nas Definições.</string>
     <string name="voiceSearchTitle">Pesquisa por voz</string>
 </resources>

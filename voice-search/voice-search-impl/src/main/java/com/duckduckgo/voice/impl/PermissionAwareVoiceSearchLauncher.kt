@@ -21,7 +21,6 @@ import androidx.activity.result.ActivityResultCaller
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
-import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -39,12 +38,9 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         source: Source,
         onEvent: (Event) -> Unit,
     ) {
-        permissionRequest.registerResultsCallback(
-            caller,
-            activity,
-            { voiceSearchActivityLauncher.launch(activity) },
-            { onEvent(VoiceSearchDisabled) },
-        )
+        permissionRequest.registerResultsCallback(caller, activity) {
+            voiceSearchActivityLauncher.launch(activity)
+        }
         voiceSearchActivityLauncher.registerResultsCallback(caller, activity, source) {
             onEvent(it)
         }

@@ -17,7 +17,6 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="voiceSearchError">Ceva nu a funcționat.Încearcă din nou mai târziu.</string>
     <string name="voiceSearchIconContentDescription">Căutare vocală</string>
     <string name="voiceSearchListening">Vorbește acum</string>
     <string name="voiceSearchListeningFooter">Componenta audio este prelucrată pe dispozitiv. Nu este stocată sau distribuită nimănui, nici DuckDuckGo.</string>
@@ -28,8 +27,5 @@
     <string name="voiceSearchPermissionRejectedDialogMessage">Pentru a utiliza căutarea vocală în DuckDuckGo, trebuie să activezi accesul la microfon din setările sistemului.</string>
     <string name="voiceSearchPermissionRejectedDialogPositiveAction">Setări</string>
     <string name="voiceSearchPermissionRejectedDialogTitle">Este necesar accesul la microfon</string>
-    <string name="voiceSearchRemovePositiveButton">Elimină</string>
-    <string name="voiceSearchRemoveTitle">Elimini opțiunea Căutare vocală privată din bara de adrese?</string>
-    <string name="voiceSearchRemoveSubtitle">Puteți gestiona oricând această preferință de accesibilitate și altele din Setări.</string>
     <string name="voiceSearchTitle">Căutare vocală</string>
 </resources>
