@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Definições</string>
     <string name="settingsPermissionsSetting">Permissões</string>
     <string name="settingsAutofillLoginsSetting">Preenchimento automático de inícios de sessão</string>
-    <string name="settingsSyncSetting">Sincronizar</string>
+    <string name="settingsSyncSetting">Sincronização e cópia de segurança</string>
     <string name="settingsFireButton">Botão de proteção</string>
 
     <!-- Private Search -->
@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Vai eliminar a pasta de marcadores &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Cancelar</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Eliminar</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Adicionar opção de pesquisa privada por voz à barra de endereços. O áudio não é armazenado nem partilhado com ninguém, incluindo o DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchTitle">Pesquisa por voz privada</string>
 </resources>
