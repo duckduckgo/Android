@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Login opslaan</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginDialogNotNow">Niet opslaan</string>
-    <string name="saveLoginDialogSubtitle">Aanmeldgegevens worden veilig opgeslagen op je apparaat en kunnen worden beheerd via het menu Aanmeldgegevens in Instellingen.</string>
+    <string name="saveLoginDialogSubtitle">Aanmeldgegevens worden veilig opgeslagen op je apparaat in het menu </string>
     <string name="saveLoginDialogTitle">Wil je dat DuckDuckGo je login opslaat?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Aanmeldgegevens laatste bijgewerkt op %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Aanmeldgegevens opslaan en automatisch invullen</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Aanmeldgegevens worden veilig opgeslagen op je apparaat</string>
     <string name="credentialManagementViewMenuEdit">Bewerken</string>
     <string name="credentialManagementViewMenuDelete">Verwijderen</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Gebruikersnaam gekopieerd</string>
     <string name="autofillManagementPasswordCopied">Wachtwoord gekopieerd</string>
 
-    <string name="autofill_password_generation_offer_title">Gegenereerd wachtwoord van DuckDuckGo gebruiken?</string>
-    <string name="autofill_password_generation_offer_message">Wachtwoord wordt opgeslagen in aanmeldgegevens.</string>
-    <string name="autofill_password_generation_offer_accept">Gegenereerd wachtwoord gebruiken</string>
+    <string name="autofill_password_generation_offer_title">Een sterk wachtwoord van DuckDuckGo gebruiken?</string>
+    <string name="autofill_password_generation_offer_message">Wachtwoorden worden veilig opgeslagen op je apparaat in het menu \'Aanmeldingen\'.</string>
+    <string name="autofill_password_generation_offer_accept">Sterk wachtwoord gebruiken</string>
     <string name="autofill_password_generation_offer_decline">Zelf wachtwoord aanmaken</string>
 
     <string name="deviceNotSupportedTitle">Apparaat wordt niet ondersteund</string>
