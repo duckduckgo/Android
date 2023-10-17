@@ -2817,11 +2817,23 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(WebViewError(errorType, url))
     }
 
-    override fun recordErrorCode(error: String) {
+    override fun recordErrorCode(error: String, url: String) {
+        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+        // called triggering a buildSite.
+        if (url != site?.url) {
+            site = siteFactory.buildSite(url)
+        }
+        Timber.d("recordErrorCode $error in ${site?.url}")
         site?.onErrorDetected(error)
     }
 
-    override fun recordHttpErrorCode(statusCode: Int) {
+    override fun recordHttpErrorCode(statusCode: Int, url: String) {
+        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+        // called triggering a buildSite.
+        if (url != site?.url) {
+            site = siteFactory.buildSite(url)
+        }
+        Timber.d("recordHttpErrorCode $statusCode in ${site?.url}")
         site?.onHttpErrorDetected(statusCode)
     }
 

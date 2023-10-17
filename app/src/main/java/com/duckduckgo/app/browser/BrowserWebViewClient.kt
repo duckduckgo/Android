@@ -417,7 +417,11 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener?.onReceivedError(parsedError, request.url.toString())
             }
             if (request?.isForMainFrame == true) {
-                webViewClientListener?.recordErrorCode(it.errorCode.asStringErrorCode())
+                Timber.d("recordErrorCode for ${request.url}")
+                webViewClientListener?.recordErrorCode(
+                    "${it.errorCode.asStringErrorCode()}:${it.description}",
+                    request.url.toString(),
+                )
             }
         }
         super.onReceivedError(view, request, error)
@@ -449,7 +453,8 @@ class BrowserWebViewClient @Inject constructor(
         }
         if (request?.isForMainFrame == true) {
             errorResponse?.let {
-                webViewClientListener?.recordHttpErrorCode(it.statusCode)
+                Timber.d("recordHttpErrorCode for ${request.url}")
+                webViewClientListener?.recordHttpErrorCode(it.statusCode, request.url.toString())
             }
         }
     }
