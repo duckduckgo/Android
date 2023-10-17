@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Активирано по подразбиране</string>
     <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
-    <string name="settingsAutofillLoginsSetting">Автоматично попълване на данни за вход</string>
+    <string name="settingsAutofillLoginsSetting">Данни за вход</string>
     <string name="settingsSyncSetting">Синхронизиране и архивиране</string>
     <string name="settingsFireButton">Fire Button</string>
 

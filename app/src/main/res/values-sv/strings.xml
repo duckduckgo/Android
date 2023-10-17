@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Aktiverat som standard</string>
     <string name="settingsHeadingSettings">Inställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
-    <string name="settingsAutofillLoginsSetting">Fyll i inloggningar automatiskt</string>
+    <string name="settingsAutofillLoginsSetting">Inloggningar</string>
     <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
 

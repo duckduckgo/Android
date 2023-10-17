@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Abilitato per impostazione predefinita</string>
     <string name="settingsHeadingSettings">Impostazioni</string>
     <string name="settingsPermissionsSetting">Autorizzazioni</string>
-    <string name="settingsAutofillLoginsSetting">Compilazione automatica dei dati di accesso</string>
+    <string name="settingsAutofillLoginsSetting">Accessi</string>
     <string name="settingsSyncSetting">Sincronizzazione e backup</string>
     <string name="settingsFireButton">Fire Button</string>
 

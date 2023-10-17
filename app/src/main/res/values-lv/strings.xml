@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Iespējots pēc noklusējuma</string>
     <string name="settingsHeadingSettings">Iestatījumi</string>
     <string name="settingsPermissionsSetting">Atļaujas</string>
-    <string name="settingsAutofillLoginsSetting">Automātiski aizpildīt pieteikšanās datus</string>
+    <string name="settingsAutofillLoginsSetting">Pieteikšanās dati</string>
     <string name="settingsSyncSetting">Sinhronizācija un dublēšana</string>
     <string name="settingsFireButton">Fire Button</string>
 
