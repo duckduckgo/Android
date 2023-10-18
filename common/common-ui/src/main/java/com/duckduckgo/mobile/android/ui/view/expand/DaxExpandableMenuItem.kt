@@ -241,7 +241,64 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
             }
         }
     }
+
+    /** Builder class for creating [ExpandableLayout]. */
+    @DaxExpandableMenuItemDsl
+    class Builder(context: Context) {
+        private val expandableMenuItem = DaxExpandableMenuItem(context)
+
+        fun setPrimaryText(value: String) = apply {
+            this.expandableMenuItem.setPrimaryText(value)
+        }
+        fun setPrimaryTextColor(value: ColorStateList?) =  apply {
+            this.expandableMenuItem.setPrimaryTextColor(value)
+        }
+
+        fun setSecondaryText(value: String?) = apply {
+            this.expandableMenuItem.setSecondaryText(value)
+        }
+
+        fun setLeadingIconDrawable(value: Drawable) = apply {
+            this.expandableMenuItem.setLeadingIconDrawable(value)
+        }
+
+        fun setLeadingIconVisibility(value: Boolean) = apply {
+            this.expandableMenuItem.setLeadingIconVisibility(value)
+        }
+
+        fun setLeadingIconBackgroundType(value: ImageBackground) = apply {
+            this.expandableMenuItem.setLeadingIconBackgroundType(value)
+        }
+
+        fun setLeadingIconSize(value: LeadingIconSize) = apply {
+            this.expandableMenuItem.setLeadingIconSize(value)
+        }
+        fun setPrimaryButtonText(value: String?) = apply {
+            this.expandableMenuItem.setPrimaryButtonText(value)
+        }
+        fun setPrimaryButtonClickListener(value: () -> Unit) = apply {
+            this.expandableMenuItem.setPrimaryButtonClickListener(value)
+        }
+
+        fun setExpandedChangeListener(value: OnExpandedChangedListener) = apply {
+            this.expandableMenuItem.setExpandedChangeListener(value)
+        }
+
+        fun setExpandedLayout(value: View) = apply {
+            this.expandableMenuItem.customExpandedLayout = value
+        }
+
+        fun build() = this.expandableMenuItem
+    }
 }
+
+@JvmSynthetic
+@DaxExpandableMenuItemDsl
+inline fun Context.daxExpandableMenuItem(
+    block: DaxExpandableMenuItem.Builder.() -> Unit
+): DaxExpandableMenuItem =
+    DaxExpandableMenuItem.Builder(this).apply(block).build()
+
 
 fun ViewGroup.measureWrapContentHeight(): Int {
     this.measure(

@@ -97,7 +97,16 @@
 
     </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
 
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/expandableItemLayout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:primaryText="Expandable Item"/>
 
-
+    <LinearLayout
+        android:id="@+id/expandableItemRootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
 
 </LinearLayout>
