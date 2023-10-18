@@ -27,11 +27,11 @@ import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBuyBinding
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyViewModel.Command.OpenBuyScreen
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyViewModel.Factory
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
+import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingViewModel.Factory
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class SubsSettingBuyView @JvmOverloads constructor(
+class SubsSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -56,10 +56,10 @@ class SubsSettingBuyView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewSettingsBuyBinding by viewBinding()
+    private val binding: ViewSettingsBinding by viewBinding()
 
-    private val viewModel: SubsSettingBuyViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SubsSettingBuyViewModel::class.java]
+    private val viewModel: SubsSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SubsSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -68,8 +68,8 @@ class SubsSettingBuyView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.buy.setClickListener {
-            viewModel.onBuyClicked()
+        binding.settings.setClickListener {
+            viewModel.onSettings()
         }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -89,8 +89,8 @@ class SubsSettingBuyView @JvmOverloads constructor(
 
     private fun processCommands(command: Command) {
         when (command) {
-            is OpenBuyScreen -> {
-                globalActivityStarter.start(context, SubscriptionsScreenWithEmptyParams)
+            is OpenSettings -> {
+                globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
             }
         }
     }

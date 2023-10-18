@@ -21,6 +21,7 @@ import android.view.View
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.SubsSettingsPlugin
 import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyView
+import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingView
 import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingsTitleView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.MapKey
@@ -42,5 +43,13 @@ class SubsSettingsTitle @Inject constructor() : SubsSettingsPlugin {
 class SubsSettingBuy @Inject constructor() : SubsSettingsPlugin {
     override fun getView(context: Context): View {
         return SubsSettingBuyView(context)
+    }
+}
+
+@ContributesMultibinding(scope = ActivityScope::class)
+@PositionKey(300)
+class SubsSettings @Inject constructor() : SubsSettingsPlugin {
+    override fun getView(context: Context): View {
+        return SubsSettingView(context)
     }
 }
