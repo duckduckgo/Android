@@ -81,31 +81,27 @@
                 app:typography="body1"
                 android:text="@string/sync_enable_sync_content"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <LinearLayout
+                android:id="@+id/syncSettingsOptions"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/sync_enable_options"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                android:id="@+id/sync_setup_option_bookmarks"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:leadingIconBackground="circular"
-                app:leadingIcon="@drawable/ic_image_24"
-                app:showSwitch="true"
-                app:primaryText="@string/sync_enable_option_favicons_title"
-                app:secondaryText="@string/sync_enable_option_favicons_subtitle"/>
+                <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/sync_enable_options" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                android:id="@+id/sync_setup_option_favourites"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:leadingIconBackground="circular"
-                app:leadingIcon="@drawable/ic_sync_device_all_24"
-                app:showSwitch="true"
-                app:primaryText="@string/sync_enable_option_favorites_title"
-                app:secondaryText="@string/sync_enable_option_favorites_subtitle"/>
-
+                <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/sync_settings_option_bookmarks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:leadingIcon="@drawable/ic_image_24"
+                    app:leadingIconBackground="circular"
+                    app:primaryText="@string/sync_enable_option_favicons_title"
+                    app:secondaryText="@string/sync_enable_option_favicons_subtitle"
+                    app:showSwitch="true" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

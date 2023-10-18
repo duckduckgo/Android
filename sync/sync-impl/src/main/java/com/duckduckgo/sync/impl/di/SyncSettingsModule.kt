@@ -23,7 +23,6 @@ import com.squareup.anvil.annotations.*
 import dagger.*
 import dagger.multibindings.*
 
-
 @Module
 @ContributesTo(ActivityScope::class)
 abstract class SyncSettingsModule {
@@ -31,4 +30,3 @@ abstract class SyncSettingsModule {
     @Multibinds
     abstract fun provideSyncSettingsPlugins(): DaggerMap<Int, SyncSettingsPlugin>
 }
-
