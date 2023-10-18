@@ -20,10 +20,10 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-import com.duckduckgo.settings.api.SubsSettingsPlugin
+import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyView
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingView
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyView
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.MapKey
 import javax.inject.Inject
@@ -33,7 +33,7 @@ annotation class PositionKey(val pos: Int)
 
 @ContributesMultibinding(ActivityScope::class)
 @PositionKey(100)
-class SubsSettingsTitle @Inject constructor() : SubsSettingsPlugin {
+class ProSettingsTitle @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return SectionHeaderListItem(context).apply {
             primaryText = context.getString(R.string.privacyPro)
@@ -43,16 +43,16 @@ class SubsSettingsTitle @Inject constructor() : SubsSettingsPlugin {
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PositionKey(200)
-class SubsSettingBuy @Inject constructor() : SubsSettingsPlugin {
+class ProSettingBuy @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return SubsSettingBuyView(context)
+        return ProSettingBuyView(context)
     }
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PositionKey(300)
-class SubsSettings @Inject constructor() : SubsSettingsPlugin {
+class ProSettings @Inject constructor() : ProSettingsPlugin {
     override fun getView(context: Context): View {
-        return SubsSettingView(context)
+        return ProSettingView(context)
     }
 }

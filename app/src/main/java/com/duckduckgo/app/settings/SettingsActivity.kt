@@ -64,7 +64,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.settings.api.SubsSettingsPlugin
+import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
@@ -98,7 +98,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var subsSettingsPlugin: DaggerMap<Int, SubsSettingsPlugin>
+    lateinit var proSettingsPlugin: DaggerMap<Int, ProSettingsPlugin>
 
     private val viewsPrivacy
         get() = binding.includeSettings.contentSettingsPrivacy
@@ -112,7 +112,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
-    private val viewsSubs
+    private val viewsPro
         get() = binding.includeSettings.settingsSectionPro
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -161,12 +161,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureSettings() {
-        if (subsSettingsPlugin.isEmpty()) {
-            viewsSubs.gone()
+        if (proSettingsPlugin.isEmpty()) {
+            viewsPro.gone()
         } else {
-            subsSettingsPlugin.keys.toSortedSet().forEach {
-                subsSettingsPlugin[it]?.let { plugin ->
-                    viewsSubs.addView(plugin.getView(this))
+            proSettingsPlugin.keys.toSortedSet().forEach {
+                proSettingsPlugin[it]?.let { plugin ->
+                    viewsPro.addView(plugin.getView(this))
                 }
             }
         }

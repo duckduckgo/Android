@@ -18,15 +18,15 @@ package com.duckduckgo.settings.impl
 
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.settings.api.SubsSettingsPlugin
+import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.multibindings.Multibinds
 
 @Module
 @ContributesTo(ActivityScope::class)
-abstract class BillingsModule {
+abstract class SettingsProModule {
     // we use multibinds as the list of plugins can be empty
     @Multibinds
-    abstract fun provideSubsSettingsPlugins(): DaggerMap<Int, SubsSettingsPlugin>
+    abstract fun provideProSettingsPlugins(): DaggerMap<Int, ProSettingsPlugin>
 }

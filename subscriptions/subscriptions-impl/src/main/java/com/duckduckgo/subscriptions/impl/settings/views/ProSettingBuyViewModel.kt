@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.impl.settings.views
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingBuyViewModel.Command.OpenBuyScreen
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -27,17 +27,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class SubsSettingBuyViewModel : ViewModel() {
+class ProSettingBuyViewModel : ViewModel() {
 
     sealed class Command {
         object OpenBuyScreen : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
-
-    fun commands(): Flow<Command> {
-        return command.receiveAsFlow()
-    }
+    internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     fun onBuyClicked() {
         sendCommand(OpenBuyScreen)
@@ -54,7 +51,7 @@ class SubsSettingBuyViewModel : ViewModel() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return with(modelClass) {
                 when {
-                    isAssignableFrom(SubsSettingBuyViewModel::class.java) -> SubsSettingBuyViewModel()
+                    isAssignableFrom(ProSettingBuyViewModel::class.java) -> ProSettingBuyViewModel()
                     else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
                 }
             } as T
