@@ -56,7 +56,7 @@ class AppSyncStateRepository @Inject constructor(private val syncAttemptDao: Syn
         val last = syncAttemptDao.lastAttemptSync()
         if (last != null) {
             val updated = last.copy(state = state)
-            Timber.d("Sync-Feature: updating sync attempt to $updated")
+            Timber.d("Sync-State: updating sync attempt to $updated")
             syncAttemptDao.insert(updated)
         }
     }

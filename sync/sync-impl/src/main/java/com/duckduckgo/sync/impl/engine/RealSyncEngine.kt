@@ -58,9 +58,9 @@ class RealSyncEngine @Inject constructor(
 ) : SyncEngine {
 
     override fun triggerSync(trigger: SyncTrigger) {
-        Timber.i("Sync-Feature: petition to sync now trigger: $trigger")
+        Timber.i("Sync-Engine: petition to sync now trigger: $trigger")
         if (syncStore.isSignedIn()) {
-            Timber.d("Sync-Feature: sync enabled, triggering operation: $trigger")
+            Timber.d("Sync-Engine: sync enabled, triggering operation: $trigger")
             when (trigger) {
                 BACKGROUND_SYNC -> scheduleSync(trigger)
                 APP_OPEN -> performSync(trigger)
@@ -70,34 +70,34 @@ class RealSyncEngine @Inject constructor(
                 ACCOUNT_LOGIN -> performSync(trigger)
             }
         } else {
-            Timber.d("Sync-Feature: sync disabled, nothing to do")
+            Timber.d("Sync-Engine: sync disabled, nothing to do")
         }
     }
 
     private fun scheduleSync(trigger: SyncTrigger) {
         when (syncScheduler.scheduleOperation()) {
             DISCARD -> {
-                Timber.d("Sync-Feature: petition to sync debounced")
+                Timber.d("Sync-Engine: petition to sync debounced")
             }
 
             EXECUTE -> {
-                Timber.d("Sync-Feature: petition to sync accepted, syncing now")
+                Timber.d("Sync-Engine: petition to sync accepted, syncing now")
                 performSync(trigger)
             }
         }
     }
 
     private fun sendLocalData() {
-        Timber.d("Sync-Feature: initiating first sync")
+        Timber.d("Sync-Engine: initiating first sync")
         syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = "Account Creation"))
         getChanges().forEach {
             if (it.isEmpty()) {
-                Timber.d("Sync-Feature: ${it.type} local data empty, nothing to send")
+                Timber.d("Sync-Engine: ${it.type} local data empty, nothing to send")
                 syncStateRepository.updateSyncState(SUCCESS)
                 return@forEach
             }
 
-            Timber.d("Sync-Feature: sending ${it.type} local data $it")
+            Timber.d("Sync-Engine: sending ${it.type} local data $it")
             patchLocalChanges(it, REMOTE_WINS)
         }
         syncStateRepository.updateSyncState(SUCCESS)
@@ -105,17 +105,17 @@ class RealSyncEngine @Inject constructor(
 
     private fun performSync(trigger: SyncTrigger) {
         if (syncInProgress()) {
-            Timber.d("Sync-Feature: sync already in progress, throttling")
+            Timber.d("Sync-Engine: sync already in progress, throttling")
         } else {
-            Timber.d("Sync-Feature: sync is not in progress, starting to sync")
+            Timber.d("Sync-Engine: sync is not in progress, starting to sync")
             syncStateRepository.store(SyncAttempt(state = IN_PROGRESS, meta = trigger.toString()))
 
-            Timber.i("Sync-Feature: getChanges - performSync")
+            Timber.i("Sync-Engine: getChanges - performSync")
             val changes = getChanges()
             performFirstSync(changes.filter { it.isFirstSync() })
             performRegularSync(changes.filter { !it.isFirstSync() })
 
-            Timber.d("Sync-Feature: Sync finished")
+            Timber.d("Sync-Engine: Sync finished")
             syncStateRepository.updateSyncState(SUCCESS)
         }
     }
@@ -123,10 +123,10 @@ class RealSyncEngine @Inject constructor(
     private fun performRegularSync(regularSyncChanges: List<SyncChangesRequest>) {
         regularSyncChanges.forEach { changes ->
             if (changes.isEmpty()) {
-                Timber.i("Sync-Feature: no changes to sync for $changes, asking for remote changes")
+                Timber.i("Sync-Engine: no changes to sync for $changes, asking for remote changes")
                 getRemoteChanges(changes, TIMESTAMP)
             } else {
-                Timber.i("Sync-Feature: $changes changes to update $changes")
+                Timber.i("Sync-Engine: $changes changes to update $changes")
                 patchLocalChanges(changes, TIMESTAMP)
             }
         }
@@ -136,16 +136,16 @@ class RealSyncEngine @Inject constructor(
         val types = firstSyncChanges.map { it.type }
 
         firstSyncChanges.forEach { changes ->
-            Timber.i("Sync-Feature: first sync for ${changes.type}, asking for remote changes")
+            Timber.i("Sync-Engine: first sync for ${changes.type}, asking for remote changes")
             getRemoteChanges(changes, DEDUPLICATION)
         }
 
         // give a chance to send changes after dedup
         getChanges().filter { it.type in types }.forEach { changes ->
             if (changes.isEmpty()) {
-                Timber.d("Sync-Feature: no changes to sync for $changes")
+                Timber.d("Sync-Engine: no changes to sync for $changes")
             } else {
-                Timber.d("Sync-Feature: $changes changes to update $changes")
+                Timber.d("Sync-Engine: $changes changes to update $changes")
                 patchLocalChanges(changes, LOCAL_WINS)
             }
         }
@@ -154,7 +154,7 @@ class RealSyncEngine @Inject constructor(
     private fun syncInProgress(): Boolean {
         val currentSync = syncStateRepository.current()
         return if (currentSync != null) {
-            Timber.d("Sync-Feature: current sync $currentSync")
+            Timber.d("Sync-Engine: current sync $currentSync")
             if (currentSync.state == IN_PROGRESS) {
                 val syncTimestamp = OffsetDateTime.parse(currentSync.timestamp)
                 val now = OffsetDateTime.now()
@@ -199,7 +199,7 @@ class RealSyncEngine @Inject constructor(
 
     private fun getChanges(): List<SyncChangesRequest> {
         return providerPlugins.getPlugins().map {
-            Timber.d("Sync-Feature: asking for changes in ${it.javaClass}")
+            Timber.d("Sync-Engine: asking for changes in ${it.javaClass}")
             it.getChanges()
         }
     }

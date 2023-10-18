@@ -58,7 +58,7 @@ class AppSyncApiClient @Inject constructor(
         }
 
         val updates = JSONObject(changes.jsonString)
-        Timber.d("Sync-Feature: patch data generated $updates")
+        Timber.d("Sync-Engine: patch data generated $updates")
         return when (val result = syncApi.patch(token, updates)) {
             is Result.Error -> {
                 result
@@ -171,7 +171,7 @@ class AppSyncApiClient @Inject constructor(
         response: JSONObject,
     ): SyncChangesResponse {
         val jsonString = response.toString()
-        Timber.d("Sync-Feature: $type response mapped to $jsonString")
+        Timber.d("Sync-Engine: $type response mapped to $jsonString")
         return SyncChangesResponse(type, jsonString)
     }
 }

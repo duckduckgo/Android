@@ -41,8 +41,6 @@ class SavedSitesSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
 
     override fun getChanges(): SyncChangesRequest {
-        // startTimestamp is later than the last modified date
-        // so changes that happened before won't be provided
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
         val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
             allContent()
@@ -52,14 +50,6 @@ class SavedSitesSyncDataProvider @Inject constructor(
         Timber.d("Sync-Bookmarks: modifiedSince changes: $updates")
         return formatUpdates(updates)
     }
-
-    // PATCH - request changes
-    // startTimestamp - now
-    // changesSince(clientModifiedTimestamp)
-
-    // STORE changes -> after patch / after get
-    // serverTimeStamp = BE timestamp
-    // clientTimestamp = startTimestamp
 
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {

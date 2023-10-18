@@ -43,7 +43,7 @@ class SyncInternalEnvInterceptor @Inject constructor(
             val newRequest = chain.request().newBuilder()
 
             val changedUrl = SYNC_DEV_ENVIRONMENT_URL + encodedPath
-            Timber.d("Sync-Feature: environment changed to $changedUrl")
+            Timber.d("Sync-Engine: environment changed to $changedUrl")
             newRequest.url(changedUrl)
             return chain.proceed(newRequest.build())
         }

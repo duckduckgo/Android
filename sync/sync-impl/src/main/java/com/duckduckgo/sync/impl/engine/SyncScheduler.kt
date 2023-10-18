@@ -48,7 +48,7 @@ class RealSyncScheduler @Inject constructor(private val syncStateRepository: Syn
                     val now = OffsetDateTime.now()
 
                     val minutesAgo = Duration.between(syncTime, now).toMinutes()
-                    Timber.d("Sync-Feature: Last sync was $minutesAgo minutes ago")
+                    Timber.d("Sync-Engine: Last sync was $minutesAgo minutes ago")
                     if (minutesAgo > DEBOUNCE_PERIOD_IN_MINUTES) {
                         EXECUTE
                     } else {
