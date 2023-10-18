@@ -123,7 +123,7 @@ subprojects {
                         }
                         // internal modules can depend on impl
                         if (projectPath.endsWith('internal') && dependencyPath.endsWith('impl')) continue
-                        if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
+                        if ((!projectPath.endsWith(":app") && !projectPath.endsWith(":sync-impl")) && dependencyPath.endsWith("impl")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")
                         }

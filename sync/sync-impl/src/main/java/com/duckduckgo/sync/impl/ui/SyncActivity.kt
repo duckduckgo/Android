@@ -26,13 +26,15 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.plugins.*
+import com.duckduckgo.di.*
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
+import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.PermissionRequest
 import com.duckduckgo.sync.impl.R
@@ -62,6 +64,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.*
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
@@ -89,6 +92,9 @@ class SyncActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var shareAction: ShareAction
+
+    @Inject
+    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
 
     private val loginFlow = registerForActivityResult(LoginContract()) { resultOk ->
         if (resultOk) {
@@ -124,6 +130,7 @@ class SyncActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         observeUiEvents()
         registerForPermission()
+        configureSettings()
 
         setupClickListeners()
         setupRecyclerView()
@@ -132,6 +139,19 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {
             binding.root.makeSnackbarWithNoBottomInset(R.string.sync_permission_required_store_recovery_code, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun configureSettings() {
+        if (syncSettingsPlugin.isEmpty()) {
+            Timber.i("CRIS: plugins empty")
+        } else {
+            syncSettingsPlugin.keys.toSortedSet().forEach {
+                syncSettingsPlugin[it]?.let { plugin ->
+                    binding.viewSyncEnabled.syncSettingsOptions.addView(plugin.getView(this))
+                }
+            }
+            Timber.i("CRIS: plugins not empty")
         }
     }
 
