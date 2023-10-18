@@ -47,10 +47,10 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Experiment: Ask for Default Browser More Than Once
-            Variant(key = "zh", weight = 0.0, features = emptyList(), filterBy = { isDefaultBrowserExperimentCountry() }),
+            Variant(key = "zh", weight = 1.0, features = emptyList(), filterBy = { isDefaultBrowserExperimentCountry() }),
             Variant(
                 key = "zj",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(AskForDefaultBrowserMoreThanOnce),
                 filterBy = { isDefaultBrowserExperimentCountry() },
             ),
