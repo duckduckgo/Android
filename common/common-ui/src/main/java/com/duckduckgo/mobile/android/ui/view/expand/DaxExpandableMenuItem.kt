@@ -250,7 +250,7 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
         fun setPrimaryText(value: String) = apply {
             this.expandableMenuItem.setPrimaryText(value)
         }
-        fun setPrimaryTextColor(value: ColorStateList?) =  apply {
+        fun setPrimaryTextColor(value: ColorStateList?) = apply {
             this.expandableMenuItem.setPrimaryTextColor(value)
         }
 
@@ -295,10 +295,9 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
 @JvmSynthetic
 @DaxExpandableMenuItemDsl
 inline fun Context.daxExpandableMenuItem(
-    block: DaxExpandableMenuItem.Builder.() -> Unit
+    block: DaxExpandableMenuItem.Builder.() -> Unit,
 ): DaxExpandableMenuItem =
     DaxExpandableMenuItem.Builder(this).apply(block).build()
-
 
 fun ViewGroup.measureWrapContentHeight(): Int {
     this.measure(
