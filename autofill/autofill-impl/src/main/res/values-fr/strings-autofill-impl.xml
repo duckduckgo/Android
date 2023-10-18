@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Enregistrer l\'identifiant</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
-    <string name="saveLoginDialogNotNow">Pas maintenant</string>
+    <string name="saveLoginDialogNotNow">Ne pas enregistrer</string>
     <string name="saveLoginDialogSubtitle">Les identifiants sont stockés en toute sécurité sur votre appareil et peuvent être gérés à partir du menu Identifiants dans Paramètres.</string>
     <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre identifiant ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">À partir de %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Modifier le mot de passe</string>
-    <string name="updateLoginDialogButtonNotNow">Pas maintenant</string>
+    <string name="updateLoginDialogButtonNotNow">Ne pas enregistrer</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Modifier le nom d\'utilisateur ?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Modifier le nom d\'utilisateur</string>
