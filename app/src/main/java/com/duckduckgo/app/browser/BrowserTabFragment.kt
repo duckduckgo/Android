@@ -3308,7 +3308,7 @@ class BrowserTabFragment :
             newMessage: Boolean,
         ) {
             // Experiment: Ask for Default Browser More Than Once
-            val daysSinceInstalled = userBrowserProperties.daysSinceInstalled() == 2L
+            val daysSinceInstalled = userBrowserProperties.daysSinceInstalled() == 0L
             val shouldRender = (newMessage || newBrowserTab.messageCta.isGone) && daysSinceInstalled
 
             if (shouldRender) {
