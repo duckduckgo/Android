@@ -24,7 +24,7 @@ import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [
         NetPManuallyExcludedApp::class,
         NetPConfigToggle::class,
