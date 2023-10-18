@@ -192,7 +192,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.api.systemautofill.SystemAutofillUsageMonitor
-import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
@@ -396,9 +395,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
-
-    @Inject
-    lateinit var userBrowserProperties: UserBrowserProperties
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -3307,9 +3303,7 @@ class BrowserTabFragment :
             message: RemoteMessage,
             newMessage: Boolean,
         ) {
-            // Experiment: Ask for Default Browser More Than Once
-            val daysSinceInstalled = userBrowserProperties.daysSinceInstalled() == 0L
-            val shouldRender = (newMessage || newBrowserTab.messageCta.isGone) && daysSinceInstalled
+            val shouldRender = newMessage || newBrowserTab.messageCta.isGone
 
             if (shouldRender) {
                 Timber.i("RMF: render $message")
