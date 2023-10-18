@@ -138,13 +138,15 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        if (request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
-            if (drm.isDrmAllowedForUrl(request.origin.toString())) {
-                request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
-            } else {
-                request.deny()
-            }
-        }
+        // TODO: potentially keep this
+        // if (request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+        //     if (drm.isDrmAllowedForUrl(request.origin.toString())) {
+        //         request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+        //     } else {
+        //         request.deny()
+        //     }
+        // }
+        Timber.d("onPermissionRequest")
 
         appCoroutineScope.launch(coroutineDispatcher.io()) {
             val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissionsAllowedToAsk(request.origin.toString(), request.resources)

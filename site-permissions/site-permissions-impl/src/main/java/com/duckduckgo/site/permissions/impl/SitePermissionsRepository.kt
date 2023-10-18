@@ -37,6 +37,7 @@ import kotlinx.coroutines.withContext
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
     var askMicEnabled: Boolean
+    var askDrmEnabled: Boolean
     fun isDomainAllowedToAsk(url: String, permission: String): Boolean
     fun isDomainGranted(url: String, tabId: String, permission: String): Boolean
     fun sitePermissionGranted(url: String, tabId: String, permission: String)
@@ -70,6 +71,12 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             sitePermissionsPreferences.askMicEnabled = value
         }
 
+    override var askDrmEnabled: Boolean
+        get() = sitePermissionsPreferences.askDrmEnabled
+        set(value) {
+            sitePermissionsPreferences.askDrmEnabled = value
+        }
+
     override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
@@ -85,6 +92,12 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                 val isAskMicDisabled =
                     askMicEnabled || sitePermissionsForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
                 isAskMicDisabled && !isAskMicSettingDenied
+            }
+            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
+                val isAskDrmSettingDenied = sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
+                val isAskDrmDisabled =
+                    askDrmEnabled || sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                isAskDrmDisabled && !isAskDrmSettingDenied
             }
             else -> false
         }
@@ -104,6 +117,10 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
                 val isMicAlwaysAllowed = sitePermissionForDomain?.askMicSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
                 permissionGrantedWithin24h || isMicAlwaysAllowed
+            }
+            PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
+                val isDrmAlwaysAllowed = sitePermissionForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
+                permissionGrantedWithin24h || isDrmAlwaysAllowed
             }
             else -> false
         }

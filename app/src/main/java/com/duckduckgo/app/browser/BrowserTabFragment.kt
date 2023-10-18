@@ -224,6 +224,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -1271,6 +1272,7 @@ class BrowserTabFragment :
             is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
+            is Command.ShowSiteDrmPermissionsDialog -> showSiteDrmPermissionsDialog(it.request)
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation -> showAuthenticationSavedOrUpdatedSnackbar(
                 loginCredentials = it.credentials,
                 messageResourceId = it.messageResourceId,
@@ -3647,6 +3649,55 @@ class BrowserTabFragment :
         request: PermissionRequest,
     ) {
         request.grant(sitePermissionsToGrant)
+    }
+
+    private fun showSiteDrmPermissionsDialog(
+        request: PermissionRequest,
+    ) {
+        if (!isActiveTab) {
+            Timber.v("Will not launch a dialog for an inactive tab")
+            return
+        }
+
+        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater)
+
+        val domain = request.origin.toString()
+        val title = domain.websiteFromGeoLocationsApiOrigin()
+        binding.sitePermissionDialogTitle.text = getString(R.string.drmSiteDialogTitle, title)
+        binding.sitePermissionDialogSubtitle.text = getString(R.string.drmSiteDialogSubtitle)
+        lifecycleScope.launch {
+            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, domain, binding.sitePermissionDialogFavicon)
+        }
+
+        val dialog = CustomAlertDialogBuilder(requireActivity())
+            .setView(binding)
+            .build()
+
+        binding.siteAllowAlwaysLocationPermission.setOnClickListener {
+            request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+            viewModel.onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
+            dialog.dismiss()
+        }
+
+        binding.siteAllowOnceLocationPermission.setOnClickListener {
+            request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+            viewModel.onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ASK_EVERY_TIME)
+            dialog.dismiss()
+        }
+
+        binding.siteDenyOnceLocationPermission.setOnClickListener {
+            request.deny()
+            viewModel.onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ASK_EVERY_TIME)
+            dialog.dismiss()
+        }
+
+        binding.siteDenyAlwaysLocationPermission.setOnClickListener {
+            request.deny()
+            viewModel.onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {

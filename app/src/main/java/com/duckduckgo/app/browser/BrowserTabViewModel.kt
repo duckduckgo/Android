@@ -131,6 +131,9 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.impl.SitePermissionsRepository
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
@@ -191,6 +194,7 @@ class BrowserTabViewModel @Inject constructor(
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val sitePermissionsManager: SitePermissionsManager,
+    private val sitePermissionsRepository: SitePermissionsRepository,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
@@ -460,6 +464,8 @@ class BrowserTabViewModel @Inject constructor(
             val sitePermissionsToGrant: Array<String>,
             val request: PermissionRequest,
         ) : Command()
+
+        class ShowSiteDrmPermissionsDialog(val request: PermissionRequest) : Command()
 
         class ShowUserCredentialSavedOrUpdatedConfirmation(
             val credentials: LoginCredentials,
@@ -1486,12 +1492,18 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val url = request.origin.toString()
             val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
-            val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
+            var sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
             if (sitePermissionsGranted.isNotEmpty()) {
                 command.postValue(GrantSitePermissionRequest(sitePermissionsGranted, request))
             }
+
+            if (sitePermissionsToAsk.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
+                sitePermissionsToAsk = sitePermissionsToAsk.filter { it != PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID }
+                command.postValue(ShowSiteDrmPermissionsDialog(request))
+            }
+
             if (sitePermissionsToAsk.isNotEmpty()) {
-                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
+                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk.toTypedArray(), request))
             }
         }
     }
@@ -1536,6 +1548,20 @@ class BrowserTabViewModel @Inject constructor(
                     command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
                 }
             }
+        }
+    }
+
+    fun onSiteDrmPermissionSave(
+        domain: String,
+        drmPermission: SitePermissionAskSettingType,
+    ) {
+        val sitePermissionsEntity = SitePermissionsEntity(
+            domain = domain,
+            askDrmSetting = drmPermission.name,
+        )
+
+        viewModelScope.launch {
+            sitePermissionsRepository.savePermission(sitePermissionsEntity)
         }
     }
 
