@@ -21,8 +21,8 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.*
 import javax.inject.Inject
 import logcat.logcat
 
@@ -42,7 +42,7 @@ interface WgServerApi {
 
 @ContributesBinding(VpnScope::class)
 class RealWgServerApi @Inject constructor(
-    private val wgVpnControllerService: WgVpnControllerService,
+    @ProtectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
     private val serverDebugProvider: WgServerDebugProvider,
     private val netNetpEgressServersProvider: NetpEgressServersProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,

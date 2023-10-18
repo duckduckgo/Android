@@ -25,7 +25,7 @@ import androidx.work.multiprocess.RemoteWorkerService
 /**
  * Use this extension function to make sure your [PeriodicWorkRequest] runs in the VPN process
  */
-internal fun PeriodicWorkRequest.Builder.boundToVpnProcess(applicationId: String): PeriodicWorkRequest.Builder {
+fun PeriodicWorkRequest.Builder.boundToVpnProcess(applicationId: String): PeriodicWorkRequest.Builder {
     val componentName = ComponentName(applicationId, RemoteWorkerService::class.java.name)
     val data = Data.Builder()
         .putString(RemoteListenableWorker.ARGUMENT_PACKAGE_NAME, componentName.packageName)

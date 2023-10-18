@@ -70,7 +70,11 @@ dependencies {
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
+    implementation "androidx.work:work-multiprocess:_"
     testImplementation AndroidX.work.testing
+
+    implementation "com.squareup.okhttp3:okhttp-tls:_"
+    implementation 'org.conscrypt:conscrypt-android:2.5.0'
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:_"

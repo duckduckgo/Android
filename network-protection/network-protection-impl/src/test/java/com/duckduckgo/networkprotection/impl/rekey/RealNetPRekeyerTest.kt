@@ -16,24 +16,33 @@
 
 package com.duckduckgo.networkprotection.impl.rekey
 
-import androidx.work.WorkManager
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
+import com.duckduckgo.networkprotection.impl.configuration.EligibleServerInfo
+import com.duckduckgo.networkprotection.impl.configuration.Server
+import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
+import java.lang.RuntimeException
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
 class RealNetPRekeyerTest {
     @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
@@ -45,37 +54,150 @@ class RealNetPRekeyerTest {
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
 
     @Mock
-    private lateinit var workManager: WorkManager
+    private lateinit var wgVpnControllerService: WgVpnControllerService
+
+    @Mock
+    private lateinit var appBuildConfig: AppBuildConfig
+
+    private var isDeviceLocked = false
 
     private lateinit var testee: RealNetPRekeyer
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealNetPRekeyer(workManager, networkProtectionRepository, vpnFeaturesRegistry, networkProtectionPixels)
+
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+        runBlocking {
+            whenever(wgVpnControllerService.registerKey(any())).thenReturn(
+                listOf(
+                    EligibleServerInfo(
+                        publicKey = "key",
+                        allowedIPs = emptyList(),
+                        server = Server("", "", emptyMap(), "", emptyList(), emptyList(), 1L),
+                    ),
+                ),
+            )
+        }
+
+        testee = RealNetPRekeyer(
+            networkProtectionRepository,
+            vpnFeaturesRegistry,
+            networkProtectionPixels,
+            "name",
+            wgVpnControllerService,
+            appBuildConfig,
+            { isDeviceLocked },
+        )
     }
 
     @Test
-    fun whenNetPIsNotRegisteredThenDoRekeyShouldNotRefreshFeature() = runTest {
-        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
-
-        testee.doRekey()
-
-        verify(networkProtectionRepository).privateKey = null
-        verify(vpnFeaturesRegistry, never()).refreshFeature(any())
-        verify(workManager).cancelUniqueWork("DAILY_NETP_REKEY_TAG")
-        verify(networkProtectionPixels).reportRekeyCompleted()
-    }
-
-    @Test
-    fun whenNetPIsRegisteredThenDoRekeyShouldRefreshFeature() = runTest {
+    fun `do not rekey if time since last rekey is less than 24h`() = runTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
 
         testee.doRekey()
 
-        verify(networkProtectionRepository).privateKey = null
+        assertNoRekey()
+    }
+
+    @Test
+    fun `do not rekey if registering new key fails`() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(wgVpnControllerService.registerKey(any())).thenThrow(RuntimeException(""))
+
+        testee.doRekey()
+
+        assertNoRekey()
+    }
+
+    @Test
+    fun `do not rekey device is not locked`() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        isDeviceLocked = false
+
+        testee.doRekey()
+
+        assertNoRekey()
+    }
+
+    @Test
+    fun `do not rekey if not internal build and forced rekey`() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        isDeviceLocked = true
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
+        testee.forceRekey()
+
+        assertNoRekey()
+    }
+
+    @Test
+    fun `do rekey if internal build and forced rekey`() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        isDeviceLocked = true
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        testee.forceRekey()
+
+        assertRekey()
+    }
+
+    @Test
+    fun `do not rekey if internal build and forced rekey but vpn disabled`() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
+        whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        isDeviceLocked = true
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+
+        testee.forceRekey()
+
+        assertNoRekey()
+    }
+
+    @Test
+    fun `do rekey if production build`() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
+        whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        isDeviceLocked = true
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
+        testee.doRekey()
+
+        assertRekey()
+    }
+
+    @Test
+    fun `do not rekey if production build but vpn disabled`() = runTest {
+        whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(false)
+        whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        isDeviceLocked = true
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
+        testee.doRekey()
+
+        assertNoRekey()
+    }
+
+    private suspend fun assertNoRekey() {
+        verify(networkProtectionRepository, never()).privateKey = any()
+        verify(vpnFeaturesRegistry, never()).refreshFeature(NETP_VPN)
+        verify(networkProtectionPixels, never()).reportRekeyCompleted()
+    }
+
+    private suspend fun assertRekey() {
+        verify(networkProtectionRepository).privateKey = any()
         verify(vpnFeaturesRegistry).refreshFeature(NETP_VPN)
         verify(networkProtectionPixels).reportRekeyCompleted()
-        verifyNoInteractions(workManager)
     }
 }

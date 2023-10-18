@@ -24,6 +24,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitli
 import com.duckduckgo.networkprotection.impl.configuration.NetPRedeemCodeError
 import com.duckduckgo.networkprotection.impl.configuration.NetPRedeemCodeRequest
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
+import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -52,7 +53,7 @@ interface NetPWaitlistManager {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealNetPWaitlistManager @Inject constructor(
-    private val service: WgVpnControllerService,
+    @ProtectedVpnControllerService private val service: WgVpnControllerService,
     private val repository: NetPWaitlistRepository,
     private val networkProtectionWaitlist: NetworkProtectionWaitlist,
     private val netPWaitlistService: NetPWaitlistService,
