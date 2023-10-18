@@ -16,6 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.rekey
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkManager
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
@@ -25,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -34,6 +37,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(AndroidJUnit4::class)
 class RealNetPRekeyerTest {
     @Mock
     private lateinit var networkProtectionRepository: NetworkProtectionRepository
@@ -52,7 +56,14 @@ class RealNetPRekeyerTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealNetPRekeyer(workManager, networkProtectionRepository, vpnFeaturesRegistry, networkProtectionPixels)
+        testee = RealNetPRekeyer(
+            workManager,
+            networkProtectionRepository,
+            vpnFeaturesRegistry,
+            networkProtectionPixels,
+            "name",
+            InstrumentationRegistry.getInstrumentation().targetContext,
+        )
     }
 
     @Test

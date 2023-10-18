@@ -21,8 +21,11 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
+import com.duckduckgo.mobile.android.vpn.boundToVpnProcess
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
@@ -30,29 +33,31 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit.HOURS
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import logcat.logcat
 
 @ContributesMultibinding(VpnScope::class)
 class NetPRekeyScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val dispatcherProvider: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (runBlocking { vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN) }) {
-            logcat { "NetPRekeyScheduler onVpnStarted called with NetP enabled" }
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .setRequiresDeviceIdle(true)
-                .build()
-            val workerRequest = PeriodicWorkRequestBuilder<NetPRekeyWorker>(24, HOURS)
-                .addTag(DAILY_NETP_REKEY_TAG)
-                .setInitialDelay(24, HOURS)
-                .setConstraints(constraints)
-                .build()
-            // Once work is already scheduled, we don't update the interval
-            // since onVpnStarted will be called many times when restarting/reconnecting the VPNService.
-            workManager.enqueueUniquePeriodicWork(DAILY_NETP_REKEY_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+                logcat { "NetPRekeyScheduler onVpnStarted called with NetP enabled" }
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+                val workerRequest = PeriodicWorkRequestBuilder<NetPRekeyWorker>(1, HOURS)
+                    .boundToVpnProcess(appBuildConfig.applicationId) // this worker is executed in the :vpn process
+                    .setConstraints(constraints)
+                    .build()
+                // Once work is already scheduled, we don't update the interval
+                // since onVpnStarted will be called many times when restarting/reconnecting the VPNService.
+                workManager.enqueueUniquePeriodicWork(DAILY_NETP_REKEY_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+            }
         }
     }
 

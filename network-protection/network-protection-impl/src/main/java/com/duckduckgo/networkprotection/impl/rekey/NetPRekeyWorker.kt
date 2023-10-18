@@ -17,8 +17,8 @@
 package com.duckduckgo.networkprotection.impl.rekey
 
 import android.content.Context
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -29,14 +29,14 @@ import kotlinx.coroutines.withContext
 class NetPRekeyWorker constructor(
     context: Context,
     workerParameters: WorkerParameters,
-) : CoroutineWorker(context, workerParameters) {
+) : RemoteCoroutineWorker(context, workerParameters) {
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
     @Inject
     lateinit var netPRekeyer: NetPRekeyer
 
-    override suspend fun doWork(): Result {
+    override suspend fun doRemoteWork(): Result {
         return withContext(dispatchers.io()) {
             netPRekeyer.doRekey()
             return@withContext Result.success()

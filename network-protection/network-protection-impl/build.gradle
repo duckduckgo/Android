@@ -70,6 +70,7 @@ dependencies {
 
     // WorkManager
     implementation AndroidX.work.runtimeKtx
+    implementation "androidx.work:work-multiprocess:_"
     testImplementation AndroidX.work.testing
 
     // Shimmer
