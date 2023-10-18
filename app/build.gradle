@@ -298,7 +298,6 @@ dependencies {
         implementation project(':subscriptions-api')
         implementation project(':subscriptions-impl')
         implementation project(':subscriptions-store')
-        internalImplementation project(':subscriptions-internal')
         internalImplementation project(':network-protection-subscription-internal')
     }
 
@@ -307,6 +306,9 @@ dependencies {
 
     implementation project(':js-messaging-api')
     implementation project(':js-messaging-impl')
+
+    implementation project(':settings-api')
+    implementation project(':settings-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

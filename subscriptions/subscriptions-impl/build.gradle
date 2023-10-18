@@ -37,6 +37,7 @@ dependencies {
     implementation project(path: ':user-agent-api')
     implementation project(path: ':subscriptions-api')
     implementation project(path: ':subscriptions-store')
+    implementation project(path: ':settings-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
