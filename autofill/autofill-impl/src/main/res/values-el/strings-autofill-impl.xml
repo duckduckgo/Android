@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
-    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια στη συσκευή σας και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
+    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
     <string name="saveLoginDialogTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Τελευταία ενημέρωση σύνδεσης %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Αποθήκευση και αυτόματη συμπλήρωση στοιχείων σύνδεσης</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Τα στοιχεία σύνδεσης αποθηκεύονται με ασφάλεια στη συσκευή σας</string>
     <string name="credentialManagementViewMenuEdit">Επεξεργασία</string>
     <string name="credentialManagementViewMenuDelete">Διαγραφή</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Το όνομα χρήστη αντιγράφηκε</string>
     <string name="autofillManagementPasswordCopied">Ο κωδικός πρόσβασης αντιγράφηκε</string>
 
-    <string name="autofill_password_generation_offer_title">Χρήση κωδικού πρόσβασης που δημιουργήθηκε από το DuckDuckGo;</string>
-    <string name="autofill_password_generation_offer_message">Ο κωδικός πρόσβασης θα αποθηκευτεί στις Συνδέσεις.</string>
-    <string name="autofill_password_generation_offer_accept">Χρήση του κωδικού πρόσβασης που δημιουργήθηκε</string>
+    <string name="autofill_password_generation_offer_title">Χρησιμοποιείτε ισχυρό κωδικό πρόσβασης από το DuckDuckGo;</string>
+    <string name="autofill_password_generation_offer_message">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
+    <string name="autofill_password_generation_offer_accept">Χρησιμοποιήστε ισχυρό κωδικό πρόσβασης</string>
     <string name="autofill_password_generation_offer_decline">Δημιουργία δικού μου</string>
 
     <string name="deviceNotSupportedTitle">Η συσκευή δεν υποστηρίζεται</string>
