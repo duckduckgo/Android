@@ -23,6 +23,7 @@ import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -61,6 +62,8 @@ class SubsSettingBuyView @JvmOverloads constructor(
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SubsSettingBuyViewModel::class.java]
     }
 
+    private var job: ConflatedJob = ConflatedJob()
+
     override fun onAttachedToWindow() {
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
@@ -72,7 +75,7 @@ class SubsSettingBuyView @JvmOverloads constructor(
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-        viewModel.commands()
+        job += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
     }
@@ -80,6 +83,7 @@ class SubsSettingBuyView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         coroutineScope?.cancel()
+        job.cancel()
         coroutineScope = null
     }
 

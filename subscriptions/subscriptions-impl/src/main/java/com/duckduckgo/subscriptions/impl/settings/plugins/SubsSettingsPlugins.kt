@@ -38,7 +38,7 @@ class SubsSettingsTitle @Inject constructor() : SubsSettingsPlugin {
 }
 
 @ContributesMultibinding(scope = ActivityScope::class)
-@PositionKey(101)
+@PositionKey(200)
 class SubsSettingBuy @Inject constructor() : SubsSettingsPlugin {
     override fun getView(context: Context): View {
         return SubsSettingBuyView(context)
