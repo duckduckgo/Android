@@ -91,6 +91,7 @@
     <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     <LinearLayout
         android:id="@+id/syncSettingsOptions"
         android:layout_width="match_parent"

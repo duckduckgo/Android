@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl
+package com.duckduckgo.savedsites.store
 
-import android.content.*
-import androidx.core.content.*
-import com.duckduckgo.app.di.*
-import com.duckduckgo.app.global.*
-import com.duckduckgo.di.scopes.*
-import com.squareup.anvil.annotations.*
-import dagger.*
-import javax.inject.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.*
-import kotlinx.coroutines.flow.*
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.savedsites.store.FavoritesViewMode.NATIVE
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
-interface SavedSitesSettings {
+interface SavedSitesSettingsStore {
     var favoritesDisplayMode: FavoritesViewMode
     fun viewModeFlow(): Flow<FavoritesViewMode>
 }
 
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class SavedSitesSettingsSharedPrefStore @Inject constructor(
+class SavedSitesSettingsSharedPrefStore(
     private val context: Context,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-) : SavedSitesSettings {
+) : SavedSitesSettingsStore {
 
     private val viewModeFlow = MutableSharedFlow<FavoritesViewMode>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
@@ -57,15 +54,22 @@ class SavedSitesSettingsSharedPrefStore @Inject constructor(
         get() {
             val storedValue = preferences.getString(
                 KEY_FAVORITES_DISPLAY_MODE,
-                FavoritesViewMode.NATIVE.value,
+                NATIVE.value,
             )
-            return FavoritesViewMode.values().firstOrNull { it.value == storedValue } ?: FavoritesViewMode.NATIVE
+            return FavoritesViewMode.values().firstOrNull { it.value == storedValue } ?: NATIVE
         }
         set(displayMode) {
             preferences.edit(commit = true) {
                 putString(KEY_FAVORITES_DISPLAY_MODE, displayMode.value)
             }
+            emitNewValue()
         }
+
+    private fun emitNewValue() {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            viewModeFlow.emit(favoritesDisplayMode)
+        }
+    }
 
     companion object {
         const val FILENAME = "com.duckduckgo.savedsites.settings"
@@ -74,5 +78,6 @@ class SavedSitesSettingsSharedPrefStore @Inject constructor(
 }
 
 enum class FavoritesViewMode(val value: String) {
-    NATIVE("display_native"), UNIFIED("display_all"), DESKTOP("display_desktop"),
+    NATIVE("display_native"),
+    UNIFIED("display_all"),
 }

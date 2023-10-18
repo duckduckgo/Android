@@ -29,10 +29,8 @@ annotation class PositionKey(val pos: Int)
 
 @ContributesMultibinding(scope = ActivityScope::class)
 @PositionKey(100)
-class DisplayModeSyncSettingsPlugin @Inject constructor(): SyncSettingsPlugin {
+class DisplayModeSyncSettingsPlugin @Inject constructor() : SyncSettingsPlugin {
     override fun getView(context: Context): View {
         return DisplayModeSyncSetting(context)
     }
 }
-
-

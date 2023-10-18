@@ -17,6 +17,7 @@
 package com.duckduckgo.savedsites.impl.di
 
 import android.content.Context
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -33,10 +34,13 @@ import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
 import com.duckduckgo.savedsites.impl.service.SavedSitesParser
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
+import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore
+import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
@@ -89,5 +93,15 @@ class SavedSitesModule {
         coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
     ): SavedSitesRepository {
         return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, coroutineDispatcher)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesSavedSitesSettingsStore(
+        context: Context,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+    ): SavedSitesSettingsStore {
+        return SavedSitesSettingsSharedPrefStore(context, appCoroutineScope, dispatcherProvider)
     }
 }
