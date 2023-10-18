@@ -33,7 +33,7 @@ abstract class EmailProtectionInContextDatabase : RoomDatabase() {
     abstract fun emailInContextDao(): EmailProtectionInContextDao
 }
 
-@Entity(tableName = "emailInContext_exceptions")
+@Entity(tableName = "email_incontext_exceptions")
 data class EmailInContextExceptionEntity(
     @PrimaryKey val domain: String,
     val reason: String,

@@ -22,7 +22,7 @@ import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.Cre
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.email.EmailProtectionChooseEmailFragment
-import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignUpFragment
+import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInContextSignUpPromptFragment
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
@@ -99,6 +99,6 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
     }
 
     override fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment {
-        return EmailProtectionInContextSignUpFragment.instance(tabId)
+        return EmailProtectionInContextSignUpPromptFragment.instance(tabId)
     }
 }

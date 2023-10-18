@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.email.incontext
+package com.duckduckgo.autofill.impl.email.incontext.prompt
 
 import android.content.Context
 import android.content.DialogInterface
@@ -23,30 +23,42 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionInContextSignUpBinding
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_CONFIRMED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISPLAYED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_NEVER_AGAIN
+import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInContextSignUpPromptViewModel.Command.FinishWithResult
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class EmailProtectionInContextSignUpFragment : BottomSheetDialogFragment(), EmailProtectionInContextSignUpDialog {
+class EmailProtectionInContextSignUpPromptFragment : BottomSheetDialogFragment(), EmailProtectionInContextSignUpDialog {
 
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[EmailProtectionInContextSignUpPromptViewModel::class.java]
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -67,11 +79,20 @@ class EmailProtectionInContextSignUpFragment : BottomSheetDialogFragment(), Emai
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISPLAYED)
+        pixel.fire(AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISPLAYED)
 
         val binding = DialogEmailProtectionInContextSignUpBinding.inflate(inflater, container, false)
         configureViews(binding)
+        observeViewModel()
         return binding.root
+    }
+
+    private fun observeViewModel() {
+        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+            when (it) {
+                is FinishWithResult -> returnResult(it.result)
+            }
+        }.launchIn(lifecycleScope)
     }
 
     private fun configureViews(binding: DialogEmailProtectionInContextSignUpBinding) {
@@ -82,18 +103,15 @@ class EmailProtectionInContextSignUpFragment : BottomSheetDialogFragment(), Emai
     private fun configureDialogButtons(binding: DialogEmailProtectionInContextSignUpBinding) {
         context?.let {
             binding.protectMyEmailButton.setOnClickListener {
-                pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_CONFIRMED)
-                returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.SignUp)
+                viewModel.onProtectEmailButtonPressed()
             }
 
             binding.closeButton.setOnClickListener {
-                pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED)
-                returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.Cancel)
+                viewModel.onCloseButtonPressed()
             }
 
             binding.doNotShowAgainButton.setOnClickListener {
-                pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_NEVER_AGAIN)
-                returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.DoNotShowAgain)
+                viewModel.onDoNotShowAgainButtonPressed()
             }
         }
     }
@@ -110,7 +128,7 @@ class EmailProtectionInContextSignUpFragment : BottomSheetDialogFragment(), Emai
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED)
+        pixel.fire(AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_PROMPT_DISMISSED)
         returnResult(EmailProtectionInContextSignUpDialog.EmailProtectionInContextSignUpResult.Cancel)
     }
 
@@ -119,8 +137,8 @@ class EmailProtectionInContextSignUpFragment : BottomSheetDialogFragment(), Emai
     companion object {
         fun instance(
             tabId: String,
-        ): EmailProtectionInContextSignUpFragment {
-            val fragment = EmailProtectionInContextSignUpFragment()
+        ): EmailProtectionInContextSignUpPromptFragment {
+            val fragment = EmailProtectionInContextSignUpPromptFragment()
             fragment.arguments = Bundle().also {
                 it.putString(KEY_TAB_ID, tabId)
             }

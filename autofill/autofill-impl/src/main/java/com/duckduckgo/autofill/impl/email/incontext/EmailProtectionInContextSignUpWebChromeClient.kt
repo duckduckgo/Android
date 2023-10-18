@@ -18,29 +18,27 @@ package com.duckduckgo.autofill.impl.email.incontext
 
 import android.webkit.WebChromeClient
 import android.webkit.WebView
-import timber.log.Timber
 
 class EmailProtectionInContextSignUpWebChromeClient(
     private val callback: ProgressListener,
 ) : WebChromeClient() {
 
     interface ProgressListener {
-        fun onPageStarted(url: String)
         fun onPageFinished(url: String)
     }
 
-    override fun onProgressChanged(webView: WebView?, newProgress: Int) {
+    override fun onProgressChanged(
+        webView: WebView?,
+        newProgress: Int,
+    ) {
         val url = webView?.url ?: return
-        Timber.v("EmailProtectionInContextSignup: onProgressChanged: $url, $newProgress")
 
         when (newProgress) {
-            PROGRESS_PAGE_START -> callback.onPageStarted(url)
             PROGRESS_PAGE_FINISH -> callback.onPageFinished(url)
         }
     }
 
     companion object {
-        private const val PROGRESS_PAGE_START = 10
         private const val PROGRESS_PAGE_FINISH = 100
     }
 }

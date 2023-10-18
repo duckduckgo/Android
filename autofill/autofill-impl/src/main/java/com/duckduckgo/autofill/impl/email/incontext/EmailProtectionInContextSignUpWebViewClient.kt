@@ -22,8 +22,12 @@ import android.webkit.WebViewClient
 import javax.inject.Inject
 
 class EmailProtectionInContextSignUpWebViewClient @Inject constructor(
-    private val callback: EmailProtectionInContextSignUpWebChromeClient.ProgressListener,
+    private val callback: NewPageCallback,
 ) : WebViewClient() {
+
+    interface NewPageCallback {
+        fun onPageStarted(url: String)
+    }
 
     override fun onPageStarted(
         view: WebView?,

@@ -11,6 +11,8 @@ import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSign
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.CancellingInContextSignUp
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.ShowingWebContent
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,9 +29,7 @@ class EmailProtectionInContextSignupViewModelTest {
 
     private val emailManager: EmailManager = mock()
     private val pixel: Pixel = mock()
-    private val testee = EmailProtectionInContextSignupViewModel(
-        pixel = pixel,
-    )
+    private val testee = EmailProtectionInContextSignupViewModel(pixel = pixel)
 
     @Test
     fun whenInitialStateThenCanExitWithoutConfirmation() = runTest {
@@ -133,6 +133,27 @@ class EmailProtectionInContextSignupViewModelTest {
     fun whenUserConfirmsEarlyExitThenPixelFired() {
         testee.onUserConfirmedCancellationOfInContextSignUp()
         verify(pixel).fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM)
+    }
+
+    @Test
+    fun whenUserCancelsWithoutConfirmationThenPixelFired() {
+        testee.userCancelledSignupWithoutConfirmation()
+        verify(pixel).fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED)
+    }
+
+    @Test
+    fun whenUserCancelsWithoutConfirmationThenCancellationViewStateSent() = runTest {
+        testee.userCancelledSignupWithoutConfirmation()
+        testee.viewState.test {
+            assertTrue(awaitItem() is CancellingInContextSignUp)
+            ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun whenLoadedStartingUrlThenPixelFired() {
+        testee.loadedStartingUrl()
+        verify(pixel).fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED)
     }
 
     private fun ShowingWebContent.verifyCanExitWithoutConfirmation() {

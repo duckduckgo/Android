@@ -26,10 +26,7 @@ import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSign
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.DEFAULT_URL_ACTIONS
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.EMAIL_VERIFICATION_LINK_URL
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.IN_CONTEXT_SUCCESS
-import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.LANDING_PAGE
-import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.PRIVACY_TERMS_AND_CONDITIONS
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.REVIEW_INPUT
-import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.START
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ExitButtonAction.ExitTreatAsSuccess
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ExitButtonAction.ExitWithConfirmation
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ExitButtonAction.ExitWithoutConfirmation
@@ -37,6 +34,8 @@ import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSign
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.ExitingAsSuccess
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState.ShowingWebContent
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM
 import com.duckduckgo.di.scopes.ActivityScope
@@ -60,10 +59,6 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
         _viewState.value = ShowingWebContent(urlActions = urlActions)
     }
 
-    fun onPageStarted(url: String) {
-        Timber.v("EmailProtectionInContextSignup: onPageStarted: %s, urlActions=%s", url, url.getUrlActions())
-    }
-
     fun onBackButtonPressed(
         url: String?,
         canGoBack: Boolean,
@@ -72,7 +67,7 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
 
         // if WebView can't go back, then we're at the first stage or something's gone wrong. Either way, time to cancel out of the screen.
         if (!canGoBack) {
-            _viewState.value = CancellingInContextSignUp
+            terminateSignUpFlowAsCancellation()
             return
         }
 
@@ -97,18 +92,21 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
     private fun String?.getUrlActions(): UrlActions {
         if (this == null) return DEFAULT_URL_ACTIONS
 
-        return urlActions[this.toUri().absoluteString] ?: DEFAULT_URL_ACTIONS.also {
-            Timber.w("Warning: URL %s not found in map. Using default URL actions.", this)
-        }
+        return urlActions[this.toUri().absoluteString] ?: DEFAULT_URL_ACTIONS
     }
 
     fun onUserConfirmedCancellationOfInContextSignUp() {
         pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM)
-        _viewState.value = CancellingInContextSignUp
+        terminateSignUpFlowAsCancellation()
     }
 
     fun onUserDecidedNotToCancelInContextSignUp() {
         pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL)
+    }
+
+    private fun terminateSignUpFlowAsCancellation() {
+        pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED)
+        _viewState.value = CancellingInContextSignUp
     }
 
     fun signedInStateUpdated(
@@ -123,6 +121,14 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
             Timber.d("Detected email verification link")
             _viewState.value = ExitingAsSuccess
         }
+    }
+
+    fun userCancelledSignupWithoutConfirmation() {
+        terminateSignUpFlowAsCancellation()
+    }
+
+    fun loadedStartingUrl() {
+        pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED)
     }
 
     sealed interface ViewState {
@@ -156,9 +162,7 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
 
     companion object {
         internal object Urls {
-            const val LANDING_PAGE = "https://duckduckgo.com/email/"
             const val START = "https://duckduckgo.com/email/start"
-            const val PRIVACY_TERMS_AND_CONDITIONS = "https://duckduckgo.com/email/privacy-terms-step"
             const val CHOOSE_ADDRESS = "https://duckduckgo.com/email/choose-address"
             const val REVIEW_INPUT = "https://duckduckgo.com/email/review"
             const val IN_CONTEXT_SUCCESS = "https://duckduckgo.com/email/welcome-incontext"
@@ -175,9 +179,6 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
          * How we handle them trying to go back will also vary by screen.
          */
         private val urlActions: Map<String, UrlActions> = mutableMapOf<String, UrlActions>().also {
-            it[LANDING_PAGE] = UrlActions(backButton = NavigateBack, exitButton = ExitWithoutConfirmation)
-            it[START] = UrlActions(backButton = NavigateBack, exitButton = ExitWithoutConfirmation)
-            it[PRIVACY_TERMS_AND_CONDITIONS] = UrlActions(backButton = NavigateBack, exitButton = ExitWithoutConfirmation)
             it[CHOOSE_ADDRESS] = UrlActions(backButton = NavigateBack, exitButton = ExitWithConfirmation)
             it[REVIEW_INPUT] = UrlActions(backButton = NavigateBack, exitButton = ExitWithConfirmation)
             it[IN_CONTEXT_SUCCESS] = UrlActions(backButton = BackButtonAction.ExitTreatAsSuccess, exitButton = ExitTreatAsSuccess)

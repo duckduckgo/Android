@@ -43,8 +43,6 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityEmailProtectionInContextSignupBinding
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ExitButtonAction
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.ViewState
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED
-import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -56,7 +54,10 @@ import kotlinx.coroutines.launch
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(EmailProtectionInContextSignUpScreenNoParams::class)
 @ContributeToActivityStarter(EmailProtectionInContextSignUpHandleVerificationLink::class)
-class EmailProtectionInContextSignupActivity : DuckDuckGoActivity(), EmailProtectionInContextSignUpWebChromeClient.ProgressListener {
+class EmailProtectionInContextSignupActivity :
+    DuckDuckGoActivity(),
+    EmailProtectionInContextSignUpWebChromeClient.ProgressListener,
+    EmailProtectionInContextSignUpWebViewClient.NewPageCallback {
 
     val binding: ActivityEmailProtectionInContextSignupBinding by viewBinding()
     private val viewModel: EmailProtectionInContextSignupViewModel by bindViewModel()
@@ -99,7 +100,7 @@ class EmailProtectionInContextSignupActivity : DuckDuckGoActivity(), EmailProtec
         binding.webView.loadUrl(url)
 
         if (url == STARTING_URL) {
-            pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED)
+            viewModel.loadedStartingUrl()
         }
     }
 
@@ -142,7 +143,9 @@ class EmailProtectionInContextSignupActivity : DuckDuckGoActivity(), EmailProtec
             ExitButtonAction.ExitWithoutConfirmation -> {
                 getToolbar().run {
                     setNavigationIconAsCross()
-                    setNavigationOnClickListener { cancelInContextSignUp() }
+                    setNavigationOnClickListener {
+                        viewModel.userCancelledSignupWithoutConfirmation()
+                    }
                 }
             }
 
@@ -156,7 +159,6 @@ class EmailProtectionInContextSignupActivity : DuckDuckGoActivity(), EmailProtec
     }
 
     private fun cancelInContextSignUp() {
-        pixel.fire(EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISMISSED)
         setResult(EmailProtectionInContextSignUpScreenResult.CANCELLED)
         finish()
     }
@@ -256,7 +258,6 @@ class EmailProtectionInContextSignupActivity : DuckDuckGoActivity(), EmailProtec
 
     override fun onPageStarted(url: String) {
         configurator.configureAutofillForCurrentPage(binding.webView, url)
-        viewModel.onPageStarted(url)
     }
 
     override fun onPageFinished(url: String) {

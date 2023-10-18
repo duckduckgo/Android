@@ -34,12 +34,12 @@ abstract class EmailProtectionInContextDao {
         insertAll(domains)
     }
 
-    @Query("select * from emailInContext_exceptions where domain = :domain")
+    @Query("select * from email_incontext_exceptions where domain = :domain")
     abstract fun get(domain: String): EmailInContextExceptionEntity
 
-    @Query("select * from emailInContext_exceptions")
+    @Query("select * from email_incontext_exceptions")
     abstract fun getAll(): List<EmailInContextExceptionEntity>
 
-    @Query("delete from emailInContext_exceptions")
+    @Query("delete from email_incontext_exceptions")
     abstract fun deleteAll()
 }

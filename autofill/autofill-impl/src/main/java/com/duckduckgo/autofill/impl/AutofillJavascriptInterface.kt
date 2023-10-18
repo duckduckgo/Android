@@ -126,7 +126,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
-        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.io()) {
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")

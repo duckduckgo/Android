@@ -28,7 +28,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @RemoteFeatureStoreNamed(EmailProtectionInContextSignupFeature::class)
@@ -39,21 +38,17 @@ class EmailProtectionInContextRemoteSettingsPersister @Inject constructor(
 ) : FeatureSettings.Store {
 
     override fun store(jsonString: String) {
-        runCatching {
-            appCoroutineScope.launch(dispatchers.io()) {
-                val json = JSONObject(jsonString)
+        appCoroutineScope.launch(dispatchers.io()) {
+            val json = JSONObject(jsonString)
 
-                "installedDays".let {
-                    val installDays = if (json.has(it)) {
-                        json.getInt(it)
-                    } else {
-                        Int.MAX_VALUE
-                    }
-                    dataStore.updateMaximumPermittedDaysSinceInstallation(installDays)
+            "installedDays".let {
+                val installDays = if (json.has(it)) {
+                    json.getInt(it)
+                } else {
+                    Int.MAX_VALUE
                 }
+                dataStore.updateMaximumPermittedDaysSinceInstallation(installDays)
             }
-        }.onFailure {
-            Timber.w(it, "Failed to parse Email Protection in-context remote settings")
         }
     }
 }

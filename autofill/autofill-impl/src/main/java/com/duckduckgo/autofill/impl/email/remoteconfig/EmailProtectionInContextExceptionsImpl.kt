@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.email.remoteconfig
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -32,14 +31,9 @@ interface EmailProtectionInContextExceptions {
 @SingleInstanceIn(AppScope::class)
 class EmailProtectionInContextExceptionsImpl @Inject constructor(
     private val repository: EmailProtectionInContextFeatureRepository,
-    private val unprotectedTemporary: UnprotectedTemporary,
 ) : EmailProtectionInContextExceptions {
 
     override fun isAnException(url: String): Boolean {
-        return unprotectedTemporary.isAnException(url) || matches(url)
-    }
-
-    private fun matches(url: String): Boolean {
         return repository.exceptions.any { sameOrSubdomain(url, it) }
     }
 }
