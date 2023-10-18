@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Shrani prijavo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne shrani</string>
-    <string name="saveLoginDialogSubtitle">Prijave so varno shranjene v tej napravi in jih lahko upravljate v razdelku Prijave v nastavitvah.</string>
+    <string name="saveLoginDialogSubtitle">Prijave so varno shranjene v vaši napravi v meniju Prijave.</string>
     <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Prijavni podatki nazadnje posodobljeni %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Shrani in samodejno izpolni prijavne podatke</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Prijave so varno shranjene v vaši napravi.</string>
     <string name="credentialManagementViewMenuEdit">Uredi</string>
     <string name="credentialManagementViewMenuDelete">Izbriši</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Uporabniško ime je bilo kopirano</string>
     <string name="autofillManagementPasswordCopied">Geslo je bilo kopirano</string>
 
-    <string name="autofill_password_generation_offer_title">Želite uporabiti geslo, ki ga je ustvaril DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Geslo bo shranjeno v razdelku Prijave.</string>
-    <string name="autofill_password_generation_offer_accept">Uporabi ustvarjeno geslo</string>
+    <string name="autofill_password_generation_offer_title">Želite uporabiti močno geslo od DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Gesla so varno shranjena v napravi v meniju Prijave.</string>
+    <string name="autofill_password_generation_offer_accept">Uporabi močno geslo</string>
     <string name="autofill_password_generation_offer_decline">Ustvari svoje</string>
 
     <string name="deviceNotSupportedTitle">Naprava ni podprta</string>

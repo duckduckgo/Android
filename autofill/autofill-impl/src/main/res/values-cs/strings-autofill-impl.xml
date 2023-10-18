@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Neukládat</string>
-    <string name="saveLoginDialogSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení a dají se spravovat v nabídce Přihlášení v Nastavení.</string>
+    <string name="saveLoginDialogSubtitle">Přihlašovací údaje jsou bezpečně uložené v zařízení v nabídce Přihlášení.</string>
     <string name="saveLoginDialogTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Přihlášení naposledy aktualizováno %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Uložit a automaticky vyplnit přihlášení</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení</string>
     <string name="credentialManagementViewMenuEdit">Upravit</string>
     <string name="credentialManagementViewMenuDelete">Smazat</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
 
-    <string name="autofill_password_generation_offer_title">Použít heslo vygenerované DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Heslo se uloží do části Přihlášení.</string>
-    <string name="autofill_password_generation_offer_accept">Použít vygenerované heslo</string>
+    <string name="autofill_password_generation_offer_title">Použít silné heslo od DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Hesla jsou bezpečně uložená v zařízení v nabídce Přihlášení.</string>
+    <string name="autofill_password_generation_offer_accept">Použít silné heslo</string>
     <string name="autofill_password_generation_offer_decline">Vytvořit vlastní</string>
 
     <string name="deviceNotSupportedTitle">Zařízení není podporované</string>
