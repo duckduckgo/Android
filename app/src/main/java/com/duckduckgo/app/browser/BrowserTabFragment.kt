@@ -2938,9 +2938,13 @@ class BrowserTabFragment :
             if (targetView != null) {
                 omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
                 playPulseAnimation(targetView)
+                webView?.setBottomMatchingBehaviourEnabled(false)
             } else {
                 if (viewState.browserShowing) {
                     omnibarScrolling.enableOmnibarScrolling(omnibar.toolbarContainer)
+                }
+                if (pulseAnimation.isActive) {
+                    webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
                 pulseAnimation.stop()
             }
@@ -3176,6 +3180,10 @@ class BrowserTabFragment :
         fun renderLoadingIndicator(viewState: LoadingViewState) {
             renderIfChanged(viewState, lastSeenLoadingViewState) {
                 lastSeenLoadingViewState = viewState
+
+                if (viewState.progress == MAX_PROGRESS) {
+                    webView?.setBottomMatchingBehaviourEnabled(true)
+                }
 
                 omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
