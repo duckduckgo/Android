@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Запазване на данните за вход</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не записвай</string>
-    <string name="saveLoginDialogSubtitle">Данните за вход са сигурно съхранени само на Вашето устройство и могат да се управляват от менюто Данни за вход в Настройки.</string>
+    <string name="saveLoginDialogSubtitle">Данните за вход се съхраняват на сигурно място в менюто Данни за вход на Вашето устройство.</string>
     <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази данните за вход?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
@@ -60,6 +60,7 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последна актуализация на данните за вход %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Запазване и автоматично попълване на данните за вход</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Данните за вход се съхраняват сигурно на Вашето устройство</string>
     <string name="credentialManagementViewMenuEdit">Редактиране</string>
     <string name="credentialManagementViewMenuDelete">Изтриване</string>
 
@@ -78,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
     <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
 
-    <string name="autofill_password_generation_offer_title">Използване на парола, генерирана от DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Паролата ще бъде запазена в „Данни за вход“.</string>
-    <string name="autofill_password_generation_offer_accept">Използване на генерирана парола</string>
+    <string name="autofill_password_generation_offer_title">Използване на силна парола от DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Паролите се съхраняват на сигурно място в менюто Данни за вход на Вашето устройство.</string>
+    <string name="autofill_password_generation_offer_accept">Използване на силна парола</string>
     <string name="autofill_password_generation_offer_decline">Създаване на собствена</string>
 
     <string name="deviceNotSupportedTitle">Устройството не се поддържа</string>
