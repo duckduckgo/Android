@@ -1947,6 +1947,7 @@ class BrowserTabFragment :
         omnibar.omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
                 viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
+                viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
                     cancelPendingAutofillRequestsToChooseCredentials()
                 } else {

@@ -19,6 +19,7 @@ package com.duckduckgo.voice.impl
 import android.app.Activity
 import androidx.activity.result.ActivityResultCaller
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
@@ -31,6 +32,7 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
     private val permissionRequest: PermissionRequest,
     private val voiceSearchActivityLauncher: VoiceSearchActivityLauncher,
     private val voiceSearchPermissionCheck: VoiceSearchPermissionCheck,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : VoiceSearchLauncher {
 
     override fun registerResultsCallback(
@@ -51,6 +53,8 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
     }
 
     override fun launch(activity: Activity) {
+        if (!voiceSearchAvailability.isVoiceSearchAvailable) return
+
         if (voiceSearchPermissionCheck.hasRequiredPermissionsGranted()) {
             voiceSearchActivityLauncher.launch(activity)
         } else {
