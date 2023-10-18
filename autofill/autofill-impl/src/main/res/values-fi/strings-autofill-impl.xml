@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Tallenna kirjautumistiedot</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
-    <string name="saveLoginDialogNotNow">Ei nyt</string>
+    <string name="saveLoginDialogNotNow">Älä tallenna</string>
     <string name="saveLoginDialogSubtitle">Kirjautumistiedot tallennetaan turvallisesti laitteellesi. Niitä voi hallita asetusten kirjautumistiedot-valikosta.</string>
     <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Sivustolta %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Päivitä salasana</string>
-    <string name="updateLoginDialogButtonNotNow">Ei nyt</string>
+    <string name="updateLoginDialogButtonNotNow">Älä tallenna</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Päivitetäänkö käyttäjätunnus?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Päivitä käyttäjätunnus</string>
