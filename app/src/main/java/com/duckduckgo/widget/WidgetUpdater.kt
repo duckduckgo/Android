@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,21 @@
 package com.duckduckgo.widget
 
 import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
-import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.ACTION_LOCALE_CHANGED
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-class VoiceSearchWidgetUpdater : BroadcastReceiver() {
-    override fun onReceive(
-        context: Context,
-        intent: Intent,
-    ) {
-        if (intent.action == ACTION_LOCALE_CHANGED) {
-            updateWidgets(context.applicationContext)
-        }
-    }
+interface WidgetUpdater {
+    fun updateWidgets(context: Context)
+}
 
-    private fun updateWidgets(context: Context) {
+@ContributesBinding(AppScope::class)
+class WidgetUpdaterImpl @Inject constructor() : WidgetUpdater {
+
+    override fun updateWidgets(context: Context) {
         AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, SearchWidget::class.java))?.also {
             broadcastUpdate(
                 it,
@@ -66,7 +63,7 @@ class VoiceSearchWidgetUpdater : BroadcastReceiver() {
         clazz: Class<*>,
     ) {
         val intent = Intent(context, clazz)
-        intent.action = ACTION_APPWIDGET_UPDATE
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, id)
         context.sendBroadcast(intent)
     }

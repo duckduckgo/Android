@@ -21,6 +21,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,12 +32,16 @@ import timber.log.Timber
 @ContributesViewModel(ActivityScope::class)
 class AccessibilitySettingsViewModel @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val voiceSearchRepository: VoiceSearchRepository,
 ) : ViewModel() {
 
     data class ViewState(
         val overrideSystemFontSize: Boolean = false,
         val appFontSize: Float = 100f,
         val forceZoom: Boolean = false,
+        val showVoiceSearch: Boolean = false,
+        val voiceSearchEnabled: Boolean = false,
     )
 
     private val viewState = MutableStateFlow(ViewState())
@@ -49,6 +55,8 @@ class AccessibilitySettingsViewModel @Inject constructor(
                     overrideSystemFontSize = accessibilitySettings.overrideSystemFontSize,
                     appFontSize = accessibilitySettings.appFontSize,
                     forceZoom = accessibilitySettings.forceZoom,
+                    showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
+                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 ),
             )
         }
@@ -85,6 +93,20 @@ class AccessibilitySettingsViewModel @Inject constructor(
             viewState.emit(
                 currentViewState().copy(
                     appFontSize = accessibilitySettings.appFontSize,
+                ),
+            )
+        }
+    }
+
+    fun onVoiceSearchChanged(checked: Boolean) {
+        voiceSearchRepository.setVoiceSearchUserEnabled(checked)
+        if (checked) {
+            voiceSearchRepository.resetVoiceSearchDismissed()
+        }
+        viewModelScope.launch {
+            viewState.emit(
+                currentViewState().copy(
+                    voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable,
                 ),
             )
         }

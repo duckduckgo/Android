@@ -1194,22 +1194,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEnteringQueryWithAutoCompleteEnabledThenAutoCompleteSuggestionsShown() {
+    fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() {
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = true)
+        testee.triggerAutocomplete("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
     }
 
     @Test
-    fun whenOmnibarInputStateChangedWithAutoCompleteEnabledButNoQueryChangeThenAutoCompleteSuggestionsNotShown() {
+    fun whenTriggeringAutoCompleteButNoQueryChangeThenAutoCompleteSuggestionsNotShown() {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("foo", true, hasQueryChanged = false)
+        testee.triggerAutocomplete("foo", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
     }
 
     @Test
-    fun whenOmnibarFocusedWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
+    fun whenTriggeringAutocompleteWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
         testee.autoCompleteViewState.value =
             autoCompleteViewState().copy(
                 favorites = listOf(
@@ -1225,7 +1225,7 @@ class BrowserTabViewModelTest {
                 ),
             )
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee.onOmnibarInputStateChanged("https://example.com", true, hasQueryChanged = false)
+        testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
         assertTrue(autoCompleteViewState().showFavorites)
     }
@@ -4054,7 +4054,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenShouldShowVoiceSearchAndUserSubmittedQueryThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
 
         testee.onUserSubmittedQuery("foo")
 
@@ -4063,7 +4063,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenShouldShowVoiceSearchAndUserNavigatesHomeThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
 
         testee.onUserPressedBack()
@@ -4073,7 +4073,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenShouldShowVoiceSearchAndUserLoadedUrlThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
 
         loadUrl("https://test.com")
 
@@ -4082,7 +4082,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenShouldShowVoiceSearchAndOmnibarInputStateChangedThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
-        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString(), anyBoolean(), anyString())).thenReturn(true)
 
         testee.onOmnibarInputStateChanged("www.fb.com", true, hasQueryChanged = false)
 
@@ -4347,6 +4347,15 @@ class BrowserTabViewModelTest {
         )
 
         assertFalse(omnibarViewState().forceExpand)
+    }
+
+    @Test
+    fun whenVoiceSearchIsDisabledThenShowVoiceSearchShouldBeFalse() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(false)
+
+        testee.voiceSearchDisabled()
+
+        assertFalse(omnibarViewState().showVoiceSearch)
     }
 
     private fun aCredential(): LoginCredentials {

@@ -47,6 +47,8 @@ class KeyboardAwareEditText : AppCompatEditText {
 
     private var didSelectQueryFirstTime = false
 
+    var showSuggestionsListener: ShowSuggestionsListener? = null
+
     private fun Editable.isWebUrl(): Boolean {
         return Patterns.WEB_URL.matcher(this.toString()).matches()
     }
@@ -61,7 +63,7 @@ class KeyboardAwareEditText : AppCompatEditText {
             if (text != null && text?.isWebUrl() == false) {
                 if (didSelectQueryFirstTime) {
                     // trigger the text change listener so that we can show autocomplete
-                    text = text
+                    showSuggestionsListener?.showSuggestions()
                     // cursor at the end of the word
                     setSelection(text!!.length)
                 } else {
@@ -126,5 +128,9 @@ class KeyboardAwareEditText : AppCompatEditText {
     interface OnBackKeyListener {
 
         fun onBackKey(): Boolean
+    }
+
+    interface ShowSuggestionsListener {
+        fun showSuggestions()
     }
 }

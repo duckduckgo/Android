@@ -32,6 +32,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
@@ -383,6 +384,14 @@ class SystemSearchViewModelTest {
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
         assertEquals(1, viewState.favorites.size)
         assertEquals(savedSite, viewState.favorites.first().favorite)
+    }
+
+    @Test
+    fun whenVoiceSearchDisabledThenShouldEmitUpdateVoiceSearchCommand() {
+        testee.voiceSearchDisabled()
+
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(UpdateVoiceSearch, commandCaptor.lastValue)
     }
 
     private suspend fun whenOnboardingShowing() {
