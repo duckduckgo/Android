@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -125,6 +126,9 @@ interface SavedSitesEntitiesDao {
 
     @Query("select * from entities where type = :type")
     fun allEntitiesByTypeSync(type: EntityType): List<Entity>
+
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId and relations.folderId <> :favoritesRoot")
+    fun allBookmarks(favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT): List<Entity>
 
     @Query("select * from entities where entityId = :id")
     fun deletedEntity(id: String): Entity?
