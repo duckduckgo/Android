@@ -46,14 +46,13 @@
         app:layout_constraintStart_toEndOf="@+id/excluded_app_entry_skeleton_imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
+    <com.duckduckgo.mobile.android.ui.view.SkeletonView
         android:id="@+id/excluded_app_entry_skeleton_bottom_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="120dp"
-        android:background="@drawable/background_skeleton_ui"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/excluded_app_entry_skeleton_imageView"
         app:layout_constraintTop_toBottomOf="@+id/excluded_app_entry_skeleton_top_text" />
