@@ -19,10 +19,11 @@ package com.duckduckgo.subscriptions.impl.settings.plugins
 import android.content.Context
 import android.view.View
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.settings.api.SubsSettingsPlugin
+import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyView
 import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingView
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingsTitleView
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.MapKey
 import javax.inject.Inject
@@ -34,7 +35,9 @@ annotation class PositionKey(val pos: Int)
 @PositionKey(100)
 class SubsSettingsTitle @Inject constructor() : SubsSettingsPlugin {
     override fun getView(context: Context): View {
-        return SubsSettingsTitleView(context)
+        return SectionHeaderListItem(context).apply {
+            primaryText = context.getString(R.string.privacyPro)
+        }
     }
 }
 

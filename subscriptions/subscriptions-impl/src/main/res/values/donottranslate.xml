@@ -18,7 +18,7 @@
 <resources>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
-
+    <string name="privacyPro">Privacy Pro</string>
     <!--Add Device Activity-->
     <string name="manage">Manage</string>
     <string name="addEmailText">Add Email</string>

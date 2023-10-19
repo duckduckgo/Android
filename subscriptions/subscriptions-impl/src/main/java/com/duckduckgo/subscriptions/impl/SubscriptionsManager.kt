@@ -78,7 +78,7 @@ interface SubscriptionsManager {
     /**
      * Returns the access token
      */
-    fun getAccessToken(): AccessToken
+    suspend fun getAccessToken(): AccessToken
 
     /**
      * Flow to know if a user is signed in or not
@@ -86,7 +86,7 @@ interface SubscriptionsManager {
     val isSignedIn: Flow<Boolean>
 
     /**
-     * Flow to know if a user is signed in or not
+     * Flow to know if a user has a subscription or not
      */
     val hasSubscription: Flow<Boolean>
 
@@ -150,7 +150,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun signOut() {
         authDataStore.authToken = ""
         authDataStore.accessToken = ""
-        _isSignedIn.emit(isUserAuthenticated())
+        _isSignedIn.emit(false)
         _hasSubscription.emit(false)
     }
 
@@ -158,30 +158,27 @@ class RealSubscriptionsManager @Inject constructor(
         _currentPurchaseState.emit(CurrentPurchase.InProgress)
         delay(500)
         var retries = 1
-        var data = hasSubscription()
-        while (!data && retries <= 3) {
+        var hasSubscription = hasSubscription()
+        while (!hasSubscription && retries <= 3) {
             delay(500L * retries)
-            data = hasSubscription()
+            hasSubscription = hasSubscription()
             retries++
         }
-        if (data) {
+        if (hasSubscription) {
             _currentPurchaseState.emit(CurrentPurchase.Success)
-            _hasSubscription.emit(true)
         } else {
-            _hasSubscription.emit(false)
             _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
         }
+        _hasSubscription.emit(hasSubscription)
     }
 
     private suspend fun hasSubscription(): Boolean {
         return when (val result = getSubscriptionData()) {
             is Success -> {
                 val isSubscribed = result.entitlements.isNotEmpty()
-                _hasSubscription.emit(isSubscribed)
                 isSubscribed
             }
             is Failure -> {
-                _hasSubscription.emit(false)
                 false
             }
         }
@@ -215,7 +212,7 @@ class RealSubscriptionsManager @Inject constructor(
                 logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
                 authenticate(response.authToken)
             } else {
-                Failure(SUBSCRIPTION_NOT_FOUND)
+                Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
@@ -313,11 +310,13 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    override fun getAccessToken(): AccessToken {
-        return if (isUserAuthenticated()) {
-            AccessToken.Success(authDataStore.accessToken!!)
-        } else {
-            AccessToken.Failure("Token not found")
+    override suspend fun getAccessToken(): AccessToken {
+        return withContext(dispatcherProvider.io()) {
+            if (isUserAuthenticated()) {
+                AccessToken.Success(authDataStore.accessToken!!)
+            } else {
+                AccessToken.Failure("Token not found")
+            }
         }
     }
 
@@ -349,7 +348,7 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     companion object {
-        const val SUBSCRIPTION_NOT_FOUND = "SubscriptionNotFound"
+        const val SUBSCRIPTION_NOT_FOUND_ERROR = "SubscriptionNotFound"
     }
 }
 

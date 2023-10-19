@@ -2,7 +2,7 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND
+import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.auth.Entitlement
@@ -67,7 +67,7 @@ class RestoreSubscriptionViewModelTest {
     @Test
     fun whenRestoreFromStoreIfNoSubscriptionFoundThenReturnNotFound() = runTest {
         whenever(subscriptionsManager.recoverSubscriptionFromStore()).thenReturn(
-            SubscriptionsData.Failure(SUBSCRIPTION_NOT_FOUND),
+            SubscriptionsData.Failure(SUBSCRIPTION_NOT_FOUND_ERROR),
         )
 
         viewModel.commands().test {

@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND
+import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBSCRIPTION_NOT_FOUND_ERROR
 import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
@@ -66,7 +66,7 @@ class RestoreSubscriptionViewModel @Inject constructor(
                 }
                 is SubscriptionsData.Failure -> {
                     when (response.message) {
-                        SUBSCRIPTION_NOT_FOUND -> command.send(SubscriptionNotFound)
+                        SUBSCRIPTION_NOT_FOUND_ERROR -> command.send(SubscriptionNotFound)
                         else -> command.send(Error(response.message))
                     }
                 }
