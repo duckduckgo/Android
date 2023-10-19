@@ -37,6 +37,9 @@ import com.duckduckgo.subscriptions.impl.ui.AddDeviceActivity.Companion.AddDevic
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.SignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.SignOutWithSync
+import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -69,24 +72,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.removeDevice.setClickListener {
-            TextAlertDialogBuilder(this)
-                .setTitle(string.removeFromDevice)
-                .setMessage(string.removeFromDeviceDescription)
-                .setDestructiveButtons(true)
-                .setPositiveButton(string.removeSubscription)
-                .setNegativeButton(string.cancel)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.removeFromDevice()
-                        }
-
-                        override fun onNegativeButtonClicked() {
-                            // NOOP
-                        }
-                    },
-                )
-                .show()
+            viewModel.onSignOut()
         }
 
         binding.changePlan.setClickListener {
@@ -101,12 +87,47 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun showSignOutDialogWithSync() {
+        TextAlertDialogBuilder(this)
+            .setTitle(string.almostThere)
+            .setMessage(string.almostThereDescription)
+            .setPositiveButton(string.goToSyncSettings)
+            .setNegativeButton(string.cancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        globalActivityStarter.start(this@SubscriptionSettingsActivity, SyncActivityWithEmptyParams)
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showSignOutDialog() {
+        TextAlertDialogBuilder(this)
+            .setTitle(string.removeFromDevice)
+            .setMessage(string.removeFromDeviceDescription)
+            .setDestructiveButtons(true)
+            .setPositiveButton(string.removeSubscription)
+            .setNegativeButton(string.cancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.removeFromDevice()
+                    }
+                },
+            )
+            .show()
+    }
+
     private fun processCommand(command: Command) {
         when (command) {
             is FinishSignOut -> {
                 Toast.makeText(this, string.subscriptionRemoved, Toast.LENGTH_SHORT).show()
                 finish()
             }
+            is SignOutWithSync -> showSignOutDialogWithSync()
+            is SignOut -> showSignOutDialog()
         }
     }
     companion object {

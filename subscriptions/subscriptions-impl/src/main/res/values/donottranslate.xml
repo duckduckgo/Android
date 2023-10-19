@@ -33,16 +33,22 @@
     <string name="viewPlans">View Plans</string>
     <string name="subscriptionNotFound">Subscription Not Found</string>
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Account is no longer active or could not be found.</string>
-    <string name="purchaseRestored">Your purchase has been restored.</string>
+    <string name="purchaseRestored">Your subscription has been restored.</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Remove Subscription</string>
     <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
     <string name="removeFromDevice">Remove From This Device?</string>
     <string name="removeFromDeviceDescription">You will no longer be able to access your subscription on this device. This will not cancel your subscription, and it will remain active on your other device.</string>
+    <string name="almostThere">Almost there…</string>
+    <string name="almostThereDescription">Your Privacy Pro subscription is associated with all of your devices with Sync activated. You must deactivate Sync before removing Privacy Pro from this device.</string>
+    <string name="goToSyncSettings">Go to Sync Settings</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>
     <string name="subscriptionSettingSubscribe">Subscribe To Privacy Pro</string>
     <string name="subscriptionSettingSubscribeSubtitle">More seamless privacy with three new protections, including:</string>
+
+    <!--Sync-->
+    <string name="notificationChannelSubscriptions">Subscriptions</string>
 </resources>

@@ -36,6 +36,7 @@ dependencies {
     implementation project(path: ':js-messaging-api')
     implementation project(path: ':user-agent-api')
     implementation project(path: ':sync-api')
+    implementation project(path: ':sync-settings-api')
     implementation project(path: ':subscriptions-api')
     implementation project(path: ':subscriptions-store')
     implementation project(path: ':settings-api')

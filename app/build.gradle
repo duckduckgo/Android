@@ -16,11 +16,11 @@ ext {
 
 android {
     defaultConfig {
-        if (project.hasProperty('internal-testing')) {
+//        if (project.hasProperty('internal-testing')) {
             applicationId "com.quackquackgo.mobile"
-        } else {
-            applicationId "com.duckduckgo.mobile.android"
-        }
+//        } else {
+//            applicationId "com.duckduckgo.mobile.android"
+//        }
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
@@ -75,9 +75,9 @@ android {
     }
     buildTypes {
         debug {
-            if (!project.hasProperty('internal-testing')) {
-                applicationIdSuffix ".debug"
-            }
+//            if (!project.hasProperty('internal-testing')) {
+//                applicationIdSuffix ".debug"
+//            }
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon     : "@mipmap/ic_launcher_blue",
@@ -295,12 +295,12 @@ dependencies {
     implementation project(':web-compat-impl')
     implementation project(':web-compat-store')
 
-    if (project.hasProperty('internal-testing')) {
+//    if (project.hasProperty('internal-testing')) {
         implementation project(':subscriptions-api')
         implementation project(':subscriptions-impl')
         implementation project(':subscriptions-store')
         internalImplementation project(':network-protection-subscription-internal')
-    }
+//    }
 
     implementation project(':user-agent-api')
     implementation project(':user-agent-impl')

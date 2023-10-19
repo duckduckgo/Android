@@ -22,6 +22,9 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.SignOut
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.SignOutWithSync
+import com.duckduckgo.sync.api.DeviceSyncState
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -32,10 +35,22 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
+    private val deviceSyncState: DeviceSyncState,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    fun onSignOut() {
+        viewModelScope.launch {
+            val signOutCommand = if (deviceSyncState.isUserSignedInOnDevice()) {
+                SignOutWithSync
+            } else {
+                SignOut
+            }
+            command.send(signOutCommand)
+        }
+    }
 
     fun removeFromDevice() {
         viewModelScope.launch {
@@ -46,5 +61,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     sealed class Command {
         object FinishSignOut : Command()
+        object SignOutWithSync : Command()
+        object SignOut : Command()
     }
 }

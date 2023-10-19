@@ -18,6 +18,8 @@ package com.duckduckgo.subscriptions.impl
 
 import android.app.Activity
 import android.content.Context
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.android.billingclient.api.ProductDetails
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
@@ -30,6 +32,8 @@ import com.duckduckgo.subscriptions.impl.auth.ResponseError
 import com.duckduckgo.subscriptions.impl.auth.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
+import com.duckduckgo.subscriptions.impl.sync.SubscriptionNotificationChannelType
+import com.duckduckgo.subscriptions.impl.sync.SubscriptionsSyncableSetting
 import com.duckduckgo.subscriptions.store.AuthDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -107,7 +111,9 @@ interface SubscriptionsManager {
 class RealSubscriptionsManager @Inject constructor(
     private val authService: AuthService,
     private val authDataStore: AuthDataStore,
+    private val syncableSetting: SubscriptionsSyncableSetting,
     private val billingClientWrapper: BillingClientWrapper,
+    private val notificationManager: NotificationManagerCompat,
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -124,7 +130,7 @@ class RealSubscriptionsManager @Inject constructor(
     private val _hasSubscription = MutableStateFlow(false)
     override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
 
-    private fun isUserAuthenticated(): Boolean = !authDataStore.accessToken.isNullOrBlank() && !authDataStore.authToken.isNullOrBlank()
+    private fun isUserAuthenticated(): Boolean = !authDataStore.accessToken.isNullOrBlank()
 
     private suspend fun emitHasSubscriptionsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -145,9 +151,16 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    init {
+        syncableSetting.registerToRemoteChanges {
+            coroutineScope.launch(dispatcherProvider.io()) {
+                recoverSubscriptionFromSync()
+            }
+        }
+    }
+
     override suspend fun signOut() {
-        authDataStore.authToken = ""
-        authDataStore.accessToken = ""
+        storeAuthData(accessToken = null, authToken = null)
         _isSignedIn.emit(false)
         _hasSubscription.emit(false)
     }
@@ -182,11 +195,35 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
+    private suspend fun recoverSubscriptionFromSync() {
+        when (authenticateWithAccessToken()) {
+            is Success -> showNotification()
+            else -> {
+                // NOOP
+            }
+        }
+    }
+
+    private suspend fun authenticateWithAccessToken(): SubscriptionsData {
+        return try {
+            val accessToken = authDataStore.accessToken.orEmpty()
+            val subscriptionData = getSubscriptionDataFromToken(accessToken)
+            storeAuthData(accessToken = accessToken, authToken = null)
+            _isSignedIn.emit(isUserAuthenticated())
+            _hasSubscription.emit(hasSubscription())
+            return subscriptionData
+        } catch (e: HttpException) {
+            val error = parseError(e)?.error ?: "An error happened"
+            Failure(error)
+        } catch (e: Exception) {
+            Failure(e.message ?: "An error happened")
+        }
+    }
+
     override suspend fun authenticate(authToken: String): SubscriptionsData {
         return try {
             val response = authService.accessToken("Bearer $authToken")
-            authDataStore.accessToken = response.accessToken
-            authDataStore.authToken = authToken
+            storeAuthData(accessToken = response.accessToken, authToken = authToken)
             val subscriptionData = getSubscriptionDataFromToken(response.accessToken)
             _isSignedIn.emit(isUserAuthenticated())
             _hasSubscription.emit(hasSubscription())
@@ -223,7 +260,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getSubscriptionData(): SubscriptionsData {
         return try {
             if (isUserAuthenticated()) {
-                getSubscriptionDataFromToken(authDataStore.accessToken!!)
+                getSubscriptionDataFromToken(authDataStore.accessToken.orEmpty())
             } else {
                 Failure("Subscription data not found")
             }
@@ -268,7 +305,7 @@ class RealSubscriptionsManager @Inject constructor(
     private suspend fun prePurchaseFlow(): SubscriptionsData {
         return try {
             val subscriptionData = if (isUserAuthenticated()) {
-                getSubscriptionDataFromToken(authDataStore.accessToken!!)
+                getSubscriptionDataFromToken(authDataStore.accessToken.orEmpty())
             } else {
                 recoverSubscriptionFromStore()
             }
@@ -289,15 +326,16 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun getAuthToken(): AuthToken {
         return if (isUserAuthenticated()) {
-            when (val response = getSubscriptionDataFromToken(authDataStore.authToken!!)) {
-                is Success -> return AuthToken.Success(authDataStore.authToken!!)
+            val authToken = authDataStore.authToken.orEmpty()
+            when (val response = getSubscriptionDataFromToken(authToken)) {
+                is Success -> return AuthToken.Success(authToken)
                 is Failure -> {
                     when (response.message) {
                         "expired_token" -> {
                             logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
                             val subscriptionsData = recoverSubscriptionFromStore()
                             if (subscriptionsData is Success) {
-                                AuthToken.Success(authDataStore.authToken!!)
+                                AuthToken.Success(authDataStore.authToken.orEmpty())
                             } else {
                                 AuthToken.Failure(response.message)
                             }
@@ -316,7 +354,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun getAccessToken(): AccessToken {
         return withContext(dispatcherProvider.io()) {
             if (isUserAuthenticated()) {
-                AccessToken.Success(authDataStore.accessToken!!)
+                AccessToken.Success(authDataStore.accessToken.orEmpty())
             } else {
                 AccessToken.Failure("Token not found")
             }
@@ -348,6 +386,24 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             null
         }
+    }
+
+    private fun storeAuthData(authToken: String?, accessToken: String?) {
+        authDataStore.authToken = authToken
+        authDataStore.accessToken = accessToken
+        if (!accessToken.isNullOrEmpty()) {
+            syncableSetting.onSettingChanged()
+        }
+    }
+
+    private fun showNotification() {
+        val notification = NotificationCompat.Builder(context, SubscriptionNotificationChannelType.SUBSCRIPTION_CHANNEL.id)
+            .setPriority(SubscriptionNotificationChannelType.SUBSCRIPTION_CHANNEL.priority)
+            .setShowWhen(false)
+            .setContentTitle(context.getString(R.string.purchaseRestored))
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .build()
+        notificationManager.notify(1, notification)
     }
 
     companion object {
