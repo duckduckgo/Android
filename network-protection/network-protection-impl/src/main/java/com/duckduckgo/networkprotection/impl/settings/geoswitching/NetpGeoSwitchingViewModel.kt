@@ -16,7 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
-import android.content.Context
+import android.annotation.SuppressLint
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -36,12 +38,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class NetpGeoSwitchingViewModel @Inject constructor(
     private val contentProvider: GeoSwitchingContentProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val dispatcherProvider: DispatcherProvider,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
     private val viewState = MutableStateFlow(ViewState())
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
 
@@ -49,30 +52,26 @@ class NetpGeoSwitchingViewModel @Inject constructor(
         val items: List<GeoswitchingListItem> = emptyList(),
     )
 
-    fun initialize(context: Context) {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             val countryItems = contentProvider.getContent().map {
                 CountryItem(
                     countryEmoji = getEmojiForCountryCode(it.countryCode),
                     countryCode = it.countryCode,
-                    countryTitle = getDisplayableCountry(it.countryCode),
-                    countrySubtitle = if (it.cities.size > 1) {
-                        String.format(context.getString(R.string.netpGeoswitchingHeaderCountrySubtitle), it.cities.size)
-                    } else {
-                        null
-                    },
+                    countryName = getDisplayableCountry(it.countryCode),
                     cities = it.cities,
                 )
             }
 
             val completeList = mutableListOf(
-                HeaderItem(context.getString(R.string.netpGeoswitchingHeaderRecommended)),
+                HeaderItem(R.string.netpGeoswitchingHeaderRecommended),
                 RecommendedItem(
-                    title = context.getString(R.string.netpGeoswitchingDefaultTitle),
-                    subtitle = context.getString(R.string.netpGeoswitchingDefaultSubtitle),
+                    title = R.string.netpGeoswitchingDefaultTitle,
+                    subtitle = R.string.netpGeoswitchingDefaultSubtitle,
                 ),
                 DividerItem,
-                HeaderItem(context.getString(R.string.netpGeoswitchingHeaderCustom)),
+                HeaderItem(R.string.netpGeoswitchingHeaderCustom),
             ).apply {
                 this.addAll(countryItems)
             }
