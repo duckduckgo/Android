@@ -108,6 +108,9 @@ class RealWgServerApi @Inject constructor(
 interface WgServerDebugProvider {
     suspend fun getSelectedServerName(): String? = null
 
+    suspend fun clearSelectedServerName() { /* noop */
+    }
+
     suspend fun cacheServers(servers: List<Server>) { /* noop */
     }
 
