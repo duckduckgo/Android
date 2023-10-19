@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Zapisz logowanie</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
-    <string name="saveLoginDialogNotNow">Nie teraz</string>
+    <string name="saveLoginDialogNotNow">Nie zapisuj</string>
     <string name="saveLoginDialogSubtitle">Dane logowania są bezpiecznie przechowywane na Twoim urządzeniu i można nimi zarządzać w sekcji Loginy menu Ustawienia.</string>
     <string name="saveLoginDialogTitle">Czy chcesz zapisać dane logowania w DuckDuckGo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Z %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizuj hasło</string>
-    <string name="updateLoginDialogButtonNotNow">Nie teraz</string>
+    <string name="updateLoginDialogButtonNotNow">Nie zapisuj</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Zaktualizować nazwę użytkownika?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Zaktualizuj nazwę użytkownika</string>
