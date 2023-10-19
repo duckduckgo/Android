@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.model
 
+import android.util.LruCache
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -27,6 +28,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -36,6 +38,8 @@ class SiteFactoryImpl @Inject constructor(
     private val contentBlocking: ContentBlocking,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SiteFactory {
+
+    private val siteCache = LruCache<String, Site>(1)
 
     /**
      * Builds a Site with minimal details; this is quick to build but won't contain the full details needed for all functionality
@@ -48,7 +52,19 @@ class SiteFactoryImpl @Inject constructor(
         title: String?,
         httpUpgraded: Boolean,
     ): Site {
-        return SiteMonitor(url, title, httpUpgraded, userAllowListDao, contentBlocking, appCoroutineScope)
+        val cachedSite = siteCache.get(url)
+        return if (cachedSite == null) {
+            Timber.d("buildSite for $url")
+            SiteMonitor(url, title, httpUpgraded, userAllowListDao, contentBlocking, appCoroutineScope).also {
+                siteCache.put(url, it)
+            }
+        } else {
+            Timber.d("buildSite cached site for $url")
+            cachedSite.upgradedHttps = httpUpgraded
+            cachedSite.title = title
+
+            cachedSite
+        }
     }
 
     /**
