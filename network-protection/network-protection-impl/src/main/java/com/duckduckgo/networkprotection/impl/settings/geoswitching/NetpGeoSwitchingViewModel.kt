@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
@@ -46,6 +47,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val wgServerDebugProvider: WgServerDebugProvider,
+    private val networkProtectionState: NetworkProtectionState,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val viewState = MutableStateFlow(ViewState())
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
@@ -54,9 +56,12 @@ class NetpGeoSwitchingViewModel @Inject constructor(
         val items: List<GeoswitchingListItem> = emptyList(),
     )
 
+    private var initialPreferredLocation: UserPreferredLocation? = null
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
+            initialPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
             val countryItems = contentProvider.getDownloadedData().map {
                 CountryItem(
                     countryEmoji = getEmojiForCountryCode(it.countryCode),
@@ -85,6 +90,17 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     items = completeList,
                 ),
             )
+        }
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (networkProtectionState.isEnabled()) {
+                if (initialPreferredLocation != netPGeoswitchingRepository.getUserPreferredLocation()) {
+                    networkProtectionState.restart()
+                }
+            }
         }
     }
 

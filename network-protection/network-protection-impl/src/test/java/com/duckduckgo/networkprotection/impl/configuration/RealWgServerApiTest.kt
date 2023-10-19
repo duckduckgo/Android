@@ -17,7 +17,9 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.FakeNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -33,6 +35,7 @@ class RealWgServerApiTest {
 
     private lateinit var productionWgServerDebugProvider: DefaultWgServerDebugProvider
     private lateinit var internalWgServerDebugProvider: FakeWgServerDebugProvider
+    private lateinit var geoswitchingRepository: FakeNetPGeoswitchingRepository
     private lateinit var productionApi: RealWgServerApi
     private lateinit var internalApi: RealWgServerApi
 
@@ -45,16 +48,19 @@ class RealWgServerApiTest {
 
         productionWgServerDebugProvider = DefaultWgServerDebugProvider()
         internalWgServerDebugProvider = FakeWgServerDebugProvider(wgVpnControllerService)
+        geoswitchingRepository = FakeNetPGeoswitchingRepository()
 
         internalApi = RealWgServerApi(
             wgVpnControllerService,
             internalWgServerDebugProvider,
             geoSwitchingContentProvider,
+            geoswitchingRepository,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
             geoSwitchingContentProvider,
+            geoswitchingRepository,
         )
     }
 
@@ -154,6 +160,61 @@ class RealWgServerApiTest {
         internalApi.registerPublicKey("testpublickey")
 
         verify(geoSwitchingContentProvider).downloadData()
+    }
+
+    @Test
+    fun whenUserPreferredCountrySetThenRegisterPublicKeyShouldRequestForCountry() = runTest {
+        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "nl"))
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.euw.2",
+                publicKey = "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
+                publicEndpoint = "31.204.129.39:443",
+                address = "",
+                location = "Rotterdam, NL",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            productionApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenUserPreferredLocationSetThenRegisterPublicKeyShouldRequestForCountryAndCity() = runTest {
+        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Des Moines"))
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.usc",
+                publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
+                publicEndpoint = "109.200.208.196:443",
+                address = "",
+                location = "Des Moines, US",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            productionApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenUserPreferredLocationSetAndInternalDebugServerSelectedThenRegisterPublicKeyShouldReturnDebugServer() = runTest {
+        internalWgServerDebugProvider.selectedServer = "egress.euw.2"
+        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Des Moines"))
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.euw.2",
+                publicKey = "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
+                publicEndpoint = "31.204.129.39:443",
+                address = "",
+                location = "Rotterdam, NL",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            internalApi.registerPublicKey("testpublickey"),
+        )
     }
 }
 
