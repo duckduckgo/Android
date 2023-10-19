@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browsertelemetry.api.BrowserTelemetryConfig
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -34,6 +35,7 @@ class EnqueuedPixelWorkerTest {
     private val lifecycleOwner: LifecycleOwner = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val browserTelemetryConfig: BrowserTelemetryConfig = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -45,6 +47,7 @@ class EnqueuedPixelWorkerTest {
             unsentForgetAllPixelStore,
             webViewVersionProvider,
             defaultBrowserDetector,
+            browserTelemetryConfig,
         )
     }
 
@@ -95,6 +98,48 @@ class EnqueuedPixelWorkerTest {
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
             ),
         )
+    }
+
+    @Test
+    fun whenOnStartAndAppLaunchAndShouldCollectOnAppLaunchIsTrueThenSendAppLaunchPixelWithFullWebViewVersion() {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(webViewVersionProvider.getFullVersion()).thenReturn("91.0.4472.101")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(browserTelemetryConfig.shouldCollectOnAppLaunch()).thenReturn(true)
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                Pixel.PixelParameter.WEBVIEW_FULL_VERSION to "91.0.4472.101",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOnStartAndAppLaunchAndShouldCollectOnAppLaunchIsFalseThenNeverSendAppLaunchPixelWithFullWebViewVersion() {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(webViewVersionProvider.getFullVersion()).thenReturn("91.0.4472.101")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(browserTelemetryConfig.shouldCollectOnAppLaunch()).thenReturn(false)
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+            ),
+        )
+        verify(webViewVersionProvider, never()).getFullVersion()
     }
 
     @Test
