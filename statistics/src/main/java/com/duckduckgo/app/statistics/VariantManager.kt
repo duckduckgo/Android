@@ -21,6 +21,8 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AskForDefaultBrowserMoreThanOnce
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantEntity
+import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import java.util.Locale
 import timber.log.Timber
@@ -107,14 +109,15 @@ interface VariantManager {
     }
 
     fun getVariant(activeVariants: List<Variant> = ACTIVE_VARIANTS): Variant
-
     fun updateAppReferrerVariant(variant: String)
+    fun updateVariants(variants: List<ExperimentVariantEntity>)
 }
 
 class ExperimentationVariantManager(
     private val store: StatisticsDataStore,
     private val indexRandomizer: IndexRandomizer,
     private val appBuildConfig: AppBuildConfig,
+    private val experimentVariantRepository: ExperimentVariantRepository,
 ) : VariantManager {
 
     @Synchronized
@@ -160,6 +163,10 @@ class ExperimentationVariantManager(
         Timber.i("Updating variant for app referer: $variant")
         store.variant = variant
         store.referrerVariant = variant
+    }
+
+    override fun updateVariants(variants: List<ExperimentVariantEntity>) {
+        experimentVariantRepository.updateAll(variants)
     }
 
     private fun lookupVariant(

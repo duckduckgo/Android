@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.WeightedRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
@@ -36,8 +37,9 @@ object VariantModule {
         statisticsDataStore: StatisticsDataStore,
         weightedRandomizer: IndexRandomizer,
         appBuildConfig: AppBuildConfig,
+        variantRepository: ExperimentVariantRepository,
     ): VariantManager =
-        ExperimentationVariantManager(statisticsDataStore, weightedRandomizer, appBuildConfig)
+        ExperimentationVariantManager(statisticsDataStore, weightedRandomizer, appBuildConfig, variantRepository)
 
     @Provides
     fun weightedRandomizer(): IndexRandomizer = WeightedRandomizer()

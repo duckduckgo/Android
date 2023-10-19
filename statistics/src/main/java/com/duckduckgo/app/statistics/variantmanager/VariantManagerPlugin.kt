@@ -26,7 +26,7 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class VariantManagerPlugin @Inject constructor(
-    private val VariantManager: VariantManager,
+    private val variantManager: VariantManager,
 ) : PrivacyVariantManagerPlugin {
 
     override fun store(jsonString: String): Boolean {
@@ -37,18 +37,21 @@ class VariantManagerPlugin @Inject constructor(
         val variants = mutableListOf<ExperimentVariantEntity>()
 
         val variantManagerConfig: VariantManagerConfig? = jsonAdapter.fromJson(jsonString)
+        if (variantManagerConfig?.variants.isNullOrEmpty()) {
+            return false
+        }
         variantManagerConfig?.variants?.map {
             variants.add(
                 ExperimentVariantEntity(
                     it.variantKey,
                     it.desc,
                     it.weight,
-                    VariantFiltersEntity(it.filters?.locale),
+                    VariantFiltersEntity(it.filters?.locale.orEmpty()),
                 ),
             )
-
-            return true
         }
-        return false
+        variantManager.updateVariants(variants)
+
+        return true
     }
 }

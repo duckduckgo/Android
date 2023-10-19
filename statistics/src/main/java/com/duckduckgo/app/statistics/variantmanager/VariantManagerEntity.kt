@@ -37,16 +37,21 @@ class VariantFiltersEntity(
 
 class VariantFiltersConverter {
     @TypeConverter
-    fun toVariantFilters(value: String): List<VariantFiltersEntity>? {
+    fun toVariantFilters(value: String): VariantFiltersEntity? {
         return Adapters.variantFiltersAdapter.fromJsonValue(value)
+    }
+
+    @TypeConverter
+    fun fromVariantFilters(value: VariantFiltersEntity?): String {
+        return Adapters.variantFiltersAdapter.toJson(value)
     }
 }
 
 class Adapters {
     companion object {
         private val moshi = Moshi.Builder().build()
-        private val ruleListType =
+        private val variantFilters =
             Types.newParameterizedType(List::class.java, VariantFiltersEntity::class.java)
-        val variantFiltersAdapter: JsonAdapter<List<VariantFiltersEntity>> = moshi.adapter(ruleListType)
+        val variantFiltersAdapter: JsonAdapter<VariantFiltersEntity> = moshi.adapter(variantFilters)
     }
 }
