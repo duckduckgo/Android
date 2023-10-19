@@ -21,10 +21,11 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.api.PrivacyVariantManagerPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
+import com.duckduckgo.privacy.config.impl.features.variantmanager.VariantManagerPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -40,7 +41,10 @@ import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 
 interface PrivacyConfigPersister {
-    suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig, eTag: String? = null)
+    suspend fun persistPrivacyConfig(
+        jsonPrivacyConfig: JsonPrivacyConfig,
+        eTag: String? = null,
+    )
 }
 
 private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
@@ -50,7 +54,7 @@ private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
 @ContributesBinding(AppScope::class)
 class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
-    private val privacyVariantManagerPluginPoint: PluginPoint<PrivacyVariantManagerPlugin>,
+    private val variantManagerPlugin: VariantManagerPlugin,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
@@ -59,7 +63,10 @@ class RealPrivacyConfigPersister @Inject constructor(
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
 ) : PrivacyConfigPersister {
 
-    override suspend fun persistPrivacyConfig(jsonPrivacyConfig: JsonPrivacyConfig, eTag: String?) {
+    override suspend fun persistPrivacyConfig(
+        jsonPrivacyConfig: JsonPrivacyConfig,
+        eTag: String?,
+    ) {
         val privacyConfig = privacyConfigRepository.get()
         val newVersion = jsonPrivacyConfig.version
         val previousVersion = privacyConfig?.version ?: 0
@@ -105,9 +112,7 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
                 jsonPrivacyConfig.variantManager?.let { jsonObject ->
-                    privacyVariantManagerPluginPoint.getPlugins().forEach { privacyVariantManagerPlugin ->
-                        privacyVariantManagerPlugin.store(jsonObject.toString())
-                    }
+                    variantManagerPlugin.store(PrivacyFeatureName.VariantManagerName.name, jsonObject.toString())
                 }
             }
             listener.privacyConfigUpdated()

@@ -22,14 +22,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface ExperimentVariantDao {
+abstract class ExperimentVariantDao {
 
     @Query("select * from experiment_variants")
-    fun variants(): List<ExperimentVariantEntity>
+    abstract fun variants(): List<ExperimentVariantEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(variants: List<ExperimentVariantEntity>)
+    abstract fun insertAll(variants: List<ExperimentVariantEntity>)
 
     @Query("delete from experiment_variants")
-    fun delete()
+    abstract fun delete()
 }

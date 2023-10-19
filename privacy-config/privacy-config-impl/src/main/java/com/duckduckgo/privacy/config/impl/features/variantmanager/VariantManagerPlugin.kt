@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.variantmanager
+package com.duckduckgo.privacy.config.impl.features.variantmanager
 
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.PrivacyVariantManagerPlugin
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantEntity
+import com.duckduckgo.app.statistics.variantmanager.VariantFiltersEntity
+import com.duckduckgo.app.statistics.variantmanager.VariantManagerConfig
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
 class VariantManagerPlugin @Inject constructor(
     private val variantManager: VariantManager,
-) : PrivacyVariantManagerPlugin {
+) : PrivacyFeaturePlugin {
 
-    override fun store(jsonString: String): Boolean {
+    override fun store(featureName: String, jsonString: String): Boolean {
         val moshi = Moshi.Builder().build()
         val jsonAdapter: JsonAdapter<VariantManagerConfig> =
             moshi.adapter(VariantManagerConfig::class.java)
@@ -54,4 +55,7 @@ class VariantManagerPlugin @Inject constructor(
 
         return true
     }
+
+    override val featureName: String
+        get() = PrivacyFeatureName.VariantManagerName.name
 }
