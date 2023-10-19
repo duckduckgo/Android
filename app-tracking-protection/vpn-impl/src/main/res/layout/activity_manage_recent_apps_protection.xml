@@ -42,6 +42,45 @@
             android:orientation="vertical">
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/systemSettingsByline"
+                app:typography="body2"
+                app:textType="secondary"
+                android:text="@string/atp_ManageRecentAppsProtectionSystemSettingsByline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"/>
+
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/atp_ManageRecentAppsProtectionSectionTitle" />
+
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/always_on"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/atp_ManageRecentAppsProtectionAlwaysOnTitle"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:secondaryText="@string/atp_ManageRecentAppsProtectionAlwaysOnByline"
+                    app:showSwitch="false"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/unrestricted_battery_usage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/atp_ManageRecentAppsProtectionBatteryTitle"
+                    app:secondaryText="@string/atp_ManageRecentAppsProtectionBatteryByline"
+                    app:showSwitch="true"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/manageRecentAppsReportIssues"
                 app:typography="body2"
                 app:textType="secondary"
@@ -52,6 +91,19 @@
                 android:paddingEnd="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_4"
                 android:layout_marginBottom="@dimen/keyline_4"/>
+
+
+            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                    app:defaultPadding="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    android:layout_marginBottom="@dimen/keyline_4"/>
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/atp_RecentAppActivity" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/manageRecentAppsSkeleton"

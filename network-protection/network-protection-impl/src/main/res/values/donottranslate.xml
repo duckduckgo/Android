@@ -135,6 +135,8 @@
     <string name="netpVpnSettingSecureDNS">Secure DNS</string>
     <string name="netpVpnSettingSecureDNSByLine">Prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver. For your security, this feature cannot be disabled.</string>
 
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Prevents Android from stopping the VPN.</string>
     <!-- VPN Notification settings -->
     <string name="netpVpnSettingNotificationEnabled">VPN Enabled</string>
     <string name="netpVpnSettingNotificationEnabledByline">Display a persistent notification when the VPN is active</string>

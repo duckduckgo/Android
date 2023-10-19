@@ -437,7 +437,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         currentTab?.tabId?.let {
             val params = PrivacyDashboardHybridWithTabIdParam(it)
             val intent = globalActivityStarter.startIntent(this, params)
-            startActivityForResult(intent, DASHBOARD_REQUEST_CODE)
+            intent?.let {
+                startActivityForResult(it, DASHBOARD_REQUEST_CODE)
+            }
         }
     }
 
