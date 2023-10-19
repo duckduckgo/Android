@@ -25,6 +25,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.DividerItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.HeaderItem
@@ -44,6 +45,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     private val contentProvider: GeoSwitchingContentProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val wgServerDebugProvider: WgServerDebugProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val viewState = MutableStateFlow(ViewState())
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
@@ -92,6 +94,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             if (netPGeoswitchingRepository.getUserPreferredLocation().countryCode != countryCode) {
                 netPGeoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = countryCode))
+                wgServerDebugProvider.clearSelectedServerName()
             }
         }
     }
@@ -99,6 +102,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     fun onNearestAvailableCountrySelected() {
         viewModelScope.launch(dispatcherProvider.io()) {
             netPGeoswitchingRepository.setUserPreferredLocation(UserPreferredLocation())
+            wgServerDebugProvider.clearSelectedServerName()
         }
     }
 }

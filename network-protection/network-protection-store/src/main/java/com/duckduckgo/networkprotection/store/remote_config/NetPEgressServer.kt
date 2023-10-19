@@ -28,6 +28,8 @@ data class NetPEgressServer(
     val hostnames: List<String>,
     val ips: List<String>,
     val port: Long,
+    val countryCode: String? = null,
+    val city: String? = null,
 )
 
 @Entity(tableName = "netp_selected_egress_server_name")
