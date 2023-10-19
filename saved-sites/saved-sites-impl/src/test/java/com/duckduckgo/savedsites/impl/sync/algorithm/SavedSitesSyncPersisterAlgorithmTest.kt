@@ -100,7 +100,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
             ),
             twoHoursAgo,
         )
-        algorithm.processEntries(someEntries, DEDUPLICATION)
+        algorithm.processEntries(someEntries, DEDUPLICATION, threeHoursAgo)
 
         verify(deduplicationStrategy).processBookmarkFolder(folder)
         verify(deduplicationStrategy).processBookmark(bookmark, folder.id)
@@ -128,7 +128,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
             ),
             twoHoursAgo,
         )
-        algorithm.processEntries(someEntries, TIMESTAMP)
+        algorithm.processEntries(someEntries, TIMESTAMP, threeHoursAgo)
 
         verify(timestampStrategy).processBookmarkFolder(folder)
         verify(timestampStrategy).processBookmark(bookmark, folder.id)
@@ -156,7 +156,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
             ),
             twoHoursAgo,
         )
-        algorithm.processEntries(someEntries, REMOTE_WINS)
+        algorithm.processEntries(someEntries, REMOTE_WINS, threeHoursAgo)
 
         verify(remoteStrategy).processBookmarkFolder(folder)
         verify(remoteStrategy).processBookmark(bookmark, folder.id)
@@ -185,7 +185,7 @@ class SavedSitesSyncPersisterAlgorithmTest {
             twoHoursAgo,
         )
 
-        val result = algorithm.processEntries(someEntries, LOCAL_WINS)
+        val result = algorithm.processEntries(someEntries, LOCAL_WINS, threeHoursAgo)
 
         assertTrue(result is Success)
         val success = result as Success
@@ -212,9 +212,8 @@ class SavedSitesSyncPersisterAlgorithmTest {
 
         whenever(repository.getSavedSite(bookmark.id)).thenReturn(null)
 
-        algorithm.processEntries(someEntries, LOCAL_WINS)
-
-        val result = algorithm.processEntries(someEntries, LOCAL_WINS)
+        algorithm.processEntries(someEntries, LOCAL_WINS, threeHoursAgo)
+        val result = algorithm.processEntries(someEntries, LOCAL_WINS, threeHoursAgo)
 
         assertTrue(result is SyncMergeResult.Success)
         val success = result as SyncMergeResult.Success

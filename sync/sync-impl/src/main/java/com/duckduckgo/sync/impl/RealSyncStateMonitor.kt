@@ -61,18 +61,19 @@ class RealSyncStateMonitor @Inject constructor(
     ): SyncState {
         return if (signedIn) {
             if (attempt == null) {
-                Timber.d("Sync-Feature: Sync Monitor signed in, READY state")
+                Timber.d("Sync-State: Sync Monitor signed in, Sync in READY state")
                 SyncState.READY
             } else {
-                Timber.d("Sync-Feature: Sync Monitor signed in, sync in ${attempt.state} state")
-                when (attempt.state) {
+                Timber.d("Sync-State: Sync Monitor signed $signedIn, sync in ${attempt.state} state")
+                val state = when (attempt.state) {
                     IN_PROGRESS -> SyncState.IN_PROGRESS
                     SUCCESS -> SyncState.READY
                     FAIL -> FAILED
                 }
+                state
             }
         } else {
-            Timber.d("Sync-Feature: Sync Monitor not signed in, OFF state")
+            Timber.d("Sync-State: Sync Monitor not signed in, Sync in OFF state")
             return OFF
         }
     }

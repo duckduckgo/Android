@@ -41,18 +41,19 @@ class SavedSitesSyncDataProvider @Inject constructor(
 ) : SyncableDataProvider {
 
     override fun getChanges(): SyncChangesRequest {
-        val since = savedSitesSyncStore.modifiedSince
-        val updates = if (since == "0") {
+        savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
+        val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
             allContent()
         } else {
-            changesSince(since)
+            changesSince(savedSitesSyncStore.clientModifiedSince)
         }
+        Timber.d("Sync-Bookmarks: modifiedSince changes: $updates")
         return formatUpdates(updates)
     }
 
     @VisibleForTesting
     fun changesSince(since: String): List<SyncBookmarkEntry> {
-        Timber.d("Sync-Feature: generating changes since $since")
+        Timber.i("Sync-Bookmarks: generating changes since $since")
         val updates = mutableListOf<SyncBookmarkEntry>()
 
         // we start adding individual folders that have been modified
@@ -83,12 +84,12 @@ class SavedSitesSyncDataProvider @Inject constructor(
 
     @VisibleForTesting
     fun allContent(): List<SyncBookmarkEntry> {
-        Timber.d("Sync-Feature: generating all content")
+        Timber.i("Sync-Bookmarks: generating all content")
         val hasFavorites = repository.hasFavorites()
         val hasBookmarks = repository.hasBookmarks()
 
         if (!hasFavorites && !hasBookmarks) {
-            Timber.d("Sync-Feature: nothing to generate, favourites and bookmarks empty")
+            Timber.d("Sync-Bookmarks: nothing to generate, favourites and bookmarks empty")
             return emptyList()
         }
 
@@ -200,16 +201,16 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     private fun formatUpdates(updates: List<SyncBookmarkEntry>): SyncChangesRequest {
-        val modifiedSince = if (savedSitesSyncStore.modifiedSince == "0") {
+        val modifiedSince = if (savedSitesSyncStore.serverModifiedSince == "0") {
             ModifiedSince.FirstSync
         } else {
-            ModifiedSince.Timestamp(savedSitesSyncStore.modifiedSince)
+            ModifiedSince.Timestamp(savedSitesSyncStore.serverModifiedSince)
         }
 
         return if (updates.isEmpty()) {
             SyncChangesRequest(BOOKMARKS, "", modifiedSince)
         } else {
-            val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.modifiedSince)
+            val bookmarkUpdates = SyncBookmarkUpdates(updates, savedSitesSyncStore.serverModifiedSince)
             val patch = SyncBookmarksRequest(bookmarkUpdates, DatabaseDateFormatter.iso8601())
             val allDataJSON = Adapters.patchAdapter.toJson(patch)
             SyncChangesRequest(BOOKMARKS, allDataJSON, modifiedSince)

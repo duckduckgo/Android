@@ -25,7 +25,6 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgo
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
-import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 import junit.framework.Assert
@@ -77,11 +76,15 @@ class SavedSitesSyncPersisterTest {
 
     @Test
     fun whenProcessingDataInEmptyDBThenResultIsSuccess() {
-        whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(Success(true))
-        whenever(store.modifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(persisterAlgorithm.processEntries(any(), any(), any())).thenReturn(Success(true))
+        whenever(store.serverModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(store.startTimeStamp).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(store.clientModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(repository.getEntitiesModifiedBefore(any())).thenReturn(emptyList())
+
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_first_get.json")
         val validChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
-        val result = syncPersister.process(validChanges, DEDUPLICATION)
+        val result = syncPersister.process(validChanges, TIMESTAMP)
 
         assertTrue(result is Success)
     }
@@ -97,7 +100,10 @@ class SavedSitesSyncPersisterTest {
 
     @Test
     fun whenMergingWithDeletedDataThenResultIsSuccess() {
-        whenever(persisterAlgorithm.processEntries(any(), any())).thenReturn(Success(true))
+        whenever(store.serverModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(store.startTimeStamp).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(store.clientModifiedSince).thenReturn(DatabaseDateFormatter.iso8601())
+        whenever(persisterAlgorithm.processEntries(any(), any(), any())).thenReturn(Success(true))
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/merger_deleted_entries.json")
         val deletedChanges = SyncChangesResponse(BOOKMARKS, updatesJSON)
         val result = syncPersister.process(deletedChanges, TIMESTAMP)
