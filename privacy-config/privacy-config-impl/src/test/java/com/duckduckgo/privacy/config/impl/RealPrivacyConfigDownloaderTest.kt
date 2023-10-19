@@ -18,13 +18,14 @@ package com.duckduckgo.privacy.config.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
+import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -58,12 +59,12 @@ class RealPrivacyConfigDownloaderTest {
                     TestFailingPrivacyConfigService(),
                     mockPrivacyConfigPersister,
                 )
-            assertFalse(testee.download())
+            assertTrue(testee.download() is Error)
         }
 
     @Test
     fun whenDownloadIsSuccessfulThenReturnTrue() =
-        runTest { assertTrue(testee.download()) }
+        runTest { assertTrue(testee.download() is Success) }
 
     @Test
     fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() =

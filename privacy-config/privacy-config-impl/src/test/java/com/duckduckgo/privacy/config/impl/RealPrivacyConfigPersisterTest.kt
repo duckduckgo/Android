@@ -148,7 +148,7 @@ class RealPrivacyConfigPersisterTest {
     @Test
     fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneStoredThenDoNothing() =
         runTest {
-            privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme", eTag = "eTag"))
+            privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -160,7 +160,7 @@ class RealPrivacyConfigPersisterTest {
     fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneAndDifferentPluginsThenStoreNewConfig() =
         runTest {
             sharedPreferences.edit().putInt("plugin_signature", 0)
-            privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme", eTag = "eTag"))
+            privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -171,7 +171,7 @@ class RealPrivacyConfigPersisterTest {
     @Test
     fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenDoNothing() =
         runTest {
-            privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme", eTag = "eTag"))
+            privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -183,7 +183,7 @@ class RealPrivacyConfigPersisterTest {
     fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredAndDifferentPluginsThenUpdateConfig() =
         runTest {
             sharedPreferences.edit().putInt("plugin_signature", 0)
-            privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme", eTag = "eTag"))
+            privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -194,7 +194,7 @@ class RealPrivacyConfigPersisterTest {
     @Test
     fun whenPersistPrivacyConfigAndVersionIsHigherThanPreviousOneStoredThenStoreNewConfig() =
         runTest {
-            privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme", eTag = "eTag"))
+            privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -205,7 +205,7 @@ class RealPrivacyConfigPersisterTest {
     fun whenPersistPrivacyConfigAndVersionIsHigherThanPreviousOneStoredAndDifferentPluginsThenStoreNewConfig() =
         runTest {
             sharedPreferences.edit().putInt("plugin_signature", 0)
-            privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme", eTag = "eTag"))
+            privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 

@@ -39,7 +39,21 @@
             app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress"
+            app:indicatorColor="?attr/daxColorSecondaryText"
+            android:indeterminate="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
     <ScrollView
+            android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="64dp"
@@ -51,34 +65,89 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                android:id="@+id/help"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/keyline_3"
-                android:text="Hint: you can use something like https://www.jsonblob.com/ and use https://jsonblob.com/api/jsonBlob/ID as the URL \n\nUsing an endpoint with a bad formatted config could lead to the app crashing.\n\nTo reload the config, restart the app." />
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/currentVersion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Supported Version"
+                    app:secondaryText="v4"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/latestVersion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Latest Version Loaded"
+                    app:secondaryText="12345667"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/timestamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Latest Loaded Date"
+                    app:secondaryText="12345667"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/latestUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="Latest Loaded URL"
+                    app:secondaryText="12345667"
+            />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
                 android:id="@+id/endpointToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="Use Custom Endpoint?"
+                app:primaryText="Use Custom URL? (disabled uses real config)"
                 app:showSwitch="true" />
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
                 android:id="@+id/urlInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/keyline_3"
+                android:layout_marginRight="@dimen/keyline_3"
+                android:layout_marginLeft="@dimen/keyline_3"
                 android:hint="Add your custom URL here"
                 app:editable="true" />
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
                 android:id="@+id/validation"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_3"
-                android:layout_margin="@dimen/keyline_3" />
+                app:textType="secondary"
+                app:typography="body2_bold"
+                android:layout_marginRight="@dimen/keyline_3"
+                android:layout_marginLeft="@dimen/keyline_3" />
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/help"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/keyline_3"
+                    app:textType="secondary"
+                    app:typography="body2"
+                    android:text="Hint: you can use something like https://www.jsonblob.com/ and use https://jsonblob.com/api/ID as the URL"
+            />
+
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/load"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Force load config"
+                    android:layout_marginRight="@dimen/keyline_3"
+                    android:layout_marginLeft="@dimen/keyline_3" />
+
+            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive
+                    android:id="@+id/reset"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Reset to default"
+                    android:layout_marginRight="@dimen/keyline_3"
+                    android:layout_marginLeft="@dimen/keyline_3" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

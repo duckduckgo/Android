@@ -20,6 +20,8 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
+import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -49,7 +51,7 @@ class PrivacyConfigDownloadWorkerTest {
     @Test
     fun whenDoWorkIfDownloadReturnsTrueThenReturnSuccess() =
         runTest {
-            whenever(mockPrivacyConfigDownloader.download()).thenReturn(true)
+            whenever(mockPrivacyConfigDownloader.download()).thenReturn(Success)
 
             val worker =
                 TestListenableWorkerBuilder<PrivacyConfigDownloadWorker>(context = context).build()
@@ -64,7 +66,7 @@ class PrivacyConfigDownloadWorkerTest {
     @Test
     fun whenDoWorkIfDownloadReturnsFalseThenReturnRetry() =
         runTest {
-            whenever(mockPrivacyConfigDownloader.download()).thenReturn(false)
+            whenever(mockPrivacyConfigDownloader.download()).thenReturn(Error("error"))
 
             val worker =
                 TestListenableWorkerBuilder<PrivacyConfigDownloadWorker>(context = context).build()

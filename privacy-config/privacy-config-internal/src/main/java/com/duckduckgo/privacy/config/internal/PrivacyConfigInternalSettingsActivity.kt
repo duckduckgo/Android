@@ -21,27 +21,39 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.webkit.URLUtil
 import android.widget.CompoundButton
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command
+import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigDownloaded
+import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigError
+import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.Loading
+import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.ViewState
 import com.duckduckgo.privacy.config.internal.databinding.ActivityPrivacyConfigInternalSettingsBinding
-import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 class PrivacyConfigInternalSettingsActivity : DuckDuckGoActivity() {
 
-    @Inject lateinit var store: DevPrivacyConfigSettingsDataStore
+    @Inject lateinit var downloader: PrivacyConfigDownloader
 
     private val binding: ActivityPrivacyConfigInternalSettingsBinding by viewBinding()
+    private val viewModel: PrivacyConfigInternalViewModel by bindViewModel()
 
     private val endpointToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        store.useCustomPrivacyConfigUrl = toggleState
+        viewModel.changeToggleState(toggleState)
         binding.urlInput.isEditable = toggleState
         if (!toggleState) binding.validation.hide()
         runValidation()
@@ -51,10 +63,19 @@ class PrivacyConfigInternalSettingsActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
+        configureViews()
+        viewModel.start()
+        viewModel.viewState().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+            renderView(it)
+        }.launchIn(lifecycleScope)
 
-        binding.urlInput.text = store.remotePrivacyConfigUrl ?: ""
-        binding.urlInput.isEditable = store.useCustomPrivacyConfigUrl
-        binding.endpointToggle.setIsChecked(store.useCustomPrivacyConfigUrl)
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun configureViews() {
         binding.endpointToggle.setOnCheckedChangeListener(endpointToggleListener)
         binding.urlInput.addTextChangedListener(
             object : TextWatcher {
@@ -67,27 +88,74 @@ class PrivacyConfigInternalSettingsActivity : DuckDuckGoActivity() {
                 }
 
                 override fun afterTextChanged(p0: Editable?) {
-                    store.remotePrivacyConfigUrl = p0.toString()
+                    viewModel.changeCustomUrl(p0.toString())
                     runValidation()
                 }
             },
         )
-        runValidation()
-    }
-
-    private fun runValidation() {
-        if (canUrlBeChanged()) {
-            binding.validation.hide()
-        } else {
-            binding.validation.show()
-            binding.validation.text = "URL is not valid or toggle is not enabled and the default URL will be used"
+        binding.load.setOnClickListener {
+            runValidation()
+            viewModel.download()
+        }
+        binding.reset.setOnClickListener {
+            binding.endpointToggle.setIsChecked(false)
+            viewModel.download()
         }
     }
 
-    private fun canUrlBeChanged(): Boolean {
-        val storedUrl = store.remotePrivacyConfigUrl
-        val isCustomSettingEnabled = store.useCustomPrivacyConfigUrl
-        return isCustomSettingEnabled && !storedUrl.isNullOrEmpty() && URLUtil.isValidUrl(storedUrl)
+    private fun renderView(viewState: ViewState) {
+        binding.latestVersion.setSecondaryText(viewState.latestVersionLoaded)
+        binding.timestamp.setSecondaryText(viewState.timestamp)
+        binding.latestUrl.setSecondaryText(viewState.latestUrl)
+        binding.urlInput.text = viewState.customUrl
+        binding.urlInput.isEditable = viewState.toggleState
+        binding.endpointToggle.setIsChecked(viewState.toggleState)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Loading -> {
+                binding.progress.show()
+                binding.container.hide()
+            }
+            is ConfigDownloaded -> {
+                binding.progress.hide()
+                binding.container.show()
+                onConfigLoaded(command.url)
+            }
+            is ConfigError -> {
+                binding.progress.hide()
+                binding.container.show()
+                onConfigError(command.message)
+            }
+        }
+    }
+
+    private fun runValidation() {
+        if (viewModel.canUrlBeChanged()) {
+            binding.validation.gone()
+            binding.load.isEnabled = true
+        } else {
+            binding.validation.show()
+            binding.load.isEnabled = false
+            binding.validation.text = "URL is not valid or toggle is disabled. Default URL will be used"
+        }
+    }
+
+    private fun onConfigLoaded(url: String) {
+        TextAlertDialogBuilder(this)
+            .setTitle("Remote Config Loaded")
+            .setPositiveButton(R.string.ok)
+            .setMessage("$url was successfully loaded and applied.")
+            .show()
+    }
+    private fun onConfigError(message: String) {
+        TextAlertDialogBuilder(this)
+            .setTitle("Something went wrong :(")
+            .setMessage(message)
+            .setDestructiveButtons(true)
+            .setPositiveButton(R.string.ok)
+            .show()
     }
 
     companion object {

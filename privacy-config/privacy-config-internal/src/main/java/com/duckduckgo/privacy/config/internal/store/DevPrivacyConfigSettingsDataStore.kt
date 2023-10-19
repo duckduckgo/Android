@@ -26,6 +26,7 @@ import javax.inject.Inject
 interface DevPrivacyConfigSettingsDataStore {
     var remotePrivacyConfigUrl: String?
     var useCustomPrivacyConfigUrl: Boolean
+    var canUrlBeChanged: Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -39,6 +40,10 @@ class DevPrivacyConfigSettingsDataStoreImpl @Inject constructor(private val cont
         get() = preferences.getBoolean(KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED, enabled) }
 
+    override var canUrlBeChanged: Boolean
+        get() = preferences.getBoolean(KEY_URL_CHANGED, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_URL_CHANGED, enabled) }
+
     private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     private fun selectedRemotePrivacyConfigUrlSavedValue(): String? {
@@ -49,5 +54,6 @@ class DevPrivacyConfigSettingsDataStoreImpl @Inject constructor(private val cont
         private const val FILENAME = "com.duckduckgo.privacy.config.internal.settings"
         private const val KEY_SELECTED_REMOTE_PRIVACY_CONFIG = "KEY_SELECTED_REMOTE_PRIVACY_CONFIG"
         private const val KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED = "KEY_CUSTOM_REMOTE_PRIVACY_CONFIG_ENABLED"
+        private const val KEY_URL_CHANGED = "KEY_URL_CHANGED"
     }
 }

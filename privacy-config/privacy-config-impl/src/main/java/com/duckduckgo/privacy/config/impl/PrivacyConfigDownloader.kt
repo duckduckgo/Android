@@ -19,13 +19,15 @@ package com.duckduckgo.privacy.config.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
+import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
 
 interface PrivacyConfigDownloader {
-    suspend fun download(): Boolean
+    suspend fun download(): ConfigDownloadResult
 }
 
 @WorkerThread
@@ -35,18 +37,32 @@ class RealPrivacyConfigDownloader @Inject constructor(
     private val privacyConfigPersister: PrivacyConfigPersister,
 ) : PrivacyConfigDownloader {
 
-    override suspend fun download(): Boolean {
+    override suspend fun download(): ConfigDownloadResult {
         Timber.d("Downloading privacy config")
         val response = runCatching {
             privacyConfigService.privacyConfig()
         }.onSuccess { response ->
             val eTag = response.headers().extractETag()
             response.body()?.let {
-                privacyConfigPersister.persistPrivacyConfig(it, eTag)
+                runCatching {
+                    privacyConfigPersister.persistPrivacyConfig(it, eTag)
+                }.onFailure {
+                    return Error(it.localizedMessage)
+                }
             }
         }.onFailure {
             Timber.w(it.localizedMessage)
         }
-        return response.isSuccess
+
+        return if (response.isFailure) {
+            Error(response.exceptionOrNull()?.localizedMessage)
+        } else {
+            Success
+        }
     }
+}
+
+sealed class ConfigDownloadResult {
+    object Success : ConfigDownloadResult()
+    data class Error(val error: String?) : ConfigDownloadResult()
 }
