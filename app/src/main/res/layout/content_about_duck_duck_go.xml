@@ -50,33 +50,21 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginBottom="@dimen/keyline_4"
-            android:text="@string/duckDuckGoPrivacySimplified"
+            android:text="@string/aboutHeader"
             android:textAlignment="center"
             app:typography="h1" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/aboutText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/keyline_6"
             android:paddingEnd="@dimen/keyline_6"
             android:text="@string/aboutDescription"
-            android:textAlignment="center"
+            android:textAlignment="viewStart"
             app:textType="secondary"
             app:typography="body1"
             tools:text="Long description would go here\n\nLots and lots of words" />
-
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-            android:id="@+id/learnMoreLink"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:layout_marginBottom="10dp"
-            android:text="@string/aboutMoreLink"
-            android:textAlignment="center"
-            android:textColor="?attr/daxColorAccentBlue"
-            app:typography="body1_bold" />
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"

@@ -52,6 +52,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchBrowserWithLearnMoreUrl : Command()
+        object LaunchBrowserWithPrivacyProtectionsUrl : Command()
         object LaunchWebViewWithPrivacyPolicyUrl : Command()
         object ShowNetPUnlockedSnackbar : Command()
         object LaunchNetPWaitlist : Command()
@@ -83,6 +84,11 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     fun onLearnMoreLinkClicked() {
         viewModelScope.launch { command.send(Command.LaunchBrowserWithLearnMoreUrl) }
         pixel.fire(SETTINGS_ABOUT_DDG_LEARN_MORE_PRESSED)
+    }
+
+    fun onPrivacyProtectionsLinkClicked() {
+        viewModelScope.launch { command.send(Command.LaunchBrowserWithPrivacyProtectionsUrl) }
+        pixel.fire(SETTINGS_ABOUT_DDG_PRIVACY_PROTECTIONS_PRESSED)
     }
 
     fun onPrivacyPolicyClicked() {
