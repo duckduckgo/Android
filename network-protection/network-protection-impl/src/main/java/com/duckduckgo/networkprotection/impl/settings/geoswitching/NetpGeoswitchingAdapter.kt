@@ -20,11 +20,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
+import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ItemGeoswitchingCountryBinding
 import com.duckduckgo.networkprotection.impl.databinding.ItemGeoswitchingDividerBinding
 import com.duckduckgo.networkprotection.impl.databinding.ItemGeoswitchingHeaderBinding
@@ -107,7 +109,7 @@ class NetpGeoswitchingAdapter constructor(
         private val binding: ItemGeoswitchingHeaderBinding,
     ) : ViewHolder(binding.root) {
         fun bind(headerItem: HeaderItem) {
-            binding.root.primaryText = headerItem.header
+            binding.root.primaryText = binding.root.context.getString(headerItem.header)
         }
     }
 
@@ -121,8 +123,8 @@ class NetpGeoswitchingAdapter constructor(
             currentSelectedCountryCode: String?,
         ) {
             with(binding.root) {
-                setPrimaryText(recommendedItem.title)
-                setSecondaryText(recommendedItem.subtitle)
+                setPrimaryText(context.getString(recommendedItem.title))
+                setSecondaryText(context.getString(recommendedItem.subtitle))
 
                 // Sets initial state
                 if (currentSelectedCountryCode.isNullOrEmpty()) {
@@ -162,17 +164,18 @@ class NetpGeoswitchingAdapter constructor(
                     updateLastCheckedItemListener.onCheckedChanged(radioButton, true)
                 }
 
-                setPrimaryText(countryItem.countryTitle)
+                setPrimaryText(countryItem.countryName)
                 setLeadingEmojiIcon(countryItem.countryEmoji)
-                countryItem.countrySubtitle?.let {
-                    setSecondaryText(it)
+
+                if (countryItem.cities.size > 1) {
+                    setSecondaryText(String.format(context.getString(R.string.netpGeoswitchingHeaderCountrySubtitle), countryItem.cities.size))
                     trailingIconContainer.show()
                     setTrailingIconClickListener {
                         // Automatically select the country before the user can choose the specific city
                         radioButton.isChecked = true
-                        onItemMenuClicked(countryItem.countryTitle, countryItem.cities)
+                        onItemMenuClicked(countryItem.countryName, countryItem.cities)
                     }
-                } ?: {
+                } else {
                     secondaryText.gone()
                     trailingIconContainer.gone()
                 }
@@ -199,18 +202,17 @@ class NetpGeoswitchingAdapter constructor(
 }
 
 sealed class GeoswitchingListItem {
-    data class HeaderItem(val header: String) : GeoswitchingListItem()
+    data class HeaderItem(@StringRes val header: Int) : GeoswitchingListItem()
     data class RecommendedItem(
-        val title: String,
-        val subtitle: String,
+        @StringRes val title: Int,
+        @StringRes val subtitle: Int,
     ) : GeoswitchingListItem()
 
     object DividerItem : GeoswitchingListItem()
     data class CountryItem(
         val countryCode: String,
         val countryEmoji: String,
-        val countryTitle: String,
-        val countrySubtitle: String?,
+        val countryName: String,
         val cities: List<String>,
     ) : GeoswitchingListItem()
 }
