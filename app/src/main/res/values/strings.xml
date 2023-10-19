@@ -599,10 +599,6 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
     <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">You previously granted %1$s permission to access your device location.</string>
 
-    <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website" translatable="false">Grant %1$s permission to access Digital Rights Management (DRM) software?</string>
-    <string name="drmSiteDialogSubtitle" translatable="false">DRM is used to play protected media content, but also provides access to device identifiers. Only grant permission to sites you trust. You can manage permissions at any time in Settings. Learn more here.</string>
-
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Personal data can build up in your browser. Yuck. Use the Fire Button to burn it all away. Give it a try now! &#128071;</string>
 

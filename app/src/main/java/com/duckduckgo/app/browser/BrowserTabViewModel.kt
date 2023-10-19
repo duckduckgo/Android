@@ -465,8 +465,6 @@ class BrowserTabViewModel @Inject constructor(
             val request: PermissionRequest,
         ) : Command()
 
-        class ShowSiteDrmPermissionsDialog(val request: PermissionRequest) : Command()
-
         class ShowUserCredentialSavedOrUpdatedConfirmation(
             val credentials: LoginCredentials,
             val includeShortcutToViewCredential: Boolean,
@@ -1492,18 +1490,12 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val url = request.origin.toString()
             val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
-            var sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
+            val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
             if (sitePermissionsGranted.isNotEmpty()) {
                 command.postValue(GrantSitePermissionRequest(sitePermissionsGranted, request))
             }
-
-            if (sitePermissionsToAsk.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
-                sitePermissionsToAsk = sitePermissionsToAsk.filter { it != PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID }
-                command.postValue(ShowSiteDrmPermissionsDialog(request))
-            }
-
             if (sitePermissionsToAsk.isNotEmpty()) {
-                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk.toTypedArray(), request))
+                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
             }
         }
     }
@@ -1548,20 +1540,6 @@ class BrowserTabViewModel @Inject constructor(
                     command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
                 }
             }
-        }
-    }
-
-    fun onSiteDrmPermissionSave(
-        domain: String,
-        drmPermission: SitePermissionAskSettingType,
-    ) {
-        val sitePermissionsEntity = SitePermissionsEntity(
-            domain = domain,
-            askDrmSetting = drmPermission.name,
-        )
-
-        viewModelScope.launch {
-            sitePermissionsRepository.savePermission(sitePermissionsEntity)
         }
     }
 
