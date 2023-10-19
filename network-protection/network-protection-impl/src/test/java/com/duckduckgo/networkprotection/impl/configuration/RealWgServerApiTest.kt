@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.FakeNetPGeoswitchingRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -30,6 +31,7 @@ class RealWgServerApiTest {
 
     private lateinit var productionWgServerDebugProvider: DefaultWgServerDebugProvider
     private lateinit var internalWgServerDebugProvider: FakeWgServerDebugProvider
+    private lateinit var geoswitchingRepository: FakeNetPGeoswitchingRepository
     private lateinit var productionApi: RealWgServerApi
     private lateinit var internalApi: RealWgServerApi
 
@@ -39,14 +41,17 @@ class RealWgServerApiTest {
 
         productionWgServerDebugProvider = DefaultWgServerDebugProvider()
         internalWgServerDebugProvider = FakeWgServerDebugProvider(wgVpnControllerService)
+        geoswitchingRepository = FakeNetPGeoswitchingRepository()
 
         internalApi = RealWgServerApi(
             wgVpnControllerService,
             internalWgServerDebugProvider,
+            geoswitchingRepository,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
+            geoswitchingRepository,
         )
     }
 
