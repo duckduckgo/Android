@@ -44,7 +44,12 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
         bindViews()
         observeViewModel()
-        viewModel.initialize(this)
+        lifecycle.addObserver(viewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(viewModel)
     }
 
     private fun bindViews() {

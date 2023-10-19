@@ -16,8 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
@@ -34,15 +33,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
-@RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class NetpGeoSwitchingViewModelTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val mockLifecycleOwner = mock<LifecycleOwner>()
     private lateinit var testee: NetpGeoSwitchingViewModel
     private val fakeContentProvider = FakeGeoSwitchingContentProvider()
     private val fakeRepository = FakeNetPGeoswitchingRepository()
@@ -58,7 +56,7 @@ class NetpGeoSwitchingViewModelTest {
 
     @Test
     fun whenViewModelIsInitializedThenViewStateShouldEmitParsedList() = runTest {
-        testee.initialize(context)
+        testee.onStart(mockLifecycleOwner)
         testee.viewState().test {
             expectMostRecentItem().also {
                 assertEquals(6, it.items.size)
@@ -72,8 +70,7 @@ class NetpGeoSwitchingViewModelTest {
                     CountryItem(
                         countryCode = "uk",
                         countryEmoji = "🇬🇧",
-                        countryTitle = "UK",
-                        countrySubtitle = null,
+                        countryName = "UK",
                         cities = emptyList(),
                     ),
                 )
@@ -83,8 +80,7 @@ class NetpGeoSwitchingViewModelTest {
                     CountryItem(
                         countryCode = "us",
                         countryEmoji = "🇺🇸",
-                        countryTitle = "United States",
-                        countrySubtitle = "4 cities",
+                        countryName = "United States",
                         cities = listOf("Chicago", "El Segundo", "Newark", "Atlanta"),
                     ),
                 )
