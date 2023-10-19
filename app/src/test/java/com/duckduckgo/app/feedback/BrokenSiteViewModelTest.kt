@@ -122,7 +122,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory()
@@ -163,7 +163,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory()
@@ -205,7 +205,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory()
@@ -247,7 +247,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory()
@@ -289,7 +289,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = arrayOf("dashboard_highlighted_toggle"),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory()
@@ -316,7 +316,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory()
@@ -338,7 +338,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory()
@@ -361,7 +361,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory(categoryIndex)
@@ -383,7 +383,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         selectAndAcceptCategory(0)
@@ -405,7 +405,7 @@ class BrokenSiteViewModelTest {
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
             params = emptyArray(),
-            errorCodes = "",
+            errorCodes = emptyArray(),
             httpErrorCodes = "",
         )
         testee.onCategoryIndexChanged(1)

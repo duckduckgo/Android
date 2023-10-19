@@ -419,7 +419,7 @@ class BrowserWebViewClient @Inject constructor(
             if (request?.isForMainFrame == true) {
                 Timber.d("recordErrorCode for ${request.url}")
                 webViewClientListener?.recordErrorCode(
-                    "${it.errorCode.asStringErrorCode()}:${it.description}",
+                    "${it.errorCode.asStringErrorCode()} - ${it.description}",
                     request.url.toString(),
                 )
             }

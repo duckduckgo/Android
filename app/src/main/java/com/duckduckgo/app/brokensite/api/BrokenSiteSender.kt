@@ -33,7 +33,6 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesBinding
-import java.net.URLEncoder
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -82,8 +81,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 CONSENT_SELF_TEST_FAILED to brokenSite.consentSelfTestFailed.toBinaryString(),
                 REMOTE_CONFIG_VERSION to privacyConfig.privacyConfigData()?.version.orEmpty(),
                 REMOTE_CONFIG_ETAG to privacyConfig.privacyConfigData()?.eTag.orEmpty(),
-                ERROR_CODES_KEY to URLEncoder.encode(brokenSite.errorCodes, "UTF-8"),
-                HTTP_ERROR_CODES_KEY to URLEncoder.encode(brokenSite.httpErrorCodes, "UTF-8"),
+                ERROR_CODES_KEY to brokenSite.errorCodes,
+                HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -123,7 +122,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val CONSENT_SELF_TEST_FAILED = "consentSelftestFailed"
         private const val REMOTE_CONFIG_VERSION = "remoteConfigVersion"
         private const val REMOTE_CONFIG_ETAG = "remoteConfigEtag"
-        private const val ERROR_CODES_KEY = "errorCodes"
+        private const val ERROR_CODES_KEY = "errorDescriptions"
         private const val HTTP_ERROR_CODES_KEY = "httpErrorCodes"
     }
 }

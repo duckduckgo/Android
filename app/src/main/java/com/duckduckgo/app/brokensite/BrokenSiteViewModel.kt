@@ -31,6 +31,8 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -38,7 +40,11 @@ class BrokenSiteViewModel @Inject constructor(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
     private val ampLinks: AmpLinks,
+    moshi: Moshi,
 ) : ViewModel() {
+    private val jsonStringListAdapter = moshi.adapter<List<String>>(
+        Types.newParameterizedType(List::class.java, String::class.java),
+    )
 
     data class ViewState(
         val indexSelected: Int = -1,
@@ -74,7 +80,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var consentOptOutFailed: Boolean = false
     private var consentSelfTestFailed: Boolean = false
     private var params: Array<out String> = emptyArray()
-    private var errorCodes: String = ""
+    private var errorCodes: Array<out String> = emptyArray()
     private var httpErrorCodes: String = ""
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
@@ -94,7 +100,7 @@ class BrokenSiteViewModel @Inject constructor(
         consentOptOutFailed: Boolean,
         consentSelfTestFailed: Boolean,
         params: Array<out String>,
-        errorCodes: String,
+        errorCodes: Array<out String>,
         httpErrorCodes: String,
     ) {
         this.url = url
@@ -182,7 +188,7 @@ class BrokenSiteViewModel @Inject constructor(
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
             consentSelfTestFailed = consentSelfTestFailed,
-            errorCodes = errorCodes,
+            errorCodes = jsonStringListAdapter.toJson(errorCodes.toList()).toString(),
             httpErrorCodes = httpErrorCodes,
         )
     }

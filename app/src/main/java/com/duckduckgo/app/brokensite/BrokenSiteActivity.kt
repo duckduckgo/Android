@@ -74,7 +74,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val consentOptOutFailed = intent.getBooleanExtra(CONSENT_OPT_OUT_FAILED_EXTRA, false)
         val consentSelfTestFailed = intent.getBooleanExtra(CONSENT_SELF_TEST_FAILED_EXTRA, false)
         val params = intent.getStringArrayExtra(BOOLEAN_PARAMS).orEmpty()
-        val errorCodes = intent.getStringExtra(ERROR_CODES).orEmpty()
+        val errorCodes = intent.getStringArrayExtra(ERROR_CODES).orEmpty()
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
         viewModel.setInitialBrokenSite(
             url = url,
@@ -195,7 +195,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(CONSENT_OPT_OUT_FAILED_EXTRA, data.consentOptOutFailed)
             intent.putExtra(CONSENT_SELF_TEST_FAILED_EXTRA, data.consentSelfTestFailed)
             intent.putExtra(BOOLEAN_PARAMS, data.params.toTypedArray())
-            intent.putExtra(ERROR_CODES, data.errorCodes)
+            intent.putExtra(ERROR_CODES, data.errorCodes.toTypedArray())
             intent.putExtra(HTTP_ERROR_CODES, data.httpErrorCodes)
             return intent
         }
