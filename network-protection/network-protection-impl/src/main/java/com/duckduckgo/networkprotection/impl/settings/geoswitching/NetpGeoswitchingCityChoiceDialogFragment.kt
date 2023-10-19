@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.TextType
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.H4
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.databinding.DialogGeoswitchingCityBinding
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -45,6 +46,9 @@ import kotlinx.coroutines.runBlocking
 class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomSheetDialogFragment() {
     @Inject
     lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
+
+    @Inject
+    lateinit var wgServerDebugProvider: WgServerDebugProvider
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -87,10 +91,12 @@ class NetpGeoswitchingCityChoiceDialogFragment private constructor() : BottomShe
         dialogGeoswitchingCityBinding.cityRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             lifecycleScope.launch(dispatcherProvider.io()) {
                 val currentUserPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
-                if (checkedId == R.id.recommended_city_item) {
+                if (checkedId == R.id.recommended_city_item && currentUserPreferredLocation.cityName != null) {
                     netPGeoswitchingRepository.setUserPreferredLocation(currentUserPreferredLocation.copy(cityName = null))
-                } else {
+                    wgServerDebugProvider.clearSelectedServerName()
+                } else if (currentUserPreferredLocation.cityName != cities?.get(checkedId - 1)) {
                     netPGeoswitchingRepository.setUserPreferredLocation(currentUserPreferredLocation.copy(cityName = cities?.get(checkedId - 1)))
+                    wgServerDebugProvider.clearSelectedServerName()
                 }
             }
         }

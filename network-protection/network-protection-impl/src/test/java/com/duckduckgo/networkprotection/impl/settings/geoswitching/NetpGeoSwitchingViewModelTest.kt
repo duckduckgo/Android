@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.DividerItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.HeaderItem
@@ -33,24 +34,34 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NetpGeoSwitchingViewModelTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
-    private val mockLifecycleOwner = mock<LifecycleOwner>()
     private lateinit var testee: NetpGeoSwitchingViewModel
+
+    @Mock
+    private lateinit var mockLifecycleOwner: LifecycleOwner
+
+    @Mock
+    private lateinit var wgServerDebugProvider: WgServerDebugProvider
     private val fakeContentProvider = FakeGeoSwitchingContentProvider()
     private val fakeRepository = FakeNetPGeoswitchingRepository()
 
     @Before
     fun setUp() {
+        MockitoAnnotations.openMocks(this)
         testee = NetpGeoSwitchingViewModel(
             fakeContentProvider,
             fakeRepository,
             coroutineRule.testDispatcherProvider,
+            wgServerDebugProvider,
         )
     }
 
@@ -98,6 +109,7 @@ class NetpGeoSwitchingViewModelTest {
             assertEquals("uk", it.countryCode)
             assertNull(it.cityName)
         }
+        verify(wgServerDebugProvider).clearSelectedServerName()
     }
 
     @Test
@@ -110,6 +122,7 @@ class NetpGeoSwitchingViewModelTest {
             assertEquals("us", it.countryCode)
             assertEquals("Newark", it.cityName)
         }
+        verifyNoInteractions(wgServerDebugProvider)
     }
 
     @Test
@@ -122,6 +135,7 @@ class NetpGeoSwitchingViewModelTest {
             assertNull(it.countryCode)
             assertNull(it.cityName)
         }
+        verify(wgServerDebugProvider).clearSelectedServerName()
     }
 }
 
