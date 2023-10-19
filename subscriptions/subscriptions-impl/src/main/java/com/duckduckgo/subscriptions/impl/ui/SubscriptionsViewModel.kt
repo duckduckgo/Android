@@ -25,8 +25,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
-import com.duckduckgo.subscriptions.impl.SubscriptionsData.Failure
-import com.duckduckgo.subscriptions.impl.SubscriptionsData.Success
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.MONTHLY_PLAN
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.YEARLY_PLAN
@@ -64,8 +62,7 @@ class SubscriptionsViewModel @Inject constructor(
     val viewState = combine(
         subscriptionsManager.isSignedIn,
         subscriptionsManager.hasSubscription,
-    ) {
-            isSignedIn, hasSubscription ->
+    ) { isSignedIn, hasSubscription ->
         ViewState(
             isUserAuthenticated = isSignedIn,
             hasSubscription = hasSubscription,
@@ -83,9 +80,9 @@ class SubscriptionsViewModel @Inject constructor(
             subscriptionsManager.currentPurchaseState.collect {
                 val state = when (it) {
                     is CurrentPurchase.Failure -> PurchaseStateView.Failure(it.message)
-                    is CurrentPurchase.Inactive -> PurchaseStateView.Inactive
                     is CurrentPurchase.Success -> PurchaseStateView.Success
                     is CurrentPurchase.InProgress -> PurchaseStateView.InProgress
+                    is CurrentPurchase.Recovered -> PurchaseStateView.Recovered
                 }
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = state))
             }
@@ -114,6 +111,7 @@ class SubscriptionsViewModel @Inject constructor(
         object Inactive : PurchaseStateView()
         object InProgress : PurchaseStateView()
         object Success : PurchaseStateView()
+        object Recovered : PurchaseStateView()
         data class Failure(val message: String) : PurchaseStateView()
     }
 

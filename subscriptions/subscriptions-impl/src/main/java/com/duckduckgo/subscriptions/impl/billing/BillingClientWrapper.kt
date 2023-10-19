@@ -43,7 +43,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
-import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Inactive
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -51,7 +50,9 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,7 +69,7 @@ interface BillingClientWrapper {
         externalId: String,
         isReset: Boolean,
     ): BillingFlowParams.Builder
-    fun launchBillingFlow(activity: Activity, params: BillingFlowParams)
+    suspend fun launchBillingFlow(activity: Activity, params: BillingFlowParams)
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -83,8 +84,8 @@ class RealBillingClientWrapper @Inject constructor(
     private var billingFlowInProcess = false
 
     // PurchaseState
-    private val _purchaseState = MutableStateFlow<PurchaseState>(Inactive)
-    override val purchaseState = _purchaseState.asStateFlow()
+    private val _purchaseState = MutableSharedFlow<PurchaseState>()
+    override val purchaseState = _purchaseState.asSharedFlow()
 
     // New Subscription ProductDetails
     override val products = mutableMapOf<String, ProductDetails>()
@@ -98,12 +99,18 @@ class RealBillingClientWrapper @Inject constructor(
     private val purchasesUpdatedListener =
         PurchasesUpdatedListener { billingResult, purchases ->
             if (billingResult.responseCode == BillingResponseCode.OK && !purchases.isNullOrEmpty()) {
-                processPurchases(purchases)
+                coroutineScope.launch(dispatcherProvider.io()) {
+                    processPurchases(purchases)
+                }
             } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
-                _purchaseState.value = Canceled
+                coroutineScope.launch(dispatcherProvider.io()) {
+                    _purchaseState.emit(Canceled)
+                }
                 // Handle an error caused by a user cancelling the purchase flow.
             } else {
-                _purchaseState.value = Canceled
+                coroutineScope.launch(dispatcherProvider.io()) {
+                    _purchaseState.emit(Canceled)
+                }
             }
             billingFlowInProcess = false
         }
@@ -140,26 +147,26 @@ class RealBillingClientWrapper @Inject constructor(
         }
     }
 
-    override fun launchBillingFlow(activity: Activity, params: BillingFlowParams) {
+    override suspend fun launchBillingFlow(activity: Activity, params: BillingFlowParams) {
         if (!billingClient.isReady) {
             logcat { "Service not ready" }
         }
         val billingFlow = billingClient.launchBillingFlow(activity, params)
         if (billingFlow.responseCode == BillingResponseCode.OK) {
-            _purchaseState.value = InProgress
+            _purchaseState.emit(InProgress)
             billingFlowInProcess = true
         } else {
-            _purchaseState.value = Canceled
+            _purchaseState.emit(Canceled)
         }
     }
 
-    private fun processPurchases(purchases: List<Purchase>) {
+    private suspend fun processPurchases(purchases: List<Purchase>) {
         // Post new purchase List to _purchases
         _purchases.value = purchases
         // Then, handle the purchases
         for (purchase in purchases) {
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                _purchaseState.value = Purchased
+                _purchaseState.emit(Purchased)
             }
         }
     }
@@ -305,5 +312,4 @@ sealed class PurchaseState {
     object InProgress : PurchaseState()
     object Purchased : PurchaseState()
     object Canceled : PurchaseState()
-    object Inactive : PurchaseState()
 }

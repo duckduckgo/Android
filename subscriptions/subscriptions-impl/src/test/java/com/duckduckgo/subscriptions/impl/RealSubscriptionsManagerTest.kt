@@ -19,7 +19,7 @@ import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.store.AuthDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -82,7 +82,7 @@ class RealSubscriptionsManagerTest {
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
         givenAuthenticateSucceeds()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
 
         val value = subscriptionsManager.recoverSubscriptionFromStore()
 
@@ -118,7 +118,7 @@ class RealSubscriptionsManagerTest {
     fun whenRecoverSubscriptionFromStoreIfValidateTokenSucceedsThenReturnExternalId() = runTest {
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
         givenAuthenticateSucceeds()
 
         val value = subscriptionsManager.recoverSubscriptionFromStore()
@@ -165,7 +165,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenGetSubscriptionDataIfTokenIsValidThenReturnSuccess() = runTest {
         givenUserIsAuthenticated()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
 
         val value = subscriptionsManager.getSubscriptionData()
         assertTrue(value is Success)
@@ -208,7 +208,7 @@ class RealSubscriptionsManagerTest {
     fun whenPurchaseFlowIfCreateAccountSucceedsThenBillingFlowUsesCorrectExternalId() = runTest {
         givenUserIsNotAuthenticated()
         givenCreateAccountSucceeds()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsNoEntitlements()
         givenAuthenticateSucceeds()
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
@@ -218,17 +218,34 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenPurchaseFlowIfUserNotAuthenticatedAndPurchaseStoredThenGetIdFromPurchase() = runTest {
+    fun whenPurchaseFlowIfUserNotAuthenticatedAndPurchaseNotActiveInStoreThenGetIdFromPurchase() = runTest {
         givenUserIsNotAuthenticated()
         givenPurchaseStored()
         givenPurchaseStoredIsValid()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsNoEntitlements()
         givenAuthenticateSucceeds()
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
 
         verify(billingClient).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
         verify(billingClient).launchBillingFlow(any(), any())
+    }
+
+    @Test
+    fun whenPurchaseFlowIfUserNotAuthenticatedAndPurchaseActiveInStoreThenRecoverSubscription() = runTest {
+        givenUserIsNotAuthenticated()
+        givenPurchaseStored()
+        givenPurchaseStoredIsValid()
+        givenValidateTokenSucceedsWithEntitlements()
+        givenAuthenticateSucceeds()
+
+        subscriptionsManager.currentPurchaseState.test {
+            subscriptionsManager.purchase(mock(), mock(), "", false)
+            verify(billingClient, never()).billingFlowParamsBuilder(any(), any(), eq("1234"), any())
+            verify(billingClient, never()).launchBillingFlow(any(), any())
+            assertTrue(awaitItem() is CurrentPurchase.Recovered)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -257,7 +274,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseFlowIfValidateTokenSucceedsThenBillingFlowUsesCorrectExternalId() = runTest {
         givenUserIsAuthenticated()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsNoEntitlements()
 
         subscriptionsManager.purchase(mock(), mock(), "", false)
 
@@ -320,7 +337,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenAuthenticateIfAccessTokenThenSignInUserAndExchangeToken() = runTest {
         givenAuthenticateSucceeds()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
 
         subscriptionsManager.authenticate("authToken")
         subscriptionsManager.isSignedIn.test {
@@ -334,7 +351,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenAuthenticateIfAccessTokenThenReturnSuccess() = runTest {
         givenAuthenticateSucceeds()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
 
         val value = subscriptionsManager.authenticate("authToken")
 
@@ -346,7 +363,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenHasSubscriptionThenHasSubscriptionEmitTrue() = runTest {
         givenUserIsAuthenticated()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
 
         val manager = RealSubscriptionsManager(
             authService,
@@ -406,7 +423,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenInitializeIfSubscriptionExistsThenEmitTrue() = runTest {
         givenUserIsAuthenticated()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
         val manager = RealSubscriptionsManager(
             authService,
             authDataStore,
@@ -444,9 +461,9 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenPurchaseSuccessfulThenPurchaseCheckedAndSuccessEmit() = runTest {
         givenUserIsAuthenticated()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
 
-        val flowTest: MutableStateFlow<PurchaseState> = MutableStateFlow(PurchaseState.Inactive)
+        val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
         whenever(billingClient.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
@@ -471,7 +488,7 @@ class RealSubscriptionsManagerTest {
         givenUserIsAuthenticated()
         givenValidateTokenFails("failure")
 
-        val flowTest: MutableStateFlow<PurchaseState> = MutableStateFlow(PurchaseState.Inactive)
+        val flowTest: MutableSharedFlow<PurchaseState> = MutableSharedFlow()
         whenever(billingClient.purchaseState).thenReturn(flowTest)
 
         val manager = RealSubscriptionsManager(
@@ -492,7 +509,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetAccessTokenIfUserIsAuthenticatedThenReturnSuccess() {
+    fun whenGetAccessTokenIfUserIsAuthenticatedThenReturnSuccess() = runTest {
         givenUserIsAuthenticated()
 
         val result = subscriptionsManager.getAccessToken()
@@ -502,7 +519,7 @@ class RealSubscriptionsManagerTest {
     }
 
     @Test
-    fun whenGetAccessTokenIfUserIsAuthenticatedThenReturnFailure() {
+    fun whenGetAccessTokenIfUserIsAuthenticatedThenReturnFailure() = runTest {
         givenUserIsNotAuthenticated()
 
         val result = subscriptionsManager.getAccessToken()
@@ -513,7 +530,7 @@ class RealSubscriptionsManagerTest {
     @Test
     fun whenGetAuthTokenIfUserAuthenticatedAndValidTokenThenReturnSuccess() = runTest {
         givenUserIsAuthenticated()
-        givenValidateTokenSucceeds()
+        givenValidateTokenSucceedsWithEntitlements()
 
         val result = subscriptionsManager.getAuthToken()
 
@@ -615,7 +632,7 @@ class RealSubscriptionsManagerTest {
         whenever(authService.storeLogin(any())).thenThrow(HttpException(Response.error<String>(400, exception)))
     }
 
-    private suspend fun givenValidateTokenSucceeds() {
+    private suspend fun givenValidateTokenSucceedsWithEntitlements() {
         whenever(authService.validateToken(any())).thenReturn(
             ValidateTokenResponse(
                 account = AccountResponse(

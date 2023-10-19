@@ -110,6 +110,11 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
                 binding.progress.gone()
                 onPurchaseSuccess()
             }
+            is PurchaseStateView.Recovered -> {
+                binding.container.show()
+                binding.progress.gone()
+                onPurchaseRecovered()
+            }
             is PurchaseStateView.Failure -> {
                 binding.container.show()
                 binding.progress.gone()
@@ -155,6 +160,22 @@ class SubscriptionsActivity : DuckDuckGoActivity() {
                 }
             }
         }
+    }
+
+    private fun onPurchaseRecovered() {
+        TextAlertDialogBuilder(this)
+            .setTitle("You're all set.")
+            .setMessage("Your already had a subscription and we've recovered that for you.")
+            .setPositiveButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        globalActivityStarter.start(this@SubscriptionsActivity, SubscriptionsSettingsScreenWithEmptyParams)
+                        finish()
+                    }
+                },
+            )
+            .show()
     }
 
     private fun onPurchaseSuccess() {

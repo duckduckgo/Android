@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority
@@ -115,30 +116,27 @@ class RealSubscriptionsManager @Inject constructor(
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
     private val _currentPurchaseState = MutableSharedFlow<CurrentPurchase>()
-    override val currentPurchaseState = _currentPurchaseState.asSharedFlow()
+    override val currentPurchaseState = _currentPurchaseState.asSharedFlow().onSubscription { emitCurrentPurchaseValues() }
 
     private val _isSignedIn = MutableStateFlow(isUserAuthenticated())
     override val isSignedIn = _isSignedIn.asStateFlow()
 
     private val _hasSubscription = MutableStateFlow(false)
-    override val hasSubscription = _hasSubscription.asStateFlow()
+    override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
 
     private fun isUserAuthenticated(): Boolean = !authDataStore.accessToken.isNullOrBlank() && !authDataStore.authToken.isNullOrBlank()
 
-    init {
+    private suspend fun emitHasSubscriptionsValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
             _hasSubscription.emit(hasSubscription())
         }
+    }
 
+    private suspend fun emitCurrentPurchaseValues() {
         coroutineScope.launch(dispatcherProvider.io()) {
             billingClientWrapper.purchaseState.collect {
                 when (it) {
-                    is PurchaseState.Purchased -> {
-                        checkPurchase()
-                    }
-                    is PurchaseState.Canceled -> {
-                        checkPurchase()
-                    }
+                    is PurchaseState.Purchased -> checkPurchase()
                     else -> {
                         // NOOP
                     }
@@ -221,6 +219,7 @@ class RealSubscriptionsManager @Inject constructor(
             Failure(e.message ?: "An error happened")
         }
     }
+
     override suspend fun getSubscriptionData(): SubscriptionsData {
         return try {
             if (isUserAuthenticated()) {
@@ -244,15 +243,19 @@ class RealSubscriptionsManager @Inject constructor(
     ) {
         when (val response = prePurchaseFlow()) {
             is Success -> {
-                val billingParams = billingClientWrapper.billingFlowParamsBuilder(
-                    productDetails = productDetails,
-                    offerToken = offerToken,
-                    externalId = response.externalId,
-                    isReset = isReset,
-                ).build()
-                logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
-                withContext(dispatcherProvider.main()) {
-                    billingClientWrapper.launchBillingFlow(activity, billingParams)
+                if (response.entitlements.isEmpty()) {
+                    val billingParams = billingClientWrapper.billingFlowParamsBuilder(
+                        productDetails = productDetails,
+                        offerToken = offerToken,
+                        externalId = response.externalId,
+                        isReset = isReset,
+                    ).build()
+                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
+                    withContext(dispatcherProvider.main()) {
+                        billingClientWrapper.launchBillingFlow(activity, billingParams)
+                    }
+                } else {
+                    _currentPurchaseState.emit(CurrentPurchase.Recovered)
                 }
             }
             is Failure -> {
@@ -368,8 +371,8 @@ sealed class SubscriptionsData {
 }
 
 sealed class CurrentPurchase {
-    object Inactive : CurrentPurchase()
     object InProgress : CurrentPurchase()
     object Success : CurrentPurchase()
+    object Recovered : CurrentPurchase()
     data class Failure(val message: String) : CurrentPurchase()
 }
