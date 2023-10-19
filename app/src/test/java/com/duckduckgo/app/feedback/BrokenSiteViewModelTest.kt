@@ -28,6 +28,8 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.squareup.moshi.Moshi
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -67,7 +69,12 @@ class BrokenSiteViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender, mockAmpLinks)
+        testee = BrokenSiteViewModel(
+            mockPixel,
+            mockBrokenSiteSender,
+            mockAmpLinks,
+            Moshi.Builder().add(JSONObjectAdapter()).build(),
+        )
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -141,7 +148,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
-            errorCodes = "",
+            errorCodes = "[]",
             httpErrorCodes = "",
         )
 
@@ -224,7 +231,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
-            errorCodes = "",
+            errorCodes = "[]",
             httpErrorCodes = "",
         )
 
@@ -266,7 +273,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
-            errorCodes = "",
+            errorCodes = "[]",
             httpErrorCodes = "",
         )
 
