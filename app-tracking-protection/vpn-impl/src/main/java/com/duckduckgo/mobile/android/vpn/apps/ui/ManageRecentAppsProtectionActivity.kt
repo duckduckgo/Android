@@ -16,9 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.apps.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.CompoundButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -26,6 +28,10 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.extensions.isIgnoringBatteryOptimizations
+import com.duckduckgo.app.global.extensions.launchAlwaysOnSystemSettings
+import com.duckduckgo.app.global.extensions.launchIgnoreBatteryOptimizationSettings
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -67,6 +73,8 @@ class ManageRecentAppsProtectionActivity :
 
     @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
 
+    @Inject lateinit var appBuildConfig: AppBuildConfig
+
     private val binding: ActivityManageRecentAppsProtectionBinding by viewBinding()
 
     private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
@@ -79,6 +87,10 @@ class ManageRecentAppsProtectionActivity :
         runBlocking {
             vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)
         }
+    }
+
+    private val unrestrictedBatteryUsageListener = CompoundButton.OnCheckedChangeListener { _, _ ->
+        this.launchIgnoreBatteryOptimizationSettings()
     }
 
     private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
@@ -107,8 +119,13 @@ class ManageRecentAppsProtectionActivity :
         lifecycle.removeObserver(viewModel)
     }
 
+    @SuppressLint("InlinedApi") // lint doesn't detect appBuildConfig
     private fun bindViews() {
         binding.manageRecentAppsSkeleton.startShimmer()
+        binding.alwaysOn.setOnClickListener {
+            this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
+        }
+        binding.unrestrictedBatteryUsage.quietlySetIsChecked(this.isIgnoringBatteryOptimizations(), unrestrictedBatteryUsageListener)
         binding.manageRecentAppsReportIssues.addClickableLink(
             REPORT_ISSUES_ANNOTATION,
             getText(R.string.atp_ManageRecentAppsProtectionReportIssues),
@@ -119,6 +136,11 @@ class ManageRecentAppsProtectionActivity :
             launchManageAppsProtection()
         }
         setupRecycler()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.unrestrictedBatteryUsage.quietlySetIsChecked(this.isIgnoringBatteryOptimizations(), unrestrictedBatteryUsageListener)
     }
 
     private fun setupRecycler() {
