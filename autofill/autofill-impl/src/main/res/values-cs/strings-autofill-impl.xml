@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
-    <string name="saveLoginDialogNotNow">Teď ne</string>
+    <string name="saveLoginDialogNotNow">Neukládat</string>
     <string name="saveLoginDialogSubtitle">Přihlašovací údaje se bezpečně ukládají do tvého zařízení a dají se spravovat v nabídce Přihlášení v Nastavení.</string>
     <string name="saveLoginDialogTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Ze stránky %1$ss</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Aktualizuj si heslo</string>
-    <string name="updateLoginDialogButtonNotNow">Teď ne</string>
+    <string name="updateLoginDialogButtonNotNow">Neukládat</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Aktualizovat uživatelské jméno?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovat uživatelské jméno</string>
