@@ -19,6 +19,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.junit.Assert.*
 import org.junit.Before
@@ -33,13 +34,14 @@ class ExperimentationVariantManagerTest {
     private val mockRandomizer: IndexRandomizer = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val activeVariants = mutableListOf<Variant>()
+    private val mockExperimentVariantRepository: ExperimentVariantRepository = mock()
 
     @Before
     fun setup() {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
 
-        testee = ExperimentationVariantManager(mockStore, mockRandomizer, appBuildConfig)
+        testee = ExperimentationVariantManager(mockStore, mockRandomizer, appBuildConfig, mockExperimentVariantRepository)
     }
 
     @Test

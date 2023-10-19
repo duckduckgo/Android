@@ -23,10 +23,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import com.duckduckgo.app.statistics.api.PrivacyVariantManagerPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.features.variantmanager.VariantManagerPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -59,12 +60,13 @@ class RealPrivacyConfigPersisterTest {
     lateinit var testee: RealPrivacyConfigPersister
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockPrivacyConfigUpdateListener: PrivacyConfigUpdateListener = mock()
+    private val mockVariantManager: VariantManager = mock()
 
     private lateinit var db: PrivacyConfigDatabase
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
-    private val variantManagerPluginPoint = FakePrivacyVariantManagerPluginPoint(listOf(FakePrivacyVariantManagerPlugin()))
+    private val variantManagerPlugin = VariantManagerPlugin(mockVariantManager)
     private lateinit var sharedPreferences: SharedPreferences
 
     private val context = RuntimeEnvironment.getApplication()
@@ -81,7 +83,7 @@ class RealPrivacyConfigPersisterTest {
         testee =
             RealPrivacyConfigPersister(
                 pluginPoint,
-                variantManagerPluginPoint,
+                variantManagerPlugin,
                 mockTogglesRepository,
                 unprotectedTemporaryRepository,
                 privacyRepository,
@@ -244,21 +246,6 @@ class RealPrivacyConfigPersisterTest {
 
         override val featureName: String =
             PrivacyFeatureName.GpcFeatureName.value
-    }
-
-    class FakePrivacyVariantManagerPluginPoint(private val plugins: List<PrivacyVariantManagerPlugin>) : PluginPoint<PrivacyVariantManagerPlugin> {
-        override fun getPlugins(): Collection<PrivacyVariantManagerPlugin> {
-            return plugins
-        }
-    }
-
-    class FakePrivacyVariantManagerPlugin : PrivacyVariantManagerPlugin {
-
-        override fun store(
-            jsonString: String,
-        ): Boolean {
-            return true
-        }
     }
 
     companion object {
