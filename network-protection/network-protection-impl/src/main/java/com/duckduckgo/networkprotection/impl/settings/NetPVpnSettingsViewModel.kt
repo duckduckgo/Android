@@ -16,6 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.settings
 
+import android.annotation.SuppressLint
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -28,11 +31,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+@SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class NetPVpnSettingsViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val displayablePreferredLocationProvider: DisplayablePreferredLocationProvider,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
     private val _viewState = MutableStateFlow(ViewState())
     internal fun viewState(): Flow<ViewState> = _viewState.asStateFlow()
 
@@ -40,7 +44,8 @@ class NetPVpnSettingsViewModel @Inject constructor(
         val preferredLocation: String? = null,
     )
 
-    internal fun initialize() {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             displayablePreferredLocationProvider.getDisplayablePreferredLocation().also {
                 _viewState.emit(_viewState.value.copy(preferredLocation = it))

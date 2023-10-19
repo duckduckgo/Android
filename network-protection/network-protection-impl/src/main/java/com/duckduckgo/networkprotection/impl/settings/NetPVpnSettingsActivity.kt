@@ -59,6 +59,13 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
         setupUiElements()
         observeViewModel()
+
+        lifecycle.addObserver(viewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(viewModel)
     }
 
     private fun observeViewModel() {
@@ -71,11 +78,6 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         val geoSwitchingSubtitle = viewState.preferredLocation ?: getString(R.string.netpVpnSettingGeoswitchingDefault)
         binding.geoswitching.setSecondaryText(geoSwitchingSubtitle)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.initialize()
     }
 
     private fun setupUiElements() {
