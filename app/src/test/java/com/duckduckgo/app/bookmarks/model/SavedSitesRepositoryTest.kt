@@ -52,6 +52,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.whenever
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
@@ -1332,7 +1333,7 @@ class SavedSitesRepositoryTest {
     }
 
     @Test
-    fun whenPruningModifiedThenDataIsProperlyUpdated() {
+    fun whenUpdatingModifiedSinceThenDatesAreProperlyUpdated() {
         val twoHoursAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(2))
         val oneHourAgo = DatabaseDateFormatter.iso8601(OffsetDateTime.now(ZoneOffset.UTC).minusHours(1))
 
@@ -1343,7 +1344,9 @@ class SavedSitesRepositoryTest {
         val folder = BookmarkFolder("folder1", "title", SavedSitesNames.BOOKMARKS_ROOT, 0, 0, lastModified = twoHoursAgo)
         repository.insert(folder)
 
-        repository.updateModifiedSince(twoHoursAgo, oneHourAgo)
+        repository.updateModifiedSince(favorite.id, oneHourAgo)
+        repository.updateModifiedSince(bookmark.id, oneHourAgo)
+        repository.updateModifiedSince(folder.id, oneHourAgo)
 
         assert(repository.getFavoriteById(favorite.id)!!.lastModified == oneHourAgo)
         assert(repository.getBookmarkById(bookmark.id)!!.lastModified == oneHourAgo)
