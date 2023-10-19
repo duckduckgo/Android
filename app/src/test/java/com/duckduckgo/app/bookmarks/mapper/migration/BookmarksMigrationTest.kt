@@ -252,6 +252,75 @@ class BookmarksMigrationTest {
         }
     }
 
+    @Test
+    fun whenNeedsOldFavouritesMigrationThenOldFavouritesAreMigrated() {
+        // given favourites not properly migrated
+        val favorite = Entity(UUID.randomUUID().toString(), "Favorite", "http://favexamplecom", BOOKMARK)
+        savedSitesEntitiesDao.insert(favorite)
+        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.entityId))
+
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
+        assertTrue(bookmarks.isEmpty())
+
+        whenMigrationApplied()
+
+        val migratedBookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
+        assertTrue(migratedBookmarks.isNotEmpty())
+    }
+
+    @Test
+    fun whenNeedsOldFavouritesMigrationBecauseSomeFavouritesDidntMigrateThenOldFavouritesAreMigrated() {
+        // given favourites properly migrated
+        for (index in 1..3) {
+            val favorite = Entity(
+                UUID.randomUUID().toString(),
+                "Favorite$index",
+                "http://favexample$index.com",
+                EntityType.BOOKMARK,
+            )
+            savedSitesEntitiesDao.insert(favorite)
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.entityId))
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = favorite.entityId))
+        }
+
+        // given favourites not properly migrated
+        for (index in 4..6) {
+            val favorite = Entity(
+                UUID.randomUUID().toString(),
+                "Favorite$index",
+                "http://favexample$index.com",
+                EntityType.BOOKMARK,
+            )
+            savedSitesEntitiesDao.insert(favorite)
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.entityId))
+        }
+
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
+        assertTrue(bookmarks.size == 3)
+
+        whenMigrationApplied()
+
+        val migratedBookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
+        assertTrue(migratedBookmarks.size == 6)
+    }
+
+    @Test
+    fun whenDoesNotNeedOldFavouritesMigrationThenOldFavouritesAreNotMigrated() {
+        // given favourites not properly migrated
+        val favorite = Entity(UUID.randomUUID().toString(), "Favorite", "http://favexamplecom", BOOKMARK)
+        savedSitesEntitiesDao.insert(favorite)
+        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.entityId))
+        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = favorite.entityId))
+
+        val bookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
+        assertTrue(bookmarks.size == 1)
+
+        whenMigrationApplied()
+
+        val migratedBookmarks = savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.BOOKMARKS_ROOT)
+        assertTrue(bookmarks.size == 1)
+    }
+
     private fun whenMigrationApplied() {
         appDatabase.apply {
             whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
