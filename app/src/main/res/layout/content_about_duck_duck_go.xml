@@ -47,12 +47,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/keyline_4"
-            android:layout_marginBottom="@dimen/keyline_4"
             android:text="@string/aboutHeader"
             android:textAlignment="center"
-            app:typography="h1" />
+            app:typography="h3" />
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/aboutSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:textAlignment="center"
+            app:textType="secondary"
+            app:typography="title"
+            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginBottom="@dimen/keyline_6"
+            tools:text="..." />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/aboutText"
