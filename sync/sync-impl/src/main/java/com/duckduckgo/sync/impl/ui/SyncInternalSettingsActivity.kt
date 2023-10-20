@@ -31,11 +31,13 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.sync.impl.databinding.ActivityInternalSyncSettingsBinding
 import com.duckduckgo.sync.impl.databinding.ItemConnectedDeviceBinding
+import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ReadQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.Command.ShowQR
 import com.duckduckgo.sync.impl.ui.SyncInitialSetupViewModel.ViewState
+import com.google.android.material.snackbar.Snackbar
 import com.google.zxing.BarcodeFormat.QR_CODE
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.ScanContract
@@ -89,6 +91,9 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deleteAccountButton.setOnClickListener { viewModel.onDeleteAccountClicked() }
         binding.connectQRCode.setOnClickListener { viewModel.onConnectStart() }
         binding.readConnectQRCode.setOnClickListener { viewModel.onReadConnectQRClicked() }
+        binding.syncRecoveryCodeCta.setOnClickListener {
+            viewModel.useRecoveryCode(binding.syncRecoveryCode.text)
+        }
     }
 
     private fun observeUiEvents() {
@@ -128,6 +133,10 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
 
             ReadConnectQR -> {
                 barcodeConnectLauncher.launch(getScanOptions())
+            }
+
+            LoginSuccess -> {
+                Snackbar.make(binding.syncRecoveryCodeCta, "Login Success", Snackbar.LENGTH_SHORT).show()
             }
         }
     }

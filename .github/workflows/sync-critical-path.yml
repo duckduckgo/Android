@@ -1,4 +1,4 @@
-name: Sync Feature End-to-End tests
+name: Sync Feature Critical Path End-to-End tests
 
 on:
   schedule:
@@ -53,6 +53,12 @@ jobs:
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
+      - name: Create test account for Sync and return the recovery code
+        uses: duckduckgo/sync_crypto/action@main
+        id: sync-recovery-code
+        with:
+            debug: true
+
       - name: Sync Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.6.0
         with:
@@ -61,7 +67,9 @@ jobs:
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
-          include-tags: syncTest
+          include-tags: syncCriticalPathTest
+          env: |
+            CODE=${{ steps.sync-recovery-code.outputs.recovery-code }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
@@ -71,8 +79,8 @@ jobs:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Android Sync E2E Flows
-          asana-task-description: The Sync Flows E2E workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Android Sync Critical Path E2E Flows
+          asana-task-description: The Android Sync Critical Path Flows E2E workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
 
       - name: Add Asana task to Browser Sync & Backup project
