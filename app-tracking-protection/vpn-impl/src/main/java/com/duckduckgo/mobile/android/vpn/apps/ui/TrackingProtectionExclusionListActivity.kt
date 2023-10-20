@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.apps.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -31,7 +33,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R as commonR
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
@@ -135,6 +139,11 @@ class TrackingProtectionExclusionListActivity :
         val restoreDefault = menu.findItem(R.id.restoreDefaults)
         // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
         restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
+
+        val textColorAttr = if (viewModel.canRestoreDefaults()) commonR.attr.daxColorPrimaryText else commonR.attr.daxColorTextDisabled
+        val spannable = SpannableString(restoreDefault.title)
+        spannable.setSpan(ForegroundColorSpan(binding.root.context.getColorFromAttr(textColorAttr)), 0, spannable.length, 0)
+        restoreDefault.title = spannable
         restoreDefault?.isVisible = isAppTPEnabled
 
         return super.onPrepareOptionsMenu(menu)
