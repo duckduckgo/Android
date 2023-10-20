@@ -192,10 +192,8 @@ class DeviceShieldTrackerActivity :
     override fun onTrackerListShowed(totalTrackers: Int) {
         if (totalTrackers >= MIN_ROWS_FOR_ALL_ACTIVITY) {
             binding.ctaShowAll.show()
-            binding.dividerCtaShowAll.show()
         } else {
             binding.ctaShowAll.gone()
-            binding.dividerCtaShowAll.gone()
         }
         viewModel.showAppTpEnabledCtaIfNeeded()
     }
