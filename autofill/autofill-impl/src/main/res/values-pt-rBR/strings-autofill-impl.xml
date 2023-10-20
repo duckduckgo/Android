@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="autofillManagementScreenTitle">Credenciais</string>
+
+    <string name="managementDisabledModeCta"><b>Ajuste nas Configurações</b></string>
+    <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio, PIN ou biometria para proteger suas credenciais.</string>
+    <string name="managementDisabledModeTitle">Proteja seu dispositivo para salvar suas credenciais</string>
+
+    <string name="saveLoginDialogButtonSave">Salvar credenciais</string>
+    <string name="saveLoginMissingUsernameDialogButtonSave">Salvar senha</string>
+    <string name="saveLoginDialogNotNow">Agora não</string>
+    <string name="saveLoginDialogSubtitle">Suas credenciais são armazenadas com segurança em seu dispositivo, e você pode gerenciá-las no menu Credenciais dentro das Configurações.</string>
+    <string name="saveLoginDialogTitle">Quer que o DuckDuckGo armazene esse login?</string>
+    <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
+
+    <string name="useSavedLoginDialogTitle">Usar credencial armazenada?</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Senha de %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Senha do site</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
+    <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">De %1$s</string>
+
+    <string name="updateLoginDialogButtonUpdatePassword">Atualizar senha</string>
+    <string name="updateLoginDialogButtonNotNow">Agora não</string>
+
+    <string name="updateLoginDialogTitleUpdateUsername">Atualizar nome de usuário?</string>
+    <string name="updateLoginDialogButtonUpdateUsername">Atualizar nome de usuário</string>
+
+    <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atualizar senha de\n%1$s?</string>
+    <string name="updateLoginUpdatePasswordExplanation">O DuckDuckGo vai atualizar as credenciais armazenadas em seu dispositivo.</string>
+
+    <string name="autofillDialogCloseButtonContentDescription">Fechar caixa de diálogo de preenchimento automático</string>
+
+    <string name="credentialManagementEditLoginTitleHint">Título</string>
+    <string name="credentialManagementEditUsernameHint">Nome de usuário</string>
+    <string name="credentialManagementEditPasswordHint">Senha</string>
+    <string name="credentialManagementEditTitle">Editar login</string>
+    <string name="credentialManagementEditWebsiteHint">URL do site</string>
+    <string name="credentialManagementEditNotesHint">Notas</string>
+    <string name="credentialManagementEditButtonDelete">Excluir</string>
+    <string name="credentialManagementEditButtonSaveChanges">Salvar alterações</string>
+    <string name="credentialManagementEditButtonCopyUsername">Copiar nome de usuário</string>
+    <string name="credentialManagementEditButtonCopyPassword">Copiar senha</string>
+    <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Informações de login atualizadas pela última vez em %1$s</string>
+
+    <string name="credentialManagementAutofillToggleLabel">Salvar e preencher dados de login automaticamente</string>
+    <string name="credentialManagementViewMenuEdit">Editar</string>
+    <string name="credentialManagementViewMenuDelete">Excluir</string>
+
+    <string name="credentialManagementSuggestionsLabel">Sugestões</string>
+    <string name="credentialManagementNoLoginsSavedTitle">Nenhuma credencial salva</string>
+    <string name="credentialManagementNoLoginsSavedSubtitle">Suas credenciais são armazenadas com segurança em seu dispositivo.</string>
+
+    <string name="autofillManagementAddLogin">Adicionar credenciais</string>
+    <string name="autofillManagementSearchLogins">Pesquisar credenciais</string>
+    <string name="autofillManagementSearchClearDescription">Limpar pesquisa</string>
+    <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nenhum resultado para \"%1$s\"</string>
+
+    <string name="autofillDeleteLoginDialogCancel">Cancelar</string>
+    <string name="autofillDeleteLoginDialogDelete">Excluir</string>
+    <string name="autofillDeleteLoginDialogTitle">Tem certeza de que deseja excluir esta credencial?</string>
+
+    <string name="autofillManagementUsernameCopied">Nome de usuário copiado</string>
+    <string name="autofillManagementPasswordCopied">Senha copiada</string>
+
+    <string name="autofill_password_generation_offer_title">Usar senha gerada pelo DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">A senha será salva nas suas Credenciais.</string>
+    <string name="autofill_password_generation_offer_accept">Usar senha gerada</string>
+    <string name="autofill_password_generation_offer_decline">Criar minha própria senha</string>
+
+
+    <string name="deviceNotSupportedTitle">Dispositivo não suportado</string>
+    <string name="deviceNotSupportedSubtitle">Para armazenar credenciais com segurança, é necessário criptografá-las e armazená-las no seu dispositivo. Como o seu dispositivo não suporta armazenamento criptografado, as credenciais não estão disponíveis.</string>
+
+    <string name="autofillManagementDeletedConfirmation">Credenciais excluídas</string>
+    <string name="autofillManagementUndoDeletion">Desfazer</string>
+
+    <string name="credentialManagementLinkButtonContentDescription" instruction="Accessibility text for a button that will show next to a text field containing a website address; it will launch the website when tapped">Abrir site</string>
+
+    <string name="credentialManagementDuckAddressLabel" translatable="false">Duck Address</string>
+
+    <string name="credentialManagementDeactivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to deactivate their private &apos;Duck Address&apos;">Desativar Duck Address privado?</string>
+    <string name="credentialManagementDeactivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Os e-mails enviados para %1$s não serão mais encaminhados para a sua caixa de entrada.</string>
+    <string name="credentialManagementDeactivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will deactivate their email address, meaning emails sent there will no longer be forwarded to their inbox">Desativar</string>
+    <string name="credentialManagementActivateDuckAddressDialogTitle" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated. We are confirming with the user that they are about to reactivate their private &apos;Duck Address&apos;">Reativar Duck Address privado?</string>
+    <string name="credentialManagementActivateDuckAddressDialogMessage" instruction="Placeholder is an email address">Os e-mails enviados para %1$s serão encaminhados para a sua caixa de entrada.</string>
+    <string name="credentialManagementActivateDuckAddressPositiveButton" instruction="This is the text shown on a button. When pressed, it will reactivate their email address, meaning emails sent there will again be forwarded to their inbox">Reativar</string>
+
+    <string name="credentialManagementDuckAddressActivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is active">Ativo</string>
+    <string name="credentialManagementDuckAddressActivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from deactivated to active">Ativando…</string>
+
+    <string name="credentialManagementDuckAddressDeactivatedLabel" instruction="This indicates that the &apos;status&apos; of their private &apos;Duck Address&apos; is deactivated">Desativado</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel" instruction="This is text shown briefly while changing the status of their &apos;Duck Address&apos;, going from active to deactivated">Desativando…</string>
+
+    <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable" instruction="Error message shown when unable to manage this &apos;Duck Address&apos; right now">A gestão deste endereço está temporariamente indisponível.</string>
+
+    <string name="credentialManagementEnableEmailProtectionPrompt" instruction="&apos;Duck Addresses&apos; is the feature name, and should not be translated."><annotation type="enable_duck_address">Ative a Proteção de Email</annotation> para gerenciar os Duck Addresses neste dispositivo.</string>
+
+    <string name="autofill_email_protection_choose_email_dialog_title">Escolha o endereço de e-mail</string>
+    <string name="autofillTooltipUseYourAliasDescription">Bloquear rastreadores de e-mail</string>
+    <string name="autofillTooltipGenerateAddress" instruction="&apos;Duck Address&apos; is the feature name, and should not be translated.">Gerar um Duck Address Privado</string>
+    <string name="autofillTooltipGenerateAddressDescription" instruction="&apos;hide address&apos; refers to using an alias so your real email address is not used">Bloquear rastreadores de e-mail e ocultar endereço</string>
+
+    <string name="autofillDisableAutofillPromptTitle">Deseja continuar a salvar suas credenciais?</string>
+    <string name="autofillDisableAutofillPromptMessage">Você pode desativar isso a qualquer momento nas configurações.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">Continuar a salvar</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">Desativar</string>
+
+</resources>

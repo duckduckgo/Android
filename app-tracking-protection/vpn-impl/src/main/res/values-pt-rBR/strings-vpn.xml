@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2023 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="atp_name">Proteção contra o rastreamento por aplicativos</string>
+    <string name="refresh">Atualizar</string>
+
+    <!-- Debug Screens -->
+    <string name="atp_DiagnosticsMenuLabel">Diagnóstico</string>
+    <string name="atp_DataMenuLabel">Estatísticas de dados</string>
+    <string name="atp_MeteredConnection" instruction="Placeholder is true or false">"Dados móveis: %1$s"</string>
+    <string name="atp_ConnectionStatus" instruction="Placeholder is true or false">"VPN ativada: %1$s"</string>
+    <string name="atp_NetworkAvailable" instruction="Placeholder is true or false">"Conectado à internet: %1$s"</string>
+    <string name="atp_DnsServers" instruction="Placeholder is a list of DNS addresses">"Servidores DNS da rede ativa: %1$s"</string>
+    <string name="atp_AppExitsReasonsTitle">Motivos de saída do aplicativo</string>
+    <string name="atp_AppRestartsTitle">Reinícios do aplicativo</string>
+
+    <!-- Diagnostics -->
+    <string name="vpnTimeRunning" instruction="Placeholder is the time expressed as a String that the vpn has been running">Tempo em execução: %1$s</string>
+    <string name="vpnTrackerCompaniesBlockedToday" instruction="Placeholder is a number">Empresas rastreadoras bloqueadas hoje: %1$d</string>
+    <string name="vpnTrackerCompaniesBlockedThisWeek" instruction="Placeholder is a number">Empresas rastreadoras bloqueadas esta semana: %1$d</string>
+    <string name="vpnTrackerCompaniesNone">"Nenhuma empresa rastreadora bloqueada"</string>
+    <string name="vpnTrackersBlockedToday" instruction="Placeholder is a number">Rastreadores bloqueados hoje: %1$d</string>
+    <string name="vpnTrackersBlockedThisWeek" instruction="Placeholder is a number">Rastreadores bloqueados esta semana: %1$d</string>
+    <string name="vpnTrackersNone">"Nenhum rastreador bloqueado"</string>
+    <string name="vpnNotRunYet">"A VPN ainda não foi executada"</string>
+    <string name="vpnDataTransferred" instruction="%1$s is the size of data transferred, i.e. 340MB. %2$s is the amount of packets, i.e. 123 packets ">"%1$s\n%2$s pacotes"</string>
+
+
+    <!-- App Tracking Protection Ongoing Notification -->
+    <string name="atp_ReportIssue">Está tendo problemas com um aplicativo?</string>
+    <string name="atp_OnInitialNotification">"A App Tracking Protection está ativada e bloqueando tentativas de rastreamento de seus aplicativos"</string>
+    <string name="atp_OnNoTrackersNotificationHeader">"Procurando atividade de rastreamento… bip… bop"</string>
+    <plurals name="atp_OnNotification">
+        <item quantity="one"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicativo</b> (última hora).]]></item>
+        <item quantity="other"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicativos</b> (última hora).]]></item>
+        <item quantity="many"><![CDATA[ Tentativas de rastreamento bloqueadas <b>em %1$d aplicativos</b> (última hora).]]></item>
+    </plurals>
+    <string name="atp_DisabledNotification">App Tracking Protection está desativada. Toque para continuar bloqueando tentativas de rastreamento.</string>
+    <string name="atp_RevokedNotification">Um aplicativo VPN em seu dispositivo desativou a App Tracking Protection. Toque para reativar.</string>
+
+    <!-- App Tracking Protection Daily Notification -->
+    <string name="atp_DailyTrackersNotificationOneTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento</b> (último dia).]]></string>
+    <string name="atp_DailyTrackersNotificationOneTrackingOneApps" instruction="%1$d is the number of tracking attempts and %2$s is the name of the app where it happened"><![CDATA[ A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento em 1 aplicativo, %2$s</b> (último dia).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingZeroApps" instruction="Placeholder is a number"><![CDATA[ A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento</b> (último dia).]]></string>
+    <string name="atp_DailyTrackersNotificationOtherTrackingOtherApps" instruction="%1$d is the number of tracking attempts, %2$d is the number of apps where the tracking took place, %3$s is the name of one of the apps where it happened"><![CDATA[ A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$d aplicativos, incluindo %3$s</b> (último dia).]]></string>
+
+    <plurals name="atp_DailyTopCompanyNotification">
+        <item quantity="one"><![CDATA[%1$s tentou rastrear seu dispositivo <b>em %2$d aplicativo</b> (último dia). <b>Mais informações</b>]]></item>
+        <item quantity="other"><![CDATA[%1$s tentou rastrear seu dispositivo <b>em %2$d aplicativos</b> (último dia). <b>Mais informações</b>]]></item>
+    </plurals>
+
+    <plurals name="atp_DailyCompanyBlockedNotification">
+        <item quantity="one"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> (último dia).]]></item>
+        <item quantity="other"><![CDATA[A App Tracking Protection bloqueou o maior número de tentativas de rastreamento no <b>%1$s</b> e <b>%2$s</b> (último dia).]]></item>
+    </plurals>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vez em %3$s</b> (último dia).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vez em %3$s e em outro aplicativo</b> (último dia).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOneTimeMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vez em %3$s e em mais %4$d aplicativos</b> (último dia).]]></string>
+
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vezes em %3$s</b> (último dia).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesOneOtherApp" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vezes em %3$s e em outro aplicativo</b> (último dia).]]></string>
+    <string name="atp_DailyLastCompanyBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$s is name of the tracking company, i.e. Facebook. %2$d is the number of times we blocked their tracking attempts. %3$s is the name of the app where it happened, %4$d is the number of apps this the tracking also happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$s %2$d vezes em %3$s e em mais %4$d aplicativos</b> (último dia).]]></string>
+
+    <!-- App Tracking Protection Weekly Notification -->
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento em %2$s</b> (semana passada).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento em %2$s</b> e em outro aplicativo (semana passada).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOneTimeMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento em %2$s</b> e em mais %3$d aplicativos (semana passada).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesZeroOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s</b> (semana passada).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesOneOtherApp" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s</b> e outro aplicativo (semana passada).]]></string>
+    <string name="atp_WeeklyCompanyTrackersBlockedNotificationOtherTimesMoreOtherApps" instruction="%1$d is the number of the tracking attempts, %2$s is the name of the app where it happened, %3$d is the number of other apps where this also happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s</b> e em mais %3$d aplicativos (semana passada).]]></string>
+
+    <plurals name="atp_WeeklyCompanyTeaserNotification">
+        <item quantity="one"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicativos, %3$s</b> (semana passada).]]></item>
+        <item quantity="other"><![CDATA[A App Tracking Protection bloqueou <b>%1$s em %2$d aplicativos, incluindo %3$s</b> (semana passada).]]></item>
+    </plurals>
+
+    <string name="atp_EnableCTA">Ativar a App Tracking Protection</string>
+
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento em %2$s</b> (última hora).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento em %2$s e em outro aplicativo</b> (última hora).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativa de rastreamento em %2$s e em mais %3$d aplicativos</b> (última hora).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of the app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s</b> (última hora).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s e em outros aplicativos</b> (última hora).]]></string>
+    <string name="atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps" instruction="%1$d is the number of tracking attempts, %2$s is the name of an app where it happened, %3$d is the number of other apps where it happened"><![CDATA[A App Tracking Protection bloqueou <b>%1$d tentativas de rastreamento em %2$s e em mais %3$d aplicativo</b> (última hora).]]></string>
+
+    <!-- App Tracking Protection Privacy Report -->
+    <string name="atp_PrivacyReportEnabledTooltip">A App Tracking Protection está ativa e bloqueando rastreadores em todo seu dispositivo</string>
+
+    <!-- App Tracking Protection Onboarding -->
+    <string name="atp_OnboardingLogoDescription">Ativar a App Tracking Protection</string>
+    <string name="atp_OnboardingLastPageOneTitle">Um passo simples para melhorar a privacidade dos aplicativos!</string>
+    <string name="atp_OnboardingLatsPageOneSubtitle" formatted="false">Verificamos que <b>mais de 96% dos aplicativos gratuitos populares</b> permitem que outras empresas rastreiem suas informações pessoais, mesmo quando você está dormindo.\n\nVeja quais aplicativos <b>permitem que outras empresas te rastreiem</b> e assuma o controle!</string>
+    <string name="atp_OnboardingLastPageTwoTitle">Como isso funciona?</string>
+    <string name="atp_OnboardingLastPageTwoSubTitle">A App Tracking Protection <b>detecta e bloqueia os rastreadores de aplicativos de outras empresas</b>, por exemplo, quando o Facebook tenta te rastrear em um aplicativo de saúde.\n\n<b>É grátis</b>, e você pode continuar usando os aplicativos normalmente. A proteção funciona em segundo plano e ajuda a <b>te proteger em todos os momentos.</b></string>
+    <string name="atp_OnboardingLastPageThreeTitle">Quem vê seus dados?</string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection não é uma VPN.</b> No entanto, ela utiliza uma ligação VPN local, por isso, seu dispositivo reconhecerá esta funcionalidade como uma VPN.\n\nA App Tracking Protection é diferente.<b> Ela nunca envia dados dos aplicativos para servidores externos. </b><annotation type="learn_more_link">Saiba mais</annotation></string>
+    <string name="atp_FAQCta">Perguntas frequentes sobre a App Tracking Protection</string>
+    <string name="atp_OnboardingContinue">Continuar</string>
+    <string name="atp_OnboardingMaybeLater">Talvez mais tarde</string>
+
+    <!-- App Tracking Protection Dax Onboarding -->
+    <string name="atp_daxOnboardingIntroTitle">Proteção contra rastreamento de aplicativos</string>
+    <string name="atp_daxOnboardingIntroMessage" formatted="false">Mais de 96% dos aplicativos gratuitos populares permitem que outras empresas te rastreiem, mesmo quando você não está usando seu dispositivo. A App Tracking Protection detecta e bloqueia essas tentativas de rastreamento.</string>
+    <string name="atp_daxOnboardingPermissionTitle">Como isso funciona?</string>
+    <string name="atp_daxOnboardingPermissionMessage">A App Tracking Protection não é uma VPN. No entanto, ela utiliza uma ligação VPN local, por isso, seu dispositivo reconhecerá esta funcionalidade como uma VPN. Ela nunca envia dados dos aplicativos para servidores externos. <annotation type="learn_more_link">Saiba mais</annotation></string>
+
+    <!--  App Tracking Protection Enabled Activity -->
+    <string name="atp_EnabledTitle">Boa! Está tudo pronto.</string>
+    <string name="atp_EnabledMessage">A App Tracking Protection mostra <b>uma lista em tempo real dos aplicativos em seu dispositivo</b> que tentaram rastrear você.</string>
+    <string name="atp_EnabledActivityCTA">Ver Resumo da App Tracking Protection</string>
+    <string name="atp_EnabledSettings">Você pode acessar a App Tracking Protection nas <annotation type="settings_link">Configurações.</annotation></string>
+
+    <!-- New Tab Integration -->
+    <string name="atp_NewTabDisabled"><b>A App Tracking Protection está desativada.</b>\nToque para continuar a bloquear as tentativas de rastreamento em seus aplicativos.</string>
+    <string name="atp_NewTabRevoked"><b>Um aplicativo de VPN em seu dispositivo desativou a App Tracking Protection.</b>\nToque para reativar.</string>
+    <string name="atp_NewTabEnabled"><b>A App Tracking Protection está ativada</b> está bloqueando tentativas de rastreamento em seus aplicativos.</string>
+
+
+    <!-- Exclusion List -->
+    <string name="atp_ExclusionListActivityTitle">Todos os Aplicativos</string>
+    <string name="atp_ExcludedAppsFeature">A App Tracking Protection detecta e bloqueia rastreadores de aplicativos de terceiros, como quando o Facebook tenta rastrear você em um aplicativo de saúde. Essas empresas ainda podem rastreá-lo em seus próprios aplicativos.\n\nSe um aplicativo não estiver funcionando corretamente, tente desativar a proteção para esse aplicativo.</string>
+    <string name="atp_ExcludedAppsEnabledLabel">Durante o lançamento beta, o DuckDuckGo pode desativar a proteção para alguns aplicativos para solucionar problemas conhecidos de carregamento de conteúdo. Suas configurações personalizadas não serão alteradas, a menos que você as redefina.</string>
+    <string name="atp_ExcludedAppsDisabledLabel"><b>A App Tracking Protection está desativada</b> A App Tracking Protection causou um problema com seus aplicativos <annotation type="report_issues_link">Relatar problemas</annotation></string>
+    <string name="atp_ExcludedAppsReport">Relatar problema com outro aplicativo</string>
+    <string name="atp_ExcludedReasonManuallyDisabled">Desativado manualmente</string>
+    <string name="atp_ExcludedReasonManuallyEnabled">Ativado manualmente</string>
+    <string name="atp_ExcludeAppsManuallyCTACancel">Cancelar</string>
+    <string name="atp_ExcludeAppsManuallyCTARestore">Restaurar</string>
+    <string name="atp_ExcludeAppsManuallyEnableFooter">Ativar a proteção envia o nome do aplicativo para o DuckDuckGo.</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerOne">Deixou de funcionar como esperado</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">Não me importo que este aplicativo me rastreie</string>
+    <string name="atp_ExcludeAppsManuallyDisableAnswerThree">Outro motivo</string>
+    <string name="atp_ExcludeAppsManuallyMenuRestore">Restaurar aplicativos protegidos por padrão</string>
+    <string name="atp_ExcludeAppsManuallyMenuReport">Relatar um problema com um aplicativo</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsTitle">Restaurar proteção padrão?</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsMessage">Suas configurações de proteção personalizadas serão atualizadas para as proteções padrão mais recentes. Você pode alterar as configurações de proteção novamente posteriormente.</string>
+    <string name="atp_ExcludeAppsRestoreDefaultSnackbar">Proteção restaurada para as configurações padrão</string>
+    <string name="atp_ExcludeAppsRestoreDefaultsDisclaimer">Ativar a proteção envia o nome do aplicativo para o DuckDuckGo.</string>
+
+
+    <!-- Report Breakage App List -->
+    <string name="atp_ReportBreakageAppListActivityTitle">Relatar um Problema</string>
+    <string name="atp_ReportBreakageAppFeature"><b>Selecione o aplicativo com problemas</b>. Seu feedback nos ajuda a melhorar!\n\nTem feedback geral sobre a App Tracking Protection? Use <annotation type="use_this_form_link">este formulário</annotation>.</string>
+    <string name="atp_ReportBreakageAppEntry" instruction="Placeholder is the name of an app">Aplicativo %1$s</string>
+    <string name="atp_ReportBreakageAppSubmitCta">Enviar</string>
+    <string name="atp_ReportBreakageAppNextCta">Próximo</string>
+    <string name="atp_ReportBreakageFormWhatHappenedText">Descreva o que está acontecendo, o que você esperava que acontecesse e os passos que o levaram ao problema.</string>
+    <string name="atp_ReportBreakageFormInputHint">Forneça mais informações sobre o problema que você encontrou</string>
+    <string name="atp_ReportBreakageFormCheckboxText">Ao clicar em "Enviar", concordo que o DuckDuckGo pode usar as informações deste relatório para melhorar as funcionalidades do aplicativo.
+</string>
+    <string name="atp_ReportBreakageFormDisclaimerText">
+    <![CDATA[Além das informações que você inseriu neste formulário, seu relatório de problema de aplicativo incluirá:<br/>• Nome do pacote do aplicativo<br/>• Lista de rastreadores bloqueados no aplicativo<br/>• Funcionalidades do DuckDuckGo ativadas<br/>• Dados de diagnóstico agregados do aplicativo DuckDuckGo<br/>]]>
+</string>
+    <string name="atp_ReportBreakageSent">Relatório enviado, obrigado! Seu feedback nos ajuda a melhorar a App Tracking Protection para todos os usuários.</string>
+    <string name="atp_ThanksForTheFeedback">Obrigado pelo feedback!</string>
+    <string name="atp_ReportBreakageCategoriesTitle">O que está acontecendo?</string>
+    <string name="atp_ReportBreakageCategoriesHint">O que está acontecendo?</string>
+    <string name="atp_ReportBreakageCategoryCrashes">O aplicativo trava ou fecha inesperadamente</string>
+    <string name="atp_ReportBreakageCategoryMessages">Problemas na entrega de mensagens</string>
+    <string name="atp_ReportBreakageCategoryCalls">Chamadas de voz não funcionam</string>
+    <string name="atp_ReportBreakageCategoryUploads">Não é possível carregar ou compartilhar arquivos</string>
+    <string name="atp_ReportBreakageCategoryDownloads">Não é possível baixar arquivos</string>
+    <string name="atp_ReportBreakageCategoryContent">O conteúdo carrega lentamente</string>
+    <string name="atp_ReportBreakageCategoryConnection">O aplicativo não está se conectando</string>
+    <string name="atp_ReportBreakageCategoryIot">Não é possível se conectar a dispositivos locais</string>
+    <string name="atp_ReportBreakageCategoryOther">Outro problema</string>
+
+    <!--  Tracker Profiling Info -->
+    <string name="atp_ProfilingActivityTitle">Sobre os rastreadores de aplicativos</string>
+    <string name="atp_ProfilingInfoTitle">O que são os rastreadores de aplicativos?</string>
+    <string name="atp_ProfilingInfoFirstParagraph" formatted="false">Você provavelmente já ouviu falar que empresas como o Google e o Facebook rastreiam você em segundo plano em sites de terceiros. Mas, sabia que eles também rastreiam suas informações pessoais por meio de aplicativos em seu dispositivo?\n\nTestamos <b>100 aplicativos Android gratuitos populares e descobrimos que 96%</b> deles incluem rastreadores de terceiros ocultos. 87% desses aplicativos enviam dados para o Google. 68% enviam dados para o Facebook. E isso ocorre mesmo quando você não está usando seu dispositivo.\n\n<b>Os rastreadores em aplicativos podem acessar muito mais informações</b> do que os rastreadores de sites, como o andar do edifício em que você está, com que frequência você joga jogos no trabalho e quantas horas você dorme por dia. <b>Mesmo que você não tenha uma conta no Google ou no Facebook, por exemplo, essas empresas ainda podem coletar dados sobre você por meio de outros aplicativos.</b>\n\nRedes de rastreamento como o Facebook e o Google usam essas informações para <b>construir um perfil digital sobre você.</b> Em seguida, essas redes de rastreamento usam esse perfil para manipular o que você vê online e permitem que anunciantes exibam anúncios com base em seus dados.\n\nOs rastreadores em aplicativos são um ENORME problema de privacidade. <b>Mas o DuckDuckGo tem uma solução que pode ajudar.</b> Quando ativada no Navegador DuckDuckGo, a App Tracking Protection bloqueia muitos rastreadores em outros aplicativos em seu dispositivo, enquanto o aplicativo DuckDuckGo bloqueia os rastreadores que encontra nos sites que você visita. <b>Essas duas camadas de proteção reduzem o que as empresas de rastreamento sabem sobre você em geral</b>, para que você possa usar seus aplicativos com menos preocupações e mais proteção.</string>
+
+
+    <!--  App Tracking Protection Activity -->
+    <string name="atp_ActivityPastWeek">Últimos 7 dias</string>
+    <string name="atp_ActivityTitle">Proteção contra rastreamento de aplicativos</string>
+    <string name="atp_MostRecentActivityTitle">Toda a atividade recente</string>
+    <string name="atp_ActivityRecentActivity">Atividade</string>
+    <string name="atp_ActivityCtaShowAll">Ver toda a atividade recente</string>
+    <string name="atp_ActivityAppTrackersFAQ">O que são os rastreadores de aplicativos?</string>
+    <string name="atp_ActivityReportProblem">Relatar um problema com um aplicativo</string>
+    <string name="atp_ActivityBetaInstructions">Instruções beta</string>
+    <string name="atp_ActivityManageProtection">Está tendo problemas com um aplicativo?</string>
+
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
+        <![CDATA[1 tentativa de rastreamento bloqueada de 1 empresa no aplicativo <b>%1$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOnetimeOtherCompanies" instruction="Placeholder %1$d is the number of companies doing the tracking. Placeholder %2$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 5 companies in Venmo app.">
+        <![CDATA[1 tentativa de rastreamento bloqueada de %1$d empresas no aplicativo <b>%2$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOneCompany" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$s is the name of the app doing the tracking. Example: 5 tracking attempts blocked from 1 company in Venmo app.">
+        <![CDATA[%1$d tentativas de rastreamento bloqueadas de 1 empresa no aplicativo <b>%2$s</b>]]>
+    </string>
+    <string name="atp_ActivityTrackersCompanyBlockedOtherTimesOtherCompanies" instruction="Placeholder %1$d is the number of tracking attempts blocked. Placeholder %2$d is the number of companies doing the tracking. Placeholder %3$s is the name of the app doing the tracking. Example: 10 tracking attempts blocked from 5 companies in Venmo app.">
+        <![CDATA[%1$d tentativas de rastreamento bloqueadas de %2$d empresas no aplicativo <b>%3$s</b>]]>
+    </string>
+
+    <string name="atp_ActivityPastWeekBlocked">Bloqueios</string>
+    <string name="atp_ActivityPastWeekAcross">Em</string>
+
+    <plurals name="atp_ActivityPastWeekTrackerCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tentativa de rastreamento</item>
+        <item quantity="other">Tentativas de rastreamento</item>
+    </plurals>
+    <plurals name="atp_ActivityPastWeekAppCount" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Aplicativo</item>
+        <item quantity="other">Aplicativos</item>
+    </plurals>
+    <string name="atp_ActivityEnabledLabel">Essa funcionalidade está em versão beta. Encontrou algum problema com um aplicativo? <annotation type="app_settings_link">Relate o problema.</annotation></string>
+    <string name="atp_ActivityDisabledLabel"><b>A App Tracking Protection está desativada</b>\nA App Tracking Protection causou um problema com seus aplicativos? <annotation type="report_issues_link">Relate os problemas</annotation></string>
+    <string name="atp_ActivityDisabledBySystemLabel"><b>O Android desativou a App Tracking Protection</b>. Deseja evitar que isso aconteça novamente? <annotation type="re_enable_link">Reative</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>A App Tracking Protectionestá desativada.</b>\nUma VPN em seu dispositivo pode ter desativado a proteção. Use o botão acima para reativar.</string>
+    <string name="atp_ActivityAbout">Sobre</string>
+    <string name="atp_ActivityManage">Gerenciar</string>
+    <string name="atp_ActivityRemoveFeature">Desativar e excluir dados</string>
+    <string name="atp_ActivityBlockingTrackersEnabledDescription">O DuckDuckGo está bloqueando rastreadores ocultos em seus aplicativos.</string>
+    <string name="atp_ActivityBlockingTrackersDisabledDescription">Reative a App Tracking Protection para continuar bloqueando rastreadores em seus aplicativos.</string>
+    <string name="atp_ActivityBlockedByHeaderText" instruction="Placeholder %1$s is a text containing either Today or Yesterday. Example: Blocked by DuckDuckGo Today">Bloqueado pelo DuckDuckGo %1$s</string>
+
+
+    <!-- App Tracking Protection FAQ -->
+    <string name="atp_FAQActivityTitle">Perguntas frequentes</string>
+    <string name="atp_FAQFirstHeader">Como funciona a App Tracking Protection?</string>
+    <string name="atp_FAQFirstText"><b>A App Tracking Protection bloqueia os rastreadores de aplicativos conhecidos de outras empresas, por exemplo, quando o Facebook tenta rastrear você em um aplicativo de saúde.</b> Essas empresas ainda podem rastreá-lo nos aplicativos delas.\n\n</string>
+    <string name="atp_FAQSecondHeader">A App Tracking Protection bloqueia rastreadores em todos os meus aplicativos?</string>
+    <string name="atp_FAQSecondText"><b>A proteção pode ser desativada automaticamente para certos aplicativos, como aqueles que carregam sites, para que o conteúdo seja apresentado normalmente.</b> Para aplicativos com problemas conhecidos, a desativação é normalmente temporária até melhorarmos a App Tracking Protection. Você pode gerenciar essa proteção para cada aplicativo em seu dispositivo nas configurações.\n\nAlém disso, alguns rastreadores podem não ser bloqueados porque ainda não os detectamos e adicionamos à nossa lista de bloqueio. Trabalhamos continuamente para identificar novos rastreadores e protegê-lo contra eles, portanto, você sempre terá a proteção mais atualizada.\n\nAtualizamos nossa lista de rastreadores a cada poucos meses. As atualizações serão aplicadas automaticamente em seu dispositivo.</string>
+    <string name="atp_FAQThirdHeader">Por que a App Tracking Protection utiliza uma conexão VPN?</string>
+    <string name="atp_FAQThirdText">O aplicativo pede para você configurar uma conexão com uma rede privada virtual (VPN), <b>mas você não precisa instalar um aplicativo de VPN para que a App Tracking Protection funcione.</b>\n\nCom essa permissão, a App Tracking Protection, que funciona localmente em seu dispositivo, consegue monitorar o tráfego da rede e <b>bloquear rastreadores conhecidos.</b></string>
+    <string name="atp_FAQFourthHeader">A App Tracking Protection funciona se eu também usar um aplicativo de VPN?</string>
+    <string name="atp_FAQFourthText">"<b>O Android permite apenas uma conexão VPN ativa de cada vez.</b>" Isto significa que você não pode usar a App Tracking Protection com um aplicativo de VPN em execução em seu dispositivo ou configurado com a opção "Sempre ativa".\n\n"<b>Recomendamos ativar a App Tracking Protection quando não estiver usando um aplicativo de VPN.</b>" Certifique-se apenas de que seu aplicativo de VPN não está configurado para estar sempre ativo. Acesse Configurações de Rede Android > VPN. Em seguida, verifique o ícone de configuração dos aplicativos de VPN listados e desative a opção "Sempre ativa". Alguns aplicativos de VPN também podem ter uma configuração de conexão automática que precisará ser desativada.</string>
+    <string name="atp_FAQFifthHeader">Qual á diferença entre a App Tracking Protection e uma VPN?</string>
+    <string name="atp_FAQFifthText">Uma VPN envia seus dados do dispositivo para o servidor da VPN, onde os dados são anonimizados e protegidos contra olhares indiscretos. No entanto, isso permite que a empresa da VPN veja seu tráfego de rede.\n\n<b>A App Tracking Protection é diferente.</b> Em vez de enviar seus dados para um servidor de VPN, <b>a App Tracking Protection funciona localmente em seu dispositivo</b> como intermediária entre seus aplicativos e os servidores com os quais eles se comunicam.\n\nSempre que detecta um rastreador conhecido, <b>a App Tracking Protection impede o rastreador de enviar informações pessoais (como seu endereço IP, sua atividade e detalhes de seu dispositivo) para fora de seu dispositivo.</b> Todo o restante tráfego chega ao destino, portanto, os aplicativos funcionam normalmente.</string>
+    <string name="atp_FAQSixthHeader">Meus dados são privados?</string>
+    <string name="atp_FAQSixthText">A App Tracking Protection funciona em seu dispositivo e não envia informações pessoais para o DuckDuckGo.</string>
+
+    <!-- App Tracking Protection Waitlist -->
+    <string name="atp_WaitlistNotificationTitle">Aqui está o seu convite para a App Tracking Protection!</string>
+    <string name="atp_WaitlistNotificationDescription">Você entrou na lista de espera e solicitou ser notificado quando puder experimentar a funcionalidade App Tracking Protection. Toque para ver o seu convite.</string>
+    <string name="atp_WaitlistStatusNotJoined">Um passo simples para melhorar a privacidade dos aplicativos!</string>
+    <string name="atp_WaitlistStatusJoined">Você já está na lista!</string>
+    <string name="atp_WaitlistStatusInBeta">Você está convidado!</string>
+    <string name="atp_WaitlistDescription">Bloqueie rastreadores ocultos em outros aplicativos e veja quem estava tentando rastreá-lo.\n<annotation type="beta_link">Saiba mais</annotation></string>
+    <string name="atp_WaitlistInBetaDescription">Bloqueie rastreadores ocultos em outros aplicativos e veja quem estava tentando rastreá-lo.\n<annotation type="beta_link">Saiba mais sobre a versão beta</annotation></string>
+    <string name="atp_WaitlistJoin">Entre na Lista de Espera Privada</string>
+    <string name="atp_WaitlistCodeCta">Eu tenho um código de convite</string>
+    <string name="atp_WaitlistGetStartedCta">Começar</string>
+    <string name="atp_WaitlistRedeemCodeCta">Continuar</string>
+    <string name="atp_WaitlistRedeemCodeLabel">Código de Convite</string>
+    <string name="atp_WaitlistRedeemCodeTitle">Quase lá…</string>
+    <string name="atp_WaitlistRedeemedCodeStatus">Ótimo! Você entrou!</string>
+    <string name="atp_WaitlistRedeemCodeError">Não reconhecemos este código de convite.</string>
+    <string name="atp_WaitlistFooterDescription">Você não precisa compartilhar nenhuma informação pessoal para se juntar à lista de espera. Seu lugar na fila é guardado por um carimbo de data/hora que existe exclusivamente em seu dispositivo, para que possamos notificá-lo quando for a sua vez.</string>
+    <string name="atp_WaitlistErrorJoining">Ocorreu um erro ao entrar na Lista de Espera, tente novamente mais tarde</string>
+    <string name="atp_WaitlistJoinedWithNotification">Vamos enviar uma notificação quando a App Tracking Protection estiver pronta para você.\n\n<annotation type="beta_link">Saiba mais sobre a versão beta</annotation></string>
+    <string name="atp_WaitlistJoinedWithoutNotification">Você receberá seu convite para experimentar a App Tracking Protection aqui. Volte em breve ou, se preferir, podemos enviar uma notificação quando chegar a sua vez\n\n<annotation type="notify_me_link">Notifique-me</annotation>\n\n<annotation type="beta_link">Saiba mais sobre a versão beta</annotation></string>
+    <string name="atp_WaitlistBetaBlogPost">https://spreadprivacy.com/introducing-app-tracking-protection/</string>
+
+    <!--  App Tracking Company Details  -->
+    <plurals name="atp_CompanyDetailsTrackingAttempts">
+        <item quantity="one">%1$d tentativa. Conhecido por coletar:</item>
+        <item quantity="other">%1$d tentativas. Conhecido por coletar:</item>
+    </plurals>
+    <plurals name="atp_CompanyDetailsTrackingAttemptsTitle">
+        <item quantity="one">O DuckDuckGo bloqueou %1$d tentativa de rastreamento</item>
+        <item quantity="other">O DuckDuckGo bloqueou %1$d tentativas de rastreamento</item>
+    </plurals>
+    <string name="atp_CompanyDetailsTrackingMenuReport">Relatar um problema com este aplicativo</string>
+    <string name="atp_CompanyDetailsTrackingShowMore" instruction="Placeholder is a number">Mostrar mais %1$d</string>
+    <string name="atp_CompanyDetailsTrackingLearnMore">Os aplicativos podem incluir rastreadores de outras empresas para fins analíticos, de marketing, etc. Se não os bloqueássemos, esses rastreadores poderiam criar perfis digitais sobre você ainda mais detalhados. <annotation type="learn_more_link">Saiba mais.</annotation></string>
+    <string name="atp_CompanyDetailsTrackingShowLess">Mostrar Menos</string>
+    <string name="atp_CompanyDetailsAppInfoPanel">A proteção está desativada para este aplicativo. Se a App Tracking Protectio causou um problema, <annotation type="report_issues_link">comunique o problema</annotation></string>
+    <string name="atp_CompanyDetailsNotAvailableForUninstalledApps" instruction="Toast shown when users tap on item that corresponds to an already uninstalled application">Detalhes de rastreador indisponíveis para aplicativos desinstalados</string>
+
+    <!--  App Tracking Company Signals -->
+    <string name="atp_TrackingSignalAAID">ID de publicidade Android</string>
+    <string name="atp_TrackingSignalUniqueIdentifier">Identificador único</string>
+    <string name="atp_TrackingSignalCookies">Cookies</string>
+    <string name="atp_TrackingSignalOsVersion">Versão do SO</string>
+    <string name="atp_TrackingSignalOsBuildNumber">Build Number do SO</string>
+    <string name="atp_TrackingSignalPlatform">Plataforma do dispositivo</string>
+    <string name="atp_TrackingSignalDeviceBrand">Marca do dispositivo</string>
+    <string name="atp_TrackingSignalDeviceLanguage">Idioma do dispositivo</string>
+    <string name="atp_TrackingSignalDeviceModel">Modelo do dispositivo</string>
+    <string name="atp_TrackingSignalCPUData">Dados da CPU</string>
+    <string name="atp_TrackingSignalScreenResolution">Resolução da Tela</string>
+    <string name="atp_TrackingSignalInternalStorage">Armazenamento interno</string>
+    <string name="atp_TrackingSignalExternalStorage">Armazenamento externo</string>
+    <string name="atp_TrackingSignalDeviceMemory">Memória do dispositivo</string>
+    <string name="atp_TrackingSignalDeviceName">Nome do dispositivo</string>
+    <string name="atp_TrackingSignalWifiNetworkName">Nome da rede Wi-Fi</string>
+    <string name="atp_TrackingSignalAppName">Nome do aplicativo</string>
+    <string name="atp_TrackingSignalAppVersion">Versão do aplicativo</string>
+    <string name="atp_TrackingSignalLocalIPAddress">Endereço IP local</string>
+    <string name="atp_TrackingSignalISP">Provedor de Internet</string>
+    <string name="atp_TrackingSignalDeviceBootTime">Tempo de funcionamento do dispositivo</string>
+    <string name="atp_TrackingSignalNetworkConnectionType">Tipo de conexão</string>
+    <string name="atp_TrackingSignalSystemVolume">Volume do sistema</string>
+    <string name="atp_TrackingSignalBatteryLevel">Nível da bateria</string>
+    <string name="atp_TrackingSignalChargingStatus">Estado da bateria</string>
+    <string name="atp_TrackingSignalBrightness">Brilho da tela</string>
+    <string name="atp_TrackingSignalHeadphoneStatus">Estado dos fones de ouvido</string>
+    <string name="atp_TrackingSignalAccelerometerData">Dados do acelerômetro</string>
+    <string name="atp_TrackingSignalRotationData">Dados de rotação</string>
+    <string name="atp_TrackingSignalDeviceOrientation">Orientação do dispositivo</string>
+    <string name="atp_TrackingSignalMagnetometerData">Dados do magnetômetro</string>
+    <string name="atp_TrackingSignalAvailableInternalStorage">Armazenamento interno disponível</string>
+    <string name="atp_TrackingSignalAvailableExternalStorage">Armazenamento externo disponível</string>
+    <string name="atp_TrackingSignalDeviceTotalMemory">Memória total do dispositivo</string>
+    <string name="atp_TrackingSignalAvailableDeviceMemory">Memória do dispositivo disponível</string>
+    <string name="atp_TrackingSignalScreenMargins">Margens da tela</string>
+    <string name="atp_TrackingSignalScreenDensity">Densidade da tela</string>
+    <string name="atp_TrackingSignalFontSize">Tamanho da Fonte</string>
+    <string name="atp_TrackingSignalNetworkCarrier">Operadora de rede</string>
+    <string name="atp_TrackingSignalAppInstallDate">Data de instalação do aplicativo</string>
+    <string name="atp_TrackingSignalFirstAppLaunchDate">Data do primeiro uso do aplicativo</string>
+    <string name="atp_TrackingSignalGPSCoordinates">Coordenadas GPS</string>
+    <string name="atp_TrackingSignalPostalCode">CEP</string>
+    <string name="atp_TrackingSignalNeighbourhood">Bairro</string>
+    <string name="atp_TrackingSignalCity">Cidade</string>
+    <string name="atp_TrackingSignalState">Estado</string>
+    <string name="atp_TrackingSignalCountry">País</string>
+    <string name="atp_TrackingSignalTimezone">Fuso horário</string>
+    <string name="atp_TrackingSignalEmailAddress">Endereço de e-mail</string>
+    <string name="atp_TrackingSignalBirthday">Aniversário</string>
+    <string name="atp_TrackingSignalGender">Gênero</string>
+    <string name="atp_TrackingSignalFirstName">Primeiro Nome</string>
+    <string name="atp_TrackingSignalLastName">Sobrenome</string>
+
+
+    <!--  App Tracking Protection Disable VPN Dialog -->
+    <string name="atp_DisableConfirmationDialogTitle">Desativar a App Tracking Protection?</string>
+    <string name="atp_DisableConfirmationDialogMessage">Se está enfrentando problemas com um aplicativo específico, você pode gerenciar a proteção para esse aplicativo.</string>
+    <string name="atp_DisableConfirmationDisableApp">Desativar para um aplicativo</string>
+    <string name="atp_DisableConfirmationDisableAllApps">Desativar para todos os aplicativos</string>
+    <string name="atp_DisableConfirmationCancel">Cancelar</string>
+
+    <!--  App Tracking Protection VPN Conflict Dialog -->
+    <string name="atp_VpnConflictDialogTitle">Sua aplicativo de VPN pode ser desligado</string>
+    <string name="atp_VpnConflictAlwaysOnDialogTitle">Sue aplicativo de VPN está bloqueando a App Tracking Protection</string>
+    <string name="atp_VpnConflictDialogMessage">O Android permite apenas uma conexão VPN ativa por vez. Se você ativar a App Tracking Protection e tiver uma VPN ativa em seu dispositivo, a VPN pode ser desligada.</string>
+    <string name="atp_VpnConflictDialogAlwaysOnMessage">O Android permite apenas uma conexão VPN ativa por vez. Vá até Configurações de Rede &gt; VPN. Encontre o aplicativo de VPN que está "sempre ligado" e desative-o para continuar.</string>
+    <string name="atp_VpnConflictDialogCancel">Cancelar</string>
+    <string name="atp_VpnConflictDialogOpenSettings">Abrir Configurações</string>
+    <string name="atp_VpnConflictDialogGotIt">Entendi</string>
+
+    <!-- Manage Recent Apps Protection -->
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Se estiver enfrentando problemas com um aplicativo (por exemplo, conteúdo que não está sendo carregado), tente desativar a proteção para esse aplicativo e <annotation type="report_issues_link">envie um relatório.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Atividade Recente de Aplicativos</string>
+    <string name="atp_ManageRecentAppsProtectionShowAll">Mostrar Todos os Aplicativos</string>
+    <string name="atp_ManageRecentAppsProtectionEmpty">Os aplicativos com tentativas de rastreamento bloqueadas recentemente aparecem aqui</string>
+
+    <!--  App Tracking Protection Remove Feature Dialog -->
+    <string name="atp_RemoveFeatureDialogTitle">Desativar e excluir Dados?</string>
+    <string name="atp_RemoveFeatureDialogMessage">A App Tracking Protection será desativada. Todas as configurações e o histórico de tentativas de rastreamento serão excluídos. Você pode reativar a funcionalidade a qualquer momento nas Configurações.</string>
+    <string name="atp_RemoveFeatureDialogCancel">Cancelar</string>
+    <string name="atp_RemoveFeatureDialogRemove">Desabilitar</string>
+
+    <!--  App Tracking Protection Promote Always On -->
+    <string name="atp_PromoteAlwaysOnDialogSettings">Ir para Configurações</string>
+    <string name="atp_PromoteAlwaysOnDialogNotNow">Agora não</string>
+    <string name="atp_AlwaysOnModalBody"><![CDATA[Vá até as configurações de VPN do DuckDuckGo em seu dispositivo e ative a opção <b>VPN sempre ativa</b> para que o Android não desative a proteção.\n\nNão se esqueça de desativar a outra opção.]]></string>
+    <string name="atp_AlwaysOnLockdownModalBody"><![CDATA[Para evitar problemas com o aplicativo, vá até as <b>configurações de VPN do DuckDuckGo</b> em seu dispositivo e desative <b>Bloquear conexões sem VPN</b>]]></string>
+    <string name="atp_AlwaysOnModalHeading">Definir como sempre ativa</string>
+    <string name="atp_AlwaysOnLockdownModalHeading">Altera suas configurações de VPN</string>
+    <string name="atp_AlwaysOnLockDownEnabled"><b>Ação necessária!</b> Para evitar problemas com o aplicativo, precisa alterar suas configurações Android. <annotation type="open_settings_link">Alterar configurações</annotation></string>
+    <string name="atp_AlwaysOnLockDownNotificationTitle">Ação necessária! Você precisa alterar uma configuração do Android para a App Tracking Protection.</string>
+
+    <!--  App Tracking Protection Exclusion list -->
+    <string name="atp_TrackingProtectionExclusionListActivityTitle">Meus Aplicativos</string>
+    <string name="atp_ExcludedReasonIssuesMayOccur">Quando ativada, os aplicativos podem apresentar problemas</string>
+    <string name="atp_ExcludeAppsManuallyCTAEnableAnyway">Ativar Mesmo Assim</string>
+    <string name="atp_ExcludeAppsManuallyEnableAnywayLabel" instruction="Placeholder is the name of an app">%1$s pode ter problemas se a App Tracking Protection estiver ativa</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogTitle">Relatar problema?</string>
+    <string name="atp_ExcludeAppsManuallyDisableAppDialogLabel" instruction="Placeholder is the name of an app">Você desativou a App Tracking Protection para %1$s porque teve problemas?</string>
+    <string name="atp_ExcludeAppsManuallyCTAReportIssue">Relatar Problema</string>
+    <string name="atp_ExcludeAppsManuallyCTANotNow">Agora Não</string>
+    <string name="atp_ActivityRecentActivityHeader">Atividade</string>
+    <string name="atp_ActivityManageProtectionLabel">Está enfrentando problemas com um aplicativo?</string>
+    <string name="atp_ActivityEnabledBannerLabel">Durante a versão beta, a proteção de alguns aplicativos é desativada automaticamente. <annotation type="app_settings_link">Veja os aplicativos</annotation></string>
+    <string name="atp_ActivityDescription">As tentativas de rastreamento bloqueadas são exibidas aqui</string>
+    <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
+        <item quantity="one">%1$s dos seus aplicativos está protegido contra rastreadores ocultos que tentam acessar suas informações pessoais</item>
+        <item quantity="other">%1$s dos seus aplicativos estão protegidos contra rastreadores ocultos que tentam acessar suas informações pessoais</item>
+    </plurals>
+    <plurals name="atp_ActivityUnprotectedApps" instruction="Placeholder is the number of apps that are not protected">
+        <item quantity="one">%1$s dos seus aplicativos não possui proteção ativada</item>
+        <item quantity="other">%1$s dos seus aplicativos não possuem proteção ativada</item>
+    </plurals>
+    <string name="atp_ActivityAppTpEnabledCtaText"><![CDATA[Boas notícias! A App Tracking Protection já está ativa.<br/><br/>👍Vou mostrar uma lista em tempo real dos aplicativos em seu dispositivo que tentam rastreá-lo.]]></string>
+    <string name="atp_ActivityAppTpEnabledCtaButtonLabel">Entendi!</string>
+    <string name="atp_ExcludedAppsFilterProtectedLabel" instruction="Placeholder is the number of apps where protection is enabled">Proteção ativa (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterUnprotectedLabel" instruction="Placeholder is the number of apps where protection is disabled">Proteção inativa (%1$s)</string>
+    <string name="atp_ExcludedAppsFilterAllLabel">Todos</string>
+    <string name="atp_ExcludedAppsFilterMenuProtectedLabel">Proteção Ativa</string>
+    <string name="atp_ExcludedAppsFilterMenuUnprotectedLabel">Proteção Inativa</string>
+    <string name="atp_ExcludedAppsFilterMenuAllLabel">Todos</string>
+    <string name="atp_ActivityViewAppsLabel">Ver Aplicativos</string>
+    <string name="atp_ActivityEnabledMoreThanADayLabel">Esta funcionalidade está em versão beta. Está tendo problemas com um aplicativo? <annotation type="app_settings_link">Ajude-nos a melhorar</annotation></string>
+    <string name="atp_ExcludedAppsEnabledLearnWhyLabel">Alguns aplicativos podem apresentar problemas quando a App Tracking Protection está ativada.<annotation type="learn_why_link">Saiba Por Quê</annotation></string>
+    <string name="atp_ExcludedAppsDisabledLearnWhyLabel">A proteção é desativada para aplicativos com problemas conhecidos. Você pode ativá-la para esses aplicativos, mas eles podem não funcionar como esperado.<annotation type="learn_why_link">Saiba Por Quê</annotation></string>
+
+    <!-- Notify Me View on AppTP -->
+    <string name="appTrackingProtectionNotifyMeTitle">Receba notificações sobre tentativas de rastreamento bloqueadas</string>
+    <string name="appTrackingProtectionNotifyMeSubtitle">Receba notificações sobre as tentativas de rastreamento bloqueadas em sua caixa de notificações.</string>
+    <string name="atp_ActivityBlockedByOnDateHeaderText">Bloqueado pelo DuckDuckGo em %1$s</string>
+
+</resources>
