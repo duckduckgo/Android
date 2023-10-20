@@ -209,5 +209,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     REPORT_VPN_ALWAYS_ON_TRIGGERED("m_vpn_ev_always_on_triggered_c"),
     REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY("m_vpn_ev_always_on_triggered_d"),
 
+    REPORT_NOTIFY_START_FAILURE("m_vpn_ev_notify_start_failed_d"),
+    REPORT_NOTIFY_START_FAILURE_DAILY("m_vpn_ev_notify_start_failed_c"),
+
     ;
 }

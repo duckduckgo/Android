@@ -19,6 +19,8 @@ package com.duckduckgo.autofill.impl
 import android.webkit.WebView
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.Callback
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
+import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.di.scopes.FragmentScope
@@ -34,14 +36,17 @@ class InlineBrowserAutofill @Inject constructor(
 
     override fun addJsInterface(
         webView: WebView,
-        callback: Callback,
+        autofillCallback: Callback,
+        emailProtectionInContextCallback: EmailProtectionUserPromptListener?,
+        emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener?,
         tabId: String,
     ) {
         Timber.v("Injecting BrowserAutofill interface")
         // Adding the interface regardless if the feature is available or not
         webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
         autofillInterface.webView = webView
-        autofillInterface.callback = callback
+        autofillInterface.callback = autofillCallback
+        autofillInterface.emailProtectionInContextCallback = emailProtectionInContextCallback
         autofillInterface.autoSavedLoginsMonitor = autoSavedLoginsMonitor
         autofillInterface.tabId = tabId
     }
@@ -68,5 +73,9 @@ class InlineBrowserAutofill @Inject constructor(
 
     override fun rejectGeneratedPassword() {
         autofillInterface.rejectGeneratedPassword()
+    }
+
+    override fun inContextEmailProtectionFlowFinished() {
+        autofillInterface.inContextEmailProtectionFlowFinished()
     }
 }

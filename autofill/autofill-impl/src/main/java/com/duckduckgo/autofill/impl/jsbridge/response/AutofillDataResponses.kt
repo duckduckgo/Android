@@ -63,3 +63,20 @@ data class AvailableInputTypeCredentials(
     val username: Boolean,
     val password: Boolean,
 )
+
+data class EmailProtectionInContextSignupDismissedAtResponse(
+    val type: String = "getIncontextSignupDismissedAt",
+    val success: DismissedAt,
+) {
+
+    data class DismissedAt(val permanentlyDismissedAt: Long? = null, val isInstalledRecently: Boolean)
+}
+
+data class ShowInContextEmailProtectionSignupPromptResponse(
+    val type: String = "ShowInContextEmailProtectionSignupPromptResponse",
+    val success: SignupResponse,
+) {
+    data class SignupResponse(
+        val isSignedIn: Boolean,
+    )
+}

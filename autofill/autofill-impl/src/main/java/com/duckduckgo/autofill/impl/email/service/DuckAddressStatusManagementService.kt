@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.email
+package com.duckduckgo.autofill.impl.email.service
 
 import com.duckduckgo.anvil.annotations.ContributesNonCachingServiceApi
 import com.duckduckgo.di.scopes.AppScope

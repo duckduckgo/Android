@@ -20,6 +20,7 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +44,7 @@ class RealAutofillRuntimeConfigProviderTest {
     private val runtimeConfigurationWriter: RuntimeConfigurationWriter = mock()
     private val shareableCredentials: ShareableCredentials = mock()
     private val autofillCapabilityChecker: AutofillCapabilityChecker = mock()
+    private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules = mock()
 
     @Before
     fun setUp() {
@@ -53,6 +55,7 @@ class RealAutofillRuntimeConfigProviderTest {
             runtimeConfigurationWriter,
             autofillCapabilityChecker = autofillCapabilityChecker,
             shareableCredentials = shareableCredentials,
+            emailProtectionInContextAvailabilityRules = emailProtectionInContextAvailabilityRules,
         )
 
         runTest {
@@ -68,6 +71,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 credentialSaving = any(),
                 passwordGeneration = any(),
                 showInlineKeyIcon = any(),
+                showInContextEmailProtectionSignup = any(),
             ),
         ).thenReturn("")
     }
@@ -349,6 +353,7 @@ class RealAutofillRuntimeConfigProviderTest {
         whenever(autofillCapabilityChecker.canInjectCredentialsToWebView(any())).thenReturn(enabled)
         whenever(autofillCapabilityChecker.canSaveCredentialsFromWebView(any())).thenReturn(enabled)
         whenever(autofillCapabilityChecker.canGeneratePasswordFromWebView(any())).thenReturn(enabled)
+        whenever(emailProtectionInContextAvailabilityRules.permittedToShow(any())).thenReturn(enabled)
     }
 
     private fun verifyAutofillCredentialsReturnedAs(expectedValue: Boolean) {
@@ -357,6 +362,7 @@ class RealAutofillRuntimeConfigProviderTest {
             credentialSaving = any(),
             passwordGeneration = any(),
             showInlineKeyIcon = any(),
+            showInContextEmailProtectionSignup = any(),
         )
     }
 
@@ -370,6 +376,7 @@ class RealAutofillRuntimeConfigProviderTest {
             credentialSaving = any(),
             passwordGeneration = any(),
             showInlineKeyIcon = eq(true),
+            showInContextEmailProtectionSignup = any(),
         )
     }
 

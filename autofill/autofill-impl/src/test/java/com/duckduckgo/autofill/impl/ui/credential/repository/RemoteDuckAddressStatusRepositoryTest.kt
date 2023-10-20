@@ -18,13 +18,9 @@ package com.duckduckgo.autofill.impl.ui.credential.repository
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.email.EmailManager
-import com.duckduckgo.autofill.impl.email.DuckAddressStatusManagementService
-import com.duckduckgo.autofill.impl.email.DuckAddressStatusManagementService.DuckAddressGetStatusResponse
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Activated
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Deactivated
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.GeneralError
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.NotSignedIn
-import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.Unmanageable
+import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementService
+import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementService.DuckAddressGetStatusResponse
+import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.*
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

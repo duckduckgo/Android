@@ -3537,9 +3537,9 @@ class BrowserTabViewModelTest {
     fun whenShowEmailTooltipIfAddressExistsThenShowEmailTooltipCommandSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("address")
 
-        testee.showEmailTooltip()
+        testee.showEmailProtectionChooseEmailPrompt()
 
-        assertCommandIssued<Command.ShowEmailTooltip> {
+        assertCommandIssued<Command.ShowEmailProtectionChooseEmailPrompt> {
             assertEquals("address", this.address)
         }
     }
@@ -3548,9 +3548,9 @@ class BrowserTabViewModelTest {
     fun whenShowEmailTooltipIfAddressDoesNotExistThenCommandNotSent() {
         whenever(mockEmailManager.getEmailAddress()).thenReturn(null)
 
-        testee.showEmailTooltip()
+        testee.showEmailProtectionChooseEmailPrompt()
 
-        assertCommandNotIssued<Command.ShowEmailTooltip>()
+        assertCommandNotIssued<Command.ShowEmailProtectionChooseEmailPrompt>()
     }
 
     @Test

@@ -20,15 +20,13 @@ import android.webkit.WebView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.Callback
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
+import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.CredentialsInjected
-import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.GetAutoFillData
-import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.NoCredentialsInjected
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import com.duckduckgo.autofill.impl.InlineBrowserAutofillTest.FakeAutofillJavascriptInterface.Actions.*
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,6 +41,9 @@ class InlineBrowserAutofillTest {
     private lateinit var autofillJavascriptInterface: FakeAutofillJavascriptInterface
 
     private lateinit var testWebView: WebView
+
+    private val emailProtectionInContextCallback: EmailProtectionUserPromptListener = mock()
+    private val emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener = mock()
 
     private val testCallback = object : Callback {
         override suspend fun onCredentialsAvailableToInject(
@@ -82,7 +83,7 @@ class InlineBrowserAutofillTest {
 
     @Test
     fun whenRemoveJsInterfaceThenRemoveReferenceToWebview() {
-        testee.addJsInterface(testWebView, testCallback, "tabId")
+        testee.addJsInterface(testWebView, testCallback, emailProtectionInContextCallback, emailProtectionInContextSignupFlowCallback, "tabId")
 
         assertNotNull(autofillJavascriptInterface.webView)
 
@@ -132,6 +133,12 @@ class InlineBrowserAutofillTest {
             lastAction = NoCredentialsInjected
         }
 
+        override fun closeEmailProtectionTab(data: String) {
+        }
+
+        override fun getIncontextSignupDismissedAt(data: String) {
+        }
+
         override fun cancelRetrievingStoredLogins() {
         }
 
@@ -141,7 +148,12 @@ class InlineBrowserAutofillTest {
         override fun rejectGeneratedPassword() {
         }
 
+        override fun inContextEmailProtectionFlowFinished() {
+        }
+
         override var callback: Callback? = null
+        override var emailProtectionInContextCallback: EmailProtectionUserPromptListener? = null
+        override var emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener? = null
         override var webView: WebView? = null
         override var autoSavedLoginsMonitor: AutomaticSavedLoginsMonitor? = null
         override var tabId: String? = null

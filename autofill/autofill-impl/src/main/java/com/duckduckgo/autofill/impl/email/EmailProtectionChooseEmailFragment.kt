@@ -25,10 +25,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.extensions.html
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType
 import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.impl.databinding.ContentAutofillTooltipBinding
+import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionChooseEmailBinding
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -37,7 +37,7 @@ import dagger.android.support.AndroidSupportInjection
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
-class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectionChooserDialog {
+class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailProtectionChooseEmailDialog {
 
     override fun getTheme(): Int = R.style.AutofillBottomSheetDialogTheme
 
@@ -60,18 +60,18 @@ class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectio
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = ContentAutofillTooltipBinding.inflate(inflater, container, false)
+        val binding = DialogEmailProtectionChooseEmailBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
     }
 
-    private fun configureViews(binding: ContentAutofillTooltipBinding) {
+    private fun configureViews(binding: DialogEmailProtectionChooseEmailBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         configureCloseButton(binding)
         configureEmailButtons(binding)
     }
 
-    private fun configureEmailButtons(binding: ContentAutofillTooltipBinding) {
+    private fun configureEmailButtons(binding: DialogEmailProtectionChooseEmailBinding) {
         context?.let {
             binding.primaryCta.setPrimaryText(getPersonalAddress().html(it).toString())
 
@@ -89,15 +89,15 @@ class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectio
         Timber.v("User action: %s", resultType::class.java.simpleName)
 
         val result = Bundle().also {
-            it.putString(EmailProtectionChooserDialog.KEY_URL, getOriginalUrl())
-            it.putParcelable(EmailProtectionChooserDialog.KEY_RESULT, resultType)
+            it.putString(EmailProtectionChooseEmailDialog.KEY_URL, getOriginalUrl())
+            it.putParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT, resultType)
         }
 
-        parentFragment?.setFragmentResult(EmailProtectionChooserDialog.resultKey(getTabId()), result)
+        parentFragment?.setFragmentResult(EmailProtectionChooseEmailDialog.resultKey(getTabId()), result)
         dismiss()
     }
 
-    private fun configureCloseButton(binding: ContentAutofillTooltipBinding) {
+    private fun configureCloseButton(binding: DialogEmailProtectionChooseEmailBinding) {
         binding.closeButton.setOnClickListener {
             returnResult(UseEmailResultType.DoNotUseEmailProtection)
         }
@@ -109,7 +109,7 @@ class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectio
     }
 
     private fun getPersonalAddress() = arguments?.getString(KEY_ADDRESS)!!
-    private fun getOriginalUrl() = arguments?.getString(EmailProtectionChooserDialog.KEY_URL)!!
+    private fun getOriginalUrl() = arguments?.getString(EmailProtectionChooseEmailDialog.KEY_URL)!!
     private fun getTabId() = arguments?.getString(KEY_TAB_ID)!!
 
     companion object {
@@ -117,11 +117,11 @@ class EmailAutofillTooltipFragment : BottomSheetDialogFragment(), EmailProtectio
             personalDuckAddress: String,
             url: String,
             tabId: String,
-        ): EmailAutofillTooltipFragment {
-            val fragment = EmailAutofillTooltipFragment()
+        ): EmailProtectionChooseEmailFragment {
+            val fragment = EmailProtectionChooseEmailFragment()
             fragment.arguments = Bundle().also {
                 it.putString(KEY_ADDRESS, personalDuckAddress)
-                it.putString(EmailProtectionChooserDialog.KEY_URL, url)
+                it.putString(EmailProtectionChooseEmailDialog.KEY_URL, url)
                 it.putString(KEY_TAB_ID, tabId)
             }
             return fragment

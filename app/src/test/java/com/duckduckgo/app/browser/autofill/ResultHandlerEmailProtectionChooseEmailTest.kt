@@ -26,10 +26,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COHORT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LAST_USED_DAY
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.DoNotUseEmailProtection
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.UsePersonalEmailAddress
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.UsePrivateAliasAddress
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.*
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.ResultHandlerEmailProtectionChooseEmail
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
@@ -41,11 +39,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -147,11 +141,11 @@ class ResultHandlerEmailProtectionChooseEmailTest {
 
     private fun bundle(
         url: String? = "example.com",
-        result: EmailProtectionChooserDialog.UseEmailResultType?,
+        result: EmailProtectionChooseEmailDialog.UseEmailResultType?,
     ): Bundle {
         return Bundle().also {
-            it.putString(EmailProtectionChooserDialog.KEY_URL, url)
-            it.putParcelable(EmailProtectionChooserDialog.KEY_RESULT, result)
+            it.putString(EmailProtectionChooseEmailDialog.KEY_URL, url)
+            it.putParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT, result)
         }
     }
 }

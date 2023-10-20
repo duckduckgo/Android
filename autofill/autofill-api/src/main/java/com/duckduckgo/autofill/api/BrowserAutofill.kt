@@ -43,7 +43,9 @@ interface BrowserAutofill {
      */
     fun addJsInterface(
         webView: WebView,
-        callback: Callback,
+        autofillCallback: Callback,
+        emailProtectionInContextCallback: EmailProtectionUserPromptListener? = null,
+        emailProtectionInContextSignupFlowCallback: EmailProtectionInContextSignupFlowListener? = null,
         tabId: String,
     )
 
@@ -74,6 +76,38 @@ interface BrowserAutofill {
      * Informs the JS layer not to use the generated password
      */
     fun rejectGeneratedPassword()
+
+    /**
+     * Informs the JS layer that the in-context Email Protection flow has finished
+     */
+    fun inContextEmailProtectionFlowFinished()
+}
+
+/**
+ * Callback for Email Protection prompts, signalling when to show the native UI to the user
+ */
+interface EmailProtectionUserPromptListener {
+
+    /**
+     * Called when the user should be shown prompt to sign up for Email Protection
+     */
+    fun showNativeInContextEmailProtectionSignupPrompt()
+
+    /**
+     * Called when the user should be shown prompt to choose an email address to use for email protection autofill
+     */
+    fun showNativeChooseEmailAddressPrompt()
+}
+
+/**
+ * Callback for Email Protection events that might happen during the in-context signup flow
+ */
+interface EmailProtectionInContextSignupFlowListener {
+
+    /**
+     * Called when the in-context email protection signup flow should be closed
+     */
+    fun closeInContextSignup()
 }
 
 /**

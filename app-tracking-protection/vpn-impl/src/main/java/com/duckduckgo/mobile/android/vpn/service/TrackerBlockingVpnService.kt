@@ -218,13 +218,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         when (val action = intent?.action) {
             null, ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
-                notifyVpnStart()
-                synchronized(this) {
-                    launch(serviceDispatcher) {
-                        async {
-                            startVpn(intent.alwaysOnTriggered())
-                        }.await()
+                if (notifyVpnStart()) {
+                    synchronized(this) {
+                        launch(serviceDispatcher) {
+                            async {
+                                startVpn(intent.alwaysOnTriggered())
+                            }.await()
+                        }
                     }
+                } else {
+                    logcat(ERROR) { "notifyStart return error, aborting" }
+                    deviceShieldPixels.notifyStartFailed()
                 }
             }
             ACTION_STOP_VPN -> {
@@ -617,15 +621,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
     }
 
-    private fun notifyVpnStart() {
+    /**
+     * @return `true` if the start was initiated correctly, otherwise `false`
+     */
+    private fun notifyVpnStart(): Boolean {
         val vpnNotification =
             vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin()?.getInitialContent()
-                ?: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
+                ?: return false
 
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,
             VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
         )
+
+        return true
     }
 
     private suspend fun monitorVpnAlwaysOnState() = withContext(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
