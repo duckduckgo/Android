@@ -48,6 +48,8 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -137,7 +139,6 @@ import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsFileActions
-import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DispatcherProvider
@@ -184,12 +185,18 @@ import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpHandleVerificationLink
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenNoParams
+import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpScreenResult
+import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.credential.saving.DuckAddressLoginCreator
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.api.systemautofill.SystemAutofillUsageMonitor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
@@ -239,6 +246,7 @@ class BrowserTabFragment :
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
     AutofillEventListener,
+    EmailProtectionUserPromptListener,
     SystemAutofillListener {
 
     private val supervisorJob = SupervisorJob()
@@ -396,6 +404,13 @@ class BrowserTabFragment :
     @Inject
     lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
 
+    /**
+     * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
+     * This is needed because the activity stack will be cleared if an external link is opened in our browser
+     * We need to be able to determine if inContextEmailProtection view was showing. If it was, it will consume email verification links.
+     */
+    var inContextEmailProtectionShowing: Boolean = false
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -491,6 +506,23 @@ class BrowserTabFragment :
         get() = omnibar.browserMenu
 
     private var webView: DuckDuckGoWebView? = null
+
+    private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
+        when (result.resultCode) {
+            EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
+                browserAutofill.inContextEmailProtectionFlowFinished()
+                inContextEmailProtectionShowing = false
+            }
+            EmailProtectionInContextSignUpScreenResult.CANCELLED -> {
+                browserAutofill.inContextEmailProtectionFlowFinished()
+                inContextEmailProtectionShowing = false
+            }
+            else -> {
+                // we don't set inContextEmailProtectionShowing to false here because the system is cancelling it
+                // this is likely because of an external link being clicked (e.g., the email protection verification link)
+            }
+        }
+    }
 
     private val errorSnackbar: Snackbar by lazy {
         binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -1028,6 +1060,16 @@ class BrowserTabFragment :
         viewModel.usePersonalDuckAddress(originalUrl, duckAddress)
     }
 
+    override fun onSelectedToSignUpForInContextEmailProtection() {
+        showEmailProtectionInContextWebFlow()
+    }
+
+    override fun onEndOfEmailProtectionInContextSignupFlow() {
+        webView?.let {
+            browserAutofill.inContextEmailProtectionFlowFinished()
+        }
+    }
+
     override fun onSavedCredentials(credentials: LoginCredentials) {
         viewModel.onShowUserCredentialsSaved(credentials)
     }
@@ -1210,7 +1252,9 @@ class BrowserTabFragment :
                 autoSaveLogin = it.autoSaveLogin,
             )
 
-            is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
+            is Command.ShowEmailProtectionChooseEmailPrompt -> showEmailProtectionChooseEmailDialog(it.address)
+            is Command.ShowEmailProtectionInContextSignUpPrompt -> showNativeInContextEmailProtectionSignupPrompt()
+
             is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.LaunchAutofillSettings -> launchAutofillManagementScreen()
             is Command.EditWithSelectedQuery -> {
@@ -2048,7 +2092,11 @@ class BrowserTabFragment :
             it.setFindListener(this)
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
-            emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
+            emailInjector.addJsInterface(
+                it,
+                onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
+                onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
+            )
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
@@ -2061,7 +2109,7 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
-        browserAutofill.addJsInterface(it, autofillCallback, tabId)
+        browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
@@ -2763,7 +2811,7 @@ class BrowserTabFragment :
         // NO OP
     }
 
-    private fun showEmailTooltip(address: String) {
+    private fun showEmailProtectionChooseEmailDialog(address: String) {
         context?.let {
             val url = webView?.url ?: return
 
@@ -2772,8 +2820,36 @@ class BrowserTabFragment :
                 personalDuckAddress = address,
                 tabId = tabId,
             )
-            showDialogHidingPrevious(dialog, EmailProtectionChooserDialog.TAG, url)
+            showDialogHidingPrevious(dialog, EmailProtectionChooseEmailDialog.TAG, url)
         }
+    }
+
+    override fun showNativeInContextEmailProtectionSignupPrompt() {
+        context?.let {
+            val url = webView?.url ?: return
+
+            val dialog = credentialAutofillDialogFactory.emailProtectionInContextSignUpDialog(
+                tabId = tabId,
+            )
+            showDialogHidingPrevious(dialog, EmailProtectionInContextSignUpDialog.TAG, url)
+        }
+    }
+
+    fun showEmailProtectionInContextWebFlow(verificationUrl: String? = null) {
+        context?.let {
+            val params = if (verificationUrl == null) {
+                EmailProtectionInContextSignUpScreenNoParams
+            } else {
+                EmailProtectionInContextSignUpHandleVerificationLink(verificationUrl)
+            }
+            val intent = globalActivityStarter.startIntent(it, params)
+            activityResultHandlerEmailProtectionInContextSignup.launch(intent)
+            inContextEmailProtectionShowing = true
+        }
+    }
+
+    override fun showNativeChooseEmailAddressPrompt() {
+        viewModel.showEmailProtectionChooseEmailPrompt()
     }
 
     companion object {

@@ -47,7 +47,7 @@ class EmailJavascriptInterface(
         return (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
     }
 
-    private fun isFeatureEnabled() = autofillFeature.self().isEnabled()
+    private fun isAutofillEnabled() = autofillFeature.self().isEnabled()
 
     @JavascriptInterface
     fun isSignedIn(): String {
@@ -101,7 +101,7 @@ class EmailJavascriptInterface(
     @JavascriptInterface
     fun showTooltip() {
         getUrl()?.let {
-            if (isFeatureEnabled() && !autofill.isAnException(it)) {
+            if (isAutofillEnabled() && !autofill.isAnException(it)) {
                 showNativeTooltip()
             }
         }

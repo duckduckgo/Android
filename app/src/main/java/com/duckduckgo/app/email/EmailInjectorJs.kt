@@ -25,27 +25,13 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.api.emailprotection.EmailInjector
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-interface EmailInjector {
-
-    fun addJsInterface(
-        webView: WebView,
-        onTooltipShown: () -> Unit,
-    )
-
-    fun injectAddressInEmailField(
-        webView: WebView,
-        alias: String?,
-        url: String?,
-    )
-
-    fun notifyWebAppSignEvent(
-        webView: WebView,
-        url: String?,
-    )
-}
-
-class EmailInjectorJs(
+@ContributesBinding(AppScope::class)
+class EmailInjectorJs @Inject constructor(
     private val emailManager: EmailManager,
     private val urlDetector: DuckDuckGoUrlDetector,
     private val dispatcherProvider: DispatcherProvider,
@@ -56,11 +42,20 @@ class EmailInjectorJs(
 
     override fun addJsInterface(
         webView: WebView,
-        onTooltipShown: () -> Unit,
+        onSignedInEmailProtectionPromptShown: () -> Unit,
+        onInContextEmailProtectionSignupPromptShown: () -> Unit,
     ) {
         // We always add the interface irrespectively if the feature is enabled or not
         webView.addJavascriptInterface(
-            EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, autofillFeature, autofill, onTooltipShown),
+            EmailJavascriptInterface(
+                emailManager,
+                webView,
+                urlDetector,
+                dispatcherProvider,
+                autofillFeature,
+                autofill,
+                onSignedInEmailProtectionPromptShown,
+            ),
             JAVASCRIPT_INTERFACE_NAME,
         )
     }

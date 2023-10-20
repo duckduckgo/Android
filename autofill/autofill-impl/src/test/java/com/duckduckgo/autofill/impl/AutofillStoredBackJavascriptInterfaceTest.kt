@@ -24,9 +24,12 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillStoredBackJavascriptInterface.UrlProvider
+import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
+import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
@@ -68,6 +71,9 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val testSavedLoginsMonitor: AutomaticSavedLoginsMonitor = mock()
     private val coroutineScope: CoroutineScope = TestScope()
     private val shareableCredentials: ShareableCredentials = mock()
+    private val emailManager: EmailManager = mock()
+    private val inContextDataStore: EmailProtectionInContextDataStore = mock()
+    private val recentInstallChecker: EmailProtectionInContextRecentInstallChecker = mock()
     private val testWebView = WebView(getApplicationContext())
     private lateinit var testee: AutofillStoredBackJavascriptInterface
 
@@ -90,6 +96,9 @@ class AutofillStoredBackJavascriptInterfaceTest {
             autofillCapabilityChecker = autofillCapabilityChecker,
             passwordEventResolver = passwordEventResolver,
             shareableCredentials = shareableCredentials,
+            emailManager = emailManager,
+            inContextDataStore = inContextDataStore,
+            recentInstallChecker = recentInstallChecker,
         )
         testee.callback = testCallback
         testee.webView = testWebView

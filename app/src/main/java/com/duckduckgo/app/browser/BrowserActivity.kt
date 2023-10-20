@@ -69,6 +69,7 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -115,6 +116,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
+
+    @Inject
+    lateinit var emailProtectionLinkVerifier: EmailProtectionLinkVerifier
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -329,6 +333,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
             return
         }
+
+        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.dataString, currentTab?.inContextEmailProtectionShowing)) {
+            currentTab?.showEmailProtectionInContextWebFlow(intent.dataString)
+            Timber.v("Verification link was consumed, so don't allow it to open in a new tab")
+            return
+        }
+
+        // the BrowserActivity will automatically clear its stack of activities when being brought to the foreground, so this can no longer be true
+        currentTab?.inContextEmailProtectionShowing = false
 
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")

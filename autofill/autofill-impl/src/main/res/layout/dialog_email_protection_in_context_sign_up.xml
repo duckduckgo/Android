@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout style="@style/AutofillDialogRootViewStyle">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".15" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".85" />
+
+        <ImageView
+            android:id="@+id/closeButton"
+            style="@style/AutofillDialogCloseButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/siteDetailsContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/favicon"
+                style="@style/AutofillDialogFaviconStyle"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/ic_dax_icon" />
+
+            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                android:id="@+id/emailProtectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_2"
+                app:typography="h5"
+                android:text="@string/autofillEmailProtectionInContextSignUpDialogFeatureName" />
+
+        </LinearLayout>
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/dialogTitle"
+            android:breakStrategy="balanced"
+            android:text="@string/autofillEmailProtectionInContextSignUpDialogTitle"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/siteDetailsContainer"
+            app:typography="h2" />
+
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/onboardingSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:text="@string/autofillEmailProtectionInContextSignUpDialogExplanation"
+            android:textAlignment="center"
+            app:typography="body2"
+            app:layout_constraintEnd_toEndOf="@id/protectMyEmailButton"
+            app:layout_constraintStart_toStartOf="@id/protectMyEmailButton"
+            app:layout_constraintTop_toBottomOf="@id/dialogTitle" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/protectMyEmailButton"
+            android:layout_width="0dp"
+            app:buttonSize="large"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:text="@string/autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/onboardingSubtitle"
+            app:layout_constraintWidth_max="300dp"
+            app:layout_constraintWidth_percent="0.8" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+            android:id="@+id/doNotShowAgainButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:buttonSize="large"
+            android:text="@string/autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText"
+            app:layout_constraintEnd_toEndOf="@id/protectMyEmailButton"
+            app:layout_constraintStart_toStartOf="@id/protectMyEmailButton"
+            app:layout_constraintTop_toBottomOf="@id/protectMyEmailButton" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
+

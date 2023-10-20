@@ -23,7 +23,7 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
@@ -36,7 +36,7 @@ interface AutofillMessagePoster {
     )
 }
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(AppScope::class)
 class AutofillWebViewMessagePoster @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AutofillMessagePoster {

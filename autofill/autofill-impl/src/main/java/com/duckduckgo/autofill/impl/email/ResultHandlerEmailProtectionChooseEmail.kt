@@ -31,11 +31,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.LAST_USED_DAY
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.DoNotUseEmailProtection
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.UsePersonalEmailAddress
-import com.duckduckgo.autofill.api.EmailProtectionChooserDialog.UseEmailResultType.UsePrivateAliasAddress
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog
+import com.duckduckgo.autofill.api.EmailProtectionChooseEmailDialog.UseEmailResultType.*
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
@@ -66,9 +63,9 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
     ) {
         Timber.d("${this::class.java.simpleName}: processing result")
 
-        val userSelection: UseEmailResultType =
-            result.safeGetParcelable(EmailProtectionChooserDialog.KEY_RESULT) ?: return
-        val originalUrl = result.getString(EmailProtectionChooserDialog.KEY_URL) ?: return
+        val userSelection: EmailProtectionChooseEmailDialog.UseEmailResultType =
+            result.safeGetParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT) ?: return
+        val originalUrl = result.getString(EmailProtectionChooseEmailDialog.KEY_URL) ?: return
 
         when (userSelection) {
             UsePersonalEmailAddress -> onSelectedToUsePersonalAddress(originalUrl, autofillCallback)
@@ -134,6 +131,6 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
         }
 
     override fun resultKey(tabId: String): String {
-        return EmailProtectionChooserDialog.resultKey(tabId)
+        return EmailProtectionChooseEmailDialog.resultKey(tabId)
     }
 }
