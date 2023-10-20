@@ -26,16 +26,26 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
+import com.duckduckgo.autofill.internal.R.string
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder.EventListener
+import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
@@ -54,6 +64,11 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var autofillStore: AutofillStore
+
+    private val dateFormatter = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -64,29 +79,119 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
+        configureEmailProtectionUiEventHandlers()
+        configureLoginsUiEventHandlers()
+    }
+
+    private fun configureLoginsUiEventHandlers() {
+        binding.addSampleLoginsButton.setClickListener {
+            val timestamp = dateFormatter.format(System.currentTimeMillis())
+            lifecycleScope.launch(dispatchers.io()) {
+                sampleCredentials(domain = "fill.dev", username = "alice-$timestamp", password = "alice-$timestamp").save()
+                sampleCredentials(domain = "fill.dev", username = "bob-$timestamp", password = "bob-$timestamp").save()
+                sampleCredentials(domain = "subdomain1.fill.dev", username = "charlie-$timestamp", password = "charlie-$timestamp").save()
+                sampleCredentials(domain = "subdomain2.fill.dev", username = "daniel-$timestamp", password = "daniel-$timestamp").save()
+            }
+        }
+
+        binding.addSampleLoginsContainingDuplicatesSameDomainButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                repeat(3) { sampleCredentials(domain = "fill.dev", username = "user").save() }
+            }
+        }
+
+        binding.addSampleLoginsContainingDuplicatesAcrossSubdomainsButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                repeat(3) { sampleCredentials("https://subdomain$it.fill.dev", username = "user").save() }
+            }
+        }
+
+        binding.clearAllSavedLoginsButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                val count = autofillStore.getCredentialCount().first()
+                withContext(dispatchers.main()) {
+                    confirmLoginDeletion(count)
+                }
+            }
+        }
+
+        // keep the number of saved logins up-to-date
+        lifecycleScope.launch(dispatchers.main()) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                autofillStore.getCredentialCount().collect { count ->
+                    binding.clearAllSavedLoginsButton.isEnabled = count > 0
+                    binding.clearAllSavedLoginsButton.setSecondaryText(getString(string.autofillDevSettingsClearLoginsSubtitle, count))
+                }
+            }
+        }
+
+        binding.viewSavedLoginsButton.setClickListener {
+            startActivity(AutofillManagementActivity.intentDefaultList(this))
+        }
+    }
+
+    private fun confirmLoginDeletion(count: Int) {
+        TextAlertDialogBuilder(this@AutofillInternalSettingsActivity)
+            .setTitle(string.autofillDevSettingsClearLogins)
+            .setMessage(getString(string.autofillDevSettingsClearLoginsConfirmationMessage, count))
+            .setDestructiveButtons(true)
+            .setPositiveButton(string.autofillDevSettingsClearLoginsDeleteButton)
+            .setNegativeButton(string.autofillDevSettingsClearLoginsCancelButton)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        onUserChoseToClearSavedLogins()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun onUserChoseToClearSavedLogins() {
+        lifecycleScope.launch(dispatchers.io()) {
+            val idsToDelete = mutableListOf<Long>()
+            autofillStore.getAllCredentials().first().forEach { login ->
+                login.id?.let {
+                    idsToDelete.add(it)
+                }
+            }
+
+            logcat { "There are ${idsToDelete.size} logins to delete" }
+
+            idsToDelete.forEach {
+                autofillStore.deleteCredentials(it)
+            }
+
+            withContext(dispatchers.main()) {
+                Toast.makeText(this@AutofillInternalSettingsActivity, "Deleted %d logins".format(idsToDelete.size), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun configureEmailProtectionUiEventHandlers() {
         binding.emailProtectionClearNeverAskAgainButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 inContextDataStore.resetNeverAskAgainChoice()
-                getString(R.string.autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared).showToast()
+                getString(string.autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared).showToast()
             }
         }
 
         binding.emailProtectionSignOutButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 emailManager.signOut()
-                getString(R.string.autofillDevSettingsEmailProtectionSignedOut).showToast()
+                getString(string.autofillDevSettingsEmailProtectionSignedOut).showToast()
             }
         }
 
         @Suppress("DEPRECATION")
         binding.configureDaysFromInstallValue.setClickListener {
             RadioListAlertDialogBuilder(this)
-                .setTitle(R.string.autofillDevSettingsOverrideMaxInstallDialogTitle)
+                .setTitle(string.autofillDevSettingsOverrideMaxInstallDialogTitle)
                 .setOptions(daysInstalledOverrideOptions().map { it.first })
-                .setPositiveButton(R.string.autofillDevSettingsOverrideMaxInstallDialogOkButtonText)
-                .setNegativeButton(R.string.autofillDevSettingsOverrideMaxInstallDialogCancelButtonText)
+                .setPositiveButton(string.autofillDevSettingsOverrideMaxInstallDialogOkButtonText)
+                .setNegativeButton(string.autofillDevSettingsOverrideMaxInstallDialogCancelButtonText)
                 .addEventListener(
-                    object : RadioListAlertDialogBuilder.EventListener() {
+                    object : EventListener() {
                         override fun onPositiveButtonClicked(selectedItem: Int) {
                             val daysInstalledOverrideChosen = daysInstalledOverrideOptions()[selectedItem - 1].second
 
@@ -154,6 +259,20 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             Pair(getString(R.string.autofillDevSettingsOverrideMaxInstalledOptionNumberDays, 21), 21),
             Pair(getString(R.string.autofillDevSettingsOverrideMaxInstalledOptionAlways), Int.MAX_VALUE),
         )
+    }
+
+    private suspend fun LoginCredentials.save() {
+        withContext(dispatchers.io()) {
+            autofillStore.saveCredentials(this@save.domain ?: "", this@save)
+        }
+    }
+
+    private fun sampleCredentials(
+        domain: String = "fill.dev",
+        username: String,
+        password: String = "password-123",
+    ): LoginCredentials {
+        return LoginCredentials(username = username, password = password, domain = domain)
     }
 
     companion object {

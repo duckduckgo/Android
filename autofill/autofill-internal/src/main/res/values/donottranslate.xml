@@ -40,4 +40,19 @@
 
     <string name="autofillDevSettingsDaysSinceInstall" instruction="%1$d is number of days since app since app was app was installed">Days since app was installed: %1$d</string>
     <string name="autofillDevSettingsOverrideTapToChange">Tap to change this rule</string>
+
+    <string name="autofillDevSettingsLoginsSectionTitle">Logins</string>
+    <string name="autofillDevSettingsClearLogins">Delete all saved logins</string>
+    <string name="autofillDevSettingsClearLoginsConfirmationMessage" instruction="%1$d is number of saved logins">Are you sure you want to delete %1$d logins?</string>
+    <string name="autofillDevSettingsClearLoginsDeleteButton">Delete</string>
+    <string name="autofillDevSettingsClearLoginsCancelButton">Cancel</string>
+    <string name="autofillDevSettingsClearLoginsSubtitle" instruction="%1$d is number of saved logins">Number of saved logins: %1$d</string>
+    <string name="autofillDevSettingsViewSavedLogins">View saved logins</string>
+
+    <string name="autofillDevSettingsAddSampleLogins">Add a few sample logins</string>
+    <string name="autofillDevSettingsAddSampleLoginsSubtitle">Adds a few logins for https://fill.dev</string>
+    <string name="autofillDevSettingsAddSampleLoginsSameSubdomain">Add duplicate logins (same domain)</string>
+    <string name="autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle">Adds multiple logins for https://fill.dev with same username and password</string>
+    <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomains">Add duplicate logins (across different subdomains)</string>
+    <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomainsSubtitle">Adds multiple logins for https://fill.dev with same username and password but across different subdomains</string>
 </resources>
