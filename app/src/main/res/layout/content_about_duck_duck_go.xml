@@ -62,7 +62,8 @@
             app:typography="title"
             android:layout_marginTop="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_6"
-            tools:text="..." />
+            tools:text="..."
+            tools:ignore="HardcodedText" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/aboutText"
