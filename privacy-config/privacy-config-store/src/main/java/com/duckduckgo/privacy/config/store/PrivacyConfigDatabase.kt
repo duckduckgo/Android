@@ -121,6 +121,7 @@ val MIGRATION_15_16 = object : Migration(15, 16) {
 
 val MIGRATION_16_17 = object : Migration(16, 17) {
     override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE 'privacy_config' ADD COLUMN 'timestamp' TEXT")
         database.execSQL("DELETE FROM privacy_config")
     }
 }
