@@ -17,8 +17,8 @@
 package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.store.ExperimentVariantDao
-import com.duckduckgo.experiments.store.ExperimentVariantEntity
+import com.duckduckgo.experiments.impl.store.ExperimentVariantDao
+import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -28,12 +28,12 @@ interface ExperimentVariantRepository {
 
 @ContributesBinding(AppScope::class)
 class ExperimentVariantRepositoryImpl @Inject constructor(
-    private val experimentVariantDao: ExperimentVariantDao,
+//    private val experimentVariantDao: ExperimentVariantDao,
 ) : ExperimentVariantRepository {
 
     override fun updateVariants() {
         val variants = listOf<ExperimentVariantEntity>() // fixme
-        experimentVariantDao.delete()
-        experimentVariantDao.insertAll(variants)
+//        experimentVariantDao.delete()
+//        experimentVariantDao.insertAll(variants)
     }
 }

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.experiments.impl
 
-import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.junit.Assert

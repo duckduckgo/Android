@@ -187,6 +187,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':statistics')
     implementation project(':experiments-api')
+    implementation project(':experiments-impl')
     implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')

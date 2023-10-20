@@ -22,7 +22,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.PrivacyVariantManagerPlugin
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -33,11 +33,15 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
+import javax.inject.Qualifier
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(
@@ -53,7 +57,7 @@ private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
 @ContributesBinding(AppScope::class)
 class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
-    private val privacyVariantManagerPluginPoint: PluginPoint<PrivacyVariantManagerPlugin>,
+    @PluginVariantManager private val variantManagerPlugin: PrivacyFeaturePlugin,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
@@ -111,9 +115,7 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
                 jsonPrivacyConfig.variantManager?.let { jsonObject ->
-                    privacyVariantManagerPluginPoint.getPlugins().first { variantManagerPlugin ->
-                        variantManagerPlugin.store(jsonObject.toString())
-                    }
+                    variantManagerPlugin.store("variantManager", jsonObject.toString())
                 }
             }
             listener.privacyConfigUpdated()
@@ -138,4 +140,19 @@ class RealPrivacyConfigPersister @Inject constructor(
 @VisibleForTesting
 fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
     return this.getPlugins().sumOf { it.featureName.hashCode() }
+}
+
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class PluginVariantManager
+
+@ContributesTo(AppScope::class)
+@Module
+object VariantManagerPluginModule {
+    @Provides
+    @PluginVariantManager
+    fun provideVariantManagerPlugin(variantManager: VariantManager): PrivacyFeaturePlugin {
+        return VariantManagerPlugin(variantManager)
+    }
 }

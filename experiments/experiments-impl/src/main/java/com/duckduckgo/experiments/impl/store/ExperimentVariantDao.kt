@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.experiments.store
+package com.duckduckgo.experiments.impl.store
 
 import androidx.room.Dao
 import androidx.room.Insert

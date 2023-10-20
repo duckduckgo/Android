@@ -17,7 +17,6 @@
 package com.duckduckgo.experiments.impl
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope

@@ -14,44 +14,61 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.experiments.impl.plugins
+package com.duckduckgo.privacy.config.impl
 
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.experiments.api.PrivacyVariantManagerPlugin
 import com.duckduckgo.experiments.api.VariantManager
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import javax.inject.Inject
+import timber.log.Timber
+import javax.inject.Qualifier
 
-@ContributesMultibinding(AppScope::class)
-class VariantManagerPlugin @Inject constructor(
+internal class VariantManagerPlugin constructor(
     private val variantManager: VariantManager,
-) : PrivacyVariantManagerPlugin {
+) : PrivacyFeaturePlugin {
 
-    override fun store(jsonString: String): Boolean {
+    override fun store(
+        featureName: String,
+        jsonString: String
+    ): Boolean {
         val moshi = Moshi.Builder().build()
         val jsonAdapter: JsonAdapter<VariantManagerConfig> =
             moshi.adapter(VariantManagerConfig::class.java)
 
-        val variants = mutableListOf<com.duckduckgo.experiments.store.ExperimentVariantEntity>()
-
-        val variantManagerConfig: VariantManagerConfig? = jsonAdapter.fromJson(jsonString)
+        val variantManagerConfig: VariantManagerConfig? = runCatching {
+            jsonAdapter.fromJson(jsonString)
+        }.onFailure {
+            Timber.e(
+                """
+                    Error: ${it.message}
+                    Parsing jsonString: $jsonString
+                """.trimIndent()
+            )
+        }.getOrThrow()
         if (variantManagerConfig?.variants.isNullOrEmpty()) {
             return false
         }
-        variantManagerConfig?.variants?.map {
-            variants.add(
-                com.duckduckgo.experiments.store.ExperimentVariantEntity(
-                    it.variantKey,
-                    it.desc,
-                    it.weight,
-                    com.duckduckgo.experiments.store.VariantFiltersEntity(it.filters?.locale.orEmpty()),
-                ),
-            )
-        }
+
         variantManager.updateVariants() // fixme Noelia
 
         return true
     }
+
+    override val featureName = "variantManager"
 }
+
+
+internal data class VariantManagerConfig(
+    val variants: List<VariantConfig>,
+)
+
+internal data class VariantConfig(
+    val variantKey: String,
+    val weight: Float? = 0.0f,
+    val filters: VariantFilters? = null,
+)
+
+internal data class VariantFilters(
+    val locale: List<String>? = null,
+)
+

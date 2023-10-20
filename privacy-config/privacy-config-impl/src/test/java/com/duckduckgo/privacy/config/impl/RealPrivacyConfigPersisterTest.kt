@@ -23,7 +23,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.experiments.api.PrivacyVariantManagerPlugin
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
@@ -64,7 +63,7 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
-    private val variantManagerPlugin = FakePrivacyVariantManagerPluginPoint(listOf(FakePrivacyVariantManagerPlugin()))
+    private val variantManagerPlugin = FakePrivacyVariantManagerPlugin()
     private lateinit var sharedPreferences: SharedPreferences
 
     private val context = RuntimeEnvironment.getApplication()
@@ -246,17 +245,16 @@ class RealPrivacyConfigPersisterTest {
             PrivacyFeatureName.GpcFeatureName.value
     }
 
-    class FakePrivacyVariantManagerPluginPoint(private val plugins: List<PrivacyVariantManagerPlugin>) : PluginPoint<PrivacyVariantManagerPlugin> {
-        override fun getPlugins(): Collection<PrivacyVariantManagerPlugin> {
-            return plugins
-        }
-    }
+    class FakePrivacyVariantManagerPlugin : PrivacyFeaturePlugin {
 
-    class FakePrivacyVariantManagerPlugin : PrivacyVariantManagerPlugin {
-
-        override fun store(jsonString: String): Boolean {
+        override fun store(
+            featureName: String,
+            jsonString: String
+        ): Boolean {
             return true
         }
+
+        override val featureName = "variantManager"
     }
 
     companion object {

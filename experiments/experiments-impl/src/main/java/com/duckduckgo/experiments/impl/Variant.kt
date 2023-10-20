@@ -16,7 +16,6 @@
 
 package com.duckduckgo.experiments.impl
 
-import com.duckduckgo.app.statistics.Probabilistic
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 
 /**

@@ -1,6 +1,5 @@
 # Android Experiments
-This module is responsible for persisting experiment variants information from the remote config 
-and allocating them to users based on that configuration.
+This module is responsible for persisting and allocating experiment variants to users.
 
 ## Who can help you better understand this feature?
 - Noelia Alcala

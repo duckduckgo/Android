@@ -32,7 +32,6 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-api')
-    implementation project(path: ':privacy-config-api')
     implementation project(path: ':experiments-api')
 
     implementation Kotlin.stdlib.jdk7
@@ -60,9 +59,6 @@ dependencies {
     implementation JakeWharton.timber
     
     implementation AndroidX.core.ktx
-
-    // Apache commons
-    implementation "org.apache.commons:commons-math3:_"
 
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     testImplementation "org.threeten:threetenbp:_"

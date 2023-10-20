@@ -66,7 +66,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 50,
+    version = 49,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -141,15 +141,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pixelDao(): PendingPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
+
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
+
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(
-    val context: Context,
-    val settingsDataStore: SettingsDataStore,
-) {
+class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDataStore) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
