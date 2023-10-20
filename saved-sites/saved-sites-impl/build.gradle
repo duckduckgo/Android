@@ -29,6 +29,7 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':sync-api')
+    implementation project(path: ':sync-settings-api')
     implementation project(path: ':browser-api')
     api project(path: ':saved-sites-store')
 

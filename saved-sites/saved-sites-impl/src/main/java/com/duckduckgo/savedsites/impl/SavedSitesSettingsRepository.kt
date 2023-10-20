@@ -17,6 +17,7 @@
 package com.duckduckgo.savedsites.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.impl.sync.DisplayModeSyncableSetting
 import com.duckduckgo.savedsites.store.FavoritesViewMode
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -33,6 +34,7 @@ interface SavedSitesSettingsRepository {
 @SingleInstanceIn(AppScope::class)
 class RealSavedSitesSettingsRepository @Inject constructor(
     private val savedSitesSettingsStore: SavedSitesSettingsStore,
+    private val syncableSetting: DisplayModeSyncableSetting,
 ) : SavedSitesSettingsRepository {
 
     override var favoritesDisplayMode: FavoritesViewMode
@@ -40,6 +42,7 @@ class RealSavedSitesSettingsRepository @Inject constructor(
         set(value) {
             if (savedSitesSettingsStore.favoritesDisplayMode == value) return
             savedSitesSettingsStore.favoritesDisplayMode = value
+            syncableSetting.onSettingChanged()
         }
 
     override fun viewModeFlow(): Flow<FavoritesViewMode> = savedSitesSettingsStore.viewModeFlow()

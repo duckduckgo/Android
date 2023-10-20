@@ -6,12 +6,14 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository
 import com.duckduckgo.savedsites.impl.SavedSitesSettingsRepository
 import com.duckduckgo.savedsites.impl.sync.DisplayModeViewModel.ViewState
+import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -20,7 +22,15 @@ class DisplayModeViewModelTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val savedSitesSettingsStore = FakeSavedSitesSettingsStore(coroutineRule.testScope)
-    private val savedSitesSettingsRepository: SavedSitesSettingsRepository = RealSavedSitesSettingsRepository(savedSitesSettingsStore)
+    private val syncSettingsListener: SyncSettingsListener = mock()
+    private val syncableSetting: DisplayModeSyncableSetting = DisplayModeSyncableSetting(
+        savedSitesSettingsStore,
+        syncSettingsListener,
+    )
+    private val savedSitesSettingsRepository: SavedSitesSettingsRepository = RealSavedSitesSettingsRepository(
+        savedSitesSettingsStore,
+        syncableSetting,
+    )
 
     private val testee = DisplayModeViewModel(savedSitesSettingsRepository, coroutineRule.testDispatcherProvider)
 
