@@ -32,6 +32,7 @@
         app:primaryText="Expandable Layout"/>
 
     <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu
+        android:id="@+id/expandableMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
@@ -47,7 +48,7 @@
             app:primaryText="Google Play"
             app:leadingIcon="@drawable/ic_dax_icon"
             app:leadingIconSize="small"
-            app:secondaryText="This is a test."/>
+            app:secondaryText="Expandable Menu Item with a text."/>
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
@@ -62,7 +63,7 @@
             app:primaryText="Email"
             app:leadingIcon="@drawable/ic_email_16"
             app:leadingIconSize="small"
-            app:secondaryText="This is a test."
+            app:secondaryText="Expandable Menu Item with a text and button"
             app:primaryButtonText="Add Email"/>
 
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
@@ -78,12 +79,34 @@
             app:primaryText="Sync"
             app:leadingIcon="@drawable/ic_globe_gray_16dp"
             app:leadingIconSize="small"
-            app:secondaryText="This is a test."
-            app:primaryButtonText="Go to Sync Settings"/>
+            app:expandedLayout="@layout/view_expandable_menu_item_expanded_layout_demo" />
+
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fullWidth="false"
+            app:defaultPadding="false"/>
+
+        <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+            android:id="@+id/expandable4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Sync Custom Layout"
+            app:leadingIcon="@drawable/ic_globe_gray_16dp"
+            app:leadingIconSize="small" />
 
     </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
 
+    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/expandableItemLayout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:primaryText="Expandable Item"/>
 
-
+    <LinearLayout
+        android:id="@+id/expandableItemRootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
 
 </LinearLayout>
