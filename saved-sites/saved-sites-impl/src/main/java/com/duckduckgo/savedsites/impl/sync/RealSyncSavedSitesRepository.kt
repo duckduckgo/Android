@@ -97,7 +97,7 @@ class RealSyncSavedSitesRepository(
         savedSite: SavedSite,
         favoriteFolder: String,
     ): SavedSite {
-        Timber.d("Sync-Feature: inserting Saved Site $savedSite")
+        Timber.d("Sync-Bookmarks: inserting Saved Site $savedSite")
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {

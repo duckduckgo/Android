@@ -264,8 +264,8 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
             storedFavourites.forEach {
                 if (!favourites.contains(it.id)) {
                     Timber.d("Sync-Bookmarks: stored favourite ${it.id} no longer exists in remote, removing it")
-                    //syncSavedSitesRepository.delete(it, favoriteFolder)
-                    //TODO: we should remove relations instead
+                    // syncSavedSitesRepository.delete(it, favoriteFolder)
+                    // TODO: we should remove relations instead
                 }
             }
         }

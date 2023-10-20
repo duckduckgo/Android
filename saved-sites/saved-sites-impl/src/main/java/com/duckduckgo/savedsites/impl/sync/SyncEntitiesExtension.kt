@@ -23,17 +23,6 @@ import org.threeten.bp.*
 fun Entity.mapToBookmark(relationId: String): SavedSite.Bookmark =
     SavedSite.Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified, deleted = this.deletedFlag())
 
-fun Entity.mapToBookmarkFolder(relationId: String, dao: SavedSitesRelationsDao): BookmarkFolder =
-    BookmarkFolder(
-        id = this.entityId,
-        name = this.title,
-        parentId = relationId,
-        numBookmarks = dao.countEntitiesInFolder(this.entityId, EntityType.BOOKMARK),
-        numFolders = dao.countEntitiesInFolder(this.entityId, EntityType.FOLDER),
-        lastModified = this.lastModified,
-        deleted = this.deletedFlag(),
-    )
-
 fun Entity.mapToFavorite(index: Int = 0): SavedSite.Favorite =
     SavedSite.Favorite(
         id = this.entityId,

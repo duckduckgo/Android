@@ -91,11 +91,10 @@ class SavedSitesModule {
     fun providesSavedSitesRepository(
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
-        savedSitesSettings: SavedSitesSettings,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        favoritesAccessor: FavoritesAccessor,
         coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
     ): SavedSitesRepository {
-        return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSettings, coroutineScope, coroutineDispatcher)
+        return RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, favoritesAccessor, coroutineDispatcher)
     }
 
     @Provides
