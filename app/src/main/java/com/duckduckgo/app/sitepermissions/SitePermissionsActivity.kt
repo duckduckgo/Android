@@ -69,7 +69,7 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
                     val sitePermissionsWebsites = viewModel.combineAllPermissions(state.locationPermissionsAllowed, state.sitesPermissionsAllowed)
-                    updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled)
+                    updateList(sitePermissionsWebsites, state.askLocationEnabled, state.askCameraEnabled, state.askMicEnabled, state.askDrmEnabled)
                 }
         }
         lifecycleScope.launch {
@@ -105,8 +105,9 @@ class SitePermissionsActivity : DuckDuckGoActivity() {
         askLocationEnabled: Boolean,
         askCameraEnabled: Boolean,
         askMicEnabled: Boolean,
+        askDrmEnabled: Boolean,
     ) {
-        adapter.updateItems(sitesAllowed, askLocationEnabled, askCameraEnabled, askMicEnabled)
+        adapter.updateItems(sitesAllowed, askLocationEnabled, askCameraEnabled, askMicEnabled, askDrmEnabled)
     }
 
     private fun setupRecyclerView() {

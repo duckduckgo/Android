@@ -66,6 +66,7 @@ class SitePermissionsAdapter(
         isLocationEnabled: Boolean,
         isCameraEnabled: Boolean,
         isMicEnabled: Boolean,
+        isDrmEnabled: Boolean,
     ) {
         val listItems = mutableListOf<SitePermissionListItem>()
         listItems.add(SitePermissionsDescription())
@@ -73,6 +74,7 @@ class SitePermissionsAdapter(
         listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsLocation, isLocationEnabled))
         listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsCamera, isCameraEnabled))
         listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsMicrophone, isMicEnabled))
+        listItems.add(SitePermissionToggle(R.string.sitePermissionsSettingsDRM, isDrmEnabled))
         listItems.add(Divider())
         listItems.add(SitePermissionsHeader(R.string.sitePermissionsSettingsAllowedSitesTitle))
         if (sites.isEmpty()) {
@@ -204,6 +206,13 @@ class SitePermissionsAdapter(
                         R.drawable.ic_microphone_24
                     } else {
                         R.drawable.ic_microphone_blocked_24
+                    }
+                }
+                R.string.sitePermissionsSettingsDRM -> {
+                    if (item.enable) {
+                        R.drawable.ic_camera_24
+                    } else {
+                        R.drawable.ic_camera_blocked_24
                     }
                 }
                 else -> null
