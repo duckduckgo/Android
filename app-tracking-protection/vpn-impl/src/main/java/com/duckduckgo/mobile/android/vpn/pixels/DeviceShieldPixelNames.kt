@@ -212,5 +212,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     REPORT_NOTIFY_START_FAILURE("m_vpn_ev_notify_start_failed_d"),
     REPORT_NOTIFY_START_FAILURE_DAILY("m_vpn_ev_notify_start_failed_c"),
 
+    REPORT_TLS_PARSING_ERROR_CODE_DAILY("m_atp_tls_parsing_error_code_%d_d"),
     ;
 }
