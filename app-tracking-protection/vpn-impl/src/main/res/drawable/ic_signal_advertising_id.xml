@@ -1,25 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2021 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-        android:width="16dp"
-        android:height="16dp"
-        android:viewportWidth="16"
-        android:viewportHeight="16">
+    android:width="12dp"
+    android:height="12dp"
+    android:viewportWidth="12"
+    android:viewportHeight="12">
+  <group>
+    <clip-path
+        android:pathData="M0,0h12v12H0z"/>
     <path
-        android:pathData="M5.86,6.16V3.6667C5.86,2.7467 6.6067,2 7.5267,2C8.4467,2 9.1933,2.7467 9.1933,3.6667V6.16C10,5.62 10.5267,4.7067 10.5267,3.6667C10.5267,2.0067 9.1867,0.6667 7.5267,0.6667C5.8667,0.6667 4.5267,2.0067 4.5267,3.6667C4.5267,4.7067 5.0533,5.62 5.86,6.16ZM9.5267,7.8067C9.34,7.7133 9.14,7.6667 8.9333,7.6667H8.5267V3.6667C8.5267,3.1133 8.08,2.6667 7.5267,2.6667C6.9733,2.6667 6.5267,3.1133 6.5267,3.6667V10.8267L4.2333,10.3467C3.9867,10.2933 3.7267,10.3733 3.5467,10.5533C3.26,10.8467 3.26,11.3133 3.5467,11.6067L6.22,14.28C6.4733,14.5267 6.8133,14.6667 7.1667,14.6667H11.2333C11.9,14.6667 12.46,14.18 12.5533,13.52L12.9733,10.54C13.0533,9.9733 12.76,9.4133 12.2467,9.16L9.5267,7.8067Z"
+        android:pathData="M3.704,0.457a6,6 0,0 1,4.947 0.16A0.625,0.625 0,1 1,8.1 1.74a4.752,4.752 0,0 0,-6.487 2.443A4.75,4.75 0,0 0,1.25 6v2.375a0.625,0.625 0,1 1,-1.25 0L0,6A6,6 0,0 1,3.704 0.457ZM10.299,2.713a0.625,0.625 0,0 1,0.856 0.217A5.997,5.997 0,0 1,12 6v2.375a0.625,0.625 0,1 1,-1.25 0L10.75,6a4.75,4.75 0,0 0,-0.669 -2.43,0.625 0.625,0 0,1 0.218,-0.857Z"
         android:fillColor="?attr/daxColorPrimaryIcon"/>
+    <path
+        android:pathData="M4.47,2.304A4,4 0,0 1,10 6v3.875a0.625,0.625 0,1 1,-1.25 0V6a2.75,2.75 0,1 0,-5.5 0v3.875a0.625,0.625 0,1 1,-1.25 0V6a4,4 0,0 1,2.47 -3.696Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
+    <path
+        android:pathData="M6,4a2,2 0,0 0,-2 2v0.375a0.625,0.625 0,1 0,1.25 0V6a0.75,0.75 0,0 1,1.5 0v5.313a0.625,0.625 0,1 0,1.25 0V6a2,2 0,0 0,-2 -2Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
+    <path
+        android:pathData="M5.25,8.656a0.625,0.625 0,1 0,-1.25 0v2.656a0.625,0.625 0,1 0,1.25 0V8.656Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
+  </group>
 </vector>

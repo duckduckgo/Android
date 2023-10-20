@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Jak to działa?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Ochrona przed śledzeniem przez aplikacje <b>wykrywa i blokuje aplikacje śledzące innych firm</b>, na przykład w sytuacji, gdy Facebook próbuje Cię śledzić za pomocą aplikacji medycznej.\n\n<b>Jest ona bezpłatna</b>, a Ty możesz korzystać z aplikacji tak, jak dotychczas. Działając w tle, pomaga <b>chronić Cię w dzień i w nocy.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kto widzi Twoje dane?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Zabezpieczenie przed śledzeniem przez aplikację nie stanowi usługi VPN.</b> Twoje urządzenie rozpozna je jednak jako jedną z nich. Dzieje się tak, ponieważ do działania wykorzystuje lokalne połączenie VPN.\n\nNarzędzie do ochrony przed śledzeniem przez aplikacje jest inne.<b> Nigdy nie przekierowuje danych aplikacji przez serwer zewnętrzny. </b><annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Zabezpieczenie przed śledzeniem przez aplikację nie stanowi usługi VPN.</b> Twoje urządzenie rozpozna je jednak jako jedną z nich. Dzieje się tak, ponieważ do działania wykorzystuje lokalne połączenie VPN.\n\nNarzędzie do ochrony przed śledzeniem przez aplikacje jest inne.<b> Nigdy nie przekierowuje danych aplikacji przez serwer zewnętrzny.</b>\n\n<annotation type="learn_more_link"><b>Dowiedz się więcej</b></annotation></string>
     <string name="atp_FAQCta">Ochrona przed śledzeniem przez aplikacje – najczęściej zadawane pytania</string>
     <string name="atp_OnboardingContinue">Kontynuuj</string>
     <string name="atp_OnboardingMaybeLater">Może później</string>
