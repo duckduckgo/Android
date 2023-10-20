@@ -342,6 +342,8 @@ interface DeviceShieldPixels {
     fun reportTunnelThreadStopTimeout()
 
     fun reportVpnAlwaysOnTriggered()
+
+    fun notifyStartFailed()
 }
 
 @ContributesBinding(AppScope::class)
@@ -766,6 +768,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportVpnAlwaysOnTriggered() {
         tryToFireDailyPixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY)
         firePixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED)
+    }
+
+    override fun notifyStartFailed() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.REPORT_NOTIFY_START_FAILURE_DAILY)
+        firePixel(DeviceShieldPixelNames.REPORT_NOTIFY_START_FAILURE)
     }
 
     private fun firePixel(
