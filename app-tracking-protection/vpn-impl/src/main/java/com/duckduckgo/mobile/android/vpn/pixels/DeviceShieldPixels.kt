@@ -344,6 +344,8 @@ interface DeviceShieldPixels {
     fun reportVpnAlwaysOnTriggered()
 
     fun notifyStartFailed()
+
+    fun reportTLSParsingError(errorCode: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -773,6 +775,10 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun notifyStartFailed() {
         tryToFireDailyPixel(DeviceShieldPixelNames.REPORT_NOTIFY_START_FAILURE_DAILY)
         firePixel(DeviceShieldPixelNames.REPORT_NOTIFY_START_FAILURE)
+    }
+
+    override fun reportTLSParsingError(errorCode: Int) {
+        tryToFireDailyPixel(String.format(Locale.US, DeviceShieldPixelNames.REPORT_TLS_PARSING_ERROR_CODE_DAILY.pixelName, errorCode))
     }
 
     private fun firePixel(

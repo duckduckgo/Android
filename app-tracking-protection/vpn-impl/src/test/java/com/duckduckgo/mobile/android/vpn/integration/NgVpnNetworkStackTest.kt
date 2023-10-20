@@ -71,6 +71,8 @@ class NgVpnNetworkStackTest {
             trackingProtectionAppsRepository,
             appTpLocalFeature,
             deviceShieldPixels,
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
         )
     }
 
