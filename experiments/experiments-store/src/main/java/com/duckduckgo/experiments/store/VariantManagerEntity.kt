@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.variantmanager
+package com.duckduckgo.experiments.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

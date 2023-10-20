@@ -66,7 +66,6 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
@@ -107,9 +106,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var ctaViewModel: CtaViewModel
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var userEventsStore: UserEventsStore

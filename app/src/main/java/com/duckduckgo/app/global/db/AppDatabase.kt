@@ -47,9 +47,6 @@ import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPre
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
-import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantDao
-import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantEntity
-import com.duckduckgo.app.statistics.variantmanager.VariantFiltersConverter
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -100,7 +97,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
-        ExperimentVariantEntity::class,
     ],
 )
 
@@ -117,7 +113,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
     LocationPermissionTypeConverter::class,
     QueryParamsTypeConverter::class,
     EntityTypeConverter::class,
-    VariantFiltersConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -148,7 +143,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
-    abstract fun experimentVariantDao(): ExperimentVariantDao
 }
 
 @Suppress("PropertyName")
@@ -622,14 +616,6 @@ class MigrationsProvider(
         }
     }
 
-    val MIGRATION_49_TO_50: Migration = object : Migration(49, 50) {
-        override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL(
-                "CREATE TABLE IF NOT EXISTS `experiment_variants` (`key` TEXT PRIMARY KEY NOT NULL, `desc` TEXT, `weight` REAL DEFAULT 0.0, `filters` TEXT)",
-            )
-        }
-    }
-
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -704,7 +690,6 @@ class MigrationsProvider(
             MIGRATION_46_TO_47,
             MIGRATION_47_TO_48,
             MIGRATION_48_TO_49,
-            MIGRATION_49_TO_50,
         )
 
     @Deprecated(

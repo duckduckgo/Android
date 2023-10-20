@@ -22,9 +22,9 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.*
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Companion.MAX_EASTER_EGG_COUNT
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist
 import com.duckduckgo.networkprotection.api.NetworkProtectionWaitlist.NetPWaitlistState.NotUnlocked
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,7 +69,7 @@ internal class AboutDuckDuckGoViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(mockVariantManager.getVariantKey()).thenReturn("DEFAULT_VARIANT")
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
         runBlocking {

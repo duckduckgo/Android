@@ -20,8 +20,8 @@ import android.net.Uri
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.global.AppUrl.ParamValue
 import com.duckduckgo.app.referral.AppReferrerDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.experiments.api.VariantManager
 import timber.log.Timber
 
 interface RequestRewriter {
@@ -68,7 +68,7 @@ class DuckDuckGoRequestRewriter(
     override fun addCustomQueryParams(builder: Uri.Builder) {
         val atb = statisticsStore.atb
         if (atb != null) {
-            builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariant()))
+            builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariantKey()))
         }
 
         val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE

@@ -25,13 +25,13 @@ import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
@@ -125,7 +125,7 @@ class BrokenSiteSubmitter @Inject constructor(
     }
 
     private fun atbWithVariant(): String {
-        return statisticsStore.atb?.formatWithVariant(variantManager.getVariant()).orEmpty()
+        return statisticsStore.atb?.formatWithVariant(variantManager.getVariantKey()).orEmpty()
     }
 
     companion object {

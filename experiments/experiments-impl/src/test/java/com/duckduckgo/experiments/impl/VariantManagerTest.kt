@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics
+package com.duckduckgo.experiments.impl
 
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.AskForDefaultBrowserMoreThanOnce
-import org.junit.Assert.*
+import org.junit.Assert
 import org.junit.Test
 
 class VariantManagerTest {
 
-    private val variants = VariantManager.ACTIVE_VARIANTS +
-        VariantManager.REFERRER_VARIANTS +
-        DEFAULT_VARIANT
+    private val variants = VariantManagerImpl.ACTIVE_VARIANTS +
+        VariantManagerImpl.REFERRER_VARIANTS +
+        VariantManagerImpl.DEFAULT_VARIANT
 
     // SERP Experiment(s)
 
@@ -33,31 +31,12 @@ class VariantManagerTest {
     fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
         assertEqualsDouble(0.0, variant.weight)
-        assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
         assertEqualsDouble(0.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    // AskForDefaultBrowserMoreThanOnce
-
-    @Test
-    fun askForDefaultBrowserMoreThanOnceVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zh" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun askForDefaultBrowserMoreThanOnceVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zj" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(AskForDefaultBrowserMoreThanOnce))
     }
 
     @Test
@@ -65,7 +44,7 @@ class VariantManagerTest {
         val existingNames = mutableSetOf<String>()
         variants.forEach {
             if (!existingNames.add(it.key)) {
-                fail("Duplicate variant name found: ${it.key}")
+                Assert.fail("Duplicate variant name found: ${it.key}")
             }
         }
     }
@@ -77,7 +56,7 @@ class VariantManagerTest {
     ) {
         val comparison = expected.compareTo(actual)
         if (comparison != 0) {
-            fail("Doubles are not equal. Expected $expected but was $actual")
+            Assert.fail("Doubles are not equal. Expected $expected but was $actual")
         }
     }
 }

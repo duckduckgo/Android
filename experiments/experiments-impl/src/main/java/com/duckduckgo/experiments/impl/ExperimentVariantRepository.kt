@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.variantmanager
+package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.store.ExperimentVariantDao
+import com.duckduckgo.experiments.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface ExperimentVariantRepository {
-    fun updateAll(variants: List<ExperimentVariantEntity>)
+    fun updateVariants()
 }
 
 @ContributesBinding(AppScope::class)
@@ -29,7 +31,8 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
     private val experimentVariantDao: ExperimentVariantDao,
 ) : ExperimentVariantRepository {
 
-    override fun updateAll(variants: List<ExperimentVariantEntity>) {
+    override fun updateVariants() {
+        val variants = listOf<ExperimentVariantEntity>() // fixme
         experimentVariantDao.delete()
         experimentVariantDao.insertAll(variants)
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-@file:Suppress("SameParameterValue")
+package com.duckduckgo.experiments.impl
 
-package com.duckduckgo.app.statistics
-
+import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.app.statistics.variantmanager.ExperimentVariantRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import org.junit.Assert.*
+import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class ExperimentationVariantManagerTest {
 
-    private lateinit var testee: ExperimentationVariantManager
+    private lateinit var testee: VariantManagerImpl
 
     private val mockStore: StatisticsDataStore = mock()
     private val mockRandomizer: IndexRandomizer = mock()
@@ -41,7 +44,12 @@ class ExperimentationVariantManagerTest {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
 
-        testee = ExperimentationVariantManager(mockStore, mockRandomizer, appBuildConfig, mockExperimentVariantRepository)
+        testee = VariantManagerImpl(
+            mockStore,
+            mockRandomizer,
+            appBuildConfig,
+            mockExperimentVariantRepository,
+        )
     }
 
     @Test
@@ -49,7 +57,7 @@ class ExperimentationVariantManagerTest {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
         whenever(mockStore.variant).thenReturn("foo")
 
-        assertEquals("foo", testee.getVariant(activeVariants).key)
+        assertEquals("foo", testee.getVariantKey())
     }
 
     @Test
@@ -57,7 +65,7 @@ class ExperimentationVariantManagerTest {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
         whenever(mockStore.variant).thenReturn("foo")
 
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
         verify(mockRandomizer, never()).random(any())
     }
 
@@ -65,17 +73,8 @@ class ExperimentationVariantManagerTest {
     fun whenNoVariantsAvailableThenDefaultVariantHasEmptyStringForKey() {
         whenever(mockStore.variant).thenReturn("foo")
 
-        val defaultVariant = testee.getVariant(activeVariants)
-        assertEquals("", defaultVariant.key)
-        assertTrue(defaultVariant.features.isEmpty())
-    }
-
-    @Test
-    fun whenNoVariantsAvailableThenDefaultVariantHasNoExperimentalFeaturesEnabled() {
-        whenever(mockStore.variant).thenReturn("foo")
-
-        val defaultVariant = testee.getVariant(activeVariants)
-        assertTrue(defaultVariant.features.isEmpty())
+        testee.getVariantKey()
+        assertEquals("", testee.defaultVariantKey())
     }
 
     @Test
@@ -83,7 +82,7 @@ class ExperimentationVariantManagerTest {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
         whenever(mockStore.variant).thenReturn("bar")
 
-        assertEquals(VariantManager.DEFAULT_VARIANT, testee.getVariant(activeVariants))
+        assertEquals(testee.defaultVariantKey(), testee.getVariantKey())
     }
 
     @Test
@@ -91,16 +90,16 @@ class ExperimentationVariantManagerTest {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
 
         whenever(mockStore.variant).thenReturn("bar")
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
 
-        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
+        verify(mockStore).variant = testee.defaultVariantKey()
     }
 
     @Test
     fun whenNoVariantPersistedThenNewVariantAllocated() {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
 
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
 
         verify(mockRandomizer).random(any())
     }
@@ -109,7 +108,7 @@ class ExperimentationVariantManagerTest {
     fun whenNoVariantPersistedThenNewVariantKeyIsAllocatedAndPersisted() {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
 
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
 
         verify(mockStore).variant = "foo"
     }
@@ -118,9 +117,9 @@ class ExperimentationVariantManagerTest {
     fun whenVariantDoesNotComplyWithFiltersThenDefaultVariantIsPersisted() {
         activeVariants.add(Variant("foo", 100.0, filterBy = { false }))
 
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
 
-        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
+        verify(mockStore).variant = testee.defaultVariantKey()
     }
 
     @Test
@@ -128,9 +127,9 @@ class ExperimentationVariantManagerTest {
         whenever(appBuildConfig.sdkInt).thenReturn(10)
         activeVariants.add(Variant("foo", 100.0, filterBy = { config -> config.sdkInt == 11 }))
 
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
 
-        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
+        verify(mockStore).variant = testee.defaultVariantKey()
     }
 
     @Test
@@ -138,7 +137,7 @@ class ExperimentationVariantManagerTest {
         whenever(appBuildConfig.sdkInt).thenReturn(10)
         activeVariants.add(Variant("foo", 100.0, filterBy = { config -> config.sdkInt == 10 }))
 
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
 
         verify(mockStore).variant = "foo"
     }
@@ -147,7 +146,7 @@ class ExperimentationVariantManagerTest {
     fun whenVariantDoesComplyWithFiltersThenNewVariantKeyIsAllocatedAndPersisted() {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
 
-        testee.getVariant(activeVariants)
+        testee.getVariantKey()
 
         verify(mockStore).variant = "foo"
     }
@@ -157,8 +156,8 @@ class ExperimentationVariantManagerTest {
         val referrerVariantKey = "xx"
         mockUpdateScenario(referrerVariantKey)
 
-        val variant = testee.getVariant(emptyList())
-        assertEquals(referrerVariantKey, variant.key)
+        val variantKey = testee.getVariantKey()
+        assertEquals(referrerVariantKey, variantKey)
     }
 
     @Test
@@ -168,9 +167,9 @@ class ExperimentationVariantManagerTest {
 
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
         activeVariants.add(Variant("bar", 100.0, filterBy = { true }))
-        val variant = testee.getVariant(activeVariants)
+        val variantKey = testee.getVariantKey()
 
-        assertEquals(referrerVariantKey, variant.key)
+        assertEquals(referrerVariantKey, variantKey)
     }
 
     @Test
@@ -182,18 +181,11 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenUpdatingReferrerVariantThenNewReferrerVariantReturned() {
-        val originalVariant = testee.getVariant(activeVariants)
+        val originalVariant = testee.getVariantKey()
         mockUpdateScenario("xx")
-        val newVariant = testee.getVariant(activeVariants)
-        assertNotEquals(originalVariant, newVariant)
-        assertEquals("xx", newVariant.key)
-    }
-
-    @Test
-    fun whenUnknownReferrerVariantReturnedThenNoFeaturesEnabled() {
-        mockUpdateScenario("xx")
-        val variant = testee.getVariant(activeVariants)
-        assertTrue(variant.features.isEmpty())
+        val newVariant = testee.getVariantKey()
+        Assert.assertNotEquals(originalVariant, newVariant)
+        assertEquals("xx", newVariant)
     }
 
     private fun mockUpdateScenario(key: String) {

@@ -18,11 +18,11 @@ package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -60,7 +60,7 @@ class StatisticsRequester @Inject constructor(
                     "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour",
                 )
                 store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
-                store.variant = VariantManager.DEFAULT_VARIANT.key
+                store.variant = variantManager.defaultVariantKey()
             }
             return
         }
@@ -74,7 +74,7 @@ class StatisticsRequester @Inject constructor(
                 val atb = Atb(it.version)
                 Timber.i("$atb")
                 store.saveAtb(atb)
-                val atbWithVariant = atb.formatWithVariant(variantManager.getVariant())
+                val atbWithVariant = atb.formatWithVariant(variantManager.getVariantKey())
 
                 Timber.i("Initialized ATB: $atbWithVariant")
                 service.exti(atbWithVariant)
@@ -100,7 +100,7 @@ class StatisticsRequester @Inject constructor(
             return
         }
 
-        val fullAtb = atb.formatWithVariant(variantManager.getVariant())
+        val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
         val retentionAtb = store.searchRetentionAtb ?: atb.version
 
         service
@@ -130,7 +130,7 @@ class StatisticsRequester @Inject constructor(
             return
         }
 
-        val fullAtb = atb.formatWithVariant(variantManager.getVariant())
+        val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
         val retentionAtb = store.appRetentionAtb ?: atb.version
 
         service

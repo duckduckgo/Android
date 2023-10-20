@@ -16,6 +16,9 @@
 
 package com.duckduckgo.app.statistics
 
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 
 interface IndexRandomizer {
@@ -26,7 +29,8 @@ interface Probabilistic {
     val weight: Double
 }
 
-class WeightedRandomizer : IndexRandomizer {
+@ContributesBinding(AppScope::class)
+class WeightedRandomizer @Inject constructor() : IndexRandomizer {
 
     override fun random(items: List<Probabilistic>): Int {
         val indexArray = arrayPopulatedWithIndexes(items)

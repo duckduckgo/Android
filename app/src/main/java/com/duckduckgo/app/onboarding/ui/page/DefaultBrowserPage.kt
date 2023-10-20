@@ -34,7 +34,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.FragmentViewModelFactory
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.button.DaxButton
@@ -47,9 +46,6 @@ class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_de
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig

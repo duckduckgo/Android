@@ -22,10 +22,9 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.edit
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.experiments.api.PrivacyVariantManagerPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
-import com.duckduckgo.privacy.config.impl.features.variantmanager.VariantManagerPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -54,7 +53,7 @@ private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
 @ContributesBinding(AppScope::class)
 class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
-    private val variantManagerPlugin: VariantManagerPlugin,
+    private val privacyVariantManagerPluginPoint: PluginPoint<PrivacyVariantManagerPlugin>,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
     private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository,
     private val privacyConfigRepository: PrivacyConfigRepository,
@@ -112,7 +111,9 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
                 jsonPrivacyConfig.variantManager?.let { jsonObject ->
-                    variantManagerPlugin.store(PrivacyFeatureName.VariantManagerName.name, jsonObject.toString())
+                    privacyVariantManagerPluginPoint.getPlugins().first { variantManagerPlugin ->
+                        variantManagerPlugin.store(jsonObject.toString())
+                    }
                 }
             }
             listener.privacyConfigUpdated()

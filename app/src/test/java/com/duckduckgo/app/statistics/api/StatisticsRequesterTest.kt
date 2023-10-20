@@ -18,11 +18,10 @@ package com.duckduckgo.app.statistics.api
 
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import org.junit.Before
@@ -51,7 +50,7 @@ class StatisticsRequesterTest {
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
+        whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
         whenever(mockService.atb(any(), any())).thenReturn(Observable.just(ATB))
         whenever(mockService.updateSearchAtb(any(), any(), any(), any())).thenReturn(Observable.just(Atb(NEW_ATB)))
         whenever(mockService.exti(any(), any())).thenReturn(Observable.just(mockResponseBody))

@@ -23,8 +23,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.RxPixelSenderTest.TestPixels.TEST
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.model.Atb
@@ -32,6 +30,7 @@ import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Completable
 import java.util.concurrent.TimeoutException
 import org.junit.After
@@ -98,7 +97,7 @@ class RxPixelSenderTest {
     fun whenPixelFiredThenPixelServiceCalledWithCorrectAtbAndVariant() {
         givenPixelApiSucceeds()
         givenAtbVariant(Atb("atb"))
-        givenVariant(Variant("variant", filterBy = { true }))
+        givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap())
@@ -130,7 +129,7 @@ class RxPixelSenderTest {
     fun whenPixelFiredWithAdditionalParametersThenPixelServiceCalledWithDefaultAndAdditionalParameters() {
         givenPixelApiSucceeds()
         givenAtbVariant(Atb("atb"))
-        givenVariant(Variant("variant", filterBy = { true }))
+        givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
@@ -145,7 +144,7 @@ class RxPixelSenderTest {
     fun whenPixelFiredWithoutAdditionalParametersThenPixelServiceCalledWithOnlyDefaultParameters() {
         givenPixelApiSucceeds()
         givenAtbVariant(Atb("atb"))
-        givenVariant(Variant("variant", filterBy = { true }))
+        givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
@@ -158,7 +157,7 @@ class RxPixelSenderTest {
     @Test
     fun whenPixelEnqueuedWitAdditionalParametersThenPixelEnqueuedWithParameters() {
         givenAtbVariant(Atb("atb"))
-        givenVariant(Variant("variant", filterBy = { true }))
+        givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
         val params = mapOf("param1" to "value1", "param2" to "value2")
@@ -183,7 +182,7 @@ class RxPixelSenderTest {
     @Test
     fun whenPixelEnqueuedWithoutAdditionalParametersThenPixelEnqueuedWithOnlyDefaultParameters() {
         givenAtbVariant(Atb("atb"))
-        givenVariant(Variant("variant", filterBy = { true }))
+        givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
@@ -304,8 +303,8 @@ class RxPixelSenderTest {
         whenever(api.fire(any(), any(), any(), any(), any(), any())).thenReturn(Completable.complete())
     }
 
-    private fun givenVariant(variant: Variant) {
-        whenever(mockVariantManager.getVariant()).thenReturn(variant)
+    private fun givenVariant(variantKey: String) {
+        whenever(mockVariantManager.getVariantKey()).thenReturn(variantKey)
     }
 
     private fun givenAtbVariant(atb: Atb) {

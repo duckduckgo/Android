@@ -19,14 +19,15 @@ package com.duckduckgo.privacy.config.impl
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.experiments.api.PrivacyVariantManagerPlugin
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersisterTest.FakePrivacyVariantManagerPluginPoint
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.drm.DrmPlugin
 import com.duckduckgo.privacy.config.impl.features.gpc.GpcPlugin
 import com.duckduckgo.privacy.config.impl.features.https.HttpsPlugin
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllowlistPlugin
-import com.duckduckgo.privacy.config.impl.features.variantmanager.VariantManagerPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -91,8 +92,8 @@ class ReferenceTestUtilities(
         return FakePrivacyFeaturePluginPoint(getPrivacyFeaturePlugins())
     }
 
-    fun getVariantManagerPlugin(): VariantManagerPlugin {
-        return VariantManagerPlugin(variantManager)
+    fun getVariantManagerPlugin(): PluginPoint<PrivacyVariantManagerPlugin> {
+        return FakePrivacyVariantManagerPluginPoint(listOf()) // fixme Noelia can't access VariantManagerPlugin impl
     }
 
     internal class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>) :

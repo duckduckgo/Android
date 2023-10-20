@@ -21,9 +21,9 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.referral.AppReferrerDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.experiments.api.VariantManager
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +43,7 @@ class DuckDuckGoRequestRewriterTest {
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(mockVariantManager.getVariantKey()).thenReturn("DEFAULT_VARIANT")
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
         testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetectorImpl(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
         builder = Uri.Builder()

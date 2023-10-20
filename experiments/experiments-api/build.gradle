@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.statistics.variantmanager
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
-data class VariantManagerConfig(
-    val variants: List<VariantConfig>,
-)
+apply from: "$rootProject.projectDir/code-formatting.gradle"
 
-data class VariantConfig(
-    val variantKey: String,
-    val desc: String? = null,
-    val weight: Float? = 0.0f,
-    val filters: VariantFilters? = null,
-)
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
-data class VariantFilters(
-    val locale: List<String>? = null,
-)
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    implementation Kotlin.stdlib.jdk7
+
+}
+

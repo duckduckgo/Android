@@ -25,11 +25,11 @@ import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.squareup.moshi.Moshi
 import dagger.Lazy

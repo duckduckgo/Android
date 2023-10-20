@@ -21,8 +21,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.getDaggerComponent
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
 import com.duckduckgo.app.statistics.api.StatisticsRequester
 import com.duckduckgo.app.statistics.api.StatisticsService
@@ -30,7 +28,11 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.autofill.api.email.EmailManager
-import org.junit.Assert.*
+import com.duckduckgo.experiments.api.VariantManager
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -61,7 +63,7 @@ class AtbIntegrationTest {
         statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
+        whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
         service = getDaggerComponent().retrofit().create(StatisticsService::class.java)
 
         val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
