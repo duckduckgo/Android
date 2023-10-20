@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Kuidas see töötab?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Rakenduse jälgimise kaitse <b>tuvastab ja blokeerib teiste ettevõtete rakenduste jälgurid</b>, näiteks kui Facebook üritab sind jälgida terviserakenduses.\n\n<b>See on tasuta</b> ja saad nautida oma rakendusi nagu tavaliselt. See töötab taustal ja aitab <b>kaitsta sind ööpäev läbi.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kes näeb sinu andmeid?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Rakenduse jälgimise kaitse ei ole VPN.</b> Sinu seade tunneb selle siiski sellena ära. Selle põhjuseks on see, et see kasutab töötamiseks kohalikku VPN-ühendust.\n\nRakenduse jälgimise kaitse on erinev.<b> See ei suuna rakenduse andmeid kunagi välise serveri kaudu. </b><annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Rakenduse jälgimise kaitse ei ole VPN.</b> Sinu seade tunneb selle siiski sellena ära. Selle põhjuseks on see, et see kasutab töötamiseks kohalikku VPN-ühendust.\n\nRakenduse jälgimise kaitse on erinev.<b> See ei suuna rakenduse andmeid kunagi välise serveri kaudu.</b>\n\n<annotation type="learn_more_link"><b>Lisateave</b></annotation></string>
     <string name="atp_FAQCta">Rakenduse jälgimise kaitse KKK</string>
     <string name="atp_OnboardingContinue">Jätka</string>
     <string name="atp_OnboardingMaybeLater">Võib-olla hiljem</string>

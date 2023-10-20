@@ -138,16 +138,20 @@
                     android:id="@+id/cta_show_all"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/keyline_4"
                     android:background="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:minHeight="@dimen/keyline_7"
                     android:paddingStart="72dp"
-                    android:paddingTop="@dimen/keyline_2"
+                    android:paddingTop="@dimen/keyline_empty"
                     android:paddingEnd="@dimen/keyline_4"
                     android:paddingBottom="@dimen/keyline_empty"
                     android:text="@string/atp_ActivityCtaShowAll"
                     android:visibility="gone" />
+
+                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                    android:id="@+id/divider_cta_show_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"/>
 
                 <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"

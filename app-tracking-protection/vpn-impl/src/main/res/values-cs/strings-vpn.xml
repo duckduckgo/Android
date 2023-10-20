@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Jak to funguje?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>detekuje a blokuje trackery jiných společností</b>, například když se tě Facebook pokouší sledovat ve zdravotní aplikaci.\n\n<b>Je to zdarma</b> a aplikace můžeš používat jako obvykle. Pracuje na pozadí a <b>chrání tě ve dne v noci.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kdo vidí tvoje data?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection není VPN.</b> Tvoje zařízení ji však bude za VPN považovat. Je to proto, že k činnosti využívá místní připojení VPN.\n\nApp Tracking Protection funguje jinak.<b> Nikdy nesměruje data aplikace přes externí server. </b><annotation type="learn_more_link">Zjistit více</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection není VPN.</b> Tvoje zařízení ji však bude za VPN považovat. Je to proto, že k činnosti využívá místní připojení VPN.\n\nApp Tracking Protection funguje jinak.<b> Nikdy nesměruje data aplikace přes externí server.</b>\n\n<annotation type="learn_more_link"><b>Zjistit více</b></annotation></string>
     <string name="atp_FAQCta">Časté dotazy ohledně App Tracking Protection</string>
     <string name="atp_OnboardingContinue">Pokračovat</string>
     <string name="atp_OnboardingMaybeLater">Možná později</string>
