@@ -25,6 +25,7 @@ import android.provider.Settings
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -32,6 +33,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.toPx
@@ -136,16 +138,24 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     ) {
 
         val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
-        val title = url.websiteFromGeoLocationsApiOrigin()
-        binding.sitePermissionDialogTitle.text = activity.getString(R.string.drmSiteDialogTitle, title)
-        binding.sitePermissionDialogSubtitle.text = activity.getString(R.string.drmSiteDialogSubtitle)
-        appCoroutineScope.launch(dispatcher.main()) {
-            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, url, binding.sitePermissionDialogFavicon)
-        }
-
         val dialog = CustomAlertDialogBuilder(activity)
             .setView(binding)
             .build()
+
+        val title = url.websiteFromGeoLocationsApiOrigin()
+        binding.sitePermissionDialogTitle.text = activity.getString(R.string.drmSiteDialogTitle, title)
+        binding.sitePermissionDialogSubtitle.addClickableLink(
+            DRM_LEARN_MORE_ANNOTATION,
+            activity.getText(R.string.drmSiteDialogSubtitle),
+        ) {
+            request.deny()
+            dialog.dismiss()
+            activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
+        }
+
+        appCoroutineScope.launch(dispatcher.main()) {
+            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, url, binding.sitePermissionDialogFavicon)
+        }
 
         val domain = url.extractDomain() ?: url
         binding.siteAllowAlwaysDrmPermission.setOnClickListener {
@@ -352,6 +362,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 },
             )
             .show()
+    }
+
+    companion object {
+        private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
+        val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/web-browsing-privacy/".toUri()
     }
 }
 

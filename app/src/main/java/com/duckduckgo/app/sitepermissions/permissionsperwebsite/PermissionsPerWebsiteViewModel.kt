@@ -92,13 +92,19 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
             micSetting = ASK_DISABLED
         }
 
-        return getSettingsList(locationSetting, cameraSetting, micSetting)
+        var drmSetting = WebsitePermissionSettingOption.mapToWebsitePermissionSetting(sitePermissionsEntity?.askDrmSetting)
+        if (drmSetting == ASK && !sitePermissionsRepository.askDrmEnabled) {
+            drmSetting = ASK_DISABLED
+        }
+
+        return getSettingsList(locationSetting, cameraSetting, micSetting, drmSetting)
     }
 
     private fun getSettingsList(
         locationSetting: WebsitePermissionSettingOption,
         cameraSetting: WebsitePermissionSettingOption,
         micSetting: WebsitePermissionSettingOption,
+        drmSetting: WebsitePermissionSettingOption,
     ): List<WebsitePermissionSetting> {
         return listOf(
             WebsitePermissionSetting(
@@ -115,6 +121,11 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
                 R.drawable.ic_microphone_24,
                 R.string.sitePermissionsSettingsMicrophone,
                 micSetting,
+            ),
+            WebsitePermissionSetting(
+                R.drawable.ic_camera_24,
+                R.string.sitePermissionsSettingsDRM,
+                drmSetting,
             ),
         )
     }
@@ -136,6 +147,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         var askLocationSetting = viewState.value.websitePermissions[0].setting
         var askCameraSetting = viewState.value.websitePermissions[1].setting
         var askMicSetting = viewState.value.websitePermissions[2].setting
+        var askDrmSetting = viewState.value.websitePermissions[3].setting
 
         when (editedPermissionSetting.title) {
             R.string.sitePermissionsSettingsLocation -> {
@@ -150,18 +162,25 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
                     true -> ASK_DISABLED
                     false -> editedPermissionSetting.setting
                 }
-                updateSitePermissionsSetting(askCameraSetting, askMicSetting, url)
+                updateSitePermissionsSetting(askCameraSetting, askMicSetting, askDrmSetting, url)
             }
             R.string.sitePermissionsSettingsMicrophone -> {
                 askMicSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askMicEnabled) {
                     true -> ASK_DISABLED
                     false -> editedPermissionSetting.setting
                 }
-                updateSitePermissionsSetting(askCameraSetting, askMicSetting, url)
+                updateSitePermissionsSetting(askCameraSetting, askMicSetting, askDrmSetting, url)
+            }
+            R.string.sitePermissionsSettingsDRM -> {
+                askDrmSetting = when (editedPermissionSetting.setting == ASK && !sitePermissionsRepository.askDrmEnabled) {
+                    true -> ASK_DISABLED
+                    false -> editedPermissionSetting.setting
+                }
+                updateSitePermissionsSetting(askCameraSetting, askMicSetting, askDrmSetting, url)
             }
         }
 
-        _viewState.value = _viewState.value.copy(websitePermissions = getSettingsList(askLocationSetting, askCameraSetting, askMicSetting))
+        _viewState.value = _viewState.value.copy(websitePermissions = getSettingsList(askLocationSetting, askCameraSetting, askMicSetting, askDrmSetting))
     }
 
     private fun updateLocationSetting(locationSetting: WebsitePermissionSettingOption, url: String) {
@@ -178,12 +197,14 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     private fun updateSitePermissionsSetting(
         askCameraSetting: WebsitePermissionSettingOption,
         askMicSetting: WebsitePermissionSettingOption,
+        askDrmSetting: WebsitePermissionSettingOption,
         url: String,
     ) {
         val sitePermissionsEntity = SitePermissionsEntity(
             domain = url,
             askCameraSetting = askCameraSetting.toSitePermissionSettingEntityType().name,
             askMicSetting = askMicSetting.toSitePermissionSettingEntityType().name,
+            askDrmSetting = askDrmSetting.toSitePermissionSettingEntityType().name,
         )
         viewModelScope.launch {
             sitePermissionsRepository.savePermission(sitePermissionsEntity)
