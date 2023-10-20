@@ -42,12 +42,15 @@ import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
+import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import timber.log.Timber.Forest
 import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
@@ -130,13 +133,26 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             .show()
     }
 
-    fun showSiteDrmPermissionsDialog(
+    private fun showSiteDrmPermissionsDialog(
         activity: Activity,
         url: String,
         tabId: String,
         request: PermissionRequest,
     ) {
+        val domain = url.extractDomain() ?: url
 
+        // Check if user allowed or denied per session
+        val sessionSetting = sitePermissionsRepository.getDrmForSession(domain)
+        if (sessionSetting != null) {
+            if (sessionSetting) {
+                request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+            } else {
+                request.deny()
+            }
+            return
+        }
+
+        // No session-based setting -> proceed to show dialog
         val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
         val dialog = CustomAlertDialogBuilder(activity)
             .setView(binding)
@@ -157,7 +173,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             faviconManager.loadToViewFromLocalWithPlaceholder(tabId, url, binding.sitePermissionDialogFavicon)
         }
 
-        val domain = url.extractDomain() ?: url
         binding.siteAllowAlwaysDrmPermission.setOnClickListener {
             request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
             onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
@@ -165,11 +180,13 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         }
 
         binding.siteAllowOnceDrmPermission.setOnClickListener {
+            sitePermissionsRepository.saveDrmForSession(domain, true)
             request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
             dialog.dismiss()
         }
 
         binding.siteDenyOnceDrmPermission.setOnClickListener {
+            sitePermissionsRepository.saveDrmForSession(domain, false)
             request.deny()
             dialog.dismiss()
         }

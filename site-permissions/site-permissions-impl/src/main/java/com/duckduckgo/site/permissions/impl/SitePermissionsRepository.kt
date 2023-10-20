@@ -33,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
@@ -44,6 +45,8 @@ interface SitePermissionsRepository {
     fun sitePermissionsWebsitesFlow(): Flow<List<SitePermissionsEntity>>
     fun sitePermissionsForAllWebsites(): List<SitePermissionsEntity>
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
+    fun getDrmForSession(domain: String): Boolean?
+    fun saveDrmForSession(domain: String, allowed: Boolean)
     suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>)
     suspend fun deleteAll()
     suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity?
@@ -77,6 +80,8 @@ class SitePermissionsRepositoryImpl @Inject constructor(
             sitePermissionsPreferences.askDrmEnabled = value
         }
 
+    private val drmSessions = mutableMapOf<String, Boolean>()
+
     override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionsForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
@@ -106,7 +111,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
-        val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission)
+        val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission) // TODO: is this one trying to do something similar? Used by audio + video
         val permissionGrantedWithin24h = permissionAllowedEntity?.allowedWithin24h() == true
 
         return when (permission) {
@@ -153,6 +158,14 @@ class SitePermissionsRepositoryImpl @Inject constructor(
 
     override fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>> {
         return sitePermissionsAllowedDao.getAllSitesPermissionsAllowedAsFlow()
+    }
+
+    override fun getDrmForSession(domain: String): Boolean? {
+        return drmSessions[domain]
+    }
+
+    override fun saveDrmForSession(domain: String, allowed: Boolean) {
+        drmSessions[domain] = allowed
     }
 
     override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>) {
