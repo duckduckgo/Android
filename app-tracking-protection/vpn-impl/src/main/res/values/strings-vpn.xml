@@ -107,7 +107,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">How does it work?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>detects and blocks app trackers from other companies</b>, like when Facebook attempts to track you in a health app.\n\n<b>It\'s free</b>, and you can enjoy your apps as you normally would. Working in the background, it helps <b>protect you night and day.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Who sees your data?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local VPN connection to work.\n\nApp Tracking Protection is different.<b> It never routes app data through an external server. </b><annotation type="learn_more_link">Learn more</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local VPN connection to work.\n\nApp Tracking Protection is different.<b> It never routes app data through an external server.</b>\n\n<annotation type="learn_more_link"><b>Learn more</b></annotation></string>
     <string name="atp_FAQCta">App Tracking Protection FAQ</string>
     <string name="atp_OnboardingContinue">Continue</string>
     <string name="atp_OnboardingMaybeLater">Maybe Later</string>

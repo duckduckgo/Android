@@ -39,6 +39,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerFeedData
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -57,7 +58,8 @@ class TrackerFeedAdapter @Inject constructor(
         position: Int,
     ) {
         when (holder) {
-            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
+            is TrackerFeedViewHolder ->
+                holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
             is TrackerAppsProtectionStateViewHolder ->
