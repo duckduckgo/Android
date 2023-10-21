@@ -180,7 +180,9 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
             }
         }
 
-        _viewState.value = _viewState.value.copy(websitePermissions = getSettingsList(askLocationSetting, askCameraSetting, askMicSetting, askDrmSetting))
+        _viewState.value = _viewState.value.copy(
+            websitePermissions = getSettingsList(askLocationSetting, askCameraSetting, askMicSetting, askDrmSetting),
+        )
     }
 
     private fun updateLocationSetting(locationSetting: WebsitePermissionSettingOption, url: String) {

@@ -42,16 +42,13 @@ import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
-import com.duckduckgo.site.permissions.store.sitepermissionsallowed.SitePermissionAllowedEntity
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import timber.log.Timber.Forest
-import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
 @InjectWith(FragmentScope::class)
@@ -95,7 +92,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         this.permissionsGrantedListener = permissionsGrantedListener
 
         when {
-            permissionsRequested.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsRequested.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
+            permissionsRequested.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsRequested.contains(
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE,
+            ) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions)
             }
             permissionsRequested.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {

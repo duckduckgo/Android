@@ -33,7 +33,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 interface SitePermissionsRepository {
     var askCameraEnabled: Boolean
@@ -111,7 +110,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     override fun isDomainGranted(url: String, tabId: String, permission: String): Boolean {
         val domain = url.extractDomain() ?: url
         val sitePermissionForDomain = sitePermissionsDao.getSitePermissionsByDomain(domain)
-        val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission) // TODO: is this one trying to do something similar? Used by audio + video
+        val permissionAllowedEntity = sitePermissionsAllowedDao.getSitePermissionAllowed(domain, tabId, permission)
         val permissionGrantedWithin24h = permissionAllowedEntity?.allowedWithin24h() == true
 
         return when (permission) {

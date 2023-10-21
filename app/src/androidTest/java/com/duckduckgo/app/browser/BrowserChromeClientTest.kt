@@ -186,30 +186,17 @@ class BrowserChromeClientTest {
         verify(mockFilePathCallback).onReceiveValue(null)
     }
 
+    @ExperimentalCoroutinesApi
     @Test
-    fun whenOnMediaPermissionRequestIfDomainIsInAllowedListThenPermissionIsGranted() {
+    fun whenOnMediaPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
         val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
-        whenever(mockDrm.isDrmAllowedForUrl(any())).thenReturn(true)
+        whenever(mockSitePermissionsManager.getSitePermissionsAllowedToAsk(any(), any())).thenReturn(permissions)
         testee.onPermissionRequest(mockPermission)
 
-        verify(mockPermission).grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
-    }
-
-    @Test
-    fun whenOnMediaPermissionRequestIfDomainIsNotInAllowedListThenPermissionIsNotGranted() {
-        val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
-        val mockPermission: PermissionRequest = mock()
-        whenever(mockPermission.resources).thenReturn(permissions)
-        whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
-        whenever(mockDrm.isDrmAllowedForUrl(any())).thenReturn(false)
-
-        testee.onPermissionRequest(mockPermission)
-
-        verify(mockPermission, never()).grant(any())
-        verify(mockPermission).deny()
+        verify(mockWebViewClientListener).onSitePermissionRequested(mockPermission, permissions)
     }
 
     @ExperimentalCoroutinesApi
