@@ -21,23 +21,23 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 
 /**
- * This is the class that represents the browser telemetry feature flags
+ * This is the class that represents the browser feature flags
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "browserTelemetry",
+    featureName = "browser",
 )
-interface BrowserTelemetryFeature {
+interface BrowserFeature {
 
     /**
-     * @return `true` when the remote config has the global "browserTelemetry" feature flag enabled
+     * @return `true` when the remote config has the global "browser" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "collectFullWebViewVersion" browserTelemetry sub-feature flag enabled
+     * @return `true` when the remote config has the global "collectFullWebViewVersion" browser sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
