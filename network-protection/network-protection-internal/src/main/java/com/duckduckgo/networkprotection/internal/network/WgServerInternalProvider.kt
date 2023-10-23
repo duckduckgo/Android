@@ -16,11 +16,11 @@
 
 package com.duckduckgo.networkprotection.internal.network
 
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.Server
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
-import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
+import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
 import com.duckduckgo.networkprotection.store.remote_config.NetPEgressServer
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,12 +28,12 @@ import com.squareup.anvil.annotations.ContributesBinding.Priority.HIGHEST
 import javax.inject.Inject
 
 @ContributesBinding(
-    scope = AppScope::class,
+    scope = VpnScope::class,
     priority = HIGHEST, // binding for internal build wins
 )
 class WgServerInternalProvider @Inject constructor(
     private val netPServerRepository: NetPServerRepository,
-    @ProtectedVpnControllerService private val controllerService: WgVpnControllerService,
+    @UnprotectedVpnControllerService private val controllerService: WgVpnControllerService,
 ) : WgServerDebugProvider {
     override suspend fun getSelectedServerName(): String? {
         return netPServerRepository.getSelectedServer()?.name

@@ -18,15 +18,14 @@ package com.duckduckgo.networkprotection.impl.rekey
 
 import android.app.KeyguardManager
 import android.content.Context
+import android.os.PowerManager
 import com.duckduckgo.app.di.ProcessName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
-import com.duckduckgo.networkprotection.impl.configuration.RegisterKeyBody
-import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
-import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -52,7 +51,7 @@ class RealNetPRekeyer @Inject constructor(
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val networkProtectionPixels: NetworkProtectionPixels,
     @ProcessName private val processName: String,
-    @UnprotectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
+    private val wgServerApi: WgServerApi,
     private val appBuildConfig: AppBuildConfig,
     @InternalApi private val deviceLockedChecker: DeviceLockedChecker,
 ) : NetPRekeyer {
@@ -76,7 +75,7 @@ class RealNetPRekeyer @Inject constructor(
 
         val newKey = runCatching {
             val newKeys = KeyPair()
-            wgVpnControllerService.registerKey(RegisterKeyBody(newKeys.publicKey.toBase64(), "*"))
+            wgServerApi.registerPublicKey(newKeys.publicKey.toBase64())
 
             newKeys
         }.onFailure {
@@ -127,9 +126,10 @@ object DeviceLockedCheckerModule {
     @InternalApi
     fun provideDeviceLockChecker(context: Context): DeviceLockedChecker {
         val keyguardManager = runCatching { context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }.getOrNull()
+        val powerManager = runCatching { context.getSystemService(Context.POWER_SERVICE) as PowerManager }.getOrNull()
 
         return {
-            keyguardManager?.isDeviceLocked ?: true
+            (keyguardManager?.isDeviceLocked == true || powerManager?.isInteractive == false)
         }
     }
 }

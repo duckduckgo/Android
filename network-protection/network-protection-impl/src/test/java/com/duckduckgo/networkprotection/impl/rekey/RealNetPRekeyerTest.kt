@@ -21,9 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature.NETP_VPN
-import com.duckduckgo.networkprotection.impl.configuration.EligibleServerInfo
-import com.duckduckgo.networkprotection.impl.configuration.Server
-import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import java.lang.RuntimeException
@@ -54,7 +52,7 @@ class RealNetPRekeyerTest {
     private lateinit var networkProtectionPixels: NetworkProtectionPixels
 
     @Mock
-    private lateinit var wgVpnControllerService: WgVpnControllerService
+    private lateinit var wgServerApi: WgServerApi
 
     @Mock
     private lateinit var appBuildConfig: AppBuildConfig
@@ -69,13 +67,14 @@ class RealNetPRekeyerTest {
 
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
         runBlocking {
-            whenever(wgVpnControllerService.registerKey(any())).thenReturn(
-                listOf(
-                    EligibleServerInfo(
-                        publicKey = "key",
-                        allowedIPs = emptyList(),
-                        server = Server("", "", emptyMap(), "", emptyList(), emptyList(), 1L),
-                    ),
+            whenever(wgServerApi.registerPublicKey(any())).thenReturn(
+                WgServerApi.WgServerData(
+                    serverName = "",
+                    publicKey = "key",
+                    publicEndpoint = "endpoint",
+                    address = "1.1.1.2",
+                    location = null,
+                    gateway = "1.1.1.1",
                 ),
             )
         }
@@ -85,7 +84,7 @@ class RealNetPRekeyerTest {
             vpnFeaturesRegistry,
             networkProtectionPixels,
             "name",
-            wgVpnControllerService,
+            wgServerApi,
             appBuildConfig,
             { isDeviceLocked },
         )
@@ -105,7 +104,7 @@ class RealNetPRekeyerTest {
         whenever(vpnFeaturesRegistry.isFeatureRegistered(NETP_VPN)).thenReturn(true)
         whenever(networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis)
             .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(wgVpnControllerService.registerKey(any())).thenThrow(RuntimeException(""))
+        whenever(wgServerApi.registerPublicKey(any())).thenThrow(RuntimeException(""))
 
         testee.doRekey()
 

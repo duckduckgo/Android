@@ -16,7 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
@@ -42,7 +41,7 @@ interface WgServerApi {
 
 @ContributesBinding(VpnScope::class)
 class RealWgServerApi @Inject constructor(
-    @ProtectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
+    @UnprotectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
     private val serverDebugProvider: WgServerDebugProvider,
     private val netNetpEgressServersProvider: NetpEgressServersProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
@@ -137,5 +136,5 @@ interface WgServerDebugProvider {
 }
 
 // Contribute just the default dummy implementation
-@ContributesBinding(AppScope::class)
+@ContributesBinding(VpnScope::class)
 class WgServerDebugProviderImpl @Inject constructor() : WgServerDebugProvider
