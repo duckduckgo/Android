@@ -33,4 +33,4 @@ interface SettingsPlugin {
 /**
  * This is the plugin for the subs settings
  */
-interface SubsSettingsPlugin : SettingsPlugin
+interface ProSettingsPlugin : SettingsPlugin

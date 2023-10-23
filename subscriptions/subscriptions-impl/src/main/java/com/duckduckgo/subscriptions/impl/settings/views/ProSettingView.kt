@@ -21,17 +21,20 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBuyBinding
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyViewModel.Command.OpenBuyScreen
-import com.duckduckgo.subscriptions.impl.settings.views.SubsSettingBuyViewModel.Factory
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
+import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Factory
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +45,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ViewScope::class)
-class SubsSettingBuyView @JvmOverloads constructor(
+class ProSettingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -56,10 +59,10 @@ class SubsSettingBuyView @JvmOverloads constructor(
 
     private var coroutineScope: CoroutineScope? = null
 
-    private val binding: ViewSettingsBuyBinding by viewBinding()
+    private val binding: ViewSettingsBinding by viewBinding()
 
-    private val viewModel: SubsSettingBuyViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[SubsSettingBuyViewModel::class.java]
+    private val viewModel: ProSettingViewModel by lazy {
+        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[ProSettingViewModel::class.java]
     }
 
     private var job: ConflatedJob = ConflatedJob()
@@ -68,8 +71,10 @@ class SubsSettingBuyView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        binding.buy.setClickListener {
-            viewModel.onBuyClicked()
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+
+        binding.settings.setClickListener {
+            viewModel.onSettings()
         }
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
@@ -78,19 +83,34 @@ class SubsSettingBuyView @JvmOverloads constructor(
         job += viewModel.commands()
             .onEach { processCommands(it) }
             .launchIn(coroutineScope!!)
+
+        viewModel.viewState
+            .onEach { renderView(it) }
+            .launchIn(coroutineScope!!)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null
     }
 
+    private fun renderView(viewState: ViewState) {
+        if (viewState.hasSubscription) {
+            binding.settings.setPrimaryText(context.getString(R.string.subscriptionSetting))
+            binding.settings.setSecondaryText("")
+        } else {
+            binding.settings.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+            binding.settings.setSecondaryText(context.getString(R.string.subscriptionSettingSubscribeSubtitle))
+        }
+    }
+
     private fun processCommands(command: Command) {
         when (command) {
-            is OpenBuyScreen -> {
-                globalActivityStarter.start(context, SubscriptionsScreenWithEmptyParams)
+            is OpenSettings -> {
+                globalActivityStarter.start(context, SubscriptionsSettingsScreenWithEmptyParams)
             }
         }
     }

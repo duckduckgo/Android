@@ -40,4 +40,9 @@
     <string name="subscriptionRemoved">Your subscription has been removed from this device</string>
     <string name="removeFromDevice">Remove From This Device?</string>
     <string name="removeFromDeviceDescription">You will no longer be able to access your subscription on this device. This will not cancel your subscription, and it will remain active on your other device.</string>
+
+    <!--Settings Subscriptions-->
+    <string name="subscriptionSetting">Subscription Settings</string>
+    <string name="subscriptionSettingSubscribe">Subscribe To Privacy Pro</string>
+    <string name="subscriptionSettingSubscribeSubtitle">More seamless privacy with three new protections, including:</string>
 </resources>
