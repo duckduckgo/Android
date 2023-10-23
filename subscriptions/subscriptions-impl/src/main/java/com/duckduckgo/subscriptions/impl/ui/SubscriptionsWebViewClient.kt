@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.subscriptions.impl
+package com.duckduckgo.subscriptions.impl.ui
 
 import android.graphics.Bitmap
 import android.webkit.WebView

@@ -3,8 +3,6 @@ package com.duckduckgo.subscriptions.impl.repository
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
-import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
 import com.duckduckgo.subscriptions.impl.billing.RealBillingClientWrapper.Companion.BASIC_SUBSCRIPTION
@@ -77,34 +75,5 @@ class RealSubscriptionsRepositoryTest {
     private fun givenProductExist(productId: String = BASIC_SUBSCRIPTION) {
         val testMap: Map<String, ProductDetails> = mapOf(productId to getProductDetails(productId))
         whenever(billingClient.products).thenReturn(testMap)
-    }
-
-    private fun purchaseWithSubscription(): Purchase {
-        val product = BASIC_SUBSCRIPTION
-        return Purchase(
-            """
-        {"purchaseToken": "token", "productIds": ["$product"]}
-        """,
-            "signature",
-        )
-    }
-
-    private fun purchaseWithoutSubscription(): Purchase {
-        val product = "test"
-        return Purchase(
-            """
-        {"purchaseToken": "token", "productIds": ["$product"]}
-        """,
-            "signature",
-        )
-    }
-
-    private fun purchaseRecordWithSubscription(time: Int): PurchaseHistoryRecord {
-        return PurchaseHistoryRecord(
-            """
-        {"purchaseToken": "token", "productId": "test", "purchaseTime":$time, "quantity":1}
-        """,
-            "signature",
-        )
     }
 }

@@ -14,11 +14,12 @@
   ~ limitations under the License.
   -->
 
-
-<com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+<com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/settings"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:primaryText="Subscriptions Internal"
-/>
+        android:layout_height="wrap_content"
+        app:primaryText="Subscription Settings"
+        app:primaryTextTruncated="false"
+        app:secondaryText="More seamless privacy with three new protections, including:" />

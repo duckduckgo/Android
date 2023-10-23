@@ -17,14 +17,14 @@
 package com.duckduckgo.settings.impl
 
 import com.duckduckgo.di.DaggerMap
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.settings.api.SubsSettingsPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.multibindings.Multibinds
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class BillingsModule {
     // we use multibinds as the list of plugins can be empty
     @Multibinds
