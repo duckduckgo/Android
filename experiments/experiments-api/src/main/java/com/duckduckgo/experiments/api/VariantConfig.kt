@@ -16,26 +16,12 @@
 
 package com.duckduckgo.experiments.api
 
-/** Public interface for variant manager feature*/
-interface VariantManager {
-    /**
-     * Returns the default variant key
-     */
-    fun defaultVariantKey(): String
+data class VariantConfig(
+    val variantKey: String,
+    val weight: Float? = 0.0f,
+    val filters: VariantFilters? = null,
+)
 
-    /**
-     * Returns the variant key assigned to the user
-     */
-    fun getVariantKey(): String
-
-    /**
-     * Updates user experimental variant when referralResultReceived from PlayStore
-     */
-    fun updateAppReferrerVariant(variant: String)
-
-    /**
-     * Persists experimental variants in the local table when remote config for variantManager
-     * has been updated.
-     */
-    fun saveVariants(variants: List<VariantConfig>)
-}
+data class VariantFilters(
+    val locale: List<String>? = null,
+)

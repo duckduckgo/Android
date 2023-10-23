@@ -16,12 +16,12 @@
 
 package com.duckduckgo.privacy.config.impl
 
+import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import timber.log.Timber
-import javax.inject.Qualifier
 
 internal class VariantManagerPlugin constructor(
     private val variantManager: VariantManager,
@@ -29,7 +29,7 @@ internal class VariantManagerPlugin constructor(
 
     override fun store(
         featureName: String,
-        jsonString: String
+        jsonString: String,
     ): Boolean {
         val moshi = Moshi.Builder().build()
         val jsonAdapter: JsonAdapter<VariantManagerConfig> =
@@ -42,33 +42,23 @@ internal class VariantManagerPlugin constructor(
                 """
                     Error: ${it.message}
                     Parsing jsonString: $jsonString
-                """.trimIndent()
+                """.trimIndent(),
             )
         }.getOrThrow()
-        if (variantManagerConfig?.variants.isNullOrEmpty()) {
-            return false
-        }
 
-        variantManager.updateVariants() // fixme Noelia
-
-        return true
+        return variantManagerConfig?.variants?.takeIf { it.isNotEmpty() }?.let { variants ->
+            variantManager.saveVariants(variants)
+            true
+        } ?: false
     }
 
-    override val featureName = "variantManager"
-}
+    override val featureName = VARIANT_MANAGER_FEATURE_NAME
 
+    companion object {
+        const val VARIANT_MANAGER_FEATURE_NAME = "variantManager"
+    }
+}
 
 internal data class VariantManagerConfig(
     val variants: List<VariantConfig>,
 )
-
-internal data class VariantConfig(
-    val variantKey: String,
-    val weight: Float? = 0.0f,
-    val filters: VariantFilters? = null,
-)
-
-internal data class VariantFilters(
-    val locale: List<String>? = null,
-)
-

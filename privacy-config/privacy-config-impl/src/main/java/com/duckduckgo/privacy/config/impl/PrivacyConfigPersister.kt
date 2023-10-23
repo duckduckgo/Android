@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.VariantManagerPlugin.Companion.VARIANT_MANAGER_FEATURE_NAME
 import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfig
@@ -38,10 +39,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import javax.inject.Qualifier
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
-import javax.inject.Qualifier
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(
@@ -115,7 +116,7 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
                 jsonPrivacyConfig.variantManager?.let { jsonObject ->
-                    variantManagerPlugin.store("variantManager", jsonObject.toString())
+                    variantManagerPlugin.store(VARIANT_MANAGER_FEATURE_NAME, jsonObject.toString())
                 }
             }
             listener.privacyConfigUpdated()
@@ -141,7 +142,6 @@ class RealPrivacyConfigPersister @Inject constructor(
 fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
     return this.getPlugins().sumOf { it.featureName.hashCode() }
 }
-
 
 @Retention(AnnotationRetention.BINARY)
 @Qualifier

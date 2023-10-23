@@ -20,7 +20,10 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
+import com.duckduckgo.experiments.impl.store.VariantFiltersEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.Locale
 import javax.inject.Inject
@@ -85,8 +88,18 @@ class VariantManagerImpl @Inject constructor(
         store.referrerVariant = variant
     }
 
-    override fun updateVariants() {
-        experimentVariantRepository.updateVariants()
+    override fun saveVariants(variants: List<VariantConfig>) {
+        val variantEntityList: MutableList<ExperimentVariantEntity> = mutableListOf()
+        variants.map {
+            variantEntityList.add(
+                ExperimentVariantEntity(
+                    key = it.variantKey,
+                    weight = it.weight,
+                    filters = VariantFiltersEntity(it.filters?.locale.orEmpty()),
+                ),
+            )
+        }
+        experimentVariantRepository.updateVariants(variantEntityList)
     }
 
     private fun lookupVariant(

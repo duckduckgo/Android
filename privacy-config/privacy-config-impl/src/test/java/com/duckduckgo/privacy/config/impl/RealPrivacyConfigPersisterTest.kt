@@ -249,7 +249,7 @@ class RealPrivacyConfigPersisterTest {
 
         override fun store(
             featureName: String,
-            jsonString: String
+            jsonString: String,
         ): Boolean {
             return true
         }

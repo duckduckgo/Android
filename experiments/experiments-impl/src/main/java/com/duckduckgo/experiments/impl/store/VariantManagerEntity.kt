@@ -26,7 +26,6 @@ import com.squareup.moshi.Types
 @Entity(tableName = "experiment_variants")
 data class ExperimentVariantEntity(
     @PrimaryKey val key: String,
-    val desc: String?,
     val weight: Float?,
     val filters: VariantFiltersEntity?,
 )
@@ -47,10 +46,25 @@ class VariantFiltersConverter {
     }
 }
 
+class StringListConverter {
+
+    @TypeConverter
+    fun toStringList(value: String): List<String> {
+        return Adapters.stringListAdapter.fromJson(value)!!
+    }
+
+    @TypeConverter
+    fun fromStringList(value: List<String>): String {
+        return Adapters.stringListAdapter.toJson(value)
+    }
+}
+
 class Adapters {
     companion object {
         private val moshi = Moshi.Builder().build()
         private val variantFilters = Types.newParameterizedType(VariantFiltersEntity::class.java)
+        private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
         val variantFiltersAdapter: JsonAdapter<VariantFiltersEntity> = moshi.adapter(variantFilters)
+        val stringListAdapter: JsonAdapter<List<String>> = moshi.adapter(stringListType)
     }
 }

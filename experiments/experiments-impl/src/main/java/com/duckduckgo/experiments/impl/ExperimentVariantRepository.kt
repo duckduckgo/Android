@@ -23,17 +23,16 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface ExperimentVariantRepository {
-    fun updateVariants()
+    fun updateVariants(variantEntityList: List<ExperimentVariantEntity>)
 }
 
 @ContributesBinding(AppScope::class)
 class ExperimentVariantRepositoryImpl @Inject constructor(
-//    private val experimentVariantDao: ExperimentVariantDao,
+    private val experimentVariantDao: ExperimentVariantDao,
 ) : ExperimentVariantRepository {
 
-    override fun updateVariants() {
-        val variants = listOf<ExperimentVariantEntity>() // fixme
-//        experimentVariantDao.delete()
-//        experimentVariantDao.insertAll(variants)
+    override fun updateVariants(variantEntityList: List<ExperimentVariantEntity>) {
+        experimentVariantDao.delete()
+        experimentVariantDao.insertAll(variantEntityList)
     }
 }
