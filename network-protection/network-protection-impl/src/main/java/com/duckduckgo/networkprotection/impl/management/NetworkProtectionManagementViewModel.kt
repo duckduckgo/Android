@@ -191,7 +191,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         if (!isTimerTickRunning) {
             isTimerTickRunning = true
             loadConnectionDetails()
-            timerTickJob += viewModelScope.launch(dispatcherProvider.default()) {
+            timerTickJob += viewModelScope.launch(dispatcherProvider.io()) {
                 var enabledTime = networkProtectionRepository.enabledTimeInMillis
                 while (isTimerTickRunning) {
                     if (enabledTime == -1L) {

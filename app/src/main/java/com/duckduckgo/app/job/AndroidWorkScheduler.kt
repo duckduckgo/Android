@@ -44,7 +44,7 @@ class AndroidWorkScheduler @Inject constructor(
 
     override fun onResume(owner: LifecycleOwner) {
         Timber.v("Scheduling work")
-        appCoroutineScope.launch(dispatcherProvider.default()) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             jobCleaner.cleanDeprecatedJobs()
             notificationScheduler.scheduleNextNotification()
         }

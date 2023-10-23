@@ -348,7 +348,7 @@ class AutofillSettingsViewModel @Inject constructor(
     fun onDeleteCredentials(loginCredentials: LoginCredentials) {
         val credentialsId = loginCredentials.id ?: return
 
-        viewModelScope.launch(dispatchers.default()) {
+        viewModelScope.launch(dispatchers.io()) {
             loginCredentials.domain?.let {
                 faviconManager.deletePersistedFavicon(it)
             }
@@ -360,7 +360,7 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun saveOrUpdateCredentials(credentials: LoginCredentials) {
-        viewModelScope.launch(dispatchers.default()) {
+        viewModelScope.launch(dispatchers.io()) {
             val credentialMode = _viewState.value.credentialMode
 
             if (credentialMode is EditingExisting) {

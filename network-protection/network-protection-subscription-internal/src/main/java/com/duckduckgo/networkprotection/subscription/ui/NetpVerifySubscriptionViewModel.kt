@@ -61,7 +61,7 @@ class NetpVerifySubscriptionViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch {
             netpSubscriptionManager.getState()
-                .flowOn(dispatchersProvider.default())
+                .flowOn(dispatchersProvider.io())
                 .collectLatest {
                     logcat { "Netp Auth: state received $it" }
                     when (it) {

@@ -39,13 +39,13 @@ class AutofillJsonRequestParser @Inject constructor(
     private val autofillStoreFormDataRequestParser by lazy { moshi.adapter(AutofillStoreFormDataRequest::class.java) }
 
     override suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
-        return withContext(dispatchers.default()) {
+        return withContext(dispatchers.io()) {
             autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }
 
     override suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
-        return withContext(dispatchers.default()) {
+        return withContext(dispatchers.io()) {
             autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }

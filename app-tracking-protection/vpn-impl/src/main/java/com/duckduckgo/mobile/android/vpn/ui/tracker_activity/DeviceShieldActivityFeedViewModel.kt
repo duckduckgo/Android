@@ -120,7 +120,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                 }
                 TrackerFeedViewState(trackers + appDataItems, trackerIntermediateState.runningState)
             }
-            .flowOn(dispatcherProvider.default())
+            .flowOn(dispatcherProvider.io())
             .onStart {
                 startTickerRefresher()
                 emit(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)))
