@@ -43,7 +43,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivit
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.Command.TrackerListDisplayed
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackerFeedViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.TrackerDividerItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -82,7 +81,6 @@ class DeviceShieldActivityFeedFragment : DuckDuckGoFragment() {
         with(binding.activityRecyclerView) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             adapter = trackerFeedAdapter
-            addItemDecoration(TrackerDividerItemDecoration(context))
         }
 
         lifecycleScope.launch {
