@@ -58,59 +58,59 @@ object FingerprintProtectionModule {
     @Provides
     fun provideFingerprintingBatteryRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): FingerprintingBatteryRepository {
-        return RealFingerprintingBatteryRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingBatteryRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingCanvasRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): FingerprintingCanvasRepository {
-        return RealFingerprintingCanvasRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingCanvasRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingHardwareRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): FingerprintingHardwareRepository {
-        return RealFingerprintingHardwareRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingHardwareRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingScreenSizeRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): FingerprintingScreenSizeRepository {
-        return RealFingerprintingScreenSizeRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingScreenSizeRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintingTemporaryStorageRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): FingerprintingTemporaryStorageRepository {
-        return RealFingerprintingTemporaryStorageRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintingTemporaryStorageRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideFingerprintProtectionSeedRepository(
         database: FingerprintProtectionDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): FingerprintProtectionSeedRepository {
-        return RealFingerprintProtectionSeedRepository(database, coroutineScope, dispatcherProvider)
+        return RealFingerprintProtectionSeedRepository(database, appCoroutineScope, dispatcherProvider)
     }
 }

@@ -29,7 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
@@ -79,6 +79,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -225,7 +227,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private fun restartVpn() {
         // we use the app coroutine scope to ensure this call outlives the Activity
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             vpnFeaturesRegistry.refreshFeature(AppTpVpnFeature.APPTP_VPN)
         }
     }

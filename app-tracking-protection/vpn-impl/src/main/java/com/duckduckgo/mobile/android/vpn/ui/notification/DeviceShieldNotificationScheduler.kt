@@ -46,12 +46,12 @@ object DeviceShieldNotificationSchedulerModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldNotificationScheduler(
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         workManager: WorkManager,
         vpnDatabase: VpnDatabase,
         dispatchers: DispatcherProvider,
     ): MainProcessLifecycleObserver {
-        return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase, dispatchers)
+        return DeviceShieldNotificationScheduler(appCoroutineScope, workManager, vpnDatabase, dispatchers)
     }
 
     @Provides
@@ -72,7 +72,7 @@ class DeviceShieldNotificationScheduler(
 
     private fun scheduleDailyNotification() {
         val vpnNotificationsDao = vpnDatabase.vpnNotificationsDao()
-        coroutineScope.launch {
+        coroutineScope.launch(dispatchers.io()) {
             val exists = withContext(dispatchers.io()) {
                 vpnNotificationsDao.exists(VPN_DAILY_NOTIFICATION_ID)
             }

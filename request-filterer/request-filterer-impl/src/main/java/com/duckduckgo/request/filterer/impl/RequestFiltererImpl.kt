@@ -81,7 +81,7 @@ class RequestFiltererImpl @Inject constructor(
         currentPage = url
         hasTimeElapsed = false
         if (job?.isActive == true) job?.cancel()
-        job = scope.launch {
+        job = scope.launch(dispatcherProvider.io()) {
             delay(windowInMs)
             hasTimeElapsed = true
         }

@@ -20,6 +20,7 @@ import android.util.LruCache
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.di.scopes.AppScope
@@ -37,6 +38,7 @@ class SiteFactoryImpl @Inject constructor(
     private val contentBlocking: ContentBlocking,
     private val userAllowListRepository: UserAllowListRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SiteFactory {
 
     private val siteCache = LruCache<String, Site>(1)
@@ -55,7 +57,7 @@ class SiteFactoryImpl @Inject constructor(
         val cachedSite = siteCache.get(url)
         return if (cachedSite == null) {
             Timber.d("buildSite for $url")
-            SiteMonitor(url, title, httpUpgraded, userAllowListRepository, contentBlocking, appCoroutineScope).also {
+            SiteMonitor(url, title, httpUpgraded, userAllowListRepository, contentBlocking, appCoroutineScope, dispatcherProvider).also {
                 siteCache.put(url, it)
             }
         } else {

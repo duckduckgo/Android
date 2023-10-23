@@ -117,6 +117,7 @@ class NetPRemoteFeatureWrapper @Inject constructor(
     private val netPFeatureRemover: NetPFeatureRemover,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) {
     /**
      * @return `true` if the waitlist beta is active. This is different that having waitlist enabled and they are
@@ -132,7 +133,7 @@ class NetPRemoteFeatureWrapper @Inject constructor(
         } else {
             // waitlistBetaActive == false means the waitlist beta period has ended, ie. wipe out NetP
             // Skip for Internal users
-            coroutineScope.launch {
+            coroutineScope.launch(dispatcherProvider.io()) {
                 logcat { "NetP waitlist beta ended, wiping out everything" }
                 netPFeatureRemover.removeFeature()
             }

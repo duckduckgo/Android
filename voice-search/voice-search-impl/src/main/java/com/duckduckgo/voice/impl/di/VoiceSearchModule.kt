@@ -68,10 +68,10 @@ object VoiceSearchModule {
     @Provides
     fun provideVoiceSearchFeatureRepository(
         database: VoiceSearchDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): VoiceSearchFeatureRepository {
-        return RealVoiceSearchFeatureRepository(database, coroutineScope, dispatcherProvider)
+        return RealVoiceSearchFeatureRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

@@ -93,20 +93,20 @@ class AutofillModule {
     @Provides
     fun provideAutofillRepository(
         database: AutofillDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): AutofillFeatureRepository {
-        return RealAutofillFeatureRepository(database, coroutineScope, dispatcherProvider)
+        return RealAutofillFeatureRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideEmailInContextRepository(
         database: EmailProtectionInContextDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): EmailProtectionInContextFeatureRepository {
-        return RealEmailProtectionInContextFeatureRepository(database, coroutineScope, dispatcherProvider)
+        return RealEmailProtectionInContextFeatureRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @Provides

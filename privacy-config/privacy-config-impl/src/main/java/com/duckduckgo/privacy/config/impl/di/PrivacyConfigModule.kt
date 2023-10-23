@@ -86,20 +86,20 @@ object DatabaseModule {
     @Provides
     fun providePTrackerAllowlistRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): TrackerAllowlistRepository {
-        return RealTrackerAllowlistRepository(database, coroutineScope, dispatcherProvider)
+        return RealTrackerAllowlistRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideContentBlockingRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): ContentBlockingRepository {
-        return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
+        return RealContentBlockingRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -119,30 +119,30 @@ object DatabaseModule {
     fun provideGpcRepository(
         gpcDataStore: GpcDataStore,
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): GpcRepository {
-        return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
+        return RealGpcRepository(gpcDataStore, database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideHttpsRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): HttpsRepository {
-        return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
+        return RealHttpsRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideUnprotectedTemporaryRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): UnprotectedTemporaryRepository {
-        return RealUnprotectedTemporaryRepository(database, coroutineScope, dispatcherProvider)
+        return RealUnprotectedTemporaryRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -155,39 +155,39 @@ object DatabaseModule {
     @Provides
     fun provideDrmRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): DrmRepository {
-        return RealDrmRepository(database, coroutineScope, dispatcherProvider)
+        return RealDrmRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideAmpLinksRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): AmpLinksRepository {
-        return RealAmpLinksRepository(database, coroutineScope, dispatcherProvider)
+        return RealAmpLinksRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideTrackingParametersRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): TrackingParametersRepository {
-        return RealTrackingParametersRepository(database, coroutineScope, dispatcherProvider)
+        return RealTrackingParametersRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideUserAgentRepository(
         database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): UserAgentRepository {
-        return RealUserAgentRepository(database, coroutineScope, dispatcherProvider)
+        return RealUserAgentRepository(database, appCoroutineScope, dispatcherProvider)
     }
 }

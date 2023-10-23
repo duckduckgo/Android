@@ -50,7 +50,7 @@ class UrlExtractingWebViewClient(
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
         url?.let {
-            appCoroutineScope.launch(dispatcherProvider.computation()) {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
             }
         }

@@ -48,12 +48,9 @@ import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.global.ApplicationClearDataState
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -125,6 +122,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     private val lastActiveTabs = TabList()
 
@@ -311,7 +310,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
                 clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
@@ -449,6 +448,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
             appCoroutineScope = appCoroutineScope,
+            dispatcherProvider = dispatcherProvider,
         )
         dialog.clearStarted = {
             removeObservers()

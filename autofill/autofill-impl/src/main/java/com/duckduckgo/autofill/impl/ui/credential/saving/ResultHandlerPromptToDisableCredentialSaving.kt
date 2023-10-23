@@ -82,7 +82,7 @@ class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
     @VisibleForTesting
     fun onKeepUsingAutofill() {
         Timber.i("User selected to keep using autofill; will not prompt to disable again")
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             declineCounter.disableDeclineCounter()
         }
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_KEEP_USING)

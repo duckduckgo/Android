@@ -17,14 +17,21 @@
 package com.duckduckgo.app.surrogates
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ResourceSurrogateLoaderTest {
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: ResourceSurrogateLoader
     private lateinit var dataStore: ResourceSurrogateDataStore
@@ -35,7 +42,7 @@ class ResourceSurrogateLoaderTest {
     fun setup() {
         resourceSurrogates = ResourceSurrogatesImpl()
         dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        testee = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore)
+        testee = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore, coroutineRule.testDispatcherProvider)
     }
 
     @Test

@@ -49,10 +49,10 @@ class AdClickModule {
     @Provides
     fun provideAdClickAttributionRepository(
         database: AdClickDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): AdClickAttributionRepository {
-        return RealAdClickAttributionRepository(database, coroutineScope, dispatcherProvider)
+        return RealAdClickAttributionRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

@@ -52,10 +52,10 @@ object RequestFiltererModule {
     @Provides
     fun provideRequestFiltererRepository(
         database: RequestFiltererDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): RequestFiltererRepository {
-        return RealRequestFiltererRepository(database, coroutineScope, dispatcherProvider)
+        return RealRequestFiltererRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

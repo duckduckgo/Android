@@ -49,9 +49,9 @@ object WebCompatModule {
     @Provides
     fun provideWebCompatRepository(
         database: WebCompatDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): WebCompatRepository {
-        return RealWebCompatRepository(database, coroutineScope, dispatcherProvider)
+        return RealWebCompatRepository(database, appCoroutineScope, dispatcherProvider)
     }
 }
