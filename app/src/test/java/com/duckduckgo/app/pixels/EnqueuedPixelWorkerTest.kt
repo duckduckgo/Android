@@ -21,9 +21,10 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.pixels.remoteconfig.BrowserTelemetryFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.WebViewVersionProvider
-import com.duckduckgo.browsertelemetry.api.BrowserTelemetryConfig
+import com.duckduckgo.feature.toggles.api.Toggle
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -35,7 +36,7 @@ class EnqueuedPixelWorkerTest {
     private val lifecycleOwner: LifecycleOwner = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
-    private val browserTelemetryConfig: BrowserTelemetryConfig = mock()
+    private val mockBrowserTelemetryFeature: BrowserTelemetryFeature = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -47,8 +48,9 @@ class EnqueuedPixelWorkerTest {
             unsentForgetAllPixelStore,
             webViewVersionProvider,
             defaultBrowserDetector,
-            browserTelemetryConfig,
+            mockBrowserTelemetryFeature,
         )
+        setupRemoteConfig(browserTelemetryEnabled = false, appLaunchEnabled = false)
     }
 
     @Test
@@ -106,7 +108,7 @@ class EnqueuedPixelWorkerTest {
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
         whenever(webViewVersionProvider.getFullVersion()).thenReturn("91.0.4472.101")
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(browserTelemetryConfig.shouldCollectOnAppLaunch()).thenReturn(true)
+        setupRemoteConfig(browserTelemetryEnabled = true, appLaunchEnabled = true)
 
         enqueuedPixelWorker.onCreate(lifecycleOwner)
         enqueuedPixelWorker.onStart(lifecycleOwner)
@@ -127,7 +129,7 @@ class EnqueuedPixelWorkerTest {
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
         whenever(webViewVersionProvider.getFullVersion()).thenReturn("91.0.4472.101")
         whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(browserTelemetryConfig.shouldCollectOnAppLaunch()).thenReturn(false)
+        setupRemoteConfig(browserTelemetryEnabled = false, appLaunchEnabled = false)
 
         enqueuedPixelWorker.onCreate(lifecycleOwner)
         enqueuedPixelWorker.onStart(lifecycleOwner)
@@ -159,6 +161,40 @@ class EnqueuedPixelWorkerTest {
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
             ),
+        )
+    }
+
+    private fun setupRemoteConfig(browserTelemetryEnabled: Boolean, appLaunchEnabled: Boolean) {
+        whenever(mockBrowserTelemetryFeature.self()).thenReturn(
+            object : Toggle {
+                override fun isEnabled(): Boolean {
+                    return browserTelemetryEnabled
+                }
+
+                override fun setEnabled(state: Toggle.State) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getRawStoredState(): Toggle.State? {
+                    TODO("Not yet implemented")
+                }
+            },
+        )
+
+        whenever(mockBrowserTelemetryFeature.collectFullWebViewVersion()).thenReturn(
+            object : Toggle {
+                override fun isEnabled(): Boolean {
+                    return appLaunchEnabled
+                }
+
+                override fun setEnabled(state: Toggle.State) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun getRawStoredState(): Toggle.State? {
+                    TODO("Not yet implemented")
+                }
+            },
         )
     }
 }

@@ -23,12 +23,12 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.pixels.remoteconfig.BrowserTelemetryFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.browser.api.WebViewVersionProvider
-import com.duckduckgo.browsertelemetry.api.BrowserTelemetryConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -48,7 +48,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val browserTelemetryConfig: BrowserTelemetryConfig,
+    private val browserTelemetryFeature: BrowserTelemetryFeature,
 ) : MainProcessLifecycleObserver {
 
     private var launchedByFireAction: Boolean = false
@@ -66,7 +66,7 @@ class EnqueuedPixelWorker @Inject constructor(
             return
         }
         Timber.i("Sending app launch pixel")
-        val collectWebViewFullVersion = browserTelemetryConfig.shouldCollectOnAppLaunch()
+        val collectWebViewFullVersion = browserTelemetryFeature.self().isEnabled() && browserTelemetryFeature.collectFullWebViewVersion().isEnabled()
         val paramsMap = mutableMapOf<String, String>().apply {
             put(WEBVIEW_VERSION, webViewVersionProvider.getMajorVersion())
             put(DEFAULT_BROWSER, defaultBrowserDetector.isDefaultBrowser().toString())

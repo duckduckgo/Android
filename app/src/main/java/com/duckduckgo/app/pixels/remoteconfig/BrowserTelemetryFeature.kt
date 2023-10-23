@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browsertelemetry.impl.remoteconfig
+package com.duckduckgo.app.pixels.remoteconfig
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -37,9 +37,9 @@ interface BrowserTelemetryFeature {
     fun self(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "appLaunch" browserTelemetry sub-feature flag enabled
+     * @return `true` when the remote config has the global "collectFullWebViewVersion" browserTelemetry sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
-    fun appLaunch(): Toggle
+    fun collectFullWebViewVersion(): Toggle
 }

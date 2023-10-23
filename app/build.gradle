@@ -311,9 +311,6 @@ dependencies {
     implementation project(':settings-api')
     implementation project(':settings-impl')
 
-    implementation project(':browser-telemetry-api')
-    implementation project(':browser-telemetry-impl')
-
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
