@@ -57,9 +57,9 @@ class AppRemoteMessagingRepository(
 
     override fun messageFlow(): Flow<RemoteMessage?> {
         // Experiment: Ask for Default Browser More Than Once
-        val daysSinceInstalled = userBrowserProperties.daysSinceInstalled() == 0L
+        val daysSinceInstalled = userBrowserProperties.daysSinceInstalled()
         return remoteMessagesDao.messagesFlow().distinctUntilChanged().map {
-            if (!daysSinceInstalled) return@map null
+            if (daysSinceInstalled != 0L && daysSinceInstalled != 1L && daysSinceInstalled != 2L) return@map null
             if (it == null || it.message.isEmpty()) return@map null
 
             val message = messageMapper.fromMessage(it.message) ?: return@map null
