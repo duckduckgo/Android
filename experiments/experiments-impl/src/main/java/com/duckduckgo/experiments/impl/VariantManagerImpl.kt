@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
-import com.duckduckgo.experiments.impl.store.VariantFiltersEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.Locale
 import javax.inject.Inject
@@ -44,7 +43,7 @@ class VariantManagerImpl @Inject constructor(
 
     @Synchronized
     override fun getVariantKey(): String {
-        val activeVariants = ACTIVE_VARIANTS
+        val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
         val currentVariantKey = store.variant
 
         if (currentVariantKey == DEFAULT_VARIANT.key) {
@@ -70,18 +69,6 @@ class VariantManagerImpl @Inject constructor(
         return currentVariant.key
     }
 
-    private fun allocateNewVariant(activeVariants: List<Variant>): Variant {
-        var newVariant = generateVariant(activeVariants)
-        val compliesWithFilters = newVariant.filterBy(appBuildConfig)
-
-        if (!compliesWithFilters || appBuildConfig.isDefaultVariantForced) {
-            newVariant = DEFAULT_VARIANT
-        }
-        Timber.i("Current variant is null; allocating new one $newVariant")
-        persistVariant(newVariant)
-        return newVariant
-    }
-
     override fun updateAppReferrerVariant(variant: String) {
         Timber.i("Updating variant for app referer: $variant")
         store.variant = variant
@@ -95,11 +82,49 @@ class VariantManagerImpl @Inject constructor(
                 ExperimentVariantEntity(
                     key = it.variantKey,
                     weight = it.weight,
-                    filters = VariantFiltersEntity(it.filters?.locale.orEmpty()),
+                    localeFilter = it.filters?.locale.orEmpty(),
                 ),
             )
         }
         experimentVariantRepository.updateVariants(variantEntityList)
+    }
+
+    private fun convertEntitiesToVariants(activeVariantEntities: List<ExperimentVariantEntity>): List<Variant> {
+        val activeVariants: MutableList<Variant> = mutableListOf()
+        activeVariantEntities.map { entity ->
+            activeVariants.add(
+                Variant(
+                    key = entity.key,
+                    weight = entity.weight ?: 0.0,
+                    filterBy = addFilters(entity),
+                ),
+            )
+        }
+        return activeVariants
+    }
+
+    private fun addFilters(entity: ExperimentVariantEntity): (AppBuildConfig) -> Boolean {
+        if (entity.key == "sc" || entity.key == "se") {
+            return { isSerpRegionToggleCountry() }
+        }
+        if (entity.localeFilter.isEmpty()) {
+            return { noFilter() }
+        }
+
+        val userLocale = Locale.getDefault()
+        return { entity.localeFilter.contains(userLocale.displayName) }
+    }
+
+    private fun allocateNewVariant(activeVariants: List<Variant>): Variant {
+        var newVariant = generateVariant(activeVariants)
+        val compliesWithFilters = newVariant.filterBy(appBuildConfig)
+
+        if (!compliesWithFilters || appBuildConfig.isDefaultVariantForced) {
+            newVariant = DEFAULT_VARIANT
+        }
+        Timber.i("Current variant is null; allocating new one $newVariant")
+        persistVariant(newVariant)
+        return newVariant
     }
 
     private fun lookupVariant(
@@ -117,10 +142,6 @@ class VariantManagerImpl @Inject constructor(
         return null
     }
 
-    private fun persistVariant(newVariant: Variant) {
-        store.variant = newVariant.key
-    }
-
     private fun matchesReferrerVariant(key: String): Boolean {
         return key == store.referrerVariant
     }
@@ -135,21 +156,18 @@ class VariantManagerImpl @Inject constructor(
         return activeVariants[randomizedIndex]
     }
 
+    private fun persistVariant(newVariant: Variant) {
+        store.variant = newVariant.key
+    }
+
     companion object {
 
-        const val RESERVED_EU_AUCTION_VARIANT = "ml"
+        private const val RESERVED_EU_AUCTION_VARIANT = "ml"
 
         // this will be returned when there are no other active experiments
-        val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
+        private val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
 
-        val ACTIVE_VARIANTS = listOf(
-            // SERP variants. "sc" may also be used as a shared control for mobile experiments in
-            // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 0.0, filterBy = { isSerpRegionToggleCountry() }),
-        )
-
-        val REFERRER_VARIANTS = listOf(
+        private val REFERRER_VARIANTS = listOf(
             Variant(RESERVED_EU_AUCTION_VARIANT, filterBy = { noFilter() }),
         )
 
@@ -169,21 +187,16 @@ class VariantManagerImpl @Inject constructor(
             "GB",
         )
 
-        fun referrerVariant(key: String): Variant {
+        private fun referrerVariant(key: String): Variant {
             val knownReferrer = REFERRER_VARIANTS.firstOrNull { it.key == key }
             return knownReferrer ?: Variant(key, filterBy = { noFilter() })
         }
 
         private fun noFilter(): Boolean = true
 
-        private fun isEnglishLocale(): Boolean {
-            val locale = Locale.getDefault()
-            return locale != null && locale.language == "en"
-        }
-
         private fun isSerpRegionToggleCountry(): Boolean {
             val locale = Locale.getDefault()
-            return locale != null && serpRegionToggleTargetCountries.contains(locale.country)
+            return serpRegionToggleTargetCountries.contains(locale.country)
         }
     }
 }

@@ -92,8 +92,10 @@ class BrowserModule {
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
         appReferrerDataStore: AppReferrerDataStore,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
     ): RequestRewriter {
-        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore)
+        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore, appCoroutineScope, dispatcherProvider)
     }
 
     @Provides

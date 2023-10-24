@@ -30,7 +30,6 @@ import androidx.room.migration.Migration
 )
 
 @TypeConverters(
-    VariantFiltersConverter::class,
     StringListConverter::class,
 )
 

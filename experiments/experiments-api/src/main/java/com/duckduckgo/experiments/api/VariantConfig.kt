@@ -18,7 +18,7 @@ package com.duckduckgo.experiments.api
 
 data class VariantConfig(
     val variantKey: String,
-    val weight: Float? = 0.0f,
+    val weight: Double? = 0.0,
     val filters: VariantFilters? = null,
 )
 

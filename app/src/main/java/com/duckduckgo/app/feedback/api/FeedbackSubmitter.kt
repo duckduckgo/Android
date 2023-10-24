@@ -185,7 +185,7 @@ class FireAndForgetFeedbackSubmitter(
         return appBuildConfig.versionName
     }
 
-    private fun atbWithVariant(): String {
+    private suspend fun atbWithVariant(): String {
         return statisticsDataStore.atb?.formatWithVariant(variantManager.getVariantKey()) ?: ""
     }
 

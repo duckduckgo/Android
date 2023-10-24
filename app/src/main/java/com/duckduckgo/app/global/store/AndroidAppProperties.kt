@@ -43,7 +43,7 @@ class AndroidAppProperties(
         return statisticsStore.searchRetentionAtb.orEmpty()
     }
 
-    override fun expVariant(): String {
+    override suspend fun expVariant(): String {
         return variantManager.getVariantKey()
     }
 

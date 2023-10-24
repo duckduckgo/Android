@@ -24,6 +24,7 @@ import javax.inject.Inject
 
 interface ExperimentVariantRepository {
     fun updateVariants(variantEntityList: List<ExperimentVariantEntity>)
+    fun getActiveVariants(): List<ExperimentVariantEntity>
 }
 
 @ContributesBinding(AppScope::class)
@@ -34,5 +35,9 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
     override fun updateVariants(variantEntityList: List<ExperimentVariantEntity>) {
         experimentVariantDao.delete()
         experimentVariantDao.insertAll(variantEntityList)
+    }
+
+    override fun getActiveVariants(): List<ExperimentVariantEntity> {
+        return experimentVariantDao.variants().filter { it.weight != null && it.weight > 0.0 }.toList()
     }
 }
