@@ -17,13 +17,12 @@
 package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -136,13 +135,13 @@ class AutofillCapabilityCheckerImplTest {
         canGeneratePassword: Boolean = false,
         canAccessCredentialManagement: Boolean = false,
     ) {
-        val autofillFeature = AutofillTestFeature(
-            topLevelFeatureEnabled = topLevelFeatureEnabled,
-            canInjectCredentials = canInjectCredentials,
-            canSaveCredentials = canSaveCredentials,
-            canGeneratePassword = canGeneratePassword,
-            canAccessCredentialManagement = canAccessCredentialManagement,
-        )
+        val autofillFeature = AutofillTestFeature().also {
+            it.topLevelFeatureEnabled = topLevelFeatureEnabled
+            it.canInjectCredentials = canInjectCredentials
+            it.canGeneratePassword = canGeneratePassword
+            it.canSaveCredentials = canSaveCredentials
+            it.canAccessCredentialManagement = canAccessCredentialManagement
+        }
 
         whenever(autofillGlobalCapabilityChecker.isSecureAutofillAvailable()).thenReturn(true)
         whenever(autofillGlobalCapabilityChecker.isAutofillEnabledByConfiguration(any())).thenReturn(true)
@@ -155,64 +154,6 @@ class AutofillCapabilityCheckerImplTest {
             autofillGlobalCapabilityChecker = autofillGlobalCapabilityChecker,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
-    }
-
-    private class AutofillTestFeature(
-        private val topLevelFeatureEnabled: Boolean,
-        private val canInjectCredentials: Boolean,
-        private val canSaveCredentials: Boolean,
-        private val canGeneratePassword: Boolean,
-        private val canAccessCredentialManagement: Boolean,
-    ) : AutofillFeature {
-        override fun self(): Toggle {
-            return object : Toggle {
-                override fun isEnabled(): Boolean = topLevelFeatureEnabled
-                override fun setEnabled(state: State) {}
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            }
-        }
-
-        override fun canInjectCredentials(): Toggle {
-            return object : Toggle {
-                override fun isEnabled(): Boolean = canInjectCredentials
-                override fun setEnabled(state: State) {}
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            }
-        }
-
-        override fun canSaveCredentials(): Toggle {
-            return object : Toggle {
-                override fun isEnabled(): Boolean = canSaveCredentials
-                override fun setEnabled(state: State) {}
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            }
-        }
-
-        override fun canGeneratePasswords(): Toggle {
-            return object : Toggle {
-                override fun isEnabled(): Boolean = canGeneratePassword
-                override fun setEnabled(state: State) {}
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            }
-        }
-
-        override fun canAccessCredentialManagement(): Toggle {
-            return object : Toggle {
-                override fun isEnabled(): Boolean = canAccessCredentialManagement
-                override fun setEnabled(state: State) {}
-                override fun getRawStoredState(): State? {
-                    TODO("Not yet implemented")
-                }
-            }
-        }
     }
 
     companion object {

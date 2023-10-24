@@ -21,6 +21,7 @@ import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
@@ -35,12 +36,15 @@ import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.store.RealAutofillPrefsStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.store.RealLastUpdatedTimeProvider
+import com.duckduckgo.autofill.store.feature.AutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.feature.AutofillFeatureRepository
+import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.feature.RealAutofillFeatureRepository
 import com.duckduckgo.autofill.store.feature.email.incontext.ALL_MIGRATIONS as EmailInContextMigrations
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextDatabase
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
 import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -63,9 +67,22 @@ class AutofillModule {
     @Provides
     fun provideAutofillPrefsStore(
         context: Context,
-        internalTestUserChecker: InternalTestUserChecker,
+        autofillDefaultStateDecider: AutofillDefaultStateDecider,
     ): AutofillPrefsStore {
-        return RealAutofillPrefsStore(context, internalTestUserChecker)
+        return RealAutofillPrefsStore(context, autofillDefaultStateDecider)
+    }
+
+    @Provides
+    fun providerAutofillDefaultStateProvider(
+        userBrowserProperties: UserBrowserProperties,
+        autofillFeature: AutofillFeature,
+        internalTestUserChecker: InternalTestUserChecker,
+    ): AutofillDefaultStateDecider {
+        return RealAutofillDefaultStateDecider(
+            userBrowserProperties = userBrowserProperties,
+            autofillFeature = autofillFeature,
+            internalTestUserChecker = internalTestUserChecker,
+        )
     }
 
     @Provides
