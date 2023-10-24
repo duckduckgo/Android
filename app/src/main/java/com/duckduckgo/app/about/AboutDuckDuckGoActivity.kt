@@ -66,18 +66,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         }
     }
 
-    private val helpPagesClickableSpan = object : ClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.onLearnMoreLinkClicked()
-        }
-    }
-
-    private val privacyProtectionsClickableSpan = object : ClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.onLearnMoreLinkClicked()
-        }
-    }
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 

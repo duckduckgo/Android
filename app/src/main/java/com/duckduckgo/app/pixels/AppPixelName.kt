@@ -122,7 +122,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_AUTOMATICALLY_CLEAR_WHEN_PRESSED("ms_automatically_clear_when_pressed"),
     SETTINGS_SITE_PERMISSIONS_PRESSED("ms_site_permissions_pressed"),
     SETTINGS_ABOUT_DDG_LEARN_MORE_PRESSED("ms_about_ddg_learn_more_pressed"),
-    SETTINGS_ABOUT_DDG_PRIVACY_PROTECTIONS_PRESSED("ms_about_ddg_privacy_protections_pressed"),
     SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED("ms_about_ddg_privacy_policy_pressed"),
     SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED("ms_about_ddg_version_easter_egg_pressed"),
     SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED("ms_about_ddg_share_feedback_pressed"),
