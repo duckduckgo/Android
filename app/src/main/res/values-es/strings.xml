@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de DuckDuckGo</string>
-    <string name="aboutDescription">
-        En DuckDuckGo, estamos estableciendo el nuevo estándar de confianza en línea.\n\nEl navegador privado de DuckDuckGo ofrece todos los Privacy Essentials que necesitas para protegerte mientras realizas búsquedas y navegas en Internet, incluyendo bloqueo de rastreadores, cifrado más inteligente y búsquedas privadas de DuckDuckGo.\n\nDespués de todo, Internet no tiene por qué ser tan horrible y disfrutar de la privacidad en línea que mereces debería ser lo más fácil posible.</string>
-    <string name="aboutMoreLink">Más información en duckduckgo.com/about</string>
+    <string name="aboutHeader">Bienvenidas al \"Lado Pato\"!</string>
+    <string name="aboutDescription">DuckDuckGo es la empresa de privacidad en internet independiente fundada en 2008 para quienes estén cansados de ser rastreados en línea y quieran una solución sencilla. Somos la prueba de que es posible obtener protección de privacidad real en línea sin concesiones.\n\nEl navegador DuckDuckGo incluye las funciones que esperas de un navegador de referencia, como favoritos, pestañas, contraseñas y más, así como más de <annotation type="privacy_protection_link">una docena de potentes funciones de protección de privacidad</annotation> que no ofrecen los navegadores más populares de forma predeterminada. Este conjunto completo de funciones de protección de privacidad ayuda a proteger tu actividad en línea, desde la búsqueda hasta la navegación, el correo electrónico y mucho más.\n\nNuestra protección de privacidad funciona sin necesidad de conocimientos técnicos y sin tener que lidiar con configuraciones complicadas. Lo único que tienes que hacer es cambiar el navegador a DuckDuckGo en todos tus dispositivos y obtener privacidad de forma predeterminada.\n\nSin embargo, si quieres conocer los entresijos, puedes encontrar más información sobre cómo funciona la protección de privacidad de DuckDuckGo en nuestras <annotation type="learn_more_link">páginas de ayuda</annotation></string>
     <string name="no_suggestions">No hay sugerencias</string>
 
     <!-- Broken Site Activity -->
