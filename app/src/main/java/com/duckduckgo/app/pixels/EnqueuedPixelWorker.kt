@@ -23,7 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.pixels.remoteconfig.BrowserFeature
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VERSION
@@ -48,7 +48,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
     private val webViewVersionProvider: WebViewVersionProvider,
     private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val browserFeature: BrowserFeature,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : MainProcessLifecycleObserver {
 
     private var launchedByFireAction: Boolean = false
@@ -66,7 +66,8 @@ class EnqueuedPixelWorker @Inject constructor(
             return
         }
         Timber.i("Sending app launch pixel")
-        val collectWebViewFullVersion = browserFeature.self().isEnabled() && browserFeature.collectFullWebViewVersion().isEnabled()
+        val collectWebViewFullVersion =
+            androidBrowserConfigFeature.self().isEnabled() && androidBrowserConfigFeature.collectFullWebViewVersion().isEnabled()
         val paramsMap = mutableMapOf<String, String>().apply {
             put(WEBVIEW_VERSION, webViewVersionProvider.getMajorVersion())
             put(DEFAULT_BROWSER, defaultBrowserDetector.isDefaultBrowser().toString())
