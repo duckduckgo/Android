@@ -102,7 +102,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
 
             if (vpnState.state == ENABLED && !isTimerTickRunning) {
                 startElapsedTimeTimer()
-            } else if (vpnState.state == DISABLED) {
+            } else if (vpnState.state == DISABLED || vpnState.state == ENABLING) {
                 stopElapsedTimeTimer()
                 connectionDetailsToEmit = null
             } else if (reconnectState == Reconnecting) {
@@ -117,8 +117,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             // This is a one-shot check run 500ms after the screen is shown
             delay(500)
@@ -128,8 +128,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
         stopElapsedTimeTimer()
     }
 

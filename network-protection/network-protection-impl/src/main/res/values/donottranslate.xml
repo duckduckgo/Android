@@ -130,6 +130,8 @@
     <string name="netpVpnSettingExcludeLocalNetworks">Exclude Local Networks</string>
     <string name="netpVpnSettingExcludeLocalNetworksByline">Let local traffic bypass the VPN and connect to devices on your local network, like a printer</string>
     <string name="netpVpnSettingDnsLeak">Network Protection prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
+    <string name="netpVpnSettingGeoswitching">Preferred Location</string>
+    <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
 
     <!-- VPN Notification settings -->
     <string name="netpVpnSettingNotificationEnabled">VPN Enabled</string>
@@ -245,4 +247,12 @@
     <string name="netpNotificationCTAReportIssue">Having problems with an app?</string>
     <string name="netpNotificationDisabled">Network Protection is disabled. Tap to continue securing your device traffic.</string>
     <string name="netpNotificationDisabledByVpn">A VPN app on your device disabled Network Protection. Tap to re-enable.</string>
+
+    <!-- Geoswitching -->
+    <string name="netpGeoswitchingTitle">VPN Location</string>
+    <string name="netpGeoswitchingHeaderRecommended">Recommended</string>
+    <string name="netpGeoswitchingDefaultTitle">Nearest Available</string>
+    <string name="netpGeoswitchingDefaultSubtitle">Automatically connect to the nearest server we can find</string>
+    <string name="netpGeoswitchingHeaderCustom">Custom</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle">%1$d cities</string>
 </resources>

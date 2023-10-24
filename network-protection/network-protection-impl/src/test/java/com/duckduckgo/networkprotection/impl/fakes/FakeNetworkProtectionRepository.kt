@@ -23,7 +23,6 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.S
 
 class FakeNetworkProtectionRepository : NetworkProtectionRepository {
     private var _reconnectStatus: ReconnectStatus? = null
-    private var _reconnectAttemptCount: Int = 0
     private var _serverDetails: ServerDetails? = null
 
     override var reconnectStatus: ReconnectStatus
