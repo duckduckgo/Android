@@ -63,6 +63,9 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED("m_autofill_logins_settings_enabled"),
     AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED("m_autofill_logins_settings_disabled"),
 
+    MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
+    SETTINGS_AUTOFILL_MANAGEMENT_OPENED("m_autofill_settings_opened"),
+
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
     EMAIL_TOOLTIP_DISMISSED("email_tooltip_dismissed"),
@@ -79,6 +82,10 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
     EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL("m_email_incontext_modal_exit_early_continue"),
     EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM("m_email_incontext_modal_exit_early"),
+}
+
+object AutofillPixelParameters {
+    const val AUTOFILL_DEFAULT_STATE = "default_state"
 }
 
 @ContributesMultibinding(
