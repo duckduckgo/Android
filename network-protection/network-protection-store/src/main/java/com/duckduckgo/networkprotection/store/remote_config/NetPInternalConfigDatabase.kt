@@ -18,13 +18,15 @@ package com.duckduckgo.networkprotection.store.remote_config
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types.newParameterizedType
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [
         NetPConfigToggle::class,
         NetPEgressServer::class,
@@ -42,10 +44,20 @@ abstract class NetPInternalConfigDatabase : RoomDatabase() {
             return Room.databaseBuilder(context, NetPInternalConfigDatabase::class.java, "netp_internal.db")
                 .enableMultiInstanceInvalidation()
                 .fallbackToDestructiveMigration()
+                .addMigrations(*ALL_MIGRATIONS)
                 .build()
         }
     }
 }
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE `netp_egress_servers` ADD COLUMN `countryCode` TEXT")
+        database.execSQL("ALTER TABLE `netp_egress_servers` ADD COLUMN `city` TEXT")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_2_3)
 
 object InternalDatabaseConverters {
 

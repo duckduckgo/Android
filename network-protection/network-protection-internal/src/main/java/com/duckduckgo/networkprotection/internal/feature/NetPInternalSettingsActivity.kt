@@ -44,6 +44,8 @@ import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
 import com.duckduckgo.networkprotection.internal.network.netpGetPcapFile
 import com.duckduckgo.networkprotection.internal.network.netpPcapFileHasContent
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.google.android.material.snackbar.Snackbar
 import com.wireguard.crypto.Key
@@ -77,6 +79,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var connectionQualityStore: ConnectionQualityStore
+
+    @Inject lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
     private val job = ConflatedJob()
 
@@ -257,6 +261,14 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                     serverRepository.setSelectedServer(it.serverName())
                     binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
                     networkProtectionState.restart()
+                    serverRepository.getSelectedServer()?.let {
+                        netPGeoswitchingRepository.setUserPreferredLocation(
+                            UserPreferredLocation(
+                                countryCode = it.countryCode,
+                                cityName = it.city,
+                            ),
+                        )
+                    }
                 }
                 true
             }
