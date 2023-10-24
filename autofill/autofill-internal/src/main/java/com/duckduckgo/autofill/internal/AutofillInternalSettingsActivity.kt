@@ -26,6 +26,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
@@ -69,6 +70,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private val dateFormatter = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
 
+    @Inject
+    lateinit var autofillFeature: AutofillFeature
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -76,6 +80,27 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
         refreshInstallationDaySettings()
         refreshDaysSinceInstall()
+        refreshRemoteConfigSettings()
+    }
+
+    private fun refreshRemoteConfigSettings() {
+        lifecycleScope.launch(dispatchers.io()) {
+            val autofillEnabled = autofillFeature.self().isEnabled()
+            val onByDefault = autofillFeature.onByDefault()
+            val canSaveCredentials = autofillFeature.canSaveCredentials()
+            val canInjectCredentials = autofillFeature.canInjectCredentials()
+            val canGeneratePasswords = autofillFeature.canGeneratePasswords()
+            val canAccessCredentialManagement = autofillFeature.canAccessCredentialManagement()
+
+            withContext(dispatchers.main()) {
+                binding.autofillTopLevelFeature.setSecondaryText(autofillEnabled.toString())
+                binding.autofillOnByDefaultFeature.setSecondaryText("${onByDefault.isEnabled()} ${onByDefault.getRawStoredState()}")
+                binding.canSaveCredentialsFeature.setSecondaryText(canSaveCredentials.isEnabled().toString())
+                binding.canInjectCredentialsFeature.setSecondaryText(canInjectCredentials.isEnabled().toString())
+                binding.canGeneratePasswordsFeature.setSecondaryText(canGeneratePasswords.isEnabled().toString())
+                binding.canAccessCredentialManagementFeature.setSecondaryText(canAccessCredentialManagement.isEnabled().toString())
+            }
+        }
     }
 
     private fun configureUiEventHandlers() {

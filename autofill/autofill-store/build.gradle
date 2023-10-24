@@ -13,6 +13,7 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':browser-api')
 
     implementation AndroidX.core.ktx
     implementation AndroidX.appCompat
