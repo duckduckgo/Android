@@ -26,7 +26,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.WebView
 import androidx.core.util.isNotEmpty
-import androidx.core.view.NestedScrollingChild
+import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
 
@@ -37,7 +37,7 @@ import androidx.core.view.ViewCompat
  *
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
-class DuckDuckGoWebView : WebView, NestedScrollingChild {
+class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var lastClampedTopY: Boolean = true // when created we are always at the top
     private var contentAllowsSwipeToRefresh: Boolean = true
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
@@ -50,6 +50,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     private val scrollConsumed = IntArray(2)
     private var nestedOffsetY: Int = 0
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
+    private val helper = CoordinatorLayoutHelper()
 
     var systemAutofillListener: SystemAutofillListener? = null
 
@@ -59,6 +60,15 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         attrs: AttributeSet?,
     ) : super(context, attrs) {
         isNestedScrollingEnabled = true
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        helper.onViewAttached(this)
+    }
+
+    fun setBottomMatchingBehaviourEnabled(value: Boolean) {
+        helper.setBottomMatchingBehaviourEnabled(value)
     }
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
@@ -142,10 +152,39 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     }
 
     override fun isNestedScrollingEnabled(): Boolean = nestedScrollHelper.isNestedScrollingEnabled
+    override fun startNestedScroll(
+        axes: Int,
+        type: Int,
+    ): Boolean = nestedScrollHelper.startNestedScroll(axes)
 
     override fun startNestedScroll(axes: Int): Boolean = nestedScrollHelper.startNestedScroll(axes)
+    override fun stopNestedScroll(type: Int) {
+        nestedScrollHelper.stopNestedScroll()
+    }
 
     override fun hasNestedScrollingParent(): Boolean = nestedScrollHelper.hasNestedScrollingParent()
+    override fun dispatchNestedScroll(
+        dxConsumed: Int,
+        dyConsumed: Int,
+        dxUnconsumed: Int,
+        dyUnconsumed: Int,
+        offsetInWindow: IntArray?,
+        type: Int,
+        consumed: IntArray,
+    ) {
+        nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
+    }
+
+    override fun hasNestedScrollingParent(type: Int): Boolean = nestedScrollHelper.hasNestedScrollingParent()
+
+    override fun dispatchNestedScroll(
+        dxConsumed: Int,
+        dyConsumed: Int,
+        dxUnconsumed: Int,
+        dyUnconsumed: Int,
+        offsetInWindow: IntArray?,
+        type: Int,
+    ): Boolean = nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
 
     override fun dispatchNestedScroll(
         dxConsumed: Int,
@@ -155,6 +194,14 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         offsetInWindow: IntArray?,
     ): Boolean =
         nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
+
+    override fun dispatchNestedPreScroll(
+        dx: Int,
+        dy: Int,
+        consumed: IntArray?,
+        offsetInWindow: IntArray?,
+        type: Int,
+    ): Boolean = nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
 
     override fun dispatchNestedPreScroll(
         dx: Int,
@@ -195,6 +242,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         }
 
         enableSwipeRefresh(canSwipeToRefresh && clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
+        post(helper::computeBottomMarginIfNeeded)
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
