@@ -19,18 +19,18 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider.AvailableCountry
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
-interface GeoSwitchingContentProvider {
-    suspend fun downloadData()
-    suspend fun getDownloadedData(): List<AvailableCountry>
+interface NetpEgressServersProvider {
+    suspend fun downloadServerLocations()
+    suspend fun getServerLocations(): List<ServerLocation>
 
-    data class AvailableCountry(
+    data class ServerLocation(
         val countryCode: String,
         val countryName: String,
         val cities: List<String>,
@@ -38,14 +38,14 @@ interface GeoSwitchingContentProvider {
 }
 
 @ContributesBinding(AppScope::class)
-class RealGeoSwitchingContentProvider @Inject constructor(
+class RealNetpEgressServersProvider @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
     private val dispatcherProvider: DispatcherProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
-) : GeoSwitchingContentProvider {
-    override suspend fun downloadData() {
+) : NetpEgressServersProvider {
+    override suspend fun downloadServerLocations() {
         withContext(dispatcherProvider.io()) {
-            getContent().map {
+            parseServersToServerLocations().map {
                 NetPGeoswitchingLocation(
                     countryCode = it.countryCode,
                     countryName = it.countryName,
@@ -57,9 +57,9 @@ class RealGeoSwitchingContentProvider @Inject constructor(
         }
     }
 
-    override suspend fun getDownloadedData(): List<AvailableCountry> = withContext(dispatcherProvider.io()) {
+    override suspend fun getServerLocations(): List<ServerLocation> = withContext(dispatcherProvider.io()) {
         netPGeoswitchingRepository.getLocations().map {
-            AvailableCountry(
+            ServerLocation(
                 countryCode = it.countryCode,
                 countryName = it.countryName,
                 cities = it.cities,
@@ -67,7 +67,7 @@ class RealGeoSwitchingContentProvider @Inject constructor(
         }
     }
 
-    private suspend fun getContent(): List<AvailableCountry> {
+    private suspend fun parseServersToServerLocations(): List<ServerLocation> {
         val locations = mutableMapOf<String, MutableSet<String>>()
 
         wgVpnControllerService.getServers().forEach {
@@ -85,7 +85,7 @@ class RealGeoSwitchingContentProvider @Inject constructor(
         }
 
         return locations.map {
-            AvailableCountry(
+            ServerLocation(
                 countryCode = it.key,
                 countryName = getDisplayableCountry(it.key),
                 cities = it.value.toList().sorted(),

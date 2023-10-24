@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.FakeNetPGeoswitchingRepository
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -40,7 +40,7 @@ class RealWgServerApiTest {
     private lateinit var internalApi: RealWgServerApi
 
     @Mock
-    private lateinit var geoSwitchingContentProvider: GeoSwitchingContentProvider
+    private lateinit var netpEgressServersProvider: NetpEgressServersProvider
 
     @Before
     fun setUp() {
@@ -53,13 +53,13 @@ class RealWgServerApiTest {
         internalApi = RealWgServerApi(
             wgVpnControllerService,
             internalWgServerDebugProvider,
-            geoSwitchingContentProvider,
+            netpEgressServersProvider,
             geoswitchingRepository,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
-            geoSwitchingContentProvider,
+            netpEgressServersProvider,
             geoswitchingRepository,
         )
     }
@@ -152,14 +152,14 @@ class RealWgServerApiTest {
     fun whenRegisterInProductionThenDownloadGeoswitchingData() = runTest {
         productionApi.registerPublicKey("testpublickey")
 
-        verify(geoSwitchingContentProvider).downloadData()
+        verify(netpEgressServersProvider).downloadServerLocations()
     }
 
     @Test
     fun whenRegisterInInternalThenDownloadGeoswitchingData() = runTest {
         internalApi.registerPublicKey("testpublickey")
 
-        verify(geoSwitchingContentProvider).downloadData()
+        verify(netpEgressServersProvider).downloadServerLocations()
     }
 
     @Test

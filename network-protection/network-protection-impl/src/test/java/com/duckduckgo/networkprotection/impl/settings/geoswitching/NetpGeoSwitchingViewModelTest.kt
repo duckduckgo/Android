@@ -61,7 +61,7 @@ class NetpGeoSwitchingViewModelTest {
 
     @Mock
     private lateinit var networkProtectionState: NetworkProtectionState
-    private val fakeContentProvider = FakeGeoSwitchingContentProvider()
+    private val fakeContentProvider = FakeNetpEgressServersProvider()
     private val fakeRepository = FakeNetPGeoswitchingRepository()
 
     @Before
@@ -112,7 +112,7 @@ class NetpGeoSwitchingViewModelTest {
 
     @Test
     fun whenProviderHasNoDownloadedDataThenViewStateShouldOnlyContainNearestAvailable() = runTest {
-        val mockProvider = mock(GeoSwitchingContentProvider::class.java)
+        val mockProvider = mock(NetpEgressServersProvider::class.java)
         testee = NetpGeoSwitchingViewModel(
             mockProvider,
             fakeRepository,
@@ -120,7 +120,7 @@ class NetpGeoSwitchingViewModelTest {
             wgServerDebugProvider,
             networkProtectionState,
         )
-        whenever(mockProvider.getDownloadedData()).thenReturn(emptyList())
+        whenever(mockProvider.getServerLocations()).thenReturn(emptyList())
 
         testee.onStart(mockLifecycleOwner)
         testee.viewState().test {

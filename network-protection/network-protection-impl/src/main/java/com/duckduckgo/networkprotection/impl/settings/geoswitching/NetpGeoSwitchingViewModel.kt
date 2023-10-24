@@ -43,7 +43,7 @@ import kotlinx.coroutines.runBlocking
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class NetpGeoSwitchingViewModel @Inject constructor(
-    private val contentProvider: GeoSwitchingContentProvider,
+    private val egressServersProvider: NetpEgressServersProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val wgServerDebugProvider: WgServerDebugProvider,
@@ -62,7 +62,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
             initialPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
-            val countryItems = contentProvider.getDownloadedData().map {
+            val countryItems = egressServersProvider.getServerLocations().map {
                 CountryItem(
                     countryEmoji = getEmojiForCountryCode(it.countryCode),
                     countryCode = it.countryCode,

@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.configuration.FakeWgVpnControllerService
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider.AvailableCountry
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,12 +33,12 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RealGeoSwitchingContentProviderTest {
+class RealNetpEgressServersProviderTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private lateinit var testee: RealGeoSwitchingContentProvider
+    private lateinit var testee: RealNetpEgressServersProvider
     private var wgVpnControllerService = FakeWgVpnControllerService()
 
     @Mock
@@ -47,7 +47,7 @@ class RealGeoSwitchingContentProviderTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealGeoSwitchingContentProvider(
+        testee = RealNetpEgressServersProvider(
             wgVpnControllerService,
             coroutineRule.testDispatcherProvider,
             netPGeoswitchingRepository,
@@ -56,7 +56,7 @@ class RealGeoSwitchingContentProviderTest {
 
     @Test
     fun whenDownloadDateThenParseAndReplaceStoredLocations() = runTest {
-        testee.downloadData()
+        testee.downloadServerLocations()
         val expectedResult = listOf(
             NetPGeoswitchingLocation(
                 countryCode = "nl",
@@ -86,13 +86,13 @@ class RealGeoSwitchingContentProviderTest {
 
         assertEquals(
             listOf(
-                AvailableCountry(
+                ServerLocation(
                     countryCode = "se",
                     countryName = "Sweden",
                     cities = listOf("Gothenburg", "Malmo", "Stockholm"),
                 ),
             ),
-            testee.getDownloadedData(),
+            testee.getServerLocations(),
         )
     }
 }

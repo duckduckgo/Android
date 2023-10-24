@@ -16,20 +16,20 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
-import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoSwitchingContentProvider.AvailableCountry
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 
-class FakeGeoSwitchingContentProvider : GeoSwitchingContentProvider {
+class FakeNetpEgressServersProvider : NetpEgressServersProvider {
 
-    override suspend fun downloadData() {}
+    override suspend fun downloadServerLocations() {}
 
-    override suspend fun getDownloadedData(): List<AvailableCountry> {
+    override suspend fun getServerLocations(): List<ServerLocation> {
         return listOf(
-            AvailableCountry(
+            ServerLocation(
                 countryCode = "uk",
                 countryName = "UK",
                 cities = emptyList(),
             ),
-            AvailableCountry(
+            ServerLocation(
                 countryCode = "us",
                 countryName = "United States",
                 cities = listOf("Chicago", "El Segundo", "Newark", "Atlanta"),
