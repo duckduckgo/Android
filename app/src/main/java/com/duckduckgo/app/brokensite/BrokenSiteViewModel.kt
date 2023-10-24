@@ -58,14 +58,14 @@ class BrokenSiteViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     var indexSelected = -1
     val categories: List<BrokenSiteCategory> = listOf(
-        ImagesCategory,
+        BlockedCategory,
+        LayoutCategory,
+        EmptySpacesCategory,
+        ShoppingCategory,
         PaywallCategory,
         CommentsCategory,
         VideosCategory,
-        LinksCategory,
-        ContentCategory,
         LoginCategory,
-        UnsupportedCategory,
         OtherCategory,
     )
     private var blockedTrackers: String = ""

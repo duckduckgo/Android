@@ -216,14 +216,6 @@
     <string name="brokenSiteSubmitButton">Send Report</string>
     <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us debug these issues and improve the app.</string>
 
-    <string name="brokenSiteCategoryImages">Images didn\'t load</string>
-    <string name="brokenSiteCategoryPaywall">The site asked me to disable</string>
-    <string name="brokenSiteCategoryComments">Comments didn\'t load</string>
-    <string name="brokenSiteCategoryVideos">Video didn\'t play</string>
-    <string name="brokenSiteCategoryLinks">Links or buttons don\'t work</string>
-    <string name="brokenSiteCategoryContent">Content is missing</string>
-    <string name="brokenSiteCategoryLogin">I can\'t sign in</string>
-    <string name="brokenSiteCategoryUnsupported">The browser is incompatible</string>
     <string name="brokenSiteCategoryOther">Something else</string>
     <string name="brokenSiteDescriptionTextInputHint">Share more details (optional)</string>
 
