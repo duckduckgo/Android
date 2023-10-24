@@ -19,12 +19,15 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFILL_PRESSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -57,6 +60,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -590,6 +594,38 @@ class AutofillSettingsViewModelTest {
             assertEquals(false, this.awaitItem().showAutofillEnabledToggle)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenScreenLaunchedDirectlyIntoCredentialViewThenNoLaunchPixelSent() {
+        val launchedFromBrowser = false
+        val directLinkToCredentials = true
+        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+        verify(pixel, never()).fire(any<PixelName>(), any(), any())
+    }
+
+    @Test
+    fun whenScreenLaunchedDirectlyIntoCredentialViewAndLaunchedFromBrowserThenNoLaunchPixelSent() {
+        val launchedFromBrowser = true
+        val directLinkToCredentials = true
+        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+        verify(pixel, never()).fire(any<PixelName>(), any(), any())
+    }
+
+    @Test
+    fun whenScreenLaunchedFromBrowserAndNotDirectLinkThenCorrectLaunchPixelSent() {
+        val launchedFromBrowser = true
+        val directLinkToCredentials = false
+        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+        verify(pixel).fire(eq(MENU_ACTION_AUTOFILL_PRESSED), any(), any())
+    }
+
+    @Test
+    fun whenScreenLaunchedNotFromBrowserAndNotDirectLinkThenCorrectLaunchPixelSent() {
+        val launchedFromBrowser = false
+        val directLinkToCredentials = false
+        testee.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+        verify(pixel).fire(eq(SETTINGS_AUTOFILL_MANAGEMENT_OPENED), any(), any())
     }
 
     private suspend fun configureStoreToHaveThisManyCredentialsStored(value: Int) {

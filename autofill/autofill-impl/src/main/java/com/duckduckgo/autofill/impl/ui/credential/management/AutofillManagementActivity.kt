@@ -97,6 +97,15 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
         observeViewModel()
+        sendLaunchPixel(savedInstanceState)
+    }
+
+    private fun sendLaunchPixel(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            val launchedFromBrowser = intent.hasExtra(EXTRAS_SUGGESTIONS_FOR_URL)
+            val directLinkToCredentials = intent.hasExtra(EXTRAS_CREDENTIALS_TO_VIEW)
+            viewModel.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+        }
     }
 
     override fun onStart() {
