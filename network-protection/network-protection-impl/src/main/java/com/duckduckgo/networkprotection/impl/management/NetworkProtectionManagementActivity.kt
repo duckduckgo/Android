@@ -112,6 +112,11 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         lifecycle.addObserver(viewModel)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(viewModel)
+    }
+
     private fun bindViews() {
         setTitle(R.string.netpManagementTitle)
         binding.netpToggle.setOnCheckedChangeListener(toggleChangeListener)

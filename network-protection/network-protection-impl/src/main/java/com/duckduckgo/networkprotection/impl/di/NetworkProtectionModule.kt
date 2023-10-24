@@ -18,13 +18,16 @@ package com.duckduckgo.networkprotection.impl.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.RealNetPExclusionListRepository
+import com.duckduckgo.networkprotection.store.RealNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.duckduckgo.networkprotection.store.db.NetPDatabase
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
@@ -56,10 +59,20 @@ object DataModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAppTrackerLoader(
+    fun provideNetPExclusionListRepository(
         database: NetPDatabase,
     ): NetPExclusionListRepository {
         return RealNetPExclusionListRepository(database.exclusionListDao())
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideNetPGeoswitchingRepository(
+        database: NetPDatabase,
+        networkProtectionPrefs: NetworkProtectionPrefs,
+        dispatcherProvider: DispatcherProvider,
+    ): NetPGeoswitchingRepository {
+        return RealNetPGeoswitchingRepository(networkProtectionPrefs, database.geoswitchingDao(), dispatcherProvider)
     }
 }
 

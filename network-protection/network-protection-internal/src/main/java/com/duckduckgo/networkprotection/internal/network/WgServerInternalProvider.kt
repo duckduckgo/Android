@@ -38,6 +38,10 @@ class WgServerInternalProvider @Inject constructor(
         return netPServerRepository.getSelectedServer()?.name
     }
 
+    override suspend fun clearSelectedServerName() {
+        netPServerRepository.setSelectedServer(null)
+    }
+
     override suspend fun cacheServers(servers: List<Server>) {
         servers.map { server ->
             NetPEgressServer(
@@ -46,6 +50,8 @@ class WgServerInternalProvider @Inject constructor(
                 port = server.port,
                 hostnames = server.hostnames,
                 ips = server.ips,
+                countryCode = server.attributes["country"] as String,
+                city = server.attributes["city"] as String,
             )
         }.let {
             netPServerRepository.storeServers(it)
