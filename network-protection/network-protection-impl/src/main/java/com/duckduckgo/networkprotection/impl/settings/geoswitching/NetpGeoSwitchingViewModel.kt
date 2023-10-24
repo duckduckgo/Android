@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
@@ -42,10 +43,11 @@ import kotlinx.coroutines.runBlocking
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ActivityScope::class)
 class NetpGeoSwitchingViewModel @Inject constructor(
-    private val contentProvider: GeoSwitchingContentProvider,
+    private val egressServersProvider: NetpEgressServersProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val wgServerDebugProvider: WgServerDebugProvider,
+    private val networkProtectionState: NetworkProtectionState,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val viewState = MutableStateFlow(ViewState())
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
@@ -54,14 +56,17 @@ class NetpGeoSwitchingViewModel @Inject constructor(
         val items: List<GeoswitchingListItem> = emptyList(),
     )
 
+    private var initialPreferredLocation: UserPreferredLocation? = null
+
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
-            val countryItems = contentProvider.getContent().map {
+            initialPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
+            val countryItems = egressServersProvider.getServerLocations().map {
                 CountryItem(
                     countryEmoji = getEmojiForCountryCode(it.countryCode),
                     countryCode = it.countryCode,
-                    countryName = getDisplayableCountry(it.countryCode),
+                    countryName = it.countryName,
                     cities = it.cities,
                 )
             }
@@ -72,10 +77,12 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     title = R.string.netpGeoswitchingDefaultTitle,
                     subtitle = R.string.netpGeoswitchingDefaultSubtitle,
                 ),
-                DividerItem,
-                HeaderItem(R.string.netpGeoswitchingHeaderCustom),
             ).apply {
-                this.addAll(countryItems)
+                if (countryItems.isNotEmpty()) {
+                    this.add(DividerItem)
+                    this.add(HeaderItem(R.string.netpGeoswitchingHeaderCustom))
+                    this.addAll(countryItems)
+                }
             }
 
             viewState.emit(
@@ -83,6 +90,17 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     items = completeList,
                 ),
             )
+        }
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (networkProtectionState.isEnabled()) {
+                if (initialPreferredLocation != netPGeoswitchingRepository.getUserPreferredLocation()) {
+                    networkProtectionState.restart()
+                }
+            }
         }
     }
 

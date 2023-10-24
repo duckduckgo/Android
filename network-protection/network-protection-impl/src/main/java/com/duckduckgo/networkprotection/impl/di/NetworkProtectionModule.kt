@@ -18,6 +18,7 @@ package com.duckduckgo.networkprotection.impl.di
 
 import android.content.Context
 import androidx.room.Room
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
@@ -67,9 +68,11 @@ object DataModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideNetPGeoswitchingRepository(
+        database: NetPDatabase,
         networkProtectionPrefs: NetworkProtectionPrefs,
+        dispatcherProvider: DispatcherProvider,
     ): NetPGeoswitchingRepository {
-        return RealNetPGeoswitchingRepository(networkProtectionPrefs)
+        return RealNetPGeoswitchingRepository(networkProtectionPrefs, database.geoswitchingDao(), dispatcherProvider)
     }
 }
 
