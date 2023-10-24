@@ -25,19 +25,20 @@ import com.duckduckgo.feature.toggles.api.Toggle
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "browser",
+    featureName = "androidBrowserConfig",
 )
-interface BrowserFeature {
+interface AndroidBrowserConfigFeature {
 
     /**
-     * @return `true` when the remote config has the global "browser" feature flag enabled
+     * @return `true` when the remote config has the global "androidBrowserConfig" feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
     fun self(): Toggle
 
     /**
-     * @return `true` when the remote config has the global "collectFullWebViewVersion" browser sub-feature flag enabled
+     * @return `true` when the remote config has the global "collectFullWebViewVersion" androidBrowserConfig
+     * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(false)
