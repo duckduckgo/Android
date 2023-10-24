@@ -63,6 +63,8 @@ data class RegisteredServerInfo(
 data class RegisterKeyBody(
     val publicKey: String,
     val server: String = "*",
+    val country: String? = null,
+    val city: String? = null,
 )
 
 data class EligibleServerInfo(

@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.DividerItem
@@ -42,6 +43,7 @@ import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -56,6 +58,9 @@ class NetpGeoSwitchingViewModelTest {
 
     @Mock
     private lateinit var wgServerDebugProvider: WgServerDebugProvider
+
+    @Mock
+    private lateinit var networkProtectionState: NetworkProtectionState
     private val fakeContentProvider = FakeGeoSwitchingContentProvider()
     private val fakeRepository = FakeNetPGeoswitchingRepository()
 
@@ -67,6 +72,7 @@ class NetpGeoSwitchingViewModelTest {
             fakeRepository,
             coroutineRule.testDispatcherProvider,
             wgServerDebugProvider,
+            networkProtectionState,
         )
     }
 
@@ -112,6 +118,7 @@ class NetpGeoSwitchingViewModelTest {
             fakeRepository,
             coroutineRule.testDispatcherProvider,
             wgServerDebugProvider,
+            networkProtectionState,
         )
         whenever(mockProvider.getDownloadedData()).thenReturn(emptyList())
 
@@ -162,6 +169,53 @@ class NetpGeoSwitchingViewModelTest {
             assertNull(it.cityName)
         }
         verify(wgServerDebugProvider).clearSelectedServerName()
+    }
+
+    @Test
+    fun whenNetPIsNotEnabledThenDoNotRestart() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(false)
+
+        testee.onStart(mockLifecycleOwner)
+        testee.onStop(mockLifecycleOwner)
+
+        verify(networkProtectionState).isEnabled()
+        verifyNoMoreInteractions(networkProtectionState)
+    }
+
+    @Test
+    fun whenNetPIsEnabledButNoChangeInPreferredLocationThenDoNotRestart() = runTest {
+        fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us"))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+        testee.onCountrySelected("us")
+        testee.onStop(mockLifecycleOwner)
+
+        verify(networkProtectionState).isEnabled()
+        verifyNoMoreInteractions(networkProtectionState)
+    }
+
+    @Test
+    fun whenNetPIsEnabledAndPreferredCountryChangedThenRestart() = runTest {
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+        testee.onCountrySelected("us")
+        testee.onStop(mockLifecycleOwner)
+
+        verify(networkProtectionState).restart()
+    }
+
+    @Test
+    fun whenNetPIsEnabledAndPreferredCityChangedThenRestart() = runTest {
+        fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "El Segundo"))
+        whenever(networkProtectionState.isEnabled()).thenReturn(true)
+
+        testee.onStart(mockLifecycleOwner)
+        fakeRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Newark"))
+        testee.onStop(mockLifecycleOwner)
+
+        verify(networkProtectionState).restart()
     }
 }
 
