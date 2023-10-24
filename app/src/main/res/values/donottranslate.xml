@@ -38,4 +38,8 @@
     <string name="webViewErrorNoConnection">The internet connection appears to be offline.</string>
     <string name="webViewErrorBadUrl">A server with the specified hostname could not be found.</string>
     <string name="webViewErrorSslProtocol"><![CDATA[The certificate for this server is invalid. You might be connecting to a server that is pretending to be <b>%1$s</b> which could put your confidential information at risk.]]></string>
+
+    <!-- Updated About Screen-->
+    <string name="aboutHeader">Welcome to the Duck Side!</string>
+    <string name="aboutNewDescription">DuckDuckGo is the independent Internet privacy company founded in 2008 for anyone who’s tired of being tracked online and wants an easy solution. We’re proof you can get real privacy protection online without tradeoffs.\n\nThe DuckDuckGo browser comes with the features you expect from a go-to browser, like bookmarks, tabs, passwords, and more, plus over <annotation type="privacy_protection_link">a dozen powerful privacy protections</annotation> not offered in most popular browsers by default. This uniquely comprehensive set of privacy protections helps protect your online activities, from searching to browsing, emailing, and more.\n\nOur privacy protections work without having to know anything about the technical details or deal with complicated settings. All you have to do is switch your browser to DuckDuckGo across all your devices and you get privacy by default.\n\nBut if you do want a peek under the hood, you can find more information about how DuckDuckGo privacy protections work on our <annotation type="learn_more_link">help pages</annotation></string>
 </resources>
