@@ -34,9 +34,7 @@ import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.AddEmail
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.ManageEmail
-import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.UseSync
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.ViewState
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -73,10 +71,6 @@ class AddDeviceActivity : DuckDuckGoActivity() {
         binding.email.setPrimaryButtonClickListener {
             viewModel.useEmail()
         }
-
-        binding.sync.setPrimaryButtonClickListener {
-            viewModel.useSync()
-        }
     }
 
     override fun onDestroy() {
@@ -92,10 +86,6 @@ class AddDeviceActivity : DuckDuckGoActivity() {
             binding.email.setPrimaryButtonText(getString(R.string.addEmailText))
             binding.email.setSecondaryText(getString(R.string.addEmail))
         }
-    }
-
-    private fun goToSync() {
-        globalActivityStarter.start(this, SyncActivityWithEmptyParams)
     }
 
     private fun goToManageEmail() {
@@ -126,7 +116,6 @@ class AddDeviceActivity : DuckDuckGoActivity() {
         when (command) {
             is AddEmail -> goToAddEmail()
             is ManageEmail -> goToManageEmail()
-            is UseSync -> goToSync()
             is Error -> showError()
         }
     }

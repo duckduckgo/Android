@@ -19,13 +19,19 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="privacyPro">Privacy Pro</string>
+
     <!--Add Device Activity-->
     <string name="manage">Manage</string>
     <string name="addEmailText">Add Email</string>
-    <string name="useEmail">%1$s You can use this email to activate your subscription on your other devices.</string>
+    <string name="useEmail" instruction="Placeholder is an email address">%1$s You can use this email to activate your subscription on your other devices.</string>
     <string name="addEmail">Add an email address to activate your subscription on your other devices. We’ll only use this address to verify your subscription.</string>
     <string name="manageEmail">Manage Email</string>
+    <string name="addDeviceEmail">Email</string>
     <string name="randomError">An error happened, try again</string>
+    <string name="addDeviceTitle">Use your subscription on all your devices</string>
+    <string name="addDeviceDescription">Access your subscription on any of your devices Google Play or by adding an email address.</string>
+    <string name="addDeviceGooglePlayTitle">Google Play</string>
+    <string name="addDeviceGooglePlayDescription">Privacy Pro is available on any device signed in to your Google Play Store account.</string>
 
     <!--Restore Subscriptions Activity-->
     <string name="somethingWentWrong">Something Went Wrong</string>
@@ -34,6 +40,15 @@
     <string name="subscriptionNotFound">Subscription Not Found</string>
     <string name="subscriptionNotFoundDescription">The subscription associated with this Google Account is no longer active or could not be found.</string>
     <string name="purchaseRestored">Your purchase has been restored.</string>
+    <string name="restoreSubscriptionTitle">Activate your subscription on this device</string>
+    <string name="restoreSubscriptionDescription">Access your Privacy Pro subscription on this device Google Play or an email address.</string>
+    <string name="restoreDeviceDescription">Access your subscription on any of your devices Google Play or by adding an email address.</string>
+    <string name="restoreSubscriptionGooglePlayTitle">Google Play</string>
+    <string name="restoreSubscriptionGooglePlayDescription">Restore your purchase to activate your subscription on this device.</string>
+    <string name="restoreSubscriptionGooglePlayButton">Restore Purchase</string>
+    <string name="restoreSubscriptionEmailTitle">Email</string>
+    <string name="restoreSubscriptionEmailDescription">Use your email to activate your subscription on this device.</string>
+    <string name="restoreSubscriptionEmailButton">Enter Email</string>
 
     <!--Settings Subscriptions Activity-->
     <string name="removeSubscription">Remove Subscription</string>

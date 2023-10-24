@@ -33,12 +33,10 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companio
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromSync
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity.Companion.SubscriptionsScreenWithEmptyParams
-import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -73,14 +71,6 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         binding.email.setPrimaryButtonClickListener {
             viewModel.restoreFromEmail()
         }
-
-        binding.sync.setPrimaryButtonClickListener {
-            viewModel.restoreFromSync()
-        }
-    }
-
-    private fun goToSync() {
-        globalActivityStarter.start(this, SyncActivityWithEmptyParams)
     }
 
     private fun goToAddEmail() {
@@ -138,7 +128,6 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         when (command) {
             is RestoreFromEmail -> goToAddEmail()
-            is RestoreFromSync -> goToSync()
             is Success -> onPurchaseRestored()
             is SubscriptionNotFound -> subscriptionNotFound()
             is Error -> showError(command.message)
