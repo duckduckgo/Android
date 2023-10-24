@@ -54,7 +54,7 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Sync Flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.4.1
+        uses: mobile-dev-inc/action-maestro-cloud@v1.6.0
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
@@ -65,11 +65,22 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
+        id: create-failure-task
         uses: duckduckgo/native-github-asana-sync@v1.0
         with:
           asana-pat: ${{ secrets.GH_ASANA_SECRET }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Sync E2E Flows
-          asana-task-description: The Sync Flows end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Android Sync E2E Flows
+          asana-task-description: The Sync Flows E2E workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
+
+      - name: Add Asana task to Browser Sync & Backup project
+        if: ${{ failure() }}
+        uses: duckduckgo/native-github-asana-sync@v1.0
+        with:
+          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-project: ${{ vars.GH_BROWSER_SYNC_BACKUP_PROJECT_ID }}
+          asana-section: ${{ vars.GGH_BROWSER_SYNC_BACKUP_PROJECT_TRIAGE_SECTION_ID }}
+          asana-task-id: ${{ steps.create-failure-task.outputs.taskId }}
+          action: 'add-task-asana-project'

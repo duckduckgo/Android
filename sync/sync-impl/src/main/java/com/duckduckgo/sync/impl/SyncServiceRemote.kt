@@ -266,6 +266,7 @@ class SyncServiceRemote @Inject constructor(
         token: String,
         since: String,
     ): Result<JSONObject> {
+        Timber.i("Sync-service: get bookmarks since servertime $since")
         val response = runCatching {
             val patchCall = if (since.isNotEmpty()) {
                 syncService.bookmarksSince("Bearer $token", since)

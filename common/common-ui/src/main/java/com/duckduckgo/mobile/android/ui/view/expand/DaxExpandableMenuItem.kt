@@ -23,9 +23,11 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.LayoutRes
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewExpandableMenuItemBinding
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -45,6 +47,8 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
     private val binding: ViewExpandableMenuItemBinding by viewBinding()
 
     private var expandedChangedListener: OnExpandedChangedListener? = null
+
+    var customExpandedLayout: View? = null
 
     private var expanded = false
     private var animating = false
@@ -115,6 +119,10 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
                 hidePrimaryButton()
             }
 
+            if (hasValue(R.styleable.DaxExpandableMenuItem_expandedLayout)) {
+                setCustomExpandedLayoutResource(getResourceId(R.styleable.DaxExpandableMenuItem_expandedLayout, 0))
+            }
+
             recycle()
         }
     }
@@ -180,6 +188,18 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
         expandedChangedListener = listener
     }
 
+    fun setExpandableMenuCustomLayout(view: View) {
+        customExpandedLayout = view
+        binding.daxExpandableLayoutContent.removeAllViews()
+        binding.daxExpandableLayoutContent.addView(customExpandedLayout)
+    }
+
+    private fun setCustomExpandedLayoutResource(@LayoutRes expandedLayoutResource: Int) {
+        LayoutInflater.from(context).inflate(expandedLayoutResource, this, false).apply {
+            setExpandableMenuCustomLayout(this)
+        }
+    }
+
     override fun onFinishInflate() {
         super.onFinishInflate()
 
@@ -221,7 +241,63 @@ class DaxExpandableMenuItem @JvmOverloads constructor(
             }
         }
     }
+
+    /** Builder class for creating [ExpandableLayout]. */
+    @DaxExpandableMenuItemDsl
+    class Builder(context: Context) {
+        private val expandableMenuItem = DaxExpandableMenuItem(context)
+
+        fun setPrimaryText(value: String) = apply {
+            this.expandableMenuItem.setPrimaryText(value)
+        }
+        fun setPrimaryTextColor(value: ColorStateList?) = apply {
+            this.expandableMenuItem.setPrimaryTextColor(value)
+        }
+
+        fun setSecondaryText(value: String?) = apply {
+            this.expandableMenuItem.setSecondaryText(value)
+        }
+
+        fun setLeadingIconDrawable(value: Drawable) = apply {
+            this.expandableMenuItem.setLeadingIconDrawable(value)
+        }
+
+        fun setLeadingIconVisibility(value: Boolean) = apply {
+            this.expandableMenuItem.setLeadingIconVisibility(value)
+        }
+
+        fun setLeadingIconBackgroundType(value: ImageBackground) = apply {
+            this.expandableMenuItem.setLeadingIconBackgroundType(value)
+        }
+
+        fun setLeadingIconSize(value: LeadingIconSize) = apply {
+            this.expandableMenuItem.setLeadingIconSize(value)
+        }
+        fun setPrimaryButtonText(value: String?) = apply {
+            this.expandableMenuItem.setPrimaryButtonText(value)
+        }
+        fun setPrimaryButtonClickListener(value: () -> Unit) = apply {
+            this.expandableMenuItem.setPrimaryButtonClickListener(value)
+        }
+
+        fun setExpandedChangeListener(value: OnExpandedChangedListener) = apply {
+            this.expandableMenuItem.setExpandedChangeListener(value)
+        }
+
+        fun setExpandedLayout(value: View) = apply {
+            this.expandableMenuItem.customExpandedLayout = value
+        }
+
+        fun build() = this.expandableMenuItem
+    }
 }
+
+@JvmSynthetic
+@DaxExpandableMenuItemDsl
+inline fun Context.daxExpandableMenuItem(
+    block: DaxExpandableMenuItem.Builder.() -> Unit,
+): DaxExpandableMenuItem =
+    DaxExpandableMenuItem.Builder(this).apply(block).build()
 
 fun ViewGroup.measureWrapContentHeight(): Int {
     this.measure(

@@ -48,18 +48,19 @@ class SavedSitesSyncPersister @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         return if (changes.type == BOOKMARKS) {
-            Timber.d("Sync-Feature: received remote changes, merging with resolution $conflictResolution")
+            Timber.d("Sync-Bookmarks: received remote changes $changes, merging with resolution $conflictResolution")
             val result = process(changes, conflictResolution)
-            Timber.d("Sync-Feature: merging bookmarks finished with $result")
+            Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
             result
         } else {
-            Timber.d("Sync-Feature: no bookmarks to merge")
             Success(false)
         }
     }
 
     override fun onSyncDisabled() {
-        savedSitesSyncStore.modifiedSince = "0"
+        savedSitesSyncStore.serverModifiedSince = "0"
+        savedSitesSyncStore.clientModifiedSince = "0"
+        savedSitesSyncStore.startTimeStamp = "0"
     }
 
     fun process(
@@ -69,26 +70,24 @@ class SavedSitesSyncPersister @Inject constructor(
         val result = when (val validation = validateChanges(changes)) {
             is SyncDataValidationResult.Error -> SyncMergeResult.Error(reason = validation.reason)
             is SyncDataValidationResult.Success -> processEntries(validation.data, conflictResolution)
-            else -> SyncMergeResult.Error(reason = "Something went wrong")
+            else -> Success(false)
         }
 
         if (result is Success) {
             pruneDeletedObjects()
-
-            if (conflictResolution == DEDUPLICATION) {
-                // first sync has a special case, bookmarks and favorites that were added previously to sync need to be updated to lastModified
-                val modifiedSince = OffsetDateTime.parse(savedSitesSyncStore.modifiedSince)
-                val updatedModifiedSince = modifiedSince.plusSeconds(1)
-                savedSitesRepository.updateModifiedSince(savedSitesSyncStore.modifiedSince, DatabaseDateFormatter.iso8601(updatedModifiedSince))
-            }
         }
 
         return result
     }
 
     private fun validateChanges(changes: SyncChangesResponse): SyncDataValidationResult<SyncBookmarkEntries> {
+        if (changes.isEmpty()) {
+            Timber.d("Sync-Bookmarks: JSON doesn't have changes, nothing to store")
+            return SyncDataValidationResult.NoChanges
+        }
+
         val response = kotlin.runCatching { Adapters.updatesAdapter.fromJson(changes.jsonString)!! }.getOrElse {
-            return SyncDataValidationResult.Error(reason = "Sync-Feature: JSON format incorrect, exception: $it")
+            return SyncDataValidationResult.Error(reason = "Sync-Bookmarks: JSON format incorrect, exception: $it")
         }
 
         return SyncDataValidationResult.Success(response.bookmarks)
@@ -98,15 +97,33 @@ class SavedSitesSyncPersister @Inject constructor(
         bookmarks: SyncBookmarkEntries,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
-        Timber.d("Sync-Feature: updating bookmarks last_modified to ${bookmarks.last_modified}")
-        savedSitesSyncStore.modifiedSince = bookmarks.last_modified
+        Timber.i("Sync-Bookmarks: updating server last_modified from ${savedSitesSyncStore.serverModifiedSince} to ${bookmarks.last_modified}")
+        Timber.i(
+            "Sync-Bookmarks: updating client last_modified from ${savedSitesSyncStore.clientModifiedSince} to ${savedSitesSyncStore.startTimeStamp}",
+        )
 
-        return if (bookmarks.entries.isEmpty()) {
-            Timber.d("Sync-Feature: merging completed, no entries to merge")
+        savedSitesSyncStore.serverModifiedSince = bookmarks.last_modified
+        savedSitesSyncStore.clientModifiedSince = savedSitesSyncStore.startTimeStamp
+
+        val result = if (bookmarks.entries.isEmpty()) {
+            Timber.d("Sync-Bookmarks: merging completed, no entries to merge")
             Success(false)
         } else {
-            algorithm.processEntries(bookmarks, conflictResolution)
+            algorithm.processEntries(bookmarks, conflictResolution, savedSitesSyncStore.clientModifiedSince)
         }
+
+        // it's possible that there were entities present in the device before the first sync
+        // we need to make sure that those entities are sent to the BE after all new data has been stored
+        // we do that by updating the modifiedSince date to a newer date that the last sync
+        if (conflictResolution == DEDUPLICATION) {
+            val modifiedSince = OffsetDateTime.now().plusSeconds(1)
+            savedSitesRepository.getEntitiesModifiedBefore(savedSitesSyncStore.startTimeStamp).forEach {
+                savedSitesRepository.updateModifiedSince(it, DatabaseDateFormatter.iso8601(modifiedSince))
+                Timber.d("Sync-Bookmarks: updating $it modifiedSince to $modifiedSince")
+            }
+        }
+
+        return result
     }
 
     private fun pruneDeletedObjects() {

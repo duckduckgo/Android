@@ -23,7 +23,7 @@ class DeviceShieldPixelNamesTest {
     @Test
     fun allAppTrackingProtectionPixelsShallBePrefixed() {
         DeviceShieldPixelNames.values().map { it.pixelName }.forEach { pixel ->
-            assertTrue(pixel.startsWith("m_atp"))
+            assertTrue(pixel.startsWith("m_atp") || pixel.startsWith("m_vpn"))
         }
     }
 }

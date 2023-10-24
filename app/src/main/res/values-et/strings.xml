@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Sätted</string>
     <string name="settingsPermissionsSetting">Load</string>
     <string name="settingsAutofillLoginsSetting">Sisesta sisselogimisandmed automaatselt</string>
-    <string name="settingsSyncSetting">Sünkrooni</string>
+    <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">See kustutab sinu järjehoidjate kausta &lt;b&gt;%1$s&lt;/b&gt;.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Loobu</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Kustuta</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Lisa aadressiribale privaatse häälotsingu valik. Heli ei salvestata ega jagata kellegagi, sealhulgas DuckDuckGoga.</string>
+    <string name="accessibilityVoiceSearchTitle">Privaatne häälotsing</string>
 </resources>

@@ -21,7 +21,9 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.ConnectedDevice
+import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
@@ -48,6 +50,7 @@ constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStore: SyncStore,
     private val syncEnvDataStore: SyncInternalEnvDataStore,
+    private val clipboard: Clipboard,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -76,6 +79,7 @@ constructor(
         object ReadQR : Command()
         object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
+        object LoginSuccess : Command()
     }
 
     init {
@@ -219,6 +223,7 @@ constructor(
                 is Error -> {
                     command.send(Command.ShowMessage("$result"))
                 }
+
                 is Success -> {
                     command.send(Command.ShowMessage("${result.data}"))
                     updateViewState()
@@ -234,6 +239,7 @@ constructor(
                     command.send(ShowMessage("$qrCodeResult"))
                     return@launch
                 }
+
                 is Success -> qrCodeResult.data
             }
             updateViewState()
@@ -245,6 +251,7 @@ constructor(
                     is Error -> {
                         command.send(Command.ShowMessage("$result"))
                     }
+
                     is Success -> {
                         command.send(Command.ShowMessage(result.data.toString()))
                         polling = false
@@ -259,6 +266,24 @@ constructor(
         viewModelScope.launch(dispatchers.io()) {
             viewModelScope.launch(dispatchers.io()) {
                 command.send(ReadConnectQR)
+            }
+        }
+    }
+
+    fun useRecoveryCode(recoveryCode: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            authFlow(recoveryCode)
+        }
+    }
+
+    private suspend fun authFlow(
+        pastedCode: String,
+    ) {
+        val result = syncAccountRepository.processCode(pastedCode)
+        when (result) {
+            is Result.Success -> command.send(Command.LoginSuccess)
+            is Result.Error -> {
+                command.send(ShowMessage("Something went wrong"))
             }
         }
     }

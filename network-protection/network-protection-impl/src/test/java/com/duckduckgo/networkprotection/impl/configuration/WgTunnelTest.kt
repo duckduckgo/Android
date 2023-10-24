@@ -2,7 +2,6 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import android.os.Build.VERSION
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
@@ -23,7 +22,6 @@ import org.mockito.kotlin.*
 class WgTunnelTest {
 
     private val wgServerApi: WgServerApi = mock()
-    private val crashLogger: CrashLogger = mock()
     private val serverData = WgServerApi.WgServerData(
         serverName = "name",
         publicKey = "public key",
@@ -46,7 +44,7 @@ class WgTunnelTest {
                 .thenReturn(serverData.copy(publicKey = deviceKeys.publicKey))
         }
 
-        wgTunnel = RealWgTunnel(deviceKeys, wgServerApi, crashLogger)
+        wgTunnel = RealWgTunnel(deviceKeys, wgServerApi)
     }
 
     @Test
@@ -71,7 +69,6 @@ class WgTunnelTest {
         whenever(wgServerApi.registerPublicKey(any())).thenReturn(serverData)
 
         assertNull(wgTunnel.establish())
-        verify(crashLogger).logCrash(any<CrashLogger.Crash>())
     }
 
     @Throws(Exception::class)

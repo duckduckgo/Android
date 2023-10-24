@@ -16,7 +16,11 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import android.app.Activity
 import android.content.Context
+import com.android.billingclient.api.ProductDetails
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
 import com.duckduckgo.subscriptions.impl.auth.AuthService
@@ -25,14 +29,22 @@ import com.duckduckgo.subscriptions.impl.auth.Entitlement
 import com.duckduckgo.subscriptions.impl.auth.ResponseError
 import com.duckduckgo.subscriptions.impl.auth.StoreLoginBody
 import com.duckduckgo.subscriptions.impl.billing.BillingClientWrapper
+import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.store.AuthDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority
 import logcat.logcat
 import retrofit2.HttpException
@@ -40,10 +52,9 @@ import retrofit2.HttpException
 interface SubscriptionsManager {
 
     /**
-     * Executes the pre-purchase flow which tries to recover the external_id from the store,
-     * if it cannot, it creates a new account
+     * Launches the purchase flow for a given product details and token
      */
-    suspend fun prePurchaseFlow(): SubscriptionsData
+    suspend fun purchase(activity: Activity, productDetails: ProductDetails, offerToken: String, isReset: Boolean = false)
 
     /**
      * Recovers a subscription from the store
@@ -76,9 +87,14 @@ interface SubscriptionsManager {
     val isSignedIn: Flow<Boolean>
 
     /**
-     * Returns [true] if the user has an active subscription
+     * Flow to know if a user has a subscription or not
      */
-    suspend fun hasSubscription(): Boolean
+    val hasSubscription: Flow<Boolean>
+
+    /**
+     * Flow to know if a user is signed in or not
+     */
+    val currentPurchaseState: Flow<CurrentPurchase>
 
     /**
      * Signs the user out
@@ -93,25 +109,76 @@ class RealSubscriptionsManager @Inject constructor(
     private val authDataStore: AuthDataStore,
     private val billingClientWrapper: BillingClientWrapper,
     private val context: Context,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SubscriptionsManager {
 
     private val adapter = Moshi.Builder().build().adapter(ResponseError::class.java)
 
+    private val _currentPurchaseState = MutableSharedFlow<CurrentPurchase>()
+    override val currentPurchaseState = _currentPurchaseState.asSharedFlow().onSubscription { emitCurrentPurchaseValues() }
+
     private val _isSignedIn = MutableStateFlow(isUserAuthenticated())
     override val isSignedIn = _isSignedIn.asStateFlow()
 
+    private val _hasSubscription = MutableStateFlow(false)
+    override val hasSubscription = _hasSubscription.asStateFlow().onSubscription { emitHasSubscriptionsValues() }
+
     private fun isUserAuthenticated(): Boolean = !authDataStore.accessToken.isNullOrBlank() && !authDataStore.authToken.isNullOrBlank()
+
+    private suspend fun emitHasSubscriptionsValues() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            _hasSubscription.emit(hasSubscription())
+        }
+    }
+
+    private suspend fun emitCurrentPurchaseValues() {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            billingClientWrapper.purchaseState.collect {
+                when (it) {
+                    is PurchaseState.Purchased -> checkPurchase()
+                    else -> {
+                        // NOOP
+                    }
+                }
+            }
+        }
+    }
 
     override suspend fun signOut() {
         authDataStore.authToken = ""
         authDataStore.accessToken = ""
-        _isSignedIn.emit(isUserAuthenticated())
+        _isSignedIn.emit(false)
+        _hasSubscription.emit(false)
     }
 
-    override suspend fun hasSubscription(): Boolean {
+    private suspend fun checkPurchase() {
+        _currentPurchaseState.emit(CurrentPurchase.InProgress)
+        delay(500)
+        var retries = 1
+        var hasSubscription = hasSubscription()
+        while (!hasSubscription && retries <= 3) {
+            delay(500L * retries)
+            hasSubscription = hasSubscription()
+            retries++
+        }
+        if (hasSubscription) {
+            _currentPurchaseState.emit(CurrentPurchase.Success)
+        } else {
+            _currentPurchaseState.emit(CurrentPurchase.Failure("An error happened, try again"))
+        }
+        _hasSubscription.emit(hasSubscription)
+    }
+
+    private suspend fun hasSubscription(): Boolean {
         return when (val result = getSubscriptionData()) {
-            is Success -> return result.entitlements.isNotEmpty()
-            is Failure -> false
+            is Success -> {
+                val isSubscribed = result.entitlements.isNotEmpty()
+                isSubscribed
+            }
+            is Failure -> {
+                false
+            }
         }
     }
 
@@ -122,6 +189,7 @@ class RealSubscriptionsManager @Inject constructor(
             authDataStore.authToken = authToken
             val subscriptionData = getSubscriptionDataFromToken(response.accessToken)
             _isSignedIn.emit(isUserAuthenticated())
+            _hasSubscription.emit(hasSubscription())
             return subscriptionData
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
@@ -142,7 +210,7 @@ class RealSubscriptionsManager @Inject constructor(
                 logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
                 authenticate(response.authToken)
             } else {
-                Failure("No previous purchases found")
+                Failure(SUBSCRIPTION_NOT_FOUND_ERROR)
             }
         } catch (e: HttpException) {
             val error = parseError(e)?.error ?: "An error happened"
@@ -151,6 +219,7 @@ class RealSubscriptionsManager @Inject constructor(
             Failure(e.message ?: "An error happened")
         }
     }
+
     override suspend fun getSubscriptionData(): SubscriptionsData {
         return try {
             if (isUserAuthenticated()) {
@@ -166,7 +235,37 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    override suspend fun prePurchaseFlow(): SubscriptionsData {
+    override suspend fun purchase(
+        activity: Activity,
+        productDetails: ProductDetails,
+        offerToken: String,
+        isReset: Boolean,
+    ) {
+        when (val response = prePurchaseFlow()) {
+            is Success -> {
+                if (response.entitlements.isEmpty()) {
+                    val billingParams = billingClientWrapper.billingFlowParamsBuilder(
+                        productDetails = productDetails,
+                        offerToken = offerToken,
+                        externalId = response.externalId,
+                        isReset = isReset,
+                    ).build()
+                    logcat(LogPriority.DEBUG) { "Subs: external id is ${response.externalId}" }
+                    withContext(dispatcherProvider.main()) {
+                        billingClientWrapper.launchBillingFlow(activity, billingParams)
+                    }
+                } else {
+                    _currentPurchaseState.emit(CurrentPurchase.Recovered)
+                }
+            }
+            is Failure -> {
+                logcat(LogPriority.ERROR) { "Subs: ${response.message}" }
+                _currentPurchaseState.emit(CurrentPurchase.Failure(response.message))
+            }
+        }
+    }
+
+    private suspend fun prePurchaseFlow(): SubscriptionsData {
         return try {
             val subscriptionData = if (isUserAuthenticated()) {
                 getSubscriptionDataFromToken(authDataStore.accessToken!!)
@@ -195,7 +294,7 @@ class RealSubscriptionsManager @Inject constructor(
                 is Failure -> {
                     when (response.message) {
                         "expired_token" -> {
-                            logcat(LogPriority.DEBUG) { "Subs: auht token expired" }
+                            logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
                             val subscriptionsData = recoverSubscriptionFromStore()
                             if (subscriptionsData is Success) {
                                 AuthToken.Success(authDataStore.authToken!!)
@@ -215,10 +314,12 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     override suspend fun getAccessToken(): AccessToken {
-        return if (isUserAuthenticated()) {
-            AccessToken.Success(authDataStore.accessToken!!)
-        } else {
-            AccessToken.Failure("Token not found")
+        return withContext(dispatcherProvider.io()) {
+            if (isUserAuthenticated()) {
+                AccessToken.Success(authDataStore.accessToken!!)
+            } else {
+                AccessToken.Failure("Token not found")
+            }
         }
     }
 
@@ -248,6 +349,10 @@ class RealSubscriptionsManager @Inject constructor(
             null
         }
     }
+
+    companion object {
+        const val SUBSCRIPTION_NOT_FOUND_ERROR = "SubscriptionNotFound"
+    }
 }
 
 sealed class AccessToken {
@@ -263,4 +368,11 @@ sealed class AuthToken {
 sealed class SubscriptionsData {
     data class Success(val email: String?, val externalId: String, val entitlements: List<Entitlement>) : SubscriptionsData()
     data class Failure(val message: String) : SubscriptionsData()
+}
+
+sealed class CurrentPurchase {
+    object InProgress : CurrentPurchase()
+    object Success : CurrentPurchase()
+    object Recovered : CurrentPurchase()
+    data class Failure(val message: String) : CurrentPurchase()
 }

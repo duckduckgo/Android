@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <!-- autofill dev settings -->
+    <string name="autofillDevSettingsTitle">Autofill Dev Settings</string>
+    <string name="autofillDevSettingsSubtitle">Autofill and Email Protection dev options</string>
+    <string name="autofillDevSettingsClearNeverAskAgainSettingButton">Clear \'never ask again\' setting</string>
+    <string name="autofillDevSettingsEmailProtectionSignOutButton">Sign out</string>
+    <string name="autofillDevSettingsEmailProtectionTitle">Email Protection Settings</string>
+    <string name="autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared">Never ask again choice cleared</string>
+    <string name="autofillDevSettingsEmailProtectionSignedOut">Signed out</string>
+    <string name="autofillDevSettingsEmailProtectionSignedInAs" instruction="Placeholder is an email address">Signed in as %1$s</string>
+    <string name="autofillDevSettingsEmailProtectionNotSignedIn">Not signed in</string>
+
+    <string name="autofillDevSettingsOverrideMaxInstallDialogTitle">Maximum number of days since install</string>
+    <string name="autofillDevSettingsOverrideMaxInstallDialogOkButtonText">OK</string>
+    <string name="autofillDevSettingsOverrideMaxInstallDialogCancelButtonText">Cancel</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledDaysSetting" instruction="%1$d is number of days since an event happened">Show in-context if installed in previous %1$d days</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledDaysNeverShow">In-context prompt will never be shown</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledDaysAlwaysShow">In-context prompt will always be available</string>
+
+    <string name="autofillDevSettingsOverrideMaxInstalledOptionNever">Never show (ignore install date)</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledOptionAlways">Always show (ignore install date)</string>
+    <string name="autofillDevSettingsOverrideMaxInstalledOptionNumberDays" instruction="%1$d is a number of days">%1$d days</string>
+
+    <string name="autofillDevSettingsDaysSinceInstall" instruction="%1$d is number of days since app since app was app was installed">Days since app was installed: %1$d</string>
+    <string name="autofillDevSettingsOverrideTapToChange">Tap to change this rule</string>
+</resources>

@@ -1,0 +1,23 @@
+appId: com.duckduckgo.mobile.android
+name: "Sync Critical Path: Account can be recovered"
+tags:
+  - syncCriticalPathTest
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- runFlow: ../shared/onboarding.yaml
+- runFlow: ../shared/open_sync_dev_settings_screen.yaml
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/trailingSwitch"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/internal_edit_text"
+- inputText: ${CODE}
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/sync_recovery_code_cta"
+- tapOn: "Navigate up"
+- tapOn: "Navigate up"
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- tapOn: "Bookmarks"
+- assertVisible: "NFL.com | Official Site of the National Football League"

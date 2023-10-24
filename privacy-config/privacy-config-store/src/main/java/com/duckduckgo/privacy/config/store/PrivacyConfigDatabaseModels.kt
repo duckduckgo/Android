@@ -153,6 +153,7 @@ data class PrivacyConfig(
     val version: Long,
     val readme: String,
     val eTag: String?,
+    val timestamp: String?,
 )
 
 fun PrivacyConfig.toPrivacyConfigData(): PrivacyConfigData {

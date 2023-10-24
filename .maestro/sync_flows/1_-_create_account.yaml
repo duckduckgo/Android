@@ -1,4 +1,5 @@
 appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Sync can create an account"
 tags:
   - syncTest
 ---

@@ -27,6 +27,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.databinding.ItemTabBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -35,8 +37,6 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.global.image.GlideApp
-import com.duckduckgo.app.global.image.GlideRequests
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.duckduckgo.mobile.android.ui.view.show
@@ -76,7 +76,7 @@ class TabSwitcherAdapter(
     ) {
         val context = holder.binding.root.context
         val tab = getItem(position)
-        val glide = GlideApp.with(context)
+        val glide = Glide.with(context)
 
         holder.title.text = extractTabTitle(tab, context)
         updateUnreadIndicator(holder, tab)
@@ -123,7 +123,7 @@ class TabSwitcherAdapter(
             }
 
             bundle[DIFF_KEY_PREVIEW]?.let {
-                loadTabPreviewImage(tab, GlideApp.with(holder.binding.root), holder)
+                loadTabPreviewImage(tab, Glide.with(holder.binding.root), holder)
             }
 
             bundle[DIFF_KEY_TITLE]?.let {
@@ -148,7 +148,7 @@ class TabSwitcherAdapter(
 
     private fun loadTabPreviewImage(
         tab: TabEntity,
-        glide: GlideRequests,
+        glide: RequestManager,
         holder: TabViewHolder,
     ) {
         val previewFile = tab.tabPreviewFile

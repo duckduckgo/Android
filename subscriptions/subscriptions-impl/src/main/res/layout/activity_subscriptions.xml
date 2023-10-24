@@ -20,13 +20,22 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="com.duckduckgo.subscriptions.impl.SubscriptionsActivity">
+              tools:context="com.duckduckgo.subscriptions.impl.ui.SubscriptionsActivity">
 
     <include
             android:id="@+id/includeToolbar"
             layout="@layout/include_default_toolbar"/>
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress"
+            app:indicatorColor="?attr/daxColorSecondaryText"
+            android:indeterminate="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
     <ScrollView
+            android:id="@+id/container"
             android:fillViewport="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -172,28 +181,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/buyButtonPlan2"/>
-
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
-                    android:id="@+id/addDevices"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:buttonSize="small"
-                    app:layout_constraintBottom_toTopOf="@id/manageAccountButton"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginBottom="@dimen/keyline_4"
-                    android:text="Add Devices"/>
-
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
-                    android:id="@+id/manageAccountButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:buttonSize="small"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginBottom="@dimen/keyline_4"
-                    android:text="Manage Account"/>
 
             <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
                 android:id="@+id/recoverSubscriptionButton"

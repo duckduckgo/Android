@@ -1,8 +1,11 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
 
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.squareup.anvil'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.squareup.anvil'
+}
 apply from: '../versioning.gradle'
 apply from: "$rootDir/code-formatting.gradle"
 
@@ -174,6 +177,7 @@ dependencies {
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
     implementation project(':autofill-store')
+    internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
     anvil project(':anvil-compiler')
@@ -231,9 +235,6 @@ dependencies {
     implementation project(':secure-storage-api')
     implementation project(':secure-storage-impl')
     implementation project(':secure-storage-store')
-
-    implementation project(':device-auth-api')
-    implementation project(':device-auth-impl')
 
     implementation project(':ad-click-api')
     implementation project(':ad-click-impl')
@@ -298,7 +299,6 @@ dependencies {
         implementation project(':subscriptions-api')
         implementation project(':subscriptions-impl')
         implementation project(':subscriptions-store')
-        internalImplementation project(':subscriptions-internal')
         internalImplementation project(':network-protection-subscription-internal')
     }
 
@@ -307,6 +307,9 @@ dependencies {
 
     implementation project(':js-messaging-api')
     implementation project(':js-messaging-impl')
+
+    implementation project(':settings-api')
+    implementation project(':settings-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
@@ -365,7 +368,7 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation AndroidX.room.ktx
-    kapt AndroidX.room.compiler
+    ksp AndroidX.room.compiler
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
 
@@ -383,7 +386,7 @@ dependencies {
     // Glide
     implementation "com.github.bumptech.glide:glide:_"
     implementation "com.github.bumptech.glide:okhttp3-integration:_"
-    kapt "com.github.bumptech.glide:compiler:_"
+    ksp "com.github.bumptech.glide:ksp:_"
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"

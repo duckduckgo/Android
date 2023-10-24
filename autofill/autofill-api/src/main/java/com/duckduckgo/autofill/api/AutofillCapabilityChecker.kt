@@ -24,17 +24,20 @@ package com.duckduckgo.autofill.api
 interface AutofillCapabilityChecker {
 
     /**
-     * Whether autofill can inject credentials into a WebView.
+     * Whether autofill can inject credentials into a WebView for the given page.
+     * @param url The URL of the webpage to check.
      */
     suspend fun canInjectCredentialsToWebView(url: String): Boolean
 
     /**
-     * Whether autofill can save credentials from a WebView.
+     * Whether autofill can save credentials from a WebView for the given page.
+     * @param url The URL of the webpage to check.
      */
     suspend fun canSaveCredentialsFromWebView(url: String): Boolean
 
     /**
-     * Whether autofill can generate a password into a WebView
+     * Whether autofill can generate a password into a WebView for the given page.
+     * @param url The URL of the webpage to check.
      */
     suspend fun canGeneratePasswordFromWebView(url: String): Boolean
 

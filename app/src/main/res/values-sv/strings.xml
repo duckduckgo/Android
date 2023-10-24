@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Inställningar</string>
     <string name="settingsPermissionsSetting">Behörigheter</string>
     <string name="settingsAutofillLoginsSetting">Fyll i inloggningar automatiskt</string>
-    <string name="settingsSyncSetting">Synkronisering</string>
+    <string name="settingsSyncSetting">Synkronisering och säkerhetskopiering</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -767,4 +767,8 @@
     <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Din bokmärkesmapp för &lt;b&gt;%1$s&lt;/b&gt; kommer att raderas.</string>
     <string name="deleteSavedSiteConfirmationDialogCancel">Avbryt</string>
     <string name="deleteSavedSiteConfirmationDialogDelete">Ta bort</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Lägg till alternativet privat röstsökning i adressfältet Ljud lagras inte och delas inte med någon, inte ens DuckDuckGo.</string>
+    <string name="accessibilityVoiceSearchTitle">Privat röstsökning</string>
 </resources>

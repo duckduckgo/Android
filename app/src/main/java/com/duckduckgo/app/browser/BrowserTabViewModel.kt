@@ -438,7 +438,8 @@ class BrowserTabViewModel @Inject constructor(
             val originalUrl: String,
             val autoSaveLogin: Boolean,
         ) : Command()
-        class ShowEmailTooltip(val address: String) : Command()
+        class ShowEmailProtectionChooseEmailPrompt(val address: String) : Command()
+        object ShowEmailProtectionInContextSignUpPrompt : Command()
         sealed class DaxCommand : Command() {
             object FinishPartialTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -824,6 +825,15 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = HideKeyboard
         }
+
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
+                hasFocus = currentOmnibarViewState().isEditing,
+                query = currentOmnibarViewState().omnibarText,
+                hasQueryChanged = false,
+                urlLoaded = url ?: "",
+            ),
+        )
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
         }
@@ -1775,7 +1785,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
     private fun currentPrivacyShieldState(): PrivacyShieldViewState = privacyShieldViewState.value!!
 
-    fun onOmnibarInputStateChanged(
+    fun triggerAutocomplete(
         query: String,
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
@@ -1797,6 +1807,24 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             false
         }
+
+        autoCompleteViewState.value = currentAutoCompleteViewState()
+            .copy(
+                showSuggestions = showAutoCompleteSuggestions,
+                showFavorites = showFavoritesAsSuggestions,
+                searchResults = autoCompleteSearchResults,
+            )
+
+        if (hasFocus && autoCompleteSuggestionsEnabled) {
+            autoCompletePublishSubject.accept(query.trim())
+        }
+    }
+
+    fun onOmnibarInputStateChanged(
+        query: String,
+        hasFocus: Boolean,
+        hasQueryChanged: Boolean,
+    ) {
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
         val showPrivacyShield = !hasFocus
@@ -1805,9 +1833,12 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             isEditing = hasFocus,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                isEditing = hasFocus,
+                hasFocus = hasFocus,
+                query = query,
+                hasQueryChanged = hasQueryChanged,
                 urlLoaded = url ?: "",
             ),
+            omnibarText = query,
             forceExpand = true,
         )
 
@@ -1831,17 +1862,6 @@ class BrowserTabViewModel @Inject constructor(
         )
 
         Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
-
-        autoCompleteViewState.value = currentAutoCompleteViewState()
-            .copy(
-                showSuggestions = showAutoCompleteSuggestions,
-                showFavorites = showFavoritesAsSuggestions,
-                searchResults = autoCompleteSearchResults,
-            )
-
-        if (hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
-            autoCompletePublishSubject.accept(query.trim())
-        }
     }
 
     fun onBookmarkMenuClicked() {
@@ -2701,9 +2721,9 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
-    fun showEmailTooltip() {
+    fun showEmailProtectionChooseEmailPrompt() {
         emailManager.getEmailAddress()?.let {
-            command.postValue(ShowEmailTooltip(it))
+            command.postValue(ShowEmailProtectionChooseEmailPrompt(it))
         }
     }
 
@@ -2817,6 +2837,26 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(WebViewError(errorType, url))
     }
 
+    override fun recordErrorCode(error: String, url: String) {
+        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+        // called triggering a buildSite.
+        if (url != site?.url) {
+            site = siteFactory.buildSite(url)
+        }
+        Timber.d("recordErrorCode $error in ${site?.url}")
+        site?.onErrorDetected(error)
+    }
+
+    override fun recordHttpErrorCode(statusCode: Int, url: String) {
+        // when navigating from one page to another it can happen that errors are recorded before pageChanged etc. are
+        // called triggering a buildSite.
+        if (url != site?.url) {
+            site = siteFactory.buildSite(url)
+        }
+        Timber.d("recordHttpErrorCode $statusCode in ${site?.url}")
+        site?.onHttpErrorDetected(statusCode)
+    }
+
     fun onAutofillMenuSelected() {
         command.value = LaunchAutofillSettings
     }
@@ -2861,6 +2901,12 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             PrintAttributes.MediaSize.ISO_A4
         }
+    }
+
+    fun voiceSearchDisabled() {
+        omnibarViewState.value = currentOmnibarViewState().copy(
+            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url ?: ""),
+        )
     }
 
     companion object {

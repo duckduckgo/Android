@@ -185,14 +185,14 @@ class SavedSitesSyncDataProviderTest {
     @Test
     fun whenNewFavouritesSinceLastSyncThenChangesContainData() {
         val modificationTimestamp = DatabaseDateFormatter.iso8601()
-        val lastSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
-        setLastSyncTime(lastSyncTimestamp)
+        val lastServerSyncTimestamp = DatabaseDateFormatter.iso8601(twoHoursAgo)
+        setLastSyncTime(lastServerSyncTimestamp, modificationTimestamp)
 
         repository.insert(bookmark3.copy(lastModified = modificationTimestamp))
         repository.insert(bookmark4.copy(lastModified = modificationTimestamp))
         repository.insert(favourite1.copy(lastModified = modificationTimestamp))
 
-        val changes = parser.changesSince(lastSyncTimestamp)
+        val changes = parser.changesSince(lastServerSyncTimestamp)
 
         assertTrue(changes.isNotEmpty())
         assertTrue(changes[0].id == favoritesFolder.id)
@@ -335,8 +335,9 @@ class SavedSitesSyncDataProviderTest {
         assertTrue(changes[1].folder!!.children == listOf(bookmark1.id))
     }
 
-    private fun setLastSyncTime(lastSyncTimestamp: String) {
-        store.modifiedSince = lastSyncTimestamp
+    private fun setLastSyncTime(lastServerSyncTimestamp: String, lastClientSyncTimestmp: String = lastServerSyncTimestamp) {
+        store.serverModifiedSince = lastServerSyncTimestamp
+        store.clientModifiedSince = lastClientSyncTimestmp
     }
 
     private fun fromSavedSite(savedSite: SavedSite): SyncBookmarkEntry {

@@ -45,6 +45,23 @@
             app:primaryText="@string/sync_internal_environment_title"
             tools:secondaryText="@string/sync_internal_environment_subtitle_prod" />
 
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+            android:id="@+id/sync_recovery_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/keyline_4"
+            android:hint="@string/sync_internal_recovery_code"
+            app:editable="true"
+            app:type="single_line" />
+
+        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            android:id="@+id/sync_recovery_code_cta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:buttonSize="large"
+            android:text="@string/sync_internal_recovery_code_cta"/>
+
         <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

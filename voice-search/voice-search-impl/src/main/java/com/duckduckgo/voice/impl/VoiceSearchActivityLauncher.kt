@@ -17,14 +17,22 @@
 package com.duckduckgo.voice.impl
 
 import android.app.Activity
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import android.view.WindowInsets
 import androidx.activity.result.ActivityResultCaller
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchVoiceSearch
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
+import com.duckduckgo.voice.impl.R.string
+import com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity.Companion.VOICE_SEARCH_ERROR
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
+import com.duckduckgo.voice.store.VoiceSearchRepository
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -44,10 +52,13 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     private val blurRenderer: VoiceSearchBackgroundBlurRenderer,
     private val pixel: Pixel,
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper,
+    private val voiceSearchRepository: VoiceSearchRepository,
+    private val permissionRequest: VoiceSearchPermissionDialogsLauncher,
 ) : VoiceSearchActivityLauncher {
 
     companion object {
         private const val KEY_PARAM_SOURCE = "source"
+        private const val SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES = 3
     }
 
     private lateinit var _source: Source
@@ -68,14 +79,41 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
                             parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName),
                         )
+                        voiceSearchRepository.resetVoiceSearchDismissed()
                         onEvent(Event.VoiceRecognitionSuccess(data))
                     } else {
                         onEvent(Event.SearchCancelled)
                     }
                 } else {
-                    onEvent(Event.SearchCancelled)
+                    if (code == VOICE_SEARCH_ERROR) {
+                        pixel.fire(
+                            pixel = VoiceSearchPixelNames.VOICE_SEARCH_ERROR,
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName, "error" to data),
+                        )
+                        activity.window?.decorView?.rootView?.let {
+                            val snackbar = Snackbar.make(it, activity.getString(string.voiceSearchError), Snackbar.LENGTH_LONG)
+                            snackbar.view.translationY =
+                                if (VERSION.SDK_INT >= VERSION_CODES.R) {
+                                    (-activity.window.decorView.rootWindowInsets.getInsets(WindowInsets.Type.systemBars()).bottom).toFloat()
+                                } else {
+                                    (-activity.window.decorView.rootWindowInsets.systemWindowInsetBottom).toFloat()
+                                }
+                            snackbar.show()
+                        }
+                    } else {
+                        onEvent(Event.SearchCancelled)
+                    }
+                    voiceSearchRepository.dismissVoiceSearch()
+                    if (voiceSearchRepository.countVoiceSearchDismissed() >= SUGGEST_REMOVE_VOICE_SEARCH_AFTER_TIMES) {
+                        permissionRequest.showRemoveVoiceSearchDialog(
+                            activity,
+                            onRemoveVoiceSearch = {
+                                voiceSearchRepository.setVoiceSearchUserEnabled(false)
+                                onEvent(VoiceSearchDisabled)
+                            },
+                        )
+                    }
                 }
-
                 activity.window?.decorView?.rootView?.let {
                     blurRenderer.removeBlur(it)
                 }

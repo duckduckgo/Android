@@ -86,8 +86,9 @@ object DataSourceModule {
         remoteMessagesDao: RemoteMessagesDao,
         dispatchers: DispatcherProvider,
         messageMapper: MessageMapper,
+        userBrowserProperties: UserBrowserProperties,
     ): RemoteMessagingRepository {
-        return AppRemoteMessagingRepository(remoteMessagingConfigRepository, remoteMessagesDao, dispatchers, messageMapper)
+        return AppRemoteMessagingRepository(remoteMessagingConfigRepository, remoteMessagesDao, dispatchers, messageMapper, userBrowserProperties)
     }
 
     @Provides

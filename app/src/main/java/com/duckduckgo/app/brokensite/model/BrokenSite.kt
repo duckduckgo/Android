@@ -32,6 +32,8 @@ data class BrokenSite(
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
     val consentSelfTestFailed: Boolean,
+    val errorCodes: String,
+    val httpErrorCodes: String,
 )
 
 sealed class BrokenSiteCategory(

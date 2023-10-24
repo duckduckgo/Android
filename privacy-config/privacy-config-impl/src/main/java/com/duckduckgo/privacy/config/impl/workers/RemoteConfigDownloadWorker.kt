@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -50,7 +51,7 @@ class PrivacyConfigDownloadWorker(
     override suspend fun doWork(): Result {
         return withContext(dispatcherProvider.io()) {
             val result = privacyConfigDownloader.download()
-            return@withContext if (result) {
+            return@withContext if (result is Success) {
                 Result.success()
             } else {
                 Result.retry()

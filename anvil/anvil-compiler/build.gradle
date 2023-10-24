@@ -17,7 +17,7 @@
 plugins {
     id 'java-library'
     id 'kotlin'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp' version "$ksp_version"
 }
 
 apply from: "$rootProject.projectDir/code-formatting.gradle"
@@ -40,7 +40,7 @@ dependencies {
     implementation Google.dagger
     implementation project(":feature-toggles-api")
 
-    compileOnly "com.google.auto.service:auto-service-annotations:1.0"
-    kapt "com.google.auto.service:auto-service:1.0"
+    implementation "com.google.auto.service:auto-service-annotations:1.1.0"
+    ksp "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 }
 

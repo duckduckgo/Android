@@ -7110,8 +7110,11 @@ var _InterfacePrototype = _interopRequireDefault(require("./InterfacePrototype.j
 var _autofillUtils = require("../autofill-utils.js");
 var _NativeUIController = require("../UI/controllers/NativeUIController.js");
 var _appleUtils = require("@duckduckgo/content-scope-scripts/src/apple-utils");
+var _InContextSignup = require("../InContextSignup.js");
+var _deviceApiCalls = require("../deviceApiCalls/__generated__/deviceApiCalls.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 class AndroidInterface extends _InterfacePrototype.default {
+  inContextSignup = new _InContextSignup.InContextSignup(this);
   async isEnabled() {
     return (0, _autofillUtils.autofillEnabled)(this.globalConfig, _appleUtils.processConfig);
   }
@@ -7122,7 +7125,20 @@ class AndroidInterface extends _InterfacePrototype.default {
   async getAlias() {
     const {
       alias
-    } = await (0, _autofillUtils.sendAndWaitForAnswer)(() => {
+    } = await (0, _autofillUtils.sendAndWaitForAnswer)(async () => {
+      if (this.inContextSignup.isAvailable()) {
+        const {
+          isSignedIn
+        } = await this.deviceApi.request(new _deviceApiCalls.ShowInContextEmailProtectionSignupPromptCall(null));
+        // On Android we can't get the input type data again without
+        // refreshing the page, so instead we can mutate it now that we
+        // know the user has Email Protection available.
+        if (this.globalConfig.availableInputTypes) {
+          this.globalConfig.availableInputTypes.email = isSignedIn;
+        }
+        this.updateForStateChange();
+        this.onFinishedAutofill();
+      }
       return window.EmailInterface.showTooltip();
     }, 'getAliasResponse');
     return alias;
@@ -7153,7 +7169,9 @@ class AndroidInterface extends _InterfacePrototype.default {
     // ...on other domains we assume true because the script wouldn't exist otherwise
     return true;
   }
-  async setupAutofill() {}
+  async setupAutofill() {
+    await this.inContextSignup.init();
+  }
 
   /**
    * Used by the email web app
@@ -7210,6 +7228,14 @@ class AndroidInterface extends _InterfacePrototype.default {
       }
     }
   }
+
+  /**
+   * Used by the email web app
+   * Provides functionality to close the window after in-context sign-up or sign-in
+   */
+  closeEmailProtection() {
+    this.deviceApi.request(new _deviceApiCalls.CloseEmailProtectionTabCall(null));
+  }
   addLogoutListener(handler) {
     // Only deal with logging out if we're in the email web app
     if (!this.globalConfig.isDDGDomain) return;
@@ -7225,7 +7251,7 @@ class AndroidInterface extends _InterfacePrototype.default {
 }
 exports.AndroidInterface = AndroidInterface;
 
-},{"../UI/controllers/NativeUIController.js":56,"../autofill-utils.js":61,"./InterfacePrototype.js":27,"@duckduckgo/content-scope-scripts/src/apple-utils":1}],24:[function(require,module,exports){
+},{"../InContextSignup.js":44,"../UI/controllers/NativeUIController.js":56,"../autofill-utils.js":61,"../deviceApiCalls/__generated__/deviceApiCalls.js":65,"./InterfacePrototype.js":27,"@duckduckgo/content-scope-scripts/src/apple-utils":1}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9240,7 +9266,7 @@ function initFormSubmissionsApi(forms, matching) {
       const focusedForm = [...forms.values()].find(form => form.hasFocus(e));
       focusedForm?.submitHandler('global keydown + Enter');
     }
-  });
+  }, true);
 
   /**
    * Global pointer down events
@@ -16543,7 +16569,7 @@ const constants = exports.constants = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.StoreFormDataCall = exports.StartEmailProtectionSignupCall = exports.SetSizeCall = exports.SetIncontextSignupPermanentlyDismissedAtCall = exports.SendJSPixelCall = exports.SelectedDetailCall = exports.OpenManagePasswordsCall = exports.OpenManageIdentitiesCall = exports.OpenManageCreditCardsCall = exports.GetRuntimeConfigurationCall = exports.GetIncontextSignupDismissedAtCall = exports.GetAvailableInputTypesCall = exports.GetAutofillInitDataCall = exports.GetAutofillDataCall = exports.GetAutofillCredentialsCall = exports.EmailProtectionStoreUserDataCall = exports.EmailProtectionRemoveUserDataCall = exports.EmailProtectionRefreshPrivateAddressCall = exports.EmailProtectionGetUserDataCall = exports.EmailProtectionGetIsLoggedInCall = exports.EmailProtectionGetCapabilitiesCall = exports.EmailProtectionGetAddressesCall = exports.CloseEmailProtectionTabCall = exports.CloseAutofillParentCall = exports.CheckCredentialsProviderStatusCall = exports.AskToUnlockProviderCall = exports.AddDebugFlagCall = void 0;
+exports.StoreFormDataCall = exports.StartEmailProtectionSignupCall = exports.ShowInContextEmailProtectionSignupPromptCall = exports.SetSizeCall = exports.SetIncontextSignupPermanentlyDismissedAtCall = exports.SendJSPixelCall = exports.SelectedDetailCall = exports.OpenManagePasswordsCall = exports.OpenManageIdentitiesCall = exports.OpenManageCreditCardsCall = exports.GetRuntimeConfigurationCall = exports.GetIncontextSignupDismissedAtCall = exports.GetAvailableInputTypesCall = exports.GetAutofillInitDataCall = exports.GetAutofillDataCall = exports.GetAutofillCredentialsCall = exports.EmailProtectionStoreUserDataCall = exports.EmailProtectionRemoveUserDataCall = exports.EmailProtectionRefreshPrivateAddressCall = exports.EmailProtectionGetUserDataCall = exports.EmailProtectionGetIsLoggedInCall = exports.EmailProtectionGetCapabilitiesCall = exports.EmailProtectionGetAddressesCall = exports.CloseEmailProtectionTabCall = exports.CloseAutofillParentCall = exports.CheckCredentialsProviderStatusCall = exports.AskToUnlockProviderCall = exports.AddDebugFlagCall = void 0;
 var _validatorsZod = require("./validators.zod.js");
 var _deviceApi = require("../../../packages/device-api");
 /* DO NOT EDIT, this file was generated by scripts/api-call-generator.js */
@@ -16772,7 +16798,16 @@ exports.StartEmailProtectionSignupCall = StartEmailProtectionSignupCall;
 class CloseEmailProtectionTabCall extends _deviceApi.DeviceApiCall {
   method = "closeEmailProtectionTab";
 }
+/**
+ * @extends {DeviceApiCall<any, showInContextEmailProtectionSignupPromptSchema>} 
+ */
 exports.CloseEmailProtectionTabCall = CloseEmailProtectionTabCall;
+class ShowInContextEmailProtectionSignupPromptCall extends _deviceApi.DeviceApiCall {
+  method = "ShowInContextEmailProtectionSignupPrompt";
+  id = "ShowInContextEmailProtectionSignupPromptResponse";
+  resultValidator = _validatorsZod.showInContextEmailProtectionSignupPromptSchema;
+}
+exports.ShowInContextEmailProtectionSignupPromptCall = ShowInContextEmailProtectionSignupPromptCall;
 
 },{"../../../packages/device-api":12,"./validators.zod.js":66}],66:[function(require,module,exports){
 "use strict";
@@ -16780,7 +16815,7 @@ exports.CloseEmailProtectionTabCall = CloseEmailProtectionTabCall;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.userPreferencesSchema = exports.triggerContextSchema = exports.storeFormDataSchema = exports.setSizeParamsSchema = exports.setIncontextSignupPermanentlyDismissedAtSchema = exports.sendJSPixelParamsSchema = exports.selectedDetailParamsSchema = exports.runtimeConfigurationSchema = exports.providerStatusUpdatedSchema = exports.outgoingCredentialsSchema = exports.getRuntimeConfigurationResponseSchema = exports.getIncontextSignupDismissedAtSchema = exports.getAvailableInputTypesResultSchema = exports.getAutofillInitDataResponseSchema = exports.getAutofillDataResponseSchema = exports.getAutofillDataRequestSchema = exports.getAutofillCredentialsResultSchema = exports.getAutofillCredentialsParamsSchema = exports.getAliasResultSchema = exports.getAliasParamsSchema = exports.genericErrorSchema = exports.generatedPasswordSchema = exports.emailProtectionStoreUserDataParamsSchema = exports.emailProtectionRefreshPrivateAddressResultSchema = exports.emailProtectionGetUserDataResultSchema = exports.emailProtectionGetIsLoggedInResultSchema = exports.emailProtectionGetCapabilitiesResultSchema = exports.emailProtectionGetAddressesResultSchema = exports.credentialsSchema = exports.contentScopeSchema = exports.checkCredentialsProviderStatusResultSchema = exports.availableInputTypesSchema = exports.availableInputTypes1Schema = exports.autofillSettingsSchema = exports.autofillFeatureTogglesSchema = exports.askToUnlockProviderResultSchema = exports.apiSchema = exports.addDebugFlagParamsSchema = void 0;
+exports.userPreferencesSchema = exports.triggerContextSchema = exports.storeFormDataSchema = exports.showInContextEmailProtectionSignupPromptSchema = exports.setSizeParamsSchema = exports.setIncontextSignupPermanentlyDismissedAtSchema = exports.sendJSPixelParamsSchema = exports.selectedDetailParamsSchema = exports.runtimeConfigurationSchema = exports.providerStatusUpdatedSchema = exports.outgoingCredentialsSchema = exports.getRuntimeConfigurationResponseSchema = exports.getIncontextSignupDismissedAtSchema = exports.getAvailableInputTypesResultSchema = exports.getAutofillInitDataResponseSchema = exports.getAutofillDataResponseSchema = exports.getAutofillDataRequestSchema = exports.getAutofillCredentialsResultSchema = exports.getAutofillCredentialsParamsSchema = exports.getAliasResultSchema = exports.getAliasParamsSchema = exports.genericErrorSchema = exports.generatedPasswordSchema = exports.emailProtectionStoreUserDataParamsSchema = exports.emailProtectionRefreshPrivateAddressResultSchema = exports.emailProtectionGetUserDataResultSchema = exports.emailProtectionGetIsLoggedInResultSchema = exports.emailProtectionGetCapabilitiesResultSchema = exports.emailProtectionGetAddressesResultSchema = exports.credentialsSchema = exports.contentScopeSchema = exports.checkCredentialsProviderStatusResultSchema = exports.availableInputTypesSchema = exports.availableInputTypes1Schema = exports.autofillSettingsSchema = exports.autofillFeatureTogglesSchema = exports.askToUnlockProviderResultSchema = exports.apiSchema = exports.addDebugFlagParamsSchema = void 0;
 var _zod = require("zod");
 /* DO NOT EDIT, this file was generated by scripts/api-call-generator.js */
 // Generated by ts-to-zod
@@ -16842,6 +16877,11 @@ const emailProtectionStoreUserDataParamsSchema = exports.emailProtectionStoreUse
   token: _zod.z.string(),
   userName: _zod.z.string(),
   cohort: _zod.z.string()
+});
+const showInContextEmailProtectionSignupPromptSchema = exports.showInContextEmailProtectionSignupPromptSchema = _zod.z.object({
+  success: _zod.z.object({
+    isSignedIn: _zod.z.boolean()
+  })
 });
 const generatedPasswordSchema = exports.generatedPasswordSchema = _zod.z.object({
   value: _zod.z.string(),
@@ -17163,7 +17203,11 @@ const apiSchema = exports.apiSchema = _zod.z.object({
     resultValidator: emailProtectionRefreshPrivateAddressResultSchema.optional()
   })).optional(),
   startEmailProtectionSignup: _zod.z.record(_zod.z.unknown()).optional(),
-  closeEmailProtectionTab: _zod.z.record(_zod.z.unknown()).optional()
+  closeEmailProtectionTab: _zod.z.record(_zod.z.unknown()).optional(),
+  ShowInContextEmailProtectionSignupPrompt: _zod.z.record(_zod.z.unknown()).and(_zod.z.object({
+    id: _zod.z.literal("ShowInContextEmailProtectionSignupPromptResponse").optional(),
+    resultValidator: showInContextEmailProtectionSignupPromptSchema.optional()
+  })).optional()
 });
 
 },{"zod":9}],67:[function(require,module,exports){
@@ -17228,6 +17272,23 @@ class AndroidTransport extends _index.DeviceApiTransport {
     }
     if (deviceApiCall instanceof _deviceApiCalls.GetAvailableInputTypesCall) {
       return androidSpecificAvailableInputTypes(this.config);
+    }
+    if (deviceApiCall instanceof _deviceApiCalls.GetIncontextSignupDismissedAtCall) {
+      window.BrowserAutofill.getIncontextSignupDismissedAt(JSON.stringify(deviceApiCall.params));
+      return waitForResponse(deviceApiCall.id, this.config);
+    }
+    if (deviceApiCall instanceof _deviceApiCalls.SetIncontextSignupPermanentlyDismissedAtCall) {
+      return window.BrowserAutofill.setIncontextSignupPermanentlyDismissedAt(JSON.stringify(deviceApiCall.params));
+    }
+    if (deviceApiCall instanceof _deviceApiCalls.StartEmailProtectionSignupCall) {
+      return window.BrowserAutofill.startEmailProtectionSignup(JSON.stringify(deviceApiCall.params));
+    }
+    if (deviceApiCall instanceof _deviceApiCalls.CloseEmailProtectionTabCall) {
+      return window.BrowserAutofill.closeEmailProtectionTab(JSON.stringify(deviceApiCall.params));
+    }
+    if (deviceApiCall instanceof _deviceApiCalls.ShowInContextEmailProtectionSignupPromptCall) {
+      window.BrowserAutofill.showInContextEmailProtectionSignupPrompt(JSON.stringify(deviceApiCall.params));
+      return waitForResponse(deviceApiCall.id, this.config);
     }
     if (deviceApiCall instanceof _deviceApiCalls.GetAutofillDataCall) {
       window.BrowserAutofill.getAutofillData(JSON.stringify(deviceApiCall.params));

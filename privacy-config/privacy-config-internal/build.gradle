@@ -32,6 +32,8 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':privacy-config-api')
+    implementation project(path: ':privacy-config-impl')
+    implementation project(path: ':privacy-config-store')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
@@ -42,6 +44,8 @@ dependencies {
     implementation AndroidX.core.ktx
 
     implementation AndroidX.appCompat
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation Square.okHttp3.okHttp

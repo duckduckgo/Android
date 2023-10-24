@@ -141,6 +141,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             consentManaged = testCase.consentManaged.toBoolean(),
             consentOptOutFailed = testCase.consentOptOutFailed.toBoolean(),
             consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean(),
+            errorCodes = "",
+            httpErrorCodes = "",
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)

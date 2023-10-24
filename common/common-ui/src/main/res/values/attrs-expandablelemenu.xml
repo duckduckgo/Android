@@ -12,6 +12,7 @@
     <attr name="leadingIcon"/>
     <attr name="leadingIconBackground"/>
     <attr name="leadingIconSize"/>
+    <attr name="expandedLayout" format="reference" />
 
     <!--Exposed part-->
     <attr name="secondaryText"/>

@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.Share
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -66,7 +67,15 @@ class AppRemoteMessagingRepositoryTest {
 
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository = mock()
 
-    private val testee = AppRemoteMessagingRepository(remoteMessagingConfigRepository, dao, coroutineRule.testDispatcherProvider, getMessageMapper())
+    private val userBrowserProperties: UserBrowserProperties = mock()
+
+    private val testee = AppRemoteMessagingRepository(
+        remoteMessagingConfigRepository,
+        dao,
+        coroutineRule.testDispatcherProvider,
+        getMessageMapper(),
+        userBrowserProperties,
+    )
 
     @After
     fun after() {

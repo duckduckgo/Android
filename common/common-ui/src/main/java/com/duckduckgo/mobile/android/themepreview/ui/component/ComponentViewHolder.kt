@@ -22,12 +22,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
+import com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+import com.duckduckgo.mobile.android.ui.view.expand.daxExpandableMenuItem
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
 import com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
@@ -325,6 +328,34 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 setPrimaryButtonClickListener {
                     Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
                 }
+            }
+            view.findViewById<DaxExpandableMenuItem>(R.id.expandable3).customExpandedLayout?.apply {
+                findViewById<DaxButtonSecondary>(R.id.daxExpandableMenuItemSecondaryButton).apply {
+                    setOnClickListener {
+                        Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            view.findViewById<DaxExpandableMenuItem>(R.id.expandable4).apply {
+                LayoutInflater.from(context).inflate(R.layout.view_expandable_menu_item_expanded_layout_demo, this, false).apply {
+                    findViewById<DaxButtonSecondary>(R.id.daxExpandableMenuItemSecondaryButton).apply {
+                        setOnClickListener {
+                            Snackbar.make(this, component.name, Snackbar.LENGTH_SHORT).show()
+                        }
+                    }
+                    setExpandableMenuCustomLayout(this)
+                }
+            }
+
+            view.findViewById<LinearLayout>(R.id.expandableItemRootLayout).apply {
+                val expandableMenuItem = context.daxExpandableMenuItem {
+                    setPrimaryText("This is a Menu Item")
+                    setSecondaryText("Created using DSL")
+                    setPrimaryButtonClickListener {
+                        Snackbar.make(rootView, component.name, Snackbar.LENGTH_SHORT).show()
+                    }.build()
+                }
+                addView(expandableMenuItem)
             }
         }
     }

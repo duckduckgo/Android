@@ -37,6 +37,8 @@ data class BrokenSiteData(
     val consentOptOutFailed: Boolean,
     val consentSelfTestFailed: Boolean,
     val params: List<String>,
+    val errorCodes: List<String>,
+    val httpErrorCodes: String,
 ) {
     companion object {
         fun fromSite(site: Site?, params: List<String> = emptyList()): BrokenSiteData {
@@ -44,6 +46,8 @@ data class BrokenSiteData(
             val blockedTrackers = events?.filter { it.status == TrackerStatus.BLOCKED }
                 ?.map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
                 .orEmpty().distinct().joinToString(",")
+            val errorCodes = site?.errorCodeEvents.orEmpty()
+            val httErrorCodes = site?.httpErrorCodeEvents.orEmpty().distinct().joinToString(",")
             val upgradedHttps = site?.upgradedHttps ?: false
             val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
             val url = site?.url.orEmpty()
@@ -61,6 +65,8 @@ data class BrokenSiteData(
                 consentOptOutFailed = consentOptOutFailed,
                 consentSelfTestFailed = consentSelfTestFailed,
                 params = params,
+                errorCodes = errorCodes,
+                httpErrorCodes = httErrorCodes,
             )
         }
     }

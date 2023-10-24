@@ -18,6 +18,8 @@ package com.duckduckgo.mobile.android.vpn.integration
 
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
@@ -36,6 +38,8 @@ import dagger.SingleInstanceIn
 import java.lang.IllegalStateException
 import java.net.InetAddress
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
@@ -60,6 +64,8 @@ class NgVpnNetworkStack @Inject constructor(
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository,
     private val appTpLocalFeature: AppTpLocalFeature,
     private val deviceShieldPixels: DeviceShieldPixels,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
     private var tunnelThread: Thread? = null
@@ -157,6 +163,13 @@ class NgVpnNetworkStack @Inject constructor(
     override fun isDomainBlocked(domainRR: DomainRR): Boolean {
         logcat { "isDomainBlocked for $domainRR" }
         return !shouldAllowDomain(domainRR.name, domainRR.uid)
+    }
+
+    override fun reportTLSParsingError(errorCode: Int) {
+        logcat { "reportTLSParsingError called with errorCode: $errorCode" }
+        coroutineScope.launch(dispatcherProvider.io()) {
+            deviceShieldPixels.reportTLSParsingError(errorCode)
+        }
     }
 
     override fun isAddressBlocked(addressRR: AddressRR): Boolean {
