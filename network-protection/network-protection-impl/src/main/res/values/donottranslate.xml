@@ -254,5 +254,5 @@
     <string name="netpGeoswitchingDefaultTitle">Nearest Available</string>
     <string name="netpGeoswitchingDefaultSubtitle">Automatically connect to the nearest server we can find</string>
     <string name="netpGeoswitchingHeaderCustom">Custom</string>
-    <string name="netpGeoswitchingHeaderCountrySubtitle">%1$d cities</string>
+    <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d cities</string>
 </resources>

@@ -27,6 +27,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.CountryItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.DividerItem
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.GeoswitchingListItem.HeaderItem
@@ -48,6 +49,7 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val wgServerDebugProvider: WgServerDebugProvider,
     private val networkProtectionState: NetworkProtectionState,
+    private val networkProtectionPixels: NetworkProtectionPixels,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val viewState = MutableStateFlow(ViewState())
     internal fun viewState(): Flow<ViewState> = viewState.asStateFlow()
@@ -57,6 +59,10 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     )
 
     private var initialPreferredLocation: UserPreferredLocation? = null
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        networkProtectionPixels.reportGeoswitchingScreenShown()
+    }
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -82,6 +88,8 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     this.add(DividerItem)
                     this.add(HeaderItem(R.string.netpGeoswitchingHeaderCustom))
                     this.addAll(countryItems)
+                } else {
+                    networkProtectionPixels.reportGeoswitchingNoLocations()
                 }
             }
 
@@ -96,9 +104,18 @@ class NetpGeoSwitchingViewModel @Inject constructor(
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
         viewModelScope.launch(dispatcherProvider.io()) {
+            val newPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
             if (networkProtectionState.isEnabled()) {
-                if (initialPreferredLocation != netPGeoswitchingRepository.getUserPreferredLocation()) {
+                if (initialPreferredLocation != newPreferredLocation) {
                     networkProtectionState.restart()
+                }
+            }
+
+            if (initialPreferredLocation != newPreferredLocation) {
+                if (newPreferredLocation.countryCode != null) {
+                    networkProtectionPixels.reportPreferredLocationSetToCustom()
+                } else {
+                    networkProtectionPixels.reportPreferredLocationSetToNearest()
                 }
             }
         }
