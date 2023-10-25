@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Ve výchozím nastavení povoleno</string>
     <string name="settingsHeadingSettings">Nastavení</string>
     <string name="settingsPermissionsSetting">Oprávnění</string>
-    <string name="settingsAutofillLoginsSetting">Automatické vyplňování přihlašovacích údajů</string>
+    <string name="settingsAutofillLoginsSetting">Přihlášení</string>
     <string name="settingsSyncSetting">Synchronizace a zálohování</string>
     <string name="settingsFireButton">Fire Button</string>
 

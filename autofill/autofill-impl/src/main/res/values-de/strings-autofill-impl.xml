@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Anmeldedaten speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Nicht speichern</string>
-    <string name="saveLoginDialogSubtitle">Die Anmeldedaten werden auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
+    <string name="saveLoginDialogSubtitle">Anmeldedaten werden sicher auf deinem Gerät im Anmeldedaten-Menü gespeichert.</string>
     <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Anmeldedaten zuletzt aktualisiert: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Anmeldedaten speichern und automatisch ausfüllen</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Die Anmeldedaten werden sicher auf deinem Gerät gespeichert</string>
     <string name="credentialManagementViewMenuEdit">Bearbeiten</string>
     <string name="credentialManagementViewMenuDelete">Löschen</string>
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Noch keine Anmeldedaten gespeichert</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Die Anmeldedaten werden sicher auf deinem Gerät gespeichert.</string>
 
     <string name="autofillManagementAddLogin">Anmeldedaten hinzufügen</string>
     <string name="autofillManagementSearchLogins">Anmeldedaten suchen</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Benutzername kopiert</string>
     <string name="autofillManagementPasswordCopied">Passwort kopiert</string>
 
-    <string name="autofill_password_generation_offer_title">Generiertes Passwort von DuckDuckGo verwenden?</string>
-    <string name="autofill_password_generation_offer_message">Das Passwort wird in den Anmeldedaten gespeichert.</string>
-    <string name="autofill_password_generation_offer_accept">Generiertes Passwort verwenden</string>
+    <string name="autofill_password_generation_offer_title">Ein sicheres Passwort von DuckDuckGo verwenden?</string>
+    <string name="autofill_password_generation_offer_message">Passwörter werden sicher auf deinem Gerät im Anmeldedaten-Menü gespeichert.</string>
+    <string name="autofill_password_generation_offer_accept">Sicheres Passwort verwenden</string>
     <string name="autofill_password_generation_offer_decline">Eigenes erstellen</string>
 
     <string name="deviceNotSupportedTitle">Gerät nicht unterstützt</string>

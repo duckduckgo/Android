@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Saglabāt pieteikšanās datus</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginDialogNotNow">Nesaglabāt</string>
-    <string name="saveLoginDialogSubtitle">Pieteikšanās dati tiek droši saglabāti tavā ierīcē, un tos var pārvaldīt no iestatījumu izvēlnes Pieteikšanās dati.</string>
+    <string name="saveLoginDialogSubtitle">Pieteikšanās dati tiek droši saglabāti tavā ierīcē, izvēlnē Pieteikšanās dati.</string>
     <string name="saveLoginDialogTitle">Vai vēlies, lai DuckDuckGo saglabātu tavus pieteikšanās datus?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pieteikšanās dati pēdējo reizi atjaunināti %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Saglabāt un automātiski aizpildīt pieteikšanās datus</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Pieteikšanās dati tiek droši saglabāti tavā ierīcē</string>
     <string name="credentialManagementViewMenuEdit">Rediģēt</string>
     <string name="credentialManagementViewMenuDelete">Dzēst</string>
 
     <string name="credentialManagementSuggestionsLabel">Ieteikts</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nav saglabātu pieteikšanās datu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Pieteikšanās dati tiek droši saglabāti tavā ierīcē.</string>
 
     <string name="autofillManagementAddLogin">Pievienot pieteikšanās datus</string>
     <string name="autofillManagementSearchLogins">Meklēt pieteikšanās datus</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Lietotājvārds nokopēts</string>
     <string name="autofillManagementPasswordCopied">Parole nokopēta</string>
 
-    <string name="autofill_password_generation_offer_title">Vai izmantot DuckDuckGo ģenerētu paroli?</string>
-    <string name="autofill_password_generation_offer_message">Parole tiks saglabāta Pieteikšanās datos.</string>
-    <string name="autofill_password_generation_offer_accept">Izmantot ģenerētu paroli</string>
+    <string name="autofill_password_generation_offer_title">Vai izmantot spēcīgu DuckDuckGo paroli?</string>
+    <string name="autofill_password_generation_offer_message">Paroles tiek droši saglabātas tavā ierīcē, izvēlnē Pieteikšanās dati.</string>
+    <string name="autofill_password_generation_offer_accept">Izmantot spēcīgu paroli</string>
     <string name="autofill_password_generation_offer_decline">Izveidot savu</string>
 
     <string name="deviceNotSupportedTitle">Ierīce netiek atbalstīta</string>

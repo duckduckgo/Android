@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Lagre påloggingen</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke lagre</string>
-    <string name="saveLoginDialogSubtitle">Pålogginger lagres trygt på enheten din og kan administreres i påloggingsmenyen i innstillinger.</string>
+    <string name="saveLoginDialogSubtitle">Pålogginger lagres trygt på enheten din i påloggingsmenyen.</string>
     <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pålogging sist oppdatert %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Lagre og fyll inn pålogginger automatisk</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Pålogginger lagres på enheten din på en sikker måte</string>
     <string name="credentialManagementViewMenuEdit">Rediger</string>
     <string name="credentialManagementViewMenuDelete">Slett</string>
 
     <string name="credentialManagementSuggestionsLabel">Forslag</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen pålogginger er lagret ennå</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Pålogginger lagres på enheten din på en sikker måte.</string>
 
     <string name="autofillManagementAddLogin">Legg til pålogging</string>
     <string name="autofillManagementSearchLogins">Søk i pålogginger</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Brukernavnet er kopiert</string>
     <string name="autofillManagementPasswordCopied">Passordet er kopiert</string>
 
-    <string name="autofill_password_generation_offer_title">Vil du bruke et generert passord fra DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Passord blir lagret i pålogginger.</string>
-    <string name="autofill_password_generation_offer_accept">Bruk generert passord</string>
+    <string name="autofill_password_generation_offer_title">Vil du bruke et sterkt passord fra DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Passord lagres trygt på enheten din i påloggingsmenyen.</string>
+    <string name="autofill_password_generation_offer_accept">Bruk sterkt passord</string>
     <string name="autofill_password_generation_offer_decline">Opprett eget passord</string>
 
     <string name="deviceNotSupportedTitle">Enheten støttes ikke</string>
