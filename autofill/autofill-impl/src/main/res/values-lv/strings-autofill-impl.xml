@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Saglabāt pieteikšanās datus</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Saglabāt paroli</string>
-    <string name="saveLoginDialogNotNow">Ne tagad</string>
+    <string name="saveLoginDialogNotNow">Nesaglabāt</string>
     <string name="saveLoginDialogSubtitle">Pieteikšanās dati tiek droši saglabāti tavā ierīcē, un tos var pārvaldīt no iestatījumu izvēlnes Pieteikšanās dati.</string>
     <string name="saveLoginDialogTitle">Vai vēlies, lai DuckDuckGo saglabātu tavus pieteikšanās datus?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">No %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Atjaunināt paroli</string>
-    <string name="updateLoginDialogButtonNotNow">Ne tagad</string>
+    <string name="updateLoginDialogButtonNotNow">Nesaglabāt</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Atjaunināt lietotājvārdu?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Atjaunināt lietotājvārdu</string>
