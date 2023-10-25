@@ -19,19 +19,24 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.experiments.api.VariantManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@ExperimentalCoroutinesApi
 class DuckDuckGoRequestRewriterTest {
 
     private lateinit var testee: DuckDuckGoRequestRewriter
@@ -41,11 +46,21 @@ class DuckDuckGoRequestRewriterTest {
     private lateinit var builder: Uri.Builder
     private val currentUrl = "http://www.duckduckgo.com"
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariantKey()).thenReturn("DEFAULT_VARIANT")
+        whenever(mockVariantManager.getVariantKey()).thenReturn("")
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
-        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetectorImpl(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
+        testee = DuckDuckGoRequestRewriter(
+            DuckDuckGoUrlDetectorImpl(),
+            mockStatisticsStore,
+            mockVariantManager,
+            mockAppReferrerDataStore,
+            TestScope(),
+            coroutineTestRule.testDispatcherProvider,
+        )
         builder = Uri.Builder()
     }
 

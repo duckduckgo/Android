@@ -18,6 +18,7 @@ package com.duckduckgo.app.integration
 
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.getDaggerComponent
 import com.duckduckgo.app.global.plugins.PluginPoint
@@ -29,6 +30,8 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.experiments.api.VariantManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
@@ -46,6 +49,7 @@ import org.mockito.kotlin.whenever
  * Would normally have separate tests for each assertion, but these tests are relatively expensive to run.
  */
 @LargeTest
+@ExperimentalCoroutinesApi
 class AtbIntegrationTest {
 
     private lateinit var mockVariantManager: VariantManager
@@ -56,6 +60,9 @@ class AtbIntegrationTest {
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
@@ -71,7 +78,15 @@ class AtbIntegrationTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins, emailManager)
+        testee = StatisticsRequester(
+            statisticsStore,
+            service,
+            mockVariantManager,
+            plugins,
+            emailManager,
+            TestScope(),
+            coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test

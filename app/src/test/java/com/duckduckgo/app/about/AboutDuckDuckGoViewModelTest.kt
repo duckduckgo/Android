@@ -89,7 +89,7 @@ internal class AboutDuckDuckGoViewModelTest {
         testee.viewState().test {
             val value = awaitItem()
 
-            assertEquals("name (1)", value.version)
+            assertEquals("name DEFAULT_VARIANT (1)", value.version)
 
             cancelAndConsumeRemainingEvents()
         }

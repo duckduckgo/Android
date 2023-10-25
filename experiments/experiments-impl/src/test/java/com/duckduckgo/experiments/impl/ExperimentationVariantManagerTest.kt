@@ -18,6 +18,8 @@ package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
+import java.util.Locale
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -42,6 +44,7 @@ class ExperimentationVariantManagerTest {
     fun setup() {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
+        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(emptyList())
 
         testee = VariantManagerImpl(
             mockStore,
@@ -53,7 +56,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantAlreadyPersistedThenVariantReturned() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
+        addActiveVariantToConfig()
         whenever(mockStore.variant).thenReturn("foo")
 
         assertEquals("foo", testee.getVariantKey())
@@ -61,7 +64,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantAlreadyPersistedThenVariantAllocatorNeverInvoked() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
+        addActiveVariantToConfig()
         whenever(mockStore.variant).thenReturn("foo")
 
         testee.getVariantKey()
@@ -78,7 +81,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
+        addActiveVariantToConfig()
         whenever(mockStore.variant).thenReturn("bar")
 
         assertEquals(testee.defaultVariantKey(), testee.getVariantKey())
@@ -86,26 +89,24 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenNewVariantIsPersisted() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
-
+        addActiveVariantToConfig()
         whenever(mockStore.variant).thenReturn("bar")
-        testee.getVariantKey()
 
+        testee.getVariantKey()
         verify(mockStore).variant = testee.defaultVariantKey()
     }
 
     @Test
     fun whenNoVariantPersistedThenNewVariantAllocated() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
+        addActiveVariantToConfig()
 
         testee.getVariantKey()
-
         verify(mockRandomizer).random(any())
     }
 
     @Test
     fun whenNoVariantPersistedThenNewVariantKeyIsAllocatedAndPersisted() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
+        addActiveVariantToConfig()
 
         testee.getVariantKey()
 
@@ -114,36 +115,20 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantDoesNotComplyWithFiltersThenDefaultVariantIsPersisted() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { false }))
+        val locale = Locale("en", "US")
+        Locale.setDefault(locale)
+        addActiveVariantToConfig(localeFilter = listOf("de_DE"))
 
         testee.getVariantKey()
 
         verify(mockStore).variant = testee.defaultVariantKey()
-    }
-
-    @Test
-    fun whenVariantDoesNotComplyWithFiltersUsingAppBuildConfigThenDefaultVariantIsPersisted() {
-        whenever(appBuildConfig.sdkInt).thenReturn(10)
-        activeVariants.add(Variant("foo", 100.0, filterBy = { config -> config.sdkInt == 11 }))
-
-        testee.getVariantKey()
-
-        verify(mockStore).variant = testee.defaultVariantKey()
-    }
-
-    @Test
-    fun whenVariantDoesComplyWithFiltersUsingAppBuildConfigThenDefaultVariantIsPersisted() {
-        whenever(appBuildConfig.sdkInt).thenReturn(10)
-        activeVariants.add(Variant("foo", 100.0, filterBy = { config -> config.sdkInt == 10 }))
-
-        testee.getVariantKey()
-
-        verify(mockStore).variant = "foo"
     }
 
     @Test
     fun whenVariantDoesComplyWithFiltersThenNewVariantKeyIsAllocatedAndPersisted() {
-        activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
+        val locale = Locale("en", "US")
+        Locale.setDefault(locale)
+        addActiveVariantToConfig(localeFilter = listOf("en_US"))
 
         testee.getVariantKey()
 
@@ -185,6 +170,11 @@ class ExperimentationVariantManagerTest {
         val newVariant = testee.getVariantKey()
         Assert.assertNotEquals(originalVariant, newVariant)
         assertEquals("xx", newVariant)
+    }
+
+    private fun addActiveVariantToConfig(variantKey: String = "foo", localeFilter: List<String> = emptyList()) {
+        val testVariantEntity = ExperimentVariantEntity(variantKey, 1.0, localeFilter)
+        whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
     }
 
     private fun mockUpdateScenario(key: String) {

@@ -21,9 +21,12 @@ import org.junit.Test
 
 class VariantManagerTest {
 
-    private val variants = VariantManagerImpl.ACTIVE_VARIANTS +
-        VariantManagerImpl.REFERRER_VARIANTS +
-        VariantManagerImpl.DEFAULT_VARIANT
+    private val variants = listOf(
+        Variant("sc", 0.0) { true },
+        Variant("se", 0.0) { true },
+        Variant("ma", 1.0) { true },
+        Variant("mb", 1.0) { false },
+    )
 
     // SERP Experiment(s)
 

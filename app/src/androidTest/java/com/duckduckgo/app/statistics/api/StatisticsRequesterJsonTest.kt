@@ -19,6 +19,7 @@ package com.duckduckgo.app.statistics.api
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.AppUrl.ParamKey
@@ -33,6 +34,8 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -48,6 +51,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 
+@ExperimentalCoroutinesApi
 class StatisticsRequesterJsonTest {
 
     private var mockVariantManager: VariantManager = mock()
@@ -60,8 +64,10 @@ class StatisticsRequesterJsonTest {
     private val server = MockWebServer()
 
     @get:Rule
-    @Suppress("unused")
     val schedulers = InstantSchedulersRule()
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
@@ -75,7 +81,15 @@ class StatisticsRequesterJsonTest {
                 return listOf()
             }
         }
-        testee = StatisticsRequester(statisticsStore, statisticsService, mockVariantManager, plugins, mockEmailManager)
+        testee = StatisticsRequester(
+            statisticsStore,
+            statisticsService,
+            mockVariantManager,
+            plugins,
+            mockEmailManager,
+            TestScope(),
+            coroutineTestRule.testDispatcherProvider,
+        )
         whenever(mockVariantManager.getVariantKey()).thenReturn("ma")
     }
 
