@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.metrics
+package com.duckduckgo.networkprotection.impl.connectionclass
 
 import android.net.InetAddresses
 import android.os.Build
