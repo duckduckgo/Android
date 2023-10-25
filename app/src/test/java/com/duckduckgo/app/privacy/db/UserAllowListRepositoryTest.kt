@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import junit.framework.TestCase.assertEquals
@@ -27,6 +28,7 @@ import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -34,10 +36,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class UserAllowListRepositoryTest {
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
@@ -50,7 +52,6 @@ class UserAllowListRepositoryTest {
     private lateinit var dao: UserAllowListDao
     private lateinit var repository: UserAllowListRepository
 
-    @ExperimentalCoroutinesApi
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -84,5 +85,36 @@ class UserAllowListRepositoryTest {
     fun whenDbDoesNotContainUserAllowListedDomainThenIsUrlInAllowListReturnsFalse() {
         dao.insert("example.com")
         assertFalse(repository.isUrlInUserAllowList("https://foo.com"))
+    }
+
+    @Test
+    fun whenDomainIsAddedToUserAllowListThenItGetsInsertedIntoDb() = runTest {
+        assertFalse(dao.contains("example.com"))
+        repository.addDomainToUserAllowList("example.com")
+        assertTrue(dao.contains("example.com"))
+    }
+
+    @Test
+    fun whenDomainIsRemovedFromUserAllowListThenItGetsDeletedFromDb() = runTest {
+        dao.insert("example.com")
+        assertTrue(dao.contains("example.com"))
+        repository.removeDomainFromUserAllowList("example.com")
+        assertFalse(dao.contains("example.com"))
+    }
+
+    @Test
+    fun whenAllowlistIsModifiedThenFlowEmitsEvent() = runTest {
+        repository.domainsInUserAllowListFlow()
+            .test {
+                assertEquals(emptyList<String>(), awaitItem())
+
+                repository.addDomainToUserAllowList("flowdomain.com")
+                assertEquals(listOf("flowdomain.com"), awaitItem())
+
+                repository.removeDomainFromUserAllowList("flowdomain.com")
+                assertEquals(emptyList<String>(), awaitItem())
+
+                cancelAndConsumeRemainingEvents()
+            }
     }
 }
