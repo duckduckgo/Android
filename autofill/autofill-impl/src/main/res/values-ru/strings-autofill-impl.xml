@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Сохранить логин</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
-    <string name="saveLoginDialogNotNow">Не сейчас</string>
+    <string name="saveLoginDialogNotNow">Не сохранять</string>
     <string name="saveLoginDialogSubtitle">Учетные данные надежно хранятся на вашем устройстве, а проконтролировать их можно в меню «Логины» в «Настройках».</string>
     <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">С %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Обновить пароль</string>
-    <string name="updateLoginDialogButtonNotNow">Не сейчас</string>
+    <string name="updateLoginDialogButtonNotNow">Не сохранять</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Обновить имя пользователя?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Обновить имя пользователя</string>

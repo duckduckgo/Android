@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Gem login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
-    <string name="saveLoginDialogNotNow">Ikke nu</string>
+    <string name="saveLoginDialogNotNow">Gem ikke</string>
     <string name="saveLoginDialogSubtitle">Logins gemmes sikkert på din enhed og kan administreres fra menuen Logins i Indstillinger.</string>
     <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme dit login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Opdater adgangskode</string>
-    <string name="updateLoginDialogButtonNotNow">Ikke nu</string>
+    <string name="updateLoginDialogButtonNotNow">Gem ikke</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Opdater brugernavn?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Opdater brugernavn</string>
