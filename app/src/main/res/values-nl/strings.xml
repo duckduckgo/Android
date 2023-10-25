@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over DuckDuckGo</string>
-    <string name="aboutDescription">
-        Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\n\nDe DuckDuckGo Privacy Browser biedt alle essentiële facetten van privacy die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, zoals het blokkeren van trackers, slimmere versleuteling en privézoekopdrachten.\n\nHet internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
-    <string name="aboutMoreLink">Meer informatie op duckduckgo.com/about</string>
+    <string name="aboutHeader">Welkom bij de Duck kant!</string>
+    <string name="aboutDescription">DuckDuckGo is het onafhankelijke internetprivacybedrijf, opgericht in 2008, voor iedereen die het beu is om online gevolgd te worden en daar een eenvoudige oplossing voor wil. Wij zijn het bewijs dat je privacy op internet écht beschermd kan worden zonder compromissen.\n\nDe DuckDuckGo-browser bevat alle functies die je van een gewone browser mag verwachten, zoals bladwijzers, tabbladen, wachtwoorden en meer, plus meer dan <annotation type="privacy_protection_link">een dozijn krachtige functies voor privacybescherming</annotation> die je standaard niet vindt in de populairste browsers. Deze unieke, uitgebreide privacybescherming helpt je online activiteiten te beschermen – of je nu zoekt, surft of mailt.\n\nJe hoeft niets te weten over de technische details of ingewikkelde instellingen om te profiteren van onze privacybescherming. Je hoeft alleen maar DuckDuckGo op al je apparaten te installeren en geniet dan standaard van privacy.\n\nWil je toch een kijkje nemen onder de motorkap? Op onze <annotation type="learn_more_link">hulppagina\'s</annotation> vind je meer informatie over hoe de privacybescherming van DuckDuckGo werkt.</string>
     <string name="no_suggestions">Geen suggesties</string>
 
     <!-- Broken Site Activity -->
