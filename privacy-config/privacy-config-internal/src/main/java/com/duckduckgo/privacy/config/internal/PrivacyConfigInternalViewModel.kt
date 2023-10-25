@@ -22,10 +22,10 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.config.api.ConfigDownloadResult.Error
+import com.duckduckgo.privacy.config.api.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
-import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
-import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
-import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigDownloaded
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigError
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.Loading

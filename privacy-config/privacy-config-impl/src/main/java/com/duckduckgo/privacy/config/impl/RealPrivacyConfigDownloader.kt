@@ -19,16 +19,14 @@ package com.duckduckgo.privacy.config.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
-import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
+import com.duckduckgo.privacy.config.api.ConfigDownloadResult
+import com.duckduckgo.privacy.config.api.ConfigDownloadResult.Error
+import com.duckduckgo.privacy.config.api.ConfigDownloadResult.Success
+import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
-
-interface PrivacyConfigDownloader {
-    suspend fun download(): ConfigDownloadResult
-}
 
 @WorkerThread
 @ContributesBinding(AppScope::class)
@@ -60,9 +58,4 @@ class RealPrivacyConfigDownloader @Inject constructor(
             Success
         }
     }
-}
-
-sealed class ConfigDownloadResult {
-    object Success : ConfigDownloadResult()
-    data class Error(val error: String?) : ConfigDownloadResult()
 }

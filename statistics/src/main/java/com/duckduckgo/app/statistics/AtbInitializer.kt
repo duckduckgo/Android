@@ -22,6 +22,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -41,6 +42,7 @@ class AtbInitializer(
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: Set<AtbInitializerListener>,
+    private val privacyConfigDownloader: PrivacyConfigDownloader,
 ) : MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
@@ -57,10 +59,11 @@ class AtbInitializer(
         initializeAtb()
     }
 
-    private fun initializeAtb() {
+    private suspend fun initializeAtb() {
         if (statisticsDataStore.hasInstallationStatistics) {
             statisticsUpdater.refreshAppRetentionAtb()
         } else {
+            privacyConfigDownloader.download()
             statisticsUpdater.initializeAtb()
         }
     }

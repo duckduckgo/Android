@@ -41,5 +41,3 @@ class ExperimentsSharedPreferences @Inject constructor(private val context: Cont
         const val KEY_VARIANT_MANAGER_DOWNLOADED = "VARIANT_MANAGER_DOWNLOADED"
     }
 }
-
-

@@ -33,6 +33,7 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':autofill-api')
     implementation project(path: ':experiments-api')
+    implementation project(path: ':privacy-config-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core

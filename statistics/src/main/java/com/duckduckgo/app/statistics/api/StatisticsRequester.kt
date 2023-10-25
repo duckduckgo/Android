@@ -17,6 +17,8 @@
 package com.duckduckgo.app.statistics.api
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -26,6 +28,8 @@ import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface StatisticsUpdater {
@@ -41,6 +45,8 @@ class StatisticsRequester @Inject constructor(
     private val variantManager: VariantManager,
     private val plugins: PluginPoint<RefreshRetentionAtbPlugin>,
     private val emailManager: EmailManager,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatchers: DispatcherProvider,
 ) : StatisticsUpdater {
 
     /**
@@ -100,25 +106,27 @@ class StatisticsRequester @Inject constructor(
             return
         }
 
-        val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
-        val retentionAtb = store.searchRetentionAtb ?: atb.version
+        appCoroutineScope.launch(dispatchers.io()) {
+            val fullAtb = atb.formatWithVariant(variantManager.getVariantKey())
+            val retentionAtb = store.searchRetentionAtb ?: atb.version
 
-        service
-            .updateSearchAtb(
-                atb = fullAtb,
-                retentionAtb = retentionAtb,
-                email = emailSignInState(),
-            )
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                {
-                    Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
-                    store.searchRetentionAtb = it.version
-                    storeUpdateVersionIfPresent(it)
-                    plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
-                },
-                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") },
-            )
+            service
+                .updateSearchAtb(
+                    atb = fullAtb,
+                    retentionAtb = retentionAtb,
+                    email = emailSignInState(),
+                )
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                    {
+                        Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
+                        store.searchRetentionAtb = it.version
+                        storeUpdateVersionIfPresent(it)
+                        plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
+                    },
+                    { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") },
+                )
+        }
     }
 
     @SuppressLint("CheckResult")

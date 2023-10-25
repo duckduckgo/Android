@@ -33,7 +33,7 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
+import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigDownloaded
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalViewModel.Command.ConfigError

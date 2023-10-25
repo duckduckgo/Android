@@ -26,7 +26,6 @@ import javax.inject.Inject
 interface ExperimentVariantRepository {
     fun updateVariants(variantEntityList: List<ExperimentVariantEntity>)
     fun getActiveVariants(): List<ExperimentVariantEntity>
-    fun variantConfigDownloaded()
     fun isVariantManagerConfigReady(): Boolean
 }
 
@@ -43,10 +42,6 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
 
     override fun getActiveVariants(): List<ExperimentVariantEntity> {
         return experimentVariantDao.variants().filter { it.weight != null && it.weight > 0.0 }.toList()
-    }
-
-    override fun variantConfigDownloaded() {
-        experimentsDataStore.variantManagerConfigDownloaded = true
     }
 
     override fun isVariantManagerConfigReady(): Boolean = experimentsDataStore.variantManagerConfigDownloaded

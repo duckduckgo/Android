@@ -19,8 +19,8 @@ package com.duckduckgo.privacy.config.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
-import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
+import com.duckduckgo.privacy.config.api.ConfigDownloadResult.Error
+import com.duckduckgo.privacy.config.api.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import kotlinx.coroutines.ExperimentalCoroutinesApi

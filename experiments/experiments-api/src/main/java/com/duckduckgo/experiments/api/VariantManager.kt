@@ -38,10 +38,4 @@ interface VariantManager {
      * has been updated.
      */
     fun saveVariants(variants: List<VariantConfig>)
-
-    /**
-     * Updates the configDownloaded flag to indicate that the variant should be assigned,
-     * as the variantManager config is now ready
-     */
-    fun variantConfigDownloaded()
 }

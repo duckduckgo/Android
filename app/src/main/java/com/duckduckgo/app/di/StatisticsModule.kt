@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -55,8 +56,9 @@ object StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
         listeners: DaggerSet<AtbInitializerListener>,
+        privacyConfigDownloader: PrivacyConfigDownloader,
     ): MainProcessLifecycleObserver {
-        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners)
+        return AtbInitializer(appCoroutineScope, statisticsDataStore, statisticsUpdater, listeners, privacyConfigDownloader)
     }
 
     @SingleInstanceIn(AppScope::class)

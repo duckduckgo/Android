@@ -46,7 +46,7 @@ class VariantManagerImpl @Inject constructor(
         val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
         val currentVariantKey = store.variant
 
-        if (!experimentVariantRepository.isVariantManagerConfigReady() || currentVariantKey == DEFAULT_VARIANT.key) {
+        if (currentVariantKey == DEFAULT_VARIANT.key) {
             return DEFAULT_VARIANT.key
         }
 
@@ -87,10 +87,6 @@ class VariantManagerImpl @Inject constructor(
             )
         }
         experimentVariantRepository.updateVariants(variantEntityList)
-    }
-
-    override fun variantConfigDownloaded() {
-        experimentVariantRepository.variantConfigDownloaded()
     }
 
     private fun convertEntitiesToVariants(activeVariantEntities: List<ExperimentVariantEntity>): List<Variant> {
