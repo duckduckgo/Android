@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Continuă să salvezi</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Dezactivează</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Ascunde-ți e-mailul și blochează tehnologiile de urmărire</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Protecția comunicațiilor prin e-mail</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Creează o adresă unică, aleatorie, care elimină și tehnologiile de urmărire ascunse și redirecționează e-mailurile către căsuța ta de inbox.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Protejează-mi adresa de e-mail</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Nu mai afișa</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Dacă ieșiți acum, Duck Address nu va fi salvată</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Continuă configurarea</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Ieși din configurare</string>
+
 </resources>
