@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Запазване на данните за вход</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
-    <string name="saveLoginDialogNotNow">Не сега</string>
+    <string name="saveLoginDialogNotNow">Не записвай</string>
     <string name="saveLoginDialogSubtitle">Данните за вход са сигурно съхранени само на Вашето устройство и могат да се управляват от менюто Данни за вход в Настройки.</string>
     <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази данните за вход?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">От %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Актуализиране на паролата</string>
-    <string name="updateLoginDialogButtonNotNow">Не сега</string>
+    <string name="updateLoginDialogButtonNotNow">Не записвай</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Актуализиране на потребителското име?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Актуализиране на потребителското име</string>
