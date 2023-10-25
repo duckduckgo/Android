@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Login opslaan</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Wachtwoord opslaan</string>
-    <string name="saveLoginDialogNotNow">Niet nu</string>
+    <string name="saveLoginDialogNotNow">Niet opslaan</string>
     <string name="saveLoginDialogSubtitle">Aanmeldgegevens worden veilig opgeslagen op je apparaat en kunnen worden beheerd via het menu Aanmeldgegevens in Instellingen.</string>
     <string name="saveLoginDialogTitle">Wil je dat DuckDuckGo je login opslaat?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Van %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Wachtwoord bijwerken</string>
-    <string name="updateLoginDialogButtonNotNow">Niet nu</string>
+    <string name="updateLoginDialogButtonNotNow">Niet opslaan</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Gebruikersnaam bijwerken?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Gebruikersnaam bijwerken</string>

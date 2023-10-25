@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Išsaugoti prisijungimą</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
-    <string name="saveLoginDialogNotNow">Ne dabar</string>
+    <string name="saveLoginDialogNotNow">Neišsaugokite</string>
     <string name="saveLoginDialogSubtitle">Prisijungimai saugiai laikomi tik šiame įrenginyje, o juos galima tvarkyti nustatymuose, prisijungimų meniu.</string>
     <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų prisijungimą?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Iš %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Atnaujinti slaptažodį</string>
-    <string name="updateLoginDialogButtonNotNow">Ne dabar</string>
+    <string name="updateLoginDialogButtonNotNow">Neišsaugokite</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Atnaujinti naudotojo vardą?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Atnaujinti naudotojo vardą</string>

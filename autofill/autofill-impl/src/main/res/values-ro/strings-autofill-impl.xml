@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Salvează autentificarea</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
-    <string name="saveLoginDialogNotNow">Nu acum</string>
+    <string name="saveLoginDialogNotNow">Nu salva</string>
     <string name="saveLoginDialogSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău și pot fi gestionate din Setări, meniul Date de conectare.</string>
     <string name="saveLoginDialogTitle">Vrei ca DuckDuckGo să îți salveze datele de conectare?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Din %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Actualizează parola</string>
-    <string name="updateLoginDialogButtonNotNow">Nu acum</string>
+    <string name="updateLoginDialogButtonNotNow">Nu salva</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Actualizezi numele de utilizator?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Actualizează numele de utilizator</string>

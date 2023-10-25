@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
-    <string name="saveLoginDialogNotNow">Όχι τώρα</string>
+    <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
     <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια στη συσκευή σας και η διαχείρισή τους γίνεται από το μενού Συνδέσεις, στις Ρυθμίσεις.</string>
     <string name="saveLoginDialogTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Από %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Ενημέρωση κωδικού πρόσβασης</string>
-    <string name="updateLoginDialogButtonNotNow">Όχι τώρα</string>
+    <string name="updateLoginDialogButtonNotNow">Να μην αποθηκευτεί</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Ενημέρωση ονόματος χρήστη;</string>
     <string name="updateLoginDialogButtonUpdateUsername">Ενημέρωση ονόματος χρήστη</string>
