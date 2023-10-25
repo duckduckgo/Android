@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Girişi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
-    <string name="saveLoginDialogNotNow">Şimdi Değil</string>
+    <string name="saveLoginDialogNotNow">Kaydetme</string>
     <string name="saveLoginDialogSubtitle">Giriş bilgileri yalnızca bu cihazda güvenli bir şekilde saklanır ve Ayarlar\'daki Giriş Bilgileri menüsünden yönetilebilir.</string>
     <string name="saveLoginDialogTitle">DuckDuckGo\'nun Girişinizi kaydetmesini istiyor musunuz?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">%1$s adresinden</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Şifreyi Güncelle</string>
-    <string name="updateLoginDialogButtonNotNow">Şimdi Değil</string>
+    <string name="updateLoginDialogButtonNotNow">Kaydetme</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Kullanıcı adı güncellensin mi?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Kullanıcı Adını Güncelle</string>

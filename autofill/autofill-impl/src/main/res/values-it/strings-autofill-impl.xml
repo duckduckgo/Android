@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Salva dati di accesso</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salva password</string>
-    <string name="saveLoginDialogNotNow">Non adesso</string>
+    <string name="saveLoginDialogNotNow">Non salvare</string>
     <string name="saveLoginDialogSubtitle">I dati di accesso sono archiviati in modo sicuro sul tuo dispositivo e possono essere gestiti dal menu Accessi, in Impostazioni.</string>
     <string name="saveLoginDialogTitle">Vuoi che DuckDuckGo salvi i dati di accesso?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Altre opzioni</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Da %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Aggiorna password</string>
-    <string name="updateLoginDialogButtonNotNow">Non adesso</string>
+    <string name="updateLoginDialogButtonNotNow">Non salvare</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Aggiornare nome utente?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Aggiorna nome utente</string>
