@@ -16,9 +16,16 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.FakeNetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
+import com.duckduckgo.networkprotection.impl.waitlist.FakeNetPRemoteFeatureFactory
+import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -28,6 +35,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealWgServerApiTest {
@@ -38,9 +46,13 @@ class RealWgServerApiTest {
     private lateinit var geoswitchingRepository: FakeNetPGeoswitchingRepository
     private lateinit var productionApi: RealWgServerApi
     private lateinit var internalApi: RealWgServerApi
+    private lateinit var netPRemoteFeature: NetPRemoteFeature
 
     @Mock
     private lateinit var netpEgressServersProvider: NetpEgressServersProvider
+
+    @Mock
+    private lateinit var appBuildConfig: AppBuildConfig
 
     @Before
     fun setUp() {
@@ -49,19 +61,25 @@ class RealWgServerApiTest {
         productionWgServerDebugProvider = DefaultWgServerDebugProvider()
         internalWgServerDebugProvider = FakeWgServerDebugProvider(wgVpnControllerService)
         geoswitchingRepository = FakeNetPGeoswitchingRepository()
+        netPRemoteFeature = FakeNetPRemoteFeatureFactory.create()
 
         internalApi = RealWgServerApi(
             wgVpnControllerService,
             internalWgServerDebugProvider,
             netpEgressServersProvider,
             geoswitchingRepository,
+            netPRemoteFeature,
+            appBuildConfig,
         )
         productionApi = RealWgServerApi(
             wgVpnControllerService,
             productionWgServerDebugProvider,
             netpEgressServersProvider,
             geoswitchingRepository,
+            netPRemoteFeature,
+            appBuildConfig,
         )
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
     }
 
     @Test
@@ -163,7 +181,9 @@ class RealWgServerApiTest {
     }
 
     @Test
-    fun whenUserPreferredCountrySetThenRegisterPublicKeyShouldRequestForCountry() = runTest {
+    fun whenUserPreferredCountrySetAndShowVPNSettingsEnabledThenRegisterPublicKeyShouldRequestForCountry() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.showVpnSettings().setEnabled(Toggle.State(enable = true))
         geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "nl"))
 
         assertEquals(
@@ -181,7 +201,29 @@ class RealWgServerApiTest {
     }
 
     @Test
-    fun whenUserPreferredLocationSetThenRegisterPublicKeyShouldRequestForCountryAndCity() = runTest {
+    fun whenUserPreferredCountrySetAndInternalThenRegisterPublicKeyShouldRequestForCountry() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        netPRemoteFeature.showVpnSettings().setEnabled(Toggle.State(enable = false))
+        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "nl"))
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.euw.2",
+                publicKey = "4PnM/V0CodegK44rd9fKTxxS9QDVTw13j8fxKsVud3s=",
+                publicEndpoint = "31.204.129.39:443",
+                address = "",
+                location = "Rotterdam, NL",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            productionApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenUserPreferredLocationSetAndShowVPNSettingsEnabledThenRegisterPublicKeyShouldRequestForCountry() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.showVpnSettings().setEnabled(Toggle.State(enable = true))
         geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Des Moines"))
 
         assertEquals(
@@ -191,6 +233,66 @@ class RealWgServerApiTest {
                 publicEndpoint = "109.200.208.196:443",
                 address = "",
                 location = "Des Moines, US",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            productionApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenUserPreferredLocationSetAndInternalBuildThenRegisterPublicKeyShouldRequestForCountryAndCity() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        netPRemoteFeature.showVpnSettings().setEnabled(Toggle.State(enable = false))
+        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Des Moines"))
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.usc",
+                publicKey = "ovn9RpzUuvQ4XLQt6B3RKuEXGIxa5QpTnehjduZlcSE=",
+                publicEndpoint = "109.200.208.196:443",
+                address = "",
+                location = "Des Moines, US",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            productionApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenUserPreferredLocationSetButVpnSettingsDisabledAndNotInternalThenRegisterFirstServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.showVpnSettings().setEnabled(Toggle.State(enable = false))
+        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "us", cityName = "Des Moines"))
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.usw.1",
+                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
+                publicEndpoint = "162.245.204.100:443",
+                address = "",
+                location = "Newark, US",
+                gateway = "1.2.3.4",
+                allowedIPs = "0.0.0.0/0,::0/0",
+            ),
+            productionApi.registerPublicKey("testpublickey"),
+        )
+    }
+
+    @Test
+    fun whenUserPreferredCountrySetButVpnSettingsDisabledAndNotInternalThenRegisterFirstServer() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.showVpnSettings().setEnabled(Toggle.State(enable = false))
+        geoswitchingRepository.setUserPreferredLocation(UserPreferredLocation(countryCode = "nl"))
+
+        assertEquals(
+            WgServerData(
+                serverName = "egress.usw.1",
+                publicKey = "R/BMR6Rr5rzvp7vSIWdAtgAmOLK9m7CqTcDynblM3Us=",
+                publicEndpoint = "162.245.204.100:443",
+                address = "",
+                location = "Newark, US",
                 gateway = "1.2.3.4",
                 allowedIPs = "0.0.0.0/0,::0/0",
             ),

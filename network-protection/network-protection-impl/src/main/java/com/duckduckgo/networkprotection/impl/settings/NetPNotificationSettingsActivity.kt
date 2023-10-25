@@ -72,5 +72,5 @@ class NetPNotificationSettingsActivity : DuckDuckGoActivity() {
 }
 
 internal object NetPNotificationSettingsScreenNoParams : GlobalActivityStarter.ActivityParams {
-    private fun readResolve(): Any = NetPVpnSettingsScreenNoParams
+    private fun readResolve(): Any = NetPNotificationSettingsScreenNoParams
 }

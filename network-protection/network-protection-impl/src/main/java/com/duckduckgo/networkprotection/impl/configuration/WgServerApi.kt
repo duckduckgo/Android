@@ -16,10 +16,13 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
+import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
@@ -46,6 +49,8 @@ class RealWgServerApi @Inject constructor(
     private val serverDebugProvider: WgServerDebugProvider,
     private val netNetpEgressServersProvider: NetpEgressServersProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
+    private val netPRemoteFeature: NetPRemoteFeature,
+    private val appBuildConfig: AppBuildConfig,
 ) : WgServerApi {
 
     override suspend fun registerPublicKey(publicKey: String): WgServerData? {
@@ -68,6 +73,8 @@ class RealWgServerApi @Inject constructor(
         val userPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
         val registerKeyBody = if (selectedServer != null) {
             RegisterKeyBody(publicKey = publicKey, server = selectedServer)
+        } else if (!netPRemoteFeature.showVpnSettings().isEnabled() && !appBuildConfig.isInternalBuild()) {
+            RegisterKeyBody(publicKey = publicKey, server = "*")
         } else if (userPreferredLocation.countryCode != null) {
             if (userPreferredLocation.cityName != null) {
                 RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode, city = userPreferredLocation.cityName)
