@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Domyślnie włączone</string>
     <string name="settingsHeadingSettings">Ustawienia</string>
     <string name="settingsPermissionsSetting">Uprawnienia</string>
-    <string name="settingsAutofillLoginsSetting">Autouzupełnianie logowania</string>
+    <string name="settingsAutofillLoginsSetting">Dane logowania</string>
     <string name="settingsSyncSetting">Synchronizacja i kopia zapasowa</string>
     <string name="settingsFireButton">Przycisk zabezpieczenia</string>
 

@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Standaard ingeschakeld</string>
     <string name="settingsHeadingSettings">Instellingen</string>
     <string name="settingsPermissionsSetting">Toestemmingen</string>
-    <string name="settingsAutofillLoginsSetting">Login met automatisch invullen</string>
+    <string name="settingsAutofillLoginsSetting">Aanmeldgegevens</string>
     <string name="settingsSyncSetting">Synchronisatie en back-up</string>
     <string name="settingsFireButton">Fire Button</string>
 
