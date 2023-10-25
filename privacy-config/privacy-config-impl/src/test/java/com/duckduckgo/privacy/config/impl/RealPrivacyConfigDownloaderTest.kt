@@ -18,11 +18,11 @@ package com.duckduckgo.privacy.config.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
 import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -96,6 +96,6 @@ class RealPrivacyConfigDownloaderTest {
     companion object {
         private const val FEATURE_NAME = "test"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
-        val unprotectedTemporaryList = listOf(UnprotectedTemporaryEntity("example.com", "reason"))
+        val unprotectedTemporaryList = listOf(FeatureException("example.com", "reason"))
     }
 }
