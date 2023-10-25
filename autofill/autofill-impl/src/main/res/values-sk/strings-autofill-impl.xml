@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Uložiť prihlasovacie údaje</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložiť heslo</string>
     <string name="saveLoginDialogNotNow">Neukladať</string>
-    <string name="saveLoginDialogSubtitle">Prihlasovacie údaje sú zabezpečene uložené len v tomto zariadení a môžete ich spravovať v ponuke Prihlasovacie údaje v Nastaveniach.</string>
+    <string name="saveLoginDialogSubtitle">Prihlasovacie údaje sú bezpečne uložené v zariadení v ponuke Prihlásenia.</string>
     <string name="saveLoginDialogTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Naposledy aktualizované prihlásenie %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Uložiť a automaticky vyplniť prihlásenia</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Prihlasovacie údaje sú zabezpečeným spôsobom uložené vo vašom zariadení.</string>
     <string name="credentialManagementViewMenuEdit">Upraviť</string>
     <string name="credentialManagementViewMenuDelete">Vymazať</string>
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
     <string name="credentialManagementNoLoginsSavedTitle">Zatiaľ nie sú uložené žiadne prihlásenia</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prihlasovacie údaje sú zabezpečeným spôsobom uložené vo vašom zariadení.</string>
 
     <string name="autofillManagementAddLogin">Pridať prihlásenie</string>
     <string name="autofillManagementSearchLogins">Vyhľadávanie prihlásení</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Meno používateľa bolo skopírované</string>
     <string name="autofillManagementPasswordCopied">Heslo bolo skopírované</string>
 
-    <string name="autofill_password_generation_offer_title">Použiť vygenerované heslo z DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Heslo sa uloží do prihlasovacích údajov.</string>
-    <string name="autofill_password_generation_offer_accept">Použiť vygenerované heslo</string>
+    <string name="autofill_password_generation_offer_title">Používate silné heslo od DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Heslá sú bezpečne uložené na vašom zariadení v ponuke Prihlásenia.</string>
+    <string name="autofill_password_generation_offer_accept">Používanie silného hesla</string>
     <string name="autofill_password_generation_offer_decline">Vytvoriť vlastné</string>
 
     <string name="deviceNotSupportedTitle">Nepodporované zariadenie</string>

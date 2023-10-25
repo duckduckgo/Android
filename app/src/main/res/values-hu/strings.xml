@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Alapértelmezés szerint engedélyezve</string>
     <string name="settingsHeadingSettings">Beállítások</string>
     <string name="settingsPermissionsSetting">Engedélyek</string>
-    <string name="settingsAutofillLoginsSetting">Bejelentkezési adatok automatikus kitöltése</string>
+    <string name="settingsAutofillLoginsSetting">Bejelentkezések</string>
     <string name="settingsSyncSetting">Szinkronizálás és biztonsági mentés</string>
     <string name="settingsFireButton">Tűz gomb</string>
 

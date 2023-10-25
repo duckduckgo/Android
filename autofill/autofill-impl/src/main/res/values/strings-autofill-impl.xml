@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Save Login</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Don\'t Save</string>
-    <string name="saveLoginDialogSubtitle">Logins are stored securely on your device, and can be managed from the Logins menu in Settings.</string>
+    <string name="saveLoginDialogSubtitle">Logins are stored securely on your device in the Logins menu.</string>
     <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your Login?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Login last updated %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Save and Autofill Logins</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Logins are stored securely on your device</string>
     <string name="credentialManagementViewMenuEdit">Edit</string>
     <string name="credentialManagementViewMenuDelete">Delete</string>
 
     <string name="credentialManagementSuggestionsLabel">Suggested</string>
     <string name="credentialManagementNoLoginsSavedTitle">No Logins saved yet</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Logins are stored securely on your device.</string>
 
     <string name="autofillManagementAddLogin">Add Login</string>
     <string name="autofillManagementSearchLogins">Search logins</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Username copied</string>
     <string name="autofillManagementPasswordCopied">Password copied</string>
 
-    <string name="autofill_password_generation_offer_title">Use generated password from DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Password will be saved in Logins.</string>
-    <string name="autofill_password_generation_offer_accept">Use Generated Password</string>
+    <string name="autofill_password_generation_offer_title">Use a strong password from DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Passwords are stored securely on your device in the Logins menu.</string>
+    <string name="autofill_password_generation_offer_accept">Use Strong Password</string>
     <string name="autofill_password_generation_offer_decline">Create My Own</string>
 
     <string name="deviceNotSupportedTitle">Device not supported</string>

@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Vaikimisi sisse lülitatud</string>
     <string name="settingsHeadingSettings">Sätted</string>
     <string name="settingsPermissionsSetting">Load</string>
-    <string name="settingsAutofillLoginsSetting">Sisesta sisselogimisandmed automaatselt</string>
+    <string name="settingsAutofillLoginsSetting">Sisselogimine</string>
     <string name="settingsSyncSetting">Sünkroonimine ja varundamine</string>
     <string name="settingsFireButton">Fire Button</string>
 

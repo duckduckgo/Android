@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Ära salvesta</string>
-    <string name="saveLoginDialogSubtitle">Sisselogimisandmed salvestatakse turvaliselt selles seadmes ja neid saab hallata sätete menüüst Sisselogimisandmed.</string>
+    <string name="saveLoginDialogSubtitle">Logisid hoitakse turvaliselt sinu seadmes logide menüüs.</string>
     <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Sisselogimist värskendati viimati %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Salvesta ja täida sisselogimisandmed automaatselt</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Sisselogimisandmed salvestatakse turvaliselt sinu seadmesse</string>
     <string name="credentialManagementViewMenuEdit">Redigeeri</string>
     <string name="credentialManagementViewMenuDelete">Kustuta</string>
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
     <string name="credentialManagementNoLoginsSavedTitle">Sisselogimisandmeid pole veel salvestatud</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Sisselogimisandmed salvestatakse turvaliselt sinu seadmesse.</string>
 
     <string name="autofillManagementAddLogin">Lisa sisselogimisandmed</string>
     <string name="autofillManagementSearchLogins">Otsi sisselogimisandmeid</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
 
-    <string name="autofill_password_generation_offer_title">Kas kasutada DuckDuckGo loodud parooli?</string>
-    <string name="autofill_password_generation_offer_message">Parool salvestatakse sisselogimisandmetesse.</string>
-    <string name="autofill_password_generation_offer_accept">Kasuta loodud parooli</string>
+    <string name="autofill_password_generation_offer_title">Kas kasutada DuckDuckGo tugevat parooli?</string>
+    <string name="autofill_password_generation_offer_message">Paroole hoitakse turvaliselt sinu seadmes sisselogimisandmete menüüs.</string>
+    <string name="autofill_password_generation_offer_accept">Kasuta tugevat parooli</string>
     <string name="autofill_password_generation_offer_decline">Loon selle ise</string>
 
     <string name="deviceNotSupportedTitle">Seadet ei toetata</string>
