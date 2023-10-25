@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
-    <string name="aboutDescription">
-        V službe DuckDuckGo zavádzame nový štandard dôvery online.\n\nPrehliadač ochrany súkromia DuckDuckGo poskytuje všetky základné informácie o ochrane súkromia, ktoré potrebujete, aby ste sa ochránili pri vyhľadávaní a prehliadaní webu, vrátane blokovania sledovacích zariadení, inteligentnejšieho šifrovania a súkromného vyhľadávania vo vyhľadávači DuckDuckGo.\n\nPri používaní internetu by sme predsa nemali mať zlý pocit a dopriať si zaslúžené online súkromie by nemalo byť o nič ťažšie ako obyčajné zatiahnutie rolety.</string>
-    <string name="aboutMoreLink">Viac informácií na stránke duckduckgo.com/about</string>
+    <string name="aboutHeader">Vitajte na Duck Side!</string>
+    <string name="aboutDescription">DuckDuckGo je nezávislá spoločnosť na ochranu súkromia na internete založená v roku 2008 pre všetkých, ktorých už nebaví sledovanie na internete a chcú jednoduché riešenie. Sme dôkazom, že skutočnú online ochranu súkromia môžete získať bez kompromisov.\n\nPrehliadač DuckDuckGo je vybavený funkciami, ktoré očakávate od prehliadača, ako sú záložky, karty, heslá a ďalšie funkcie, a viac ako <annotation type="privacy_protection_link">tuctom výkonných prvkov na ochranu súkromia</annotation>, ktoré väčšina populárnych prehliadačov štandardne neponúka. Tento jedinečne komplexný súbor ochrany súkromia pomáha chrániť vaše online aktivity od vyhľadávania po prehliadanie, posielanie e-mailov a ďalšie.\n\nNaša ochrana súkromia funguje bez toho, aby ste museli poznať technické detaily alebo riešiť zložité nastavenia. Stačí prepnúť prehliadač na DuckDuckGo vo všetkých zariadeniach a získate predvolené súkromie.\n\nAk však máte záujem o podrobnejšie preskúmanie, viac informácií o tom, ako funguje ochrana súkromia v službe DuckDuckGo, nájdete na našich <annotation type="learn_more_link">stránkach pomoci</annotation>.</string>
     <string name="no_suggestions">Žiadne návrhy</string>
 
     <!-- Broken Site Activity -->
