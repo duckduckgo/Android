@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Activation par défaut</string>
     <string name="settingsHeadingSettings">Paramètres</string>
     <string name="settingsPermissionsSetting">Autorisations</string>
-    <string name="settingsAutofillLoginsSetting">Saisie automatique des identifiants</string>
+    <string name="settingsAutofillLoginsSetting">Identifiants</string>
     <string name="settingsSyncSetting">Synchronisation et sauvegarde</string>
     <string name="settingsFireButton">Fire Button</string>
 

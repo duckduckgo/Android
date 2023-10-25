@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Bejelentkezés mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginDialogNotNow">Mentés mellőzése</string>
-    <string name="saveLoginDialogSubtitle">A bejelentkezési adatokat az eszközöd biztonságosan tárolja, ezen adatok pedig a Beállítások &gt; Bejelentkezések menüpontban kezelhetők.</string>
+    <string name="saveLoginDialogSubtitle">A rendszer biztonságosan tárolja az eszköz Bejelentkezés menüjében elérhető bejelentkezési adatokat.</string>
     <string name="saveLoginDialogTitle">A DuckDuckGo mentse a bejelentkezést?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Bejelentkezés utolsó frissítése: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Bejelentkezések mentése és automatikus kitöltése</string>
+    <string name="credentialManagementAutofillToggleSubtitle">A bejelentkezési adatokat az eszközöd biztonságosan tárolja</string>
     <string name="credentialManagementViewMenuEdit">Szerkesztés</string>
     <string name="credentialManagementViewMenuDelete">Törlés</string>
 
     <string name="credentialManagementSuggestionsLabel">Javasolt</string>
     <string name="credentialManagementNoLoginsSavedTitle">Még nincsenek mentett bejelentkezési adatok</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">A bejelentkezési adatokat az eszközöd biztonságosan tárolja.</string>
 
     <string name="autofillManagementAddLogin">Bejelentkezési adatok hozzáadása</string>
     <string name="autofillManagementSearchLogins">Bejelentkezési adatok keresése</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Felhasználónév másolva</string>
     <string name="autofillManagementPasswordCopied">Jelszó másolva</string>
 
-    <string name="autofill_password_generation_offer_title">DuckDuckGo által generált jelszó használata?</string>
-    <string name="autofill_password_generation_offer_message">A jelszó mentve lesz a Bejelentkezésekben.</string>
-    <string name="autofill_password_generation_offer_accept">Generált jelszó használata</string>
+    <string name="autofill_password_generation_offer_title">A DuckDuckGo által kínált erős jelszót kívánsz használni?</string>
+    <string name="autofill_password_generation_offer_message">A rendszer biztonságosan tárolja az eszköz Bejelentkezés menüjében elérhető jelszavakat.</string>
+    <string name="autofill_password_generation_offer_accept">Erős jelszó használata</string>
     <string name="autofill_password_generation_offer_decline">Saját létrehozása</string>
 
     <string name="deviceNotSupportedTitle">Az eszköz nem támogatott</string>

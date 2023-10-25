@@ -26,7 +26,7 @@
     <string name="saveLoginDialogButtonSave">Salvează autentificarea</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu salva</string>
-    <string name="saveLoginDialogSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău și pot fi gestionate din Setări, meniul Date de conectare.</string>
+    <string name="saveLoginDialogSubtitle">Conexiunile sunt stocate în siguranță pe dispozitivul dvs. în meniul Conectări.</string>
     <string name="saveLoginDialogTitle">Vrei ca DuckDuckGo să îți salveze datele de conectare?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Ultima actualizare a datelor de autentificare %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Salvează și completează automat datele de autentificare</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău</string>
     <string name="credentialManagementViewMenuEdit">Editează</string>
     <string name="credentialManagementViewMenuDelete">Ștergere</string>
 
     <string name="credentialManagementSuggestionsLabel">Sugerat</string>
     <string name="credentialManagementNoLoginsSavedTitle">Nu au fost salvate încă date de autentificare</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Datele de conectare sunt stocate în siguranță pe dispozitivul tău.</string>
 
     <string name="autofillManagementAddLogin">Adaugă date de autentificare</string>
     <string name="autofillManagementSearchLogins">Date de autentificare pentru căutare</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
     <string name="autofillManagementPasswordCopied">Parolă copiată</string>
 
-    <string name="autofill_password_generation_offer_title">Vrei să folosești parola generată de DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Parola va fi salvată în Datele de conectare.</string>
-    <string name="autofill_password_generation_offer_accept">Folosește parola generată</string>
+    <string name="autofill_password_generation_offer_title">Folosiți o parolă puternică de la DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Parolele sunt stocate în siguranță pe dispozitivul dvs. în meniul Autentificări.</string>
+    <string name="autofill_password_generation_offer_accept">Utilizați o parolă puternică</string>
     <string name="autofill_password_generation_offer_decline">Îmi creez propria parolă</string>
 
     <string name="deviceNotSupportedTitle">Dispozitivul nu este acceptat</string>
