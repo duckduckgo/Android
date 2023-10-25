@@ -33,6 +33,8 @@ import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -468,6 +470,12 @@ class UserAgentProviderTest {
         override fun isDomainInUserAllowList(domain: String?): Boolean = (domain == ALLOWED_HOST)
 
         override fun domainsInUserAllowList(): List<String> = emptyList()
+
+        override fun domainsInUserAllowListFlow(): Flow<List<String>> = flowOf(emptyList())
+
+        override suspend fun addDomainToUserAllowList(domain: String) = Unit
+
+        override suspend fun removeDomainFromUserAllowList(domain: String) = Unit
     }
 
     companion object {
