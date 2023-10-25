@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Guardar inicio de sesión</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar contraseña</string>
-    <string name="saveLoginDialogNotNow">Ahora no</string>
+    <string name="saveLoginDialogNotNow">No guardar</string>
     <string name="saveLoginDialogSubtitle">Los inicios de sesión se almacenan de forma segura en tu dispositivo y se pueden administrar desde el menú de Inicios de Sesión en Ajustes.</string>
     <string name="saveLoginDialogTitle">¿Quieres que DuckDuckGo guarde tu inicio de sesión?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Más opciones</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Desde %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Actualizar contraseña</string>
-    <string name="updateLoginDialogButtonNotNow">Ahora no</string>
+    <string name="updateLoginDialogButtonNotNow">No guardar</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">¿Actualizar nombre de usuario?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Actualizar nombre de usuario</string>

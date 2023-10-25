@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
-    <string name="saveLoginDialogNotNow">Mitte praegu</string>
+    <string name="saveLoginDialogNotNow">Ära salvesta</string>
     <string name="saveLoginDialogSubtitle">Sisselogimisandmed salvestatakse turvaliselt selles seadmes ja neid saab hallata sätete menüüst Sisselogimisandmed.</string>
     <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Saidilt %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Värskenda parooli</string>
-    <string name="updateLoginDialogButtonNotNow">Mitte praegu</string>
+    <string name="updateLoginDialogButtonNotNow">Ära salvesta</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Kas värskendada kasutajanime?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Värskenda kasutajanime</string>
