@@ -30,7 +30,6 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.toFeatureException
 import com.duckduckgo.privacy.config.store.toGpcException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -103,9 +102,7 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         }
 
         val isEnabled = gpcFeature?.state == "enabled"
-        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(
-            config?.unprotectedTemporary?.map { it.toFeatureException() } ?: emptyList(),
-        )
+        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary.orEmpty())
 
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value, isEnabled)).thenReturn(isEnabled)
         whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList(gpcExceptions))

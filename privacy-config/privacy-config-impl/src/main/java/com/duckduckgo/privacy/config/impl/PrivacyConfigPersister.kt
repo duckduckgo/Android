@@ -29,6 +29,7 @@ import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -88,7 +89,12 @@ class RealPrivacyConfigPersister @Inject constructor(
                         ),
                     ),
                 )
-                unprotectedTemporaryRepository.updateAll(jsonPrivacyConfig.unprotectedTemporary)
+                val unProtectedExceptions = mutableListOf<UnprotectedTemporaryEntity>()
+                val unprotectedList = jsonPrivacyConfig.unprotectedTemporary
+                unprotectedList.map {
+                    unProtectedExceptions.add(UnprotectedTemporaryEntity(it.domain, it.reason.orEmpty()))
+                }
+                unprotectedTemporaryRepository.updateAll(unProtectedExceptions)
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
                         privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->

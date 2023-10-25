@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -31,7 +32,6 @@ import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -245,6 +245,6 @@ class RealPrivacyConfigPersisterTest {
     companion object {
         private const val FEATURE_NAME = "gpc"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
-        val unprotectedTemporaryList = listOf(UnprotectedTemporaryEntity("example.com", "reason"))
+        val unprotectedTemporaryList = listOf(FeatureException("example.com", "reason"))
     }
 }
