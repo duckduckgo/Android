@@ -26,7 +26,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsData
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromSync
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import javax.inject.Inject
@@ -80,16 +79,9 @@ class RestoreSubscriptionViewModel @Inject constructor(
         }
     }
 
-    fun restoreFromSync() {
-        viewModelScope.launch {
-            command.send(RestoreFromSync)
-        }
-    }
-
     sealed class Command {
         object RestoreFromEmail : Command()
         object Success : Command()
-        object RestoreFromSync : Command()
         object SubscriptionNotFound : Command()
         data class Error(val message: String) : Command()
     }

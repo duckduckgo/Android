@@ -54,7 +54,7 @@
                     android:layout_marginEnd="@dimen/keyline_5"
                     android:textAlignment="center"
                     app:typography="h1"
-                    android:text="Use your subscription on all your devices"
+                    android:text="@string/addDeviceTitle"
                     tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -65,7 +65,7 @@
                     android:textAlignment="center"
                     app:typography="body1"
                     app:textType="secondary"
-                    android:text="Access your subscription on any of your devices via Sync, Google Play or by adding an email address."
+                    android:text="@string/addDeviceDescription"
                     tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu
@@ -82,10 +82,10 @@
                         android:id="@+id/googlePlay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Google Play"
+                        app:primaryText="@string/addDeviceGooglePlayTitle"
                         app:leadingIcon="@drawable/ic_google_play"
                         app:leadingIconSize="small"
-                        app:secondaryText="Privacy Pro is available on any device signed in to your Google Play Store account."/>
+                        app:secondaryText="@string/addDeviceGooglePlayDescription"/>
 
                 <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                         android:layout_width="match_parent"
@@ -97,27 +97,11 @@
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Email"
+                        app:primaryText="@string/addDeviceEmail"
                         app:leadingIcon="@drawable/ic_email_16"
                         app:leadingIconSize="small"
                         app:secondaryText="@string/addEmail"
-                        app:primaryButtonText="Add Email"/>
-
-                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:fullWidth="false"
-                        app:defaultPadding="false"/>
-
-                <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/sync"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="Sync"
-                        app:leadingIcon="@drawable/ic_sync"
-                        app:leadingIconSize="small"
-                        app:secondaryText="Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
-                        app:primaryButtonText="Go to Sync Settings"/>
+                        app:primaryButtonText="@string/addEmailText"/>
 
             </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
         </LinearLayout>
