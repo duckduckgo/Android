@@ -215,9 +215,7 @@ class FirstPartyCookiesReferenceTest(private val testCase: TestCase) {
             maxAge = cookieFeature.settings.firstPartyCookiePolicy.maxAge,
         )
 
-        val unprotectedTemporaryExceptions = config?.unprotectedTemporary?.map {
-            it.toFeatureException()
-        }
+        val unprotectedTemporaryExceptions = config?.unprotectedTemporary
 
         whenever(cookiesRepository.exceptions).thenReturn(CopyOnWriteArrayList(cookieExceptions))
         whenever(cookiesRepository.firstPartyCookiePolicy).thenReturn(policy)

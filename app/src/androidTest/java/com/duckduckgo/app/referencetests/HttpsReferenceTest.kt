@@ -168,9 +168,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         }
 
         val isEnabled = httpsFeature?.state == "enabled"
-        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(
-            config?.unprotectedTemporary?.map { it.toFeatureException() } ?: emptyList(),
-        )
+        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary.orEmpty())
 
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value, isEnabled)).thenReturn(isEnabled)
         whenever(mockHttpsRepository.exceptions).thenReturn(CopyOnWriteArrayList(httpsExceptions))
