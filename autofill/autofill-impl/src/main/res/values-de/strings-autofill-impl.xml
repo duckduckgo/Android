@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Anmeldedaten speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
-    <string name="saveLoginDialogNotNow">Jetzt nicht</string>
+    <string name="saveLoginDialogNotNow">Nicht speichern</string>
     <string name="saveLoginDialogSubtitle">Die Anmeldedaten werden auf diesem Gerät sicher gespeichert und können über das Anmeldedaten-Menü in den Einstellungen verwaltet werden.</string>
     <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo deine Anmeldedaten speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Von %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Passwort aktualisieren</string>
-    <string name="updateLoginDialogButtonNotNow">Jetzt nicht</string>
+    <string name="updateLoginDialogButtonNotNow">Nicht speichern</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Benutzernamen aktualisieren?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Benutzernamen aktualisieren</string>

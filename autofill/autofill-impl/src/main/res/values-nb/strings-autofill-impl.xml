@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Lagre påloggingen</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
-    <string name="saveLoginDialogNotNow">Ikke nå</string>
+    <string name="saveLoginDialogNotNow">Ikke lagre</string>
     <string name="saveLoginDialogSubtitle">Pålogginger lagres trygt på enheten din og kan administreres i påloggingsmenyen i innstillinger.</string>
     <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Oppdater passordet</string>
-    <string name="updateLoginDialogButtonNotNow">Ikke nå</string>
+    <string name="updateLoginDialogButtonNotNow">Ikke lagre</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Vil du oppdatere brukernavnet?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Oppdater brukernavn</string>

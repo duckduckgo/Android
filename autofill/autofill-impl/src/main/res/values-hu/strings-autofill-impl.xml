@@ -25,7 +25,7 @@
 
     <string name="saveLoginDialogButtonSave">Bejelentkezés mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
-    <string name="saveLoginDialogNotNow">Most nem</string>
+    <string name="saveLoginDialogNotNow">Mentés mellőzése</string>
     <string name="saveLoginDialogSubtitle">A bejelentkezési adatokat az eszközöd biztonságosan tárolja, ezen adatok pedig a Beállítások &gt; Bejelentkezések menüpontban kezelhetők.</string>
     <string name="saveLoginDialogTitle">A DuckDuckGo mentse a bejelentkezést?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
@@ -37,7 +37,7 @@
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Innen: %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Jelszó frissítése</string>
-    <string name="updateLoginDialogButtonNotNow">Most nem</string>
+    <string name="updateLoginDialogButtonNotNow">Ne mentse</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Frissíted a felhasználónevet?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Felhasználónév frissítése</string>
