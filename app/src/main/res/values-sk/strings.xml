@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Predvolene povolené</string>
     <string name="settingsHeadingSettings">Nastavenia</string>
     <string name="settingsPermissionsSetting">Oprávnenia</string>
-    <string name="settingsAutofillLoginsSetting">Automatické vyplňovanie prihlasovacích údajov</string>
+    <string name="settingsAutofillLoginsSetting">Prihlasovacie údaje</string>
     <string name="settingsSyncSetting">Synchronizácia a zálohovanie</string>
     <string name="settingsFireButton">Tlačidlo Fire</string>
 
