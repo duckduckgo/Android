@@ -46,7 +46,7 @@ class VariantManagerImpl @Inject constructor(
         val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
         val currentVariantKey = store.variant
 
-        if (currentVariantKey == DEFAULT_VARIANT.key) {
+        if (!experimentVariantRepository.isVariantManagerConfigReady() || currentVariantKey == DEFAULT_VARIANT.key) {
             return DEFAULT_VARIANT.key
         }
 
@@ -89,6 +89,10 @@ class VariantManagerImpl @Inject constructor(
         experimentVariantRepository.updateVariants(variantEntityList)
     }
 
+    override fun variantConfigDownloaded() {
+        experimentVariantRepository.variantConfigDownloaded()
+    }
+
     private fun convertEntitiesToVariants(activeVariantEntities: List<ExperimentVariantEntity>): List<Variant> {
         val activeVariants: MutableList<Variant> = mutableListOf()
         activeVariantEntities.map { entity ->
@@ -112,7 +116,7 @@ class VariantManagerImpl @Inject constructor(
         }
 
         val userLocale = Locale.getDefault()
-        return { entity.localeFilter.contains(userLocale.displayName) }
+        return { entity.localeFilter.contains(userLocale.toString()) }
     }
 
     private fun allocateNewVariant(activeVariants: List<Variant>): Variant {

@@ -19,17 +19,21 @@ package com.duckduckgo.experiments.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.impl.store.ExperimentVariantDao
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
+import com.duckduckgo.experiments.impl.store.ExperimentsDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface ExperimentVariantRepository {
     fun updateVariants(variantEntityList: List<ExperimentVariantEntity>)
     fun getActiveVariants(): List<ExperimentVariantEntity>
+    fun variantConfigDownloaded()
+    fun isVariantManagerConfigReady(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 class ExperimentVariantRepositoryImpl @Inject constructor(
     private val experimentVariantDao: ExperimentVariantDao,
+    private val experimentsDataStore: ExperimentsDataStore,
 ) : ExperimentVariantRepository {
 
     override fun updateVariants(variantEntityList: List<ExperimentVariantEntity>) {
@@ -40,4 +44,10 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
     override fun getActiveVariants(): List<ExperimentVariantEntity> {
         return experimentVariantDao.variants().filter { it.weight != null && it.weight > 0.0 }.toList()
     }
+
+    override fun variantConfigDownloaded() {
+        experimentsDataStore.variantManagerConfigDownloaded = true
+    }
+
+    override fun isVariantManagerConfigReady(): Boolean = experimentsDataStore.variantManagerConfigDownloaded
 }
