@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Ativado por predefinição</string>
     <string name="settingsHeadingSettings">Definições</string>
     <string name="settingsPermissionsSetting">Permissões</string>
-    <string name="settingsAutofillLoginsSetting">Preenchimento automático de inícios de sessão</string>
+    <string name="settingsAutofillLoginsSetting">Inícios de sessão</string>
     <string name="settingsSyncSetting">Sincronização e cópia de segurança</string>
     <string name="settingsFireButton">Botão de proteção</string>
 

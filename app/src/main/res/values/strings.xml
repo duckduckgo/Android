@@ -149,7 +149,7 @@
     <string name="settingsWebTrackingProtectionDescription">Enabled by default</string>
     <string name="settingsHeadingSettings">Settings</string>
     <string name="settingsPermissionsSetting">Permissions</string>
-    <string name="settingsAutofillLoginsSetting">Autofill Logins</string>
+    <string name="settingsAutofillLoginsSetting">Logins</string>
     <string name="settingsSyncSetting">Sync &amp; Backup</string>
     <string name="settingsFireButton">Fire Button</string>
 
