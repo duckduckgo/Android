@@ -357,7 +357,7 @@ class BrowserTabViewModel @Inject constructor(
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
-        class ShareLink(val url: String) : Command()
+        class ShareLink(val url: String, val title: String = "") : Command()
         class SharePromoLinkRMF(val url: String, val shareTitle: String) : Command()
         class PrintLink(val url: String, val mediaSize: PrintAttributes.MediaSize) : Command()
         class CopyLink(val url: String) : Command()
@@ -2297,7 +2297,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onShareSelected() {
         url?.let {
-            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(it))
+            command.value = ShareLink(removeAtbAndSourceParamsFromSearch(it), title.orEmpty())
         }
     }
 
