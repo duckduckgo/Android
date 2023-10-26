@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre o DuckDuckGo</string>
-    <string name="aboutDescription">
-        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\nO Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\nApesar de tudo, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as cortinas.</string>
-    <string name="aboutMoreLink">Mais em duckduckgo.com/about</string>
+    <string name="aboutHeader">Bem-vindo ao Duck Side!</string>
+    <string name="aboutDescription">A DuckDuckGo é a empresa independente de privacidade na Internet fundada em 2008 para quem está cansado de ser rastreado online e quer uma solução simples. Somos a prova de que podes proteger a tua privacidade online sem compromissos.\n\nO navegador DuckDuckGo vem com as funcionalidades que esperas num navegador de referência, como marcadores, separadores, palavras-passe, entre outras, além de <annotation type="privacy_protection_link">mais de uma dúzia de proteções de privacidade poderosas</annotation> que os navegadores mais populares não oferecem por predefinição. Este conjunto especialmente abrangente de proteções de privacidade ajuda a proteger as tuas atividades online, desde a pesquisa à navegação, e-mails, entre outras.\n\nPara utilizares as nossas proteções de privacidade, não tens de saber nada sobre os detalhes técnicos nem lidar com definições complicadas. Tudo o que tens de fazer é mudar o teu navegador para o DuckDuckGo em todos os teus dispositivos e desfrutar de privacidade como predefinição.\n\nMas, se quiseres espreitar os bastidores, podes consultar mais informações sobre como funcionam as proteções de privacidade do DuckDuckGo nas nossas <annotation type="learn_more_link">páginas de ajuda</annotation></string>
     <string name="no_suggestions">Sem sugestões</string>
 
     <!-- Broken Site Activity -->
