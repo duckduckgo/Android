@@ -27,6 +27,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillStoredBackJavascriptInterface.UrlProvider
+import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
@@ -75,6 +76,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val inContextDataStore: EmailProtectionInContextDataStore = mock()
     private val recentInstallChecker: EmailProtectionInContextRecentInstallChecker = mock()
     private val testWebView = WebView(getApplicationContext())
+    private val loginDeduplicator: AutofillLoginDeduplicator = NoopDeduplicator()
     private lateinit var testee: AutofillStoredBackJavascriptInterface
 
     private val testCallback = TestCallback()
@@ -99,6 +101,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
             emailManager = emailManager,
             inContextDataStore = inContextDataStore,
             recentInstallChecker = recentInstallChecker,
+            loginDeduplicator = loginDeduplicator,
         )
         testee.callback = testCallback
         testee.webView = testWebView
@@ -389,5 +392,9 @@ class AutofillStoredBackJavascriptInterfaceTest {
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
             // no-op
         }
+    }
+
+    private class NoopDeduplicator : AutofillLoginDeduplicator {
+        override fun deduplicate(originalUrl: String, logins: List<LoginCredentials>): List<LoginCredentials> = logins
     }
 }
