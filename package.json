@@ -18,6 +18,6 @@
     "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#9.0.0",
     "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#4.41.0",
     "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#1.7.0",
-    "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1692081744"
+    "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1698156591"
   }
 }
