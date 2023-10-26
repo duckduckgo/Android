@@ -85,5 +85,11 @@
                 <action android:name="com.duckduckgo.networkprotection.notification.disabled.restart" />
             </intent-filter>
         </receiver>
+
+        <!-- This is the Worker Service where VPN workers need to bind into -->
+        <service
+                android:name="androidx.work.multiprocess.RemoteWorkerService"
+                android:exported="false"
+                android:process=":vpn" />
     </application>
 </manifest>

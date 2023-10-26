@@ -16,7 +16,6 @@
 
 package com.duckduckgo.networkprotection.impl
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
@@ -33,13 +32,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(AndroidJUnit4::class)
 class WgVpnNetworkStackTest {
 
     @Mock
