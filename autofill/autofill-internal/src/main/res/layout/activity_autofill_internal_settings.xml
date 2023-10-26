@@ -27,6 +27,51 @@
         layout="@layout/include_default_toolbar" />
 
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/autofillLoginsSectionTitle"
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillDevSettingsLoginsSectionTitle" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/addSampleLoginsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillDevSettingsAddSampleLogins"
+        app:secondaryText="@string/autofillDevSettingsAddSampleLoginsSubtitle" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/addSampleLoginsContainingDuplicatesSameDomainButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillDevSettingsAddSampleLoginsSameSubdomain"
+        app:secondaryText="@string/autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/addSampleLoginsContainingDuplicatesAcrossSubdomainsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillDevSettingsAddSampleLoginsMultipleSubdomains"
+        app:secondaryText="@string/autofillDevSettingsAddSampleLoginsMultipleSubdomainsSubtitle" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/clearAllSavedLoginsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillDevSettingsClearLogins"
+        tools:secondaryText="@string/autofillDevSettingsClearLoginsSubtitle" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/viewSavedLoginsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/autofillDevSettingsViewSavedLogins" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/emailProtectionInContextSectionTitle"
         android:layout_width="match_parent"
         android:layout_marginTop="20dp"
