@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre DuckDuckGo</string>
-    <string name="aboutDescription">
-        Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\nDuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\nLa urma urmei, internetul nu ar trebui să fie perceput atât de terifiant, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
-    <string name="aboutMoreLink">Află mai multe la duckduckgo.com/about</string>
+    <string name="aboutHeader">Welcome to the Duck Side!</string>
+    <string name="aboutDescription">DuckDuckGo este o companie independentă înființată în 2008, care oferă confidențialitate pe internet pentru toți cei care s-au săturat să fie urmăriți online și doresc o soluție simplă.Suntem dovada că protecția confidențialității online fără compromisuri este reală.\n\nBrowserul DuckDuckGo oferă funcțiile la care vă așteptați de la browserul preferat, cum ar fi marcajele, filele, parolele și multe altele, plus peste <annotation type="privacy_protection_link">o duzină de protecții ale confidențialității remarcabile,</annotation> care nu sunt oferite implicit în majoritatea browserelor populare.Acest set unic și cuprinzător de măsuri de protecție a confidențialității vă ajută să vă protejați activitățile online, de la căutări la navigare, e-mailuri și multe altele.\n\nMăsurile noastre robuste de protecție a confidențialității funcționează fără a fi nevoie să cunoașteți detalii tehnice sau să aveți de-a face cu setări complicate.Tot ce trebuie să faceți este să folosiți browserul DuckDuckGo pe toate dispozitivele și veți beneficia automat de confidențialitate.\n\nDar dacă doriți să aflați detaliile din culise, puteți găsi mai multe informații despre modul în care funcționează protecțiile de confidențialitate DuckDuckGo pe paginile noastre de <annotation type="learn_more_link">ajutor</annotation></string>
     <string name="no_suggestions">Fără sugestii</string>
 
     <!-- Broken Site Activity -->
