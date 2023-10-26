@@ -210,9 +210,9 @@ class SitePermissionsAdapter(
                 }
                 R.string.sitePermissionsSettingsDRM -> {
                     if (item.enable) {
-                        R.drawable.ic_camera_24
+                        R.drawable.ic_video_player_24
                     } else {
-                        R.drawable.ic_camera_blocked_24
+                        R.drawable.ic_video_player_blocked_24
                     }
                 }
                 else -> null

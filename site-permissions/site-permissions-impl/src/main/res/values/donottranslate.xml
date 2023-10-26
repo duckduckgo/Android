@@ -16,8 +16,8 @@
 
 <resources>
     <!-- DRM Permission -->
-    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">Grant %1$s permission to access Digital Rights Management (DRM) software?</string>
-    <string name="drmSiteDialogSubtitle">DRM is used to play protected media content, but also provides access to device identifiers. Only grant permission to sites you trust. You can manage permissions at any time in Settings. Learn more <annotation type="drm_learn_more_link">here</annotation>.</string>
+    <string name="drmSiteDialogTitle" instruction="Placeholder is the name of a website">Grant %1$s permission to access DRM software on your device?</string>
+    <string name="drmSiteDialogSubtitle">Digital Rights Management software is required to play protected media content, but also provides access to device identifiers. Only grant permission to sites you trust with this data. You can manage permissions at any time in Settings. <annotation type="drm_learn_more_link">Learn More</annotation></string>
     <string name="drmSiteDialogAllowAlways">Always</string>
     <string name="drmSiteDialogAllowOnce">Only for This Session</string>
     <string name="drmSiteDialogDenyAlways">Deny Always</string>
