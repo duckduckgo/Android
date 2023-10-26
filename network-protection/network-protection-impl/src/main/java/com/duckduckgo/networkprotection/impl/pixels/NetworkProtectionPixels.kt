@@ -232,6 +232,34 @@ interface NetworkProtectionPixels {
      * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
      */
     fun waitlistBetaIsEnabled()
+
+    /**
+     * This fun will fire one pixel
+     */
+    fun reportGeoswitchingScreenShown()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     *
+     * The pixels fire whenever the user resets the preferred location to the default nearest available
+     */
+    fun reportPreferredLocationSetToNearest()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     *
+     * The pixels fire whenever the user sets the preferred location to any other location than the default.
+     */
+    fun reportPreferredLocationSetToCustom()
+
+    /**
+     * This fun will fire one pixel
+     */
+    fun reportGeoswitchingNoLocations()
 }
 
 @ContributesBinding(AppScope::class)
@@ -395,6 +423,25 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun waitlistBetaIsEnabled() {
         tryToFireDailyPixel(NETP_WAITLIST_BETA_ENABLED_DAILY)
         firePixel(NETP_WAITLIST_BETA_ENABLED)
+    }
+
+    override fun reportGeoswitchingScreenShown() {
+        firePixel(NETP_GEOSWITCHING_PAGE_SHOWN)
+    }
+
+    override fun reportPreferredLocationSetToNearest() {
+        tryToFireDailyPixel(NETP_GEOSWITCHING_SET_NEAREST_DAILY)
+        firePixel(NETP_GEOSWITCHING_SET_NEAREST)
+    }
+
+    override fun reportPreferredLocationSetToCustom() {
+        tryToFireDailyPixel(NETP_GEOSWITCHING_SET_CUSTOM_DAILY)
+        firePixel(NETP_GEOSWITCHING_SET_CUSTOM)
+    }
+
+    override fun reportGeoswitchingNoLocations() {
+        tryToFireDailyPixel(NETP_GEOSWITCHING_NO_AVAILABLE_LOCATIONS_DAILY)
+        firePixel(NETP_GEOSWITCHING_NO_AVAILABLE_LOCATIONS)
     }
 
     private fun firePixel(

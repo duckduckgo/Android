@@ -36,7 +36,19 @@ class FakeWgVpnControllerService : WgVpnControllerService {
     }
 
     override suspend fun registerKey(registerKeyBody: RegisterKeyBody): List<EligibleServerInfo> {
-        return servers.filter { it.server.name == registerKeyBody.server || registerKeyBody.server == "*" }.map { it.toEligibleServerInfo() }
+        return servers.filter {
+            return@filter if (registerKeyBody.server != "*") {
+                it.server.name == registerKeyBody.server
+            } else if (registerKeyBody.country != null) {
+                if (registerKeyBody.city != null) {
+                    it.server.attributes["country"] == registerKeyBody.country && it.server.attributes["city"] == registerKeyBody.city
+                } else {
+                    it.server.attributes["country"] == registerKeyBody.country
+                }
+            } else {
+                true
+            }
+        }.map { it.toEligibleServerInfo() }
     }
 
     private fun RegisteredServerInfo.toEligibleServerInfo(): EligibleServerInfo {

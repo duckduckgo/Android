@@ -283,7 +283,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
                 this.expectMostRecentItem(),
             )
-            testee.onDestroy(mock())
+            testee.onStop(mock())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -344,7 +344,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
                 this.expectMostRecentItem(),
             )
-            testee.onDestroy(mock())
+            testee.onStop(mock())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -380,7 +380,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
                 this.expectMostRecentItem(),
             )
-            testee.onDestroy(mock())
+            testee.onStop(mock())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -416,7 +416,7 @@ class NetworkProtectionManagementViewModelTest {
                 ),
                 this.expectMostRecentItem(),
             )
-            testee.onDestroy(mock())
+            testee.onStop(mock())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -525,7 +525,7 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
-    fun whenOnCreateWithAlwaysOnLockdownThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+    fun whenOnStartWithAlwaysOnLockdownThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -536,14 +536,14 @@ class NetworkProtectionManagementViewModelTest {
         )
 
         testee.commands().test {
-            testee.onCreate(mock())
+            testee.onStart(mock())
             assertEquals(ShowAlwaysOnLockdownDialog, this.awaitItem())
             verify(networkProtectionPixels).reportAlwaysOnLockdownDialogShown()
         }
     }
 
     @Test
-    fun whenOnCreateWithoutAlwaysOnLockdowmThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
+    fun whenOnStartWithoutAlwaysOnLockdowmThenDoNotEmitShowAlwaysOnLockdownDialogCommand() = runTest {
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
@@ -554,7 +554,7 @@ class NetworkProtectionManagementViewModelTest {
         )
 
         testee.commands().test {
-            testee.onCreate(mock())
+            testee.onStart(mock())
             this.ensureAllEventsConsumed()
         }
     }

@@ -19,6 +19,8 @@ package com.duckduckgo.networkprotection.impl.configuration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*
 import javax.inject.Inject
@@ -42,11 +44,13 @@ interface WgServerApi {
 class RealWgServerApi @Inject constructor(
     private val wgVpnControllerService: WgVpnControllerService,
     private val serverDebugProvider: WgServerDebugProvider,
+    private val netNetpEgressServersProvider: NetpEgressServersProvider,
+    private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
 ) : WgServerApi {
 
     override suspend fun registerPublicKey(publicKey: String): WgServerData? {
         // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
-        // returns the closest one or "*" if list is empty
+        // returns the closest one or null if list is empty
         val selectedServer = serverDebugProvider.fetchServers()
             .also { fetchedServers ->
                 logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
@@ -57,9 +61,24 @@ class RealWgServerApi @Inject constructor(
                 serverDebugProvider.getSelectedServerName()?.let { userSelectedServer ->
                     serverName == userSelectedServer
                 } ?: false
-            } ?: "*"
+            }
 
-        return wgVpnControllerService.registerKey(RegisterKeyBody(publicKey = publicKey, server = selectedServer))
+        netNetpEgressServersProvider.downloadServerLocations()
+
+        val userPreferredLocation = netPGeoswitchingRepository.getUserPreferredLocation()
+        val registerKeyBody = if (selectedServer != null) {
+            RegisterKeyBody(publicKey = publicKey, server = selectedServer)
+        } else if (userPreferredLocation.countryCode != null) {
+            if (userPreferredLocation.cityName != null) {
+                RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode, city = userPreferredLocation.cityName)
+            } else {
+                RegisterKeyBody(publicKey = publicKey, country = userPreferredLocation.countryCode)
+            }
+        } else {
+            RegisterKeyBody(publicKey = publicKey, server = "*")
+        }
+
+        return wgVpnControllerService.registerKey(registerKeyBody)
             .run {
                 logcat { "Register key in $selectedServer" }
                 logcat { "Register key returned ${this.map { it.server.name }}" }
@@ -107,6 +126,9 @@ class RealWgServerApi @Inject constructor(
 
 interface WgServerDebugProvider {
     suspend fun getSelectedServerName(): String? = null
+
+    suspend fun clearSelectedServerName() { /* noop */
+    }
 
     suspend fun cacheServers(servers: List<Server>) { /* noop */
     }
