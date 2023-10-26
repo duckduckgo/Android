@@ -16,8 +16,10 @@
 
 package com.duckduckgo.networkprotection.impl.configuration
 
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
+import com.duckduckgo.networkprotection.impl.di.UnprotectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -49,7 +51,7 @@ class RealWgServerApi @Inject constructor(
     override suspend fun registerPublicKey(publicKey: String): WgServerData? {
         // This bit of code gets all possible egress servers which should be order by proximity, caches them for internal builds and then
         // returns the closest one or null if list is empty
-        val selectedServer = serverDebugProvider.fetchServers()
+        val selectedServer = wgVpnControllerService.getServers().map { it.server }
             .also { fetchedServers ->
                 logcat { "Fetched servers ${fetchedServers.map { it.name }}" }
                 serverDebugProvider.cacheServers(fetchedServers)
@@ -130,10 +132,8 @@ interface WgServerDebugProvider {
 
     suspend fun cacheServers(servers: List<Server>) { /* noop */
     }
-
-    suspend fun fetchServers(): List<Server> = emptyList()
 }
 
 // Contribute just the default dummy implementation
-@ContributesBinding(VpnScope::class)
+@ContributesBinding(AppScope::class)
 class WgServerDebugProviderImpl @Inject constructor() : WgServerDebugProvider

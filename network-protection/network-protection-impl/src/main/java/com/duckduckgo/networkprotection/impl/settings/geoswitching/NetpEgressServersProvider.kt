@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.settings.geoswitching
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
+import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider.ServerLocation
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation
@@ -39,7 +40,7 @@ interface NetpEgressServersProvider {
 
 @ContributesBinding(AppScope::class)
 class RealNetpEgressServersProvider @Inject constructor(
-    private val wgVpnControllerService: WgVpnControllerService,
+    @ProtectedVpnControllerService private val wgVpnControllerService: WgVpnControllerService,
     private val dispatcherProvider: DispatcherProvider,
     private val netPGeoswitchingRepository: NetPGeoswitchingRepository,
 ) : NetpEgressServersProvider {

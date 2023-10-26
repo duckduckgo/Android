@@ -47,7 +47,7 @@ class RealWgServerApiTest {
         MockitoAnnotations.openMocks(this)
 
         productionWgServerDebugProvider = DefaultWgServerDebugProvider()
-        internalWgServerDebugProvider = FakeWgServerDebugProvider(wgVpnControllerService)
+        internalWgServerDebugProvider = FakeWgServerDebugProvider()
         geoswitchingRepository = FakeNetPGeoswitchingRepository()
 
         internalApi = RealWgServerApi(
@@ -218,7 +218,7 @@ class RealWgServerApiTest {
     }
 }
 
-private class FakeWgServerDebugProvider(private val controllerService: WgVpnControllerService) : WgServerDebugProvider {
+private class FakeWgServerDebugProvider() : WgServerDebugProvider {
     val cachedServers = mutableListOf<Server>()
     var selectedServer: String? = null
 
@@ -227,10 +227,6 @@ private class FakeWgServerDebugProvider(private val controllerService: WgVpnCont
     override suspend fun cacheServers(servers: List<Server>) {
         cachedServers.clear()
         cachedServers.addAll(servers)
-    }
-
-    override suspend fun fetchServers(): List<Server> {
-        return controllerService.getServers().map { it.server }
     }
 }
 
