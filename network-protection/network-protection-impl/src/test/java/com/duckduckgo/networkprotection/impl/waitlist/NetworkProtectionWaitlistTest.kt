@@ -39,9 +39,11 @@ class NetworkProtectionWaitlistTest {
     private lateinit var networkProtectionWaitlist: NetworkProtectionWaitlist
     private val networkProtectionState: NetworkProtectionState = mock()
     private val networkProtectionPixels: NetworkProtectionPixels = mock()
+    private var isUsTimeZone: Boolean = false
 
     @Before
     fun setup() {
+        isUsTimeZone = false
         netPWaitlistRepository = FakeNetPWaitlistRepository()
         netPRemoteFeature = FakeNetPRemoteFeatureFactory.create()
         val netPRemoteFeatureWrapper = NetPRemoteFeatureWrapper(
@@ -59,6 +61,7 @@ class NetworkProtectionWaitlistTest {
             networkProtectionState,
             networkProtectionPixels,
             coroutinesTestRule.testDispatcherProvider,
+            { isUsTimeZone },
         )
     }
 
@@ -100,12 +103,12 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenSubFeatureNotTreatedAndWaitlistTokenThenNoUnlocked() = runTest {
+    fun whenSubFeatureNotTreatedAndWaitlistTokenThenJoinedWaitlist() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = false))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
 
         netPWaitlistRepository.setWaitlistToken("fakeToken")
-        assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
+        assertEquals(JoinedWaitlist, networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -118,12 +121,12 @@ class NetworkProtectionWaitlistTest {
     }
 
     @Test
-    fun whenFeatureNotTreatedAndWaitlistTokenSetThenNotUnlocked() = runTest {
+    fun whenFeatureNotTreatedAndWaitlistTokenSetThenJoinedWaitlist() = runTest {
         netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
         netPRemoteFeature.self().setEnabled(Toggle.State(enable = false))
 
         netPWaitlistRepository.setWaitlistToken("fakeToken")
-        assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
+        assertEquals(JoinedWaitlist, networkProtectionWaitlist.getState())
     }
 
     @Test
@@ -157,6 +160,63 @@ class NetworkProtectionWaitlistTest {
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         netPWaitlistRepository.setWaitlistToken("fakeToken")
         assertEquals(JoinedWaitlist, networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenWaitlistEnabledAndWaitlistTokenNonUSThenJoinedWaitlist() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPWaitlistRepository.setWaitlistToken("fakeToken")
+        assertEquals(JoinedWaitlist, networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenWaitlistEnabledAndWaitlistTokenAndUSThenJoinedWaitlist() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPWaitlistRepository.setWaitlistToken("fakeToken")
+        isUsTimeZone = true
+        assertEquals(JoinedWaitlist, networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenWaitlistEnabledAndAuthTokenNonUSThenInBeta() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPWaitlistRepository.setAuthenticationToken("fakeToken")
+        isUsTimeZone = false
+        assertEquals(InBeta(termsAccepted = false), networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenWaitlistEnabledAndAuthTokenUSThenInBeta() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        netPWaitlistRepository.setAuthenticationToken("fakeToken")
+        isUsTimeZone = true
+        assertEquals(InBeta(termsAccepted = false), networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenWaitlistEnabledNonUSThenNotUnlocked() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        isUsTimeZone = false
+        assertEquals(NotUnlocked, networkProtectionWaitlist.getState())
+    }
+
+    @Test
+    fun whenWaitlistEnabledUSThenPendingInviteCode() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        netPRemoteFeature.waitlist().setEnabled(Toggle.State(enable = true))
+        netPRemoteFeature.self().setEnabled(Toggle.State(enable = true))
+        isUsTimeZone = true
+        assertEquals(PendingInviteCode, networkProtectionWaitlist.getState())
     }
 
     @Test

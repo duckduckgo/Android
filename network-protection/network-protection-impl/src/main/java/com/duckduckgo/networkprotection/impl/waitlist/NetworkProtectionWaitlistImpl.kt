@@ -36,7 +36,12 @@ import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.impl.waitlist.store.NetPWaitlistRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import java.util.*
 import javax.inject.Inject
+import javax.inject.Qualifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -51,6 +56,7 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val networkProtectionPixels: NetworkProtectionPixels,
     private val dispatcherProvider: DispatcherProvider,
+    @InternalApi private val isUSTimeZone: USTimeZoneChecker,
 ) : NetworkProtectionWaitlist {
     override suspend fun getState(): NetPWaitlistState = withContext(dispatcherProvider.io()) {
         if (isTreated()) {
@@ -87,12 +93,12 @@ class NetworkProtectionWaitlistImpl @Inject constructor(
             return true
         }
         // User is in beta already
-        if (netPWaitlistRepository.getAuthenticationToken() != null) {
+        if (didJoinBeta() || didJoinWaitlist()) {
             return netPRemoteFeature.isWaitlistActive()
         }
 
-        // Both NetP and the waitlist features need to be enabled
-        return netPRemoteFeature.isWaitlistEnabled() && netPRemoteFeature.isWaitlistActive()
+        // Both NetP and the waitlist features need to be enabled and US-only users
+        return isUSTimeZone.invoke() && netPRemoteFeature.isWaitlistEnabled() && netPRemoteFeature.isWaitlistActive()
     }
 
     private suspend fun didJoinBeta(): Boolean = netPWaitlistRepository.getAuthenticationToken() != null
@@ -139,5 +145,44 @@ class NetPRemoteFeatureWrapper @Inject constructor(
      */
     fun isWaitlistEnabled(): Boolean {
         return netPRemoteFeature.self().isEnabled() && netPRemoteFeature.waitlist().isEnabled()
+    }
+}
+
+internal interface DeviceTimezoneProvider {
+    fun getTimeZone(): TimeZone
+}
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class InternalApi
+
+// visible for testing
+internal typealias USTimeZoneChecker = () -> Boolean
+
+@Module
+@ContributesTo(AppScope::class)
+class TimezoneProviderModule {
+    @Provides
+    @InternalApi
+    fun provideUsTimezoneChecker(): USTimeZoneChecker {
+        return {
+            val defaultTimeZone = TimeZone.getDefault()
+            // IANA/Olson time zone identifiers for the 50 United States
+            val usTimeZoneIDs = arrayOf(
+                "America/Indiana",
+                "America/Kentucky",
+                "America/Los_Angeles",
+                "America/New_York",
+                "America/North_Dakota",
+                "America/Phoenix",
+                "America/Detroit",
+                "America/Chicago",
+                "America/Anchorage",
+                "America/Adak",
+                "Pacific/Honolulu",
+            )
+
+            usTimeZoneIDs.contains(defaultTimeZone.id)
+        }
     }
 }
