@@ -73,21 +73,18 @@ class RealNetPRekeyer @Inject constructor(
             return
         }
 
-        val newKey = runCatching {
-            val newKeys = KeyPair()
-            wgServerApi.registerPublicKey(newKeys.publicKey.toBase64())
-
-            newKeys
-        }.onFailure {
-            logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
-        }.getOrNull()
-        if (newKey == null) {
-            return
-        } else {
-            logcat { "Re-keying with public key: ${newKey.publicKey.toBase64()}" }
-        }
-
         if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
+            val newKey = runCatching {
+                val newKeys = KeyPair()
+                wgServerApi.registerPublicKey(newKeys.publicKey.toBase64())
+
+                newKeys
+            }.onFailure {
+                logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
+            }.getOrNull() ?: return
+
+            logcat { "Re-keying with public key: ${newKey.publicKey.toBase64()}" }
+
             if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
                 logcat { "Restarting VPN after clearing client keys" }
                 networkProtectionPixels.reportRekeyCompleted()

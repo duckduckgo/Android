@@ -20,7 +20,6 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
-import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import logcat.logcat

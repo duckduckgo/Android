@@ -43,9 +43,9 @@ import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
 import com.duckduckgo.networkprotection.internal.network.netpGetPcapFile
 import com.duckduckgo.networkprotection.internal.network.netpPcapFileHasContent
+import com.duckduckgo.networkprotection.internal.rekey.DebugRekeyReceiver
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
-import com.duckduckgo.networkprotection.internal.rekey.DebugRekeyReceiver
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.google.android.material.snackbar.Snackbar
 import com.wireguard.crypto.Key
