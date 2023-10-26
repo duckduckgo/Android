@@ -229,7 +229,7 @@ class BrowserChromeClientTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun whenNotSitePermissionsAreRequestedThenRequestPermissionIsNotCalled() = runTest {
+    fun whenNotSitePermissionsAreRequestedThenPermissionDenied() = runTest {
         val permissions = arrayOf<String>()
         val mockRequest: PermissionRequest = mock()
         whenever(mockRequest.resources).thenReturn(permissions)
@@ -239,6 +239,7 @@ class BrowserChromeClientTest {
         testee.onPermissionRequest(mockRequest)
 
         verify(mockWebViewClientListener, never()).onSitePermissionRequested(mockRequest, permissions)
+        verify(mockWebViewClientListener).onSitePermissionDenied(mockRequest)
     }
 
     private val mockMsg = Message().apply {

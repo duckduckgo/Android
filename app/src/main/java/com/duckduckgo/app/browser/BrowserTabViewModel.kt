@@ -461,6 +461,10 @@ class BrowserTabViewModel @Inject constructor(
             val request: PermissionRequest,
         ) : Command()
 
+        class DenySitePermissionRequest(
+            val request: PermissionRequest,
+        ) : Command()
+
         class ShowUserCredentialSavedOrUpdatedConfirmation(
             val credentials: LoginCredentials,
             val includeShortcutToViewCredential: Boolean,
@@ -1494,6 +1498,12 @@ class BrowserTabViewModel @Inject constructor(
                 command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
             }
         }
+    }
+
+    override fun onSitePermissionDenied(
+        request: PermissionRequest,
+    ) {
+        command.postValue(DenySitePermissionRequest(request))
     }
 
     override fun onSiteLocationPermissionRequested(

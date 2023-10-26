@@ -138,7 +138,7 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        // TODO: potentially keep this
+        // TODO: potentially re-enable parts of this
         // if (request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
         //     if (drm.isDrmAllowedForUrl(request.origin.toString())) {
         //         request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
@@ -146,12 +146,13 @@ class BrowserChromeClient @Inject constructor(
         //         request.deny()
         //     }
         // }
-        Timber.d("onPermissionRequest")
 
         appCoroutineScope.launch(coroutineDispatcher.io()) {
             val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissionsAllowedToAsk(request.origin.toString(), request.resources)
             if (permissionsAllowedToAsk.isNotEmpty()) {
                 webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
+            } else {
+                webViewClientListener?.onSitePermissionDenied(request)
             }
         }
     }
