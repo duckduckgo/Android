@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -127,6 +128,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 submitted = true
             }
         }
+
+        brokenSites.protectionsToggle.setOnProtectionsToggledListener(viewModel::onProtectionsToggled)
     }
 
     private fun configureObservers() {
@@ -165,6 +168,13 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }.orEmpty()
         brokenSites.categoriesSelection.text = category
         brokenSites.submitButton.isEnabled = viewState.submitAllowed
+
+        if (viewState.protectionsState != null) {
+            brokenSites.protectionsToggle.isVisible = true
+            brokenSites.protectionsToggle.setState(viewState.protectionsState)
+        } else {
+            brokenSites.protectionsToggle.isVisible = false
+        }
     }
 
     companion object {

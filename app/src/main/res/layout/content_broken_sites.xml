@@ -27,6 +27,19 @@
         tools:context="com.duckduckgo.app.brokensite.BrokenSiteActivity"
         tools:showIn="@layout/activity_broken_site">
 
+        <com.duckduckgo.app.brokensite.view.SiteProtectionsToggle
+            android:id="@+id/protectionsToggle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_5"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+
         <ImageView
             android:id="@+id/bicycleImage"
             android:layout_width="128dp"
@@ -36,7 +49,7 @@
             android:src="@drawable/broken_bike"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/protectionsToggle" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
             android:id="@+id/noteText"

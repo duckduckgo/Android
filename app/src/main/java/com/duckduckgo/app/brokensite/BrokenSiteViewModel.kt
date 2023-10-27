@@ -20,26 +20,48 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
+import com.duckduckgo.app.brokensite.model.SiteProtectionsState
+import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED
+import com.duckduckgo.app.brokensite.model.SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG
+import com.duckduckgo.app.brokensite.model.SiteProtectionsState.ENABLED
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import java.lang.IllegalArgumentException
 import javax.inject.Inject
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class BrokenSiteViewModel @Inject constructor(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
     private val ampLinks: AmpLinks,
+    private val featureToggle: FeatureToggle,
+    private val contentBlocking: ContentBlocking,
+    private val unprotectedTemporary: UnprotectedTemporary,
+    private val userAllowListRepository: UserAllowListRepository,
     moshi: Moshi,
 ) : ViewModel() {
     private val jsonStringListAdapter = moshi.adapter<List<String>>(
@@ -50,6 +72,7 @@ class BrokenSiteViewModel @Inject constructor(
         val indexSelected: Int = -1,
         val categorySelected: BrokenSiteCategory? = null,
         var submitAllowed: Boolean = true,
+        val protectionsState: SiteProtectionsState? = null,
     )
 
     sealed class Command {
@@ -114,6 +137,8 @@ class BrokenSiteViewModel @Inject constructor(
         this.params = params
         this.errorCodes = errorCodes
         this.httpErrorCodes = httpErrorCodes
+
+        loadProtectionsState()
     }
 
     fun setCategories(categoryList: List<BrokenSiteCategory>): MutableList<BrokenSiteCategory> {
@@ -136,6 +161,18 @@ class BrokenSiteViewModel @Inject constructor(
             indexSelected = indexSelected,
             categorySelected = shuffledCategories.elementAtOrNull(indexSelected),
         )
+    }
+
+    fun onProtectionsToggled(protectionsEnabled: Boolean) {
+        val domain = getDomain() ?: return
+
+        viewModelScope.launch {
+            if (protectionsEnabled) {
+                userAllowListRepository.removeDomainFromUserAllowList(domain)
+            } else {
+                userAllowListRepository.addDomainToUserAllowList(domain)
+            }
+        }
     }
 
     fun onSubmitPressed(webViewVersion: String, description: String?) {
@@ -168,6 +205,33 @@ class BrokenSiteViewModel @Inject constructor(
         command.value = Command.ConfirmAndFinish
     }
 
+    private fun loadProtectionsState() {
+        val domain = getDomain() ?: return
+
+        if (
+            !featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) ||
+            contentBlocking.isAnException(url) ||
+            unprotectedTemporary.isAnException(url)
+        ) {
+            viewState.setProtectionsState(DISABLED_BY_REMOTE_CONFIG)
+            return
+        }
+
+        userAllowListRepository
+            .domainsInUserAllowListFlow()
+            .map { allowListedDomains -> if (domain in allowListedDomains) DISABLED else ENABLED }
+            .distinctUntilChanged()
+            .onEach { protectionsState -> viewState.setProtectionsState(protectionsState) }
+            .launchIn(viewModelScope)
+    }
+
+    private fun getDomain(): String? =
+        try {
+            url.takeUnless { it.isEmpty() }?.extractDomain()
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+
     @VisibleForTesting
     fun getBrokenSite(
         urlString: String,
@@ -197,4 +261,8 @@ class BrokenSiteViewModel @Inject constructor(
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
     }
+}
+
+private fun MutableLiveData<ViewState>.setProtectionsState(state: SiteProtectionsState?) {
+    value = value!!.copy(protectionsState = state)
 }
