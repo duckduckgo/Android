@@ -25,24 +25,36 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
+import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.anyString
 import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteViewModelTest {
 
@@ -62,6 +74,14 @@ class BrokenSiteViewModelTest {
 
     private val mockAmpLinks: AmpLinks = mock()
 
+    private val mockFeatureToggle: FeatureToggle = mock()
+
+    private val mockContentBlocking: ContentBlocking = mock()
+
+    private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
+
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
+
     private lateinit var testee: BrokenSiteViewModel
 
     private val viewState: BrokenSiteViewModel.ViewState
@@ -74,6 +94,10 @@ class BrokenSiteViewModelTest {
             mockPixel,
             mockBrokenSiteSender,
             mockAmpLinks,
+            mockFeatureToggle,
+            mockContentBlocking,
+            mockUnprotectedTemporary,
+            mockUserAllowListRepository,
             Moshi.Builder().add(JSONObjectAdapter()).build(),
         )
         testee.command.observeForever(mockCommandObserver)
@@ -521,6 +545,163 @@ class BrokenSiteViewModelTest {
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
+    }
+
+    @Test
+    fun whenSiteProtectionsToggledAllowlistIsUpdated() = runTest {
+        val url = "https://stuff.example.com"
+
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        testee.onProtectionsToggled(protectionsEnabled = false)
+
+        verify(mockUserAllowListRepository).addDomainToUserAllowList("stuff.example.com")
+        verify(mockUserAllowListRepository, never()).removeDomainFromUserAllowList(anyString())
+
+        clearInvocations(mockUserAllowListRepository)
+
+        testee.onProtectionsToggled(protectionsEnabled = true)
+
+        verify(mockUserAllowListRepository).removeDomainFromUserAllowList("stuff.example.com")
+        verify(mockUserAllowListRepository, never()).addDomainToUserAllowList(anyString())
+    }
+
+    @Test
+    fun whenContentBlockingIsDisabledThenSiteProtectionsAreDisabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value))
+            .thenReturn(false)
+
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
+    }
+
+    @Test
+    fun whenUrlIsInUnprotectedTemporaryExceptionsThenSiteProtectionsAreDisabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value))
+            .thenReturn(true)
+
+        whenever(mockContentBlocking.isAnException(url)).thenReturn(false)
+        whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(true)
+
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
+    }
+
+    @Test
+    fun whenUrlIsInContentBlockingExceptionsThenSiteProtectionsAreDisabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value))
+            .thenReturn(true)
+
+        whenever(mockContentBlocking.isAnException(url)).thenReturn(true)
+        whenever(mockUnprotectedTemporary.isAnException(url)).thenReturn(false)
+
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        assertEquals(SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG, viewState.protectionsState)
+    }
+
+    @Test
+    fun whenUrlIsInUserAllowlistThenSiteProtectionsAreDisabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value))
+            .thenReturn(true)
+
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(flowOf(listOf("example.com")))
+
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        assertEquals(SiteProtectionsState.DISABLED, viewState.protectionsState)
+    }
+
+    @Test
+    fun whenUrlIsNotInUserAllowlistThenSiteProtectionsAreEnabled() {
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value))
+            .thenReturn(true)
+
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(flowOf(emptyList()))
+
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        assertEquals(SiteProtectionsState.ENABLED, viewState.protectionsState)
     }
 
     private fun selectAndAcceptCategory(indexSelected: Int = 0) {
