@@ -88,7 +88,6 @@ class AboutDuckDuckGoViewModel @Inject constructor(
 
     fun onPrivacyProtectionsLinkClicked() {
         viewModelScope.launch { command.send(Command.LaunchBrowserWithPrivacyProtectionsUrl) }
-        pixel.fire(SETTINGS_ABOUT_DDG_PRIVACY_PROTECTIONS_PRESSED)
     }
 
     fun onPrivacyPolicyClicked() {
