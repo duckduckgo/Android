@@ -21,8 +21,10 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -131,4 +133,14 @@ interface SavedSitesEntitiesDao {
 
     @Query("select * from entities where deleted = 1")
     fun allDeleted(): List<Entity>
+
+    @Transaction
+    fun removeFormFactorFavoriteFolders() {
+        entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT)?.let {
+            deletePermanently(it)
+        }
+        entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT)?.let {
+            deletePermanently(it)
+        }
+    }
 }
