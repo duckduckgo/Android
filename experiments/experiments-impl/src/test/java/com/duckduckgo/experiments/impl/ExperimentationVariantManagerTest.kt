@@ -16,7 +16,6 @@
 
 package com.duckduckgo.experiments.impl
 
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import java.util.Locale
@@ -34,7 +33,6 @@ class ExperimentationVariantManagerTest {
 
     private lateinit var testee: VariantManagerImpl
 
-    private val mockStore: StatisticsDataStore = mock()
     private val mockRandomizer: IndexRandomizer = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val activeVariants = mutableListOf<Variant>()
@@ -47,7 +45,6 @@ class ExperimentationVariantManagerTest {
         whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(emptyList())
 
         testee = VariantManagerImpl(
-            mockStore,
             mockRandomizer,
             appBuildConfig,
             mockExperimentVariantRepository,
@@ -57,7 +54,7 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenVariantAlreadyPersistedThenVariantReturned() {
         addActiveVariantToConfig()
-        whenever(mockStore.variant).thenReturn("foo")
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("foo")
 
         assertEquals("foo", testee.getVariantKey())
     }
@@ -65,7 +62,7 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenVariantAlreadyPersistedThenVariantAllocatorNeverInvoked() {
         addActiveVariantToConfig()
-        whenever(mockStore.variant).thenReturn("foo")
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("foo")
 
         testee.getVariantKey()
         verify(mockRandomizer, never()).random(any())
@@ -73,7 +70,7 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenNoVariantsAvailableThenDefaultVariantHasEmptyStringForKey() {
-        whenever(mockStore.variant).thenReturn("foo")
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("foo")
 
         testee.getVariantKey()
         assertEquals("", testee.defaultVariantKey())
@@ -82,7 +79,7 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
         addActiveVariantToConfig()
-        whenever(mockStore.variant).thenReturn("bar")
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("bar")
 
         assertEquals(testee.defaultVariantKey(), testee.getVariantKey())
     }
@@ -90,7 +87,7 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenNewVariantIsPersisted() {
         addActiveVariantToConfig()
-        whenever(mockStore.variant).thenReturn("bar")
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("bar")
 
         testee.getVariantKey()
         verify(mockStore).variant = testee.defaultVariantKey()

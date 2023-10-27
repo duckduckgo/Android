@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.api
+package com.duckduckgo.privacy.config.impl.plugins
 
-/** Public interface for download remote privacy config */
-interface PrivacyConfigDownloader {
-    /**
-     * This method will download remote config and returns the [ConfigDownloadResult]
-     * @return [ConfigDownloadResult.Success] if remote config has been downloaded correctly or
-     * [ConfigDownloadResult.Error] otherwise.
-     */
-    suspend fun download(): ConfigDownloadResult
-}
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 
-sealed class ConfigDownloadResult {
-    object Success : ConfigDownloadResult()
-    data class Error(val error: String?) : ConfigDownloadResult()
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
+interface PrivacyConfigCallbackPluginPoint

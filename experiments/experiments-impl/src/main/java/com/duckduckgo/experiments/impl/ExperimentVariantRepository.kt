@@ -16,28 +16,61 @@
 
 package com.duckduckgo.experiments.impl
 
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.impl.store.ExperimentVariantDao
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 interface ExperimentVariantRepository {
-    fun updateVariants(variantEntityList: List<ExperimentVariantEntity>)
+    fun saveVariants(variants: List<VariantConfig>)
     fun getActiveVariants(): List<ExperimentVariantEntity>
+    fun getUserVariant(): String?
+    fun updateVariant(variantKey: String)
+    fun getAppReferrerVariant(): String?
+    fun updateAppReferrerVariant(variant: String)
 }
 
 @ContributesBinding(AppScope::class)
 class ExperimentVariantRepositoryImpl @Inject constructor(
     private val experimentVariantDao: ExperimentVariantDao,
+    private val store: StatisticsDataStore,
 ) : ExperimentVariantRepository {
 
-    override fun updateVariants(variantEntityList: List<ExperimentVariantEntity>) {
+    override fun saveVariants(variants: List<VariantConfig>) {
+        val variantEntityList: MutableList<ExperimentVariantEntity> = mutableListOf()
+        variants.map {
+            variantEntityList.add(
+                ExperimentVariantEntity(
+                    key = it.variantKey,
+                    weight = it.weight,
+                    localeFilter = it.filters?.locale.orEmpty(),
+                ),
+            )
+        }
         experimentVariantDao.delete()
         experimentVariantDao.insertAll(variantEntityList)
     }
 
     override fun getActiveVariants(): List<ExperimentVariantEntity> {
-        return experimentVariantDao.variants().filter { it.weight != null && it.weight > 0.0 }.toList()
+        return experimentVariantDao.variants()
+    }
+
+    override fun getUserVariant(): String? = store.variant
+
+    override fun updateVariant(variantKey: String) {
+        Timber.i("Updating variant for user: $variantKey")
+        store.variant = variantKey
+    }
+
+    override fun getAppReferrerVariant(): String? = store.referrerVariant
+
+    override fun updateAppReferrerVariant(variant: String) {
+        Timber.i("Updating variant for app referer: $variant")
+        store.variant = variant
+        store.referrerVariant = variant
     }
 }

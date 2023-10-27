@@ -17,7 +17,6 @@
 package com.duckduckgo.experiments.impl
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantConfig
@@ -31,7 +30,6 @@ import timber.log.Timber
 @WorkerThread
 @ContributesBinding(AppScope::class)
 class VariantManagerImpl @Inject constructor(
-    private val store: StatisticsDataStore,
     private val indexRandomizer: IndexRandomizer,
     private val appBuildConfig: AppBuildConfig,
     private val experimentVariantRepository: ExperimentVariantRepository,
@@ -41,52 +39,50 @@ class VariantManagerImpl @Inject constructor(
         return DEFAULT_VARIANT.key
     }
 
-    @Synchronized
     override fun getVariantKey(): String {
-        val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
-        val currentVariantKey = store.variant
-
-        if (currentVariantKey == DEFAULT_VARIANT.key) {
-            return DEFAULT_VARIANT.key
-        }
-
-        if (currentVariantKey != null && matchesReferrerVariant(currentVariantKey)) {
-            return referrerVariant(currentVariantKey).key
-        }
-
-        if (currentVariantKey == null || activeVariants.isEmpty()) {
-            return allocateNewVariant(activeVariants).key
-        }
-
-        val currentVariant = lookupVariant(currentVariantKey, activeVariants)
-        if (currentVariant == null) {
-            Timber.i("Variant $currentVariantKey no longer an active variant; user will now use default variant")
-            val newVariant = DEFAULT_VARIANT
-            persistVariant(newVariant)
-            return newVariant.key
-        }
-
-        return currentVariant.key
+        Timber.d("NOELIA getting variantKey: ${experimentVariantRepository.getUserVariant()}")
+        return experimentVariantRepository.getUserVariant().orEmpty()
     }
 
     override fun updateAppReferrerVariant(variant: String) {
-        Timber.i("Updating variant for app referer: $variant")
-        store.variant = variant
-        store.referrerVariant = variant
+        experimentVariantRepository.updateAppReferrerVariant(variant)
     }
 
-    override fun saveVariants(variants: List<VariantConfig>) {
-        val variantEntityList: MutableList<ExperimentVariantEntity> = mutableListOf()
-        variants.map {
-            variantEntityList.add(
-                ExperimentVariantEntity(
-                    key = it.variantKey,
-                    weight = it.weight,
-                    localeFilter = it.filters?.locale.orEmpty(),
-                ),
-            )
+    override fun newVariantsDownloaded(variants: List<VariantConfig>) {
+        experimentVariantRepository.saveVariants(variants)
+        Timber.d("NOELIA saving variants ${experimentVariantRepository.getActiveVariants()}")
+
+        val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
+        val currentVariantKey = experimentVariantRepository.getUserVariant()
+        Timber.d("NOELIA newVariantsDownloaded activeVariants $activeVariants")
+        Timber.d("NOELIA newVariantsDownloaded currentVariant $currentVariantKey")
+
+        updateUserVariant(activeVariants, currentVariantKey)
+    }
+
+    private fun updateUserVariant(activeVariants: List<Variant>, currentVariantKey: String?) {
+        if (currentVariantKey == DEFAULT_VARIANT.key) {
+            return
         }
-        experimentVariantRepository.updateVariants(variantEntityList)
+
+        if (currentVariantKey != null && matchesReferrerVariant(currentVariantKey)) {
+            return
+        }
+
+        if (currentVariantKey == null) {
+            allocateNewVariant(activeVariants)
+            return
+        }
+
+        val keyInActiveVariants = activeVariants.map { it.key }.contains(currentVariantKey)
+        if (!keyInActiveVariants) {
+            Timber.i("NOELIA Variant $currentVariantKey no longer an active variant; user will now use default variant")
+            val newVariant = DEFAULT_VARIANT
+            experimentVariantRepository.updateVariant(newVariant.key)
+            return
+        }
+
+        Timber.i("NOELIA Variant $currentVariantKey is still in use, no need to update")
     }
 
     private fun convertEntitiesToVariants(activeVariantEntities: List<ExperimentVariantEntity>): List<Variant> {
@@ -115,6 +111,10 @@ class VariantManagerImpl @Inject constructor(
         return { entity.localeFilter.contains(userLocale.toString()) }
     }
 
+    private fun matchesReferrerVariant(key: String): Boolean {
+        return key == experimentVariantRepository.getAppReferrerVariant()
+    }
+
     private fun allocateNewVariant(activeVariants: List<Variant>): Variant {
         var newVariant = generateVariant(activeVariants)
         val compliesWithFilters = newVariant.filterBy(appBuildConfig)
@@ -123,27 +123,8 @@ class VariantManagerImpl @Inject constructor(
             newVariant = DEFAULT_VARIANT
         }
         Timber.i("Current variant is null; allocating new one $newVariant")
-        persistVariant(newVariant)
+        experimentVariantRepository.updateVariant(newVariant.key)
         return newVariant
-    }
-
-    private fun lookupVariant(
-        key: String?,
-        activeVariants: List<Variant>,
-    ): Variant? {
-        val variant = activeVariants.firstOrNull { it.key == key }
-
-        if (variant != null) return variant
-
-        if (key != null && matchesReferrerVariant(key)) {
-            return referrerVariant(key)
-        }
-
-        return null
-    }
-
-    private fun matchesReferrerVariant(key: String): Boolean {
-        return key == store.referrerVariant
     }
 
     private fun generateVariant(activeVariants: List<Variant>): Variant {
@@ -154,10 +135,6 @@ class VariantManagerImpl @Inject constructor(
         }
         val randomizedIndex = indexRandomizer.random(activeVariants)
         return activeVariants[randomizedIndex]
-    }
-
-    private fun persistVariant(newVariant: Variant) {
-        store.variant = newVariant.key
     }
 
     companion object {

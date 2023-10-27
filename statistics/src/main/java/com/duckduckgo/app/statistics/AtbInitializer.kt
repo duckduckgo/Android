@@ -22,7 +22,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.privacy.config.api.PrivacyConfigDownloader
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -37,13 +42,21 @@ interface AtbInitializerListener {
     fun beforeAtbInitTimeoutMillis(): Long
 }
 
-class AtbInitializer(
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = MainProcessLifecycleObserver::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
+@SingleInstanceIn(AppScope::class)
+class AtbInitializer @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
-    private val listeners: Set<AtbInitializerListener>,
-    private val privacyConfigDownloader: PrivacyConfigDownloader,
-) : MainProcessLifecycleObserver {
+    private val listeners: DaggerSet<AtbInitializerListener>,
+) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     override fun onResume(owner: LifecycleOwner) {
         appCoroutineScope.launch { initialize() }
@@ -59,11 +72,15 @@ class AtbInitializer(
         initializeAtb()
     }
 
-    private suspend fun initializeAtb() {
+    private fun initializeAtb() {
         if (statisticsDataStore.hasInstallationStatistics) {
             statisticsUpdater.refreshAppRetentionAtb()
-        } else {
-            privacyConfigDownloader.download()
+        }
+    }
+
+    override fun onPrivacyConfigDownloaded() {
+        if (!statisticsDataStore.hasInstallationStatistics) {
+            // First time we initializeAtb
             statisticsUpdater.initializeAtb()
         }
     }
