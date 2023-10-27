@@ -21,6 +21,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import io.reactivex.Single
@@ -100,4 +101,22 @@ interface SavedSitesRelationsDao {
 
     @Query("delete from relations")
     fun deleteAll()
+
+    @Transaction
+    fun migrateNativeFavoritesAsNewRoot() {
+        // clear non-native favorites
+        delete(FAVORITES_DESKTOP_ROOT)
+        // clear unified folder
+        delete(FAVORITES_ROOT)
+        // add all native favorites to unified folder
+        updateFolderId(FAVORITES_MOBILE_ROOT, FAVORITES_ROOT)
+    }
+
+    @Transaction
+    fun migrateUnifiedFavoritesAsNewRoot() {
+        // clear non-native folder
+        delete(FAVORITES_DESKTOP_ROOT)
+        // clear native folder
+        delete(FAVORITES_MOBILE_ROOT)
+    }
 }
