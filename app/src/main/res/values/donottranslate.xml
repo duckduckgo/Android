@@ -58,4 +58,9 @@
 
     <string name="brokenSiteDescriptionCaption">What happened? What should have happened? Did turning protections off help?</string>
 
+    <string name="brokenSiteProtectionsOn">Protections are <b>ON</b> for this site</string>
+    <string name="brokenSiteProtectionsOff">Protections are <b>OFF</b> for this site</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Turning protections OFF might help.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We temporarily turned Privacy Protections off as they appear to be breaking this site.</string>
+
 </resources>
