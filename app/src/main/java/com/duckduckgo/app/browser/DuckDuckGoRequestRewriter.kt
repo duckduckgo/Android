@@ -17,15 +17,11 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.global.AppUrl.ParamValue
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.experiments.api.VariantManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface RequestRewriter {
@@ -39,8 +35,6 @@ class DuckDuckGoRequestRewriter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val appReferrerDataStore: AppReferrerDataStore,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : RequestRewriter {
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
@@ -74,9 +68,7 @@ class DuckDuckGoRequestRewriter(
     override fun addCustomQueryParams(builder: Uri.Builder) {
         val atb = statisticsStore.atb
         if (atb != null) {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariantKey()))
-            }
+            builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariantKey()))
         }
 
         val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE

@@ -20,7 +20,7 @@ interface AppProperties {
     fun atb(): String
     fun appAtb(): String
     fun searchAtb(): String
-    suspend fun expVariant(): String
+    fun expVariant(): String
     fun installedGPlay(): Boolean
     fun webView(): String
 }

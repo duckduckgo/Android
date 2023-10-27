@@ -69,7 +69,7 @@ internal class AboutDuckDuckGoViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockVariantManager.getVariantKey()).thenReturn("DEFAULT_VARIANT")
+        whenever(mockVariantManager.getVariantKey()).thenReturn("")
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
         runBlocking {
@@ -89,7 +89,7 @@ internal class AboutDuckDuckGoViewModelTest {
         testee.viewState().test {
             val value = awaitItem()
 
-            assertEquals("name DEFAULT_VARIANT (1)", value.version)
+            assertEquals("name (1)", value.version)
 
             cancelAndConsumeRemainingEvents()
         }

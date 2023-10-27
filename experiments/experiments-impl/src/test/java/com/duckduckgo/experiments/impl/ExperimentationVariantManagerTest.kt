@@ -17,6 +17,7 @@
 package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.impl.store.ExperimentVariantEntity
 import java.util.Locale
 import org.junit.Assert
@@ -61,7 +62,6 @@ class ExperimentationVariantManagerTest {
 
     @Test
     fun whenVariantAlreadyPersistedThenVariantAllocatorNeverInvoked() {
-        addActiveVariantToConfig()
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("foo")
 
         testee.getVariantKey()
@@ -79,7 +79,8 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
         addActiveVariantToConfig()
-        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("bar")
+
+        testee.newVariantsDownloaded(listOf()) // fixme Noelia
 
         assertEquals(testee.defaultVariantKey(), testee.getVariantKey())
     }
@@ -89,8 +90,8 @@ class ExperimentationVariantManagerTest {
         addActiveVariantToConfig()
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("bar")
 
-        testee.getVariantKey()
-        verify(mockStore).variant = testee.defaultVariantKey()
+        testee.newVariantsDownloaded(listOf()) // fixme Noelia
+        verify(mockExperimentVariantRepository).updateVariant("")
     }
 
     @Test
@@ -107,7 +108,7 @@ class ExperimentationVariantManagerTest {
 
         testee.getVariantKey()
 
-        verify(mockStore).variant = "foo"
+        verify(mockExperimentVariantRepository).updateVariant("foo")
     }
 
     @Test
@@ -118,7 +119,7 @@ class ExperimentationVariantManagerTest {
 
         testee.getVariantKey()
 
-        verify(mockStore).variant = testee.defaultVariantKey()
+        verify(mockExperimentVariantRepository).updateVariant("")
     }
 
     @Test
@@ -129,7 +130,7 @@ class ExperimentationVariantManagerTest {
 
         testee.getVariantKey()
 
-        verify(mockStore).variant = "foo"
+        verify(mockExperimentVariantRepository).updateVariant("foo")
     }
 
     @Test
@@ -156,8 +157,8 @@ class ExperimentationVariantManagerTest {
     @Test
     fun whenUpdatingReferrerVariantThenDataStoreHasItsDataUpdated() {
         testee.updateAppReferrerVariant("xx")
-        verify(mockStore).referrerVariant = "xx"
-        verify(mockStore).variant = "xx"
+
+        verify(mockExperimentVariantRepository).updateAppReferrerVariant("xx")
     }
 
     @Test
@@ -172,11 +173,13 @@ class ExperimentationVariantManagerTest {
     private fun addActiveVariantToConfig(variantKey: String = "foo", localeFilter: List<String> = emptyList()) {
         val testVariantEntity = ExperimentVariantEntity(variantKey, 1.0, localeFilter)
         whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
+
+        testee.newVariantsDownloaded(listOf(VariantConfig(variantKey)))
     }
 
     private fun mockUpdateScenario(key: String) {
         testee.updateAppReferrerVariant(key)
-        whenever(mockStore.referrerVariant).thenReturn(key)
-        whenever(mockStore.variant).thenReturn(key)
+        whenever(mockExperimentVariantRepository.getAppReferrerVariant()).thenReturn(key)
+        whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn(key)
     }
 }

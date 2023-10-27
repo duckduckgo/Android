@@ -18,28 +18,20 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.experiments.api.VariantManager
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
-
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
@@ -49,8 +41,6 @@ class QueryUrlConverterTest {
         mockStatisticsStore,
         variantManager,
         mockAppReferrerDataStore,
-        TestScope(),
-        coroutineTestRule.testDispatcherProvider,
     )
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 

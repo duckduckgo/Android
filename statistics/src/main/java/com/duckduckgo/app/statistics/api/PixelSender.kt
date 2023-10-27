@@ -17,8 +17,6 @@
 package com.duckduckgo.app.statistics.api
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
@@ -35,8 +33,6 @@ import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface PixelSender : MainProcessLifecycleObserver {
@@ -69,8 +65,6 @@ class RxPixelSender @Inject constructor(
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig?,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider,
 ) : PixelSender {
 
     private val compositeDisposable = CompositeDisposable()
@@ -116,19 +110,14 @@ class RxPixelSender @Inject constructor(
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
     ): Completable {
-        return Completable.fromCallable {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                val atbInfo = getAtbInfo()
-                api.fire(
-                    pixelName,
-                    getDeviceFactor(),
-                    atbInfo,
-                    addDeviceParametersTo(parameters),
-                    encodedParameters,
-                    devMode = shouldFirePixelsAsDev,
-                )
-            }
-        }
+        return api.fire(
+            pixelName,
+            getDeviceFactor(),
+            getAtbInfo(),
+            addDeviceParametersTo(parameters),
+            encodedParameters,
+            devMode = shouldFirePixelsAsDev,
+        )
     }
 
     override fun enqueuePixel(
@@ -137,16 +126,13 @@ class RxPixelSender @Inject constructor(
         encodedParameters: Map<String, String>,
     ): Completable {
         return Completable.fromCallable {
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                val atbInfo = getAtbInfo()
-                val pixelEntity = PixelEntity(
-                    pixelName = pixelName,
-                    atb = atbInfo,
-                    additionalQueryParams = addDeviceParametersTo(parameters),
-                    encodedQueryParams = encodedParameters,
-                )
-                pendingPixelDao.insert(pixelEntity)
-            }
+            val pixelEntity = PixelEntity(
+                pixelName = pixelName,
+                atb = getAtbInfo(),
+                additionalQueryParams = addDeviceParametersTo(parameters),
+                encodedQueryParams = encodedParameters,
+            )
+            pendingPixelDao.insert(pixelEntity)
         }
     }
 
@@ -174,7 +160,7 @@ class RxPixelSender @Inject constructor(
         return defaultParameters.plus(parameters)
     }
 
-    private suspend fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariantKey()) ?: ""
+    private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariantKey()) ?: ""
 
     private fun getDeviceFactor() = deviceInfo.formFactor().description
 }

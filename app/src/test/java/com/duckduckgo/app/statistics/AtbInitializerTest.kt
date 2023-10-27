@@ -41,7 +41,7 @@ class AtbInitializerTest {
     fun whenReferrerInformationInstantlyAvailableThenAtbInitialized() = runTest {
         configureNeverInitialized()
 
-        testee.initialize()
+        testee.onPrivacyConfigDownloaded()
 
         verify(statisticsUpdater).initializeAtb()
     }
@@ -52,7 +52,7 @@ class AtbInitializerTest {
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = 1000L)
         testee = AtbInitializer(TestScope(), statisticsDataStore, statisticsUpdater, setOf(appReferrerStateListener))
 
-        testee.initialize()
+        testee.onPrivacyConfigDownloaded()
 
         verify(statisticsUpdater).initializeAtb()
     }
@@ -78,21 +78,21 @@ class AtbInitializerTest {
     }
 
     @Test
-    fun givenHasInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitialized() = runTest {
+    fun givenHasInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitializedNeverCalled() = runTest {
         configureAlreadyInitialized()
 
-        testee.initialize()
+        testee.onPrivacyConfigDownloaded()
 
-        verify(statisticsUpdater).initializeAtb()
+        verify(statisticsUpdater, never()).initializeAtb()
     }
 
     @Test
-    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitializedNeverCalled() = runTest {
+    fun givenNeverInstallationStatisticsWhenOnPrivacyConfigDownloadedThenAtbInitialized() = runTest {
         configureNeverInitialized()
 
-        testee.initialize()
+        testee.onPrivacyConfigDownloaded()
 
-        verify(statisticsUpdater, never()).initializeAtb()
+        verify(statisticsUpdater).initializeAtb()
     }
 
     private fun configureNeverInitialized() {

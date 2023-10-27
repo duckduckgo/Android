@@ -24,6 +24,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -255,6 +256,18 @@ class RealPrivacyConfigPersisterTest {
         }
 
         override val featureName = "variantManager"
+    }
+
+    class FakeFakePrivacyConfigCallbackPluginPoint(
+        private val plugins: List<PrivacyConfigCallbackPlugin>,
+    ) : PluginPoint<PrivacyConfigCallbackPlugin> {
+        override fun getPlugins(): Collection<PrivacyConfigCallbackPlugin> {
+            return plugins
+        }
+    }
+
+    class FakePrivacyConfigCallbackPlugin : PrivacyConfigCallbackPlugin {
+        override fun onPrivacyConfigDownloaded() {}
     }
 
     companion object {

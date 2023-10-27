@@ -20,7 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LifecycleOwner
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
@@ -34,8 +33,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Completable
 import java.util.concurrent.TimeoutException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -45,7 +42,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.*
 
-@ExperimentalCoroutinesApi
 class RxPixelSenderTest {
 
     @get:Rule
@@ -53,9 +49,6 @@ class RxPixelSenderTest {
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
-
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Mock
     val api: PixelService = mock()
@@ -90,8 +83,6 @@ class RxPixelSenderTest {
             object : StatisticsLibraryConfig {
                 override fun shouldFirePixelsAsDev() = true
             },
-            TestScope(),
-            coroutineTestRule.testDispatcherProvider,
         )
     }
 

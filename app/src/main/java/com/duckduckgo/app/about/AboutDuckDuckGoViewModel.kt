@@ -65,8 +65,9 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     private var netPEasterEggCounter = 0
 
     fun viewState(): Flow<ViewState> = viewState.onStart {
+        val variantKey = variantManager.getVariantKey()
+
         viewModelScope.launch {
-            val variantKey = variantManager.getVariantKey()
             viewState.emit(
                 currentViewState().copy(
                     networkProtectionWaitlistState = networkProtectionWaitlist.getState(),
