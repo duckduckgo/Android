@@ -48,6 +48,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
@@ -94,7 +95,7 @@ class SavedSitesSyncDataProviderTest {
         repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
         store = RealSavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
-        parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto())
+        parser = SavedSitesSyncDataProvider(repository, store, FakeCrypto(), mock())
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)

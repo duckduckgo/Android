@@ -25,6 +25,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.store.EntityType.FOLDER
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 
@@ -133,6 +134,29 @@ interface SavedSitesEntitiesDao {
 
     @Query("select * from entities where deleted = 1")
     fun allDeleted(): List<Entity>
+
+    @Transaction
+    fun createFormFactorFavoriteFolders() {
+        val rootFolder = entityById(SavedSitesNames.FAVORITES_ROOT)
+        if (rootFolder == null) {
+            insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", FOLDER, lastModified = null))
+        }
+        val rootFolderLastModified = rootFolder?.lastModified ?: DatabaseDateFormatter.iso8601()
+        if (entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT) == null) {
+            insert(
+                Entity(
+                    SavedSitesNames.FAVORITES_MOBILE_ROOT,
+                    SavedSitesNames.FAVORITES_MOBILE_NAME,
+                    "",
+                    FOLDER,
+                    lastModified = rootFolderLastModified,
+                ),
+            )
+        }
+        if (entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT) == null) {
+            insert(Entity(SavedSitesNames.FAVORITES_DESKTOP_ROOT, SavedSitesNames.FAVORITES_DESKTOP_NAME, "", FOLDER, lastModified = null))
+        }
+    }
 
     @Transaction
     fun removeFormFactorFavoriteFolders() {
