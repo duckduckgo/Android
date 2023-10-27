@@ -56,4 +56,6 @@
     <string name="brokenSiteCategoryVideos">Video didn\'t play or load</string>
     <string name="brokenSiteCategoryLogin">Can\'t sign in/register</string>
 
+    <string name="brokenSiteDescriptionCaption">What happened? What should have happened? Did turning protections off help?</string>
+
 </resources>

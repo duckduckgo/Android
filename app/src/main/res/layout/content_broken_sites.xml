@@ -97,6 +97,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/brokenSiteFormLoginInput" />
 
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            android:id="@+id/brokenSiteFormFeedbackInputCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_5"
+            android:paddingStart="@dimen/keyline_4"
+            android:paddingEnd="@dimen/keyline_4"
+            android:text="@string/brokenSiteDescriptionCaption"
+            app:layout_constraintEnd_toEndOf="@id/brokenSiteFormFeedbackInput"
+            app:layout_constraintStart_toStartOf="@id/brokenSiteFormFeedbackInput"
+            app:layout_constraintTop_toBottomOf="@id/brokenSiteFormFeedbackInput"
+            app:typography="caption" />
+
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/submitButton"
             android:layout_width="0dp"
@@ -106,7 +121,7 @@
             app:buttonSize="large"
             app:layout_constraintEnd_toEndOf="@id/brokenSiteFormFeedbackInput"
             app:layout_constraintStart_toStartOf="@id/brokenSiteFormFeedbackInput"
-            app:layout_constraintTop_toBottomOf="@id/brokenSiteFormFeedbackInput" />
+            app:layout_constraintTop_toBottomOf="@id/brokenSiteFormFeedbackInputCaption" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
