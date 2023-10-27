@@ -16,39 +16,43 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.*
+import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.impl.SavedSitesSettingsRepository
-import com.duckduckgo.savedsites.store.FavoritesViewMode.DESKTOP
 import com.duckduckgo.savedsites.store.FavoritesViewMode.NATIVE
 import com.duckduckgo.savedsites.store.FavoritesViewMode.UNIFIED
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
-import kotlinx.coroutines.CoroutineScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 interface SavedSitesSyncMigration {
+    fun onSyncEnabled()
     fun onSyncDisabled()
 }
 
-class SavedSitesSyncMigrationImpl(
+@ContributesBinding(AppScope::class)
+class SavedSitesSyncMigrationImpl @Inject constructor(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val savedSitesSettings: SavedSitesSettingsRepository,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesSyncMigration {
+    override fun onSyncEnabled() {
+        savedSitesEntitiesDao.createFormFactorFavoriteFolders()
+        savedSitesRelationsDao.cloneFolder(
+            SavedSitesNames.FAVORITES_ROOT,
+            SavedSitesNames.FAVORITES_MOBILE_ROOT,
+        )
+    }
 
     override fun onSyncDisabled() {
         when (savedSitesSettings.favoritesDisplayMode) {
             NATIVE -> {
                 savedSitesRelationsDao.migrateNativeFavoritesAsNewRoot()
             }
+
             UNIFIED -> {
                 savedSitesRelationsDao.migrateUnifiedFavoritesAsNewRoot()
-            }
-            DESKTOP -> {
-                // doesn't exist here
             }
         }
         savedSitesEntitiesDao.removeFormFactorFavoriteFolders()

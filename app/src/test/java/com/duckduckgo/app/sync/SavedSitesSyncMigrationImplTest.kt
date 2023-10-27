@@ -40,7 +40,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class SavedSitesSyncMigrationImplTest {
@@ -70,14 +69,35 @@ class SavedSitesSyncMigrationImplTest {
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSiteSettingsRepository,
-            mock(),
-            mock(),
         )
     }
 
     @After
     fun after() {
         db.close()
+    }
+
+    @Test
+    fun whenSyncEnabledThenFormFactorFavoriteFoldersCreated() {
+        testee.onSyncEnabled()
+
+        assertNotNull(savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_ROOT))
+        assertNotNull(savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT))
+        assertNotNull(savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT))
+    }
+
+    @Test
+    fun whenSyncEnabledThenAllFavoritesCopiedToNativeFolder() = runTest {
+        val entities = givenEntitiesWithIds("Entity1", "Entity2", "Entity3")
+        givenEntitiesStoredIn(entities, SavedSitesNames.FAVORITES_ROOT)
+
+        testee.onSyncEnabled()
+
+        val rootRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).first()
+        val nativeRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_MOBILE_ROOT).first()
+
+        assertNotEquals(rootRelations, nativeRelations)
+        assertEquals(rootRelations.map { it.entityId }, nativeRelations.map { it.entityId })
     }
 
     @Test

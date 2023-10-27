@@ -105,18 +105,27 @@ interface SavedSitesRelationsDao {
     @Transaction
     fun migrateNativeFavoritesAsNewRoot() {
         // clear non-native favorites
-        delete(FAVORITES_DESKTOP_ROOT)
+        delete(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
         // clear unified folder
-        delete(FAVORITES_ROOT)
+        delete(SavedSitesNames.FAVORITES_ROOT)
         // add all native favorites to unified folder
-        updateFolderId(FAVORITES_MOBILE_ROOT, FAVORITES_ROOT)
+        updateFolderId(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
     }
+
+    @Transaction
+    fun cloneFolder(from: String, to: String) {
+        delete(to)
+        copyRelationsFromTo(from, to)
+    }
+
+    @Query("INSERT INTO relations (folderId, entityId) Select :to, entityId from relations where folderId = :from")
+    fun copyRelationsFromTo(from: String, to: String)
 
     @Transaction
     fun migrateUnifiedFavoritesAsNewRoot() {
         // clear non-native folder
-        delete(FAVORITES_DESKTOP_ROOT)
+        delete(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
         // clear native folder
-        delete(FAVORITES_MOBILE_ROOT)
+        delete(SavedSitesNames.FAVORITES_MOBILE_ROOT)
     }
 }
