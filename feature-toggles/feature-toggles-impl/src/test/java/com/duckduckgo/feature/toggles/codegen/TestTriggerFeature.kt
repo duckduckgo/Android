@@ -34,7 +34,17 @@ interface TestTriggerFeature {
     @DefaultValue(false)
     fun fooFeature(): Toggle
 
+    @DefaultValue(true)
+    @InternalAlwaysEnabled
+    fun internalDefaultTrue(): Toggle
+
     @DefaultValue(false)
     @InternalAlwaysEnabled
-    fun fooInternal(): Toggle
+    fun internalDefaultFalse(): Toggle
+
+    @DefaultValue(true)
+    fun defaultTrue(): Toggle
+
+    @DefaultValue(false)
+    fun defaultFalse(): Toggle
 }
