@@ -17,6 +17,7 @@
 package com.duckduckgo.networkprotection.impl.settings
 
 import android.os.Bundle
+import android.view.View
 import android.widget.CompoundButton
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -25,6 +26,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpNotificationSettingsBinding
@@ -64,6 +66,14 @@ class NetPNotificationSettingsActivity : DuckDuckGoActivity() {
             )
         }
         binding.vpnNotificationAlerts.setOnCheckedChangeListener(toggleNotificationAlertListener)
+        binding.vpnNotificationSettingsNotifyMe.setOnVisibilityChange(
+            object : NotifyMeView.OnVisibilityChangedListener {
+                override fun onVisibilityChange(v: View?, isVisible: Boolean) {
+                    // The settings are only interactable when the notifyMe component is not visible
+                    binding.vpnNotificationAlerts.isEnabled = !isVisible
+                }
+            },
+        )
     }
 }
 

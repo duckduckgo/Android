@@ -281,6 +281,7 @@ class NotifyMeView @JvmOverloads constructor(
             if (newVisibility != previousVisibility) {
                 this.visibilityChangedListener?.onVisibilityChange(this, newVisibility == VISIBLE)
             }
+            setTag(tag, newVisibility)
         }
 
         viewTreeObserver.addOnGlobalLayoutListener(vtoGlobalLayoutListener)
