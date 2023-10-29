@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Настройки</string>
     <string name="settingsPermissionsSetting">Разрешения</string>
     <string name="settingsAutofillLoginsSetting">Автозаполнение логинов</string>
-    <string name="settingsSyncSetting">Синхронизация</string>
+    <string name="settingsSyncSetting">Синхронизация и резервное копирование</string>
     <string name="settingsFireButton">Кнопка «Тревога»</string>
 
     <!-- Private Search -->
