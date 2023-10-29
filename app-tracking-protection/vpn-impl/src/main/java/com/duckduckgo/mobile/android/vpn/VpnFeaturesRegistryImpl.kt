@@ -111,7 +111,10 @@ internal class VpnFeaturesRegistryImpl(
  *
  * The class is marked as open to be able to mock it in tests.
  */
-internal open class VpnServiceWrapper(private val context: Context) {
+internal open class VpnServiceWrapper(
+    private val context: Context,
+    private val dispatcherProvider: DispatcherProvider,
+) : Vpn {
     open fun restartVpnService(forceRestart: Boolean) {
         TrackerBlockingVpnService.restartVpnService(context, forceRestart = forceRestart)
     }
@@ -126,5 +129,13 @@ internal open class VpnServiceWrapper(private val context: Context) {
 
     open fun isServiceRunning(): Boolean {
         return TrackerBlockingVpnService.isServiceRunning(context)
+    }
+
+    override suspend fun start() = withContext(dispatcherProvider.io()) {
+        startService()
+    }
+
+    override suspend fun stop() = withContext(dispatcherProvider.io()) {
+        stopService()
     }
 }

@@ -38,4 +38,7 @@ interface NetPInternalFeatureToggles {
 
     @Toggle.DefaultValue(defaultValue = false)
     fun enablePcapRecording(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = false)
+    fun snoozeWhileCalling(): Toggle
 }

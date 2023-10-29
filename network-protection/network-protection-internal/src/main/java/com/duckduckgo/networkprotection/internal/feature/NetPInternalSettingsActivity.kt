@@ -16,16 +16,22 @@
 
 package com.duckduckgo.networkprotection.internal.feature
 
+import android.Manifest.permission.READ_PHONE_STATE
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.extensions.launchApplicationInfoSettings
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -33,6 +39,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
@@ -54,10 +61,12 @@ import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class NetPInternalSettingsActivity : DuckDuckGoActivity() {
@@ -79,6 +88,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var connectionQualityStore: ConnectionQualityStore
 
     @Inject lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
+
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private val job = ConflatedJob()
 
@@ -124,6 +135,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             while (isActive) {
                 val isEnabled = networkProtectionState.isEnabled()
 
+                binding.snoozeWhileCalling.isEnabled = isEnabled
                 binding.excludeSystemAppsToggle.isEnabled = isEnabled
                 binding.dnsLeakProtectionToggle.isEnabled = isEnabled
                 binding.netpPcapRecordingToggle.isEnabled = isEnabled
@@ -167,6 +179,46 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
+        fun hasPhoneStatePermission(): Boolean {
+            return if (appBuildConfig.sdkInt >= Build.VERSION_CODES.M) {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    READ_PHONE_STATE,
+                ) == PackageManager.PERMISSION_GRANTED
+            } else {
+                true
+            }
+        }
+
+        with(netPInternalFeatureToggles.snoozeWhileCalling()) {
+            binding.snoozeWhileCalling.setIsChecked(this.isEnabled())
+            binding.snoozeWhileCalling.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked && hasPhoneStatePermission()) {
+                    this.setEnabled(Toggle.State(enable = true))
+                } else if (isChecked) {
+                    // need to request permission
+                    binding.snoozeWhileCalling.setIsChecked(false)
+                    Snackbar.make(
+                        binding.root,
+                        getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionByline),
+                        Snackbar.LENGTH_LONG,
+                    ).setAction(
+                        getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionAction),
+                    ) {
+                        if (shouldShowRequestPermissionRationale(READ_PHONE_STATE)) {
+                            requestPermissions(arrayOf(READ_PHONE_STATE), READ_PHONE_STATE.hashCode().absoluteValue)
+                        } else {
+                            // User denied the permission 2+ times
+                            this@NetPInternalSettingsActivity.launchApplicationInfoSettings()
+                        }
+                    }.show()
+                } else {
+                    this.setEnabled(Toggle.State(enable = false))
+                    binding.snoozeWhileCalling.setIsChecked(false)
+                }
+            }
+        }
+
         with(netPInternalFeatureToggles.excludeSystemApps()) {
             binding.excludeSystemAppsToggle.setIsChecked(this.isEnabled())
             binding.excludeSystemAppsToggle.setOnCheckedChangeListener { _, isChecked ->
@@ -223,6 +275,21 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.changeEnvironment.setClickListener {
             globalActivityStarter.start(this, NetPEnvironmentSettingScreen)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            READ_PHONE_STATE.hashCode().absoluteValue -> {
+                val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                netPInternalFeatureToggles.snoozeWhileCalling().setEnabled(Toggle.State(enable = granted))
+                binding.snoozeWhileCalling.setIsChecked(granted)
+                if (!granted) {
+                    logcat { "READ_PHONE_STATE permission denied" }
+                }
+            }
+            else -> {}
         }
     }
 

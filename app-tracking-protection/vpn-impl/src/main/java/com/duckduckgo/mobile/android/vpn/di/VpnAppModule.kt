@@ -22,6 +22,7 @@ import android.net.ConnectivityManager
 import androidx.room.Room
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
 import com.duckduckgo.mobile.android.vpn.VpnServiceWrapper
@@ -101,7 +102,16 @@ object VpnAppModule {
         sharedPreferencesProvider: VpnSharedPreferencesProvider,
         dispatcherProvider: DispatcherProvider,
     ): VpnFeaturesRegistry {
-        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context), sharedPreferencesProvider, dispatcherProvider)
+        return VpnFeaturesRegistryImpl(VpnServiceWrapper(context, dispatcherProvider), sharedPreferencesProvider, dispatcherProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideVpnServiceWrapper(
+        context: Context,
+        dispatcherProvider: DispatcherProvider,
+    ): Vpn {
+        return VpnServiceWrapper(context, dispatcherProvider)
     }
 
     @Provides
