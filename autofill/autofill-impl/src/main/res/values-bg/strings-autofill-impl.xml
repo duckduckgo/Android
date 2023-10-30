@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Продължаване на запазването</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Забрани</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Скрийте имейл адреса си и\nблокирайте тракерите</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Защита на имейл</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Създайте уникален, произволен адрес, който премахва скритите тракери и препраща имейлите към пощенската Ви кутия.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Защита на моя имейл</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Не показвай отново</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ако излезете сега, Вашият Duck Address няма да бъде запазен</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Продължаване с настройката</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Изход от настройката</string>
+
 </resources>
