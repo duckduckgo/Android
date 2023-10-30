@@ -3293,6 +3293,7 @@ class BrowserTabFragment :
         }
 
         private fun renderFullscreenMode(viewState: BrowserViewState) {
+            if (!this@BrowserTabFragment.isVisible) return
             activity?.isImmersiveModeEnabled()?.let {
                 if (viewState.isFullScreen) {
                     if (!it) goFullScreen()
@@ -3597,14 +3598,12 @@ class BrowserTabFragment :
         }
 
         private fun goFullScreen() {
-            Timber.i("Entering full screen")
             binding.webViewFullScreenContainer.show()
             activity?.toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
         private fun exitFullScreen() {
-            Timber.i("Exiting full screen")
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()
