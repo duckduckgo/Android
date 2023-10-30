@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Info su DuckDuckGo</string>
-    <string name="aboutDescription">
-        DuckDuckGo è il nuovo standard di sicurezza online.\n\nIl Privacy Browser di DuckDuckGo ti offre tutti i privacy essentials di cui hai bisogno per proteggerti mentre navighi ed effettui ricerche online, inclusi il blocco del sistema di tracciamento, una crittografia più sofisticata e la navigazione in incognito DuckDuckGo.\n\nDel resto, Internet non deve essere un luogo da temere e avere la meritata privacy online dovrebbe essere una cosa semplice.</string>
-    <string name="aboutMoreLink">Scopri di più su duckduckgo.com/about</string>
+    <string name="aboutHeader">Dax the Duck ti dà il benvenuto!</string>
+    <string name="aboutDescription">Fondata nel 2008, DuckDuckGo è un\'azienda indipendente che tutela la privacy online per tutti coloro che sono stanchi di essere tracciati online e vogliono una soluzione semplice. Siamo la dimostrazione che si può garantire una vera protezione della privacy online senza compromessi.\n\nIl browser DuckDuckGo è ricco di funzioni essenziali come i segnalibri, le schede, le password e molto altro ancora, oltre a <annotation type="privacy_protection_link">numerose e potenti protezioni della privacy</annotation> che normalmente non vengono offerte dai browser più comuni. Stiamo parlando di uno straordinario set completo per la protezione della privacy, che aiuta a proteggere le attività online, dalla ricerca alla navigazione, alle e-mail e molto altro ancora.\n\nCon le nostre protezioni della privacy non è necessario conoscere particolari tecnici o dover affrontare configurazioni complesse. È sufficiente scegliere il browser DuckDuckGo su tutti i dispositivi personali per avere automaticamente garantita la privacy.\n\nPer saperne di più su come funzionano le protezioni della privacy di DuckDuckGo, è possibile consultare le nostre <annotation type="learn_more_link">pagine di aiuto</annotation></string>
     <string name="no_suggestions">Nessun suggerimento</string>
 
     <!-- Broken Site Activity -->

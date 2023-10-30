@@ -72,7 +72,7 @@
             android:paddingStart="@dimen/keyline_6"
             android:paddingEnd="@dimen/keyline_6"
             android:paddingBottom="@dimen/keyline_4"
-            android:text="@string/aboutNewDescription"
+            android:text="@string/aboutDescription"
             android:textAlignment="viewStart"
             app:textType="secondary"
             app:typography="body1"

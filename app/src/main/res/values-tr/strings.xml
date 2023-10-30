@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
-    <string name="aboutDescription">
-        DuckDuckGo\'da, internet için yeni güven standardını belirliyoruz.\n\nDuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dâhil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\nNe de olsa, internet sizi korkutmamalı ve internette hakkınız olan gizliliği elde etmek panjurları kapatmak kadar basit olmalı.</string>
-    <string name="aboutMoreLink">Duckduckgo.com/about adresinde daha fazla bilgi edinin</string>
+    <string name="aboutHeader">Duck Side\'a hoş geldiniz!</string>
+    <string name="aboutDescription">DuckDuckGo, çevrim içi takip edilmeyi hiç istemeyen ve pratik bir çözüm arayan herkese hizmet veren, 2008 yılında kurulmuş bağımsız bir İnternet gizlilik şirketidir. Biz, çevrim içi ortamda ödün vermeden gerçek gizlilik koruması elde edebileceğinizin kanıtıyız.\n\nDuckDuckGo tarayıcı; yer imleri, sekmeler, parolalar ve daha fazlası gibi bir tarayıcıdan beklediğiniz özelliklerin yanı sıra varsayılan olarak çoğu popüler tarayıcıda sunulmayan <annotation type="privacy_protection_link">ondan fazla güçlü gizlilik koruması</annotation> ile birlikte gelir. Son derece kapsamlı olan bu gizlilik koruma seti, aramadan gezinmeye, e-posta göndermeye ve daha fazlasına kadar çevrim içi etkinliklerinizde koruma sağlamaya yardımcı olur.\n\nGizlilik korumalarımız, teknik ayrıntılar hakkında hiçbir şey bilmenize veya karmaşık ayarlarla uğraşmanıza gerek kalmadan çalışır. Tüm cihazlarınızda tarayıcı olarak DuckDuckGo\'yu kullanarak aradığınız gizliliği sağlayabilirsiniz.\n\nAncak ayrıntılara göz atmak istiyorsanız, DuckDuckGo gizlilik korumalarının nasıl çalıştığıyla ilgili daha fazla bilgiyi <annotation type="learn_more_link">yardım sayfalarımızda</annotation>bulabilirsiniz.</string>
     <string name="no_suggestions">Öneri yok</string>
 
     <!-- Broken Site Activity -->

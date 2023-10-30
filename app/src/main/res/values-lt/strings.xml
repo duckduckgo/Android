@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie „DuckDuckGo“</string>
-    <string name="aboutDescription">
-        „DuckDuckGo“ nustatome naują patikimumo tinkle standartą.\n\n„DuckDuckGo“ privatumo naršyklė užtikrina visus svarbiausius įrankius, kurie padės apsaugoti savo privatumą ieškant ir naršant tinkle, įskaitant sekiklių blokavimą, išmanųjį šifravimą ir „DuckDuckGo“ privačias paieškas.\n\nMūsų komanda tiki, kad internetas neturėtų būti toks baisus, o privatumas, kurio nusipelnėte internete, turėtų būti ranka pasiekiamas.</string>
-    <string name="aboutMoreLink">Daugiau informacijos rasite duckdukgo.com/about</string>
+    <string name="aboutHeader">Sveiki prisijungę prie „Duck“!</string>
+    <string name="aboutDescription">„DuckDuckGo“ yra nepriklausoma interneto privatumo bendrovė, įkurta 2008 metais ir skirta visiems, kurie pavargo nuo sekimo internete ir nori lengvo sprendimo. Esame įrodymas, kad galite gauti tikrą privatumo apsaugą internete be kompromisų.\n\n„DuckDuckGo“ naršyklėje yra funkcijų, kurių tikitės iš pagrindinės naršyklės, pavyzdžiui, žymės, skirtukai, slaptažodžiai ir kt., taip pat daugiau nei <annotation type="privacy_protection_link"> tuzinas galingų privatumo apsaugos priemonių,</annotation> kurios nesiūlomos daugumoje populiarių naršyklių. Šis unikalus išsamus privatumo apsaugos rinkinys padeda apsaugoti jūsų veiklą internete – nuo paieškos iki naršymo, el. pašto ir kt.\n\nMūsų privatumo apsaugos priemonės veikia nereikalaudamos nieko žinoti apie technines detales ar naudotis sudėtingais nustatymais. Tereikia visuose įrenginiuose perjungti naršyklę į „DuckDuckGo“ ir privatumas bus užtikrintas pagal numatytuosius nustatymus.\n\nTačiau jei norite daugiau informacijos apie tai, kaip veikia „DuckDuckGo“ privatumo apsaugos priemonės, žiūrėkite mūsų <annotation type="learn_more_link">pagalbos puslapius</annotation>.</string>
     <string name="no_suggestions">Pasiūlymų nėra</string>
 
     <!-- Broken Site Activity -->
