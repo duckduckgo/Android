@@ -29,4 +29,9 @@ interface Vpn {
      * Disable the device VPN by stopping the VPN service
      */
     suspend fun stop()
+
+    /**
+     * Snoozes the VPN for [triggerAtMillis] milliseconds
+     */
+    suspend fun snooze(triggerAtMillis: Long)
 }

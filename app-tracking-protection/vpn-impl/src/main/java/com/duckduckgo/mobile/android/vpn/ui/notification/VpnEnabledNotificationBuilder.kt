@@ -65,7 +65,11 @@ class VpnEnabledNotificationBuilder {
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .addAction(vpnEnabledNotificationContent.notificationAction)
+                .apply {
+                    vpnEnabledNotificationContent.notificationActions.take(2).forEach { action ->
+                        addAction(action)
+                    }
+                }
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()
@@ -88,7 +92,11 @@ class VpnEnabledNotificationBuilder {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
                 .setOngoing(true)
-                .addAction(vpnNotification.notificationAction)
+                .apply {
+                    vpnNotification.notificationActions.take(2).forEach { action ->
+                        addAction(action)
+                    }
+                }
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()

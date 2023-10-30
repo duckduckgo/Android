@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.notification
+package com.duckduckgo.networkprotection.internal.notification
 
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
+import androidx.core.app.NotificationCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import com.duckduckgo.di.scopes.VpnScope
@@ -32,6 +34,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.notification.NetPEnableReceiver
+import com.duckduckgo.networkprotection.impl.notification.NetPEnabledNotificationContentPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -40,28 +44,62 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesMultibinding(
+    scope = VpnScope::class,
+    replaces = [NetPEnabledNotificationContentPlugin::class],
+)
 @SingleInstanceIn(VpnScope::class)
-class NetPEnabledNotificationContentPlugin @Inject constructor(
+class NetPEnabledSnoozeNotificationContentPlugin @Inject constructor(
     private val context: Context,
     private val resources: Resources,
     private val networkProtectionState: NetworkProtectionState,
     private val appTrackingProtection: AppTrackingProtection,
-    private val netPNotificationActions: NetPNotificationActions,
     netPIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
     override fun getInitialContent(): VpnEnabledNotificationContent? {
+        fun getActions(): List<NotificationCompat.Action> {
+            return listOf(
+                NotificationCompat.Action(
+                    R.drawable.ic_baseline_feedback_24,
+                    context.getString(com.duckduckgo.networkprotection.internal.R.string.netpSnoozeAction),
+                    PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, NetPEnableReceiver::class.java).apply {
+                            action = "com.duckduckgo.networkprotection.notification.ACTION_NETP_SNOOZE" // FIXME VPN
+                        },
+                        PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                ),
+                NotificationCompat.Action(
+                    R.drawable.ic_baseline_feedback_24,
+                    context.getString(com.duckduckgo.networkprotection.internal.R.string.netpDisableVpnAction),
+                    PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, NetPEnableReceiver::class.java).apply {
+                            action = "com.duckduckgo.networkprotection.notification.ACTION_NETP_DISABLE" // FIXME VPN
+                        },
+                        PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                ),
+            )
+        }
+
         return if (isActive()) {
             val title = networkProtectionState.serverLocation()?.run {
-                HtmlCompat.fromHtml(resources.getString(R.string.netpEnabledNotificationTitle, this), FROM_HTML_MODE_LEGACY)
-            } ?: resources.getString(R.string.netpEnabledNotificationInitialTitle)
+                HtmlCompat.fromHtml(
+                    resources.getString(com.duckduckgo.networkprotection.internal.R.string.netpInternalEnabledNotificationTitle, this),
+                    FROM_HTML_MODE_LEGACY,
+                )
+            } ?: resources.getString(com.duckduckgo.networkprotection.internal.R.string.netpInternalEnabledNotificationInitialTitle)
 
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = onPressIntent,
-                notificationActions = listOf(netPNotificationActions.getReportIssueNotificationAction(context)),
+                notificationActions = getActions(),
             )
         } else {
             null
@@ -91,7 +129,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
 class NetPEnabledNotificationIntentProvider @Inject constructor(
     private val context: Context,
     private val globalActivityStarter: GlobalActivityStarter,
-) : NetPEnabledNotificationContentPlugin.IntentProvider {
+) : NetPEnabledSnoozeNotificationContentPlugin.IntentProvider {
     override fun getOnPressNotificationIntent(): PendingIntent? {
         val intent = globalActivityStarter.startIntent(context, NetworkProtectionManagementScreenNoParams)
         return TaskStackBuilder.create(context).run {
