@@ -187,39 +187,4 @@ class RealSyncSavedSitesRepository(
         savedSitesRelationsDao.updateEntityId(localId, favorite.id)
         updateFavourite(favorite, favoriteFolder)
     }
-
-    private fun getQueryFavoriteFolder(viewMode: FavoritesViewMode): String {
-        return when (viewMode) {
-            FavoritesViewMode.NATIVE -> SavedSitesNames.FAVORITES_MOBILE_ROOT
-            FavoritesViewMode.UNIFIED -> SavedSitesNames.FAVORITES_ROOT
-            FavoritesViewMode.DESKTOP -> SavedSitesNames.FAVORITES_DESKTOP_ROOT
-        }
-    }
-
-    private fun getInsertFavoriteFolder(viewMode: FavoritesViewMode): List<String> {
-        return when (viewMode) {
-            FavoritesViewMode.NATIVE -> listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
-            FavoritesViewMode.UNIFIED -> listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
-            FavoritesViewMode.DESKTOP -> TODO()
-        }
-    }
-
-    private fun getDeleteFavoriteFolder(viewMode: FavoritesViewMode): List<String> {
-        return when (viewMode) {
-            FavoritesViewMode.NATIVE -> {
-                // bookmark exists for desktop, remove only for mobile
-                if (false) {
-                    listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT)
-                } else {
-                    listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
-                }
-            }
-
-            FavoritesViewMode.UNIFIED -> {
-                return listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_DESKTOP_ROOT)
-            }
-
-            FavoritesViewMode.DESKTOP -> TODO()
-        }
-    }
 }

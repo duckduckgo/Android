@@ -50,7 +50,6 @@ class SavedSitesSyncMigrationImpl @Inject constructor(
             NATIVE -> {
                 savedSitesRelationsDao.migrateNativeFavoritesAsNewRoot()
             }
-
             UNIFIED -> {
                 savedSitesRelationsDao.migrateUnifiedFavoritesAsNewRoot()
             }
