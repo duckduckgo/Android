@@ -39,12 +39,12 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 import com.duckduckgo.networkprotection.internal.feature.NetPEnvironmentSettingActivity.Companion.NetPEnvironmentSettingScreen
+import com.duckduckgo.networkprotection.internal.feature.snooze.VpnDisableOnCall
 import com.duckduckgo.networkprotection.internal.feature.system_apps.NetPSystemAppsExclusionListActivity
 import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
@@ -90,6 +90,8 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var vpnDisableOnCall: VpnDisableOnCall
 
     private val job = ConflatedJob()
 
@@ -190,31 +192,33 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(netPInternalFeatureToggles.snoozeWhileCalling()) {
-            binding.snoozeWhileCalling.setIsChecked(this.isEnabled())
-            binding.snoozeWhileCalling.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked && hasPhoneStatePermission()) {
-                    this.setEnabled(Toggle.State(enable = true))
-                } else if (isChecked) {
-                    // need to request permission
-                    binding.snoozeWhileCalling.setIsChecked(false)
-                    Snackbar.make(
-                        binding.root,
-                        getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionByline),
-                        Snackbar.LENGTH_LONG,
-                    ).setAction(
-                        getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionAction),
-                    ) {
-                        if (shouldShowRequestPermissionRationale(READ_PHONE_STATE)) {
-                            requestPermissions(arrayOf(READ_PHONE_STATE), READ_PHONE_STATE.hashCode().absoluteValue)
-                        } else {
-                            // User denied the permission 2+ times
-                            this@NetPInternalSettingsActivity.launchApplicationInfoSettings()
-                        }
-                    }.show()
-                } else {
-                    this.setEnabled(Toggle.State(enable = false))
-                    binding.snoozeWhileCalling.setIsChecked(false)
+        lifecycleScope.launch {
+            with(vpnDisableOnCall) {
+                binding.snoozeWhileCalling.setIsChecked(this.isEnabled())
+                binding.snoozeWhileCalling.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked && hasPhoneStatePermission()) {
+                        vpnDisableOnCall.enable()
+                    } else if (isChecked) {
+                        // need to request permission
+                        binding.snoozeWhileCalling.setIsChecked(false)
+                        Snackbar.make(
+                            binding.root,
+                            getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionByline),
+                            Snackbar.LENGTH_LONG,
+                        ).setAction(
+                            getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionAction),
+                        ) {
+                            if (shouldShowRequestPermissionRationale(READ_PHONE_STATE)) {
+                                // User denied the permission 2+ times
+                                this@NetPInternalSettingsActivity.launchApplicationInfoSettings()
+                            } else {
+                                requestPermissions(arrayOf(READ_PHONE_STATE), READ_PHONE_STATE.hashCode().absoluteValue)
+                            }
+                        }.show()
+                    } else {
+                        binding.snoozeWhileCalling.setIsChecked(false)
+                        vpnDisableOnCall.disable()
+                    }
                 }
             }
         }
@@ -283,7 +287,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
         when (requestCode) {
             READ_PHONE_STATE.hashCode().absoluteValue -> {
                 val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                netPInternalFeatureToggles.snoozeWhileCalling().setEnabled(Toggle.State(enable = granted))
+                vpnDisableOnCall.enable()
                 binding.snoozeWhileCalling.setIsChecked(granted)
                 if (!granted) {
                     logcat { "READ_PHONE_STATE permission denied" }
