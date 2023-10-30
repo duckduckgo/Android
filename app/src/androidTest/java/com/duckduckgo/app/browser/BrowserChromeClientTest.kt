@@ -239,7 +239,7 @@ class BrowserChromeClientTest {
         testee.onPermissionRequest(mockRequest)
 
         verify(mockWebViewClientListener, never()).onSitePermissionRequested(mockRequest, permissions)
-        verify(mockWebViewClientListener).onSitePermissionDenied(mockRequest)
+        verify(mockRequest).deny()
     }
 
     private val mockMsg = Message().apply {

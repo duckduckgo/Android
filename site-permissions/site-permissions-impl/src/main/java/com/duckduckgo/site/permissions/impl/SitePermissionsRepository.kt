@@ -123,8 +123,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                 permissionGrantedWithin24h || isMicAlwaysAllowed
             }
             PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
-                val isDrmAlwaysAllowed = sitePermissionForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
-                permissionGrantedWithin24h || isDrmAlwaysAllowed
+                sitePermissionForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
             }
             else -> false
         }

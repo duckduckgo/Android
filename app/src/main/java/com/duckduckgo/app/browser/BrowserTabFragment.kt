@@ -1271,7 +1271,6 @@ class BrowserTabFragment :
             is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
-            is Command.DenySitePermissionRequest -> denySitePermissionRequest(it.request)
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation -> showAuthenticationSavedOrUpdatedSnackbar(
                 loginCredentials = it.credentials,
                 messageResourceId = it.messageResourceId,
@@ -3648,12 +3647,6 @@ class BrowserTabFragment :
         request: PermissionRequest,
     ) {
         request.grant(sitePermissionsToGrant)
-    }
-
-    private fun denySitePermissionRequest(
-        request: PermissionRequest,
-    ) {
-        request.deny()
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {

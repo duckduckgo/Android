@@ -42,10 +42,6 @@ interface WebViewClientListener {
         sitePermissionsAllowedToAsk: Array<String>,
     )
 
-    fun onSitePermissionDenied(
-        request: PermissionRequest,
-    )
-
     fun onSiteLocationPermissionRequested(
         origin: String,
         callback: GeolocationPermissions.Callback,
