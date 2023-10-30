@@ -55,11 +55,11 @@ interface VpnStateMonitor {
         fun isAlwaysOnLockedDown(): Boolean = enabled && lockedDown
     }
 
-    enum class VpnRunningState {
-        ENABLING,
-        ENABLED,
-        DISABLED,
-        INVALID,
+    sealed class VpnRunningState {
+        object ENABLING : VpnRunningState()
+        object ENABLED : VpnRunningState()
+        data class DISABLED(val snoozedTriggerAtMillis: Long? = null) : VpnRunningState()
+        object INVALID : VpnRunningState()
     }
 
     enum class VpnStopReason {

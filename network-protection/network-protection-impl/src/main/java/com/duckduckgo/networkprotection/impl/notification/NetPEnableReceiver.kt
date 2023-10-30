@@ -16,26 +16,32 @@
 
 package com.duckduckgo.networkprotection.impl.notification
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.mobile.android.vpn.Vpn
 import dagger.android.AndroidInjection
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import logcat.LogPriority
 import logcat.logcat
 
 @InjectWith(ReceiverScope::class)
 class NetPEnableReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+//    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
+
+    @Inject lateinit var vpn: Vpn
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject lateinit var context: Context
 
     override fun onReceive(
         context: Context,
@@ -46,10 +52,20 @@ class NetPEnableReceiver : BroadcastReceiver() {
         logcat { "NetPEnableReceiver onReceive ${intent.action}" }
         val pendingResult = goAsync()
 
-        if (intent.action == ACTION_NETP_DISABLED_RESTART) {
+        if (intent.action == ACTION_NETP_ENABLE) {
             logcat { "NetP will restart because the user asked it" }
             goAsync(pendingResult) {
-                vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
+                vpn.start()
+            }
+        } else if (intent.action == ACTION_NETP_SNOOZE) {
+            logcat { "NetP will snooze because the user asked it" }
+            goAsync(pendingResult) {
+                snoozeAndScheduleWakeUp()
+            }
+        } else if (intent.action == ACTION_NETP_DISABLE) {
+            logcat { "NetP will disable because the user asked it" }
+            goAsync(pendingResult) {
+                vpn.stop()
             }
         } else {
             logcat(LogPriority.WARN) { "NetPEnableReceiver: unknown action" }
@@ -57,8 +73,32 @@ class NetPEnableReceiver : BroadcastReceiver() {
         }
     }
 
+    private suspend fun snoozeAndScheduleWakeUp() = withContext(dispatcherProvider.io()) {
+        vpn.snooze(10_000)
+
+        val alarmManager =
+            context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+        val alarmIntent = PendingIntent.getBroadcast(
+            context,
+            0,
+            Intent(context, NetPEnableReceiver::class.java).apply {
+                action = ACTION_NETP_ENABLE
+            },
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+        if (alarmIntent != null && alarmManager != null) {
+            alarmManager.set(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + 10_000,
+                alarmIntent,
+            )
+        }
+    }
+
     companion object {
-        internal const val ACTION_NETP_DISABLED_RESTART = "com.duckduckgo.networkprotection.notification.disabled.restart"
+        internal const val ACTION_NETP_ENABLE = "com.duckduckgo.networkprotection.notification.ACTION_NETP_ENABLE"
+        internal const val ACTION_NETP_DISABLE = "com.duckduckgo.networkprotection.notification.ACTION_NETP_DISABLE"
+        internal const val ACTION_NETP_SNOOZE = "com.duckduckgo.networkprotection.notification.ACTION_NETP_SNOOZE"
     }
 }
 

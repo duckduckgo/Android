@@ -96,7 +96,7 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).")
-        assertNull(content.notificationAction)
+        assertNull(content.notificationActions)
     }
 
     @Test
@@ -108,7 +108,7 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
-        assertNull(content.notificationAction)
+        assertNull(content.notificationActions)
     }
 
     @Test
