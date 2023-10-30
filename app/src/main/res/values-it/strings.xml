@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Invia il rapporto</string>
     <string name="brokenSiteDescription">L\'invio di un rapporto anonimo su un sito non funzionante ci consente di eseguire il debug di questi problemi e migliorare l\'app.</string>
 
-    <string name="brokenSiteCategoryImages">Le immagini non sono state caricate</string>
-    <string name="brokenSiteCategoryPaywall">Il sito mi ha chiesto di disabilitare</string>
-    <string name="brokenSiteCategoryComments">I commenti non sono stati caricati</string>
-    <string name="brokenSiteCategoryVideos">Il video non è stato riprodotto</string>
-    <string name="brokenSiteCategoryLinks">Collegamenti o pulsanti non funzionano</string>
-    <string name="brokenSiteCategoryContent">Manca il contenuto</string>
-    <string name="brokenSiteCategoryLogin">Non riesco ad accedere</string>
-    <string name="brokenSiteCategoryUnsupported">Il browser non è compatibile</string>
+    <string name="brokenSiteCategoryBlocked">Sito bloccato o non caricato</string>
+    <string name="brokenSiteCategoryLayout">Layout del sito interrotto</string>
+    <string name="brokenSiteCategoryEmptySpaces">Il sito contiene grandi spazi vuoti</string>
+    <string name="brokenSiteCategoryShopping">Non riesco a pagare, effettuare il check-out o fare acquisti</string>
+    <string name="brokenSiteCategoryPaywall">Il sito mi ha chiesto di disabilitare il blocco degli annunci</string>
+    <string name="brokenSiteCategoryComments">Commenti, recensioni o chat non sono stati caricati</string>
+    <string name="brokenSiteCategoryVideos">Il video non è stato riprodotto o caricato</string>
+    <string name="brokenSiteCategoryLogin">Impossibile accedere/registrarsi</string>
     <string name="brokenSiteCategoryOther">Qualcos\'altro</string>
     <string name="brokenSiteDescriptionTextInputHint">Condividi maggiori dettagli (facoltativo)</string>
+    <string name="brokenSiteDescriptionCaption">Cos\'è successo? Cosa sarebbe dovuto succedere? Disattivare le protezioni è stato utile?</string>
+
+    <string name="brokenSiteProtectionsOn">Le protezioni sono <b>ATTIVE</b> per questo sito</string>
+    <string name="brokenSiteProtectionsOff">Le protezioni sono <b>DISATTIVATE</b> per questo sito</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Disattivare le protezioni potrebbe essere utile.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Abbiamo temporaneamente disabilitato le Protezioni della Privacy perché sembra che stiano interrompendo il funzionamento del sito.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Segnalibri</string>

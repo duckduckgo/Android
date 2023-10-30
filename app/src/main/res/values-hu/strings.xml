@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Jelentés küldése</string>
     <string name="brokenSiteDescription">Egy megsérült webhelyről szóló névtelen bejelentés segít a hibakeresésben és az alkalmazás fejlesztésében.</string>
 
-    <string name="brokenSiteCategoryImages">A képek nem töltődtek be</string>
-    <string name="brokenSiteCategoryPaywall">A webhely kérte tőlem a letiltást</string>
-    <string name="brokenSiteCategoryComments">A megjegyzések nem töltődtek be</string>
-    <string name="brokenSiteCategoryVideos">A videót nem játszotta le</string>
-    <string name="brokenSiteCategoryLinks">A hivatkozások vagy a gombok nem működnek</string>
-    <string name="brokenSiteCategoryContent">Hiányzik a tartalom</string>
-    <string name="brokenSiteCategoryLogin">Nem tudok bejelentkezni</string>
-    <string name="brokenSiteCategoryUnsupported">A böngésző nem kompatibilis</string>
+    <string name="brokenSiteCategoryBlocked">A webhely blokkolva van vagy nem töltődött be</string>
+    <string name="brokenSiteCategoryLayout">A webhely megjelenítési elrendezése hibás</string>
+    <string name="brokenSiteCategoryEmptySpaces">A webhelyen nagy üres területek jelennek meg</string>
+    <string name="brokenSiteCategoryShopping">Nem lehet fizetni vagy vásárolni</string>
+    <string name="brokenSiteCategoryPaywall">A webhely a reklámblokkoló kikapcsolását kérte</string>
+    <string name="brokenSiteCategoryComments">A megjegyzések, vélemények vagy csevegések nem töltődtek be</string>
+    <string name="brokenSiteCategoryVideos">A videó nem játszódott le vagy nem töltődött be</string>
+    <string name="brokenSiteCategoryLogin">Nem lehet bejelentkezni/regisztrálni</string>
     <string name="brokenSiteCategoryOther">Valami más</string>
     <string name="brokenSiteDescriptionTextInputHint">További részletek megosztása (nem kötelező)</string>
+    <string name="brokenSiteDescriptionCaption">Mi történt? Minek kellett volna történnie? A védelem kikapcsolása segített?</string>
+
+    <string name="brokenSiteProtectionsOn">A védelmek <b>BE</b> vannak kapcsolva ezen a webhelyen</string>
+    <string name="brokenSiteProtectionsOff">A védelmek <b>KI</b> vannak kapcsolva ezen a webhelyen</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">A védelem kikapcsolása segíthet.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Ideiglenesen kikapcsoltuk az adatvédelmi funkciókat, mert úgy tűnik, hogy a webhely helytelen működését eredményezik.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>

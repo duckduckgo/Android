@@ -216,8 +216,22 @@
     <string name="brokenSiteSubmitButton">Send Report</string>
     <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us debug these issues and improve the app.</string>
 
+    <string name="brokenSiteCategoryBlocked">Site blocked or didn\'t load</string>
+    <string name="brokenSiteCategoryLayout">Site layout broken</string>
+    <string name="brokenSiteCategoryEmptySpaces">Site contains large empty spaces</string>
+    <string name="brokenSiteCategoryShopping">Can\'t pay, check out, or shop</string>
+    <string name="brokenSiteCategoryPaywall">Site asked me to disable ad blocker</string>
+    <string name="brokenSiteCategoryComments">Comments, reviews, or chats didn\'t load</string>
+    <string name="brokenSiteCategoryVideos">Video didn\'t play or load</string>
+    <string name="brokenSiteCategoryLogin">Can\'t sign in/register</string>
     <string name="brokenSiteCategoryOther">Something else</string>
     <string name="brokenSiteDescriptionTextInputHint">Share more details (optional)</string>
+    <string name="brokenSiteDescriptionCaption">What happened? What should have happened? Did turning protections off help?</string>
+
+    <string name="brokenSiteProtectionsOn">Protections are <b>ON</b> for this site</string>
+    <string name="brokenSiteProtectionsOff">Protections are <b>OFF</b> for this site</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Turning protections OFF might help.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We temporarily turned Privacy Protections off as they appear to be breaking this site.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>

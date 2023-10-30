@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Odoslať správu</string>
     <string name="brokenSiteDescription">Odoslaním anonymného hlásenia o nefunkčnom webe nám pomôžete tieto problémy odstrániť a zlepšiť aplikáciu.</string>
 
-    <string name="brokenSiteCategoryImages">Obrázky sa nepodarilo načítať</string>
-    <string name="brokenSiteCategoryPaywall">Táto stránka ma požiadala o deaktiváciu</string>
-    <string name="brokenSiteCategoryComments">Komentáre nepodarilo načítať</string>
-    <string name="brokenSiteCategoryVideos">Video sa neprehráva</string>
-    <string name="brokenSiteCategoryLinks">Odkazy alebo tlačidlá nefungujú</string>
-    <string name="brokenSiteCategoryContent">Chýba obsah</string>
-    <string name="brokenSiteCategoryLogin">Nemôžem sa prihlásiť</string>
-    <string name="brokenSiteCategoryUnsupported">Prehliadač je nekompatibilný</string>
+    <string name="brokenSiteCategoryBlocked">Stránka je zablokovaná alebo sa nenačítala</string>
+    <string name="brokenSiteCategoryLayout">Rozloženie stránky je nefunkčné</string>
+    <string name="brokenSiteCategoryEmptySpaces">Stránka obsahuje veľké prázdne miesta</string>
+    <string name="brokenSiteCategoryShopping">Nedá sa zaplatiť, prejsť do pokladne ani nakupovať</string>
+    <string name="brokenSiteCategoryPaywall">Stránka ma požiadala, aby som vypol/vypla blokovanie reklám</string>
+    <string name="brokenSiteCategoryComments">Nenačítali sa komentáre, recenzie alebo čety</string>
+    <string name="brokenSiteCategoryVideos">Video sa neprehralo alebo nenačítalo</string>
+    <string name="brokenSiteCategoryLogin">Nedá sa prihlásiť/registrovať</string>
     <string name="brokenSiteCategoryOther">Niečo iné</string>
     <string name="brokenSiteDescriptionTextInputHint">Zdieľať ďalšie podrobnosti (voliteľné)</string>
+    <string name="brokenSiteDescriptionCaption">Čo sa stalo? Čo sa malo stať? Pomohlo vypnutie ochranných prvkov?</string>
+
+    <string name="brokenSiteProtectionsOn">Ochrany pre túto lokalitu sú <b>ZAPNUTÉ</b></string>
+    <string name="brokenSiteProtectionsOff">Ochrany pre túto lokalitu sú <b>VYPNUTÉ</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Pomôcť by mohlo VYPNUTIE ochranných prvkov.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Dočasne sme vypli ochranu súkromia, pretože sa zdá, že spôsobuje poruchy na tejto lokalite.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>

@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Send rapport</string>
     <string name="brokenSiteDescription">Indsendelse af en anonym webstedsrapport om brud hjælper os med at debugge disse problemer og forbedre appen.</string>
 
-    <string name="brokenSiteCategoryImages">Billeder blev ikke indlæst</string>
-    <string name="brokenSiteCategoryPaywall">Webstedet bad mig om at deaktivere</string>
-    <string name="brokenSiteCategoryComments">Kommentarer blev ikke indlæst</string>
-    <string name="brokenSiteCategoryVideos">Videoen blev ikke spillet</string>
-    <string name="brokenSiteCategoryLinks">Links eller knapper fungerer ikke</string>
-    <string name="brokenSiteCategoryContent">Indhold mangler</string>
-    <string name="brokenSiteCategoryLogin">Jeg kan ikke logge ind</string>
-    <string name="brokenSiteCategoryUnsupported">Browseren er inkompatibel</string>
+    <string name="brokenSiteCategoryBlocked">Webstedet er blokeret eller blev ikke indlæst</string>
+    <string name="brokenSiteCategoryLayout">Sidens layout er ødelagt</string>
+    <string name="brokenSiteCategoryEmptySpaces">Siden indeholder store tomme områder</string>
+    <string name="brokenSiteCategoryShopping">Kan ikke betale, tjekke ud eller shoppe</string>
+    <string name="brokenSiteCategoryPaywall">Siden bad mig om at deaktivere annonceblokering</string>
+    <string name="brokenSiteCategoryComments">Kommentarer, anmeldelser eller chats blev ikke indlæst</string>
+    <string name="brokenSiteCategoryVideos">Video blev ikke afspillet eller indlæst</string>
+    <string name="brokenSiteCategoryLogin">Kan ikke logge ind/tilmelde</string>
     <string name="brokenSiteCategoryOther">Noget andet</string>
     <string name="brokenSiteDescriptionTextInputHint">Del flere detaljer (valgfrit)</string>
+    <string name="brokenSiteDescriptionCaption">Hvad skete der? Hvad skulle der være sket? Hjalp det at slå beskyttelsen fra?</string>
+
+    <string name="brokenSiteProtectionsOn">Beskyttelse er <b>TIL</b> for dette websted</string>
+    <string name="brokenSiteProtectionsOff">Beskyttelse er <b>FRA</b> for dette websted</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjælpe at slå beskyttelserne FRA.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har midlertidigt deaktiveret beskyttelse af privatlivet, da det ser ud til at påvirke visning af dette websted.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bogmærker</string>

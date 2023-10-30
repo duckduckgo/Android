@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Pošalji izvješće</string>
     <string name="brokenSiteDescription">Slanje anonimnog izvješća o neispravnom web-mjestu pomaže nam da ispravimo te probleme i poboljšamo ekstenziju.</string>
 
-    <string name="brokenSiteCategoryImages">Slike se nisu učitale</string>
-    <string name="brokenSiteCategoryPaywall">Web-mjesto je zatražilo da onemogućim</string>
-    <string name="brokenSiteCategoryComments">Komentari se nisu učitali</string>
-    <string name="brokenSiteCategoryVideos">Videozapis nije se reproducirao</string>
-    <string name="brokenSiteCategoryLinks">Veze ili gumbi ne funkcioniraju</string>
-    <string name="brokenSiteCategoryContent">Nedostaje sadržaj</string>
-    <string name="brokenSiteCategoryLogin">Ne mogu se prijaviti</string>
-    <string name="brokenSiteCategoryUnsupported">Preglednik nije kompatibilan</string>
+    <string name="brokenSiteCategoryBlocked">Stranica je blokirana ili se nije učitala</string>
+    <string name="brokenSiteCategoryLayout">Stranica ne izgleda ispravno</string>
+    <string name="brokenSiteCategoryEmptySpaces">Stranica sadrži velike prazne prostore</string>
+    <string name="brokenSiteCategoryShopping">Ne mogu platiti, odjaviti se ili kupovati</string>
+    <string name="brokenSiteCategoryPaywall">Web-lokacija me zamolila da onemogućim blokiranje oglasa</string>
+    <string name="brokenSiteCategoryComments">Komentari, recenzije ili razgovori nisu se učitali</string>
+    <string name="brokenSiteCategoryVideos">Videozapis se nije reproducirao niti učitao</string>
+    <string name="brokenSiteCategoryLogin">Ne mogu se prijaviti/registrirati</string>
     <string name="brokenSiteCategoryOther">Nešto drugo</string>
     <string name="brokenSiteDescriptionTextInputHint">Podijelite više pojedinosti (nije obavezno)</string>
+    <string name="brokenSiteDescriptionCaption">Šta se dogodilo? Što se trebalo dogoditi? Je li isključivanje zaštite pomoglo?</string>
+
+    <string name="brokenSiteProtectionsOn">Zaštite su <b>UKLJUČENE</b> za ovu web lokaciju</string>
+    <string name="brokenSiteProtectionsOff">Zaštite su <b>ISKLJUČENE</b> za ovu web lokaciju</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">ISKLJUČIVANJE zaštite može pomoći.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Privremeno smo onemogućili zaštitu privatnosti jer se čini da ona ruši ovu web lokaciju.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Knjižne oznake</string>
