@@ -15,12 +15,5 @@
   -->
 
 <resources>
-    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Hide Your Email and Block Trackers</string>
-    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Email Protection</string>
-    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Create a unique, random address that also removes hidden trackers and forwards email to your inbox.</string>
-    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Protect My Email</string>
-    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Don\'t Show Again</string>
-    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">If you exit now, your Duck Address will not be saved</string>
-    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Continue Setup</string>
-    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Exit Setup</string>
+
 </resources>

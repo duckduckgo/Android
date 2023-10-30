@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Jatka tallentamista</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Poista käytöstä</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Piilota sähköpostisi ja\nEstä seurantaohjelmat</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Sähköpostisuojaus</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Luo yksilöllinen, satunnainen osoite, joka lisäksi poistaa piilotetut seurantaohjelmat ja välittää sähköpostin omaan postilaatikkoosi.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Suojaa sähköpostini</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Älä näytä enää</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Jos poistut nyt, Duck Address -osoitettasi ei tallenneta</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Jatka asennusta</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Poistu asennuksesta</string>
+
 </resources>

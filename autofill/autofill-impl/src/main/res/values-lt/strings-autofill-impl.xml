@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Toliau įrašyti</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Išjungti</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Paslėpkite savo el. paštą ir \n blokuokite stebėjimo priemones</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">El. pašto apsauga</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Sukurkite unikalų atsitiktinį adresą, kuriuo taip pat pašalinamos slaptos sekimo priemonės ir el. laiškai persiunčiami į pašto dėžutę.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Apsaugoti mano el. paštą</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Daugiau nerodyti</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Jei išeisite dabar, jūsų „Duck Address“ nebus išsaugotas</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Tęsti sąranką</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Išeiti iš sąrankos</string>
+
 </resources>

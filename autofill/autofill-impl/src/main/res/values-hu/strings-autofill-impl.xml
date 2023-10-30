@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Mentés folytatása</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Letiltás</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">E-mail elrejtése és\nnyomkövetők blokkolása</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">E-mail védelem</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Hozz létre egy egyedi, véletlenszerű címet, amely eltávolítja a rejtett nyomkövetőket is, és a postafiókodba továbbítja az e-maileket.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">E-mail védelme</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Ne jelenjen meg újra</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ha most kilépsz, a Duck-címed nem lesz mentve</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Beállítás folytatása</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Kilépés a beállításokból</string>
+
 </resources>

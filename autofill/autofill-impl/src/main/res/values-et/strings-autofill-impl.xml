@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Jätka salvestamist</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Keela</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Peida oma e-post ja\nblokeeri jälgijad</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">E-posti kaitse</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Loo unikaalne, juhuslik aadress, mis eemaldab ka varjatud jäglijad ja edastab e-kirjad sinu postkasti.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Kaitse minu e-posti aadressi</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Ära enam näita</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Kui sa praegu väljud, siis sinu Duck Addressi ei salvestata</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Jätka seadistamist</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Välju seadistusest</string>
+
 </resources>
