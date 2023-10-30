@@ -47,7 +47,7 @@ internal class VariantManagerPlugin constructor(
         }.getOrThrow()
 
         return variantManagerConfig?.variants?.takeIf { it.isNotEmpty() }?.let { variants ->
-            variantManager.newVariantsDownloaded(variants)
+            variantManager.saveVariants(variants)
             true
         } ?: false
     }

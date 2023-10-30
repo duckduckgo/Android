@@ -80,7 +80,7 @@ class ExperimentationVariantManagerTest {
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
         addActiveVariantToConfig()
 
-        testee.newVariantsDownloaded(listOf()) // fixme Noelia
+        testee.saveVariants(listOf()) // fixme Noelia
 
         assertEquals(testee.defaultVariantKey(), testee.getVariantKey())
     }
@@ -90,7 +90,7 @@ class ExperimentationVariantManagerTest {
         addActiveVariantToConfig()
         whenever(mockExperimentVariantRepository.getUserVariant()).thenReturn("bar")
 
-        testee.newVariantsDownloaded(listOf()) // fixme Noelia
+        testee.saveVariants(listOf()) // fixme Noelia
         verify(mockExperimentVariantRepository).updateVariant("")
     }
 
@@ -174,7 +174,7 @@ class ExperimentationVariantManagerTest {
         val testVariantEntity = ExperimentVariantEntity(variantKey, 1.0, localeFilter)
         whenever(mockExperimentVariantRepository.getActiveVariants()).thenReturn(listOf(testVariantEntity))
 
-        testee.newVariantsDownloaded(listOf(VariantConfig(variantKey)))
+        testee.saveVariants(listOf(VariantConfig(variantKey)))
     }
 
     private fun mockUpdateScenario(key: String) {

@@ -34,10 +34,9 @@ interface VariantManager {
     fun updateAppReferrerVariant(variant: String)
 
     /**
-     * Persists experimental variants in the local database when the remote configuration for variantManager
-     * has been updated.
+     * Persists experimental variants in the local database
      *
-     * @param variants A list of VariantConfig objects containing updated variants to be persisted.
+     * @param variants Updated list of VariantConfig objects
      */
-    fun newVariantsDownloaded(variants: List<VariantConfig>)
+    fun saveVariants(variants: List<VariantConfig>)
 }

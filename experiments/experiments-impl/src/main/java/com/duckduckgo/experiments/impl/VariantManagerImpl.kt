@@ -40,7 +40,6 @@ class VariantManagerImpl @Inject constructor(
     }
 
     override fun getVariantKey(): String {
-        Timber.d("NOELIA getting variantKey: ${experimentVariantRepository.getUserVariant()}")
         return experimentVariantRepository.getUserVariant().orEmpty()
     }
 
@@ -48,14 +47,12 @@ class VariantManagerImpl @Inject constructor(
         experimentVariantRepository.updateAppReferrerVariant(variant)
     }
 
-    override fun newVariantsDownloaded(variants: List<VariantConfig>) {
+    override fun saveVariants(variants: List<VariantConfig>) {
         experimentVariantRepository.saveVariants(variants)
-        Timber.d("NOELIA saving variants ${experimentVariantRepository.getActiveVariants()}")
+        Timber.d("Variants update ${experimentVariantRepository.getActiveVariants()}")
 
         val activeVariants = convertEntitiesToVariants(experimentVariantRepository.getActiveVariants())
         val currentVariantKey = experimentVariantRepository.getUserVariant()
-        Timber.d("NOELIA newVariantsDownloaded activeVariants $activeVariants")
-        Timber.d("NOELIA newVariantsDownloaded currentVariant $currentVariantKey")
 
         updateUserVariant(activeVariants, currentVariantKey)
     }
@@ -76,13 +73,13 @@ class VariantManagerImpl @Inject constructor(
 
         val keyInActiveVariants = activeVariants.map { it.key }.contains(currentVariantKey)
         if (!keyInActiveVariants) {
-            Timber.i("NOELIA Variant $currentVariantKey no longer an active variant; user will now use default variant")
+            Timber.i("Variant $currentVariantKey no longer an active variant; user will now use default variant")
             val newVariant = DEFAULT_VARIANT
             experimentVariantRepository.updateVariant(newVariant.key)
             return
         }
 
-        Timber.i("NOELIA Variant $currentVariantKey is still in use, no need to update")
+        Timber.i("Variant $currentVariantKey is still in use, no need to update")
     }
 
     private fun convertEntitiesToVariants(activeVariantEntities: List<ExperimentVariantEntity>): List<Variant> {
@@ -139,14 +136,10 @@ class VariantManagerImpl @Inject constructor(
 
     companion object {
 
-        private const val RESERVED_EU_AUCTION_VARIANT = "ml"
+        const val RESERVED_EU_AUCTION_VARIANT = "ml"
 
         // this will be returned when there are no other active experiments
         private val DEFAULT_VARIANT = Variant(key = "", filterBy = { noFilter() })
-
-        private val REFERRER_VARIANTS = listOf(
-            Variant(RESERVED_EU_AUCTION_VARIANT, filterBy = { noFilter() }),
-        )
 
         private val serpRegionToggleTargetCountries = listOf(
             "AU",
@@ -163,11 +156,6 @@ class VariantManagerImpl @Inject constructor(
             "SE",
             "GB",
         )
-
-        private fun referrerVariant(key: String): Variant {
-            val knownReferrer = REFERRER_VARIANTS.firstOrNull { it.key == key }
-            return knownReferrer ?: Variant(key, filterBy = { noFilter() })
-        }
 
         private fun noFilter(): Boolean = true
 
