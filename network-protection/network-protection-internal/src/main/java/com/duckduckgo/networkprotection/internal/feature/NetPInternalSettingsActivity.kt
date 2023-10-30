@@ -199,22 +199,21 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                     if (isChecked && hasPhoneStatePermission()) {
                         vpnDisableOnCall.enable()
                     } else if (isChecked) {
-                        // need to request permission
                         binding.snoozeWhileCalling.setIsChecked(false)
-                        Snackbar.make(
-                            binding.root,
-                            getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionByline),
-                            Snackbar.LENGTH_LONG,
-                        ).setAction(
-                            getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionAction),
-                        ) {
-                            if (shouldShowRequestPermissionRationale(READ_PHONE_STATE)) {
+                        if (shouldShowRequestPermissionRationale(READ_PHONE_STATE)) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionByline),
+                                Snackbar.LENGTH_LONG,
+                            ).setAction(
+                                getString(com.duckduckgo.networkprotection.internal.R.string.netpGrantPhonePermissionAction),
+                            ) {
                                 // User denied the permission 2+ times
                                 this@NetPInternalSettingsActivity.launchApplicationInfoSettings()
-                            } else {
-                                requestPermissions(arrayOf(READ_PHONE_STATE), READ_PHONE_STATE.hashCode().absoluteValue)
-                            }
-                        }.show()
+                            }.show()
+                        } else {
+                            requestPermissions(arrayOf(READ_PHONE_STATE), READ_PHONE_STATE.hashCode().absoluteValue)
+                        }
                     } else {
                         binding.snoozeWhileCalling.setIsChecked(false)
                         vpnDisableOnCall.disable()
