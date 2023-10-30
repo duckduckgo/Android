@@ -11,6 +11,9 @@ tags:
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/item_container"
     index: 2
+- extendedWaitUntil:
+    id: "com.duckduckgo.mobile.android:id/footer_button"
+    enabled: true
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/footer_button"
 - tapOn:
