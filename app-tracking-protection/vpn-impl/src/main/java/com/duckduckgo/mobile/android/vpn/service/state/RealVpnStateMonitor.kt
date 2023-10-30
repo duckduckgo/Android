@@ -24,9 +24,7 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLING
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.*
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.RESTART
@@ -53,14 +51,14 @@ class RealVpnStateMonitor @Inject constructor(
         return vpnServiceStateStatsDao.getStateStats().map { mapState(it) }
             .filter {
                 // we only care about the following states
-                (it.state == VpnRunningState.ENABLED) || (it.state == VpnRunningState.ENABLING) || (it.state == VpnRunningState.DISABLED)
+                (it.state == VpnRunningState.ENABLED) || (it.state == VpnRunningState.ENABLING) || (it.state is VpnRunningState.DISABLED)
             }
             .onEach { logcat { "service state value $it" } }
             .map { vpnState ->
                 val isFeatureEnabled = vpnFeaturesRegistry.isFeatureRunning(vpnFeature)
 
-                if (!isFeatureEnabled) {
-                    vpnState.copy(state = VpnRunningState.DISABLED)
+                if (!isFeatureEnabled && vpnState.state !is VpnRunningState.DISABLED) {
+                    vpnState.copy(state = VpnRunningState.DISABLED())
                 } else {
                     vpnState
                 }
@@ -68,7 +66,7 @@ class RealVpnStateMonitor @Inject constructor(
             .onStart {
                 val vpnState = mapState(vpnServiceStateStatsDao.getLastStateStats())
                 VpnState(
-                    state = if (vpnFeaturesRegistry.isFeatureRunning(vpnFeature)) VpnRunningState.ENABLED else VpnRunningState.DISABLED,
+                    state = if (vpnFeaturesRegistry.isFeatureRunning(vpnFeature)) VpnRunningState.ENABLED else VpnRunningState.DISABLED(),
                     alwaysOnState = vpnState.alwaysOnState,
                     stopReason = vpnState.stopReason,
                 ).also { emit(it) }
@@ -111,8 +109,9 @@ class RealVpnStateMonitor @Inject constructor(
         val runningState = when (lastState?.state) {
             ENABLING -> VpnRunningState.ENABLING
             ENABLED -> VpnRunningState.ENABLED
-            DISABLED -> VpnRunningState.DISABLED
-            else -> VpnRunningState.INVALID
+            DISABLED -> VpnRunningState.DISABLED()
+            SNOOZED -> VpnRunningState.DISABLED(10_000)
+            null, INVALID -> VpnRunningState.INVALID
         }
         val alwaysOnState = when (lastState?.alwaysOnState) {
             AlwaysOnState.ALWAYS_ON_ENABLED -> VpnStateMonitor.AlwaysOnState.ALWAYS_ON_ENABLED

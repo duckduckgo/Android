@@ -59,13 +59,13 @@ interface VpnEnabledNotificationContentPlugin {
     data class VpnEnabledNotificationContent(
         val title: SpannableStringBuilder,
         val onNotificationPressIntent: PendingIntent?,
-        val notificationAction: NotificationCompat.Action?,
+        val notificationActions: List<NotificationCompat.Action>,
     ) {
         companion object {
             val EMPTY = VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(),
                 onNotificationPressIntent = null,
-                notificationAction = null,
+                notificationActions = emptyList(),
             )
         }
     }

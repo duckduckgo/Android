@@ -63,7 +63,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         return@withContext vpnStateMonitor
             .getStateFlow(AppTpVpnFeature.APPTP_VPN)
             // we only cared about enabled and disabled states for AppTP
-            .filter { (it.state == VpnStateMonitor.VpnRunningState.ENABLED) || (it.state == VpnStateMonitor.VpnRunningState.DISABLED) }
+            .filter { (it.state == VpnStateMonitor.VpnRunningState.ENABLED) || (it.state is VpnStateMonitor.VpnRunningState.DISABLED) }
             .combine(refreshVpnRunningState.asStateFlow()) { state, _ -> state }
     }
 
