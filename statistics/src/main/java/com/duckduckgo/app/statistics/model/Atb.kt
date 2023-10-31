@@ -21,7 +21,7 @@ data class Atb(
     val updateVersion: String? = null,
 ) {
 
-    fun formatWithVariant(variantKey: String): String {
-        return version + variantKey
+    fun formatWithVariant(variantKey: String?): String {
+        return version + variantKey.orEmpty()
     }
 }

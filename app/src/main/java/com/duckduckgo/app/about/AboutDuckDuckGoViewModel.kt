@@ -129,8 +129,8 @@ class AboutDuckDuckGoViewModel @Inject constructor(
         return viewState.value
     }
 
-    private fun obtainVersion(variantKey: String): String {
-        val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
+    private fun obtainVersion(variantKey: String?): String {
+        val formattedVariantKey = if (variantKey.isNullOrBlank()) " " else " $variantKey "
         return "${appBuildConfig.versionName}$formattedVariantKey(${appBuildConfig.versionCode})"
     }
 

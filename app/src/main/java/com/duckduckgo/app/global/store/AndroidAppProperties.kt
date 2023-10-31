@@ -44,7 +44,7 @@ class AndroidAppProperties(
     }
 
     override fun expVariant(): String {
-        return variantManager.getVariantKey()
+        return variantManager.getVariantKey().orEmpty()
     }
 
     override fun installedGPlay(): Boolean {

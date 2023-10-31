@@ -39,8 +39,8 @@ class VariantManagerImpl @Inject constructor(
         return DEFAULT_VARIANT.key
     }
 
-    override fun getVariantKey(): String {
-        return experimentVariantRepository.getUserVariant().orEmpty()
+    override fun getVariantKey(): String? {
+        return experimentVariantRepository.getUserVariant()
     }
 
     override fun updateAppReferrerVariant(variant: String) {

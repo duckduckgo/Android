@@ -26,7 +26,7 @@ interface VariantManager {
     /**
      * Returns the variant key assigned to the user
      */
-    fun getVariantKey(): String
+    fun getVariantKey(): String?
 
     /**
      * Updates user experimental variant when referralResultReceived from PlayStore
