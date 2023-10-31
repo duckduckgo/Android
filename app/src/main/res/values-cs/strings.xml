@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Poslat zprávu</string>
     <string name="brokenSiteDescription">Odeslání anonymní zprávy o nefunkčním webu nám pomůže tyto problémy řešit a vylepšovat aplikaci.</string>
 
-    <string name="brokenSiteCategoryImages">Obrázky nebyly načteny</string>
-    <string name="brokenSiteCategoryPaywall">Tato stránka mě požádala o deaktivaci</string>
-    <string name="brokenSiteCategoryComments">Komentáře nebyly načteny</string>
-    <string name="brokenSiteCategoryVideos">Video nebylo přehráno</string>
-    <string name="brokenSiteCategoryLinks">Odkazy nebo tlačítka nefungují</string>
-    <string name="brokenSiteCategoryContent">Chybí obsah</string>
-    <string name="brokenSiteCategoryLogin">Nemohu se přihlásit</string>
-    <string name="brokenSiteCategoryUnsupported">Prohlížeč je nekompatibilní</string>
+    <string name="brokenSiteCategoryBlocked">Stránka je zablokovaná nebo se nenačetla</string>
+    <string name="brokenSiteCategoryLayout">Stránka má rozbité rozvržení</string>
+    <string name="brokenSiteCategoryEmptySpaces">Na stránce jsou velké prázdné oblasti</string>
+    <string name="brokenSiteCategoryShopping">Nemůžu zaplatit nebo dokončit nákup</string>
+    <string name="brokenSiteCategoryPaywall">Stránka mě požádala, ať přestanu blokovat reklamy</string>
+    <string name="brokenSiteCategoryComments">Komentáře, recenze nebo chaty se nenačetly</string>
+    <string name="brokenSiteCategoryVideos">Video se nepřehrálo nebo nenačetlo</string>
+    <string name="brokenSiteCategoryLogin">Nemůžu se přihlásit nebo zaregistrovat</string>
     <string name="brokenSiteCategoryOther">Něco jiného</string>
     <string name="brokenSiteDescriptionTextInputHint">Poděl se o další podrobnosti (volitelné)</string>
+    <string name="brokenSiteDescriptionCaption">Co se stalo? Co se mělo stát? Pomohlo vypnutí ochrany?</string>
+
+    <string name="brokenSiteProtectionsOn">Na tomhle webu je ochrana <b>ZAPNUTÁ</b></string>
+    <string name="brokenSiteProtectionsOff">Na tomhle webu je ochrana <b>VYPNUTÁ</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Možná zabere vypnutí ochrany.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Dočasně jsme vypnuli ochranu osobních údajů, protože se zdá, že při načítání stránky způsobuje chyby.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
