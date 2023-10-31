@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Blijf opslaan</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Uitschakelen</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Je e-mailadres verbergen en\n trackers blokkeren</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">E-mailbescherming</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Maak een uniek, willekeurig adres dat ook verborgen trackers verwijdert en e-mails doorstuurt naar je inbox.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Mijn e-mailadres beschermen</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Niet meer weergeven</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Als je nu afsluit, wordt je Duck Address niet opgeslagen</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Doorgaan met instellen</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Instellen beëindigen</string>
+
 </resources>

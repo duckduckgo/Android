@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
-    <string name="aboutDescription">
-        V DuckDuckGo přinášíme nový standard důvěry online.\n\nDuckDuckGo Privacy Browser poskytuje všechny základní prvky ochrany osobních údajů, které potřebujete k ochraně při vyhledávání a prohlížení webu, včetně blokování sledovacích zařízení, chytřejšího šifrování a soukromého vyhledávání DuckDuckGo.\n\nInternet by v konečném důsledku neměl být tak nebezpečný a získat ochranu osobních údajů, kterou si zasloužíte online, by mělo být stejně jednoduché jako zatáhnout žaluzie.</string>
-    <string name="aboutMoreLink">Více na duckduckgo.com/about</string>
+    <string name="aboutHeader">Vítejte na Kačeří straně!</string>
+    <string name="aboutDescription">DuckDuckGo je nezávislá společnost založená v roce 2008, která se zabývá ochranou soukromí pro všechny, kdo už mají dost sledování na internetu a chtějí snadné řešení. Jsme důkazem, že skutečná ochrana soukromí na internetu nemusí mít kompromisy.\n\nProhlížeč DuckDuckGo má všechno, co od prohlížeče očekáváš, jako jsou záložky, karty, hesla a další funkce. A k tomu má víc než <annotation type="privacy_protection_link">desítku účinných funkcí na ochranu soukromí</annotation>, které většina oblíbených prohlížečů ve výchozím nastavení nenabízí. Tahle jedinečná komplexní sada na ochranu soukromí pomáhá chránit tvoje aktivity na internetu od vyhledávání přes prohlížení až po posílání e-mailů.\n\nAby naše ochrana soukromí fungovala, nemusíš znát technické detaily ani řešit žádná složitá nastavení. Stačí přejít na prohlížeč DuckDuckGo ve všech zařízeních a dostaneš soukromí pro všechny své aktivity.\n\nJestli chceš nahlédnout pod pokličku, víc informací o tom, jak ochrana soukromí DuckDuckGo funguje, najdeš v naší <annotation type="learn_more_link">nápovědě</annotation>.</string>
     <string name="no_suggestions">Žádné návrhy</string>
 
     <!-- Broken Site Activity -->

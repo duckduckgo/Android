@@ -54,7 +54,7 @@
                     android:layout_marginEnd="@dimen/keyline_5"
                     android:textAlignment="center"
                     app:typography="h1"
-                    android:text="Activate your subscription on this device"
+                    android:text="@string/restoreSubscriptionTitle"
                     tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
@@ -65,7 +65,7 @@
                     android:textAlignment="center"
                     app:typography="body1"
                     app:textType="secondary"
-                    android:text="Access your Privacy Pro subscription on this device via Sync, Google Play or an email address."
+                    android:text="@string/restoreSubscriptionDescription"
                     tools:ignore="HardcodedText"/>
 
             <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu
@@ -82,12 +82,11 @@
                         android:id="@+id/googlePlay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Google Play"
+                        app:primaryText="@string/restoreSubscriptionGooglePlayTitle"
                         app:leadingIcon="@drawable/ic_google_play"
                         app:leadingIconSize="small"
-                        app:secondaryText="Restore your purchase to activate your subscription on this device."
-                        app:primaryButtonText="Restore Purchase"
-                />
+                        app:secondaryText="@string/restoreSubscriptionGooglePlayDescription"
+                        app:primaryButtonText="@string/restoreSubscriptionGooglePlayButton"/>
 
                 <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                         android:layout_width="match_parent"
@@ -99,27 +98,11 @@
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:primaryText="Email"
+                        app:primaryText="@string/restoreSubscriptionEmailTitle"
                         app:leadingIcon="@drawable/ic_email_16"
                         app:leadingIconSize="small"
-                        app:secondaryText="Use your email to activate your subscription on this device."
-                        app:primaryButtonText="Enter Email"/>
-
-                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:fullWidth="false"
-                        app:defaultPadding="false"/>
-
-                <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
-                        android:id="@+id/sync"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:primaryText="Sync"
-                        app:leadingIcon="@drawable/ic_sync"
-                        app:leadingIconSize="small"
-                        app:secondaryText="Privacy Pro is automatically available on your Synced devices. Manage your synced devices in Sync settings."
-                        app:primaryButtonText="Go to Sync Settings"/>
+                        app:secondaryText="@string/restoreSubscriptionEmailDescription"
+                        app:primaryButtonText="@string/restoreSubscriptionEmailButton"/>
 
             </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
         </LinearLayout>

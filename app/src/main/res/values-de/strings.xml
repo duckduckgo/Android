@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Über DuckDuckGo</string>
-    <string name="aboutDescription">
-        Wir bei DuckDuckGo setzen den neuen Vertrauensstandard im Internet.\n\nDer DuckDuckGo Privacy Browser bietet dir alles Grundlegende zum Datenschutz, um dich beim Suchen und Browsen im Internet zu schützen, u. a. eine Tracker-Blockade, eine klügere Verschlüsselung und die private DuckDuckGo-Suche.\n\nSchließlich muss das Internet kein gruseliger Ort sein. Die Online-Privatsphäre zu bekommen, die du verdienst, sollte so einfach sein, wie die Jalousien herunterzulassen.</string>
-    <string name="aboutMoreLink">Mehr auf duckduckgo.com/about</string>
+    <string name="aboutHeader">Willkommen auf der Duck-len Seite!</string>
+    <string name="aboutDescription">DuckDuckGo ist die unabhängige Firma für Internet-Datenschutz, das 2008 für alle gegründet wurde, die es leid sind, online getrackt zu werden, und eine einfache Lösung suchen. Wir sind der Beweis, dass du echten Online-Datenschutz ohne Kompromisse erhalten kannst.\n\nDer DuckDuckGo-Browser verfügt über die Funktionen, die von einem Go-to-Browser erwartet werden, darunter Lesezeichen, Tabs, Passwörter und mehr. Hinzu kommen über <annotation type="privacy_protection_link">ein Dutzend leistungsstarke Datenschutzfunktionen</annotation>, die in den meisten gängigen Browsern standardmäßig nicht angeboten werden. Dieser einzigartige, umfassende Datenschutz hilft dir, deine Online-Aktivitäten zu schützen – von der Suche über das Browsen bis hin zu E-Mails und vielem mehr.\n\nUnser Datenschutz funktioniert, ohne dass du etwas über die technischen Details wissen oder dich mit komplizierten Einstellungen auseinandersetzen musst. Du musst lediglich den Browser auf allen deinen Geräten auf DuckDuckGo umstellen und schon erhältst du echte Privatsphäre als Standard.\n\nWenn du jedoch einen Blick unter die Haube werfen möchtest, findest du auf unseren <annotation type="learn_more_link">Hilfeseiten</annotation> mehr Informationen darüber, wie der Datenschutz bei DuckDuckGo funktioniert.</string>
     <string name="no_suggestions">Keine Vorschläge</string>
 
     <!-- Broken Site Activity -->

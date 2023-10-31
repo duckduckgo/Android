@@ -71,6 +71,11 @@
             android:label="@string/netpVpnNotificationSettingsTitle"
             android:parentActivityName=".management.NetworkProtectionManagementActivity"
             android:exported="false" />
+        <activity
+            android:name=".settings.geoswitching.NetpGeoswitchingActivity"
+            android:label="@string/netpGeoswitchingTitle"
+            android:parentActivityName="settings.NetPVpnSettingsActivity"
+            android:exported="false" />
         <receiver
             android:name=".notification.NetPEnableReceiver"
             android:enabled="false"
@@ -80,5 +85,11 @@
                 <action android:name="com.duckduckgo.networkprotection.notification.disabled.restart" />
             </intent-filter>
         </receiver>
+
+        <!-- This is the Worker Service where VPN workers need to bind into -->
+        <service
+                android:name="androidx.work.multiprocess.RemoteWorkerService"
+                android:exported="false"
+                android:process=":vpn" />
     </application>
 </manifest>

@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Nadal zapisuj</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Wyłącz</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Ukryj swój adres e-mail i\nblokuj skrypty śledzące</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Ochrona poczty e-mail</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Utwórz unikalny, losowy adres, który usuwa ukryte mechanizmy śledzące i przekazuje wiadomości e-mail do Twojej skrzynki odbiorczej.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Chroń moją pocztę e-mail</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Nie pokazuj więcej</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Jeśli teraz wyjdziesz, Twój Duck Address nie zostanie zapisany</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Kontynuuj konfigurację</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Wyjdź z konfiguracji</string>
+
 </resources>

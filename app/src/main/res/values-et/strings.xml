@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">DuckDuckGo\'st</string>
-    <string name="aboutDescription">
-        DuckDuckGo on veebi usaldusväärsuse uus standard.\n \nDuckDuckGo privaatsusbrauser pakub kõiki privaatsuse põhifunktsioone, mida peate enda kaitsmiseks veebist otsides ja sirvides kasutama, sealhulgas jälgijate blokeerimist, nutikamat krüptimist ja DuckDuckGo privaatset otsingut.\n\nLõppude lõpuks ei tohiks Internet nii jube olla ja Internetis väärilise privaatsuse saavutamine peaks olema sama lihtne kui ruloo alla tõmbamine.</string>
-    <string name="aboutMoreLink">Lisateave: duckduckgo.com/about</string>
+    <string name="aboutHeader">Tere tulemast Pardipoolele!</string>
+    <string name="aboutDescription">DuckDuckGo on 2008. aastal asutatud sõltumatu internetiprivaatsuse ettevõte igaühele, kellel on kõrini varjatud jälgimisest internetis ja kes soovib lihtsat lahendust selle vältimiseks. Me oleme tõestuseks, et internetis on võimalik saada tõelist privaatsuskaitset ilma kompromisse tegemata.\n\nDuckDuckGo brauseril on kõik funktsioonid, mida sa brauserilt ootad, nagu järjehoidjad, vahekaardid, paroolid ja palju muud, lisaks sellele aga ka üle <annotation type="privacy_protection_link">tosina võimsa privaatsuskaitse funktsiooni</annotation>, mida enamik populaarsemaid brausereid vaikimisi ei paku. See ainulaadselt terviklik privaatsuskaitse aitab kaitsta sinu tegevust internetis alates otsingutest kuni sirvimiseni, meilide saatmiseni ja palju muuni.\n\nMeie privaatsuskaitse toimib ilma, et peaks teadma midagi tehnilistest nüanssidest või tegelema keeruliste seadistustega. Ainus, mis sa pead tegema, on vahetada oma brauser kõigis seadmetes DuckDuckGo vastu – ja vaikeprivaatsus ongi tagatud.\n\nKui aga soovid piiluda kapoti alla, leiad lisateavet DuckDuckGo privaatsuskaitse tööpõhimõtete kohta meie <annotation type="learn_more_link">abilehtedelt</annotation></string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
     <!-- Broken Site Activity -->

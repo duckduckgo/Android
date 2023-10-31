@@ -1179,7 +1179,7 @@ class BrowserTabFragment :
             is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
-            is Command.ShareLink -> launchSharePageChooser(it.url)
+            is Command.ShareLink -> launchSharePageChooser(it.url, it.title)
             is Command.SharePromoLinkRMF -> launchSharePromoRMFPageChooser(it.url, it.shareTitle)
             is Command.CopyLink -> clipboardManager.setPrimaryClip(ClipData.newPlainText(null, it.url))
             is Command.ShowFileChooser -> {
@@ -2430,10 +2430,12 @@ class BrowserTabFragment :
         ).show()
     }
 
-    private fun launchSharePageChooser(url: String) {
+    private fun launchSharePageChooser(url: String, title: String) {
         val intent = Intent(Intent.ACTION_SEND).also {
             it.type = "text/plain"
             it.putExtra(Intent.EXTRA_TEXT, url)
+            it.putExtra(Intent.EXTRA_SUBJECT, title)
+            it.putExtra(Intent.EXTRA_TITLE, title)
         }
         try {
             startActivity(Intent.createChooser(intent, null))
@@ -2938,9 +2940,13 @@ class BrowserTabFragment :
             if (targetView != null) {
                 omnibarScrolling.disableOmnibarScrolling(omnibar.toolbarContainer)
                 playPulseAnimation(targetView)
+                webView?.setBottomMatchingBehaviourEnabled(false)
             } else {
                 if (viewState.browserShowing) {
                     omnibarScrolling.enableOmnibarScrolling(omnibar.toolbarContainer)
+                }
+                if (pulseAnimation.isActive) {
+                    webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
                 pulseAnimation.stop()
             }
@@ -3177,6 +3183,10 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenLoadingViewState) {
                 lastSeenLoadingViewState = viewState
 
+                if (viewState.progress == MAX_PROGRESS) {
+                    webView?.setBottomMatchingBehaviourEnabled(true)
+                }
+
                 omnibar.pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
                     smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
@@ -3283,6 +3293,7 @@ class BrowserTabFragment :
         }
 
         private fun renderFullscreenMode(viewState: BrowserViewState) {
+            if (!this@BrowserTabFragment.isVisible) return
             activity?.isImmersiveModeEnabled()?.let {
                 if (viewState.isFullScreen) {
                     if (!it) goFullScreen()
@@ -3587,14 +3598,12 @@ class BrowserTabFragment :
         }
 
         private fun goFullScreen() {
-            Timber.i("Entering full screen")
             binding.webViewFullScreenContainer.show()
             activity?.toggleFullScreen()
             showToast(R.string.fullScreenMessage, Toast.LENGTH_SHORT)
         }
 
         private fun exitFullScreen() {
-            Timber.i("Exiting full screen")
             binding.webViewFullScreenContainer.removeAllViews()
             binding.webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()

@@ -17,11 +17,14 @@
 package com.duckduckgo.app.brokensite.api
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.absoluteString
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -29,9 +32,11 @@ import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -54,13 +59,22 @@ class BrokenSiteSubmitter @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val privacyConfig: PrivacyConfig,
+    private val userAllowListRepository: UserAllowListRepository,
+    private val unprotectedTemporary: UnprotectedTemporary,
+    private val contentBlocking: ContentBlocking,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value) && gpc.isEnabled()).toString()
-        val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
-
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value) && gpc.isEnabled()).toString()
+            val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
+
+            val domain = brokenSite.siteUrl.toUri().domain()
+            val protectionsState = !userAllowListRepository.isDomainInUserAllowList(domain) &&
+                !unprotectedTemporary.isAnException(brokenSite.siteUrl) &&
+                featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) &&
+                !contentBlocking.isAnException(brokenSite.siteUrl)
+
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
                 DESCRIPTION_KEY to brokenSite.description.orEmpty(),
@@ -83,6 +97,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 REMOTE_CONFIG_ETAG to privacyConfig.privacyConfigData()?.eTag.orEmpty(),
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
+                PROTECTIONS_STATE to protectionsState.toBinaryString(),
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -124,6 +139,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val REMOTE_CONFIG_ETAG = "remoteConfigEtag"
         private const val ERROR_CODES_KEY = "errorDescriptions"
         private const val HTTP_ERROR_CODES_KEY = "httpErrorCodes"
+        private const val PROTECTIONS_STATE = "protectionsState"
     }
 }
 

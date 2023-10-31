@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Še naprej shranjujte</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Onemogoči</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Skrijte svojo e-pošto in \nblokirajte sledilnike</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Zaščita e-pošte</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Ustvarite edinstven, naključen naslov, ki odstrani tudi skrite sledilnike in posreduje e-pošto v vaš e-poštni predal.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Zaščiti mojo e-pošto</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Ne prikaži več</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Če zaprete zdaj, vaš naslov Duck Address ne bo shranjen</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Nadaljujte nastavitev</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Izhod iz nastavitev</string>
+
 </resources>

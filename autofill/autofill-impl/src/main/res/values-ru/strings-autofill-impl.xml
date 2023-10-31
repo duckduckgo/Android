@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Сохранять</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Отключить</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Скрытие адреса почты\nи блокировка трекеров</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Защита электронной почты</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Создайте уникальный случайный адрес, который также удалит скрытые трекеры и перенаправит электронную почту на ваш ящик.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Защитить почту</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Больше не показывать</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Если вы прервете настройку, ваш адрес Duck Address не сохранится</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Продолжить настройку</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Выйти из настройки</string>
+
 </resources>

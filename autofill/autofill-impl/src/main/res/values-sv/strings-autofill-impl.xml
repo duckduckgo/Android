@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Fortsätt att spara</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Inaktivera</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Dölj din e-postadress och\nblockera spårare</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">E-postskydd</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Skapa en unik, slumpmässig adress som också tar bort dolda spårare och vidarebefordrar e-post till din inkorg.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Skydda min e-postadress</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Visa inte igen</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Om du avslutar nu kommer din Duck Address inte att sparas</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Fortsätt inställningen</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Avsluta inställningen</string>
+
 </resources>

@@ -56,6 +56,15 @@
         >
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/geoswitching"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpVpnSettingGeoswitching"
+                app:secondaryText="@string/netpVpnSettingGeoswitchingDefault"
+                app:showSwitch="false"
+                />
+
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/always_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

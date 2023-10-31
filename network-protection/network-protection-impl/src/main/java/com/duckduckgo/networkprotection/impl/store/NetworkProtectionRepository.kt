@@ -152,7 +152,6 @@ class RealNetworkProtectionRepository @Inject constructor(
         private const val KEY_WG_SERVER_LOCATION = "wg_server_location"
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"
         private const val KEY_WG_RECONNECT_STATUS = "wg_reconnect_status"
-        private const val KEY_WG_RECONNECT_COUNT = "wg_reconnect_count"
         private const val KEY_WG_CLIENT_IFACE_TUNNEL_IP = "wg_client_iface_tunnel_ip"
     }
 }

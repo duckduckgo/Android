@@ -283,4 +283,29 @@ class MissingInstructionDetectorTest {
             .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
             .run().expect(expected)
     }
+
+    @Test
+    fun whenStringDoNotTranslateHasOrderedPlaceholdersAndNoInstructionThenFailWithError() {
+        val expected =
+            """
+            res/values/donottranslate.xml:3: Error: Missing instruction attribute or attribute empty [MissingInstruction]
+                <string name="macos_windows">Windows %1＄s coming soon! %2＄s</string>
+                                             ~~~~~
+            1 errors, 0 warnings
+            """
+
+        TestLintTask.lint().files(
+            xml(
+                "res/values/donottranslate.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <resources>
+                    <string name="macos_windows">Windows %1${'$'}s coming soon! %2${'$'}s</string>
+                </resources>    
+                """
+            ).indented())
+            .skipTestModes(TestMode.CDATA)
+            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .run().expect(expected)
+    }
 }

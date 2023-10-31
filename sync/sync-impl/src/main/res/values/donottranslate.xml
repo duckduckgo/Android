@@ -33,7 +33,7 @@
     <!-- Settings screen -->
     <string name="sync_screen_title">Sync &amp; Backup</string>
     <string name="sync_off_hint">Securely sync bookmarks and Logins between your devices.</string>
-    <string name="sync_setup_quick_connect_title">Sync with Another Devicee</string>
+    <string name="sync_setup_quick_connect_title">Sync with Another Device</string>
     <string name="sync_setup_quick_primary_cta_subtitle">Sync your devices by scanning a QR code</string>
     <string name="sync_setup_quick_primary_cta_title">Scan QR Code</string>
     <string name="sync_setup_quick_secondary_cta_title">Enter Text Code</string>
@@ -56,7 +56,7 @@
 
     <!-- Device synced screen -->
     <string name="sync_connected_device_title">Device Synced!</string>
-    <string name="sync_connected_device_hint">Your bookmarks and Logins are now syncing with %1$s</string>
+    <string name="sync_connected_device_hint" instruction="Placeholder is a device name">Your bookmarks and Logins are now syncing with %1$s</string>
 
     <!-- Connect screen -->
     <string name="login_screen_title">Scan QR Code</string>
@@ -101,7 +101,7 @@
     <string name="sync_instructions_step2">Scan the QR code or copy and paste the text code into another DuckDuckGo app.</string>
     <string name="sync_instructions_step3">Sync will be activated and you\'ll once again have access to all of your data.</string>
     <string name="remove_device_dialog_title">Remove device?</string>
-    <string name="remove_device_dialog_content">\"%1$s\" will no longer be able to access your synced data.</string>
+    <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" will no longer be able to access your synced data.</string>
     <string name="remove_device_dialog_primary_button">Remove</string>
     <string name="remove_device_dialog_secondary_button">Cancel</string>
     <string name="edit_device_dialog_title">Edit</string>

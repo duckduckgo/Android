@@ -35,7 +35,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.connectionclass.ConnectionQualityStore
 import com.duckduckgo.networkprotection.impl.connectionclass.asConnectionQuality
-import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyer
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.internal.databinding.ActivityNetpInternalSettingsBinding
 import com.duckduckgo.networkprotection.internal.feature.NetPEnvironmentSettingActivity.Companion.NetPEnvironmentSettingScreen
@@ -44,6 +43,9 @@ import com.duckduckgo.networkprotection.internal.network.NetPInternalMtuProvider
 import com.duckduckgo.networkprotection.internal.network.netpDeletePcapFile
 import com.duckduckgo.networkprotection.internal.network.netpGetPcapFile
 import com.duckduckgo.networkprotection.internal.network.netpPcapFileHasContent
+import com.duckduckgo.networkprotection.internal.rekey.DebugRekeyReceiver
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository
+import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.remote_config.NetPServerRepository
 import com.google.android.material.snackbar.Snackbar
 import com.wireguard.crypto.Key
@@ -72,11 +74,11 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
-    @Inject lateinit var netPRekeyer: NetPRekeyer
-
     @Inject lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject lateinit var connectionQualityStore: ConnectionQualityStore
+
+    @Inject lateinit var netPGeoswitchingRepository: NetPGeoswitchingRepository
 
     private val job = ConflatedJob()
 
@@ -215,7 +217,7 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.forceRekey.setClickListener {
             lifecycleScope.launch {
-                netPRekeyer.doRekey()
+                sendBroadcast(Intent(DebugRekeyReceiver.ACTION_FORCE_REKEY))
             }
         }
 
@@ -257,6 +259,14 @@ class NetPInternalSettingsActivity : DuckDuckGoActivity() {
                     serverRepository.setSelectedServer(it.serverName())
                     binding.overrideServerBackendSelector.setSecondaryText("${serverRepository.getSelectedServer()?.name ?: AUTOMATIC}")
                     networkProtectionState.restart()
+                    serverRepository.getSelectedServer()?.let {
+                        netPGeoswitchingRepository.setUserPreferredLocation(
+                            UserPreferredLocation(
+                                countryCode = it.countryCode,
+                                cityName = it.city,
+                            ),
+                        )
+                    }
                 }
                 true
             }

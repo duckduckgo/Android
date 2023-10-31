@@ -49,6 +49,6 @@ object NetPInternalModule {
 
     @Provides
     fun provideNetPServerRepository(netPServersDao: NetPServersDao): NetPServerRepository {
-        return NetPServerRepository((netPServersDao))
+        return NetPServerRepository(netPServersDao)
     }
 }

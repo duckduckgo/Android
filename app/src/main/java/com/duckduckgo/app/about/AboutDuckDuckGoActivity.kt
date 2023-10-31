@@ -17,6 +17,15 @@
 package com.duckduckgo.app.about
 
 import android.os.Bundle
+import android.text.Annotation
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.SpannedString
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.UnderlineSpan
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +39,8 @@ import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.R.attr
+import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetPWaitlistInvitedScreenNoParams
@@ -66,19 +77,86 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+        configureClickableLinks()
     }
 
     override fun onResume() {
         super.onResume()
-
         viewModel.resetNetPEasterEggCounter()
     }
 
-    private fun configureUiEventHandlers() {
-        binding.includeContent.learnMoreLink.setOnClickListener {
-            viewModel.onLearnMoreLinkClicked()
+    private fun configureClickableLinks() {
+        with(binding.includeContent.aboutText) {
+            text = addClickableLinks()
+            movementMethod = LinkMovementMethod.getInstance()
+        }
+    }
+
+    private fun addClickableLinks(): SpannableString {
+        val fullText = getText(R.string.aboutDescription) as SpannedString
+        val spannableString = SpannableString(fullText)
+        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
+
+        annotations?.find { it.value == PRIVACY_PROTECTION_ANNOTATION }?.let {
+            addSpannable(
+                spannableString,
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onPrivacyProtectionsLinkClicked()
+                    }
+                },
+                fullText,
+                it,
+            )
         }
 
+        annotations?.find { it.value == LEARN_MORE_ANNOTATION }?.let {
+            addSpannable(
+                spannableString,
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreLinkClicked()
+                    }
+                },
+                fullText,
+                it,
+            )
+        }
+
+        return spannableString
+    }
+
+    private fun addSpannable(
+        spannableString: SpannableString,
+        clickableSpan: ClickableSpan,
+        fullText: SpannedString,
+        it: Annotation,
+    ) {
+        spannableString.apply {
+            setSpan(
+                clickableSpan,
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            setSpan(
+                UnderlineSpan(),
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+            setSpan(
+                ForegroundColorSpan(
+                    getColorFromAttr(attr.daxColorAccentBlue),
+                ),
+                fullText.getSpanStart(it),
+                fullText.getSpanEnd(it),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+            )
+        }
+    }
+
+    private fun configureUiEventHandlers() {
         binding.includeContent.aboutPrivacyPolicy.setClickListener {
             viewModel.onPrivacyPolicyClicked()
         }
@@ -115,6 +193,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         when (it) {
             is Command.LaunchBrowserWithLearnMoreUrl -> launchBrowserScreen()
             is Command.LaunchWebViewWithPrivacyPolicyUrl -> launchWebViewScreen()
+            is Command.LaunchBrowserWithPrivacyProtectionsUrl -> launchPrivacyProtectionsScreen()
             is Command.ShowNetPUnlockedSnackbar -> showNetPUnlockedSnackbar()
             is Command.LaunchNetPWaitlist -> launchNetPWaitlist()
             is Command.LaunchFeedback -> launchFeedback()
@@ -136,6 +215,16 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun launchPrivacyProtectionsScreen() {
+        globalActivityStarter.start(
+            this,
+            WebViewActivityWithParams(
+                url = PRIVACY_PROTECTIONS_WEB_LINK,
+                screenTitle = getString(R.string.settingsAboutDuckduckgo),
+            ),
+        )
+    }
+
     private fun showNetPUnlockedSnackbar() {
         Snackbar.make(
             binding.root,
@@ -152,6 +241,9 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        private const val PRIVACY_PROTECTION_ANNOTATION = "privacy_protection_link"
+        private const val LEARN_MORE_ANNOTATION = "learn_more_link"
         private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
+        private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://duckduckgo.com/duckduckgo-help-pages/privacy/web-tracking-protections/"
     }
 }

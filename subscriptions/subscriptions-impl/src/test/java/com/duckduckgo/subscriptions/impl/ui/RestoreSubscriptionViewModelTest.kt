@@ -8,7 +8,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.auth.Entitlement
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromSync
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,14 +38,6 @@ class RestoreSubscriptionViewModelTest {
         viewModel.commands().test {
             viewModel.restoreFromEmail()
             assertTrue(awaitItem() is RestoreFromEmail)
-        }
-    }
-
-    @Test
-    fun whenRestoreFromSyncThenSendCommand() = runTest {
-        viewModel.commands().test {
-            viewModel.restoreFromSync()
-            assertTrue(awaitItem() is RestoreFromSync)
         }
     }
 

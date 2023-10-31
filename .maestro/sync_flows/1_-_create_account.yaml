@@ -11,6 +11,11 @@ tags:
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/item_container"
     index: 2
+- extendedWaitUntil:
+    visible:
+      id: "com.duckduckgo.mobile.android:id/footer_button"
+      enabled: true
+    timeout: 5000
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/footer_button"
 - tapOn:

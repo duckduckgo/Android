@@ -63,6 +63,7 @@
         <item name="snackbarButtonStyle">@style/Widget.DuckDuckGo.SnackbarButton</item>
         <item name="snackbarTextViewStyle">@style/Widget.DuckDuckGo.SnackbarText</item>
         <item name="android:datePickerDialogTheme">@style/Widget.DuckDuckGo.DatePicker</item>
+        <item name="android:timePickerDialogTheme">@style/Widget.DuckDuckGo.TimePicker</item>
         <item name="alertDialogTheme">@style/Widget.DuckDuckGo.LegacyDialog</item>
         <item name="android:alertDialogTheme">@style/Widget.DuckDuckGo.LegacyDialog</item>
         <item name="materialAlertDialogTheme">@style/Widget.DuckDuckGo.Dialog</item>

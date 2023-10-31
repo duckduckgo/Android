@@ -151,7 +151,7 @@
     <string name="settingsHeadingSettings">Postavke</string>
     <string name="settingsPermissionsSetting">Dozvole</string>
     <string name="settingsAutofillLoginsSetting">Automatsko popunjavanje prijave</string>
-    <string name="settingsSyncSetting">Sinkronizacija</string>
+    <string name="settingsSyncSetting">Sinkronizacija i sigurnosno kopiranje</string>
     <string name="settingsFireButton">Fire Button</string>
 
     <!-- Private Search -->
@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGou</string>
-    <string name="aboutDescription">
-        U DuckDuckGou postavljamo novi standard povjerenja na internetu.\n\nDuckDuckGo anonimni je preglednik koji pruža sve što ti je potrebno da se zaštitiš dok pretražuješ i pregledavaš internet, uključujući blokiranje alata za praćenje, pametnije šifriranje i privatno pretraživanje uz pomoć DuckDuckGoa.\n\nUostalom, internet ne bi trebao biti neugodno mjesto, a zaštita privatnosti na internetu koju zaslužuješ trebala bi biti jednostavna poput spuštanja roleta.</string>
-    <string name="aboutMoreLink">Više na duckduckgo.com/about</string>
+    <string name="aboutHeader">Dobrodošli na našu stranu!</string>
+    <string name="aboutDescription">DuckDuckGo neovisna je tvrtka za privatnost na internetu osnovana 2008. godine namijenjena svakome tko je umoran od toga da ga prate na internetu i želi jednostavno rješenje za to. Mi smo dokaz da je prava zaštita privatnosti na internetu moguća bez kompromisa.\n\nPreglednik DuckDuckGo dolazi sa značajkama koje očekuješ od preglednika, poput oznaka, kartica, lozinki i još mnogo toga; ali uz to, pruža se više od <annotation type="privacy_protection_link">desetak moćnih zaštita privatnosti</annotation> koje se zadano ne nude u najpopularnijim preglednicima. Ovaj jedinstveno sveobuhvatan skup zaštite privatnosti pomaže u zaštiti tvojih mrežnih aktivnosti, od pretraživanja do pregledavanja, slanja e-pošte i još mnogo toga.\n\nNaša zaštita privatnosti funkcionira bez potrebe da znamo bilo što o tehničkim detaljima ili da se bavimo kompliciranim postavkama. Sve što trebaš učiniti jest prebaciti svoj preglednik na DuckDuckGo na svim svojim uređajima i prema zadanim postavkama dobivaš našu zaštitu privatnosti.\n\nAli ako želiš \"zaviriti ispod haube\", više informacija o tome kako DuckDuckGo zaštita privatnosti funkcionira možeš pronaći na našim <annotation type="learn_more_link">stranicama pomoći</annotation></string>
     <string name="no_suggestions">Nema prijedloga</string>
 
     <!-- Broken Site Activity -->

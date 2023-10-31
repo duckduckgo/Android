@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Pokračovať v ukladaní</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Zakázať</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Skryte svoj e-mail\na blokujte sledovače</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Ochrana e-mailu</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Vytvorte si náhodnú jedinečnú adresu, ktorá odstráni aj skryté sledovacie prvky a prepošle e-maily do vašej schránky.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Ochrana môjho e-mailu</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Nabudúce už neukazovať</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ak teraz skončíte, vaša adresa Duck sa neuloží.</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Pokračovať v nastavovaní</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Odísť z nastavení</string>
+
 </resources>

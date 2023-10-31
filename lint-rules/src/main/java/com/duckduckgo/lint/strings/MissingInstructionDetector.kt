@@ -35,7 +35,6 @@ import org.w3c.dom.Node
 class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
 
     private fun ignoreFile(context: Context) =
-        context.file.name.startsWith("donottranslate") ||
             ResourceUsageModel.isAnalyticsFile(context.file) ||
             !context.project.reportIssues
 

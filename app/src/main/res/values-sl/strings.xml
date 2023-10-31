@@ -204,9 +204,8 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O DuckDuckGo</string>
-    <string name="aboutDescription">
-        Pri DuckDuckGo vzpostavljamo nov standard zaupanja na spletu.\n\\ .\n\\ Navsezadnje nam internet ne bi smel vzbujati strahu.\n\nZasebni brskalnik DuckDuckGo zagotavlja vse bistvene sestavine zasebnosti, ki jih potrebujete za svojo zaščito, kadar iščete in brskate po spletu, vključno z blokiranjem sledilnikov, pametnejšim šifriranjem in zasebnim iskanjem DuckDuckGo.\n\nDoseganje zasebnosti na spletu, ki si jo zaslužimo, bi moralo biti tako preprosto kot zagrinjanje zaves.</string>
-    <string name="aboutMoreLink">Več na duckduckgo.com/about</string>
+    <string name="aboutHeader">Dobrodošli na strani Duck!</string>
+    <string name="aboutDescription">DuckDuckGo je neodvisno podjetje za zasebnost v internetu, ustanovljeno leta 2008, in je namenjeno vsem, ki so naveličani sledenja v spletu in si želijo preproste rešitve. Dokazujemo, da je v spletu mogoče zagotoviti pravo zaščito zasebnosti brez sklepanja kompromisov.\n\nBrskalnik DuckDuckGo ima funkcije, ki jih pričakujete od priljubljenega brskalnika, kot so zaznamki, zavihki, gesla in drugo, ter več kot <annotation type="privacy_protection_link">deset zmogljivih zaščit zasebnosti</annotation>, ki jih večina priljubljenih brskalnikov ne ponuja privzeto. Ta edinstveni celovit sklop zaščite zasebnosti pomaga zaščititi vaše spletne dejavnosti, od iskanja do brskanja, pošiljanja e-pošte in še več.\n\nNaša zaščita zasebnosti deluje, ne da bi se vam bilo treba spoznati na tehnične podrobnosti ali se ukvarjati z zapletenimi nastavitvami. Vse, kar morate storiti, je, da brskalnik preklopite na DuckDuckGo v vseh napravah in zasebnost bo privzeta.\n\nČe pa želite pogledati v mehanizem delovanja, lahko več informacij o delovanju zaščite zasebnosti DuckDuckGo najdete na naših <annotation type="learn_more_link">straneh s pomočjo</annotation>.</string>
     <string name="no_suggestions">Ni predlogov</string>
 
     <!-- Broken Site Activity -->

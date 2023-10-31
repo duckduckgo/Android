@@ -29,7 +29,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.AddEmail
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.ManageEmail
-import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.UseSync
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -84,17 +83,9 @@ class AddDeviceViewModel @Inject constructor(
         }
     }
 
-    fun useSync() {
-        viewModelScope.launch {
-            command.send(UseSync)
-        }
-    }
-
     sealed class Command {
         object AddEmail : Command()
         object ManageEmail : Command()
-        object UseSync : Command()
-
         object Error : Command()
     }
 }

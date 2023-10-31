@@ -16,39 +16,117 @@
 
 package com.duckduckgo.networkprotection.impl.rekey
 
-import androidx.work.WorkManager
-import com.duckduckgo.di.scopes.AppScope
+import android.app.KeyguardManager
+import android.content.Context
+import android.os.PowerManager
+import com.duckduckgo.app.di.ProcessName
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.impl.configuration.WgServerApi
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.duckduckgo.networkprotection.impl.rekey.NetPRekeyScheduler.Companion.DAILY_NETP_REKEY_TAG
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import com.wireguard.crypto.KeyPair
+import dagger.Module
+import dagger.Provides
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import javax.inject.Qualifier
+import logcat.LogPriority
+import logcat.asLog
 import logcat.logcat
 
 interface NetPRekeyer {
     suspend fun doRekey()
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(VpnScope::class)
 class RealNetPRekeyer @Inject constructor(
-    private val workManager: WorkManager,
     private val networkProtectionRepository: NetworkProtectionRepository,
     private val vpnFeaturesRegistry: VpnFeaturesRegistry,
     private val networkProtectionPixels: NetworkProtectionPixels,
+    @ProcessName private val processName: String,
+    private val wgServerApi: WgServerApi,
+    private val appBuildConfig: AppBuildConfig,
+    @InternalApi private val deviceLockedChecker: DeviceLockedChecker,
 ) : NetPRekeyer {
 
+    private val forceRekey = AtomicBoolean(false)
+
     override suspend fun doRekey() {
-        logcat { "Rekeying client" }
-        networkProtectionRepository.privateKey = null
-        if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
-            logcat { "Restarting VPN after clearing client keys" }
-            vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
-        } else {
-            logcat { "Cancelling scheduled rekey" }
-            workManager.cancelUniqueWork(DAILY_NETP_REKEY_TAG)
+        fun AtomicBoolean.getAndResetValue(): Boolean {
+            val value = getAndSet(false)
+            return appBuildConfig.isInternalBuild() && value // only allowed in internal builds
         }
-        networkProtectionPixels.reportRekeyCompleted()
+
+        logcat { "Rekeying client on $processName" }
+        val forceOrFalseInProductionBuilds = forceRekey.getAndResetValue()
+
+        val millisSinceLastKeyUpdate = System.currentTimeMillis() - networkProtectionRepository.lastPrivateKeyUpdateTimeInMillis
+        if (!forceOrFalseInProductionBuilds && millisSinceLastKeyUpdate < TimeUnit.DAYS.toMillis(1)) {
+            logcat { "Less than 24h passed, skip re-keying" }
+            return
+        }
+
+        if (deviceLockedChecker.invoke() || forceOrFalseInProductionBuilds) {
+            val newKey = runCatching {
+                val newKeys = KeyPair()
+                wgServerApi.registerPublicKey(newKeys.publicKey.toBase64())
+
+                newKeys
+            }.onFailure {
+                logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
+            }.getOrNull() ?: return
+
+            logcat { "Re-keying with public key: ${newKey.publicKey.toBase64()}" }
+
+            if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
+                logcat { "Restarting VPN after clearing client keys" }
+                networkProtectionPixels.reportRekeyCompleted()
+                networkProtectionRepository.privateKey = newKey.privateKey.toBase64()
+                vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
+            } else {
+                logcat(LogPriority.ERROR) { "Re-key work should not happen" }
+            }
+        } else {
+            logcat { "Device not locked, skip re-keying" }
+        }
+    }
+
+    suspend fun forceRekey() {
+        if (appBuildConfig.isInternalBuild()) {
+            forceRekey.set(true)
+            doRekey()
+        } else {
+            logcat(LogPriority.ERROR) { "Force re-key not allowed in production builds" }
+        }
+    }
+}
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class InternalApi
+
+// visible for testing
+internal typealias DeviceLockedChecker = () -> Boolean
+
+@Module
+@ContributesTo(VpnScope::class)
+object DeviceLockedCheckerModule {
+
+    @Provides
+    @InternalApi
+    fun provideDeviceLockChecker(context: Context): DeviceLockedChecker {
+        val keyguardManager = runCatching { context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }.getOrNull()
+        val powerManager = runCatching { context.getSystemService(Context.POWER_SERVICE) as PowerManager }.getOrNull()
+
+        return {
+            (keyguardManager?.isDeviceLocked == true || powerManager?.isInteractive == false)
+        }
     }
 }

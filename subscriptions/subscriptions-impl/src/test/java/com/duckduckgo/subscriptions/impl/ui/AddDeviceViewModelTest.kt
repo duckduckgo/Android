@@ -7,7 +7,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.AddEmail
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.ManageEmail
-import com.duckduckgo.subscriptions.impl.ui.AddDeviceViewModel.Command.UseSync
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -29,14 +28,6 @@ class AddDeviceViewModelTest {
     @Before
     fun before() {
         viewModel = AddDeviceViewModel(subscriptionsManager, coroutineTestRule.testDispatcherProvider)
-    }
-
-    @Test
-    fun whenUseSyncThenCommandSent() = runTest {
-        viewModel.commands().test {
-            viewModel.useSync()
-            assertTrue(awaitItem() is UseSync)
-        }
     }
 
     @Test

@@ -256,6 +256,18 @@
         <item name="android:textColorSecondaryInverse">?daxColorPrimaryInvertedText</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.TimePicker" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:buttonBarButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.DuckDuckGo.LegacyDialogButtonStyle</item>
+        <item name="colorAccent">?attr/daxColorAccentBlue</item>
+        <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
+        <item name="colorControlHighlight">?attr/daxColorAccentBlue</item>
+        <item name="android:textColorPrimaryInverse">?daxColorPrimaryInvertedText</item>
+        <item name="android:textColorSecondaryInverse">?daxColorPrimaryInvertedText</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.LegacyDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">?attr/daxColorAccentBlue</item>
     </style>

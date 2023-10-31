@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Kaydetmeye Devam Et</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Devre dışı bırak</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">E-postanızı Gizleyin ve \n İzleyicileri Engelleyin</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">E-posta Koruması</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Gizli izleyicileri de kaldıran ve e-postaları gelen kutunuza ileten benzersiz, rastgele bir adres oluşturun.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">E-postamı Koru</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Bir Daha Gösterme</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Şimdi çıkış yaparsanız Duck Address kaydedilmez.</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Kuruluma Devam Et</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Kurulumdan Çık</string>
+
 </resources>

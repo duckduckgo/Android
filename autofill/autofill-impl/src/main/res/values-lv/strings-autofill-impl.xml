@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Turpināt saglabāt</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Atslēgt</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Paslēp savu e-pastu un\nbloķē izsekotājus</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">E-pasta aizsardzība</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Izveido unikālu, nejauši izvēlētu adresi, kas arī aizvāc slēptos izsekotājus un pārsūta e-pastus uz tavu pastkastīti.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Aizsargāt manu e-pastu</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Turpmāk nerādīt</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Ja tagad iziesi, tava Duck adrese netiks saglabāta</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Turpināt iestatīšanu</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Iziet no iestatīšanas</string>
+
 </resources>

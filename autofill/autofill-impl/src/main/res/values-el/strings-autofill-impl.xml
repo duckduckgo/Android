@@ -121,4 +121,13 @@
     <string name="autofillDisableAutofillPromptPositiveButton">Συνεχίστε την αποθήκευση</string>
     <string name="autofillDisableAutofillPromptNegativeButton">Απενεργοποίηση</string>
 
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">Απόκρυψη του email σας και \n αποκλεισμός εφαρμογών παρακολούθησης</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">Προστασία email</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">Δημιουργήστε μια μοναδική, τυχαία διεύθυνση η οποία αφαιρεί επίσης κρυφές εφαρμογές παρακολούθησης και προωθεί email στα εισερχόμενά σας.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">Προστασία του email μου</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">Να μην εμφανιστεί ξανά</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">Εάν εξέλθετε τώρα, η Duck Address δεν θα αποθηκευτεί</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">Συνέχιση εγκατάστασης</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">Έξοδος από την εγκατάσταση</string>
+
 </resources>
