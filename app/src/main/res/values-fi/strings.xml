@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Lähetä raportti</string>
     <string name="brokenSiteDescription">Anonyymin raportin lähettäminen toimimattomasta sivustosta auttaa meitä korjaamaan nämä ongelmat ja parantamaan sovellusta.</string>
 
-    <string name="brokenSiteCategoryImages">Kuvat eivät latautuneet</string>
-    <string name="brokenSiteCategoryPaywall">Sivusto pyysi minua poistamaan käytöstä</string>
-    <string name="brokenSiteCategoryComments">Kommentit eivät latautuneet</string>
-    <string name="brokenSiteCategoryVideos">Videoita ei toistettu</string>
-    <string name="brokenSiteCategoryLinks">Linkit tai painikkeet eivät toimineet</string>
-    <string name="brokenSiteCategoryContent">Sisältöä puuttuu</string>
-    <string name="brokenSiteCategoryLogin">En pysty kirjautumaan sisään</string>
-    <string name="brokenSiteCategoryUnsupported">Selain ei ole yhteensopiva</string>
+    <string name="brokenSiteCategoryBlocked">Sivusto estetty tai ei latautunut</string>
+    <string name="brokenSiteCategoryLayout">Sivuston asettelu rikki</string>
+    <string name="brokenSiteCategoryEmptySpaces">Sivustolla on suuria tyhjiä tiloja</string>
+    <string name="brokenSiteCategoryShopping">Ei voi maksaa, siirtyä kassalle tai ostaa</string>
+    <string name="brokenSiteCategoryPaywall">Sivusto pyysi minua poistamaan mainosten eston</string>
+    <string name="brokenSiteCategoryComments">Kommentit, arvostelut tai chatit eivät latautuneet</string>
+    <string name="brokenSiteCategoryVideos">Videota ei toistettu se ei latautunut</string>
+    <string name="brokenSiteCategoryLogin">Ei voi kirjautua sisään/rekisteröityä</string>
     <string name="brokenSiteCategoryOther">Jotain muuta</string>
     <string name="brokenSiteDescriptionTextInputHint">Jaa lisää tietoja (valinnainen)</string>
+    <string name="brokenSiteDescriptionCaption">Mitä tapahtui? Mitä olisi pitänyt tapahtua? Auttoiko estojen poistaminen käytöstä?</string>
+
+    <string name="brokenSiteProtectionsOn">Tämän sivuston suojaukset ovat <b>KÄYTÖSSÄ</b></string>
+    <string name="brokenSiteProtectionsOff">Tämän sivuston suojaukset ovat <b>POIS KÄYTÖSTÄ</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Suojausten kytkeminen pois päältä voi auttaa.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Yksityisyyden suojaukset on väliaikaisesti poistettu käytöstä, koska ne näyttäisivät rikkovan tämän sivun.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>
