@@ -52,4 +52,18 @@
         <item name="android:src">@drawable/ic_close_24</item>
     </style>
 
+    <style name="AutofillDialogContentGuidelineStart">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="layout_constraintGuide_percent">0.1</item>
+    </style>
+
+    <style name="AutofillDialogContentGuidelineEnd">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="layout_constraintGuide_percent">0.9</item>
+    </style>
+
 </resources>

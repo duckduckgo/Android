@@ -30,52 +30,65 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.duckduckgo.common.ui.view.text.DaxTextView
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineStart"
+            style="@style/AutofillDialogContentGuidelineStart" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineEnd"
+            style="@style/AutofillDialogContentGuidelineEnd" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/autofillDialogContentContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/dialogTitle"
-            android:layout_marginTop="40dp"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:text="@string/autofill_email_protection_choose_email_dialog_title"
-            android:gravity="center_horizontal"
-            app:layout_constraintBottom_toTopOf="@id/primaryCta"
-            app:layout_constraintEnd_toEndOf="@id/primaryCta"
-            app:layout_constraintStart_toStartOf="@id/primaryCta"
             app:layout_constraintTop_toTopOf="parent"
-            app:typography="h2" />
+            app:layout_constraintWidth_max="@dimen/autofillBottomSheetContentMaxWidth"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd">
 
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/primaryCta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_5"
-            android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:background="@drawable/autofill_rounded_container_listitem_background"
-            tools:primaryText="dax@duck.com"
-            app:layout_constraintWidth_percent="0.9"
-            app:layout_constraintTop_toBottomOf="@id/dialogTitle"
-            app:leadingIcon="@drawable/ic_dax_icon"
-            app:secondaryText="@string/autofillTooltipUseYourAliasDescription" />
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/dialogTitle"
+                android:layout_marginTop="40dp"
+                android:layout_marginStart="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:text="@string/autofill_email_protection_choose_email_dialog_title"
+                android:gravity="center_horizontal"
+                app:layout_constraintBottom_toTopOf="@id/primaryCta"
+                app:layout_constraintEnd_toEndOf="@id/primaryCta"
+                app:layout_constraintStart_toStartOf="@id/primaryCta"
+                app:layout_constraintTop_toTopOf="parent"
+                app:typography="h2" />
 
-        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-            android:id="@+id/secondaryCta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/autofill_rounded_container_listitem_background"
-            android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintWidth_percent="0.9"
-            app:leadingIcon="@drawable/ic_dax_icon"
-            app:layout_constraintTop_toBottomOf="@id/primaryCta"
-            app:primaryText="@string/autofillTooltipGenerateAddress"
-            app:secondaryText="@string/autofillTooltipGenerateAddressDescription" />
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/primaryCta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@drawable/autofill_rounded_container_listitem_background"
+                tools:primaryText="dax@duck.com"
+                app:layout_constraintTop_toBottomOf="@id/dialogTitle"
+                app:leadingIcon="@drawable/ic_dax_icon"
+                app:secondaryText="@string/autofillTooltipUseYourAliasDescription" />
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/secondaryCta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/autofill_rounded_container_listitem_background"
+                android:layout_marginTop="@dimen/keyline_2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:leadingIcon="@drawable/ic_dax_icon"
+                app:layout_constraintTop_toBottomOf="@id/primaryCta"
+                app:primaryText="@string/autofillTooltipGenerateAddress"
+                app:secondaryText="@string/autofillTooltipGenerateAddressDescription" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
