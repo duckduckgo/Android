@@ -111,6 +111,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mockAppBuildConfig,
             coroutineRule.testDispatcherProvider,
             mockPrivacyConfig,
+            mock(),
+            mock(),
+            mock(),
         )
     }
 
