@@ -217,16 +217,22 @@
     <string name="brokenSiteSubmitButton">Verzend Rapport</string>
     <string name="brokenSiteDescription">Als je een anoniem rapport voor een defecte site indient, kunnen we deze problemen oplossen en de app verbeteren.</string>
 
-    <string name="brokenSiteCategoryImages">Afbeeldingen zijn niet geladen</string>
-    <string name="brokenSiteCategoryPaywall">De site heeft me gevraagd om uit te schakelen</string>
-    <string name="brokenSiteCategoryComments">Opmerkingen zijn niet geladen</string>
-    <string name="brokenSiteCategoryVideos">Video werd niet afgespeeld</string>
-    <string name="brokenSiteCategoryLinks">Links of knoppen werken niet</string>
-    <string name="brokenSiteCategoryContent">Inhoud ontbreekt</string>
-    <string name="brokenSiteCategoryLogin">Ik kan niet inloggen</string>
-    <string name="brokenSiteCategoryUnsupported">De browser is niet compatibel</string>
+    <string name="brokenSiteCategoryBlocked">Site geblokkeerd of niet geladen</string>
+    <string name="brokenSiteCategoryLayout">Site wordt niet goed vormgegeven</string>
+    <string name="brokenSiteCategoryEmptySpaces">Site bevat grote lege ruimtes</string>
+    <string name="brokenSiteCategoryShopping">Betalen, afrekenen of winkelen niet mogelijk</string>
+    <string name="brokenSiteCategoryPaywall">De site vroeg me om de adblocker uit te schakelen</string>
+    <string name="brokenSiteCategoryComments">Reacties, recensies of chats worden niet geladen</string>
+    <string name="brokenSiteCategoryVideos">Video wordt niet afgespeeld of geladen</string>
+    <string name="brokenSiteCategoryLogin">Aanmelden/registreren niet mogelijk</string>
     <string name="brokenSiteCategoryOther">Iets anders</string>
     <string name="brokenSiteDescriptionTextInputHint">Meer details delen (optioneel)</string>
+    <string name="brokenSiteDescriptionCaption">Wat is er gebeurd? Wat had er moeten gebeuren? Hielp het uitschakelen van de beveiliging?</string>
+
+    <string name="brokenSiteProtectionsOn">Beveiliging is <b>INGESCHAKELD</b> voor deze website</string>
+    <string name="brokenSiteProtectionsOff">Beveiliging is <b>UITGESCHAKELD</b> voor deze website</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Het kan helpen om de beveiliging uit te schakelen.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We hebben privacybescherming tijdelijk uitgeschakeld, omdat het erop lijkt dat deze site hierdoor niet goed meer werkt.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
