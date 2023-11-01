@@ -26,7 +26,6 @@ import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
 import androidx.core.net.toUri
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
@@ -51,7 +50,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @ContributesBinding(FragmentScope::class)
-@InjectWith(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,

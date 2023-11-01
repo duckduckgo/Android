@@ -44,5 +44,5 @@
     <string name="brokenSitesLoginSmallHint">Site name (required)</string>
     
     <!-- DRM -->
-    <string name="sitePermissionsSettingsDRM">DRM (Digital Rights Management)</string>
+    <string name="sitePermissionsSettingsDRM">DRM</string>
 </resources>
