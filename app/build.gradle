@@ -144,6 +144,11 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.4"
     }
+
+    dependencies {
+        def compose_version = "1.0.0-beta07"
+        implementation("androidx.compose.runtime:runtime:$compose_version")
+    }
 }
 
 fulladleModuleConfig {
