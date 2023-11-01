@@ -85,6 +85,10 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         binding.excludeLocalNetworks.showSwitch()
         binding.secureDns.setSwitchEnabled(false)
 
+        binding.secureDns.quietlySetIsChecked(true, null)
+        binding.secureDns.showSwitch()
+        binding.secureDns.setSwitchEnabled(false)
+
         binding.alwaysOn.setOnClickListener {
             openVPNSettings()
         }

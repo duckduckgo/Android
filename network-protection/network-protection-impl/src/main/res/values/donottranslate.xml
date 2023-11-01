@@ -132,6 +132,8 @@
     <string name="netpVpnSettingDnsLeak">Network Protection prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
     <string name="netpVpnSettingGeoswitching">Preferred Location</string>
     <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
+    <string name="netpVpnSettingSecureDNS">Secure DNS</string>
+    <string name="netpVpnSettingSecureDNSByLine">Network Protection prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver. For your security, this feature cannot be disabled.</string>
 
     <!-- VPN Notification settings -->
     <string name="netpVpnSettingNotificationEnabled">VPN Enabled</string>
