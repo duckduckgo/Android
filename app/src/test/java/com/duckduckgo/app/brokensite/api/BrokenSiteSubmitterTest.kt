@@ -13,6 +13,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
@@ -22,6 +23,7 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -63,6 +65,8 @@ class BrokenSiteSubmitterTest {
 
     private val mockContentBlocking: ContentBlocking = mock()
 
+    private val mockBrokenSiteLastSentReport: BrokenSiteLastSentReport = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     @Before
@@ -91,6 +95,7 @@ class BrokenSiteSubmitterTest {
             mockUserAllowListRepository,
             mockUnprotectedTemporary,
             mockContentBlocking,
+            mockBrokenSiteLastSentReport,
         )
     }
 
@@ -179,6 +184,23 @@ class BrokenSiteSubmitterTest {
         val params = paramsCaptor.firstValue
 
         assertEquals("1", params["protectionsState"])
+    }
+
+    @Test
+    fun whenBrokenSiteFeedbackIsSuccessfullySubmittedThenParamSentAndSetLastSentDayIsCalledForThatDomain() = runTest {
+        val lastSentDay = "2023-11-01"
+        whenever(mockBrokenSiteLastSentReport.getLastSentDay(any())).thenReturn(lastSentDay)
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
+        val params = paramsCaptor.firstValue
+
+        assertEquals(lastSentDay, params["lastSentDay"])
+        verify(mockBrokenSiteLastSentReport).setLastSentDay("example.com")
     }
 
     private fun getBrokenSite(): BrokenSite {

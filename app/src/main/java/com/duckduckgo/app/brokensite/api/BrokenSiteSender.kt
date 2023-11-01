@@ -30,6 +30,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -62,6 +63,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val contentBlocking: ContentBlocking,
+    private val brokenSiteLastSentReport: BrokenSiteLastSentReport,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -74,6 +76,8 @@ class BrokenSiteSubmitter @Inject constructor(
                 !unprotectedTemporary.isAnException(brokenSite.siteUrl) &&
                 featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) &&
                 !contentBlocking.isAnException(brokenSite.siteUrl)
+
+            val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty()).orEmpty()
 
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
@@ -98,6 +102,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
                 PROTECTIONS_STATE to protectionsState.toBinaryString(),
+                LAST_SENT_DAY to lastSentDay,
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -106,7 +111,12 @@ class BrokenSiteSubmitter @Inject constructor(
             runCatching {
                 pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
-                .onSuccess { Timber.v("Feedback submission succeeded") }
+                .onSuccess {
+                    Timber.v("Feedback submission succeeded")
+                    if (!domain.isNullOrEmpty()) {
+                        brokenSiteLastSentReport.setLastSentDay(domain)
+                    }
+                }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
         }
     }
@@ -140,6 +150,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val ERROR_CODES_KEY = "errorDescriptions"
         private const val HTTP_ERROR_CODES_KEY = "httpErrorCodes"
         private const val PROTECTIONS_STATE = "protectionsState"
+        private const val LAST_SENT_DAY = "lastSentDay"
     }
 }
 

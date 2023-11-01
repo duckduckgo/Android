@@ -114,6 +114,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mock(),
             mock(),
             mock(),
+            mock(),
         )
     }
 
