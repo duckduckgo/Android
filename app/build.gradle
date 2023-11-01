@@ -136,6 +136,14 @@ android {
         println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
         android.buildTypes.release.signingConfig = null
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.4"
+    }
 }
 
 fulladleModuleConfig {
@@ -310,6 +318,8 @@ dependencies {
 
     implementation project(':settings-api')
     implementation project(':settings-impl')
+
+    implementation project(':common-ui-compose')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
