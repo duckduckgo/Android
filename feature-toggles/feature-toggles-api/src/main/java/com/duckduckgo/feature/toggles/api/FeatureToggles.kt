@@ -26,6 +26,7 @@ import kotlin.random.Random
 class FeatureToggles private constructor(
     private val store: Toggle.Store,
     private val appVersionProvider: () -> Int,
+    private val flavorNameProvider: () -> String,
     private val featureName: String,
 ) {
 
@@ -34,11 +35,13 @@ class FeatureToggles private constructor(
     data class Builder(
         private var store: Toggle.Store? = null,
         private var appVersionProvider: () -> Int = { Int.MAX_VALUE },
+        private var flavorNameProvider: () -> String = { "" },
         private var featureName: String? = null,
     ) {
 
         fun store(store: Toggle.Store) = apply { this.store = store }
         fun appVersionProvider(appVersionProvider: () -> Int) = apply { this.appVersionProvider = appVersionProvider }
+        fun flavorNameProvider(flavorNameProvider: () -> String) = apply { this.flavorNameProvider = flavorNameProvider }
         fun featureName(featureName: String) = apply { this.featureName = featureName }
         fun build(): FeatureToggles {
             val missing = StringBuilder()
@@ -51,7 +54,7 @@ class FeatureToggles private constructor(
             if (missing.isNotBlank()) {
                 throw IllegalArgumentException("This following parameters can't be null: $missing")
             }
-            return FeatureToggles(this.store!!, appVersionProvider, featureName!!)
+            return FeatureToggles(this.store!!, appVersionProvider, flavorNameProvider, featureName!!)
         }
     }
 
@@ -80,8 +83,18 @@ class FeatureToggles private constructor(
             } catch (t: Throwable) {
                 throw IllegalStateException("Feature toggle methods shall have annotated default value")
             }
+            val isInternalAlwaysEnabledAnnotated: Boolean = runCatching {
+                method.getAnnotation(Toggle.InternalAlwaysEnabled::class.java)
+            }.getOrNull() != null
 
-            return ToggleImpl(store, getToggleNameForMethod(method), defaultValue, appVersionProvider).also { featureToggleCache[method] = it }
+            return ToggleImpl(
+                store = store,
+                key = getToggleNameForMethod(method),
+                defaultValue = defaultValue,
+                isInternalAlwaysEnabled = isInternalAlwaysEnabledAnnotated,
+                appVersionProvider = appVersionProvider,
+                flavorNameProvider = flavorNameProvider,
+            ).also { featureToggleCache[method] = it }
         }
     }
 
@@ -156,19 +169,30 @@ interface Toggle {
     annotation class DefaultValue(
         val defaultValue: Boolean,
     )
+
+    @Target(AnnotationTarget.FUNCTION)
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class InternalAlwaysEnabled
 }
 
 internal class ToggleImpl constructor(
     private val store: Toggle.Store,
     private val key: String,
     private val defaultValue: Boolean,
+    private val isInternalAlwaysEnabled: Boolean,
     private val appVersionProvider: () -> Int,
+    private val flavorNameProvider: () -> String = { "" },
 ) : Toggle {
     override fun isEnabled(): Boolean {
         fun evaluateLocalEnable(state: State): Boolean {
             return state.enable && appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
         }
+        // check if it should always be enabled for internal builds
+        if (isInternalAlwaysEnabled && flavorNameProvider.invoke().lowercase() == "internal") {
+            return true
+        }
 
+        // normal check
         return store.get(key)?.let { state ->
             state.remoteEnableState?.let { remoteState ->
                 remoteState && evaluateLocalEnable(state)

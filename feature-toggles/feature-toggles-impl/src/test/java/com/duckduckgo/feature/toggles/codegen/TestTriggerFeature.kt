@@ -19,6 +19,7 @@ package com.duckduckgo.feature.toggles.codegen
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 
 abstract class TriggerTestScope private constructor()
 
@@ -32,4 +33,18 @@ interface TestTriggerFeature {
 
     @DefaultValue(false)
     fun fooFeature(): Toggle
+
+    @DefaultValue(true)
+    @InternalAlwaysEnabled
+    fun internalDefaultTrue(): Toggle
+
+    @DefaultValue(false)
+    @InternalAlwaysEnabled
+    fun internalDefaultFalse(): Toggle
+
+    @DefaultValue(true)
+    fun defaultTrue(): Toggle
+
+    @DefaultValue(false)
+    fun defaultFalse(): Toggle
 }
