@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.Variant
@@ -21,6 +22,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -71,6 +73,7 @@ class BrokenSiteSubmitterTest {
 
     @Before
     fun before() {
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
         whenever(mockAppBuildConfig.sdkInt).thenReturn(1)
         whenever(mockAppBuildConfig.manufacturer).thenReturn("manufacturer")
         whenever(mockAppBuildConfig.model).thenReturn("model")
@@ -203,7 +206,43 @@ class BrokenSiteSubmitterTest {
         verify(mockBrokenSiteLastSentReport).setLastSentDay("example.com")
     }
 
-    private fun getBrokenSite(): BrokenSite {
+    @Test
+    fun whenDeviceIsEnglishAndLoginReportThenIncludeLoginSite() {
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
+        whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
+        whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
+        val brokenSite = getBrokenSite(BrokenSiteCategory.LOGIN_CATEGORY_KEY)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
+        val params = paramsCaptor.firstValue
+
+        assertEquals("", params["loginSite"])
+    }
+
+    @Test
+    fun whenDeviceIsNotEnglishAndLoginReportThenIncludeLoginSite() {
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
+        whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
+        whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
+        val brokenSite = getBrokenSite(BrokenSiteCategory.LOGIN_CATEGORY_KEY)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
+        val params = paramsCaptor.firstValue
+
+        assertFalse(params.containsKey("loginSite"))
+    }
+
+    private fun getBrokenSite(category: String = "category"): BrokenSite {
         return BrokenSite(
             category = "category",
             description = "description",
@@ -219,6 +258,7 @@ class BrokenSiteSubmitterTest {
             consentSelfTestFailed = false,
             errorCodes = "",
             httpErrorCodes = "",
+            loginSite = null,
         )
     }
 }

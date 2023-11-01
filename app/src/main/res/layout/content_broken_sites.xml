@@ -69,18 +69,33 @@
             app:layout_constraintTop_toBottomOf="@id/noteText" />
 
         <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
-            android:id="@+id/brokenSiteFormFeedbackInput"
+            android:id="@+id/brokenSiteFormLoginInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_5"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_5"
-            android:hint="@string/brokenSiteDescriptionTextInputHint"
+            android:hint="@string/brokenSitesLoginHint"
+            android:visibility="gone"
             app:editable="true"
-            app:type="form_mode"
+            app:type="single_line"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/categoriesSelection" />
+
+        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+                android:id="@+id/brokenSiteFormFeedbackInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/keyline_5"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginEnd="@dimen/keyline_5"
+                android:hint="@string/brokenSiteDescriptionTextInputHint"
+                app:editable="true"
+                app:type="form_mode"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brokenSiteFormLoginInput" />
 
         <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
             android:id="@+id/submitButton"

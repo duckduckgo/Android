@@ -34,6 +34,7 @@ data class BrokenSite(
     val consentSelfTestFailed: Boolean,
     val errorCodes: String,
     val httpErrorCodes: String,
+    val loginSite: String?,
 )
 
 sealed class BrokenSiteCategory(
