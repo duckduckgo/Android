@@ -50,7 +50,7 @@ interface VariantManager {
             Variant(key = "zh", weight = 1.0, features = emptyList(), filterBy = { isDefaultBrowserExperimentCountry() }),
             Variant(
                 key = "zj",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(AskForDefaultBrowserMoreThanOnce),
                 filterBy = { isDefaultBrowserExperimentCountry() },
             ),
