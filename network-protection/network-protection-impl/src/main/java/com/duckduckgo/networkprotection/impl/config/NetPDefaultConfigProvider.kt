@@ -16,12 +16,15 @@
 
 package com.duckduckgo.networkprotection.impl.config
 
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface NetPDefaultConfigProvider {
     fun mtu(): Int = 1280
@@ -30,15 +33,7 @@ interface NetPDefaultConfigProvider {
 
     fun fallbackDns(): Set<InetAddress> = emptySet()
 
-    fun routes(): Map<String, Int> {
-        // ensure the set DNS are in the routes
-        // We're only setting routes for IPv4 atm
-        return WgVpnRoutes.wgVpnRoutes.toMutableMap().apply {
-            fallbackDns().filterIsInstance<Inet4Address>().mapNotNull { it.hostAddress }.forEach { ip ->
-                this[ip] = 32
-            }
-        }
-    }
+    suspend fun routes(): Map<String, Int> = emptyMap()
 
     fun pcapConfig(): PcapConfig? = null
 }
@@ -48,8 +43,28 @@ data class PcapConfig(val filename: String, val snapLen: Int, val fileSize: Int)
 @ContributesBinding(VpnScope::class)
 class RealNetPDefaultConfigProvider @Inject constructor(
     private val netPExclusionListRepository: NetPExclusionListRepository,
+    private val dispatcherProvider: DispatcherProvider,
+    private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
 ) : NetPDefaultConfigProvider {
     override fun exclusionList(): Set<String> {
         return netPExclusionListRepository.getExcludedAppPackages().toSet()
+    }
+
+    override suspend fun routes(): Map<String, Int> = withContext(dispatcherProvider.io()) {
+        val defaultImpl = object : NetPDefaultConfigProvider {}
+
+        return@withContext if (netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled()) {
+            WgVpnRoutes.wgVpnDefaultRoutes.toMutableMap().apply {
+                fallbackDns().filterIsInstance<Inet4Address>().mapNotNull { it.hostAddress }.forEach { ip ->
+                    this[ip] = 32
+                }
+            }
+        } else {
+            WgVpnRoutes.wgVpnRoutesIncludingLocal.toMutableMap().apply {
+                fallbackDns().filterIsInstance<Inet4Address>().mapNotNull { it.hostAddress }.forEach { ip ->
+                    this[ip] = 32
+                }
+            }
+        }
     }
 }
