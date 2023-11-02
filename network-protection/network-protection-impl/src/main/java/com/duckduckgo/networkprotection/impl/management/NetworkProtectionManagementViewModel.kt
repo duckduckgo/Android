@@ -198,13 +198,18 @@ class NetworkProtectionManagementViewModel @Inject constructor(
                         // We can't do anything with  a -1 enabledTime so we try to refetch it.
                         enabledTime = networkProtectionRepository.enabledTimeInMillis
                     } else {
+                        val dataVolume = networkProtectionRepository.dataVolume
                         connectionDetailsFlow.value = if (connectionDetailsFlow.value == null) {
                             ConnectionDetails(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                receivedBytes = dataVolume?.received ?: 0L,
+                                transmittedBytes = dataVolume?.transmitted ?: 0L,
                             )
                         } else {
                             connectionDetailsFlow.value!!.copy(
                                 elapsedConnectedTime = getElapsedTimeString(enabledTime),
+                                receivedBytes = dataVolume?.received ?: 0L,
+                                transmittedBytes = dataVolume?.transmitted ?: 0L,
                             )
                         }
                     }
@@ -227,7 +232,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         }
     }
 
-    fun onRequiredPermissionNotGranted(vpnIntent: Intent, lastVpnRequestTimeInMillis: Long) {
+    fun onRequiredPermissionNotGranted(
+        vpnIntent: Intent,
+        lastVpnRequestTimeInMillis: Long,
+    ) {
         lastVpnRequestTime = lastVpnRequestTimeInMillis
         sendCommand(RequestVPNPermission(vpnIntent))
     }
@@ -262,6 +270,7 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             // TODO find a better place to reset values when manually starting or stopping NetP.
             networkProtectionRepository.reconnectStatus = NotReconnecting
             networkProtectionRepository.enabledTimeInMillis = -1L
+            networkProtectionRepository.dataVolume = null
             reconnectNotifications.clearNotifications()
             forceUpdateRunningState()
             tryShowAlwaysOnPromotion()
@@ -354,6 +363,8 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         val location: String? = null,
         val ipAddress: String? = null,
         val elapsedConnectedTime: String? = null,
+        val receivedBytes: Long = 0L,
+        val transmittedBytes: Long = 0L,
     )
 
     enum class ConnectionState {

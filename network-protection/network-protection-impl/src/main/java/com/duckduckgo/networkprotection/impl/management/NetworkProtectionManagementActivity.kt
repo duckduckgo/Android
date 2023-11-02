@@ -22,6 +22,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.format.Formatter.formatFileSize
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
@@ -209,8 +210,17 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpStatusHeader.setText(R.string.netpManagementHeadlineStatusOn)
         netpToggle.quietlySetChecked(true)
         netpToggle.isEnabled = true
+        netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnected))
+        connectionStats.root.show()
         connectionDetailsData.elapsedConnectedTime?.let {
-            netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnected, it))
+            connectionStats.connectionStatsTime.setSecondaryText(it)
+        }
+        getString(
+            R.string.netpManagementConnectionStatsVolumeValues,
+            formatFileSize(baseContext, connectionDetailsData.receivedBytes),
+            formatFileSize(baseContext, connectionDetailsData.transmittedBytes),
+        ).let {
+            connectionStats.connectionStatsVolume.setSecondaryText(it)
         }
         connectionDetails.root.show()
         if (connectionDetailsData.location.isNullOrEmpty()) {
@@ -232,6 +242,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleDisconnected))
         netpToggle.isEnabled = true
         connectionDetails.root.gone()
+        connectionStats.root.gone()
     }
 
     private fun ActivityNetpManagementBinding.renderConnectingState() {
@@ -241,6 +252,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpToggle.setSecondaryText(getString(R.string.netpManagementToggleSubtitleConnecting))
         netpToggle.isEnabled = false
         connectionDetails.root.gone()
+        connectionStats.root.gone()
     }
 
     private fun handleCommand(command: Command) {

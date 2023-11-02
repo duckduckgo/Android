@@ -79,6 +79,10 @@
                 app:showSwitch="true" />
 
             <include
+                android:id="@+id/connection_stats"
+                layout="@layout/section_connection_stats" />
+
+            <include
                 android:id="@+id/connection_details"
                 layout="@layout/section_connection_details" />
 

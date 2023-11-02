@@ -195,6 +195,7 @@ class WgVpnNetworkStackTest {
 
         verify(networkProtectionRepository).enabledTimeInMillis = -1
         verify(networkProtectionRepository).serverDetails = null
+        verify(networkProtectionRepository).dataVolume = null
     }
 
     @Test

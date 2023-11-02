@@ -19,6 +19,7 @@ package com.duckduckgo.networkprotection.impl.store
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ClientInterface
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.DataVolume
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.NotReconnecting
 import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository.ReconnectStatus.Reconnecting
@@ -36,6 +37,7 @@ interface NetworkProtectionRepository {
     var enabledTimeInMillis: Long
     var serverDetails: ServerDetails?
     var clientInterface: ClientInterface?
+    var dataVolume: DataVolume?
 
     enum class ReconnectStatus {
         NotReconnecting,
@@ -51,6 +53,11 @@ interface NetworkProtectionRepository {
 
     data class ClientInterface(
         val tunnelCidrSet: Set<String>,
+    )
+
+    data class DataVolume(
+        val transmitted: Long = 0L,
+        val received: Long = 0L,
     )
 }
 
@@ -144,6 +151,21 @@ class RealNetworkProtectionRepository @Inject constructor(
             }
         }
 
+    override var dataVolume: DataVolume?
+        get() = DataVolume(
+            transmitted = networkProtectionPrefs.getLong(KEY_WG_VOLUME_TRANSMITTED, 0L),
+            received = networkProtectionPrefs.getLong(KEY_WG_VOLUME_RECEIVED, 0L),
+        )
+        set(value) {
+            if (value != null) {
+                networkProtectionPrefs.putLong(KEY_WG_VOLUME_TRANSMITTED, value.transmitted)
+                networkProtectionPrefs.putLong(KEY_WG_VOLUME_RECEIVED, value.received)
+            } else {
+                networkProtectionPrefs.putLong(KEY_WG_VOLUME_TRANSMITTED, 0L)
+                networkProtectionPrefs.putLong(KEY_WG_VOLUME_RECEIVED, 0L)
+            }
+        }
+
     companion object {
         private const val KEY_WG_PRIVATE_KEY = "wg_private_key"
         private const val KEY_WG_PRIVATE_KEY_LAST_UPDATE = "wg_private_key_last_update"
@@ -153,5 +175,7 @@ class RealNetworkProtectionRepository @Inject constructor(
         private const val KEY_WG_SERVER_ENABLE_TIME = "wg_server_enable_time"
         private const val KEY_WG_RECONNECT_STATUS = "wg_reconnect_status"
         private const val KEY_WG_CLIENT_IFACE_TUNNEL_IP = "wg_client_iface_tunnel_ip"
+        private const val KEY_WG_VOLUME_TRANSMITTED = "wg_volume_transmitted_data"
+        private const val KEY_WG_VOLUME_RECEIVED = "wg_volume_received_data"
     }
 }

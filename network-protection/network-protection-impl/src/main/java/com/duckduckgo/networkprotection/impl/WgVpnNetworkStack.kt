@@ -169,6 +169,7 @@ class WgVpnNetworkStack @Inject constructor(
         // Only update if enabledTimeInMillis stop has been initiated by the user
         if (reason == SELF_STOP) {
             networkProtectionRepository.get().enabledTimeInMillis = -1
+            networkProtectionRepository.get().dataVolume = null
         }
         return Result.success(Unit)
     }
