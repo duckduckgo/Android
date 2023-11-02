@@ -242,7 +242,7 @@ class BrowserTabViewModel @Inject constructor(
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val canChangePrivacyProtection: Boolean = false,
-        val isPrivacyProtectionEnabled: Boolean = false,
+        val isPrivacyProtectionDisabled: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false,
@@ -1249,7 +1249,7 @@ class BrowserTabViewModel @Inject constructor(
             showPrivacyShield = true,
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
-            isPrivacyProtectionEnabled = false,
+            isPrivacyProtectionDisabled = false,
             showSearchIcon = false,
             showClearButton = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
@@ -1321,20 +1321,20 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
-        val isAllowListed = isAllowListed(domain)
+        val privacyProtectionEnabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !isAllowListed)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionEnabled)
         }
     }
 
     private suspend fun updatePrivacyProtectionState(domain: String) {
-        val isAllowListed = isAllowListed(domain)
+        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = isAllowListed)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = privacyProtectionDisabled)
         }
     }
 
-    private suspend fun isAllowListed(domain: String): Boolean {
+    private suspend fun isPrivacyProtectionDisabled(domain: String): Boolean {
         return withContext(dispatchers.io()) {
             userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
         }
@@ -2096,7 +2096,7 @@ class BrowserTabViewModel @Inject constructor(
     fun onPrivacyProtectionMenuClicked() {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
-            if (isAllowListed(domain)) {
+            if (isPrivacyProtectionDisabled(domain)) {
                 removeFromAllowList(domain)
             } else {
                 addToAllowList(domain)
@@ -2112,7 +2112,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
-            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }
     }
 
@@ -2123,7 +2123,7 @@ class BrowserTabViewModel @Inject constructor(
         }
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
-            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = false)
         }
     }
 
