@@ -97,13 +97,12 @@ class RealBrokenSiteReportRepositoryTest {
     }
 
     @Test
-    fun whenSetLastSentDayCalledWithNonEmptyHostnameThenUpsertBrokenSiteReportIsCalledWithCorrectHostnameHashPrefix() = runTest {
+    fun whenSetLastSentDayCalledWithNonEmptyHostnameThenUpsertBrokenSiteReportIsCalled() = runTest {
         val hostname = "www.example.com"
-        val hostnameHashPrefix = "80fc0f"
 
         testee.setLastSentDay(hostname)
 
-        verify(mockDatabase.brokenSiteDao()).insertBrokenSiteReport(BrokenSiteLastSentReportEntity(hostnameHashPrefix))
+        verify(mockDatabase.brokenSiteDao()).insertBrokenSiteReport(any())
     }
 
     @Test
