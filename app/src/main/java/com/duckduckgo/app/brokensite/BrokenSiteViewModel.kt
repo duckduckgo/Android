@@ -43,12 +43,12 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class BrokenSiteViewModel @Inject constructor(
@@ -169,8 +169,10 @@ class BrokenSiteViewModel @Inject constructor(
         viewModelScope.launch {
             if (protectionsEnabled) {
                 userAllowListRepository.removeDomainFromUserAllowList(domain)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE)
             } else {
                 userAllowListRepository.addDomainToUserAllowList(domain)
+                pixel.fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD)
             }
         }
     }

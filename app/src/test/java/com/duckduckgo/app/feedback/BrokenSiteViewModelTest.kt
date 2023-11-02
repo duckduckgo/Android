@@ -704,6 +704,48 @@ class BrokenSiteViewModelTest {
         assertEquals(SiteProtectionsState.ENABLED, viewState.protectionsState)
     }
 
+    @Test
+    fun whenUrlIsAddedToUserAllowlistThenPixelIsFired() = runTest {
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        testee.onProtectionsToggled(protectionsEnabled = false)
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_ADD)
+    }
+
+    @Test
+    fun whenUrlIsRemovedFromUserAllowlistThenPixelIsFired() = runTest {
+        testee.setInitialBrokenSite(
+            url = url,
+            blockedTrackers = "",
+            surrogates = "",
+            upgradedHttps = false,
+            urlParametersRemoved = false,
+            consentManaged = false,
+            consentOptOutFailed = false,
+            consentSelfTestFailed = false,
+            params = emptyArray(),
+            errorCodes = emptyArray(),
+            httpErrorCodes = "",
+            isDesktopMode = false,
+        )
+
+        testee.onProtectionsToggled(protectionsEnabled = true)
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_ALLOWLIST_REMOVE)
+    }
+
     private fun selectAndAcceptCategory(indexSelected: Int = 0) {
         testee.onCategoryIndexChanged(indexSelected)
         testee.onCategoryAccepted()
