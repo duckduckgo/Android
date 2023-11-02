@@ -38,6 +38,7 @@ dependencies {
     implementation project(path: ':remote-messaging-store')
     implementation project(path: ':browser-api')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':statistics')
 
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {
