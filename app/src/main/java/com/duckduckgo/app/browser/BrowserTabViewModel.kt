@@ -2127,26 +2127,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onDisablePrivacyProtectionSnackbarUndoClicked(domain: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            userAllowListDao.insert(domain)
-            withContext(dispatchers.main()) {
-                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
-                command.value = NavigationCommand.Refresh
-            }
-        }
-    }
-
-    fun onEnablePrivacyProtectionSnackbarUndoClicked(domain: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            userAllowListDao.delete(domain)
-            withContext(dispatchers.main()) {
-                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
-                command.value = NavigationCommand.Refresh
-            }
-        }
-    }
-
     fun onUserSelectedToEditQuery(query: String) {
         command.value = EditWithSelectedQuery(query)
     }
