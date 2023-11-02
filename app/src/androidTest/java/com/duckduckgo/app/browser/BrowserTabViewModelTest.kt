@@ -4058,7 +4058,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4068,7 +4068,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4077,7 +4077,7 @@ class BrowserTabViewModelTest {
 
         loadUrl("https://test.com")
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4086,7 +4086,7 @@ class BrowserTabViewModelTest {
 
         testee.onOmnibarInputStateChanged("www.fb.com", true, hasQueryChanged = false)
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4355,7 +4355,7 @@ class BrowserTabViewModelTest {
 
         testee.voiceSearchDisabled()
 
-        assertFalse(omnibarViewState().showVoiceSearch)
+        assertFalse(browserViewState().showVoiceSearch)
     }
 
     private fun aCredential(): LoginCredentials {
