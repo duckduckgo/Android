@@ -1361,6 +1361,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
         assertTrue(browserViewState().isDesktopBrowsingMode)
+        val site = testee.siteLiveData.value
+        assertTrue(site?.isDesktopMode == true)
     }
 
     @Test
@@ -1370,6 +1372,8 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
         assertFalse(browserViewState().isDesktopBrowsingMode)
+        val site = testee.siteLiveData.value
+        assertFalse(site?.isDesktopMode == true)
     }
 
     @Test

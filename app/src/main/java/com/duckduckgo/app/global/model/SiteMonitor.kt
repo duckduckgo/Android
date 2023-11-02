@@ -174,6 +174,8 @@ class SiteMonitor(
 
     override var consentCosmeticHide: Boolean? = false
 
+    override var isDesktopMode: Boolean = false
+
     companion object {
         private val specialDomainTypes = setOf(
             TrackerStatus.AD_ALLOWED,

@@ -39,6 +39,7 @@ data class BrokenSiteData(
     val params: List<String>,
     val errorCodes: List<String>,
     val httpErrorCodes: String,
+    val isDesktopMode: Boolean,
 ) {
     companion object {
         fun fromSite(site: Site?, params: List<String> = emptyList()): BrokenSiteData {
@@ -55,6 +56,7 @@ data class BrokenSiteData(
             val consentManaged = site?.consentManaged ?: false
             val consentOptOutFailed = site?.consentOptOutFailed ?: false
             val consentSelfTestFailed = site?.consentSelfTestFailed ?: false
+            val isDesktopMode = site?.isDesktopMode ?: false
             return BrokenSiteData(
                 url = url,
                 blockedTrackers = blockedTrackers,
@@ -67,6 +69,7 @@ data class BrokenSiteData(
                 params = params,
                 errorCodes = errorCodes,
                 httpErrorCodes = httErrorCodes,
+                isDesktopMode = isDesktopMode,
             )
         }
     }

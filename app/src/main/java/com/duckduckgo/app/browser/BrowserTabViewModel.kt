@@ -1753,6 +1753,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onSiteChanged() {
         httpsUpgraded = false
+        site?.isDesktopMode = currentBrowserViewState().isDesktopBrowsingMode
         viewModelScope.launch {
             val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
                 site?.privacyProtection() ?: PrivacyShield.UNKNOWN
@@ -2238,6 +2239,7 @@ class BrowserTabViewModel @Inject constructor(
         val desktopSiteRequested = !currentBrowserViewState().isDesktopBrowsingMode
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
         command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
+        site?.isDesktopMode = desktopSiteRequested
 
         val uri = site?.uri ?: return
 
