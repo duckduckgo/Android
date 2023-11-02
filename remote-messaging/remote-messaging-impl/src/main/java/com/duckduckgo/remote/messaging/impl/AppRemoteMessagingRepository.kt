@@ -17,6 +17,8 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isAskForDefaultBrowserMoreThanOnceExperimentEnabled
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -37,6 +39,7 @@ class AppRemoteMessagingRepository(
     private val dispatchers: DispatcherProvider,
     private val messageMapper: MessageMapper,
     private val userBrowserProperties: UserBrowserProperties,
+    private val variantManager: VariantManager,
 ) : RemoteMessagingRepository {
 
     override fun activeMessage(message: RemoteMessage?) {
@@ -58,8 +61,14 @@ class AppRemoteMessagingRepository(
     override fun messageFlow(): Flow<RemoteMessage?> {
         // Experiment: Ask for Default Browser More Than Once
         val daysSinceInstalled = userBrowserProperties.daysSinceInstalled()
+        val isDefaultBrowser = userBrowserProperties.defaultBrowser()
+        val isDefaultBrowserExperiment = variantManager.isAskForDefaultBrowserMoreThanOnceExperimentEnabled()
         return remoteMessagesDao.messagesFlow().distinctUntilChanged().map {
-            if (daysSinceInstalled != 0L && daysSinceInstalled != 1L && daysSinceInstalled != 2L) return@map null
+            if (
+                isDefaultBrowserExperiment && (daysSinceInstalled != 0L && daysSinceInstalled != 1L && daysSinceInstalled != 2L || isDefaultBrowser)
+            ) {
+                return@map null
+            }
             if (it == null || it.message.isEmpty()) return@map null
 
             val message = messageMapper.fromMessage(it.message) ?: return@map null

@@ -196,6 +196,9 @@ class ExperimentationVariantManager(
     }
 }
 
+fun VariantManager.isAskForDefaultBrowserMoreThanOnceExperimentEnabled() =
+    this.getVariant().hasFeature(AskForDefaultBrowserMoreThanOnce)
+
 /**
  * A variant which can be used for experimentation.
  * @param weight Relative weight. These are normalised to all other variants, so they don't have to add up to any specific number.
