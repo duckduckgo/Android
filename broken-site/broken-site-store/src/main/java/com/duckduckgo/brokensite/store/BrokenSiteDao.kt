@@ -20,9 +20,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
-import androidx.room.Update
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 
 @Dao
 abstract class BrokenSiteDao {
@@ -30,33 +27,9 @@ abstract class BrokenSiteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertBrokenSiteReport(brokenSiteReportEntity: BrokenSiteLastSentReportEntity)
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun update(brokenSiteReportEntity: BrokenSiteLastSentReportEntity)
-
     @Query("select * from broken_site_last_sent_report where hostnameHashPrefix = :hostnameHashPrefix")
     abstract fun getBrokenSiteReport(hostnameHashPrefix: String): BrokenSiteLastSentReportEntity?
 
-    @Query("select id from broken_site_last_sent_report where lastSentTimestamp < :expiryTime")
-    abstract fun getAllExpiredIds(expiryTime: String): List<Long>
-
-    @Query("delete from broken_site_last_sent_report where id in (:brokenSiteReportEntityIdList)")
-    abstract fun deleteAllExpiredIds(brokenSiteReportEntityIdList: List<Long>)
-
-    @Transaction
-    open fun upsertBrokenSiteReport(hostnameHashPrefix: String) {
-        val brokenSiteReport = getBrokenSiteReport(hostnameHashPrefix)
-        if (brokenSiteReport == null) {
-            insertBrokenSiteReport(BrokenSiteLastSentReportEntity(hostnameHashPrefix = hostnameHashPrefix))
-        } else {
-            update(brokenSiteReport.copy(lastSentTimestamp = DatabaseDateFormatter.iso8601()))
-        }
-    }
-
-    @Transaction
-    open fun cleanupBrokenSiteReport(expiryTime: String) {
-        val expiredIds = getAllExpiredIds(expiryTime)
-        if (expiredIds.isNotEmpty()) {
-            deleteAllExpiredIds(expiredIds)
-        }
-    }
+    @Query("delete from broken_site_last_sent_report where lastSentTimestamp < :expiryTime")
+    abstract fun deleteAllExpiredReports(expiryTime: String)
 }

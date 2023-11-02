@@ -79,7 +79,7 @@ class RealBrokenSiteReportRepositoryTest {
         val hostname = "www.example.com"
         val hostnameHashPrefix = "80fc0f"
         val lastSentDay = "2023-11-01T15:30:54.401Z"
-        val brokenSiteReportEntity = BrokenSiteLastSentReportEntity(1, hostnameHashPrefix, lastSentDay)
+        val brokenSiteReportEntity = BrokenSiteLastSentReportEntity(hostnameHashPrefix, lastSentDay)
         whenever(mockDatabase.brokenSiteDao().getBrokenSiteReport(hostnameHashPrefix)).thenReturn(brokenSiteReportEntity)
 
         val result = testee.getLastSentDay(hostname)
@@ -93,7 +93,7 @@ class RealBrokenSiteReportRepositoryTest {
 
         testee.setLastSentDay(hostname)
 
-        verify(mockDatabase.brokenSiteDao(), never()).upsertBrokenSiteReport(any())
+        verify(mockDatabase.brokenSiteDao(), never()).insertBrokenSiteReport(any())
     }
 
     @Test
@@ -103,13 +103,13 @@ class RealBrokenSiteReportRepositoryTest {
 
         testee.setLastSentDay(hostname)
 
-        verify(mockDatabase.brokenSiteDao()).upsertBrokenSiteReport(hostnameHashPrefix)
+        verify(mockDatabase.brokenSiteDao()).insertBrokenSiteReport(BrokenSiteLastSentReportEntity(hostnameHashPrefix))
     }
 
     @Test
     fun whenCleanupOldEntriesCalledThenCleanupBrokenSiteReportIsCalled() = runTest {
         testee.cleanupOldEntries()
 
-        verify(mockDatabase.brokenSiteDao()).cleanupBrokenSiteReport(any())
+        verify(mockDatabase.brokenSiteDao()).deleteAllExpiredReports(any())
     }
 }

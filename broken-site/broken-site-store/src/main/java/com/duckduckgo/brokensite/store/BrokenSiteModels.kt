@@ -22,7 +22,6 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 
 @Entity(tableName = "broken_site_last_sent_report")
 data class BrokenSiteLastSentReportEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val hostnameHashPrefix: String,
+    @PrimaryKey val hostnameHashPrefix: String,
     val lastSentTimestamp: String = DatabaseDateFormatter.iso8601(),
 )

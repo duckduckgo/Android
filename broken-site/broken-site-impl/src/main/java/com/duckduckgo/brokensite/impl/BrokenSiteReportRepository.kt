@@ -16,10 +16,12 @@
 
 package com.duckduckgo.brokensite.impl
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.sha256
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
+import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,7 +40,7 @@ interface BrokenSiteReportRepository {
 
 class RealBrokenSiteReportRepository constructor(
     private val database: BrokenSiteDatabase,
-    private val coroutineScope: CoroutineScope,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : BrokenSiteReportRepository {
 
@@ -61,14 +63,14 @@ class RealBrokenSiteReportRepository constructor(
 
         coroutineScope.launch(dispatcherProvider.io()) {
             val hostnameHashPrefix = hostname.sha256.take(PREFIX_LENGTH)
-            database.brokenSiteDao().upsertBrokenSiteReport(hostnameHashPrefix)
+            database.brokenSiteDao().insertBrokenSiteReport(BrokenSiteLastSentReportEntity(hostnameHashPrefix))
         }
     }
 
     override fun cleanupOldEntries() {
         coroutineScope.launch(dispatcherProvider.io()) {
             val expiryTime = getUTCDate30DaysAgo()
-            database.brokenSiteDao().cleanupBrokenSiteReport(expiryTime)
+            database.brokenSiteDao().deleteAllExpiredReports(expiryTime)
         }
     }
 
