@@ -123,7 +123,7 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
                 micSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_camera_24,
+                R.drawable.ic_video_player_24,
                 R.string.sitePermissionsSettingsDRM,
                 drmSetting,
             ),
