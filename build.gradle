@@ -96,6 +96,10 @@ subprojects {
                                     "'api' modules can't use the anvil plugin")
                         }
                     }
+                    if (!projectPath.endsWith(":app") && plugin.toString().toLowerCase().contains("kapt")) {
+                        throw new GradleException("Invalid usage of kapt $projectPath -> " +
+                                "Use ksp instead of kapt")
+                    }
                 }
 
                 for (dependency in dependencies) {
