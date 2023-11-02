@@ -82,6 +82,15 @@
                     app:showSwitch="true"
             />
 
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/secure_dns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpVpnSettingSecureDNS"
+                app:secondaryText="@string/netpVpnSettingSecureDNSByLine"
+                app:showSwitch="true"
+                />
+
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:id="@+id/vpnSettingsDivider"
                     android:layout_width="match_parent"

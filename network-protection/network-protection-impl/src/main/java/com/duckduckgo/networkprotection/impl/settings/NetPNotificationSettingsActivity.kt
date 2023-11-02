@@ -57,10 +57,6 @@ class NetPNotificationSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupUiElements() {
-        binding.vpnNotificationEnabled.quietlySetIsChecked(true, null)
-        binding.vpnNotificationEnabled.showSwitch()
-        binding.vpnNotificationEnabled.setSwitchEnabled(false)
-
         lifecycleScope.launch(dispatcherProvider.io()) {
             binding.vpnNotificationAlerts.quietlySetIsChecked(
                 netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled(),

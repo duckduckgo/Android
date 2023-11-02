@@ -62,6 +62,7 @@ import com.duckduckgo.networkprotection.impl.management.NetworkProtectionManagem
 import com.duckduckgo.networkprotection.impl.management.alwayson.NetworkProtectionAlwaysOnDialogFragment
 import com.duckduckgo.networkprotection.impl.settings.NetPNotificationSettingsScreenNoParams
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsScreenNoParams
+import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpGeoswitchingScreenNoParams
 import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -126,6 +127,10 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
             getText(R.string.netpManagementBetaDescription),
         ) {
             viewModel.onReportIssuesClicked()
+        }
+
+        binding.connectionDetails.connectionDetailsLocation.setOnClickListener {
+            globalActivityStarter.start(this, NetpGeoswitchingScreenNoParams)
         }
 
         binding.settings.settingsExclusion.setClickListener {
