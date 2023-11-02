@@ -131,6 +131,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -143,7 +144,7 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
@@ -172,6 +173,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -214,6 +216,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -226,7 +229,7 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
@@ -256,6 +259,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -268,7 +272,7 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            siteType = BrokenSiteViewModel.MOBILE_SITE,
             urlParametersRemoved = false,
             consentManaged = false,
             consentOptOutFailed = false,
@@ -298,6 +302,7 @@ class BrokenSiteViewModelTest {
             params = arrayOf("dashboard_highlighted_toggle"),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion", "description")
@@ -312,7 +317,7 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenUrlIsDesktopThenSendDesktopParameter() {
+    fun whenIsDesktopModeTrueThenSendDesktopParameter() {
         testee.setInitialBrokenSite(
             url = url,
             blockedTrackers = "",
@@ -325,6 +330,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = true,
         )
         selectAndAcceptCategory()
 
@@ -333,8 +339,7 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenUrlIsMobileThenSendMobileParameter() {
-        val url = "http://m.example.com"
+    fun whenDesktopModeIsFalseThenSendMobileParameter() {
         testee.setInitialBrokenSite(
             url = url,
             blockedTrackers = "",
@@ -347,6 +352,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory()
 
@@ -370,6 +376,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory(categoryIndex)
 
@@ -392,6 +399,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
@@ -414,6 +422,7 @@ class BrokenSiteViewModelTest {
             params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
+            isDesktopMode = false,
         )
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()

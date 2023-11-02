@@ -76,6 +76,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val params = intent.getStringArrayExtra(BOOLEAN_PARAMS).orEmpty()
         val errorCodes = intent.getStringArrayExtra(ERROR_CODES).orEmpty()
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
+        val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -88,6 +89,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             params = params,
             errorCodes = errorCodes,
             httpErrorCodes = httpErrorCodes,
+            isDesktopMode = isDesktopMode,
         )
     }
 
@@ -180,6 +182,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val BOOLEAN_PARAMS = "BOOLEAN_PARAMS"
         private const val ERROR_CODES = "ERROR_CODES"
         private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
+        private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
 
         fun intent(
             context: Context,
@@ -197,6 +200,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(BOOLEAN_PARAMS, data.params.toTypedArray())
             intent.putExtra(ERROR_CODES, data.errorCodes.toTypedArray())
             intent.putExtra(HTTP_ERROR_CODES, data.httpErrorCodes)
+            intent.putExtra(IS_DESKTOP_MODE, data.isDesktopMode)
             return intent
         }
     }
