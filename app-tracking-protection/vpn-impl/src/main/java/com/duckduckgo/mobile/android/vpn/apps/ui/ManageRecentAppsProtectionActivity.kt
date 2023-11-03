@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.CompoundButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -28,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.extensions.isIgnoringBatteryOptimizations
 import com.duckduckgo.app.global.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.app.global.extensions.launchIgnoreBatteryOptimizationSettings
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -42,6 +40,7 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
+import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel.RecommendedSettings
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -89,10 +88,6 @@ class ManageRecentAppsProtectionActivity :
         }
     }
 
-    private val unrestrictedBatteryUsageListener = CompoundButton.OnCheckedChangeListener { _, _ ->
-        this.launchIgnoreBatteryOptimizationSettings()
-    }
-
     private lateinit var reportBreakage: ActivityResultLauncher<ReportBreakageScreen>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -125,7 +120,9 @@ class ManageRecentAppsProtectionActivity :
         binding.alwaysOn.setOnClickListener {
             this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
         }
-        binding.unrestrictedBatteryUsage.quietlySetIsChecked(this.isIgnoringBatteryOptimizations(), unrestrictedBatteryUsageListener)
+        binding.unrestrictedBatteryUsage.setOnClickListener {
+            this.launchIgnoreBatteryOptimizationSettings()
+        }
         binding.manageRecentAppsReportIssues.addClickableLink(
             REPORT_ISSUES_ANNOTATION,
             getText(R.string.atp_ManageRecentAppsProtectionReportIssues),
@@ -136,11 +133,6 @@ class ManageRecentAppsProtectionActivity :
             launchManageAppsProtection()
         }
         setupRecycler()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        binding.unrestrictedBatteryUsage.quietlySetIsChecked(this.isIgnoringBatteryOptimizations(), unrestrictedBatteryUsageListener)
     }
 
     private fun setupRecycler() {
@@ -173,6 +165,11 @@ class ManageRecentAppsProtectionActivity :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { renderViewState(it) }
         }
+        viewModel.recommendedSettings()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { renderRecommendedSettings(it) }
+            .launchIn(lifecycleScope)
+
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
@@ -192,6 +189,24 @@ class ManageRecentAppsProtectionActivity :
         binding.manageRecentAppsShowAll.show()
         binding.manageRecentAppsDivider.show()
         shimmerLayout.gone()
+    }
+
+    private fun renderRecommendedSettings(state: RecommendedSettings) {
+        val batteryTextTitle = if (state.isIgnoringBatteryOptimizations) {
+            R.string.atp_ManageRecentAppsProtectionUnrestrictedBattTitle
+        } else {
+            R.string.atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle
+        }
+        val batteryTextByline = if (state.isIgnoringBatteryOptimizations) {
+            R.string.atp_ManageRecentAppsProtectionUnrestrictedBattByline
+        } else {
+            R.string.atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline
+        }
+        binding.unrestrictedBatteryUsage.setPrimaryText(getString(batteryTextTitle))
+        binding.unrestrictedBatteryUsage.setSecondaryText(getString(batteryTextByline))
+
+        // val alwaysOnLeadingIcon = if (state.alwaysOnState) R.drawable.ic_check_color_24 else R.drawable.ic_alert_color_24
+        // binding.alwaysOn.setLeadingIconResource(alwaysOnLeadingIcon)
     }
 
     private fun processCommand(command: Command) {
