@@ -41,6 +41,10 @@
       "to": "app/src/test/resources/reference_tests/brokensites/tests.json"
     },
     {
+      "from": "node_modules/@duckduckgo/privacy-reference-tests/broken-site-reporting/multiple_report_tests.json",
+      "to": "app/src/test/resources/reference_tests/brokensites/multiple_report_tests.json"
+    },
+    {
       "from": "node_modules/@duckduckgo/privacy-reference-tests/amp-protections/tests.json",
       "to": "privacy-config/privacy-config-impl/src/test/resources/reference_tests/amplinks/tests.json"
     },

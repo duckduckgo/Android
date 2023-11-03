@@ -77,9 +77,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) &&
                 !contentBlocking.isAnException(brokenSite.siteUrl)
 
-            val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty()).orEmpty()
-
-            val params = mapOf(
+            val params = mutableMapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
                 DESCRIPTION_KEY to brokenSite.description.orEmpty(),
                 SITE_URL_KEY to absoluteUrl,
@@ -102,14 +100,19 @@ class BrokenSiteSubmitter @Inject constructor(
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
                 PROTECTIONS_STATE to protectionsState.toBinaryString(),
-                LAST_SENT_DAY to lastSentDay,
             )
+
+            val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
+            if (lastSentDay != null) {
+                params[LAST_SENT_DAY] = lastSentDay
+            }
+
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
                 SURROGATES_KEY to brokenSite.surrogates,
             )
             runCatching {
-                pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
+                pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params.toMap(), encodedParams)
             }
                 .onSuccess {
                     Timber.v("Feedback submission succeeded")
