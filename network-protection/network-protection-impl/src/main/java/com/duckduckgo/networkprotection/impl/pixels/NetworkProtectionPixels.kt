@@ -260,6 +260,16 @@ interface NetworkProtectionPixels {
      * This fun will fire one pixel
      */
     fun reportGeoswitchingNoLocations()
+
+    /**
+     * This fun will fire just daily pixel whenever private DNS is set by the user
+     */
+    fun reportPrivateDnsSet()
+
+    /**
+     * This fun will fire just daily pixel whenever private DNS is set by the user and VPN start fails
+     */
+    fun reportPrivateDnsSetOnVpnStartFail()
 }
 
 @ContributesBinding(AppScope::class)
@@ -442,6 +452,14 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportGeoswitchingNoLocations() {
         tryToFireDailyPixel(NETP_GEOSWITCHING_NO_AVAILABLE_LOCATIONS_DAILY)
         firePixel(NETP_GEOSWITCHING_NO_AVAILABLE_LOCATIONS)
+    }
+
+    override fun reportPrivateDnsSet() {
+        tryToFireDailyPixel(NETP_PRIVATE_DNS_SET_DAILY)
+    }
+
+    override fun reportPrivateDnsSetOnVpnStartFail() {
+        tryToFireDailyPixel(NETP_PRIVATE_DNS_SET_VPN_START_FAILED_DAILY)
     }
 
     private fun firePixel(
