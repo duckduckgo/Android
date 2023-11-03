@@ -66,7 +66,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.*
 
-@InjectWith(ActivityScope::class)
+@InjectWith(ActivityScope::class, delayGeneration = true)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
