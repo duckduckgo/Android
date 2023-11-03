@@ -17,6 +17,7 @@
 package com.duckduckgo.app.survey.api
 
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.LiveData
 import com.duckduckgo.app.notification.NotificationRegistrar.NotificationId
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -33,7 +34,12 @@ interface SurveyRepository {
     fun remainingDaysForShowingSurvey(survey: Survey): Long
     fun shouldShowSurvey(survey: Survey): Boolean
     fun getScheduledSurvey(): Survey
+    fun getScheduledLiveSurvey(): LiveData<Survey>
+    fun persistSurvey(survey: Survey)
+    fun surveyExists(surveyId: String): Boolean
     fun updateSurvey(survey: Survey)
+    fun cancelScheduledSurveys()
+    fun deleteUnusedSurveys()
     fun clearSurveyNotification()
 }
 
@@ -92,8 +98,28 @@ class SurveyRepositoryImpl @Inject constructor(
         return surveyDao.getScheduled().last()
     }
 
+    override fun getScheduledLiveSurvey(): LiveData<Survey> {
+        return surveyDao.getLiveScheduled()
+    }
+
+    override fun persistSurvey(survey: Survey) {
+        surveyDao.insert(survey)
+    }
+
+    override fun surveyExists(surveyId: String): Boolean {
+        return surveyDao.get(surveyId) != null
+    }
+
     override fun updateSurvey(survey: Survey) {
         surveyDao.update(survey)
+    }
+
+    override fun cancelScheduledSurveys() {
+        surveyDao.cancelScheduledSurveys()
+    }
+
+    override fun deleteUnusedSurveys() {
+        surveyDao.deleteUnusedSurveys()
     }
 
     override fun clearSurveyNotification() {

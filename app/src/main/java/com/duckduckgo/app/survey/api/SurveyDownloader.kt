@@ -19,7 +19,6 @@ package com.duckduckgo.app.survey.api
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
@@ -36,7 +35,6 @@ import timber.log.Timber
 
 class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
-    private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
     private val surveyRepository: SurveyRepository,
     private val netpCohortStore: NetpCohortStore,
@@ -73,17 +71,17 @@ class SurveyDownloader @Inject constructor(
             val surveyGroup = response.body()
             if (surveyGroup?.id == null) {
                 Timber.d("No survey received, deleting old unused surveys")
-                surveyDao.deleteUnusedSurveys()
+                surveyRepository.deleteUnusedSurveys()
                 return@fromAction
             }
 
-            if (surveyDao.exists(surveyGroup.id)) {
+            if (surveyRepository.surveyExists(surveyGroup.id)) {
                 Timber.d("Survey received already in db, ignoring ${surveyGroup.id}")
                 return@fromAction
             }
 
             Timber.d("New survey received. Unused surveys cleared and new survey saved")
-            surveyDao.deleteUnusedSurveys()
+            surveyRepository.deleteUnusedSurveys()
             val surveyOption = determineOption(surveyGroup.surveyOptions)
 
             val newSurvey = when {
@@ -103,7 +101,7 @@ class SurveyDownloader @Inject constructor(
             newSurvey?.let {
                 if (surveyRepository.isUserEligibleForSurvey(newSurvey)) {
                     Timber.v("User eligible for survey, storing")
-                    surveyDao.insert(newSurvey)
+                    surveyRepository.persistSurvey(newSurvey)
                 }
             }
         }

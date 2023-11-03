@@ -104,7 +104,6 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -232,9 +231,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
-
-    @Mock
-    private lateinit var mockSurveyDao: SurveyDao
 
     @Mock
     private lateinit var mockDismissedCtaDao: DismissedCtaDao
@@ -417,7 +413,6 @@ class BrowserTabViewModelTest {
         ctaViewModel = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
@@ -2264,7 +2259,7 @@ class BrowserTabViewModelTest {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         setCta(cta)
         testee.onUserDismissedCta()
-        verify(mockSurveyDao).cancelScheduledSurveys()
+        verify(mockSurveyRepository).cancelScheduledSurveys()
     }
 
     @Test

@@ -39,7 +39,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -86,9 +85,6 @@ class CtaViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
-
-    @Mock
-    private lateinit var mockSurveyDao: SurveyDao
 
     @Mock
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
@@ -151,7 +147,6 @@ class CtaViewModelTest {
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
             pixel = mockPixel,
-            surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
@@ -240,7 +235,7 @@ class CtaViewModelTest {
     @Test
     fun whenSurveyCtaDismissedThenScheduledSurveysAreCancelled() = runTest {
         testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockSurveyDao).cancelScheduledSurveys()
+        verify(mockSurveyRepository).cancelScheduledSurveys()
         verify(mockDismissedCtaDao, never()).insert(any())
     }
 

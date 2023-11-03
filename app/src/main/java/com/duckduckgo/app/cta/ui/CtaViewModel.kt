@@ -35,7 +35,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.api.SurveyRepository
-import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -56,7 +55,6 @@ import timber.log.Timber
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
-    private val surveyDao: SurveyDao,
     private val widgetCapabilities: WidgetCapabilities,
     private val dismissedCtaDao: DismissedCtaDao,
     private val userAllowListRepository: UserAllowListRepository,
@@ -69,7 +67,7 @@ class CtaViewModel @Inject constructor(
     private val appTheme: AppTheme,
     private val surveyRepository: SurveyRepository,
 ) {
-    val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
+    val surveyLiveData: LiveData<Survey> = surveyRepository.getScheduledLiveSurvey()
     var canShowAutoconsentCta: AtomicBoolean = AtomicBoolean(false)
 
     @ExperimentalCoroutinesApi
@@ -155,7 +153,7 @@ class CtaViewModel @Inject constructor(
 
             if (cta is HomePanelCta.Survey) {
                 activeSurvey = null
-                surveyDao.cancelScheduledSurveys()
+                surveyRepository.cancelScheduledSurveys()
             } else {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }

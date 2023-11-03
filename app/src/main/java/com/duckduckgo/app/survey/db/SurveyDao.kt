@@ -29,9 +29,6 @@ interface SurveyDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(survey: Survey)
 
-    @Query("select count(1) > 0 from survey where surveyId = :surveyId")
-    fun exists(surveyId: String): Boolean
-
     @Query("select * from survey where surveyId = :surveyId")
     fun get(surveyId: String): Survey?
 

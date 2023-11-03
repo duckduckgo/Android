@@ -252,10 +252,6 @@ private class FakeSurveyDao : SurveyDao {
         insert(survey)
     }
 
-    override fun exists(surveyId: String): Boolean {
-        return surveys[surveyId] != null
-    }
-
     override fun get(surveyId: String): Survey? {
         return surveys[surveyId]
     }
