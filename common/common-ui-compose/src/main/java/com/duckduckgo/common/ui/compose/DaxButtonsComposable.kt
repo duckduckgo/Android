@@ -28,6 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.duckduckgo.common.ui.compose.ButtonStyle.ALT
+import com.duckduckgo.common.ui.compose.ButtonStyle.DEFAULT
+import com.duckduckgo.common.ui.compose.ButtonStyle.DESTRUCTIVE
+import com.duckduckgo.common.ui.compose.ui.DaxButtonShape
+import com.duckduckgo.common.ui.compose.ui.DaxColor
 
 @Preview
 @Composable
@@ -35,16 +40,26 @@ fun DaxButtonPrimary(
     modifier: Modifier = Modifier,
     buttonSize: ButtonSize = ButtonSize.LARGE,
     buttonStyle: ButtonStyle = ButtonStyle.DEFAULT,
-    text: String = "",
+    text: String = "test",
     iconRes: Int? = null,
     enabled: Boolean = true,
     onClick: () -> Unit = {},
 ) {
+    val containerColor = when(buttonStyle) {
+        DEFAULT -> DaxColor.ButtonDefault
+        DESTRUCTIVE -> DaxColor.ButtonDestructive
+        ALT -> DaxColor.ButtonAlt
+    }
+
     Button(
         modifier = modifier,
         onClick = { onClick.invoke() },
         enabled = enabled,
-
+        shape = DaxButtonShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = DaxColor.ButtonPrimaryTextColor,
+        ),
     ) {
         DaxButtonContent(text, iconRes)
     }

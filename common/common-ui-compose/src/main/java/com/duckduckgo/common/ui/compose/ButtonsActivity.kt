@@ -39,7 +39,16 @@ class ButtonsActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 DaxButtonPrimary(
-                    text = "Primary Button",
+                    text = "Primary Default",
+                    buttonStyle = ButtonStyle.DEFAULT
+                )
+                DaxButtonPrimary(
+                    text = "Primary Alt",
+                    buttonStyle = ButtonStyle.ALT
+                )
+                DaxButtonPrimary(
+                    text = "Primary Destructive",
+                    buttonStyle = ButtonStyle.DESTRUCTIVE
                 )
             }
         }

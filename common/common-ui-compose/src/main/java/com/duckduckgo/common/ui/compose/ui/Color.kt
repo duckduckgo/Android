@@ -16,4 +16,12 @@
 
 package com.duckduckgo.common.ui.compose.ui
 
-object DaxColor
+import androidx.compose.ui.graphics.Color
+
+object DaxColor {
+
+    val ButtonDefault = Color(0xFF3969EF)
+    val ButtonAlt= Color(0x99000000)
+    val ButtonDestructive = Color(0xFFEB102D)
+    val ButtonPrimaryTextColor = Color.White
+}
