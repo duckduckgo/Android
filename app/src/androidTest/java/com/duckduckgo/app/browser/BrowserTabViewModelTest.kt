@@ -453,6 +453,7 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserAllowListDao.contains(anyString())).thenReturn(false)
+        whenever(mockUserAllowListDao.allDomainsFlow()).thenReturn(flowOf(emptyList()))
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
@@ -1674,7 +1675,6 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListDao).insert(UserAllowListedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
-        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
@@ -1694,7 +1694,6 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserAllowListDao).delete(UserAllowListedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
-        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test

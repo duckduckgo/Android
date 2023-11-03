@@ -550,6 +550,7 @@ class BrowserTabViewModel @Inject constructor(
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
+    private var allowlistRefreshTriggerJob: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1268,6 +1269,14 @@ class BrowserTabViewModel @Inject constructor(
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updatePrivacyProtectionState(domain) } }
 
+        allowlistRefreshTriggerJob?.cancel()
+        if (domain != null) {
+            allowlistRefreshTriggerJob = isDomainInUserAllowlist(domain)
+                .drop(count = 1) // skip current state - we're only interested in change events
+                .onEach { command.postValue(NavigationCommand.Refresh) }
+                .launchIn(viewModelScope)
+        }
+
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
         val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
@@ -1339,6 +1348,12 @@ class BrowserTabViewModel @Inject constructor(
             userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
         }
     }
+
+    private fun isDomainInUserAllowlist(domain: String): Flow<Boolean> =
+        userAllowListDao
+            .allDomainsFlow()
+            .map { allowlistedDomains -> domain in allowlistedDomains }
+            .distinctUntilChanged()
 
     private suspend fun updateBookmarkAndFavoriteState(url: String) {
         val bookmark = getBookmark(url)
@@ -2101,7 +2116,6 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 addToAllowList(domain)
             }
-            command.postValue(NavigationCommand.Refresh)
         }
     }
 
