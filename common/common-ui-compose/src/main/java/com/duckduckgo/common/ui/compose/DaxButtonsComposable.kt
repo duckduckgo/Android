@@ -45,7 +45,6 @@ fun DaxButtonPrimary(
         onClick = { onClick.invoke() },
         enabled = enabled,
 
-
     ) {
         DaxButtonContent(text, iconRes)
     }
@@ -57,25 +56,23 @@ private fun DaxButtonContent(text: String, iconRes: Int?) {
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = null,
-            modifier = Modifier.size(ButtonDefaults.IconSize)
+            modifier = Modifier.size(ButtonDefaults.IconSize),
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
     }
     Text(
         text = text,
-        modifier = Modifier.padding(vertical = 2.dp)
+        modifier = Modifier.padding(vertical = 2.dp),
     )
 }
 
 enum class ButtonSize {
     SMALL,
-    LARGE
+    LARGE,
 }
 
 enum class ButtonStyle {
     DEFAULT,
     DESTRUCTIVE,
-    ALT
+    ALT,
 }
-
-

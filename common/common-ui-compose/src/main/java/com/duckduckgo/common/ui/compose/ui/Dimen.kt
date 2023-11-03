@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose
+package com.duckduckgo.common.ui.compose.ui
 
-class UnitTest
+import androidx.compose.ui.unit.dp
+
+val keyline_empty = 0.dp
+val keyline_0 = 2.dp
+val keyline_1 = 4.dp
+val keyline_2 = 8.dp
+val keyline_3 = 12.dp
+val keyline_4 = 16.dp
+val keyline_5 = 24.dp
+val keyline_6 = 32.dp
+val keyline_7 = 48.dp

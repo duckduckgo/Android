@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose
+package com.duckduckgo.common.ui.compose.ui
 
-class UnitTest
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+
+private val ColorPalette = lightColorScheme(
+    // primary = ,
+    // ....
+)
+
+@Composable
+fun DaxMaterialTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = ColorPalette,
+        typography = Typography,
+        content = content,
+    )
+}

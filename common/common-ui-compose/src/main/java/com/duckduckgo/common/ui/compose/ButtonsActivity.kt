@@ -39,7 +39,7 @@ class ButtonsActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 DaxButtonPrimary(
-                    text = "Primary Button"
+                    text = "Primary Button",
                 )
             }
         }

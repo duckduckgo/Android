@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose
+package com.duckduckgo.common.ui.compose.ui
 
-class UnitTest
+object DaxColor

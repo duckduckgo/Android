@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.compose
-
-class UnitTest
+package com.duckduckgo.common.ui.compose.ui
