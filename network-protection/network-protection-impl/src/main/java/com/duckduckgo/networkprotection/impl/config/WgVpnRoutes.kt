@@ -33,7 +33,7 @@ internal class WgVpnRoutes {
      *   - broadcast address
      */
     companion object {
-        val wgVpnRoutes: Map<String, Int> = mapOf(
+        val wgVpnDefaultRoutes: Map<String, Int> = mapOf(
             "0.0.0.0" to 5,
             "8.0.0.0" to 7,
             // Excluded range: 10.0.0.0 -> 10.255.255.255
@@ -89,6 +89,47 @@ internal class WgVpnRoutes {
             "196.0.0.0" to 6,
             "200.0.0.0" to 5,
             "208.0.0.0" to 4,
+            // Excluded range: 224.0.0.0 -> 239.255.255.255
+            // Excluded range: 240.0.0.0 -> 255.255.255.255
+        )
+
+        val wgVpnRoutesIncludingLocal: Map<String, Int> = mapOf(
+            "0.0.0.0" to 5,
+            "8.0.0.0" to 7,
+            // Excluded range: 10.0.0.0 -> 10.255.255.255
+            "11.0.0.0" to 8,
+            "12.0.0.0" to 6,
+            "16.0.0.0" to 4,
+            "32.0.0.0" to 3,
+            "64.0.0.0" to 3,
+            "96.0.0.0" to 6,
+            "100.0.0.0" to 10,
+            // Excluded range: 100.64.0.0 -> 100.127.255.255
+            "100.128.0.0" to 9,
+            "101.0.0.0" to 8,
+            "102.0.0.0" to 7,
+            "104.0.0.0" to 5,
+            "112.0.0.0" to 5,
+            "120.0.0.0" to 6,
+            "124.0.0.0" to 7,
+            "126.0.0.0" to 8,
+            // Excluded range: 127.0.0.0 -> 127.255.255.255
+            "128.0.0.0" to 3,
+            "160.0.0.0" to 5,
+            "168.0.0.0" to 8,
+            "169.0.0.0" to 9,
+            "169.128.0.0" to 10,
+            "169.192.0.0" to 11,
+            "169.224.0.0" to 12,
+            "169.240.0.0" to 13,
+            "169.248.0.0" to 14,
+            "169.252.0.0" to 15,
+            // Excluded range: 169.254.0.0 -> 169.254.255.255
+            "169.255.0.0" to 16,
+            "170.0.0.0" to 7,
+            "172.0.0.0" to 6,
+            "176.0.0.0" to 4,
+            "192.0.0.0" to 3,
             // Excluded range: 224.0.0.0 -> 239.255.255.255
             // Excluded range: 240.0.0.0 -> 255.255.255.255
         )

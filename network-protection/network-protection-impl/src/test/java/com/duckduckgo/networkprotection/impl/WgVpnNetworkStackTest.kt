@@ -63,7 +63,7 @@ class WgVpnNetworkStackTest {
             return setOf(InetAddress.getByName("127.0.0.1"))
         }
 
-        override fun routes(): Map<String, Int> {
+        override suspend fun routes(): Map<String, Int> {
             return mapOf("10.11.12.1" to 32)
         }
 
