@@ -24,13 +24,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.ResultReceiver
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory.DeviceShieldNotification
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -52,13 +52,13 @@ interface DeviceShieldAlertNotificationBuilder {
 
     fun buildStatusNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        deviceShieldNotification: DeviceShieldNotification,
         onNotificationPressedCallback: ResultReceiver,
     ): Notification
 
     fun buildAlwaysOnLockdownNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        deviceShieldNotification: DeviceShieldNotification,
         contentNextIntent: Intent,
     ): Notification
 }
@@ -81,38 +81,29 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
 
     override fun buildStatusNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        deviceShieldNotification: DeviceShieldNotification,
         onNotificationPressedCallback: ResultReceiver,
     ): Notification {
         registerAlertChannel(context)
 
-        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
-
-        val notificationImage = getNotificationImage(deviceShieldNotification)
-        notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
-        notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
         val vpnControllerIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = onNotificationPressedCallback)
 
-        return buildNotification(context, notificationLayout, addReportIssueAction = true, contentNextIntent = vpnControllerIntent)
+        return buildNotification(context, deviceShieldNotification, addReportIssueAction = true, contentNextIntent = vpnControllerIntent)
     }
 
     override fun buildAlwaysOnLockdownNotification(
         context: Context,
-        deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
+        deviceShieldNotification: DeviceShieldNotification,
         contentNextIntent: Intent,
     ): Notification {
         registerAlertChannel(context)
 
-        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
-
         val notificationImage = getNotificationImage(deviceShieldNotification)
-        notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
-        notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
-        return buildNotification(context, notificationLayout, addReportIssueAction = false, contentNextIntent = contentNextIntent)
+        return buildNotification(context, deviceShieldNotification, addReportIssueAction = false, contentNextIntent = contentNextIntent)
     }
 
-    private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
+    private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotification): Int {
         if (deviceShieldNotification.title.contains(TRACKER_COMPANY_GOOGLE)) {
             return R.drawable.ic_apptb_google
         }
@@ -130,7 +121,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
 
     private fun buildNotification(
         context: Context,
-        content: RemoteViews,
+        content: DeviceShieldNotification,
         addReportIssueAction: Boolean,
         contentNextIntent: Intent,
     ): Notification {
@@ -143,10 +134,10 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
 
         return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setStyle(NotificationCompat.BigTextStyle().bigText(content.title))
+            .setContentTitle("App Tracking Protection")
             .setContentIntent(vpnControllerPendingIntent)
             .setSilent(true)
-            .setCustomContentView(content)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)

@@ -48,7 +48,7 @@ interface VpnReminderNotificationContentPlugin {
     data class NotificationContent(
         val isSilent: Boolean,
         val shouldAutoCancel: Boolean?,
-        @LayoutRes val customViewLayout: Int,
+        val title: String,
         val onNotificationPressIntent: PendingIntent?,
         val notificationAction: List<NotificationCompat.Action>,
     ) {
@@ -56,9 +56,10 @@ interface VpnReminderNotificationContentPlugin {
             val EMPTY = NotificationContent(
                 isSilent = false,
                 shouldAutoCancel = null,
-                customViewLayout = -1,
+                // customViewLayout = -1,
                 onNotificationPressIntent = null,
                 notificationAction = emptyList(),
+                title = ""
             )
         }
     }

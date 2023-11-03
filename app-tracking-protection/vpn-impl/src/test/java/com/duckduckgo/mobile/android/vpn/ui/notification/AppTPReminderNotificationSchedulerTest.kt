@@ -433,7 +433,7 @@ class AppTPReminderNotificationSchedulerTest {
         override fun getContent(): NotificationContent = NotificationContent(
             isSilent = false,
             shouldAutoCancel = false,
-            customViewLayout = R.layout.notification_device_shield_revoked,
+            title = "",
             onNotificationPressIntent = null,
             notificationAction = emptyList(),
         )
@@ -446,7 +446,7 @@ class AppTPReminderNotificationSchedulerTest {
         override fun getContent(): NotificationContent = NotificationContent(
             isSilent = false,
             shouldAutoCancel = false,
-            customViewLayout = R.layout.notification_device_shield_disabled,
+            title = "",
             onNotificationPressIntent = null,
             notificationAction = emptyList(),
         )

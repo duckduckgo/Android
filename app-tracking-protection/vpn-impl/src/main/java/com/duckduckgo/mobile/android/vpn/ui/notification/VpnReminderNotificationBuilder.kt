@@ -60,13 +60,12 @@ class RealVpnReminderNotificationBuilder @Inject constructor(
         vpnNotification: VpnReminderNotificationContentPlugin.NotificationContent,
     ): Notification {
         registerAlertChannel(context)
-        val notificationLayout = RemoteViews(context.packageName, vpnNotification.customViewLayout)
 
         val builder = NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setStyle(NotificationCompat.BigTextStyle().bigText(vpnNotification.title))
+            .setContentTitle("App Tracking Protection")
             .setContentIntent(vpnNotification.onNotificationPressIntent)
-            .setCustomContentView(notificationLayout)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setSilent(vpnNotification.isSilent)

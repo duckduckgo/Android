@@ -26,6 +26,8 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.VpnActionReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
@@ -61,14 +63,12 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnEnabledNotificationContent.title)
-
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setLargeIcon(ContextCompat.getDrawable(context, R.drawable.ic_apptb_default)?.toBitmap())
+                .setContentTitle("App Tracking Protection")
+                .setStyle(NotificationCompat.BigTextStyle().bigText(vpnEnabledNotificationContent.title))
                 .setContentIntent(vpnEnabledNotificationContent.onNotificationPressIntent)
-                .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
@@ -82,14 +82,13 @@ class VpnEnabledNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_vpn_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, vpnNotification.title)
-
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setLargeIcon(ContextCompat.getDrawable(context, R.drawable.ic_apptb_default)?.toBitmap())
+                .setStyle(NotificationCompat.BigTextStyle().bigText(vpnNotification.title))
+                .setContentTitle("App Tracking Protection")
                 .setContentIntent(vpnNotification.onNotificationPressIntent)
-                .setCustomContentView(notificationLayout)
+                // .setCustomContentView(notificationLayout)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
                 .setOngoing(true)

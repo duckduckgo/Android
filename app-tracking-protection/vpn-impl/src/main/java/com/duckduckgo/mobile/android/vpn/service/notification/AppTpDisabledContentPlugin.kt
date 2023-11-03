@@ -41,8 +41,8 @@ class AppTpDisabledContentPlugin @Inject constructor(
         return NotificationContent(
             isSilent = true,
             shouldAutoCancel = null,
-            customViewLayout = R.layout.notification_device_shield_disabled,
             onNotificationPressIntent = notificationPendingIntent,
+            title = context.getString(R.string.atp_DisabledNotification),
             notificationAction = listOf(
                 NotificationCompat.Action(
                     R.drawable.ic_vpn_notification_24,

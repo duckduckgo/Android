@@ -43,7 +43,7 @@ class AppTpRevokedContentPlugin @Inject constructor(
         return NotificationContent(
             isSilent = true,
             shouldAutoCancel = null,
-            customViewLayout = R.layout.notification_device_shield_revoked,
+            title = context.getString(R.string.atp_RevokedNotification),
             onNotificationPressIntent = notificationPendingIntent,
             notificationAction = listOf(
                 Action(
