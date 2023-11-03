@@ -37,12 +37,11 @@ class SyncInternalEnvInterceptor @Inject constructor(
     override fun getInterceptor(): Interceptor = this
     override fun intercept(chain: Chain): Response {
         val useDevEnvironment = envDataStore.useSyncDevEnvironment
-        val encodedPath = chain.request().url.encodedPath
 
         if (useDevEnvironment && chain.request().url.toString().contains(SYNC_PROD_ENVIRONMENT_URL)) {
             val newRequest = chain.request().newBuilder()
 
-            val changedUrl = SYNC_DEV_ENVIRONMENT_URL + encodedPath
+            val changedUrl = chain.request().url.toString().replace(SYNC_PROD_ENVIRONMENT_URL, SYNC_DEV_ENVIRONMENT_URL)
             Timber.d("Sync-Engine: environment changed to $changedUrl")
             newRequest.url(changedUrl)
             return chain.proceed(newRequest.build())
