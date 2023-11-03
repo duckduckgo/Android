@@ -140,6 +140,8 @@
     <string name="netpVpnSettingNotificationEnabledByline">Display a persistent notification when the VPN is active</string>
     <string name="netpVpnSettingNotificationAlert">VPN Alerts</string>
     <string name="netpVpnSettingNotificationAlertByline">Get notified if your connection drops or VPN status changes</string>
+    <string name="netpVpnNotifyMeTitle">Notifications are disabled</string>
+    <string name="netpVpnNotifyMeByLine">Get notified of VPN events</string>
 
     <!-- Exclusion list -->
     <string name="netpExclusionListTitle">Manage Apps</string>

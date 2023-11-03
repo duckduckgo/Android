@@ -280,6 +280,7 @@ class NotifyMeView @JvmOverloads constructor(
             val previousVisibility = getTag(tag)
             if (newVisibility != previousVisibility) {
                 this.visibilityChangedListener?.onVisibilityChange(this, newVisibility == VISIBLE)
+                setTag(tag, newVisibility)
             }
         }
 

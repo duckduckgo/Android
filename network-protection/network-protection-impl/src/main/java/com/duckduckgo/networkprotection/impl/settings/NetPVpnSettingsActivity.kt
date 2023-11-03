@@ -78,12 +78,15 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         val geoSwitchingSubtitle = viewState.preferredLocation ?: getString(R.string.netpVpnSettingGeoswitchingDefault)
         binding.geoswitching.setSecondaryText(geoSwitchingSubtitle)
+        binding.excludeLocalNetworks.quietlySetIsChecked(viewState.excludeLocalNetworks) { _, isChecked ->
+            viewModel.onExcludeLocalRoutes(isChecked)
+        }
     }
 
     private fun setupUiElements() {
-        binding.excludeLocalNetworks.quietlySetIsChecked(true, null)
-        binding.excludeLocalNetworks.showSwitch()
-        binding.secureDns.setSwitchEnabled(false)
+        binding.excludeLocalNetworks.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onExcludeLocalRoutes(isChecked)
+        }
 
         binding.secureDns.quietlySetIsChecked(true, null)
         binding.secureDns.showSwitch()

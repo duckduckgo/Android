@@ -74,6 +74,10 @@ class NetPInternalDefaultConfigProvider @Inject constructor(
             null
         }
     }
+
+    override suspend fun routes(): Map<String, Int> {
+        return realNetPConfigProvider.routes()
+    }
 }
 
 private const val WIREGIARD_PCAP = "wiregiard.pcap"
