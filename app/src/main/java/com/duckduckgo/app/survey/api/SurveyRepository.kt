@@ -33,6 +33,7 @@ interface SurveyRepository {
     fun remainingDaysForShowingSurvey(survey: Survey): Long
     fun shouldShowSurvey(survey: Survey): Boolean
     fun getScheduledSurvey(): Survey
+    fun updateSurvey(survey: Survey)
     fun clearSurveyNotification()
 }
 
@@ -89,6 +90,10 @@ class SurveyRepositoryImpl @Inject constructor(
 
     override fun getScheduledSurvey(): Survey {
         return surveyDao.getScheduled().last()
+    }
+
+    override fun updateSurvey(survey: Survey) {
+        surveyDao.update(survey)
     }
 
     override fun clearSurveyNotification() {

@@ -39,7 +39,6 @@ import kotlinx.coroutines.withContext
 
 @ContributesViewModel(ActivityScope::class)
 class SurveyViewModel @Inject constructor(
-    private val surveyDao: SurveyDao,
     private val statisticsStore: StatisticsDataStore,
     private val appInstallStore: AppInstallStore,
     private val appBuildConfig: AppBuildConfig,
@@ -106,7 +105,7 @@ class SurveyViewModel @Inject constructor(
         surveyRepository.clearSurveyNotification()
         viewModelScope.launch {
             withContext(dispatchers.io() + NonCancellable) {
-                surveyDao.update(survey)
+                surveyRepository.updateSurvey(survey)
             }
             withContext(dispatchers.main()) {
                 command.value = Command.Close
