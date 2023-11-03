@@ -215,9 +215,11 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         Timber.i("Sync-Bookmarks: processing favourites folder $favoriteFolder")
         val favouriteFolder = entries.find { it.id == favoriteFolder } ?: return
         val favourites = favouriteFolder.folder?.children ?: emptyList()
-        if (favourites.isEmpty()) {
+        // TODO: we should apply strategies here, then we can remove Deduplication check
+        if (favourites.isEmpty() && conflictResolution != DEDUPLICATION) {
             Timber.d("Sync-Bookmarks: Favourites folder is empty, removing all local favourites")
             val storedFavourites = syncSavedSitesRepository.getFavoritesSync(favoriteFolder)
+            Timber.d("Sync-Bookmarks: stored favorites to remove $storedFavourites")
             storedFavourites.forEach {
                 syncSavedSitesRepository.delete(it, favoriteFolder)
             }

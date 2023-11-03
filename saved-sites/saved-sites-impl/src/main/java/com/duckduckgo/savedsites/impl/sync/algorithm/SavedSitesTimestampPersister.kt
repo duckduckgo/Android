@@ -46,7 +46,7 @@ class SavedSitesTimestampPersister @Inject constructor(
                 Timber.d("Sync-Bookmarks-Persister: remote folder ${folder.id} exists locally but was deleted, deleting locally")
                 savedSitesRepository.delete(localFolder)
             } else {
-                if (folder.modifiedAfter(localFolder.lastModified)) {
+                if (localFolder.modifiedAfter(folder.lastModified)) {
                     Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified after local folder, replacing content")
                     savedSitesRepository.replaceFolderContent(folder, localFolder.id)
                 } else {
@@ -75,7 +75,7 @@ class SavedSitesTimestampPersister @Inject constructor(
                 Timber.d("Sync-Bookmarks-Persister: remote bookmark ${bookmark.id} deleted, deleting local bookmark")
                 savedSitesRepository.delete(storedBookmark)
             } else {
-                if (bookmark.modifiedAfter(storedBookmark.lastModified)) {
+                if (storedBookmark.modifiedAfter(bookmark.lastModified)) {
                     Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified after local bookmark, replacing content")
                     savedSitesRepository.replaceBookmark(bookmark, bookmark.id)
                 } else {

@@ -25,6 +25,7 @@ import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import timber.log.Timber
 
 interface SavedSitesSyncMigration {
     fun onSyncEnabled()
@@ -38,6 +39,7 @@ class SavedSitesSyncMigrationImpl @Inject constructor(
     private val savedSitesSettings: SavedSitesSettingsRepository,
 ) : SavedSitesSyncMigration {
     override fun onSyncEnabled() {
+        Timber.d("Sync-Bookmarks: syncEnabled creating FFS folders")
         savedSitesEntitiesDao.createFormFactorFavoriteFolders()
         savedSitesRelationsDao.cloneFolder(
             SavedSitesNames.FAVORITES_ROOT,
@@ -46,6 +48,7 @@ class SavedSitesSyncMigrationImpl @Inject constructor(
     }
 
     override fun onSyncDisabled() {
+        Timber.d("Sync-Bookmarks: syncDisabled removing FFS folders and migrating favorites")
         when (savedSitesSettings.favoritesDisplayMode) {
             NATIVE -> {
                 savedSitesRelationsDao.migrateNativeFavoritesAsNewRoot()
@@ -56,5 +59,6 @@ class SavedSitesSyncMigrationImpl @Inject constructor(
         }
         savedSitesEntitiesDao.removeFormFactorFavoriteFolders()
         savedSitesSettings.favoritesDisplayMode = NATIVE
+        Timber.d("Sync-Bookmarks: displayMode changed to NATIVE")
     }
 }

@@ -61,6 +61,8 @@ class FavoritesAccessorImpl @Inject constructor(
 
     private var viewMode: ViewMode = ViewMode.Default
 
+    private val viewModeFlow = MutableStateFlow<ViewMode>(ViewMode.Default)
+
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             savedSitesSettings.viewModeFlow()
@@ -71,14 +73,17 @@ class FavoritesAccessorImpl @Inject constructor(
                     }
                 }.distinctUntilChanged().collect {
                     viewMode = it
+                    viewModeFlow.emit(it)
                 }
         }
     }
 
     override fun getFavorites(): Flow<List<SavedSite.Favorite>> {
-        return getFavoriteFolderFlow().flatMapLatest { favoriteFolder ->
+        return viewModeFlow.flatMapLatest { viewMode ->
+            val favoriteFolder = getFavoriteFolder(viewMode)
+            Timber.d("Sync-Bookmarks: getFavorites as Flow from $favoriteFolder")
             savedSitesRelationsDao.relations(favoriteFolder).distinctUntilChanged().map { relations ->
-                Timber.d("Sync-Bookmarks: getFavorites as Flow, emit relations")
+                Timber.d("Sync-Bookmarks: getFavorites as Flow, emit relations $relations")
                 relations.mapIndexed { index, relation ->
                     savedSitesEntitiesDao.entityById(relation.entityId)!!.mapToFavorite(index)
                 }
@@ -167,9 +172,12 @@ class FavoritesAccessorImpl @Inject constructor(
             }
             getFavoriteById(entity.entityId)!!
         } else {
+            val currentRelations = savedSitesRelationsDao.relationsByEntityId(existentBookmark.entityId)
             favoriteFolders.forEach { favoriteFolderName ->
-                savedSitesRelationsDao.insert(Relation(folderId = favoriteFolderName, entityId = existentBookmark.entityId))
-                savedSitesEntitiesDao.updateModified(entityId = favoriteFolderName, lastModified = lastModifiedOrFallback)
+                if (currentRelations.firstOrNull { it.folderId == favoriteFolderName } == null) {
+                    savedSitesRelationsDao.insert(Relation(folderId = favoriteFolderName, entityId = existentBookmark.entityId))
+                    savedSitesEntitiesDao.updateModified(entityId = favoriteFolderName, lastModified = lastModifiedOrFallback)
+                }
             }
             savedSitesEntitiesDao.updateModified(id, lastModifiedOrFallback)
             getFavorite(url)!!
@@ -234,6 +242,7 @@ class FavoritesAccessorImpl @Inject constructor(
             FavoritesViewMode.NATIVE -> {
                 val isDesktopFavorite = savedSitesRelationsDao.relationsByEntityId(entityId)
                     .find { it.folderId == SavedSitesNames.FAVORITES_DESKTOP_ROOT } != null
+                Timber.i("Sync-Bookmarks: Deleting $entityId, isDesktopFavorite: $isDesktopFavorite")
                 if (isDesktopFavorite) {
                     listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT)
                 } else {
