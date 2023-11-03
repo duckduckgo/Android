@@ -47,6 +47,7 @@
                 android:orientation="vertical">
 
                 <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                    android:id="@+id/previewTitle"
                     app:typography="h1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

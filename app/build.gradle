@@ -202,6 +202,7 @@ dependencies {
     implementation project(':common-utils')
     implementation project(':app-store')
     implementation project(':common-ui')
+    implementation project(':common-ui-compose')
     internalImplementation project(':common-ui-internal')
     implementation project(':di')
     implementation project(':app-tracking-api')

@@ -17,4 +17,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.common.ui.compose">
 
+    <application>
+        <activity
+            android:name=".ButtonsActivity"
+            android:exported="true" />
+    </application>
+
 </manifest>

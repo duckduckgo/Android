@@ -26,6 +26,14 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.4"
+    }
 }
 
 dependencies {
@@ -49,6 +57,15 @@ dependencies {
     // UI Tests
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    // Integration with activities
+    implementation 'androidx.activity:activity-compose:1.7.2'
+    // Integration with ViewModels
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+    // Integration with LiveData
+    implementation 'androidx.compose.runtime:runtime-livedata'
+    // Integration with RxJava
+    implementation 'androidx.compose.runtime:runtime-rxjava2'
 
     implementation "androidx.core:core-ktx:_"
 }

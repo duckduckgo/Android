@@ -23,10 +23,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.viewpager.widget.ViewPager
+import com.duckduckgo.common.ui.compose.ButtonsActivity
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
 import com.google.android.material.tabs.TabLayout
 
 class AppComponentsActivity : AppCompatActivity() {
@@ -60,6 +62,12 @@ class AppComponentsActivity : AppCompatActivity() {
             startActivity(intent(this))
             finish()
         }
+        setComposePreview()
+    }
+
+    private fun setComposePreview() {
+        val title: DaxTextView = findViewById(R.id.previewTitle)
+        title.setOnClickListener { startActivity(Intent(this, ButtonsActivity::class.java)) }
     }
 
     companion object {
