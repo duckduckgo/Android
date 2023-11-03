@@ -31,7 +31,6 @@ dependencies {
     implementation project(path: ':sync-store')
     implementation project(path: ':sync-lib')
     implementation project(path: ':saved-sites-api')
-    implementation project(path: ':saved-sites-impl')
     implementation project(':feature-toggles-api')
     implementation project(':navigation-api')
 

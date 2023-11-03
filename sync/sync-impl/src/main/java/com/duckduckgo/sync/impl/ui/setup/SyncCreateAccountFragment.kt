@@ -50,9 +50,6 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    @Inject
-    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
-
     private val binding: FragmentCreateAccountBinding by viewBinding()
 
     private val viewModel: SyncCreateAccountViewModel by lazy {
@@ -69,24 +66,11 @@ class SyncCreateAccountFragment : DuckDuckGoFragment(R.layout.fragment_create_ac
         super.onViewCreated(view, savedInstanceState)
         observeUiEvents()
         configureListeners()
-        configureSettings()
     }
 
     private fun configureListeners() {
         binding.footerButton.setOnClickListener {
             viewModel.onNextClicked()
-        }
-    }
-
-    private fun configureSettings() {
-        if (syncSettingsPlugin.isEmpty()) {
-            Timber.i("configureSettings: plugins empty")
-        } else {
-            syncSettingsPlugin.keys.toSortedSet().forEach {
-                syncSettingsPlugin[it]?.let { plugin ->
-                    binding.syncSettingsOptions.addView(plugin.getView(requireActivity()))
-                }
-            }
         }
     }
 

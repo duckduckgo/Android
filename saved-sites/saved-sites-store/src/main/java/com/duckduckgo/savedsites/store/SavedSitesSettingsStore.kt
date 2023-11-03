@@ -40,13 +40,15 @@ class SavedSitesSettingsSharedPrefStore(
 
     private val viewModeFlow = MutableSharedFlow<FavoritesViewMode>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
+    private val preferences: SharedPreferences by lazy {
+        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    }
+
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             viewModeFlow.emit(favoritesDisplayMode)
         }
     }
-
-    private val preferences: SharedPreferences by lazy { context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE) }
 
     override fun viewModeFlow(): Flow<FavoritesViewMode> = viewModeFlow
 

@@ -123,9 +123,7 @@ subprojects {
                         }
                         // internal modules can depend on impl
                         if (projectPath.endsWith('internal') && dependencyPath.endsWith('impl')) continue
-                        if ((!projectPath.endsWith(":app") && dependencyPath.endsWith("impl"))
-                                // https://app.asana.com/0/1202552961248957/1205756175181184/f
-                                && !(projectPath == ":sync-impl" && dependencyPath == ":saved-sites-impl")) {
+                        if (!projectPath.endsWith(":app") && dependencyPath.endsWith("impl")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "Only :app module can depend on 'impl' modules")
                         }
