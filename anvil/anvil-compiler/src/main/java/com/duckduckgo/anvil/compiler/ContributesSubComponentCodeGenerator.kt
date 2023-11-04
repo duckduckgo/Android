@@ -178,7 +178,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
     }
 
     private fun FqName.subComponentAnnotation(module: ModuleDescriptor, delayGeneration: Boolean): AnnotationSpec {
-        return if (this == vpnScopeFqName || delayGeneration) {
+        return if (delayGeneration) {
             AnnotationSpec.builder(ContributesSubcomponent::class)
                 .addMember("scope = %T::class", this.asClassName(module))
                 .addMember("parentScope = %T::class", getParentScope(module).asClassName(module))
@@ -189,7 +189,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
     }
 
     private fun FqName.subComponentFactoryAnnotation(module: ModuleDescriptor, delayGeneration: Boolean): AnnotationSpec {
-        return if (this == vpnScopeFqName || delayGeneration) {
+        return if (delayGeneration) {
             AnnotationSpec.builder(ContributesSubcomponent.Factory::class).build()
         } else {
             AnnotationSpec.builder(Subcomponent.Factory::class).build()

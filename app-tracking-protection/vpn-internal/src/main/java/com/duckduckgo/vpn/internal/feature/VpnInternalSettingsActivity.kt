@@ -55,7 +55,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @ContributeToActivityStarter(LaunchVpnInternalScreenWithEmptyParams::class)
-@InjectWith(VpnScope::class)
+@InjectWith(
+    scope = VpnScope::class,
+    delayGeneration = true,
+)
 class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
