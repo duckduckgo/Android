@@ -65,7 +65,7 @@ class VpnEnabledNotificationBuilder {
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setLargeIcon(ContextCompat.getDrawable(context, R.drawable.ic_apptb_default)?.toBitmap())
+                // .setLargeIcon(ContextCompat.getDrawable(context, R.drawable.ic_apptb_default)?.toBitmap())
                 .setContentTitle("App Tracking Protection")
                 .setStyle(NotificationCompat.BigTextStyle().bigText(vpnEnabledNotificationContent.title))
                 .setContentIntent(vpnEnabledNotificationContent.onNotificationPressIntent)
@@ -84,7 +84,7 @@ class VpnEnabledNotificationBuilder {
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-                .setLargeIcon(ContextCompat.getDrawable(context, R.drawable.ic_apptb_default)?.toBitmap())
+                // .setLargeIcon(ContextCompat.getDrawable(context, R.drawable.ic_apptb_default)?.toBitmap())
                 .setStyle(NotificationCompat.BigTextStyle().bigText(vpnNotification.title))
                 .setContentTitle("App Tracking Protection")
                 .setContentIntent(vpnNotification.onNotificationPressIntent)
