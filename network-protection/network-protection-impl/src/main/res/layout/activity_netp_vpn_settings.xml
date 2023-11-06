@@ -91,22 +91,6 @@
                 app:showSwitch="true"
                 />
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                    android:id="@+id/vpnSettingsDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                    android:id="@+id/vpnSettingsDns"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/keyline_4"
-                    android:layout_marginBottom="@dimen/keyline_2"
-                    android:text="@string/netpVpnSettingDnsLeak"
-                    app:textType="secondary"
-                    app:typography="body2" />
-
-
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
