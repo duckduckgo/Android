@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.savedsites.api.models.*
+import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository.ViewMode
 import com.duckduckgo.savedsites.impl.sync.*
 import com.duckduckgo.savedsites.store.*
 import com.duckduckgo.sync.api.*
@@ -35,7 +36,6 @@ import kotlinx.coroutines.launch
 import timber.log.*
 
 interface FavoritesAccessor {
-    fun changeViewMode()
     fun getFavoritesSync(): List<SavedSite.Favorite>
     fun getFavoritesCountByDomain(domain: String): Int
     fun getFavorite(url: String): SavedSite.Favorite?
@@ -53,25 +53,19 @@ interface FavoritesAccessor {
 class FavoritesAccessorImpl @Inject constructor(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
-    private val syncStateMonitor: SyncStateMonitor,
     private val savedSitesSettings: SavedSitesSettingsRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : FavoritesAccessor {
 
-    private var viewMode: ViewMode = ViewMode.Default
+    private var viewMode: ViewMode = ViewMode.DEFAULT
 
-    private val viewModeFlow = MutableStateFlow<ViewMode>(ViewMode.Default)
+    private val viewModeFlow = MutableStateFlow<ViewMode>(ViewMode.DEFAULT)
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             savedSitesSettings.viewModeFlow()
-                .combine(syncStateMonitor.syncState()) { viewMode, syncState ->
-                    when (syncState) {
-                        SyncState.OFF -> ViewMode.Default
-                        else -> ViewMode.FormFactorViewMode(viewMode)
-                    }
-                }.distinctUntilChanged().collect {
+                .collect {
                     viewMode = it
                     viewModeFlow.emit(it)
                 }
@@ -192,13 +186,9 @@ class FavoritesAccessorImpl @Inject constructor(
         }
     }
 
-    private fun getFavoriteFolderFlow(): Flow<String> {
-        return savedSitesSettings.viewModeFlow().map { getFavoriteFormFactorFolder(it) }
-    }
-
     private fun getFavoriteFolder(viewMode: ViewMode): String {
         return when (viewMode) {
-            ViewMode.Default -> SavedSitesNames.FAVORITES_ROOT
+            ViewMode.DEFAULT -> SavedSitesNames.FAVORITES_ROOT
             is ViewMode.FormFactorViewMode -> return getFavoriteFormFactorFolder(viewMode.favoritesViewMode)
         }
     }
@@ -212,7 +202,7 @@ class FavoritesAccessorImpl @Inject constructor(
 
     private fun getInsertFavoriteFolder(viewMode: ViewMode): List<String> {
         return when (viewMode) {
-            ViewMode.Default -> listOf(SavedSitesNames.FAVORITES_ROOT)
+            ViewMode.DEFAULT -> listOf(SavedSitesNames.FAVORITES_ROOT)
             is ViewMode.FormFactorViewMode -> getInsertFavoriteFormFactorFolder(viewMode.favoritesViewMode)
         }
     }
@@ -229,7 +219,7 @@ class FavoritesAccessorImpl @Inject constructor(
         viewMode: ViewMode,
     ): List<String> {
         return when (viewMode) {
-            ViewMode.Default -> listOf(SavedSitesNames.FAVORITES_ROOT)
+            ViewMode.DEFAULT -> listOf(SavedSitesNames.FAVORITES_ROOT)
             is ViewMode.FormFactorViewMode -> { getDeleteFormFactorFolder(entityId, viewMode.favoritesViewMode) }
         }
     }
@@ -254,27 +244,5 @@ class FavoritesAccessorImpl @Inject constructor(
                 listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_DESKTOP_ROOT)
             }
         }
-    }
-
-    override fun changeViewMode() {
-        val viewModeX = viewMode
-        when (viewModeX) {
-            ViewMode.Default -> return
-            is ViewMode.FormFactorViewMode -> {
-                when (viewModeX.favoritesViewMode) {
-                    FavoritesViewMode.UNIFIED -> {
-                        savedSitesSettings.favoritesDisplayMode = FavoritesViewMode.NATIVE
-                    }
-                    FavoritesViewMode.NATIVE -> {
-                        savedSitesSettings.favoritesDisplayMode = FavoritesViewMode.UNIFIED
-                    }
-                }
-            }
-        }
-    }
-
-    sealed class ViewMode {
-        object Default : ViewMode()
-        data class FormFactorViewMode(val favoritesViewMode: FavoritesViewMode) : ViewMode()
     }
 }

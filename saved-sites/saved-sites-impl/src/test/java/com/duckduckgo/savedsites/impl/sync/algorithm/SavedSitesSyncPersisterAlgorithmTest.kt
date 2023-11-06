@@ -110,48 +110,6 @@ class SavedSitesSyncPersisterAlgorithmTest {
     }
 
     @Test
-    fun whenProcessingEntriesWithDeduplicationStrategyThenDeduplicationPersisterIsUsed1() {
-        val rootFolder = BookmarkFolder(
-            id = SavedSitesNames.BOOKMARKS_ROOT,
-            name = SavedSitesNames.BOOKMARKS_NAME,
-            lastModified = twoHoursAgo,
-            parentId = "",
-        )
-        val rootFavFolder = BookmarkFolder(
-            id = SavedSitesNames.FAVORITES_ROOT,
-            name = SavedSitesNames.FAVORITES_NAME,
-            lastModified = twoHoursAgo,
-            parentId = "",
-        )
-        val rootMobileFavFolder = BookmarkFolder(
-            id = SavedSitesNames.FAVORITES_MOBILE_ROOT,
-            name = SavedSitesNames.FAVORITES_MOBILE_NAME,
-            lastModified = twoHoursAgo,
-            parentId = "",
-        )
-        val folder = BookmarkFolder(id = "folder1", name = "name", lastModified = twoHoursAgo, parentId = SavedSitesNames.BOOKMARKS_ROOT)
-        val bookmark = Bookmark(id = "bookmark1", title = "title", url = "foo.com", lastModified = twoHoursAgo, parentId = folder.id)
-        val someEntries = SyncBookmarkEntries(
-            listOf(
-                fromSavedSite(bookmark),
-                fromBookmarkFolder(folder, listOf(bookmark.id)),
-                fromBookmarkFolder(rootFolder, listOf(folder.id)),
-                fromBookmarkFolder(rootFavFolder, listOf(bookmark.id)),
-                fromBookmarkFolder(rootMobileFavFolder, listOf(bookmark.id)),
-            ),
-            twoHoursAgo,
-        )
-        algorithm.processEntries(someEntries, DEDUPLICATION)
-
-        verify(deduplicationStrategy).processBookmarkFolder(folder)
-        verify(deduplicationStrategy).processBookmark(bookmark, folder.id)
-
-        verifyNoInteractions(remoteStrategy)
-        verifyNoInteractions(localStrategy)
-        verifyNoInteractions(timestampStrategy)
-    }
-
-    @Test
     fun whenProcessingEntriesWithTimestampStrategyThenTimestampPersisterIsUsed() {
         val rootFolder = BookmarkFolder(
             id = SavedSitesNames.BOOKMARKS_ROOT,

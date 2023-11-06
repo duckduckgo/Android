@@ -19,12 +19,18 @@ package com.duckduckgo.savedsites.impl
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository.ViewMode.FormFactorViewMode
 import com.duckduckgo.savedsites.impl.sync.DisplayModeSyncableSetting
 import com.duckduckgo.savedsites.impl.sync.FakeSavedSitesSettingsStore
 import com.duckduckgo.savedsites.store.FavoritesViewMode
 import com.duckduckgo.savedsites.store.FavoritesViewMode.NATIVE
+import com.duckduckgo.savedsites.store.FavoritesViewMode.UNIFIED
+import com.duckduckgo.sync.api.SyncState
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -41,6 +47,8 @@ class RealSavedSitesSettingsRepositoryTest {
 
     private val savedSitesSettingsStore = FakeSavedSitesSettingsStore(coroutineRule.testScope)
     private val syncSettingsListener: SyncSettingsListener = mock()
+    private val syncStateFlow = MutableStateFlow(SyncState.READY)
+    private val syncStateMonitor: SyncStateMonitor = FakeSyncStateMonitor(syncStateFlow)
     private val syncableSetting: DisplayModeSyncableSetting = DisplayModeSyncableSetting(
         savedSitesSettingsStore,
         syncSettingsListener,
@@ -48,12 +56,13 @@ class RealSavedSitesSettingsRepositoryTest {
     private val testee = RealSavedSitesSettingsRepository(
         savedSitesSettingsStore,
         syncableSetting,
+        syncStateMonitor,
     )
 
     @Test
     fun whenObserverAddedThenCurrentViewStateEmitted() = runTest {
         testee.viewModeFlow().test {
-            assertEquals(NATIVE, awaitItem())
+            assertEquals(FormFactorViewMode(NATIVE), awaitItem())
         }
     }
 
@@ -62,7 +71,7 @@ class RealSavedSitesSettingsRepositoryTest {
         testee.viewModeFlow().test {
             awaitItem()
             testee.favoritesDisplayMode = FavoritesViewMode.UNIFIED
-            assertEquals(FavoritesViewMode.UNIFIED, awaitItem())
+            assertEquals(FormFactorViewMode(UNIFIED), awaitItem())
         }
     }
 
@@ -72,4 +81,24 @@ class RealSavedSitesSettingsRepositoryTest {
 
         verify(syncSettingsListener).onSettingChanged(syncableSetting.key)
     }
+
+    @Test
+    fun whenSyncOffThenViewModeDefault() = runTest {
+        syncStateFlow.value = SyncState.OFF
+        testee.viewModeFlow().test {
+            assertEquals(RealSavedSitesSettingsRepository.ViewMode.DEFAULT, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenSyncOnThenFavoritesViewMode() = runTest {
+        syncStateFlow.value = SyncState.READY
+        testee.viewModeFlow().test {
+            assertTrue(awaitItem() is RealSavedSitesSettingsRepository.ViewMode.FormFactorViewMode)
+        }
+    }
+}
+
+class FakeSyncStateMonitor(private val syncStateFlow: Flow<SyncState>) : SyncStateMonitor {
+    override fun syncState(): Flow<SyncState> = syncStateFlow
 }

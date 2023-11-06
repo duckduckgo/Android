@@ -102,10 +102,8 @@ class SavedSitesModule {
     fun providesSyncSavedSitesRepository(
         savedSitesEntitiesDao: SavedSitesEntitiesDao,
         savedSitesRelationsDao: SavedSitesRelationsDao,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
-        coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
     ): SyncSavedSitesRepository {
-        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, coroutineScope, coroutineDispatcher)
+        return RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
     }
 
     @Provides

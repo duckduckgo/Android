@@ -63,13 +63,11 @@ class RealSavedSitesDuplicateFinder @Inject constructor(
 
     override fun findFavouriteDuplicate(favorite: Favorite, favoriteFolder: String): SavedSitesDuplicateResult {
         val presentUrl = syncRepository.getFavorite(favorite.url, favoriteFolder)
-        Timber.i("findFavouriteDuplicate: presentUrl: $presentUrl")
 
         return if (presentUrl != null) {
             if (presentUrl.title == favorite.title) {
                 Duplicate(presentUrl.id)
             } else {
-                Timber.i("findFavouriteDuplicate: title ${presentUrl.title} vs ${favorite.title}")
                 NotDuplicate
             }
         } else {

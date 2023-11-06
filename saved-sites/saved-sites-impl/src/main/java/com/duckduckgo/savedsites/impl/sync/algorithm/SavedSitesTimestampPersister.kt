@@ -47,10 +47,10 @@ class SavedSitesTimestampPersister @Inject constructor(
                 savedSitesRepository.delete(localFolder)
             } else {
                 if (localFolder.modifiedAfter(folder.lastModified)) {
+                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified before local folder, nothing to do")
+                } else {
                     Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified after local folder, replacing content")
                     savedSitesRepository.replaceFolderContent(folder, localFolder.id)
-                } else {
-                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified before local folder, nothing to do")
                 }
             }
         } else {
@@ -76,10 +76,10 @@ class SavedSitesTimestampPersister @Inject constructor(
                 savedSitesRepository.delete(storedBookmark)
             } else {
                 if (storedBookmark.modifiedAfter(bookmark.lastModified)) {
+                    Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
+                } else {
                     Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified after local bookmark, replacing content")
                     savedSitesRepository.replaceBookmark(bookmark, bookmark.id)
-                } else {
-                    Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
                 }
             }
         } else {
@@ -102,11 +102,11 @@ class SavedSitesTimestampPersister @Inject constructor(
                 Timber.d("Sync-Bookmarks-Persister: remote favourite ${favourite.id} deleted, deleting local favourite")
                 syncSavedSitesRepository.delete(favourite, favoriteFolder)
             } else {
-                if (favourite.modifiedAfter(storedFavourite.lastModified)) {
+                if (storedFavourite.modifiedAfter(favourite.lastModified)) {
+                    Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} modified before local favourite, nothing to do")
+                } else {
                     Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} modified after local favourite, replacing content")
                     syncSavedSitesRepository.replaceFavourite(favourite, favourite.id, favoriteFolder)
-                } else {
-                    Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} modified before local favourite, nothing to do")
                 }
             }
         } else {

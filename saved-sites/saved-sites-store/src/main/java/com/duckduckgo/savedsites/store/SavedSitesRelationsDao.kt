@@ -64,7 +64,8 @@ interface SavedSitesRelationsDao {
     ): Int
 
     @Query(
-        "select * from relations where relations.entityId = :entityId and relations.folderId <> '$FAVORITES_MOBILE_ROOT' and relations.folderId <> '$FAVORITES_DESKTOP_ROOT' and relations.folderId <> '$FAVORITES_ROOT'",
+        "select * from relations where relations.entityId = :entityId and relations.folderId <> '$FAVORITES_MOBILE_ROOT' " +
+            "and relations.folderId <> '$FAVORITES_DESKTOP_ROOT' and relations.folderId <> '$FAVORITES_ROOT'",
     )
     fun relationByEntityId(entityId: String): Relation?
 
@@ -97,7 +98,7 @@ interface SavedSitesRelationsDao {
 
     @Query(
         "select count(*) from entities inner join relations on entities.entityId = relations.entityId " +
-            "where entities.url LIKE :domain AND folderId == :folderId AND entities.deleted = 0",
+            "where entities.url LIKE '%' || :domain AND folderId == :folderId AND entities.deleted = 0",
     )
     fun countFavouritesByUrl(
         domain: String,

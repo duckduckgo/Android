@@ -50,7 +50,7 @@ class SavedSitesSyncMigrationImplTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
 
-    private val savedSiteSettingsRepository: SavedSitesSettingsRepository = FakeSaveSitesSettingsRepository()
+    private val savedSiteSettingsRepository: SavedSitesSettingsRepository = FakeSavedSitesSettingsRepository()
     private lateinit var db: AppDatabase
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao

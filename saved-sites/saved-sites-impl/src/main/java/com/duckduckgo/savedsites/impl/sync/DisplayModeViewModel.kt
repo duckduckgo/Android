@@ -18,12 +18,14 @@ package com.duckduckgo.savedsites.impl.sync
 
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.*
+import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository.ViewMode.FormFactorViewMode
 import com.duckduckgo.savedsites.impl.SavedSitesSettingsRepository
 import com.duckduckgo.savedsites.store.FavoritesViewMode
 import javax.inject.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -36,11 +38,14 @@ class DisplayModeViewModel(
         val shareFavoritesEnabled: Boolean = false,
     )
 
-    fun viewState(): Flow<ViewState> = savedSitesSettingsRepository.viewModeFlow().map { viewMode ->
-        ViewState(
-            shareFavoritesEnabled = viewMode == FavoritesViewMode.UNIFIED,
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    fun viewState(): Flow<ViewState> = savedSitesSettingsRepository.viewModeFlow()
+        .filterIsInstance<FormFactorViewMode>()
+        .map { it.favoritesViewMode }
+        .map { viewMode ->
+            ViewState(
+                shareFavoritesEnabled = viewMode == FavoritesViewMode.UNIFIED,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     fun onDisplayModeChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {

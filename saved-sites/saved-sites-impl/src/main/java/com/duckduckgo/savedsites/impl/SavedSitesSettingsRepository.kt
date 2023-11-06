@@ -17,17 +17,24 @@
 package com.duckduckgo.savedsites.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository.ViewMode
+import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository.ViewMode.DEFAULT
+import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository.ViewMode.FormFactorViewMode
 import com.duckduckgo.savedsites.impl.sync.DisplayModeSyncableSetting
 import com.duckduckgo.savedsites.store.FavoritesViewMode
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
+import com.duckduckgo.sync.api.SyncState.OFF
+import com.duckduckgo.sync.api.SyncStateMonitor
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 interface SavedSitesSettingsRepository {
     var favoritesDisplayMode: FavoritesViewMode
-    fun viewModeFlow(): Flow<FavoritesViewMode>
+    fun viewModeFlow(): Flow<ViewMode>
 }
 
 @ContributesBinding(AppScope::class)
@@ -35,6 +42,7 @@ interface SavedSitesSettingsRepository {
 class RealSavedSitesSettingsRepository @Inject constructor(
     private val savedSitesSettingsStore: SavedSitesSettingsStore,
     private val syncableSetting: DisplayModeSyncableSetting,
+    private val syncStateMonitor: SyncStateMonitor,
 ) : SavedSitesSettingsRepository {
 
     override var favoritesDisplayMode: FavoritesViewMode
@@ -45,5 +53,16 @@ class RealSavedSitesSettingsRepository @Inject constructor(
             syncableSetting.onSettingChanged()
         }
 
-    override fun viewModeFlow(): Flow<FavoritesViewMode> = savedSitesSettingsStore.viewModeFlow()
+    override fun viewModeFlow(): Flow<ViewMode> =
+        syncStateMonitor.syncState().combine(savedSitesSettingsStore.viewModeFlow()) { syncState, viewMode ->
+            when (syncState) {
+                OFF -> DEFAULT
+                else -> FormFactorViewMode(viewMode)
+            }
+        }.distinctUntilChanged()
+
+    sealed class ViewMode {
+        object DEFAULT : ViewMode()
+        data class FormFactorViewMode(val favoritesViewMode: FavoritesViewMode) : ViewMode()
+    }
 }

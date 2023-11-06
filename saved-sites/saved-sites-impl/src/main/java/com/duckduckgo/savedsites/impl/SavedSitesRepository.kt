@@ -51,10 +51,6 @@ class RealSavedSitesRepository(
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
-    override suspend fun test() {
-        favoritesAccessor.changeViewMode()
-    }
-
     override fun getSavedSites(folderId: String): Flow<SavedSites> {
         return if (folderId == SavedSitesNames.BOOKMARKS_ROOT) {
             getFavorites().combine(getFolderContent(folderId)) { favorites, folderContent ->
@@ -297,8 +293,6 @@ class RealSavedSitesRepository(
         }
     }
 
-    // inspect how this is used
-    // favorite is a bookmark, seems we prioritize being a favorite
     override fun getSavedSite(id: String): SavedSite? {
         val savedSite = savedSitesEntitiesDao.entityById(id)
         return if (savedSite != null) {
@@ -384,7 +378,6 @@ class RealSavedSitesRepository(
         }
     }
 
-    // This is called only to update content, not position
     override fun updateFavourite(favorite: Favorite) {
         favoritesAccessor.updateFavourite(favorite)
     }

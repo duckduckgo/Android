@@ -21,6 +21,9 @@ import com.duckduckgo.savedsites.api.*
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_DESKTOP_ROOT
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_MOBILE_ROOT
+import com.duckduckgo.savedsites.api.models.SavedSitesNames.FAVORITES_ROOT
 import com.duckduckgo.savedsites.impl.sync.*
 import com.duckduckgo.sync.api.*
 import com.duckduckgo.sync.api.engine.*
@@ -58,7 +61,9 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         val processIds: MutableList<String> = mutableListOf(SavedSitesNames.BOOKMARKS_ROOT)
         val allResponseIds = bookmarks.entries.filterNot { it.deleted != null }.map { it.id }
         val allFolders = bookmarks.entries.filter { it.isFolder() }
-            .filterNot { it.id == SavedSitesNames.FAVORITES_ROOT || it.id == SavedSitesNames.FAVORITES_MOBILE_ROOT || it.id == SavedSitesNames.FAVORITES_DESKTOP_ROOT }
+            .filterNot {
+                it.id == FAVORITES_ROOT || it.id == FAVORITES_MOBILE_ROOT || it.id == FAVORITES_DESKTOP_ROOT
+            }
         val allFolderIds = allFolders.map { it.id }
         val allChildren = mutableListOf<String>()
         allFolders.forEach { entry ->
@@ -102,7 +107,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         processDeletedItems(allDeletedIds)
 
         // Favourites
-        val favoriteFolders = listOf(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_DESKTOP_ROOT)
+        val favoriteFolders = listOf(FAVORITES_ROOT, FAVORITES_MOBILE_ROOT, FAVORITES_DESKTOP_ROOT)
         favoriteFolders.forEach { favoriteFolder ->
             if (allResponseIds.contains(favoriteFolder)) {
                 Timber.d("Sync-Bookmarks: favourites root found, traversing from there")
@@ -153,7 +158,7 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
         lastModified: String,
     ) {
         val folder = decryptFolder(remoteFolder, parentId, lastModified)
-        if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != SavedSitesNames.FAVORITES_ROOT) {
+        if (folder.id != SavedSitesNames.BOOKMARKS_ROOT && folder.id != FAVORITES_ROOT) {
             Timber.d("Sync-Bookmarks: processing folder ${folder.id} with parentId $parentId")
             when (conflictResolution) {
                 DEDUPLICATION -> deduplicationStrategy.processBookmarkFolder(folder)
@@ -294,10 +299,6 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                 Timber.d("Sync-Bookmarks: item $id is a bookmark, deleting it")
                 savedSitesRepository.delete(isBookmark)
             }
-            // can this be removed?
-            // if it was a bookmark, should be already removed?
-            // will logic around favorites remove it as well?
-            // if not, what favorite folder should we use?
             val isFavourite = savedSitesRepository.getFavoriteById(id)
             if (isFavourite != null) {
                 Timber.d("Sync-Bookmarks: item $id is a favourite, deleting it")

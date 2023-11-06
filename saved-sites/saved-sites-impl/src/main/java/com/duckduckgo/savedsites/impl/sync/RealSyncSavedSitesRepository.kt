@@ -30,8 +30,6 @@ import timber.log.*
 class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SyncSavedSitesRepository {
 
     override fun getFavoritesSync(favoriteFolder: String): List<Favorite> {
@@ -59,7 +57,6 @@ class RealSyncSavedSitesRepository(
         return favorites.firstOrNull { it.id == id }
     }
 
-    // why not receiving an entity?
     override fun insertFavorite(
         id: String,
         url: String,

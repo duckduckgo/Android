@@ -17,36 +17,38 @@
 package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.savedsites.api.models.SavedSite
-import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 
 interface SyncSavedSitesRepository {
 
     /**
-     * Returns all [Favorite] in the Database
+     * Returns all [Favorite] in the Database on specific Folder
+     * @param favoriteFolder the folder to search
      * @return [List] of all [Favorite] in the Database
      */
     fun getFavoritesSync(favoriteFolder: String): List<Favorite>
 
     /**
-     * Returns a [Favorite] given a domain
+     * Returns a [Favorite] given a domain on specific Folder
      * @param domain the url to filter
+     * @param favoriteFolder the folder to search
      * @return [Favorite] if found or null if not found
      */
     fun getFavorite(url: String, favoriteFolder: String): Favorite?
 
     /**
-     * Returns a [Favorite] given a domain
+     * Returns a [Favorite] given a domain on specific Folder
      * @param id of the [Favorite]
+     * @param favoriteFolder the folder to search
      * @return [Favorite] if found or null if not found
      */
     fun getFavoriteById(id: String, favoriteFolder: String): Favorite?
 
     /**
      * Inserts a new [Favorite]
-     * Used when adding a [Favorite] from the Browser Menu
      * @param url of the site
      * @param title of the [Favorite]
+     * @param favoriteFolder which folder to insert
      * @return [Favorite] inserted
      */
     fun insertFavorite(
@@ -59,26 +61,28 @@ interface SyncSavedSitesRepository {
 
     /**
      * Inserts a new [SavedSite]
-     * Used when undoing the deletion of a [Bookmark] or [Favorite]
+     * @param favoriteFolder which folder to insert
      * @return [SavedSite] inserted
      */
     fun insert(savedSite: SavedSite, favoriteFolder: String): SavedSite
 
     /**
      * Deletes a [SavedSite]
+     * @param favoriteFolder which folder to delete from
      * @param savedSite to be deleted
      */
     fun delete(savedSite: SavedSite, favoriteFolder: String)
 
     /**
      * Updates the content of a [Favorite]
+     * @param favoriteFolder which folder to update
      * @param savedSite to be updated
      */
     fun updateFavourite(favorite: Favorite, favoriteFolder: String)
 
     /**
      * Updates the position of [Favorite]
-     * Used when reordering [Favorite] in the QuickAccessPanel
+     * @param favoriteFolder which folder to update
      * @param favorites with all [Favorite]
      */
     fun updateWithPosition(favorites: List<Favorite>, favoriteFolder: String)
@@ -88,6 +92,7 @@ interface SyncSavedSitesRepository {
      * Used when syncing data from the backend
      * There are scenarios when a duplicate remote favourite has to be replace the local one
      * @param favorite the favourite to replace locally
+     * @param favoriteFolder which folder to update
      * @param localId the local Id to be replaced
      */
     fun replaceFavourite(

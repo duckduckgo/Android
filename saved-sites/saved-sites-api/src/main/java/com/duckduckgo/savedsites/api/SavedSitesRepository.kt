@@ -349,6 +349,4 @@ interface SavedSitesRepository {
      * Updates entity [entityId] to a modified date of [modifiedSince]
      */
     fun updateModifiedSince(entityId: String, modifiedSince: String)
-
-    suspend fun test()
 }
