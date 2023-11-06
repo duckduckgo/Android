@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Na koji način sve funkcionira?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>otkriva i blokira aplikacije za praćenje drugih tvrtki</b>, primjerice kad vas Facebook pokuša pratiti u zdravstvenoj aplikaciji.\n\n<b>Besplatna je</b> i možeš uživati u svojim aplikacijama kao i inače. Radeći u pozadini pomaže <b>te štititi i noću i danju.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Tko vidi tvoje podatke?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection nije VPN.</b> Međutim, tvoj će ga uređaj prepoznati kao takvog. To je zato što za rad koristi lokalnu VPN vezu.\n\nZaštita od praćenja aplikacija je drugačija.<b> Nikad ne usmjerava podatke aplikacija preko vanjskog poslužitelja. </b><annotation type="learn_more_link">Saznajte više</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection nije VPN.</b> Međutim, tvoj će ga uređaj prepoznati kao takvog. To je zato što za rad koristi lokalnu VPN vezu.\n\nZaštita od praćenja aplikacija je drugačija.<b> Nikad ne usmjerava podatke aplikacija preko vanjskog poslužitelja.</b>\n\n<annotation type="learn_more_link"><b>Saznajte više</b></annotation></string>
     <string name="atp_FAQCta">Često postavljana pitanja o zaštiti od praćenja aplikacija</string>
     <string name="atp_OnboardingContinue">Nastavi</string>
     <string name="atp_OnboardingMaybeLater">Možda kasnije</string>
