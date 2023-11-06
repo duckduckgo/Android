@@ -38,6 +38,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
+import java.util.*
 import java.util.regex.Pattern
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -137,6 +138,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             whenever(mockAppBuildConfig.sdkInt).thenReturn(report.os?.toInt() ?: 1)
             whenever(mockAppBuildConfig.manufacturer).thenReturn(report.manufacturer)
             whenever(mockAppBuildConfig.model).thenReturn(report.model)
+            whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.US)
             whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
             whenever(mockGpc.isEnabled()).thenReturn(report.gpcEnabled)
             whenever(mockTdsMetadataDao.eTag()).thenReturn(report.blocklistVersion)
@@ -167,6 +169,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 consentSelfTestFailed = report.consentSelfTestFailed.toBoolean(),
                 errorCodes = "",
                 httpErrorCodes = "",
+                loginSite = null,
             )
 
             testee.submitBrokenSiteFeedback(brokenSite)
