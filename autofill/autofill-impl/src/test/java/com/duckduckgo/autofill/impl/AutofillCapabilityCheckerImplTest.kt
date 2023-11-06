@@ -17,8 +17,8 @@
 package com.duckduckgo.autofill.impl
 
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.toggle.AutofillTestFeature
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse

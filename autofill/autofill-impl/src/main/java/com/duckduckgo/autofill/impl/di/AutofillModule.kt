@@ -43,8 +43,8 @@ import com.duckduckgo.autofill.store.feature.email.incontext.ALL_MIGRATIONS as E
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextDatabase
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
 import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
