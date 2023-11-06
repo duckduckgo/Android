@@ -3159,13 +3159,10 @@ class BrowserTabFragment :
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
                 }
-
-                renderVoiceSearch(viewState)
-                omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
             }
         }
 
-        private fun renderVoiceSearch(viewState: OmnibarViewState) {
+        private fun renderVoiceSearch(viewState: BrowserViewState) {
             if (viewState.showVoiceSearch) {
                 omnibar.voiceSearchButton.visibility = VISIBLE
                 omnibar.voiceSearchButton.setOnClickListener {
@@ -3289,6 +3286,8 @@ class BrowserTabFragment :
                 renderToolbarMenus(viewState)
                 popupMenu.renderState(browserShowing, viewState)
                 renderFullscreenMode(viewState)
+                renderVoiceSearch(viewState)
+                omnibar.spacer.isVisible = viewState.showVoiceSearch && lastSeenBrowserViewState?.showClearButton ?: false
             }
         }
 
@@ -3337,7 +3336,7 @@ class BrowserTabFragment :
                 omnibar.searchIcon?.isVisible = true
             }
 
-            omnibar.spacer.isVisible = viewState.showClearButton && lastSeenOmnibarViewState?.showVoiceSearch ?: false
+            omnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
 
             decorator.updateToolbarActionsVisibility(viewState)
         }
