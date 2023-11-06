@@ -31,19 +31,18 @@ class FeatureTogglesTest {
 
     private lateinit var feature: TestFeature
     private lateinit var provider: FakeProvider
-    private lateinit var variantProvider: FakeAppVariantProvider
     private lateinit var toggleStore: FakeToggleStore
 
     @Before
     fun setup() {
         provider = FakeProvider()
-        variantProvider = FakeAppVariantProvider()
         toggleStore = FakeToggleStore()
         feature = FeatureToggles.Builder()
             .store(toggleStore)
-            .appVariantProvider { variantProvider.variant }
+            .appVariantProvider { provider.variantKey }
             .appVersionProvider { provider.version }
             .flavorNameProvider { provider.flavorName }
+            .forceDefaultVariantProvider { provider.variantKey = "" }
             .featureName("test")
             .build()
             .create(TestFeature::class.java)
@@ -129,6 +128,20 @@ class FeatureTogglesTest {
         assertFalse(feature.internal().isEnabled())
         provider.flavorName = BuildFlavor.INTERNAL.name
         assertTrue(feature.internal().isEnabled())
+    }
+
+    @Test
+    fun testForcesDefaultVariantIfNull() {
+        assertNull(provider.variantKey)
+        assertFalse(feature.forcesDefaultVariant().isEnabled())
+        assertEquals("", provider.variantKey)
+    }
+
+    @Test
+    fun testSkipForcesDefaultVariantWhenNotNull() {
+        provider.variantKey = "ma"
+        assertFalse(feature.forcesDefaultVariant().isEnabled())
+        assertEquals("ma", provider.variantKey)
     }
 
     @Test(expected = java.lang.IllegalArgumentException::class)
@@ -365,11 +378,11 @@ class FeatureTogglesTest {
 
     @Test
     fun whenMatchingVariantThenReturnFeatureState() {
-        variantProvider.variant = "ma"
+        provider.variantKey = "ma"
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
-            targets = listOf(Toggle.State.Target(variantProvider.variant)),
+            targets = listOf(Toggle.State.Target(provider.variantKey!!)),
         )
 
         // Use directly the store because setEnabled() populates the local state when the remote state is null
@@ -383,7 +396,7 @@ class FeatureTogglesTest {
 
     @Test
     fun whenMultipleNotMatchingVariantThenReturnFeatureState() {
-        variantProvider.variant = "zz"
+        provider.variantKey = "zz"
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
@@ -404,7 +417,7 @@ class FeatureTogglesTest {
 
     @Test
     fun whenAnyMatchingVariantThenReturnFeatureState() {
-        variantProvider.variant = "zz"
+        provider.variantKey = "zz"
         val state = Toggle.State(
             remoteEnableState = null,
             enable = true,
@@ -447,13 +460,14 @@ interface TestFeature {
     @Toggle.DefaultValue(false)
     @Toggle.InternalAlwaysEnabled
     fun internal(): Toggle
+
+    @Toggle.DefaultValue(false)
+    @Toggle.ForcesDefaultVariantIfNull
+    fun forcesDefaultVariant(): Toggle
 }
 
 private class FakeProvider {
     var version = Int.MAX_VALUE
     var flavorName = ""
-}
-
-private class FakeAppVariantProvider {
-    var variant = ""
+    var variantKey: String? = null
 }

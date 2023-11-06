@@ -21,6 +21,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.*
+import com.duckduckgo.experiments.api.VariantConfig
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.feature.toggles.api.FeatureSettings
@@ -40,6 +42,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -48,19 +51,19 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
     private lateinit var testFeature: TestTriggerFeature
     private val appBuildConfig: AppBuildConfig = mock()
-//    private lateinit var provider: FakeProvider
+    private lateinit var variantManager: FakeVariantManager
 
     @Before
     fun setup() {
-//        provider = FakeProvider(appBuildConfig)
+        variantManager = FakeVariantManager()
         whenever(appBuildConfig.flavor).thenReturn(PLAY)
-        whenever(appBuildConfig.variantName).thenReturn("")
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "testFeature",
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
-            appVariantProvider = { appBuildConfig.variantName },
+            appVariantProvider = { variantManager.getVariantKey() },
+            forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
         ).build().create(TestTriggerFeature::class.java)
     }
 
@@ -1085,7 +1088,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     fun `test variant parsing`() {
-        whenever(appBuildConfig.variantName).thenReturn("mc")
+        variantManager.variant = "mc"
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1143,7 +1146,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     fun `test variant when assigned variant key is null`() {
-        whenever(appBuildConfig.variantName).thenReturn(null)
+        variantManager.variant = null
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1183,6 +1186,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
+        assertEquals(0, variantManager.saveVariantsCallCounter)
         assertEquals(
             listOf(
                 Toggle.State.Target("ma"),
@@ -1191,11 +1195,135 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             testFeature.fooFeature().getRawStoredState()!!.targets,
         )
         assertFalse(testFeature.variantFeature().isEnabled())
+        assertEquals(0, variantManager.saveVariantsCallCounter)
         assertEquals(
             listOf(
                 Toggle.State.Target("mc"),
             ),
             testFeature.variantFeature().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature disabled and forces variant when variant is null`() {
+        variantManager.variant = null
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "variantFeatureForcesDefaultVariant": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.variantFeatureForcesDefaultVariant().isEnabled())
+        assertEquals(1, variantManager.saveVariantsCallCounter)
+        assertEquals("", variantManager.getVariantKey())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc"),
+            ),
+            testFeature.variantFeatureForcesDefaultVariant().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature enabled and forces variant when variant is null`() {
+        variantManager.variant = null
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "variantFeatureForcesDefaultVariant": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": ""
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.variantFeatureForcesDefaultVariant().isEnabled())
+        assertEquals(1, variantManager.saveVariantsCallCounter)
+        assertEquals("", variantManager.getVariantKey())
+        assertEquals(
+            listOf(
+                Toggle.State.Target(""),
+            ),
+            testFeature.variantFeatureForcesDefaultVariant().getRawStoredState()!!.targets,
+        )
+    }
+
+    @Test
+    fun `test feature does not force variant when already assigned`() {
+        variantManager.variant = "mc"
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // all disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "variantFeatureForcesDefaultVariant": {
+                                "state": "enabled",
+                                "targets": [
+                                    {
+                                        "variantKey": "mc"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.variantFeatureForcesDefaultVariant().isEnabled())
+        assertEquals(0, variantManager.saveVariantsCallCounter)
+        assertEquals("mc", variantManager.getVariantKey())
+        assertEquals(
+            listOf(
+                Toggle.State.Target("mc"),
+            ),
+            testFeature.variantFeatureForcesDefaultVariant().getRawStoredState()!!.targets,
         )
     }
 
@@ -1207,17 +1335,41 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 FeatureSettings.Store::class.java,
                 dagger.Lazy::class.java as Class<*>,
                 AppBuildConfig::class.java,
+                VariantManager::class.java,
                 Context::class.java,
             ).newInstance(
                 FeatureExceptions.EMPTY_STORE,
                 FeatureSettings.EMPTY_STORE,
                 Lazy { testFeature },
                 appBuildConfig,
+                variantManager,
                 context,
             )
     }
 
     private fun Toggle.rolloutStep(): Int? {
         return getRawStoredState()?.rolloutStep
+    }
+}
+
+private class FakeVariantManager : VariantManager {
+    var saveVariantsCallCounter = 0
+    var variant: String? = null
+
+    override fun defaultVariantKey(): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun getVariantKey(): String? {
+        return variant
+    }
+
+    override fun updateAppReferrerVariant(variant: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun saveVariants(variants: List<VariantConfig>) {
+        saveVariantsCallCounter++
+        variant = ""
     }
 }

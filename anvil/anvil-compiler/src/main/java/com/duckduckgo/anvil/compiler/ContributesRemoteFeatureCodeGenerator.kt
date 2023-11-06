@@ -106,6 +106,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                     .build(),
                             )
                             .addParameter("appBuildConfig", appBuildConfig.asClassName(module))
+                            .addParameter("variantManager", variantManager.asClassName(module))
                             .addCode(
                                 """
                             return %T.Builder()
@@ -114,6 +115,8 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
                                 .appVariantProvider({ appBuildConfig.variantName })
+                                // save empty variants will force the default variant to be set
+                                .forceDefaultVariantProvider({ variantManager.saveVariants(emptyList()) })
                                 .build()
                                 .create(%T::class.java)
                                 """.trimIndent(),
@@ -257,6 +260,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             )
                             .addParameter("feature", dagger.Lazy::class.asClassName().parameterizedBy(boundType.asClassName()))
                             .addParameter("appBuildConfig", appBuildConfig.asClassName(module))
+                            .addParameter("variantManager", variantManager.asClassName(module))
                             .addParameter("context", context.asClassName(module))
                             .build(),
                     )
@@ -288,6 +292,11 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                     .addProperty(
                         PropertySpec.builder("appBuildConfig", appBuildConfig.asClassName(module), KModifier.PRIVATE)
                             .initializer("appBuildConfig")
+                            .build(),
+                    )
+                    .addProperty(
+                        PropertySpec.builder("variantManager", variantManager.asClassName(module), KModifier.PRIVATE)
+                            .initializer("variantManager")
                             .build(),
                     )
                     .addProperty(
@@ -979,6 +988,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         private val context = FqName("android.content.Context")
         private val privacyFeaturePlugin = FqName("com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin")
         private val appBuildConfig = FqName("com.duckduckgo.appbuildconfig.api.AppBuildConfig")
+        private val variantManager = FqName("com.duckduckgo.experiments.api.VariantManager")
         private val buildFlavorInternal = FqName("com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL")
         private val moshi = FqName("com.squareup.moshi.Moshi")
         private val jsonObjectAdapter = FqName("JSONObjectAdapter")
