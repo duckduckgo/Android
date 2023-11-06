@@ -32,11 +32,13 @@ dependencies {
     implementation project(':fingerprint-protection-api')
     implementation project(':browser-api')
     implementation project(':feature-toggles-api')
+    implementation project(':js-messaging-api')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
     implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
 

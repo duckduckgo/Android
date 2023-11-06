@@ -1,29 +1,11 @@
-/*
- * Copyright (c) 2023 DuckDuckGo
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.duckduckgo.contentscopescripts.impl.messaging
+package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
-import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
-import org.junit.Assert.assertTrue
+import com.duckduckgo.js.messaging.api.JsMessaging
+import java.util.*
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
@@ -31,24 +13,27 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-class RealMessagingContentScopeScriptsTest {
+class ContentScopeScriptsJsInjectorPluginTest {
 
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
-    private val mockMessageHandlerPlugins: PluginPoint<MessageHandlerPlugin> = mock()
+    private val mockJsMessaging: JsMessaging = mock()
     private val mockWebView: WebView = mock()
 
-    private lateinit var messagingContentScopeScripts: ContentScopeScripts
+    private lateinit var contentScopeScriptsJsInjectorPlugin: ContentScopeScriptsJsInjectorPlugin
 
     @Before
     fun setUp() {
-        messagingContentScopeScripts = RealMessagingContentScopeScripts(mockCoreContentScopeScripts, mockMessageHandlerPlugins)
+        whenever(mockJsMessaging.context).thenReturn(getSecret())
+        whenever(mockJsMessaging.secret).thenReturn(getSecret())
+        whenever(mockJsMessaging.callbackName).thenReturn(getSecret())
+        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts, mockJsMessaging)
     }
 
     @Test
     fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
         whenever(mockCoreContentScopeScripts.getScript()).thenReturn(coreContentScopeJs)
-        messagingContentScopeScripts.injectContentScopeScripts(mockWebView)
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null)
 
         val scriptCatcher = argumentCaptor<String>()
         verify(mockWebView).evaluateJavascript(scriptCatcher.capture(), anyOrNull())
@@ -65,31 +50,12 @@ class RealMessagingContentScopeScriptsTest {
     @Test
     fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(false)
-        messagingContentScopeScripts.injectContentScopeScripts(mockWebView)
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null)
 
         verifyNoInteractions(mockWebView)
     }
 
-    @Test
-    fun whenAddJsInterfaceThenSetNameToUUID() {
-        messagingContentScopeScripts.addJsInterface(mockWebView)
-        val nameCaptor = argumentCaptor<String>()
-        verify(mockWebView).addJavascriptInterface(any(), nameCaptor.capture())
-
-        val regex = Regex("[\\da-f]{32}")
-        val interfaceName = nameCaptor.firstValue
-        assertTrue(regex.matches(interfaceName))
-    }
-
-    @Test
-    fun whenSendMessageThenEvaluateJS() {
-        messagingContentScopeScripts.sendMessage(MESSAGE, mockWebView)
-        val jsCaptor = argumentCaptor<String>()
-        verify(mockWebView).evaluateJavascript(jsCaptor.capture(), anyOrNull())
-
-        val js = jsCaptor.firstValue
-        assertTrue(sendMessageJSRegex.matches(js))
-    }
+    private fun getSecret(): String = UUID.randomUUID().toString().replace("-", "")
 
     companion object {
         const val coreContentScopeJs = "processConfig(" +
@@ -112,10 +78,5 @@ class RealMessagingContentScopeScriptsTest {
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"messageInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
-
-        const val MESSAGE = "message"
-
-        val sendMessageJSRegex =
-            Regex("\\(function\\(\\) \\{\\s*window\\['([\\da-f]{32})'\\]\\('([\\da-f]{32})', ${MESSAGE}\\);\\s*\\}\\)\\(\\);")
     }
 }
