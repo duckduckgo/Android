@@ -98,7 +98,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -153,7 +153,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val savedSitesRepository: SavedSitesRepository,
@@ -1345,13 +1345,13 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun isPrivacyProtectionDisabled(domain: String): Boolean {
         return withContext(dispatchers.io()) {
-            userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
+            userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)
         }
     }
 
     private fun isDomainInUserAllowlist(domain: String): Flow<Boolean> =
-        userAllowListDao
-            .allDomainsFlow()
+        userAllowListRepository
+            .domainsInUserAllowListFlow()
             .map { allowlistedDomains -> domain in allowlistedDomains }
             .distinctUntilChanged()
 
@@ -2121,9 +2121,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun addToAllowList(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
-        withContext(dispatchers.io()) {
-            userAllowListDao.insert(domain)
-        }
+        userAllowListRepository.addDomainToUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
@@ -2132,9 +2130,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private suspend fun removeFromAllowList(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
-        withContext(dispatchers.io()) {
-            userAllowListDao.delete(domain)
-        }
+        userAllowListRepository.removeDomainFromUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = false)

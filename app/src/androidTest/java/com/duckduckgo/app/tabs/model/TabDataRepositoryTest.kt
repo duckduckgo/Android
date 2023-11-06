@@ -29,7 +29,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.SiteFactoryImpl
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -410,14 +410,14 @@ class TabDataRepositoryTest {
     private fun tabDataRepository(
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),
-        allowListDao: UserAllowListDao = mock(),
+        allowListRepository: UserAllowListRepository = mock(),
         contentBlocking: ContentBlocking = mock(),
         webViewPreviewPersister: WebViewPreviewPersister = mock(),
         faviconManager: FaviconManager = mock(),
     ): TabDataRepository {
         return TabDataRepository(
             dao,
-            SiteFactoryImpl(entityLookup, allowListDao, contentBlocking, TestScope()),
+            SiteFactoryImpl(entityLookup, contentBlocking, allowListRepository, TestScope()),
             webViewPreviewPersister,
             faviconManager,
             coroutinesTestRule.testScope,

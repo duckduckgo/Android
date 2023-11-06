@@ -19,7 +19,7 @@ package com.duckduckgo.app.brokensite
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
@@ -35,7 +35,7 @@ import org.mockito.kotlin.mock
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteDataTest {
 
-    private val mockAllowlistDao: UserAllowListDao = mock()
+    private val mockAllowListRepository: UserAllowListRepository = mock()
 
     private val mockContentBlocking: ContentBlocking = mock()
 
@@ -190,7 +190,7 @@ class BrokenSiteDataTest {
         url: String,
         httpsUpgraded: Boolean = false,
     ): Site {
-        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded, mockAllowlistDao, mockContentBlocking, TestScope())
+        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded, mockAllowListRepository, mockContentBlocking, TestScope())
     }
 
     companion object {
