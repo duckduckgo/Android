@@ -21,9 +21,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.Share
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -45,13 +42,10 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
 @ExperimentalCoroutinesApi
@@ -72,26 +66,12 @@ class AppRemoteMessagingRepositoryTest {
 
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository = mock()
 
-    private val userBrowserProperties: UserBrowserProperties = mock()
-
-    private val variantManager: VariantManager = mock()
-
-    private val variant: Variant = mock()
-
     private val testee = AppRemoteMessagingRepository(
         remoteMessagingConfigRepository,
         dao,
         coroutineRule.testDispatcherProvider,
         getMessageMapper(),
-        userBrowserProperties,
-        variantManager,
     )
-
-    @Before
-    fun before() {
-        whenever(variant.hasFeature(any())).thenReturn(false)
-        whenever(variantManager.getVariant()).thenReturn(variant)
-    }
 
     @After
     fun after() {

@@ -22,14 +22,13 @@ import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
+import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyConfig
@@ -141,7 +140,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
             whenever(mockGpc.isEnabled()).thenReturn(report.gpcEnabled)
             whenever(mockTdsMetadataDao.eTag()).thenReturn(report.blocklistVersion)
             whenever(mockStatisticsDataStore.atb).thenReturn(Atb("v123-456"))
-            whenever(mockVariantManager.getVariant()).thenReturn(Variant("g", 1.0, emptyList()) { true })
+            whenever(mockVariantManager.getVariantKey()).thenReturn("g")
             whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(
                 PrivacyConfigData(version = report.remoteConfigVersion ?: "v", eTag = report.remoteConfigEtag ?: "e"),
             )
