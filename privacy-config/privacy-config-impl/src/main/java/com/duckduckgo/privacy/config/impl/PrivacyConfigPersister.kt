@@ -108,15 +108,17 @@ class RealPrivacyConfigPersister @Inject constructor(
                     unProtectedExceptions.add(UnprotectedTemporaryEntity(it.domain, it.reason.orEmpty()))
                 }
                 unprotectedTemporaryRepository.updateAll(unProtectedExceptions)
+                // First store the variants...
+                jsonPrivacyConfig.variantManager?.let { jsonObject ->
+                    variantManagerPlugin.store(VARIANT_MANAGER_FEATURE_NAME, jsonObject.toString())
+                }
+                // Then feature flags
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
                         privacyFeaturePluginPoint.getPlugins().firstOrNull { feature.key == it.featureName }?.let { featurePlugin ->
                             featurePlugin.store(feature.key, jsonObject.toString())
                         }
                     }
-                }
-                jsonPrivacyConfig.variantManager?.let { jsonObject ->
-                    variantManagerPlugin.store(VARIANT_MANAGER_FEATURE_NAME, jsonObject.toString())
                 }
             }
             listener.privacyConfigUpdated()
