@@ -20,10 +20,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
-import android.os.Build
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.provider.Settings
 import android.view.Menu
 import android.widget.CompoundButton
 import androidx.activity.result.ActivityResultLauncher
@@ -35,6 +33,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
 import com.duckduckgo.di.scopes.ActivityScope
@@ -446,13 +445,7 @@ class DeviceShieldTrackerActivity :
 
     @SuppressLint("InlinedApi")
     private fun openVPNSettings() {
-        val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            Intent(Settings.ACTION_VPN_SETTINGS)
-        } else {
-            Intent("android.net.vpn.SETTINGS")
-        }
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
     }
 
     fun onVpnConflictDialogContinue() {

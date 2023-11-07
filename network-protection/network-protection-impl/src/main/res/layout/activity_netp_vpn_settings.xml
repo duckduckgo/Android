@@ -68,8 +68,11 @@
                     android:id="@+id/always_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:primaryText="@string/netpVpnSettingAlwaysOn"
                     app:secondaryText="@string/netpVpnSettingAlwaysOnByline"
+                    app:trailingIcon="@drawable/ic_open_in_24"
                     app:showSwitch="false"
             />
 
