@@ -71,6 +71,12 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                 it.fqName == InjectWith::class.fqName
             }.argumentAt("delayGeneration", 2)?.value() as Boolean?
             ) ?: false
+        if (delayed && scope.fqName.getParentScope(module) != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: 'delayGeneration = true' can only be used in scopes with 'AppScope' as direct parent.",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
 
         val content = FileSpec.buildFile(generatedPackage, subcomponentFactoryClassName) {
             addType(
