@@ -16,12 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.management
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.VpnService
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
@@ -32,6 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.ActivityScope
@@ -333,15 +331,8 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         openVPNSettings()
     }
 
-    @SuppressLint("InlinedApi")
     private fun openVPNSettings() {
-        val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            Intent(Settings.ACTION_VPN_SETTINGS)
-        } else {
-            Intent("android.net.vpn.SETTINGS")
-        }
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
     }
 
     private fun resetToggle() {
