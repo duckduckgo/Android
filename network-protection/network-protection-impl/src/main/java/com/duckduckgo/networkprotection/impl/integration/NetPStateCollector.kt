@@ -17,20 +17,25 @@
 package com.duckduckgo.networkprotection.impl.integration
 
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.duckduckgo.networkprotection.impl.NetPVpnFeature
+import com.duckduckgo.networkprotection.api.NetworkProtectionState
+import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
 class NetPStateCollector @Inject constructor(
-    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
+    private val networkProtectionState: NetworkProtectionState,
+    private val repository: NetworkProtectionRepository,
 ) : VpnStateCollectorPlugin {
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
-            put("enabled", vpnFeaturesRegistry.isFeatureRunning(NetPVpnFeature.NETP_VPN).toString())
+            val isRunning = networkProtectionState.isRunning()
+            put("enabled", isRunning)
+            if (isRunning) {
+                put("server", repository.serverDetails?.location ?: "unknown")
+            }
         }
     }
 

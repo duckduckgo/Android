@@ -41,6 +41,7 @@ class DeviceInfoCollector @Inject constructor(
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
             put("buildFlavor", appBuildConfig.flavor.toString())
+            put("manufacturer", appBuildConfig.manufacturer)
             put("os", appBuildConfig.sdkInt)
             put("batteryOptimizations", (!isIgnoringBatteryOptimizations.get()).toString())
         }
