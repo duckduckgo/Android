@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.prefs
 
 import android.content.SharedPreferences
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 
 class FakeVpnSharedPreferencesProvider : VpnSharedPreferencesProvider {
     override fun getSharedPreferences(name: String, multiprocess: Boolean, migrate: Boolean): SharedPreferences {

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.networkprotection.impl.pixels
 
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import org.junit.Before
 import org.junit.Test

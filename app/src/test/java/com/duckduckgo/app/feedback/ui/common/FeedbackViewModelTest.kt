@@ -18,8 +18,6 @@ package com.duckduckgo.app.feedback.ui.common
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FragmentState.InitialAppEnjoymentClarifier
 import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackMainReason
@@ -30,6 +28,8 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.triggers
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC

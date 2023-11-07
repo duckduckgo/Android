@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.drm
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toFeatureException

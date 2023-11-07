@@ -21,6 +21,8 @@ import androidx.room.*
 import androidx.test.ext.junit.runners.*
 import androidx.test.platform.app.*
 import com.duckduckgo.app.*
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.DEDUPLICATION

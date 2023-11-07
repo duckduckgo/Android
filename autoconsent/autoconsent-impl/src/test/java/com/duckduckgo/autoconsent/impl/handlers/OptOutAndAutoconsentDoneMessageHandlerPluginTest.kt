@@ -19,8 +19,8 @@ package com.duckduckgo.autoconsent.impl.handlers
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*

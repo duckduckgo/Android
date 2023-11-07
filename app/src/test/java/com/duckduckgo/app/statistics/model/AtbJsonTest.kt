@@ -17,7 +17,7 @@
 package com.duckduckgo.app.statistics.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.FileUtilities.loadText
+import com.duckduckgo.common.test.FileUtilities.loadText
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonEncodingException
 import com.squareup.moshi.Moshi

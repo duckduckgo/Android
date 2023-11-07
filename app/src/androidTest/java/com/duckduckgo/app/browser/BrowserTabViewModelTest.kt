@@ -34,8 +34,6 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
@@ -124,6 +122,8 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader

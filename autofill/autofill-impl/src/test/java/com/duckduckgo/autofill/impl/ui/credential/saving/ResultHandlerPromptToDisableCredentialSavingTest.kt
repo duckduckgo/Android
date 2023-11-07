@@ -4,13 +4,13 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.saving.declines.AutofillDeclineCounter
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

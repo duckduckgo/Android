@@ -1,9 +1,9 @@
 package com.duckduckgo.autofill.impl.feature.plugin.emailprotection
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.autofill.impl.email.remoteconfig.EmailProtectionInContextRemoteSettingsPersister
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule

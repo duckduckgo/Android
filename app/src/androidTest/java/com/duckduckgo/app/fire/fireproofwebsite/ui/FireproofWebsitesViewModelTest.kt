@@ -20,8 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -34,6 +32,8 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_SETTING_SELECTION_ALWAYS
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.InstantSchedulersRule
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

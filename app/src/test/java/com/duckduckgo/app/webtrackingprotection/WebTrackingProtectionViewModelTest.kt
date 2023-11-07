@@ -18,10 +18,10 @@ package com.duckduckgo.app.webtrackingprotection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName

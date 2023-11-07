@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.*

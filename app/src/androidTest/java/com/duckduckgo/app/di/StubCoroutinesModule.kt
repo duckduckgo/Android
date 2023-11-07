@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module

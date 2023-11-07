@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.PurchaseHistoryRecord
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.Failure
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.Success
 import com.duckduckgo.subscriptions.impl.auth.AccessTokenResponse

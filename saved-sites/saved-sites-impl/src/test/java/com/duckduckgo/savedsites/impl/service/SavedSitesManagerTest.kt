@@ -19,9 +19,9 @@ package com.duckduckgo.savedsites.impl.service
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult

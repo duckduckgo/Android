@@ -20,8 +20,8 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities.loadResource
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities.loadResource
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope

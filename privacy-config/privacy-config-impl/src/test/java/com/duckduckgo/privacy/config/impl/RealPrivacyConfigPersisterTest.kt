@@ -20,9 +20,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin

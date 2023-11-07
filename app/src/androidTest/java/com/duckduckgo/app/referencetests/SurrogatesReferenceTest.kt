@@ -25,8 +25,6 @@ import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.fakes.FeatureToggleFake
@@ -52,6 +50,8 @@ import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking

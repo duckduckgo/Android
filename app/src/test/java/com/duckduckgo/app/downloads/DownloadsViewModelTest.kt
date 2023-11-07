@@ -19,7 +19,6 @@ package com.duckduckgo.app.downloads
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
@@ -33,6 +32,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.R as CommonR
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED

@@ -18,10 +18,10 @@ package com.duckduckgo.app.widget.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
+import com.duckduckgo.common.test.InstantSchedulersRule
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before

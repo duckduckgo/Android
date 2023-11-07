@@ -19,13 +19,13 @@ package com.duckduckgo.autofill.sync
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error

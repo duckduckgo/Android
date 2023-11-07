@@ -24,8 +24,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.*
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover

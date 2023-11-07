@@ -19,7 +19,7 @@ package com.duckduckgo.sync.impl.triggers
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.WorkManager
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.api.DeviceSyncState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope

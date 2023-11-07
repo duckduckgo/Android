@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.statistics.pixels
 
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.RxBasedPixelTest.TestPixels.TEST
+import com.duckduckgo.common.test.InstantSchedulersRule
 import io.reactivex.Completable
 import java.util.concurrent.TimeoutException
 import org.junit.Rule

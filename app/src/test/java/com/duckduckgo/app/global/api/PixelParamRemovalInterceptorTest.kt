@@ -21,6 +21,7 @@ import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
 import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
+import com.duckduckgo.common.test.api.FakeChain
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before

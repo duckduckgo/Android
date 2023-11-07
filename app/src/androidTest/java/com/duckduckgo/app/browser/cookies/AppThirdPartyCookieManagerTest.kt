@@ -22,11 +22,11 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager.Companion.USER_ID_COOKIE
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

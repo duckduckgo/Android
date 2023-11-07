@@ -16,10 +16,10 @@
 
 package com.duckduckgo.brokensite.impl
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.brokensite.store.BrokenSiteDao
 import com.duckduckgo.brokensite.store.BrokenSiteDatabase
 import com.duckduckgo.brokensite.store.BrokenSiteLastSentReportEntity
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

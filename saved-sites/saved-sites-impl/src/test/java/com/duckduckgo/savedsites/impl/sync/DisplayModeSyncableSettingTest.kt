@@ -1,7 +1,7 @@
 package com.duckduckgo.savedsites.impl.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.store.FavoritesDisplayMode
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi

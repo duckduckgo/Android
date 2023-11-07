@@ -18,7 +18,7 @@ package com.duckduckgo.cookies.impl
 
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
 import kotlinx.coroutines.ExperimentalCoroutinesApi

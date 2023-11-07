@@ -20,8 +20,8 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.sync.DisplayModeSyncableSetting
 import com.duckduckgo.savedsites.store.FavoritesDisplayMode

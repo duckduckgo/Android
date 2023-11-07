@@ -23,7 +23,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -33,6 +32,7 @@ import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepositoryImpl
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import java.io.File

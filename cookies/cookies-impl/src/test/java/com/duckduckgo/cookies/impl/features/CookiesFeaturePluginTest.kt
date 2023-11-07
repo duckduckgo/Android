@@ -16,7 +16,7 @@
 
 package com.duckduckgo.cookies.impl.features
 
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.cookies.api.CookiesFeatureName
 import com.duckduckgo.cookies.store.CookieEntity
 import com.duckduckgo.cookies.store.CookieExceptionEntity

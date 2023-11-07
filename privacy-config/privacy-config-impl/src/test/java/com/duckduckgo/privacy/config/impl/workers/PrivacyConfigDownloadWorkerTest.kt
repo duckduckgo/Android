@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.impl.workers
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
 import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader

@@ -18,8 +18,8 @@ package com.duckduckgo.macos.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.macos.impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.ShareLink

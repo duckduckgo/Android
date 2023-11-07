@@ -60,7 +60,7 @@ class NoHardcodedCoroutineDispatcherDetector : Detector(), SourceCodeScanner {
 
         private val EXCLUDED_SOURCE_FILES = listOf(
             "com.duckduckgo.app.global.DispatcherProvider",
-            "com.duckduckgo.app.CoroutineTestRule"
+            "com.duckduckgo.common.test.CoroutineTestRule"
         )
 
         val NO_HARCODED_COROUTINE_DISPATCHER = Issue.create(

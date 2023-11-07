@@ -16,13 +16,13 @@
 
 package com.duckduckgo.autoconsent.impl
 
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.autoconsent.api.AutoconsentFeatureName
 import com.duckduckgo.autoconsent.store.AutoconsentExceptionEntity
 import com.duckduckgo.autoconsent.store.AutoconsentFeatureToggleRepository
 import com.duckduckgo.autoconsent.store.AutoconsentFeatureToggles
 import com.duckduckgo.autoconsent.store.AutoconsentRepository
 import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
+import com.duckduckgo.common.test.FileUtilities
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

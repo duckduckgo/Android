@@ -16,8 +16,8 @@
 
 package com.duckduckgo.request.filterer.impl.plugins
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.request.filterer.api.RequestFiltererFeatureName.RequestFilterer
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi

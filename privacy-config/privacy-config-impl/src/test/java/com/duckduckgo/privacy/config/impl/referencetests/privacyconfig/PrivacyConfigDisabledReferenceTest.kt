@@ -17,9 +17,9 @@
 package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 
 import androidx.room.Room
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.privacy.config.impl.PrivacyConfigUpdateListener
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
