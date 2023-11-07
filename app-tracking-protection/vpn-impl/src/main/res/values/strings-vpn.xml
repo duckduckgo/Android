@@ -192,7 +192,6 @@
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
     <string name="atp_ActivityManageProtection">Having Issues?</string>
-    <string name="atp_RecentAppActivity">Recent App Activity</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"
         instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -360,13 +359,6 @@
 
     <!-- Manage Recent Apps Protection -->
     <string name="atp_ManageRecentAppsProtectionReportIssues">If you still have issues with a specific app, disable protection for that app and <annotation type="report_issues_link">submit a report.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionSectionTitle">Recommended System Settings</string>
-    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Always ON</string>
-    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">The VPN automatically restores you connection after interruption.</string>
-    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Allow Unrestricted Battery Usage</string>
-    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Go to Battery Settings and set it to unrestricted to prevent the VPN from being turned off in the background.</string>
-    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">App Battery Usage is Unrestricted</string>
-    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Prevents Android from turning off the VPN in the background.</string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Having Issues?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Show All Apps</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Apps with recently blocked tracking attempts will appear here</string>
