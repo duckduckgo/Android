@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.traces.api
+package com.duckduckgo.traces.api
 
 interface StartupTraces {
     var isTraceEnabled: Boolean
