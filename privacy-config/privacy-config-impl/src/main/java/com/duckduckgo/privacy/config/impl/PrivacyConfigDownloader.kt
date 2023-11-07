@@ -42,13 +42,16 @@ class RealPrivacyConfigDownloader @Inject constructor(
         val response = runCatching {
             privacyConfigService.privacyConfig()
         }.onSuccess { response ->
-            val eTag = response.headers().extractETag()
-            response.body()?.let {
-                runCatching {
-                    privacyConfigPersister.persistPrivacyConfig(it, eTag)
-                }.onFailure {
-                    return Error(it.localizedMessage)
+            runCatching {
+                val eTag = response.headers().extractETag()
+                val body = response.body()
+                if (body != null) {
+                    privacyConfigPersister.persistPrivacyConfig(body, eTag)
+                } else {
+                    return Error(null)
                 }
+            }.onFailure {
+                return Error(it.localizedMessage)
             }
         }.onFailure {
             Timber.w(it.localizedMessage)
