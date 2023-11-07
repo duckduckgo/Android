@@ -139,15 +139,21 @@ class BrokenSiteViewModel @Inject constructor(
         )
     }
 
-    fun onSubmitPressed(webViewVersion: String, description: String?) {
+    fun onSubmitPressed(webViewVersion: String, description: String?, loginSite: String?) {
         viewState.value?.submitAllowed = false
         if (url.isNotEmpty()) {
             val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
 
-            val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
-                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion, description)
+            val loginSiteFinal = if (shuffledCategories.elementAtOrNull(viewValue.indexSelected)?.key == BrokenSiteCategory.LOGIN_CATEGORY_KEY) {
+                loginSite
             } else {
-                getBrokenSite(url, webViewVersion, description)
+                ""
+            }
+
+            val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
+                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion, description, loginSiteFinal)
+            } else {
+                getBrokenSite(url, webViewVersion, description, loginSiteFinal)
             }
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
@@ -174,6 +180,7 @@ class BrokenSiteViewModel @Inject constructor(
         urlString: String,
         webViewVersion: String,
         description: String?,
+        loginSite: String?,
     ): BrokenSite {
         val category = shuffledCategories.elementAtOrNull(viewValue.indexSelected)
         return BrokenSite(
@@ -191,6 +198,7 @@ class BrokenSiteViewModel @Inject constructor(
             consentSelfTestFailed = consentSelfTestFailed,
             errorCodes = jsonStringListAdapter.toJson(errorCodes.toList()).toString(),
             httpErrorCodes = httpErrorCodes,
+            loginSite = loginSite,
         )
     }
 

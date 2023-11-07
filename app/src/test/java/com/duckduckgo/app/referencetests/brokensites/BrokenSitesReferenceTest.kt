@@ -37,6 +37,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
@@ -100,6 +101,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
@@ -147,6 +149,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean(),
             errorCodes = "",
             httpErrorCodes = "",
+            loginSite = null,
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)

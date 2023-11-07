@@ -39,6 +39,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -107,6 +108,10 @@ class BrokenSiteSubmitter @Inject constructor(
                 params[LAST_SENT_DAY] = lastSentDay
             }
 
+            if (appBuildConfig.deviceLocale.language == Locale.ENGLISH.language) {
+                params[LOGIN_SITE] = brokenSite.loginSite.orEmpty()
+            }
+
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
                 SURROGATES_KEY to brokenSite.surrogates,
@@ -154,6 +159,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val HTTP_ERROR_CODES_KEY = "httpErrorCodes"
         private const val PROTECTIONS_STATE = "protectionsState"
         private const val LAST_SENT_DAY = "lastSentDay"
+        private const val LOGIN_SITE = "loginSite"
     }
 }
 
