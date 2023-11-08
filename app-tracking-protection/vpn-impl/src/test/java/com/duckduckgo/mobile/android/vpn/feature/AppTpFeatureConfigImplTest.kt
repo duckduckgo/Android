@@ -58,7 +58,6 @@ class AppTpFeatureConfigImplTest {
     fun whenDbTablesAreEmptyThenReturnToggleDefaultValue() {
         AppTpSetting.values().forEach { setting ->
             when (setting) {
-                AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.RestartOnConnectivityLoss -> assertTrue(config.isEnabled(setting))
@@ -128,11 +127,7 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.CPUMonitoring, true, isManualOverride = true)
         config.setEnabled(AppTpSetting.CPUMonitoring, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
-
         assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
-        assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
     }
 
     @Test
@@ -142,10 +137,6 @@ class AppTpFeatureConfigImplTest {
         config.setEnabled(AppTpSetting.CPUMonitoring, true, isManualOverride = true)
         config.setEnabled(AppTpSetting.CPUMonitoring, false, isManualOverride = true)
 
-        config.setEnabled(AppTpSetting.AlwaysSetDNS, true, isManualOverride = false)
-        config.setEnabled(AppTpSetting.AlwaysSetDNS, false, isManualOverride = true)
-
         assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
-        assertFalse(config.isEnabled(AppTpSetting.AlwaysSetDNS))
     }
 }

@@ -26,7 +26,6 @@ class AppTpSettingTest {
     fun whenAppTpSettingThenShouldHaveCorrectValues() {
         AppTpSetting.values().forEach { setting ->
             when (setting) {
-                AppTpSetting.AlwaysSetDNS -> assertFalse(setting.defaultValue)
                 AppTpSetting.CPUMonitoring -> assertFalse(setting.defaultValue)
                 AppTpSetting.ExceptionLists -> assertTrue(setting.defaultValue)
                 AppTpSetting.RestartOnConnectivityLoss -> assertTrue(setting.defaultValue)
