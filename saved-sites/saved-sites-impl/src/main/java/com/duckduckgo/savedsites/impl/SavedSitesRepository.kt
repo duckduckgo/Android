@@ -28,7 +28,6 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.sync.*
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
@@ -36,7 +35,6 @@ import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import io.reactivex.Single
-import java.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
@@ -47,7 +45,7 @@ import timber.log.Timber
 class RealSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
-    private val favoritesAccessor: FavoritesAccessor,
+    private val favoritesDelegate: FavoritesDelegate,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
@@ -230,27 +228,27 @@ class RealSavedSitesRepository(
     }
 
     override fun getFavorites(): Flow<List<Favorite>> {
-        return favoritesAccessor.getFavorites()
+        return favoritesDelegate.getFavorites()
     }
 
     override fun getFavoritesObservable(): Single<List<Favorite>> {
-        return favoritesAccessor.getFavoritesObservable()
+        return favoritesDelegate.getFavoritesObservable()
     }
 
     override fun getFavoritesSync(): List<Favorite> {
-        return favoritesAccessor.getFavoritesSync()
+        return favoritesDelegate.getFavoritesSync()
     }
 
     override fun getFavoritesCountByDomain(domain: String): Int {
-        return favoritesAccessor.getFavoritesCountByDomain(domain)
+        return favoritesDelegate.getFavoritesCountByDomain(domain)
     }
 
     override fun getFavorite(url: String): Favorite? {
-        return favoritesAccessor.getFavorite(url)
+        return favoritesDelegate.getFavorite(url)
     }
 
     override fun getFavoriteById(id: String): Favorite? {
-        return favoritesAccessor.getFavoriteById(id)
+        return favoritesDelegate.getFavoriteById(id)
     }
 
     override fun getBookmarks(): Flow<List<Bookmark>> {
@@ -329,7 +327,7 @@ class RealSavedSitesRepository(
         title: String,
         lastModified: String?,
     ): Favorite {
-        return favoritesAccessor.insertFavorite(id, url, title, lastModified)
+        return favoritesDelegate.insertFavorite(id, url, title, lastModified)
     }
 
     override fun insert(savedSite: SavedSite): SavedSite {
@@ -364,7 +362,7 @@ class RealSavedSitesRepository(
     }
 
     private fun deleteFavorite(favorite: Favorite) {
-        favoritesAccessor.deleteFavorite(favorite)
+        favoritesDelegate.deleteFavorite(favorite)
     }
 
     private fun deleteBookmark(bookmark: Bookmark) {
@@ -379,7 +377,7 @@ class RealSavedSitesRepository(
     }
 
     override fun updateFavourite(favorite: Favorite) {
-        favoritesAccessor.updateFavourite(favorite)
+        favoritesDelegate.updateFavourite(favorite)
     }
 
     override fun updateBookmark(
@@ -566,7 +564,7 @@ class RealSavedSitesRepository(
     }
 
     override fun favoritesCount(): Long {
-        return favoritesAccessor.favoritesCount()
+        return favoritesDelegate.favoritesCount()
     }
 
     override fun lastModified(): Flow<String> {
@@ -636,7 +634,7 @@ class RealSavedSitesRepository(
     }
 
     override fun updateWithPosition(favorites: List<Favorite>) {
-        favoritesAccessor.updateWithPosition(favorites)
+        favoritesDelegate.updateWithPosition(favorites)
     }
 
     private fun Entity.mapToBookmark(relationId: String): Bookmark =

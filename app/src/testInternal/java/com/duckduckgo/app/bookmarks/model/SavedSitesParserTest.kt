@@ -23,13 +23,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.sync.FakeSavedSitesSettingsRepository
+import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
-import com.duckduckgo.savedsites.impl.FavoritesAccessorImpl
+import com.duckduckgo.savedsites.impl.FavoritesDelegateImpl
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesParser
@@ -80,18 +80,17 @@ class SavedSitesParserTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
-        val savedSitesSettingsRepository: FakeSavedSitesSettingsRepository = FakeSavedSitesSettingsRepository()
-        val favoritesAccessor = FavoritesAccessorImpl(
+        val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
+        val favoritesDelegate = FavoritesDelegateImpl(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesSettingsRepository,
-            coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
         )
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
-            favoritesAccessor,
+            favoritesDelegate,
             coroutinesTestRule.testDispatcherProvider,
         )
         parser = RealSavedSitesParser()

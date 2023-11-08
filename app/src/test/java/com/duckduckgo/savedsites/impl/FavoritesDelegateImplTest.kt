@@ -6,12 +6,14 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.sync.FakeSavedSitesSettingsRepository
+import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
+import com.duckduckgo.app.sync.FakeFavoritesDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
-import com.duckduckgo.savedsites.store.FavoritesViewMode
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode.NATIVE
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode.UNIFIED
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
@@ -28,16 +30,16 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class FavoritesAccessorImplTest {
+class FavoritesDelegateImplTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
-    private lateinit var testee: FavoritesAccessorImpl
-    private val savedSitesSettingsRepository = FakeSavedSitesSettingsRepository()
-
+    private lateinit var testee: FavoritesDelegateImpl
+    private val syncDisabledFavoritesSettings = FakeDisplayModeSettingsRepository()
+    private val favoritesDisplayModeSettings = FakeFavoritesDisplayModeSettingsRepository(NATIVE)
     private lateinit var db: AppDatabase
 
     @Before
@@ -47,13 +49,6 @@ class FavoritesAccessorImplTest {
             .build()
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
-        testee = FavoritesAccessorImpl(
-            savedSitesEntitiesDao,
-            savedSitesRelationsDao,
-            savedSitesSettingsRepository,
-            coroutineRule.testScope,
-            coroutineRule.testDispatcherProvider,
-        )
     }
 
     @After
@@ -63,6 +58,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenDefaultThenReturnFavoritesFromRootFolderFlow() = runTest {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -76,7 +72,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeThenReturnFavoritesFromRootFolderFlow() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -90,7 +86,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenNativeModeThenReturnMobileFavoritesFolderFlow() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -104,7 +100,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenViewModeChangesThenNewFlowEmitted() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -113,13 +109,15 @@ class FavoritesAccessorImplTest {
 
         testee.getFavorites().test {
             assertEquals(2, awaitItem().size)
-            savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+            favoritesDisplayModeSettings.favoritesDisplayMode = UNIFIED
+            favoritesDisplayModeSettings.queryFavoritesFolderFlow.emit(favoritesDisplayModeSettings.getQueryFolder())
             assertEquals(3, awaitItem().size)
         }
     }
 
     @Test
     fun whenDefaultThenReturnRootFavoritesFolderList() = runTest {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -131,7 +129,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeThenReturnRootFavoritesFolderList() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -143,7 +141,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenNativeModeThenReturnMobileFavoritesFolderList() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -155,6 +153,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenGetFavoritesCountByDomainThenOnlyCheckRootFolder() = runTest {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -166,7 +165,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeGetFavoritesCountByDomainThenOnlyCheckRootFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -178,7 +177,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenNativeModeGetFavoritesCountByDomainThenOnlyCheckMobileFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -189,6 +188,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenGetFavoriteByIdThenOnlyCheckRootFolder() = runTest {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -200,7 +200,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeGetFavoriteByIdThenOnlyCheckRootFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -212,7 +212,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenNativeModeGetFavoriteByIdThenOnlyCheckMobileFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -224,6 +224,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenFavoritesCountThenOnlyCheckRootFolder() = runTest {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -235,7 +236,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeFavoritesCountThenOnlyCheckRootFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -247,7 +248,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenNativeModeFavoritesCountThenOnlyCheckMobileFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -259,6 +260,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUpdateWithPositionThenUpdateItemsOnRootFolder() {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -279,7 +281,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeUpdateWithPositionThenUpdateItemsOnRootFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -300,7 +302,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenNativeModeUpdateWithPositionThenUpdateItemsOnRootFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         val favoritetwo = Favorite("favorite2", "Favorite2", "http://favexample.com", "timestamp", 1)
         val favoritethree = Favorite("favorite3", "Favorite3", "http://favexample.com", "timestamp", 2)
@@ -321,6 +323,8 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenInsertFavoriteThenUpdateItemsOnRootFolder() {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
+
         testee.insertFavorite("favorite1", "Favorite", "http://favexample.com", "timestamp")
 
         assertTrue(savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT).size == 1)
@@ -329,7 +333,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeInsertFavoriteThenUpdateItemsOnRootAndMobileFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         testee.insertFavorite("favorite1", "Favorite", "http://favexample.com", "timestamp")
 
         assertTrue(savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT).size == 1)
@@ -338,7 +342,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenNativeModeInsertFavoriteThenUpdateItemsOnRootAndMobileFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         testee.insertFavorite("favorite1", "Favorite", "http://favexample.com", "timestamp")
 
         assertTrue(savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT).size == 1)
@@ -347,6 +351,8 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenDeleteFavoriteThenDeleteFromRootFolder() = runTest {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
+
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_ROOT)
         givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_MOBILE_ROOT)
@@ -361,7 +367,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenUnifiedModeDeleteFavoriteThenDeleteFromAllFolders() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.UNIFIED)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = UNIFIED })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_ROOT)
         givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_MOBILE_ROOT)
@@ -375,23 +381,8 @@ class FavoritesAccessorImplTest {
     }
 
     @Test
-    fun whenNativeModeDeleteDesktopFavoriteThenDeleteFromMobileFolder() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
-        val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
-        givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_ROOT)
-        givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_MOBILE_ROOT)
-        givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_DESKTOP_ROOT)
-
-        testee.deleteFavorite(favoriteone)
-
-        assertTrue(savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT).size == 1)
-        assertTrue(savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_MOBILE_ROOT).isEmpty())
-        assertTrue(savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_DESKTOP_ROOT).size == 1)
-    }
-
-    @Test
     fun whenNativeModeDeleteNonDesktopFavoriteThenDeleteFromAllFolders() = runTest {
-        savedSitesSettingsRepository.setViewMode(FavoritesViewMode.NATIVE)
+        givenFavoriteDelegate(favoritesDisplayModeSettings.apply { favoritesDisplayMode = NATIVE })
         val favoriteone = Favorite("favorite1", "Favorite", "http://favexample.com", "timestamp", 0)
         givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_ROOT)
         givenFavoriteStored(favoriteone, favoriteFolderId = SavedSitesNames.FAVORITES_MOBILE_ROOT)
@@ -405,6 +396,7 @@ class FavoritesAccessorImplTest {
 
     @Test
     fun whenDataSourceChangesThenNewListReceived() {
+        givenFavoriteDelegate(syncDisabledFavoritesSettings)
         givenNoFavoritesStored()
 
         testee.insertFavorite(id = "Favorite1", title = "Favorite", url = "http://favexample.com", lastModified = "timestamp")
@@ -416,6 +408,15 @@ class FavoritesAccessorImplTest {
         Assert.assertEquals("Favorite", lastState.first().title)
         Assert.assertEquals("http://favexample.com", lastState.first().url)
         Assert.assertEquals(0, lastState.first().position)
+    }
+
+    private fun givenFavoriteDelegate(displayModeSettingsRepository: FavoritesDisplayModeSettingsRepository) {
+        testee = FavoritesDelegateImpl(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            displayModeSettingsRepository,
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     private fun givenFavoriteStored(vararg favorite: Favorite, favoriteFolderId: String) {

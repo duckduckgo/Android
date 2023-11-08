@@ -22,13 +22,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.sync.FakeSavedSitesSettingsRepository
+import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.FavoritesAccessorImpl
+import com.duckduckgo.savedsites.impl.FavoritesDelegateImpl
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
@@ -72,12 +72,10 @@ class SavedSitesDuplicateFinderTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
-        val savedSitesSettingsRepository: FakeSavedSitesSettingsRepository = FakeSavedSitesSettingsRepository()
-        val favoritesAccessor = FavoritesAccessorImpl(
+        val favoritesDelegate = FavoritesDelegateImpl(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
-            savedSitesSettingsRepository,
-            coroutinesTestRule.testScope,
+            FakeDisplayModeSettingsRepository(),
             coroutinesTestRule.testDispatcherProvider,
         )
 
@@ -85,7 +83,7 @@ class SavedSitesDuplicateFinderTest {
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
-            favoritesAccessor,
+            favoritesDelegate,
             coroutinesTestRule.testDispatcherProvider,
         )
 

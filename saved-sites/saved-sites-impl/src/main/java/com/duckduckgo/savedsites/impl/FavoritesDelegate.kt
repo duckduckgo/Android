@@ -16,13 +16,10 @@
 
 package com.duckduckgo.savedsites.impl
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.*
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.savedsites.api.models.*
-import com.duckduckgo.savedsites.impl.RealSavedSitesSettingsRepository.ViewMode
 import com.duckduckgo.savedsites.impl.sync.*
 import com.duckduckgo.savedsites.store.*
 import com.duckduckgo.sync.api.*
@@ -30,12 +27,10 @@ import com.squareup.anvil.annotations.*
 import io.reactivex.*
 import java.util.*
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.*
 
-interface FavoritesAccessor {
+interface FavoritesDelegate {
     fun getFavoritesSync(): List<SavedSite.Favorite>
     fun getFavoritesCountByDomain(domain: String): Int
     fun getFavorite(url: String): SavedSite.Favorite?
@@ -50,31 +45,16 @@ interface FavoritesAccessor {
 }
 
 @ContributesBinding(AppScope::class)
-class FavoritesAccessorImpl @Inject constructor(
+class FavoritesDelegateImpl @Inject constructor(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
-    private val savedSitesSettings: SavedSitesSettingsRepository,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
-) : FavoritesAccessor {
-
-    private var viewMode: ViewMode = ViewMode.DEFAULT
-
-    private val viewModeFlow = MutableStateFlow<ViewMode>(ViewMode.DEFAULT)
-
-    init {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            savedSitesSettings.viewModeFlow()
-                .collect {
-                    viewMode = it
-                    viewModeFlow.emit(it)
-                }
-        }
-    }
+    private val favoritesDisplayModeSetting: FavoritesDisplayModeSettingsRepository,
+    private val dispatcherProvider: DispatcherProvider,
+) : FavoritesDelegate {
 
     override fun getFavorites(): Flow<List<SavedSite.Favorite>> {
-        return viewModeFlow.flatMapLatest { viewMode ->
-            val favoriteFolder = getFavoriteFolder(viewMode)
+        return favoritesDisplayModeSetting.getFavoriteFolderFlow().flatMapLatest { viewMode ->
+            val favoriteFolder = favoritesDisplayModeSetting.getQueryFolder()
             Timber.d("Sync-Bookmarks: getFavorites as Flow from $favoriteFolder")
             savedSitesRelationsDao.relations(favoriteFolder).distinctUntilChanged().map { relations ->
                 Timber.d("Sync-Bookmarks: getFavorites as Flow, emit relations $relations")
@@ -94,17 +74,17 @@ class FavoritesAccessorImpl @Inject constructor(
     }
 
     override fun getFavoritesSync(): List<SavedSite.Favorite> {
-        val folder = getFavoriteFolder(viewMode)
+        val folder = favoritesDisplayModeSetting.getQueryFolder()
         return savedSitesEntitiesDao.entitiesInFolderSync(folder).mapToFavorites()
     }
 
     override fun getFavoritesCountByDomain(domain: String): Int {
-        val folder = getFavoriteFolder(viewMode)
+        val folder = favoritesDisplayModeSetting.getQueryFolder()
         return savedSitesRelationsDao.countFavouritesByUrl(domain, folder)
     }
 
     override fun getFavoriteById(id: String): SavedSite.Favorite? {
-        val folder = getFavoriteFolder(viewMode)
+        val folder = favoritesDisplayModeSetting.getQueryFolder()
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(folder).mapIndexed { index, entity ->
             entity.mapToFavorite(index)
         }
@@ -112,12 +92,12 @@ class FavoritesAccessorImpl @Inject constructor(
     }
 
     override fun favoritesCount(): Long {
-        val folder = getFavoriteFolder(viewMode)
+        val folder = favoritesDisplayModeSetting.getQueryFolder()
         return savedSitesEntitiesDao.entitiesInFolderSync(folder).size.toLong()
     }
 
     override fun getFavorite(url: String): SavedSite.Favorite? {
-        val folder = getFavoriteFolder(viewMode)
+        val folder = favoritesDisplayModeSetting.getQueryFolder()
         val favorites = savedSitesEntitiesDao.entitiesInFolderSync(folder).mapIndexed { index, entity ->
             entity.mapToFavorite(index)
         }
@@ -125,7 +105,7 @@ class FavoritesAccessorImpl @Inject constructor(
     }
 
     override fun updateWithPosition(favorites: List<SavedSite.Favorite>) {
-        val favoriteFolder = getFavoriteFolder(viewMode)
+        val favoriteFolder = favoritesDisplayModeSetting.getQueryFolder()
         savedSitesRelationsDao.delete(favoriteFolder)
         val relations = favorites.map { Relation(folderId = favoriteFolder, entityId = it.id) }
         savedSitesRelationsDao.insertList(relations)
@@ -148,7 +128,7 @@ class FavoritesAccessorImpl @Inject constructor(
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
         val existentBookmark = savedSitesEntitiesDao.entityByUrl(url)
         val lastModifiedOrFallback = lastModified ?: DatabaseDateFormatter.iso8601()
-        val favoriteFolders = getInsertFavoriteFolder(viewMode)
+        val favoriteFolders = favoritesDisplayModeSetting.getInsertFolder()
         return if (existentBookmark == null) {
             val entity = Entity(
                 entityId = idOrFallback,
@@ -179,70 +159,10 @@ class FavoritesAccessorImpl @Inject constructor(
     }
 
     override fun deleteFavorite(favorite: SavedSite.Favorite) {
-        val deleteFavoriteFolder = getDeleteFavoriteFolder(favorite.id, viewMode)
+        val deleteFavoriteFolder = favoritesDisplayModeSetting.getDeleteFolder(favorite.id)
         deleteFavoriteFolder.forEach { folderName ->
             savedSitesRelationsDao.deleteRelationByEntity(favorite.id, folderName)
             savedSitesEntitiesDao.updateModified(folderName)
-        }
-    }
-
-    private fun getFavoriteFolder(viewMode: ViewMode): String {
-        return when (viewMode) {
-            ViewMode.DEFAULT -> SavedSitesNames.FAVORITES_ROOT
-            is ViewMode.FormFactorViewMode -> return getFavoriteFormFactorFolder(viewMode.favoritesViewMode)
-        }
-    }
-
-    private fun getFavoriteFormFactorFolder(viewMode: FavoritesViewMode): String {
-        return when (viewMode) {
-            FavoritesViewMode.NATIVE -> SavedSitesNames.FAVORITES_MOBILE_ROOT
-            FavoritesViewMode.UNIFIED -> SavedSitesNames.FAVORITES_ROOT
-        }
-    }
-
-    private fun getInsertFavoriteFolder(viewMode: ViewMode): List<String> {
-        return when (viewMode) {
-            ViewMode.DEFAULT -> listOf(SavedSitesNames.FAVORITES_ROOT)
-            is ViewMode.FormFactorViewMode -> getInsertFavoriteFormFactorFolder(viewMode.favoritesViewMode)
-        }
-    }
-
-    private fun getInsertFavoriteFormFactorFolder(viewMode: FavoritesViewMode): List<String> {
-        return when (viewMode) {
-            FavoritesViewMode.NATIVE -> listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
-            FavoritesViewMode.UNIFIED -> listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
-        }
-    }
-
-    private fun getDeleteFavoriteFolder(
-        entityId: String,
-        viewMode: ViewMode,
-    ): List<String> {
-        return when (viewMode) {
-            ViewMode.DEFAULT -> listOf(SavedSitesNames.FAVORITES_ROOT)
-            is ViewMode.FormFactorViewMode -> { getDeleteFormFactorFolder(entityId, viewMode.favoritesViewMode) }
-        }
-    }
-
-    private fun getDeleteFormFactorFolder(
-        entityId: String,
-        viewMode: FavoritesViewMode,
-    ): List<String> {
-        return when (viewMode) {
-            FavoritesViewMode.NATIVE -> {
-                val isDesktopFavorite = savedSitesRelationsDao.relationsByEntityId(entityId)
-                    .find { it.folderId == SavedSitesNames.FAVORITES_DESKTOP_ROOT } != null
-                Timber.i("Sync-Bookmarks: Deleting $entityId, isDesktopFavorite: $isDesktopFavorite")
-                if (isDesktopFavorite) {
-                    listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT)
-                } else {
-                    listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT)
-                }
-            }
-
-            FavoritesViewMode.UNIFIED -> {
-                listOf(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_DESKTOP_ROOT)
-            }
         }
     }
 }

@@ -29,7 +29,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.FavoritesAccessorImpl
+import com.duckduckgo.savedsites.impl.FavoritesDelegateImpl
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
@@ -100,12 +100,11 @@ class SavedSitesSyncDataProviderTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
-        val savedSitesSettingsRepository = FakeSavedSitesSettingsRepository()
-        val favoritesAccessor = FavoritesAccessorImpl(
+        val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
+        val favoritesDelegate = FavoritesDelegateImpl(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesSettingsRepository,
-            coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
         )
 
@@ -113,7 +112,7 @@ class SavedSitesSyncDataProviderTest {
         repository = RealSavedSitesRepository(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
-            favoritesAccessor,
+            favoritesDelegate,
             coroutinesTestRule.testDispatcherProvider,
         )
         store = RealSavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)

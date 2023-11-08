@@ -18,9 +18,9 @@ package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.savedsites.api.models.*
-import com.duckduckgo.savedsites.impl.SavedSitesSettingsRepository
-import com.duckduckgo.savedsites.store.FavoritesViewMode.NATIVE
-import com.duckduckgo.savedsites.store.FavoritesViewMode.UNIFIED
+import com.duckduckgo.savedsites.impl.FavoritesDisplayModeSettingsRepository
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode.NATIVE
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode.UNIFIED
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 import com.squareup.anvil.annotations.ContributesBinding
@@ -36,7 +36,7 @@ interface SavedSitesSyncMigration {
 class SavedSitesSyncMigrationImpl @Inject constructor(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
-    private val savedSitesSettings: SavedSitesSettingsRepository,
+    private val favoritesFormFactorSettings: FavoritesDisplayModeSettingsRepository,
 ) : SavedSitesSyncMigration {
     override fun onSyncEnabled() {
         Timber.d("Sync-Bookmarks: syncEnabled creating FFS folders")
@@ -49,7 +49,7 @@ class SavedSitesSyncMigrationImpl @Inject constructor(
 
     override fun onSyncDisabled() {
         Timber.d("Sync-Bookmarks: syncDisabled removing FFS folders and migrating favorites")
-        when (savedSitesSettings.favoritesDisplayMode) {
+        when (favoritesFormFactorSettings.favoritesDisplayMode) {
             NATIVE -> {
                 savedSitesRelationsDao.migrateNativeFavoritesAsNewRoot()
             }
@@ -58,7 +58,7 @@ class SavedSitesSyncMigrationImpl @Inject constructor(
             }
         }
         savedSitesEntitiesDao.removeFormFactorFavoriteFolders()
-        savedSitesSettings.favoritesDisplayMode = NATIVE
-        Timber.d("Sync-Bookmarks: displayMode changed to NATIVE")
+        favoritesFormFactorSettings.favoritesDisplayMode = NATIVE
+        Timber.d("Sync-Bookmarks: favoriteFormFactor changed to NATIVE")
     }
 }

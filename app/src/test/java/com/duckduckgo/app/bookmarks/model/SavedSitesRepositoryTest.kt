@@ -26,7 +26,7 @@ import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeBookmarks
 import com.duckduckgo.app.bookmarks.BookmarkTestUtils.givenSomeFolders
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import com.duckduckgo.app.sync.FakeSavedSitesSettingsRepository
+import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
@@ -34,7 +34,7 @@ import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.FavoritesAccessorImpl
+import com.duckduckgo.savedsites.impl.FavoritesDelegateImpl
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
@@ -80,15 +80,14 @@ class SavedSitesRepositoryTest {
             .build()
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
-        val savedSitesSettingsRepository = FakeSavedSitesSettingsRepository()
-        val favoritesAccessor = FavoritesAccessorImpl(
+        val favoritesDisplayModeSettings = FakeDisplayModeSettingsRepository()
+        val favoritesDelegate = FavoritesDelegateImpl(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
-            savedSitesSettingsRepository,
-            coroutineRule.testScope,
+            favoritesDisplayModeSettings,
             coroutineRule.testDispatcherProvider,
         )
-        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, favoritesAccessor, coroutineRule.testDispatcherProvider)
+        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao, favoritesDelegate, coroutineRule.testDispatcherProvider)
     }
 
     @After
