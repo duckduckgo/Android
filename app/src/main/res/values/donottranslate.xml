@@ -42,4 +42,7 @@
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>
     <string name="brokenSitesLoginSmallHint">Site name (required)</string>
+
+    <!-- DRM -->
+    <string name="sitePermissionsSettingsDRM">DRM</string>
 </resources>

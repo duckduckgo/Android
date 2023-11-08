@@ -70,7 +70,7 @@ class PermissionsPerWebsiteViewModelTest {
 
         viewModel.viewState.test {
             val permissions = awaitItem().websitePermissions
-            assertEquals(3, permissions.size)
+            assertEquals(4, permissions.size)
         }
     }
 

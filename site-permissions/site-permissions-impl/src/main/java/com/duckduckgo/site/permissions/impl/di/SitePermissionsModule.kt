@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.impl.SitePermissionsManagerImpl
 import com.duckduckgo.site.permissions.impl.SitePermissionsRepositoryImpl
+import com.duckduckgo.site.permissions.store.ALL_MIGRATIONS
 import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferencesImp
@@ -42,6 +43,7 @@ object SitePermissionsModule {
     fun providesSitePermissionsDatabase(context: Context): SitePermissionsDatabase {
         return Room.databaseBuilder(context, SitePermissionsDatabase::class.java, "site_permissions.db")
             .fallbackToDestructiveMigration()
+            .addMigrations(*ALL_MIGRATIONS)
             .build()
     }
 

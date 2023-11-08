@@ -25,22 +25,36 @@ import android.provider.Settings
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.addClickableLink
+import com.duckduckgo.mobile.android.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.site.permissions.impl.databinding.ContentSiteDrmPermissionDialogBinding
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
+import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
     private val systemPermissionsHelper: SystemPermissionsHelper,
     private val sitePermissionsRepository: SitePermissionsRepository,
+    private val dispatcher: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SitePermissionsDialogLauncher {
 
     private lateinit var sitePermissionRequest: PermissionRequest
@@ -49,6 +63,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     private lateinit var permissionsGrantedListener: SitePermissionsGrantedListener
     private var siteURL: String = ""
     private var tabId: String = ""
+
+    @Inject
+    lateinit var faviconManager: FaviconManager
 
     override fun registerPermissionLauncher(caller: ActivityResultCaller) {
         systemPermissionsHelper.registerPermissionLaunchers(
@@ -73,7 +90,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         this.permissionsGrantedListener = permissionsGrantedListener
 
         when {
-            permissionsRequested.size == 2 -> {
+            permissionsRequested.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) && permissionsRequested.contains(
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE,
+            ) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsMicAndCameraDialogTitle, url, this::askForMicAndCameraPermissions)
             }
             permissionsRequested.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) -> {
@@ -81,6 +100,9 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
             permissionsRequested.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) -> {
                 showSitePermissionsRationaleDialog(R.string.sitePermissionsCameraDialogTitle, url, this::askForCameraPermissions)
+            }
+            permissionsRequested.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) -> {
+                showSiteDrmPermissionsDialog(activity, url, tabId, request)
             }
         }
     }
@@ -106,6 +128,87 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 },
             )
             .show()
+    }
+
+    private fun showSiteDrmPermissionsDialog(
+        activity: Activity,
+        url: String,
+        tabId: String,
+        request: PermissionRequest,
+    ) {
+        val domain = url.extractDomain() ?: url
+
+        // Check if user allowed or denied per session
+        val sessionSetting = sitePermissionsRepository.getDrmForSession(domain)
+        if (sessionSetting != null) {
+            if (sessionSetting) {
+                request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+            } else {
+                request.deny()
+            }
+            return
+        }
+
+        // No session-based setting -> proceed to show dialog
+        val binding = ContentSiteDrmPermissionDialogBinding.inflate(activity.layoutInflater)
+        val dialog = CustomAlertDialogBuilder(activity)
+            .setView(binding)
+            .build()
+
+        val title = url.websiteFromGeoLocationsApiOrigin()
+        binding.sitePermissionDialogTitle.text = activity.getString(R.string.drmSiteDialogTitle, title)
+        binding.sitePermissionDialogSubtitle.addClickableLink(
+            DRM_LEARN_MORE_ANNOTATION,
+            activity.getText(R.string.drmSiteDialogSubtitle),
+        ) {
+            request.deny()
+            dialog.dismiss()
+            activity.startActivity(Intent(Intent.ACTION_VIEW, DRM_LEARN_MORE_URL))
+        }
+
+        appCoroutineScope.launch(dispatcher.main()) {
+            faviconManager.loadToViewFromLocalWithPlaceholder(tabId, url, binding.sitePermissionDialogFavicon)
+        }
+
+        binding.siteAllowAlwaysDrmPermission.setOnClickListener {
+            request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.ALLOW_ALWAYS)
+            dialog.dismiss()
+        }
+
+        binding.siteAllowOnceDrmPermission.setOnClickListener {
+            sitePermissionsRepository.saveDrmForSession(domain, true)
+            request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
+            dialog.dismiss()
+        }
+
+        binding.siteDenyOnceDrmPermission.setOnClickListener {
+            sitePermissionsRepository.saveDrmForSession(domain, false)
+            request.deny()
+            dialog.dismiss()
+        }
+
+        binding.siteDenyAlwaysDrmPermission.setOnClickListener {
+            request.deny()
+            onSiteDrmPermissionSave(domain, SitePermissionAskSettingType.DENY_ALWAYS)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun onSiteDrmPermissionSave(
+        domain: String,
+        drmPermission: SitePermissionAskSettingType,
+    ) {
+        val sitePermissionsEntity = SitePermissionsEntity(
+            domain = domain,
+            askDrmSetting = drmPermission.name,
+        )
+
+        appCoroutineScope.launch(dispatcher.io()) {
+            sitePermissionsRepository.savePermission(sitePermissionsEntity)
+        }
     }
 
     private fun askForMicAndCameraPermissions() {
@@ -273,6 +376,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 },
             )
             .show()
+    }
+
+    companion object {
+        private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
+        val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/drm-permission/".toUri()
     }
 }
 

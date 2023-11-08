@@ -31,6 +31,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class BrowserChromeClient @Inject constructor(
@@ -138,18 +139,14 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        if (request.resources.contains(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)) {
-            if (drm.isDrmAllowedForUrl(request.origin.toString())) {
-                request.grant(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
-            } else {
-                request.deny()
-            }
-        }
-
         appCoroutineScope.launch(coroutineDispatcher.io()) {
             val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissionsAllowedToAsk(request.origin.toString(), request.resources)
             if (permissionsAllowedToAsk.isNotEmpty()) {
                 webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
+            } else {
+                withContext(coroutineDispatcher.main()) {
+                    request.deny()
+                }
             }
         }
     }
