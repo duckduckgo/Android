@@ -92,4 +92,24 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override fun sendSubscriptionEvent() {
         // NOOP
     }
+
+    inner class ShimMessage : JsMessageHandler {
+
+        override fun process(jsMessage: JsMessage, secret: String, webView: WebView, jsMessageCallback: JsMessageCallback): JsRequestResponse? {
+            if (jsMessage.featureName != featureName && jsMessage.method != method) return null
+            if (jsMessage.id == null) return null
+            logcat { "Marcos sending error" }
+            return JsRequestResponse.Success(
+                context = jsMessage.context,
+                featureName = featureName,
+                method = method,
+                id = jsMessage.id!!,
+                result = JSONObject("""{ "failure": {"name":"AbortError", "message":"Aborted by user"} }"""),
+            )
+        }
+
+        override val allowedDomains: List<String> = emptyList()
+        override val featureName: String = "webShareShim"
+        override val method: String = "web-share"
+    }
 }
