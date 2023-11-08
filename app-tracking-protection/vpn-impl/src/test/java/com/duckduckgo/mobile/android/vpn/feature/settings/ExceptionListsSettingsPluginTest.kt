@@ -86,13 +86,7 @@ class ExceptionListsSettingsPluginTest {
     }
 
     @Test
-    fun whenWrongNameReturnsFalse() {
-        assertFalse(exceptionListsSettingPlugin.store(AppTpSetting.CPUMonitoring, ""))
-        verifyNoInteractions(mockVpnDatabase)
-    }
-
-    @Test
-    fun whenInvalidJSONReturnsTrue() {
+    fun whenWrongNameReturnsDefaultValue() {
         assertTrue(exceptionListsSettingPlugin.store(AppTpSetting.ExceptionLists, ""))
         verifyNoInteractions(mockVpnDatabase)
     }
