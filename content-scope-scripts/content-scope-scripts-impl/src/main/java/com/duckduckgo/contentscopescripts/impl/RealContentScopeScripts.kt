@@ -29,12 +29,15 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
+import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 interface CoreContentScopeScripts {
     fun getScript(): String
     fun isEnabled(): Boolean
+
+    val secret: String
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -60,6 +63,8 @@ class RealContentScopeScripts @Inject constructor(
     private var cachedUnprotectTemporaryExceptionsJson: String = emptyJsonList
 
     private lateinit var cachedContentScopeJS: String
+
+    override val secret: String = getSecret()
 
     override fun getScript(): String {
         var updateJS = false
@@ -97,6 +102,10 @@ class RealContentScopeScripts @Inject constructor(
     override fun isEnabled(): Boolean {
         return contentScopeScriptsFeature.self().isEnabled()
     }
+
+    private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""
+    private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$secret\""
+    private fun getInterfaceKeyValuePair() = "\"messageInterface\":\"$secret\""
 
     private fun getPluginParameters(): PluginParameters {
         var config = ""
@@ -145,6 +154,7 @@ class RealContentScopeScripts @Inject constructor(
             .replace(contentScope, cachedContentScopeJson)
             .replace(userUnprotectedDomains, cachedUserUnprotectedDomainsJson)
             .replace(userPreferences, cachedUserPreferencesJson)
+            .replace(messagingParameters, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
     }
 
     private fun getUserUnprotectedDomainsJson(userUnprotectedDomains: List<String>): String {
@@ -184,6 +194,10 @@ class RealContentScopeScripts @Inject constructor(
         const val userUnprotectedDomains = "\$USER_UNPROTECTED_DOMAINS$"
         const val userPreferences = "\$USER_PREFERENCES$"
         const val messagingParameters = "\$ANDROID_MESSAGING_PARAMETERS$"
+
+        private fun getSecret(): String {
+            return UUID.randomUUID().toString().replace("-", "")
+        }
     }
 }
 

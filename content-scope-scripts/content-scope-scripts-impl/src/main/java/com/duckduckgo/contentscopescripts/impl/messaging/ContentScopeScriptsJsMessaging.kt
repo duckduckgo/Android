@@ -20,7 +20,8 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
@@ -28,19 +29,18 @@ import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(FragmentScope::class)
 @Named("ContentScopeScripts")
 class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
+    coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -48,9 +48,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
 
-    override val context: String = getSecret()
-    override val callbackName: String = getSecret()
-    override val secret: String = getSecret()
+    override val context: String = coreContentScopeScripts.secret
+    override val callbackName: String = coreContentScopeScripts.secret
+    override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
     private val handlers: List<JsMessageHandler> = listOf()
@@ -58,6 +58,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     @JavascriptInterface
     override fun process(message: String, secret: String) {
         try {
+            logcat { "Marcos in $webView message is $message" }
+            logcat { "Marcos in $webView secret is $secret and ${this.secret}" }
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val domain = runBlocking(dispatcherProvider.main()) {
@@ -82,6 +84,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
+        logcat { "Marcos registering interface $context in $webView" }
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
         this.webView.addJavascriptInterface(this, context)
@@ -89,11 +92,5 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
     override fun sendSubscriptionEvent() {
         // NOOP
-    }
-
-    companion object {
-        fun getSecret(): String {
-            return UUID.randomUUID().toString().replace("-", "")
-        }
     }
 }

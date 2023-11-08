@@ -19,34 +19,22 @@ package com.duckduckgo.contentscopescripts.impl
 import android.webkit.WebView
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
+import logcat.logcat
 import javax.inject.Inject
-import javax.inject.Named
 
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
-    @Named("ContentScopeScripts") private val jsMessaging: JsMessaging,
 ) : JsInjectorPlugin {
     override fun onPageStarted(webView: WebView, url: String?) {
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${getScript()}", null)
+            logcat { "Marcos adding JS code in $webView" }
+            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript()}", null)
         }
     }
 
     override fun onPageFinished(webView: WebView, url: String?) {
         // NOOP
-    }
-    private fun getSecretKeyValuePair() = "\"messageSecret\":\"${jsMessaging.secret}\""
-    private fun getCallbackKeyValuePair() = "\"messageCallback\":\"${jsMessaging.callbackName}\""
-    private fun getInterfaceKeyValuePair() = "\"messageInterface\":\"${jsMessaging.context}\""
-
-    private fun getScript(): String {
-        return coreContentScopeScripts.getScript()
-            .replace(
-                RealContentScopeScripts.messagingParameters,
-                "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}",
-            )
     }
 }
