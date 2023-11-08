@@ -16,7 +16,8 @@
 
 package com.duckduckgo.autofill.impl.pixel
 
-import com.duckduckgo.app.global.plugins.pixel.PixelRequiringDataCleaningPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_TOOLTIP_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_USE_ADDRESS
@@ -82,14 +83,14 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelRequiringDataCleaningPlugin::class,
+    boundType = PixelParamRemovalPlugin::class,
 )
-object AutofillPixelsRequiringDataCleaning : PixelRequiringDataCleaningPlugin {
-    override fun names(): List<String> {
+object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
-            EMAIL_USE_ALIAS.pixelName,
-            EMAIL_USE_ADDRESS.pixelName,
-            EMAIL_TOOLTIP_DISMISSED.pixelName,
+            EMAIL_USE_ALIAS.pixelName to PixelParameter.removeAll(),
+            EMAIL_USE_ADDRESS.pixelName to PixelParameter.removeAll(),
+            EMAIL_TOOLTIP_DISMISSED.pixelName to PixelParameter.removeAll(),
         )
     }
 }

@@ -19,7 +19,10 @@ package com.duckduckgo.app.global.api
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
-import com.duckduckgo.app.global.plugins.pixel.PixelRequiringDataCleaningPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
@@ -34,25 +37,27 @@ import okhttp3.Response
     scope = AppScope::class,
     boundType = PixelInterceptorPlugin::class,
 )
-class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor(
-    private val pixelsPlugin: PluginPoint<PixelRequiringDataCleaningPlugin>,
+class PixelParamRemovalInterceptor @Inject constructor(
+    private val pixelsPlugin: PluginPoint<PixelParamRemovalPlugin>,
 ) : Interceptor, PixelInterceptorPlugin {
 
-    val pixels: Set<String> by lazy {
+    val pixels by lazy {
         pixelsPlugin.getPlugins().flatMap { it.names() }.toSet()
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
-        val url = if (isInPixelsList(pixel)) {
-            chain.request().url.newBuilder()
-                .removeAllQueryParameters(AppUrl.ParamKey.ATB)
-                .removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
-                .build()
-        } else {
-            chain.request().url.newBuilder().build()
-        }
+        val url = chain.request().url.newBuilder().apply {
+            val atbs = pixels.filter { it.second.contains(ATB) }.map { it.first }
+            val versions = pixels.filter { it.second.contains(APP_VERSION) }.map { it.first }
+            if (atbs.any { pixel.startsWith(it) }) {
+                removeAllQueryParameters(AppUrl.ParamKey.ATB)
+            }
+            if (versions.any { pixel.startsWith(it) }) {
+                removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
+            }
+        }.build()
 
         return chain.proceed(request.url(url).build())
     }
@@ -60,23 +65,18 @@ class AtbAndAppVersionPixelRemovalInterceptor @Inject constructor(
     override fun getInterceptor(): Interceptor {
         return this
     }
-
-    private fun isInPixelsList(pixel: String): Boolean {
-        return pixels.firstOrNull { pixel.startsWith(it) } != null
-    }
 }
 
 @ContributesMultibinding(
     scope = AppScope::class,
-    boundType = PixelRequiringDataCleaningPlugin::class,
+    boundType = PixelParamRemovalPlugin::class,
 )
-object PixelInterceptorPixelsRequiringDataCleaning : PixelRequiringDataCleaningPlugin {
-    override fun names(): List<String> {
+object PixelInterceptorPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
-            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName,
-            StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName,
-            VoiceSearchPixelNames.VOICE_SEARCH_ERROR.pixelName,
-            "m_atp_unprotected_apps_bucket_",
+            AppPixelName.EMAIL_COPIED_TO_CLIPBOARD.pixelName to PixelParameter.removeAll(),
+            StatisticsPixelName.BROWSER_DAILY_ACTIVE_FEATURE_STATE.pixelName to PixelParameter.removeAll(),
+            VoiceSearchPixelNames.VOICE_SEARCH_ERROR.pixelName to PixelParameter.removeAll(),
         )
     }
 }
