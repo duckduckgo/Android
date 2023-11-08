@@ -123,7 +123,7 @@ sealed class JsRequestResponse {
         val featureName: String,
         val method: String,
         val id: String,
-        val error: String,
+        val error: JSONObject,
     ) : JsRequestResponse()
 }
 
