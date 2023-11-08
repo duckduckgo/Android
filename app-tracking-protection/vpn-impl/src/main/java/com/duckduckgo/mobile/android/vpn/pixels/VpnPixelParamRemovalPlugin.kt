@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.api
+package com.duckduckgo.mobile.android.vpn.pixels
 
-import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
 import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
-class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : PixelParamRemovalPlugin {
-
+@ContributesMultibinding(AppScope::class)
+class VpnPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {
         return listOf(
-            AdClickPixelName.AD_CLICK_DETECTED.pixelName to PixelParameter.removeAtb(),
-            AdClickPixelName.AD_CLICK_ACTIVE.pixelName to PixelParameter.removeAtb(),
-            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName to PixelParameter.removeAll(),
+            ATP_PIXEL_PREFIX to PixelParameter.removeAtb(),
+            NETP_PIXEL_PREFIX to PixelParameter.removeAtb(),
+            VPN_PIXEL_PREFIX to PixelParameter.removeAtb(),
+            "m_atp_unprotected_apps_bucket_" to PixelParameter.removeAll(),
         )
+    }
+
+    companion object {
+        private const val ATP_PIXEL_PREFIX = "m_atp_"
+        private const val NETP_PIXEL_PREFIX = "m_netp_"
+        private const val VPN_PIXEL_PREFIX = "m_vpn_"
     }
 }
