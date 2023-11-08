@@ -225,9 +225,7 @@ interface NetworkProtectionPixels {
     fun waitlistNotificationCancelled()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire daily -> fire only once a day no matter how many times we call this fun
      *
      * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
      */
@@ -432,7 +430,6 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun waitlistBetaIsEnabled() {
         tryToFireDailyPixel(NETP_WAITLIST_BETA_ENABLED_DAILY)
-        firePixel(NETP_WAITLIST_BETA_ENABLED)
     }
 
     override fun reportGeoswitchingScreenShown() {
