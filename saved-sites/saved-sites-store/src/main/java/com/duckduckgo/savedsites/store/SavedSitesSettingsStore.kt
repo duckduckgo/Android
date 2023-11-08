@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.savedsites.store.FavoritesViewMode.NATIVE
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode.NATIVE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -28,8 +28,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 interface SavedSitesSettingsStore {
-    var favoritesDisplayMode: FavoritesViewMode
-    fun viewModeFlow(): Flow<FavoritesViewMode>
+    var favoritesFavoritesDisplayMode: FavoritesDisplayMode
+    fun favoritesFormFactorModeFlow(): Flow<FavoritesDisplayMode>
 }
 
 class SavedSitesSettingsSharedPrefStore(
@@ -38,7 +38,7 @@ class SavedSitesSettingsSharedPrefStore(
     private val dispatcherProvider: DispatcherProvider,
 ) : SavedSitesSettingsStore {
 
-    private val viewModeFlow = MutableSharedFlow<FavoritesViewMode>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val favoritesFavoritesDisplayModeFlow = MutableSharedFlow<FavoritesDisplayMode>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     private val preferences: SharedPreferences by lazy {
         context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -46,30 +46,30 @@ class SavedSitesSettingsSharedPrefStore(
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            viewModeFlow.emit(favoritesDisplayMode)
+            favoritesFavoritesDisplayModeFlow.emit(favoritesFavoritesDisplayMode)
         }
     }
 
-    override fun viewModeFlow(): Flow<FavoritesViewMode> = viewModeFlow
+    override fun favoritesFormFactorModeFlow(): Flow<FavoritesDisplayMode> = favoritesFavoritesDisplayModeFlow
 
-    override var favoritesDisplayMode: FavoritesViewMode
+    override var favoritesFavoritesDisplayMode: FavoritesDisplayMode
         get() {
             val storedValue = preferences.getString(
                 KEY_FAVORITES_DISPLAY_MODE,
                 NATIVE.value,
             )
-            return FavoritesViewMode.values().firstOrNull { it.value == storedValue } ?: NATIVE
+            return FavoritesDisplayMode.values().firstOrNull { it.value == storedValue } ?: NATIVE
         }
-        set(displayMode) {
+        set(formFactorMode) {
             preferences.edit(commit = true) {
-                putString(KEY_FAVORITES_DISPLAY_MODE, displayMode.value)
+                putString(KEY_FAVORITES_DISPLAY_MODE, formFactorMode.value)
             }
             emitNewValue()
         }
 
     private fun emitNewValue() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            viewModeFlow.emit(favoritesDisplayMode)
+            favoritesFavoritesDisplayModeFlow.emit(favoritesFavoritesDisplayMode)
         }
     }
 
@@ -79,7 +79,7 @@ class SavedSitesSettingsSharedPrefStore(
     }
 }
 
-enum class FavoritesViewMode(val value: String) {
+enum class FavoritesDisplayMode(val value: String) {
     NATIVE("display_native"),
     UNIFIED("display_all"),
 }

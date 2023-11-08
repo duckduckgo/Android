@@ -2,7 +2,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.savedsites.store.FavoritesViewMode
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -30,13 +30,13 @@ class DisplayModeSyncableSettingTest {
 
     @Test
     fun whenGetValueThenReturnStoredValue() = runTest {
-        savedSitesSettingsStore.favoritesDisplayMode = FavoritesViewMode.NATIVE
-        assertEquals(FavoritesViewMode.NATIVE.value, testee.getValue())
+        savedSitesSettingsStore.favoritesFavoritesDisplayMode = FavoritesDisplayMode.NATIVE
+        assertEquals(FavoritesDisplayMode.NATIVE.value, testee.getValue())
     }
 
     @Test
     fun whenSaveWithValidValueThenReturnTrue() = runTest {
-        assertTrue(testee.save(FavoritesViewMode.NATIVE.value))
+        assertTrue(testee.save(FavoritesDisplayMode.NATIVE.value))
     }
 
     @Test
@@ -46,7 +46,7 @@ class DisplayModeSyncableSettingTest {
 
     @Test
     fun whenDeduplicateWithValidValueThenReturnTrue() = runTest {
-        assertTrue(testee.deduplicate(FavoritesViewMode.NATIVE.value))
+        assertTrue(testee.deduplicate(FavoritesDisplayMode.NATIVE.value))
     }
 
     @Test

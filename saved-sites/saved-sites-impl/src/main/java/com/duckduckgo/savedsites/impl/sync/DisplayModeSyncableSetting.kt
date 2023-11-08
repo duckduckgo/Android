@@ -17,8 +17,7 @@
 package com.duckduckgo.savedsites.impl.sync
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.savedsites.store.FavoritesViewMode
-import com.duckduckgo.savedsites.store.FavoritesViewMode.NATIVE
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.duckduckgo.sync.settings.api.SyncableSetting
@@ -39,21 +38,23 @@ class DisplayModeSyncableSetting @Inject constructor(
     override val key: String = "favorites_display_mode"
 
     override fun getValue(): String? {
-        return savedSitesSettingsStore.favoritesDisplayMode.value
+        return savedSitesSettingsStore.favoritesFavoritesDisplayMode.value
     }
 
     override fun save(value: String?): Boolean {
-        val displayMode = FavoritesViewMode.values().firstOrNull { it.value == value } ?: return false
-        Timber.i("Sync-Settings-Display-Mode: save($displayMode)")
-        savedSitesSettingsStore.favoritesDisplayMode = displayMode
+        Timber.i("Sync-Settings-Display-Mode: save, value received $value")
+        val displayMode = FavoritesDisplayMode.values().firstOrNull { it.value == value } ?: return false
+        Timber.i("Sync-Settings-Display-Mode: save, storing($displayMode)")
+        savedSitesSettingsStore.favoritesFavoritesDisplayMode = displayMode
         listener.invoke()
         return true
     }
 
     override fun deduplicate(value: String?): Boolean {
-        val displayMode = FavoritesViewMode.values().firstOrNull { it.value == value } ?: return false
-        Timber.i("Sync-Settings-Display-Mode: deduplicate($displayMode)")
-        savedSitesSettingsStore.favoritesDisplayMode = displayMode
+        Timber.i("Sync-Settings-Display-Mode: deduplicate, value received $value")
+        val displayMode = FavoritesDisplayMode.values().firstOrNull { it.value == value } ?: return false
+        Timber.i("Sync-Settings-Display-Mode: deduplicate, storing ($displayMode)")
+        savedSitesSettingsStore.favoritesFavoritesDisplayMode = displayMode
         listener.invoke()
         return true
     }
@@ -68,6 +69,6 @@ class DisplayModeSyncableSetting @Inject constructor(
     }
 
     override fun onSyncDisabled() {
-        savedSitesSettingsStore.favoritesDisplayMode = NATIVE
+        // no-op
     }
 }
