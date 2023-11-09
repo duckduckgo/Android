@@ -58,7 +58,6 @@ class AppTpFeatureConfigImplTest {
     fun whenDbTablesAreEmptyThenReturnToggleDefaultValue() {
         AppTpSetting.values().forEach { setting ->
             when (setting) {
-                AppTpSetting.CPUMonitoring -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ExceptionLists -> assertTrue(config.isEnabled(setting))
                 AppTpSetting.RestartOnConnectivityLoss -> assertTrue(config.isEnabled(setting))
             }
@@ -124,19 +123,19 @@ class AppTpFeatureConfigImplTest {
     fun whenInternalBuildThenProperlyHandleManualOverrides() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        config.setEnabled(AppTpSetting.CPUMonitoring, true, isManualOverride = true)
-        config.setEnabled(AppTpSetting.CPUMonitoring, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.ExceptionLists, true, isManualOverride = true)
+        config.setEnabled(AppTpSetting.ExceptionLists, false, isManualOverride = true)
 
-        assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
+        assertFalse(config.isEnabled(AppTpSetting.ExceptionLists))
     }
 
     @Test
     fun whenNotInternalBuildThenAlwaysOverride() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        config.setEnabled(AppTpSetting.CPUMonitoring, true, isManualOverride = true)
-        config.setEnabled(AppTpSetting.CPUMonitoring, false, isManualOverride = true)
+        config.setEnabled(AppTpSetting.ExceptionLists, true, isManualOverride = true)
+        config.setEnabled(AppTpSetting.ExceptionLists, false, isManualOverride = true)
 
-        assertFalse(config.isEnabled(AppTpSetting.CPUMonitoring))
+        assertFalse(config.isEnabled(AppTpSetting.ExceptionLists))
     }
 }

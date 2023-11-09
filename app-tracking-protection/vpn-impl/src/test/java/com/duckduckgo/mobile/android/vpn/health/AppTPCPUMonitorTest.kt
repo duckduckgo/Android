@@ -32,8 +32,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfigImpl
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.feature.FakeToggleConfigDao
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigTogglesDao
@@ -66,7 +64,6 @@ class AppTPCPUMonitorTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private lateinit var config: AppTpFeatureConfigImpl
     private lateinit var toggleDao: VpnConfigTogglesDao
     private lateinit var workManager: WorkManager
     private lateinit var testDriver: TestDriver
@@ -84,13 +81,6 @@ class AppTPCPUMonitorTest {
         whenever(mockVpnRemoteConfigDatabase.vpnConfigTogglesDao()).thenReturn(toggleDao)
         whenever(appBuildConfig.applicationId).thenReturn("")
 
-        config = AppTpFeatureConfigImpl(
-            TestScope(),
-            mockAppBuildConfig,
-            mockVpnRemoteConfigDatabase,
-            coroutineRule.testDispatcherProvider,
-        )
-
         val workManagerConfig = Configuration.Builder()
             .setMinimumLoggingLevel(Log.DEBUG)
             .setExecutor(SynchronousExecutor())
@@ -101,7 +91,7 @@ class AppTPCPUMonitorTest {
         workManager = WorkManager.getInstance(context)
         testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
 
-        cpuMonitor = AppTPCPUMonitor(workManager, config, appBuildConfig)
+        cpuMonitor = AppTPCPUMonitor(workManager, appBuildConfig)
     }
 
     @After
@@ -112,16 +102,6 @@ class AppTPCPUMonitorTest {
     @Test
     fun whenConfigEnabledStartWorker() {
         assertStartWorker()
-    }
-
-    @Test
-    fun whenConfigDisabledDontStartWorker() {
-        assertWorkerNotRunning()
-
-        config.setEnabled(AppTpSetting.CPUMonitoring, false)
-        cpuMonitor.onVpnStarted(TestScope())
-
-        assertWorkerNotRunning()
     }
 
     @Test
@@ -188,7 +168,6 @@ class AppTPCPUMonitorTest {
 
     private fun assertStartWorker() {
         assertWorkerNotRunning()
-        config.setEnabled(AppTpSetting.CPUMonitoring, true)
         cpuMonitor.onVpnStarted(TestScope())
         assertWorkerRunning()
     }

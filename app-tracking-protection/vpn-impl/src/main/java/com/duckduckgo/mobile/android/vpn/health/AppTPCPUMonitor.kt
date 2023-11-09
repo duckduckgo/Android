@@ -23,8 +23,6 @@ import androidx.work.WorkManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.boundToVpnProcess
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -36,7 +34,6 @@ import logcat.logcat
 @ContributesMultibinding(VpnScope::class)
 class AppTPCPUMonitor @Inject constructor(
     private val workManager: WorkManager,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
     private val appBuildConfig: AppBuildConfig,
 ) : VpnServiceCallbacks {
 
@@ -46,17 +43,13 @@ class AppTPCPUMonitor @Inject constructor(
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.CPUMonitoring)) {
-            logcat { "AppTpSetting.CPUMonitoring is enabled, starting monitoring" }
-            val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(4, TimeUnit.HOURS)
-                .boundToVpnProcess(appBuildConfig.applicationId) // this worker is executed in the :vpn process
-                .setInitialDelay(10, TimeUnit.MINUTES) // let the CPU usage settle after VPN restart
-                .build()
+        logcat { "AppTpSetting.CPUMonitoring is enabled, starting monitoring" }
+        val work = PeriodicWorkRequestBuilder<CPUMonitorWorker>(4, TimeUnit.HOURS)
+            .boundToVpnProcess(appBuildConfig.applicationId) // this worker is executed in the :vpn process
+            .setInitialDelay(10, TimeUnit.MINUTES) // let the CPU usage settle after VPN restart
+            .build()
 
-            workManager.enqueueUniquePeriodicWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, work)
-        } else {
-            logcat { "AppTpSetting.CPUMonitoring is disabled" }
-        }
+        workManager.enqueueUniquePeriodicWork(APP_TRACKER_CPU_MONITOR_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, work)
     }
 
     override fun onVpnStopped(
