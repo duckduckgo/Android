@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
@@ -41,10 +42,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -187,6 +191,17 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         site.filterNotNull()
             .onEach(::updateSite)
             .launchIn(viewModelScope)
+
+        combine(site.filterNotNull(), userAllowListRepository.domainsInUserAllowListFlow()) { site, domains -> site to domains }
+            .map { (site, allowlistedDomains) ->
+                // Checking if site was added to / removed from allowlist since the screen was initialized
+                site.userAllowList != site.domain in allowlistedDomains
+            }
+            .onEach { allowlistChanged ->
+                // Closing the Privacy Dashboard screen
+                viewState.update { it?.copy(userChangedValues = allowlistChanged) }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun viewState(): StateFlow<ViewState?> {
@@ -255,6 +270,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $enabled")
 
         viewModelScope.launch(dispatcher.io()) {
+            delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = pixelParamMap()
                 if (enabled) {
@@ -264,13 +280,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     userAllowListRepository.addDomainToUserAllowList(domain)
                     pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams)
                 }
-            }
-            delay(CLOSE_DASHBOARD_ON_INTERACTION_DELAY)
-            withContext(dispatcher.main()) {
-                viewState.value = currentViewState().copy(
-                    protectionStatus = currentViewState().protectionStatus.copy(allowlisted = enabled),
-                    userChangedValues = true,
-                )
             }
         }
     }
