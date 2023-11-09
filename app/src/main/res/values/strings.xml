@@ -214,6 +214,7 @@
     <string name="brokenSitesCategoriesTitle">Describe what happened</string>
     <string name="brokenSitesCategoriesHint">Describe what happened</string>
     <string name="brokenSiteSubmitButton">Send Report</string>
+    <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us improve the app.</string>
 
     <string name="brokenSiteCategoryBlocked">Site blocked or didn\'t load</string>
     <string name="brokenSiteCategoryLayout">Site layout broken</string>
