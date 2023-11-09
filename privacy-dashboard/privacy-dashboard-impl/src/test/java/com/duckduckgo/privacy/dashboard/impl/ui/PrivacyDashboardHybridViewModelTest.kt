@@ -23,7 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -58,7 +58,7 @@ class PrivacyDashboardHybridViewModelTest {
         whenever(this.sdkInt).thenReturn(VERSION_CODES.Q)
     }
 
-    private val userAllowListDao = mock<UserAllowListDao>()
+    private val userAllowListRepository = mock<UserAllowListRepository>()
 
     private val contentBlocking = mock<ContentBlocking>()
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
@@ -68,7 +68,7 @@ class PrivacyDashboardHybridViewModelTest {
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
-            userAllowListDao = userAllowListDao,
+            userAllowListRepository = userAllowListRepository,
             pixel = pixel,
             dispatcher = coroutineRule.testDispatcherProvider,
             siteViewStateMapper = AppSiteViewStateMapper(PublicKeyInfoMapper(androidQAppBuildConfig)),
@@ -137,7 +137,7 @@ class PrivacyDashboardHybridViewModelTest {
         testee.onSiteChanged(site)
         testee.onPrivacyProtectionsClicked(enabled = false)
 
-        verify(userAllowListDao).insert(site.domain!!)
+        verify(userAllowListRepository).addDomainToUserAllowList(site.domain!!)
     }
 
     private fun site(

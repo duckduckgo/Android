@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
@@ -51,7 +51,7 @@ import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardHybridViewModel @Inject constructor(
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val pixel: Pixel,
     private val dispatcher: DispatcherProvider,
     private val siteViewStateMapper: SiteViewStateMapper,
@@ -258,10 +258,10 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
             currentViewState().siteViewState.domain?.let { domain ->
                 val pixelParams = pixelParamMap()
                 if (enabled) {
-                    userAllowListDao.delete(domain)
+                    userAllowListRepository.removeDomainFromUserAllowList(domain)
                     pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_REMOVE, pixelParams)
                 } else {
-                    userAllowListDao.insert(domain)
+                    userAllowListRepository.addDomainToUserAllowList(domain)
                     pixel.fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, pixelParams)
                 }
             }
