@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sitetoestemmingen</string>
-    <string name="sitePermissionsSettingsDescription">Sites die je bezoekt, kunnen om toegang vragen tot de locatie, camera of microfoon van je apparaat. Ze krijgen die toegang alleen als je daar expliciet toestemming voor geeft.</string>
+    <string name="sitePermissionsSettingsDescription">Sites die je bezoekt, kunnen toegang vragen tot de software, je camera, je microfoon of DRM (Digital Rights Management) op je apparaat. Ze krijgen die toegang alleen als je daar expliciet toestemming voor geeft.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Sta alle sites toe om het volgende vragen:</string>
     <string name="sitePermissionsSettingsLocation">Locatie</string>
     <string name="sitePermissionsSettingsCamera">Camera</string>
