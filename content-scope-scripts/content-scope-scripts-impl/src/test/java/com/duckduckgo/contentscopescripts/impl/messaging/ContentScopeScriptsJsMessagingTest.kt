@@ -18,6 +18,7 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +29,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class ContentScopeScriptsJsMessagingTest {
@@ -35,11 +37,19 @@ class ContentScopeScriptsJsMessagingTest {
 
     private val mockWebView: WebView = mock()
     private val jsMessageHelper: JsMessageHelper = mock()
+    private val coreContentScopeScripts: CoreContentScopeScripts = mock()
     private lateinit var contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging
 
     @Before
     fun setUp() {
-        contentScopeScriptsJsMessaging = ContentScopeScriptsJsMessaging(jsMessageHelper, coroutineRule.testDispatcherProvider)
+        whenever(coreContentScopeScripts.secret).thenReturn("secret")
+        whenever(coreContentScopeScripts.javascriptInterface).thenReturn("javascriptInterface")
+        whenever(coreContentScopeScripts.callbackName).thenReturn("callbackName")
+        contentScopeScriptsJsMessaging = ContentScopeScriptsJsMessaging(
+            jsMessageHelper,
+            coroutineRule.testDispatcherProvider,
+            coreContentScopeScripts,
+        )
     }
 
     @Test

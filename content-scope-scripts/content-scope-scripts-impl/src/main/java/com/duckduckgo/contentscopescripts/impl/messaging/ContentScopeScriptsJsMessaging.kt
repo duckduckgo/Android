@@ -33,6 +33,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.runBlocking
+import logcat.LogPriority.DEBUG
 import logcat.logcat
 
 @ContributesBinding(FragmentScope::class)
@@ -40,7 +41,7 @@ import logcat.logcat
 class ContentScopeScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
-    coreContentScopeScripts: CoreContentScopeScripts,
+    private val coreContentScopeScripts: CoreContentScopeScripts,
 ) : JsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -48,8 +49,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private lateinit var webView: WebView
     private lateinit var jsMessageCallback: JsMessageCallback
 
-    override val context: String = coreContentScopeScripts.secret
-    override val callbackName: String = coreContentScopeScripts.secret
+    override val context: String = "contentScopeScripts"
+    override val callbackName: String = coreContentScopeScripts.callbackName
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
@@ -58,15 +59,14 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     @JavascriptInterface
     override fun process(message: String, secret: String) {
         try {
-            logcat { "Marcos in $webView message is $message" }
-            logcat { "Marcos in $webView secret is $secret and ${this.secret}" }
+            logcat(DEBUG) { "Message received $message" }
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
             val domain = runBlocking(dispatcherProvider.main()) {
                 webView.url?.toUri()?.host
             }
             jsMessage?.let {
-                if (context == jsMessage.context && allowedDomains.contains(domain)) {
+                if (context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     handlers.firstOrNull {
                         it.method == jsMessage.method && it.featureName == jsMessage.featureName
                     }?.let {
@@ -84,10 +84,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
-        logcat { "Marcos registering interface $context in $webView" }
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, context)
+        this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
     }
 
     override fun sendSubscriptionEvent() {

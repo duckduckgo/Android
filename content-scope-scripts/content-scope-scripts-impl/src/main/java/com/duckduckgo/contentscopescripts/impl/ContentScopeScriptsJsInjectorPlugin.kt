@@ -20,7 +20,6 @@ import android.webkit.WebView
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import logcat.logcat
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
@@ -29,7 +28,6 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
 ) : JsInjectorPlugin {
     override fun onPageStarted(webView: WebView, url: String?) {
         if (coreContentScopeScripts.isEnabled()) {
-            logcat { "Marcos adding JS code in $webView" }
             webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript()}", null)
         }
     }

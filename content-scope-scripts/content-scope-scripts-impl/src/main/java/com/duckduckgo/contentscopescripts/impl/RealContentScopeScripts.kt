@@ -38,6 +38,8 @@ interface CoreContentScopeScripts {
     fun isEnabled(): Boolean
 
     val secret: String
+    val javascriptInterface: String
+    val callbackName: String
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -65,6 +67,8 @@ class RealContentScopeScripts @Inject constructor(
     private lateinit var cachedContentScopeJS: String
 
     override val secret: String = getSecret()
+    override val javascriptInterface: String = getSecret()
+    override val callbackName: String = getSecret()
 
     override fun getScript(): String {
         var updateJS = false
@@ -104,8 +108,8 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""
-    private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$secret\""
-    private fun getInterfaceKeyValuePair() = "\"messageInterface\":\"$secret\""
+    private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$callbackName\""
+    private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
 
     private fun getPluginParameters(): PluginParameters {
         var config = ""
