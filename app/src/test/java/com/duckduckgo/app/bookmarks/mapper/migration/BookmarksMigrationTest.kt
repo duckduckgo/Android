@@ -241,15 +241,30 @@ class BookmarksMigrationTest {
     }
 
     @Test
-    fun whenNeedsFormFactorMigrationThenFavoritesAndFormFactorFolderLastModifiedUdpated() {
+    fun whenNeedsFormFactorMigrationThenFormFactorFolderLastModifiedUdpated() {
         givenSomeFavoritesSavedSites(10)
         whenMigrationApplied()
 
         val mobileLastModified = savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT)!!.lastModified
         assertTrue(mobileLastModified.isNullOrEmpty().not())
-        savedSitesEntitiesDao.entitiesInFolderSync(SavedSitesNames.FAVORITES_MOBILE_ROOT).forEach {
-            assertEquals(mobileLastModified, it.lastModified)
-        }
+    }
+
+    @Test
+    fun whenAnyFavoriteRootFolderHasRelationWithBookmarksRootThenRemoveRelation() = runTest {
+        givenFormFactorFolderExist()
+        givenSomeFavoritesSavedSitesIn(
+            total = 10,
+            folderIds = arrayOf(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_MOBILE_ROOT),
+        )
+        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = SavedSitesNames.FAVORITES_ROOT))
+        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = SavedSitesNames.FAVORITES_MOBILE_ROOT))
+        savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = SavedSitesNames.FAVORITES_DESKTOP_ROOT))
+
+        whenMigrationApplied()
+
+        val bookmarkRootRelations = savedSitesRelationsDao.relations(SavedSitesNames.BOOKMARKS_ROOT).first()
+
+        assertTrue(bookmarkRootRelations.size == 10)
     }
 
     private fun whenMigrationApplied() {
@@ -312,6 +327,31 @@ class BookmarksMigrationTest {
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_ROOT, entityId = favorite.entityId))
             savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = favorite.entityId))
         }
+    }
+
+    private fun givenSomeFavoritesSavedSitesIn(
+        total: Int,
+        vararg folderIds: String,
+    ) {
+        for (index in 1..total) {
+            val favorite = Entity(
+                UUID.randomUUID().toString(),
+                "Favorite$index",
+                "http://favexample$index.com",
+                EntityType.BOOKMARK,
+            )
+            savedSitesEntitiesDao.insert(favorite)
+            folderIds.forEach {
+                savedSitesRelationsDao.insert(Relation(folderId = it, entityId = favorite.entityId))
+            }
+            savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = favorite.entityId))
+        }
+    }
+
+    private fun givenFormFactorFolderExist() {
+        savedSitesEntitiesDao.insert(Entity(SavedSitesNames.FAVORITES_DESKTOP_ROOT, SavedSitesNames.FAVORITES_DESKTOP_NAME, "", EntityType.FOLDER))
+        savedSitesEntitiesDao.insert(Entity(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_MOBILE_NAME, "", EntityType.FOLDER))
+        savedSitesEntitiesDao.insert(Entity(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_NAME, "", EntityType.FOLDER))
     }
 
     companion object {

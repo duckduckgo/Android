@@ -58,11 +58,24 @@ class AppDatabaseBookmarksMigrationCallback(
 
         // To be removed once internals update the app too FormFactorSpecificFavorites
         if (appBuildConfig.isInternalBuild()) {
-            addFavoritesFormFactorFolders()
-            val needsFormFactorFavoritesMigration = needsFormFactorFavoritesMigration()
-            if (needsFormFactorFavoritesMigration) {
-                migrateFavoritesToFormFactorFolders()
+            val foldersAdded = createFavoritesFormFactorFolders()
+            detachRootFoldersFromBookmarksRoot()
+            if (foldersAdded) {
+                val needsFormFactorFavoritesMigration = needsFormFactorFavoritesMigration()
+                if (needsFormFactorFavoritesMigration) {
+                    migrateFavoritesToFormFactorFolders()
+                }
             }
+        }
+    }
+
+    private fun detachRootFoldersFromBookmarksRoot() {
+        // users that received a payload from a FFS version could have attached root folders to bookmarks_root
+        // this fixes that state if it happened
+        with(appDatabase.get()) {
+            syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_ROOT)
+            syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_MOBILE_ROOT)
+            syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
         }
     }
 
@@ -77,19 +90,23 @@ class AppDatabaseBookmarksMigrationCallback(
         }
     }
 
-    private fun addFavoritesFormFactorFolders() {
+    private fun createFavoritesFormFactorFolders(): Boolean {
+        var foldersAdded = false
         with(appDatabase.get()) {
             if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT) == null) {
                 syncEntitiesDao().insert(
                     Entity(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_MOBILE_NAME, "", FOLDER, lastModified = null),
                 )
+                foldersAdded = true
             }
             if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT) == null) {
                 syncEntitiesDao().insert(
                     Entity(SavedSitesNames.FAVORITES_DESKTOP_ROOT, SavedSitesNames.FAVORITES_DESKTOP_NAME, "", FOLDER, lastModified = null),
                 )
+                foldersAdded = true
             }
         }
+        return foldersAdded
     }
 
     private fun needsMigration(): Boolean {
@@ -97,6 +114,7 @@ class AppDatabaseBookmarksMigrationCallback(
             return (favoritesDao().userHasFavorites() || bookmarksDao().bookmarksCount() > 0)
         }
     }
+
     private fun needsFormFactorFavoritesMigration(): Boolean {
         with(appDatabase.get()) {
             return syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT) != syncEntitiesDao().allEntitiesInFolderSync(
@@ -136,22 +154,17 @@ class AppDatabaseBookmarksMigrationCallback(
             val favouriteMigration = mutableListOf<Relation>()
             val entitiesMigration = mutableListOf<Entity>()
             val rootFavorites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
-            val formFactorFavorites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_MOBILE_ROOT)
+            val mobileFavorites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_MOBILE_ROOT)
             val formFactorFolder = syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT)
             val needRelation = rootFavorites.filter { rootFavorite ->
-                formFactorFavorites.firstOrNull { it.entityId == rootFavorite.entityId } == null
+                mobileFavorites.firstOrNull { it.entityId == rootFavorite.entityId } == null
             }
             val now = DatabaseDateFormatter.iso8601()
             needRelation.forEach {
-                it.lastModified = now
-                entitiesMigration.add(it)
                 favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_MOBILE_ROOT, entityId = it.entityId))
             }
-            if (needRelation.isNotEmpty()) {
-                formFactorFolder?.apply {
-                    lastModified = now
-                    entitiesMigration.add(this)
-                }
+            if (needRelation.isNotEmpty() && formFactorFolder != null) {
+                entitiesMigration.add(formFactorFolder.copy(lastModified = now))
             }
             syncEntitiesDao().insertList(entitiesMigration)
             syncRelationsDao().insertList(favouriteMigration)
