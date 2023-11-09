@@ -6,7 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
-import com.duckduckgo.savedsites.store.FavoritesViewMode.NATIVE
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode.NATIVE
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore.Companion.FILENAME
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore.Companion.KEY_FAVORITES_DISPLAY_MODE
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,21 +40,21 @@ class SavedSitesSettingsSharedPrefStoreTest {
     fun whenGetFavoritesDisplayModeThenReturnStoredValue() = runTest {
         prefs.edit().putString(KEY_FAVORITES_DISPLAY_MODE, NATIVE.value).commit()
 
-        assertEquals(NATIVE, testee.favoritesDisplayMode)
+        assertEquals(NATIVE, testee.favoritesFavoritesDisplayMode)
     }
 
     @Test
     fun whenNoValueThenReturnNative() = runTest {
-        assertEquals(NATIVE, testee.favoritesDisplayMode)
+        assertEquals(NATIVE, testee.favoritesFavoritesDisplayMode)
     }
 
     @Test
     fun whenValueChangedThenFlowEmitsNewValue() = runTest {
         prefs.edit().putString(KEY_FAVORITES_DISPLAY_MODE, NATIVE.value).commit()
-        testee.viewModeFlow().test {
+        testee.favoritesFormFactorModeFlow().test {
             assertEquals(NATIVE, awaitItem())
-            testee.favoritesDisplayMode = FavoritesViewMode.UNIFIED
-            assertEquals(FavoritesViewMode.UNIFIED, awaitItem())
+            testee.favoritesFavoritesDisplayMode = FavoritesDisplayMode.UNIFIED
+            assertEquals(FavoritesDisplayMode.UNIFIED, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

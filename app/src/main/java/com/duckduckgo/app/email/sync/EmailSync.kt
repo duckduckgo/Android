@@ -102,6 +102,10 @@ class EmailSync @Inject constructor(
         syncSettingsListener.onSettingChanged(key)
     }
 
+    override fun onSyncDisabled() {
+        // no-op
+    }
+
     companion object {
         const val DUCK_EMAIL_SETTING = "email_protection_generation"
     }

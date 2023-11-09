@@ -154,6 +154,7 @@ class SettingsSyncDataPersister @Inject constructor(
         syncSettingsSyncStore.clientModifiedSince = "0"
         syncSettingsSyncStore.startTimeStamp = "0"
         settingsSyncMetadataDao.removeAll()
+        syncableSettings.getPlugins().forEach { it.onSyncDisabled() }
     }
 
     private class Adapters {
