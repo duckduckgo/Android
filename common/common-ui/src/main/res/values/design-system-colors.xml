@@ -40,6 +40,7 @@
         daxColorAccentYellow
         daxColorContainerDisabled - Disabled color applied to background elements like buttons
         daxColorTextDisabled - Disabled color applied to text elements
+        daxColorTertiaryText - Tertiary text color
     -->
     <attr name="daxColorBackground" format="color"/>
     <attr name="daxColorBackgroundInverted" format="color"/>
@@ -50,6 +51,7 @@
     <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
     <attr name="daxColorSecondaryInvertedText" format="color"/>
+    <attr name="daxColorTertiaryText" format="color"/>
     <attr name="daxColorPrimaryIcon" format="color"/>
     <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
@@ -145,6 +147,7 @@
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
+    <color name="black48">#7A000000</color>
     <color name="black40">#66000000</color>
     <color name="black36">#5C000000</color>
     <color name="black30">#4D000000</color>
@@ -158,6 +161,7 @@
 
     <color name="white84">#D6FFFFFF</color>
     <color name="white60">#99FFFFFF</color>
+    <color name="white48">#7AFFFFFF</color>
     <color name="white40">#66FFFFFF</color>
     <color name="white36">#5CFFFFFF</color>
     <color name="white30">#4DFFFFFF</color>
