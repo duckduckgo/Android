@@ -48,13 +48,15 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
+import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -102,9 +104,9 @@ class BrowserWebViewClientTest {
     private val internalTestUserChecker: InternalTestUserChecker = mock()
     private val adClickManager: AdClickManager = mock()
     private val autoconsent: Autoconsent = mock()
-    private val contentScopeScripts: ContentScopeScripts = mock()
     private val pixel: Pixel = mock()
     private val crashLogger: CrashLogger = mock()
+    private val jsPlugins = FakePluginPoint()
 
     @UiThreadTest
     @Before
@@ -129,9 +131,9 @@ class BrowserWebViewClientTest {
             internalTestUserChecker,
             adClickManager,
             autoconsent,
-            contentScopeScripts,
             pixel,
             crashLogger,
+            jsPlugins,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -177,9 +179,11 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenInjectContentScopeScripts() = runTest {
+    fun whenOnPageStartedCalledThenInjectJsCode() = runTest {
+        assertEquals(0, jsPlugins.plugin.countStarted)
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(contentScopeScripts).injectContentScopeScripts(webView)
+        assertEquals(1, jsPlugins.plugin.countStarted)
+        assertEquals(0, jsPlugins.plugin.countFinished)
     }
 
     @UiThreadTest
@@ -201,6 +205,15 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).navigationStateChanged(any())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledThenInjectJsCode() = runTest {
+        assertEquals(0, jsPlugins.plugin.countFinished)
+        testee.onPageFinished(webView, EXAMPLE_URL)
+        assertEquals(1, jsPlugins.plugin.countFinished)
+        assertEquals(0, jsPlugins.plugin.countStarted)
     }
 
     @UiThreadTest
@@ -674,6 +687,29 @@ class BrowserWebViewClientTest {
     private class TestWebView(context: Context) : WebView(context) {
         override fun getOriginalUrl(): String {
             return EXAMPLE_URL
+        }
+    }
+
+    private class FakePluginPoint : PluginPoint<JsInjectorPlugin> {
+        val plugin = FakeJsInjectorPlugin()
+        override fun getPlugins(): Collection<JsInjectorPlugin> {
+            return listOf(plugin)
+        }
+    }
+
+    private class FakeJsInjectorPlugin : JsInjectorPlugin {
+        var countFinished = 0
+        var countStarted = 0
+
+        override fun onPageStarted(
+            webView: WebView,
+            url: String?,
+        ) {
+            countStarted++
+        }
+
+        override fun onPageFinished(webView: WebView, url: String?) {
+            countFinished++
         }
     }
 

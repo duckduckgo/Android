@@ -200,13 +200,14 @@ import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.autofill.api.systemautofill.SystemAutofillUsageMonitor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
 import com.duckduckgo.mobile.android.ui.view.*
@@ -231,6 +232,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
@@ -399,7 +401,8 @@ class BrowserTabFragment :
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var contentScopeScripts: ContentScopeScripts
+    @Named("ContentScopeScripts")
+    lateinit var contentScopeScripts: JsMessaging
 
     @Inject
     lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
@@ -2100,7 +2103,16 @@ class BrowserTabFragment :
             configureWebViewForAutofill(it)
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
             autoconsent.addJsInterface(it, autoconsentCallback)
-            contentScopeScripts.addJsInterface(it)
+            contentScopeScripts.register(
+                it,
+                object : JsMessageCallback(this) {
+                    override fun process(method: String) {
+                        runCatching {
+                            callback.javaClass.getDeclaredMethod(method)
+                        }.getOrNull()?.invoke(callback)
+                    }
+                },
+            )
         }
 
         if (appBuildConfig.isDebug) {

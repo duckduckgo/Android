@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.messaging
+package com.duckduckgo.browser.api
 
-object ReplyHandler {
-    fun constructReply(message: String, messageCallback: String, messageSecret: String): String {
-        return """
-            (function() {
-                window['$messageCallback']('$messageSecret', $message);
-            })();
-        """.trimIndent()
-    }
+import android.webkit.WebView
+
+/** Public interface to inject JS code to a website */
+interface JsInjectorPlugin {
+    /**
+     * This method is called during onPageStarted and receives a [webView] instance and the [url] of the website
+     */
+    fun onPageStarted(webView: WebView, url: String?)
+
+    /**
+     * This method is called during onPageFinished and receives a [webView] instance and the [url] of the website
+     */
+    fun onPageFinished(webView: WebView, url: String?)
 }

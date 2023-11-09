@@ -46,11 +46,12 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
-import com.duckduckgo.contentscopescripts.api.ContentScopeScripts
+import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.privacy.config.api.AmpLinks
 import java.net.URI
@@ -77,9 +78,9 @@ class BrowserWebViewClient @Inject constructor(
     private val internalTestUserChecker: InternalTestUserChecker,
     private val adClickManager: AdClickManager,
     private val autoconsent: Autoconsent,
-    private val contentScopeScripts: ContentScopeScripts,
     private val pixel: Pixel,
     private val crashLogger: CrashLogger,
+    private val jsPlugins: PluginPoint<JsInjectorPlugin>,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -277,7 +278,9 @@ class BrowserWebViewClient @Inject constructor(
         }
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
-        contentScopeScripts.injectContentScopeScripts(webView)
+        jsPlugins.getPlugins().forEach {
+            it.onPageStarted(webView, url)
+        }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
@@ -286,6 +289,9 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: String?,
     ) {
+        jsPlugins.getPlugins().forEach {
+            it.onPageFinished(webView, url)
+        }
         accessibilityManager.onPageFinished(webView, url)
         url?.let {
             // We call this for any url but it will only be processed for an internal tester verification url

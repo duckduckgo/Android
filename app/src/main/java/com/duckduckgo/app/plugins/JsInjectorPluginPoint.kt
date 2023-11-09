@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.messaging
+package com.duckduckgo.app.plugins
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(
     scope = AppScope::class,
-    boundType = MessageHandlerPlugin::class,
+    boundType = JsInjectorPlugin::class,
 )
 @Suppress("unused")
-interface MessageHandlerPlugin {
-    fun process(messageType: String, jsonString: String, responseListener: ResponseListener)
-    val supportedTypes: List<String>
-}
-
-interface ResponseListener {
-    fun onResponse(message: String)
-}
+interface UnusedJsInjectorPluginPoint
