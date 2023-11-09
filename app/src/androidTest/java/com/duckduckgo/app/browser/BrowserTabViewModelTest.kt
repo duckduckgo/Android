@@ -125,7 +125,6 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
@@ -386,8 +385,6 @@ class BrowserTabViewModelTest {
 
     private val favoriteListFlow = Channel<List<Favorite>>()
 
-    private val mockAutofillStore: AutofillStore = mock()
-
     private val mockAppTheme: AppTheme = mock()
 
     private val autofillCapabilityChecker: FakeCapabilityChecker = FakeCapabilityChecker(enabled = false)
@@ -500,7 +497,6 @@ class BrowserTabViewModelTest {
             voiceSearchAvailability = voiceSearchAvailability,
             voiceSearchPixelLogger = voiceSearchPixelLogger,
             settingsDataStore = mockSettingsDataStore,
-            autofillStore = mockAutofillStore,
             adClickManager = mockAdClickManager,
             sitePermissionsManager = mockSitePermissionsManager,
             autofillCapabilityChecker = autofillCapabilityChecker,
@@ -4165,54 +4161,6 @@ class BrowserTabViewModelTest {
         assertTrue(testee.siteLiveData.value?.consentOptOutFailed!!)
         assertTrue(testee.siteLiveData.value?.consentSelfTestFailed!!)
         assertTrue(testee.siteLiveData.value?.consentCosmeticHide!!)
-    }
-
-    @Test
-    fun givenPermissionsAlreadyGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.GrantSitePermissionRequest> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
-        }
-    }
-
-    @Test
-    fun givenPermissionNeverGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf<String>()
-        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.ShowSitePermissionsDialog> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
-        }
-    }
-
-    @Test
-    fun whenOnePermissionIsGrantedAndOtherNeedsToBeRequestedThenBothCommandsAreCalled() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.GrantSitePermissionRequest> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
-        }
-        assertCommandIssued<Command.ShowSitePermissionsDialog> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
-        }
     }
 
     @Test

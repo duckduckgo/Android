@@ -115,7 +115,6 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
@@ -187,7 +186,6 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
-    private val autofillStore: AutofillStore,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
     private val sitePermissionsManager: SitePermissionsManager,
@@ -453,11 +451,6 @@ class BrowserTabViewModel @Inject constructor(
         object EmailSignEvent : Command()
         class ShowSitePermissionsDialog(
             val permissionsToRequest: Array<String>,
-            val request: PermissionRequest,
-        ) : Command()
-
-        class GrantSitePermissionRequest(
-            val sitePermissionsToGrant: Array<String>,
             val request: PermissionRequest,
         ) : Command()
 
@@ -732,6 +725,8 @@ class BrowserTabViewModel @Inject constructor(
                     )
             }.launchIn(viewModelScope)
     }
+
+    override fun getCurrentTabId(): String = tabId
 
     fun onMessageProcessed() {
         showBrowser()
@@ -1484,12 +1479,7 @@ class BrowserTabViewModel @Inject constructor(
         sitePermissionsAllowedToAsk: Array<String>,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            val url = request.origin.toString()
-            val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
-            val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
-            if (sitePermissionsGranted.isNotEmpty()) {
-                command.postValue(GrantSitePermissionRequest(sitePermissionsGranted, request))
-            }
+            val sitePermissionsToAsk = sitePermissionsManager.getSitePermissionsForUserToHandle(tabId, request)
             if (sitePermissionsToAsk.isNotEmpty()) {
                 command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
             }
