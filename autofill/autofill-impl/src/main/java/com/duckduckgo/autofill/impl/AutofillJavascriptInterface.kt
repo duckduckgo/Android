@@ -47,6 +47,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerTyp
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
+import com.duckduckgo.autofill.impl.systemautofill.SystemAutofillServiceSuppressor
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.DeleteAutoLogin
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.DiscardAutoLoginId
@@ -110,6 +111,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val inContextDataStore: EmailProtectionInContextDataStore,
     private val recentInstallChecker: EmailProtectionInContextRecentInstallChecker,
     private val loginDeduplicator: AutofillLoginDeduplicator,
+    private val systemAutofillServiceSuppressor: SystemAutofillServiceSuppressor,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -248,6 +250,9 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     @JavascriptInterface
     fun storeFormData(data: String) {
+        // important to call suppressor as soon as possible
+        systemAutofillServiceSuppressor.suppressAutofill(webView)
+
         Timber.i("storeFormData called, credentials provided to be persisted")
 
         storeFormDataJob += coroutineScope.launch(dispatcherProvider.default()) {
