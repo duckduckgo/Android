@@ -21,6 +21,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.Duplicate
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.squareup.anvil.annotations.ContributesBinding
@@ -32,6 +33,7 @@ import timber.log.Timber
 @Named("deduplicationStrategy")
 class SavedSitesDeduplicationPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
+    private val syncSavedSitesRepository: SyncSavedSitesRepository,
     private val duplicateFinder: SavedSitesDuplicateFinder,
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
@@ -84,19 +86,20 @@ class SavedSitesDeduplicationPersister @Inject constructor(
 
     override fun processFavourite(
         favourite: Favorite,
+        favoriteFolder: String,
     ) {
         if (favourite.isDeleted()) {
             Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} is removed and not present locally, nothing to do")
         } else {
-            when (val result = duplicateFinder.findFavouriteDuplicate(favourite)) {
+            when (val result = duplicateFinder.findFavouriteDuplicate(favourite, favoriteFolder)) {
                 is SavedSitesDuplicateResult.Duplicate -> {
                     Timber.d("Sync-Bookmarks-Persister: child ${favourite.id} exists locally as ${result.id}, replacing")
-                    savedSitesRepository.replaceFavourite(favourite, result.id)
+                    syncSavedSitesRepository.replaceFavourite(favourite, result.id, favoriteFolder)
                 }
 
                 is SavedSitesDuplicateResult.NotDuplicate -> {
                     Timber.d("Sync-Bookmarks-Persister: child ${favourite.id} not present locally, inserting")
-                    savedSitesRepository.insert(favourite)
+                    syncSavedSitesRepository.insert(favourite, favoriteFolder)
                 }
             }
         }

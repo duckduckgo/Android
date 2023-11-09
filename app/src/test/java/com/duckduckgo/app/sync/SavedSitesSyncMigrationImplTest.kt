@@ -23,12 +23,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.SavedSitesSettingsRepository
+import com.duckduckgo.savedsites.impl.FavoritesDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncMigrationImpl
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
-import com.duckduckgo.savedsites.store.FavoritesViewMode
+import com.duckduckgo.savedsites.store.FavoritesDisplayMode
 import com.duckduckgo.savedsites.store.Relation
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
@@ -50,7 +50,7 @@ class SavedSitesSyncMigrationImplTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
 
-    private val savedSiteSettingsRepository: SavedSitesSettingsRepository = FakeSaveSitesSettingsRepository()
+    private val savedSiteSettingsRepository: FavoritesDisplayModeSettingsRepository = FakeFavoritesDisplayModeSettingsRepository()
     private lateinit var db: AppDatabase
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
@@ -107,7 +107,7 @@ class SavedSitesSyncMigrationImplTest {
         val nativeEntities = givenEntitiesWithIds("Entity4", "Entity5", "Entity6")
         givenEntitiesStoredIn(nativeEntities, SavedSitesNames.FAVORITES_MOBILE_ROOT)
         givenEntitiesStoredIn(nativeEntities + desktopEntities, SavedSitesNames.FAVORITES_ROOT)
-        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesViewMode.NATIVE
+        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.NATIVE
 
         testee.onSyncDisabled()
 
@@ -127,7 +127,7 @@ class SavedSitesSyncMigrationImplTest {
         val nativeEntities = givenEntitiesWithIds("Entity4", "Entity5", "Entity6")
         givenEntitiesStoredIn(nativeEntities, SavedSitesNames.FAVORITES_MOBILE_ROOT)
         givenEntitiesStoredIn(nativeEntities + desktopEntities, SavedSitesNames.FAVORITES_ROOT)
-        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesViewMode.UNIFIED
+        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.UNIFIED
 
         testee.onSyncDisabled()
 
@@ -142,20 +142,20 @@ class SavedSitesSyncMigrationImplTest {
 
     @Test
     fun whenSyncDisabledAndDisplayModeUnifiedThenNewDisplayModeIsNative() {
-        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesViewMode.UNIFIED
+        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.UNIFIED
 
         testee.onSyncDisabled()
 
-        assertEquals(FavoritesViewMode.NATIVE, savedSiteSettingsRepository.favoritesDisplayMode)
+        assertEquals(FavoritesDisplayMode.NATIVE, savedSiteSettingsRepository.favoritesDisplayMode)
     }
 
     @Test
     fun whenSyncDisabledAndDisplayModeNativeThenNewDisplayModeIsNative() {
-        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesViewMode.NATIVE
+        savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.NATIVE
 
         testee.onSyncDisabled()
 
-        assertEquals(FavoritesViewMode.NATIVE, savedSiteSettingsRepository.favoritesDisplayMode)
+        assertEquals(FavoritesDisplayMode.NATIVE, savedSiteSettingsRepository.favoritesDisplayMode)
     }
 
     @Test
