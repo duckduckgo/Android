@@ -51,8 +51,6 @@
     <string name="sync_enable_options">Options</string>
     <string name="sync_enable_option_favicons_title">Fetch Bookmark Icons</string>
     <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
-    <string name="sync_enable_option_favorites_title">Share Favorites</string>
-    <string name="sync_enable_option_favorites_subtitle">Use the same favorites on all devices. Leave off to keep mobile and desktop favorites separate.</string>
 
     <!-- Device synced screen -->
     <string name="sync_connected_device_title">Device Synced!</string>

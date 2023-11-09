@@ -28,6 +28,7 @@ interface SavedSitesSyncPersisterStrategy {
 
     fun processFavourite(
         favourite: Favorite,
+        favoriteFolder: String,
     )
 
     fun processBookmark(

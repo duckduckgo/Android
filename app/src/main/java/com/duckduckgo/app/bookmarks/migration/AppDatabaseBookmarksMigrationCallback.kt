@@ -20,6 +20,8 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.formatters.time.*
+import com.duckduckgo.appbuildconfig.api.*
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
@@ -34,6 +36,7 @@ import kotlinx.coroutines.asExecutor
 class AppDatabaseBookmarksMigrationCallback(
     private val appDatabase: Lazy<AppDatabase>,
     private val dispatcherProvider: DispatcherProvider,
+    private val appBuildConfig: AppBuildConfig,
 ) : RoomDatabase.Callback() {
 
     private val folderMap: MutableMap<Long, String> = mutableMapOf()
@@ -46,10 +49,33 @@ class AppDatabaseBookmarksMigrationCallback(
 
     fun runMigration() {
         addRootFolders()
-        if (needsMigration()) {
+        val needsMigration = needsMigration()
+        if (needsMigration) {
             migrateBookmarks()
             migrateFavorites()
             cleanUpTables()
+        }
+
+        // To be removed once internals update the app too FormFactorSpecificFavorites
+        if (appBuildConfig.isInternalBuild()) {
+            val foldersAdded = createFavoritesFormFactorFolders()
+            detachRootFoldersFromBookmarksRoot()
+            if (foldersAdded) {
+                val needsFormFactorFavoritesMigration = needsFormFactorFavoritesMigration()
+                if (needsFormFactorFavoritesMigration) {
+                    migrateFavoritesToFormFactorFolders()
+                }
+            }
+        }
+    }
+
+    private fun detachRootFoldersFromBookmarksRoot() {
+        // users that received a payload from a FFS version could have attached root folders to bookmarks_root
+        // this fixes that state if it happened
+        with(appDatabase.get()) {
+            syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_ROOT)
+            syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_MOBILE_ROOT)
+            syncRelationsDao().deleteRelationByEntity(SavedSitesNames.FAVORITES_DESKTOP_ROOT)
         }
     }
 
@@ -64,9 +90,36 @@ class AppDatabaseBookmarksMigrationCallback(
         }
     }
 
+    private fun createFavoritesFormFactorFolders(): Boolean {
+        var foldersAdded = false
+        with(appDatabase.get()) {
+            if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT) == null) {
+                syncEntitiesDao().insert(
+                    Entity(SavedSitesNames.FAVORITES_MOBILE_ROOT, SavedSitesNames.FAVORITES_MOBILE_NAME, "", FOLDER, lastModified = null),
+                )
+                foldersAdded = true
+            }
+            if (syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_DESKTOP_ROOT) == null) {
+                syncEntitiesDao().insert(
+                    Entity(SavedSitesNames.FAVORITES_DESKTOP_ROOT, SavedSitesNames.FAVORITES_DESKTOP_NAME, "", FOLDER, lastModified = null),
+                )
+                foldersAdded = true
+            }
+        }
+        return foldersAdded
+    }
+
     private fun needsMigration(): Boolean {
         with(appDatabase.get()) {
             return (favoritesDao().userHasFavorites() || bookmarksDao().bookmarksCount() > 0)
+        }
+    }
+
+    private fun needsFormFactorFavoritesMigration(): Boolean {
+        with(appDatabase.get()) {
+            return syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT) != syncEntitiesDao().allEntitiesInFolderSync(
+                SavedSitesNames.FAVORITES_MOBILE_ROOT,
+            )
         }
     }
 
@@ -89,6 +142,28 @@ class AppDatabaseBookmarksMigrationCallback(
                 }
             }
 
+            syncEntitiesDao().insertList(entitiesMigration)
+            syncRelationsDao().insertList(favouriteMigration)
+        }
+    }
+
+    private fun migrateFavoritesToFormFactorFolders() {
+        with(appDatabase.get()) {
+            val favouriteMigration = mutableListOf<Relation>()
+            val entitiesMigration = mutableListOf<Entity>()
+            val rootFavorites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
+            val mobileFavorites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_MOBILE_ROOT)
+            val formFactorFolder = syncEntitiesDao().entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT)
+            val needRelation = rootFavorites.filter { rootFavorite ->
+                mobileFavorites.firstOrNull { it.entityId == rootFavorite.entityId } == null
+            }
+            val now = DatabaseDateFormatter.iso8601()
+            needRelation.forEach {
+                favouriteMigration.add(Relation(folderId = SavedSitesNames.FAVORITES_MOBILE_ROOT, entityId = it.entityId))
+            }
+            if (needRelation.isNotEmpty() && formFactorFolder != null) {
+                entitiesMigration.add(formFactorFolder.copy(lastModified = now))
+            }
             syncEntitiesDao().insertList(entitiesMigration)
             syncRelationsDao().insertList(favouriteMigration)
         }
