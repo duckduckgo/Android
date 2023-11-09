@@ -56,7 +56,7 @@ class RealSyncStateMonitor @Inject constructor(
     }
 
     private fun mapState(
-        attempt: SyncAttempt,
+        attempt: SyncAttempt?,
         signedIn: Boolean,
     ): SyncState {
         return if (signedIn) {
