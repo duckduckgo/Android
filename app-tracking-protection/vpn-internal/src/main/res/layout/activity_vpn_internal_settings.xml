@@ -45,20 +45,6 @@
                     app:panelDrawable="@drawable/ic_info_panel_alert"
                     app:panelText="Turn AppTP ON to be able to configure this settings"/>
 
-            <!-- Section Config -->
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-                    android:id="@+id/sectionConfigTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="Config"/>
-
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-                    android:id="@+id/vpnAlwaysSetDNSToggle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:primaryText="Always set DNS"
-                    app:showSwitch="true"/>
-
             <!-- Section Trackers -->
             <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"

@@ -39,14 +39,12 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.apps.isSystemApp
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListUpdateWorker
-import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
 import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
-import com.duckduckgo.vpn.internal.feature.remote.VpnRemoteFeatureReceiver
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.google.android.material.snackbar.Snackbar
@@ -62,9 +60,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var vpnBugReporter: VpnBugReporter
-
-    @Inject
-    lateinit var appTpConfig: AppTpFeatureConfig
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -101,7 +96,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupBugReport()
         setupDeleteTrackingHistory()
         setupForceUpdateBlocklist()
-        setupConfigSection()
         setupUiElementsState()
         setupAppProtectionSection()
     }
@@ -188,7 +182,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         job += lifecycleScope.launch {
             while (isActive) {
                 val isEnabled = appTrackingProtection.isEnabled()
-                binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled && !appBuildConfig.isDebug
                 binding.settingsInfo.isVisible = !isEnabled
 
@@ -237,19 +230,6 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     private fun setupAppTrackerExceptionRules() {
         binding.exceptionRules.setOnClickListener {
             startActivity(ExceptionRulesDebugActivity.intent(this))
-        }
-    }
-
-    private fun setupConfigSection() {
-        with(AppTpSetting.AlwaysSetDNS) {
-            binding.vpnAlwaysSetDNSToggle.setIsChecked(appTpConfig.isEnabled(this))
-            binding.vpnAlwaysSetDNSToggle.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
-                } else {
-                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
-                }
-            }
         }
     }
 

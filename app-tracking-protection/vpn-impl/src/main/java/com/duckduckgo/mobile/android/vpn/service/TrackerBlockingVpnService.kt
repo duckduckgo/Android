@@ -37,8 +37,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -127,7 +126,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
-    @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
+    @Inject lateinit var appTpLocalFeature: AppTpLocalFeature
 
     @Inject lateinit var vpnNetworkStackProvider: VpnNetworkStackProvider
 
@@ -136,9 +135,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     private val alwaysOnStateJob = ConflatedJob()
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
-    private val isAlwaysSetDNSEnabled: Boolean
-        get() = appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)
 
     private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(provider = {
         runBlocking { vpnNetworkStackProvider.provideNetworkStack() }
@@ -502,21 +498,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         val dns = mutableSetOf<InetAddress>().apply {
             addAll(originalDns)
-        }
-
-        // This is purely internal, never to go to production
-        if (appBuildConfig.isInternalBuild() && isAlwaysSetDNSEnabled) {
-            if (dns.isEmpty()) {
-                kotlin.runCatching {
-                    logcat { "VPN log: Adding cloudflare DNS" }
-                    dns.add(InetAddress.getByName("1.1.1.1"))
-                    dns.add(InetAddress.getByName("1.0.0.1"))
-                    dns.add(InetAddress.getByName("2606:4700:4700::1111"))
-                    dns.add(InetAddress.getByName("2606:4700:4700::1001"))
-                }.onFailure {
-                    logcat(WARN) { "VPN log: Error adding fallback DNS: ${it.asLog()}" }
-                }
-            }
         }
 
         if (!dns.containsIpv4()) {
