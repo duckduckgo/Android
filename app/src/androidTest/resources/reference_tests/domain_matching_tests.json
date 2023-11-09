@@ -1011,10 +1011,17 @@
                 "name": "options blocking with surrogate",
                 "siteURL": "https://site-that-tracks.com/",
                 "requestURL": "https://sometimes-bad.third-party.site/surrogate-and-option-blocking-only?abc=2",
-                "requestType": "image",
+                "requestType": "script",
                 "expectAction": "redirect",
                 "expectRedirect": "data:application/javascript;base64,KGZ1bmN0aW9uKCkge3dpbmRvdy5zdXJyb2dhdGUxPXRydWV9KSgpOw==",
                 "expectExpression": "window.surrogate1 === true"
+            },
+            {
+                "name": "options blocking, wrong type",
+                "siteURL": "https://site-that-tracks.com/",
+                "requestURL": "https://sometimes-bad.third-party.site/surrogate-and-option-blocking-only?abc=2",
+                "requestType": "image",
+                "expectAction": "ignore"
             },
             {
                 "name": "require exact match for surrogates",
