@@ -100,7 +100,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 REMOTE_CONFIG_ETAG to privacyConfig.privacyConfigData()?.eTag.orEmpty(),
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
-                PROTECTIONS_STATE to protectionsState.toBinaryString(),
+                PROTECTIONS_STATE to protectionsState.toString(),
             )
 
             val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())

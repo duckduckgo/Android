@@ -116,7 +116,7 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
         val params = paramsCaptor.firstValue
 
-        assertEquals("0", params["protectionsState"])
+        assertEquals("false", params["protectionsState"])
     }
 
     @Test
@@ -133,7 +133,7 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
         val params = paramsCaptor.firstValue
 
-        assertEquals("0", params["protectionsState"])
+        assertEquals("false", params["protectionsState"])
     }
 
     @Test
@@ -150,7 +150,7 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
         val params = paramsCaptor.firstValue
 
-        assertEquals("0", params["protectionsState"])
+        assertEquals("false", params["protectionsState"])
     }
 
     @Test
@@ -169,7 +169,7 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
         val params = paramsCaptor.firstValue
 
-        assertEquals("0", params["protectionsState"])
+        assertEquals("false", params["protectionsState"])
     }
 
     @Test
@@ -186,7 +186,7 @@ class BrokenSiteSubmitterTest {
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
         val params = paramsCaptor.firstValue
 
-        assertEquals("1", params["protectionsState"])
+        assertEquals("true", params["protectionsState"])
     }
 
     @Test
