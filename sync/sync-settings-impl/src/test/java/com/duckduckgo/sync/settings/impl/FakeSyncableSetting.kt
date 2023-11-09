@@ -44,4 +44,8 @@ open class FakeSyncableSetting : SyncableSetting {
     override fun onSettingChanged() {
         this.listener.invoke()
     }
+
+    override fun onSyncDisabled() {
+        // no-op
+    }
 }

@@ -21,6 +21,7 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
@@ -30,6 +31,7 @@ import timber.log.Timber
 @Named("remoteWinsStrategy")
 class SavedSitesRemoteWinsPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
+    private val syncSavedSitesRepository: SyncSavedSitesRepository,
 ) : SavedSitesSyncPersisterStrategy {
     override fun processBookmarkFolder(
         folder: BookmarkFolder,
@@ -78,22 +80,23 @@ class SavedSitesRemoteWinsPersister @Inject constructor(
 
     override fun processFavourite(
         favourite: Favorite,
+        favoriteFolder: String,
     ) {
-        val storedFavorite = savedSitesRepository.getFavoriteById(favourite.id)
+        val storedFavorite = syncSavedSitesRepository.getFavoriteById(favourite.id, favoriteFolder)
         if (storedFavorite != null) {
             if (favourite.isDeleted()) {
                 Timber.d("Sync-Bookmarks-Persister: remote favourite ${favourite.id} exists locally but was deleted remotely, deleting locally too")
-                savedSitesRepository.delete(favourite)
+                syncSavedSitesRepository.delete(favourite, favoriteFolder)
             } else {
                 Timber.d("Sync-Bookmarks-Persister: remote favourite ${favourite.id} exists locally, replacing")
-                savedSitesRepository.replaceFavourite(favourite, favourite.id)
+                syncSavedSitesRepository.replaceFavourite(favourite, favourite.id, favoriteFolder)
             }
         } else {
             if (favourite.isDeleted()) {
                 Timber.d("Sync-Bookmarks-Persister: favourite ${favourite.id} not present locally but was deleted, nothing to do")
             } else {
                 Timber.d("Sync-Bookmarks-Persister: adding ${favourite.id} to Favourites")
-                savedSitesRepository.insert(favourite)
+                syncSavedSitesRepository.insert(favourite, favoriteFolder)
             }
         }
     }

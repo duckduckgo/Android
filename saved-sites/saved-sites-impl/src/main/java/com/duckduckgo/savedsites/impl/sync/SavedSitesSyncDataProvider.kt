@@ -36,13 +36,16 @@ import timber.log.Timber
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
 class SavedSitesSyncDataProvider @Inject constructor(
     private val repository: SavedSitesRepository,
+    private val syncSavedSitesRepository: SyncSavedSitesRepository,
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val syncCrypto: SyncCrypto,
+    private val savedSitesSyncMigration: SavedSitesSyncMigration,
 ) : SyncableDataProvider {
 
     override fun getChanges(): SyncChangesRequest {
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
         val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
+            savedSitesSyncMigration.onSyncEnabled()
             allContent()
         } else {
             changesSince(savedSitesSyncStore.clientModifiedSince)
@@ -96,10 +99,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
         val updates = mutableListOf<SyncBookmarkEntry>()
         // favorites (we don't add individual items, they are added as we go through bookmark folders)
         if (hasFavorites) {
-            val favorites = repository.getFavoritesSync()
-            val favoriteFolder = repository.getFolder(SavedSitesNames.FAVORITES_ROOT)
-            favoriteFolder?.let {
-                updates.add(encryptFolder(favoriteFolder, favorites.map { it.id }))
+            val favoritesFolders = listOf(SavedSitesNames.FAVORITES_ROOT, SavedSitesNames.FAVORITES_MOBILE_ROOT)
+            favoritesFolders.forEach {
+                val favorites = syncSavedSitesRepository.getFavoritesSync(it)
+                val favoriteFolder = repository.getFolder(it)
+                favoriteFolder?.let {
+                    updates.add(encryptFolder(favoriteFolder, favorites.map { it.id }))
+                }
             }
         }
 
