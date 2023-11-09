@@ -178,7 +178,11 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runBlocking<Unit> {
         whenever(mockRequest.url).thenReturn(testCase.requestURL.toUri())
-        whenever(mockRequest.requestHeaders).thenReturn(mapOf("Accept" to "${testCase.requestType}/"))
+        val type = when(testCase.requestType) {
+            "script" -> "application/javascript"
+            else -> "${testCase.requestType}/"
+        }
+        whenever(mockRequest.requestHeaders).thenReturn(mapOf("Accept" to type))
 
         val response = testee.shouldIntercept(
             request = mockRequest,
