@@ -41,6 +41,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -176,10 +179,14 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     val viewState = MutableStateFlow<ViewState?>(null)
 
-    private var site: Site? = null
+    private val site = MutableStateFlow<Site?>(null)
 
     init {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
+
+        site.filterNotNull()
+            .onEach(::updateSite)
+            .launchIn(viewModelScope)
     }
 
     fun viewState(): StateFlow<ViewState?> {
@@ -194,16 +201,13 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             // when the broken site form is opened from the dashboard, send
             // along a list of params to be sent with the `m_bsr` pixel
-            val siteData = BrokenSiteData.fromSite(site, pixelParamList())
+            val siteData = BrokenSiteData.fromSite(site.value, pixelParamList())
             command.send(LaunchReportBrokenSite(siteData))
         }
     }
 
     fun onSiteChanged(site: Site?) {
-        this.site = site
-        if (site == null) return
-
-        viewModelScope.launch { updateSite(site) }
+        this.site.value = site
     }
 
     private fun pixelParamList(): List<String> {
