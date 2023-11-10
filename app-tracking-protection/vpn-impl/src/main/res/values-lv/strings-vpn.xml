@@ -112,7 +112,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Kā tas darbojas?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Lietotņu pretizsekošanas aizsardzība <b>atklāj un bloķē citu uzņēmumu lietotņu izsekotājus</b>, piemēram, Facebook, kad tas mēģina izsekot tevi veselības lietotnē.\n\n<b>Tā ir bezmaksas</b>, un tu vari izmantot savas lietotnes kā parasti. Tā darbojas fonā un palīdz <b>aizsargāt tevi dienu un nakti.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kas redz tavus datus?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Lietotņu pretizsekošanas aizsardzība nav VPN.</b> Tomēr tava ierīce to atpazīs kā tādu. Tas ir tāpēc, ka tās darbībai tiek izmantots vietējs VPN savienojums.\n\nLietotņu pretizsekošanas aizsardzība darbojas citādāk.<b> Tā nekad nenovirza lietotņu datus caur ārēju serveri.</b>\n\n<annotation type="learn_more_link"><b>Uzzināt vairāk</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection nav VPN.</b> Tomēr tava ierīce to atpazīs kā tādu. Tas ir tāpēc, ka tās darbībai tiek izmantots vietējs VPN savienojums.\n\nApp Tracking Protection darbojas citādi.<b> Tā nekad nenovirza lietotņu datus caur ārēju serveri.</b>\n\n<annotation type="learn_more_link"><b>Uzzināt vairāk</b></annotation></string>
     <string name="atp_FAQCta">Bieži uzdotie jautājumi par Lietotņu pretizsekošanas aizsardzību</string>
     <string name="atp_OnboardingContinue">Turpināt</string>
     <string name="atp_OnboardingMaybeLater">Varbūt vēlāk</string>
