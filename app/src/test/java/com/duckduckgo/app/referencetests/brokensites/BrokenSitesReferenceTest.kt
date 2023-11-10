@@ -16,12 +16,14 @@
 
 package com.duckduckgo.app.referencetests.brokensites
 
+import android.net.Uri
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
@@ -78,6 +80,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockPrivacyConfig: PrivacyConfig = mock()
 
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
@@ -113,7 +117,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mockAppBuildConfig,
             coroutineRule.testDispatcherProvider,
             mockPrivacyConfig,
-            mock(),
+            mockUserAllowListRepository,
             mock(),
             mock(),
             mock(),
@@ -133,6 +137,11 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         whenever(mockPrivacyConfig.privacyConfigData()).thenReturn(
             PrivacyConfigData(version = testCase.remoteConfigVersion ?: "v", eTag = testCase.remoteConfigEtag ?: "e"),
         )
+
+        if (!testCase.protectionsEnabled) {
+            val url = Uri.parse(testCase.siteURL).host
+            whenever(mockUserAllowListRepository.isDomainInUserAllowList(url)).thenReturn(true)
+        }
 
         val brokenSite = BrokenSite(
             category = testCase.category,
@@ -191,6 +200,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val model: String?,
         val os: String?,
         val gpcEnabled: Boolean = false,
+        val protectionsEnabled: Boolean = true,
         val expectReportURLPrefix: String,
         val expectReportURLParams: List<UrlParam>,
         val exceptPlatforms: List<String>,
