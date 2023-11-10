@@ -138,10 +138,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             PrivacyConfigData(version = testCase.remoteConfigVersion ?: "v", eTag = testCase.remoteConfigEtag ?: "e"),
         )
 
-        if (!testCase.protectionsEnabled) {
-            val url = Uri.parse(testCase.siteURL).host
-            whenever(mockUserAllowListRepository.isDomainInUserAllowList(url)).thenReturn(true)
-        }
+        val url = Uri.parse(testCase.siteURL).host
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(url)).thenReturn(!testCase.protectionsEnabled)
 
         val brokenSite = BrokenSite(
             category = testCase.category,
