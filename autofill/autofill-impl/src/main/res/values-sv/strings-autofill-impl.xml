@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">För att skydda dina inloggningar krävs ett enhetslåsmönster, en PIN-kod eller biometri.</string>
     <string name="managementDisabledModeTitle">Säkra din enhet för att spara inloggningar</string>
 
-    <string name="saveLoginDialogButtonSave">Spara inloggning</string>
+    <string name="saveLoginDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginDialogNotNow">Spara inte</string>
-    <string name="saveLoginDialogSubtitle">Inloggningar lagras säkert på din enhet i menyn Inloggningar.</string>
-    <string name="saveLoginDialogTitle">Vill du att DuckDuckGo ska spara din inloggning?</string>
+    <string name="saveLoginDialogSubtitle">Lösenord lagras säkert på din enhet i menyn Inloggningar.</string>
+    <string name="saveLoginDialogTitle">Vill du att DuckDuckGo ska spara ditt lösenord?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
-    <string name="useSavedLoginDialogTitle">Använd sparad inloggning?</string>
+    <string name="useSavedLoginDialogTitle">Vill du använda ett sparat lösenord?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Lösenord för %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Lösenord för webbplatsen</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Från den här webbplatsen</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Uppdatera användarnamn</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Uppdatera lösenordet för \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo uppdaterar den här lagrade inloggningen på din enhet.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo kommer att uppdatera det lagrade lösenordet på din enhet.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Stäng dialogrutan för automatisk ifyllning</string>
 
