@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Du trenger låsemønster, PIN-kode eller biometri på enheten for å beskytte påloggingene dine.</string>
     <string name="managementDisabledModeTitle">Sikre enheten din for å lagre pålogginger</string>
 
-    <string name="saveLoginDialogButtonSave">Lagre påloggingen</string>
+    <string name="saveLoginDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke lagre</string>
-    <string name="saveLoginDialogSubtitle">Pålogginger lagres trygt på enheten din i påloggingsmenyen.</string>
-    <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre påloggingen din?</string>
+    <string name="saveLoginDialogSubtitle">Passord lagres trygt på enheten din i påloggingsmenyen.</string>
+    <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre passordet ditt?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
-    <string name="useSavedLoginDialogTitle">Vil du bruke en lagret pålogging?</string>
+    <string name="useSavedLoginDialogTitle">Vil du bruke et lagret passord?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Passord for %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Passord for nettstedet</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette nettstedet</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Oppdater brukernavn</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Vil du oppdatere passordet for \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo oppdaterer denne lagrede påloggingen på enheten din.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo oppdaterer dette lagrede passordet på enheten din.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Lukk Autofyll-dialogboksen</string>
 
