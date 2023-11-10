@@ -27,7 +27,6 @@ import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistryImpl
 import com.duckduckgo.mobile.android.vpn.VpnServiceWrapper
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
-import com.duckduckgo.mobile.android.vpn.remote_config.*
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.*
@@ -73,12 +72,6 @@ object VpnAppModule {
             .addMigrations(*VpnDatabase.ALL_MIGRATIONS.toTypedArray())
             .addCallback(vpnDatabaseCallbackProvider.provideCallbacks())
             .build()
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideVpnRemoveConfigDatabase(context: Context): VpnRemoteConfigDatabase {
-        return VpnRemoteConfigDatabase.create(context)
     }
 
     @Provides
