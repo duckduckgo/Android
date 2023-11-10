@@ -130,6 +130,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.lifecycle.runtime.testing
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(':common-test')

@@ -112,7 +112,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Cum funcționează?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Protecția împotriva urmăririi de către aplicație <b>detectează și blochează tehnologiile de urmărire din aplicațiile altor companii</b>, cum ar fi atunci când Facebook încearcă să te urmărească într-o aplicație de sănătate.\n\n<b> Este gratuit</b> și te poți bucura de aplicațiile tale ca de obicei. Lucrând în fundal, te ajută <b> să te protejezi zi și noapte. </b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Cine îți vede datele?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b> App Tracking Protection nu este un VPN. </b> Cu toate acestea, dispozitivul tău îl va recunoaște ca atare. Acest lucru se datorează faptului că utilizează o conexiune VPN locală pentru a funcționa.\n\nProtecția urmăririi aplicației este diferită. <b> Nu direcționează niciodată datele aplicației prin intermediul unui server extern.</b>\n\n<annotation type="learn_more_link"><b>Află mai multe</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection nu este un VPN.</b> Cu toate acestea, dispozitivul tău îl va recunoaște ca atare. Acest lucru se datorează faptului că utilizează o conexiune VPN locală pentru a funcționa.\n\nApp Tracking Protection este diferită.<b> Nu direcționează niciodată datele aplicației prin intermediul unui server extern.</b>\n\n<annotation type="learn_more_link"><b>Află mai multe</b></annotation></string>
     <string name="atp_FAQCta">Întrebări frecvente - Protecția împotriva urmăririi de către aplicație</string>
     <string name="atp_OnboardingContinue">Continuă</string>
     <string name="atp_OnboardingMaybeLater">Poate mai târziu</string>
@@ -196,7 +196,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Ce sunt tehnologiile de urmărire ale aplicațiilor?</string>
     <string name="atp_ActivityReportProblem">Raportează o problemă cu o aplicație</string>
     <string name="atp_ActivityBetaInstructions">Instrucțiuni beta</string>
-    <string name="atp_ActivityManageProtection">Ai probleme cu o aplicație?</string>
+    <string name="atp_ActivityManageProtection">Ai probleme?</string>
+    <string name="atp_RecentAppActivity">Activitatea recentă a aplicației</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[O încercare de urmărire blocată de la o societate în aplicația <b>%1$s</b>]]>
@@ -363,10 +364,17 @@
     <string name="atp_VpnConflictDialogGotIt">Am înțeles</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Dacă ai probleme cu o aplicație (cum ar fi faptul că nu se încarcă conținutul), încearcă să dezactivezi protecția pentru aplicația respectivă și <annotation type="report_issues_link">transmite un raport.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Activitatea recentă a aplicației</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Dacă ai în continuare probleme cu o anumită aplicație, dezactivează protecția pentru aplicația respectivă și <annotation type="report_issues_link">trimite un raport.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Ai probleme?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Afișează toate aplicațiile</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Aplicațiile cu încercări de urmărire blocate recent vor apărea aici</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Setări de sistem recomandate</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Asigură-te că VPN-ul este întotdeauna PORNIT</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">În Setări Android, permite ca opțiunea Pornit întotdeauna să reactiveze automat App Tracking Protection după întreruperea conexiunii VPN</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Permite utilizarea nerestricționată a bateriei de către aplicație</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">În Setări baterie aplicații, permite Utilizarea nerestricționată pentru a împiedica Android să dezactiveze App Tracking Protection în fundal</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Utilizarea bateriei de către aplicație nu este restricționată</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">În Setări baterie aplicații, acest lucru împiedică Android să dezactiveze App Tracking Protection în fundal</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Dezactivezi și ștergi datele?</string>
@@ -394,7 +402,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Raportează problema</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Nu acum</string>
     <string name="atp_ActivityRecentActivityHeader">Activitate</string>
-    <string name="atp_ActivityManageProtectionLabel">Ai probleme cu o aplicație?</string>
+    <string name="atp_ActivityManageProtectionLabel">Ai probleme?</string>
     <string name="atp_ActivityEnabledBannerLabel">În timpul versiunii beta, protecția pentru unele aplicații este dezactivată automat. <annotation type="app_settings_link">Vezi aplicațiile</annotation></string>
     <string name="atp_ActivityDescription">Încercările de urmărire blocate vor apărea aici</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

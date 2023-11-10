@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.extensions
 
 import android.content.Context
+import android.os.PowerManager
 import android.provider.Settings
 import timber.log.Timber
 
@@ -35,4 +36,13 @@ fun Context.isAirplaneModeOn(): Boolean {
     val airplaneMode = Settings.Global.getString(contentResolver, "airplane_mode_on")
     Timber.v("airplane_mode_on $airplaneMode")
     return airplaneMode == "1"
+}
+
+fun Context.isIgnoringBatteryOptimizations(): Boolean {
+    return runCatching {
+        packageName?.let {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            powerManager.isIgnoringBatteryOptimizations(packageName)
+        } ?: false
+    }.getOrDefault(false)
 }

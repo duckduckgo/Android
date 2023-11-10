@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
+import androidx.lifecycle.testing.TestLifecycleOwner
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.R.string
@@ -41,12 +43,14 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class ManageAppsProtectionViewModelTest {
 
     @get:Rule
@@ -70,6 +74,8 @@ class ManageAppsProtectionViewModelTest {
             deviceShieldPixels,
             coroutineRule.testDispatcherProvider,
             emptyList(),
+            coroutineRule.testScope,
+            { false },
         )
     }
 
@@ -77,7 +83,7 @@ class ManageAppsProtectionViewModelTest {
     fun whenAppIsManuallyExcludedThenUserMadeChangesReturnsTrue() = runTest {
         manuallyExcludedApps.send(listOf())
 
-        viewModel.onResume(mock())
+        viewModel.onResume(TestLifecycleOwner())
 
         manuallyExcludedApps.send(listOf("package.com" to true))
 
@@ -181,9 +187,9 @@ class ManageAppsProtectionViewModelTest {
     fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
         viewModel.commands().test {
             manuallyExcludedApps.send(listOf())
-            viewModel.onResume(mock())
+            viewModel.onResume(TestLifecycleOwner())
             manuallyExcludedApps.send(listOf("com.package.name" to true))
-            viewModel.onPause(mock())
+            viewModel.onPause(TestLifecycleOwner())
             assertEquals(Command.RestartVpn, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
@@ -193,8 +199,8 @@ class ManageAppsProtectionViewModelTest {
     fun whenUserLeavesScreenAndNoChangesWereMadeThenTheVpnIsNotRestarted() = runTest {
         viewModel.commands().test {
             manuallyExcludedApps.send(listOf())
-            viewModel.onResume(mock())
-            viewModel.onPause(mock())
+            viewModel.onResume(TestLifecycleOwner())
+            viewModel.onPause(TestLifecycleOwner())
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }

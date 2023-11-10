@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Kuidas see töötab?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Rakenduse jälgimise kaitse <b>tuvastab ja blokeerib teiste ettevõtete rakenduste jälgurid</b>, näiteks kui Facebook üritab sind jälgida terviserakenduses.\n\n<b>See on tasuta</b> ja saad nautida oma rakendusi nagu tavaliselt. See töötab taustal ja aitab <b>kaitsta sind ööpäev läbi.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kes näeb sinu andmeid?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Rakenduse jälgimise kaitse ei ole VPN.</b> Sinu seade tunneb selle siiski sellena ära. Selle põhjuseks on see, et see kasutab töötamiseks kohalikku VPN-ühendust.\n\nRakenduse jälgimise kaitse on erinev.<b> See ei suuna rakenduse andmeid kunagi välise serveri kaudu.</b>\n\n<annotation type="learn_more_link"><b>Lisateave</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection ei ole VPN.</b> Sinu seade aga tuvastab selle siiski sellena. Selle põhjuseks on asjaolu, et selle töös kasutatakse kohalikku VPN-ühendust.\n\nApp Tracking Protection toimib teistmoodi.<b> See ei suuna rakenduseandmeid kunagi läbi välisserveri.</b>\n\n<annotation type="learn_more_link"><b>Lisateave</b></annotation></string>
     <string name="atp_FAQCta">Rakenduse jälgimise kaitse KKK</string>
     <string name="atp_OnboardingContinue">Jätka</string>
     <string name="atp_OnboardingMaybeLater">Võib-olla hiljem</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Mis on rakendusejälgurid?</string>
     <string name="atp_ActivityReportProblem">Teata rakendusega seotud probleemist</string>
     <string name="atp_ActivityBetaInstructions">Beeta-juhtnöörid</string>
-    <string name="atp_ActivityManageProtection">Kas sul on rakendusega probleeme?</string>
+    <string name="atp_ActivityManageProtection">Kas sul on probleeme?</string>
+    <string name="atp_RecentAppActivity">Hiljutine rakenduste tegevus</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Blokeeriti 1 ettevõtte 1 jälgimiskatse rakenduses <b>%1$s</b>]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Sain aru</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Kui sul on mõne rakendusega probleeme (näiteks sisu ei laadi), proovi selle rakenduse kaitse välja lülitada ja <annotation type="report_issues_link">saada meile asjakohane teavitus.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Hiljutine rakenduste tegevus</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Kui sul on endiselt probleeme mingi kindla rakendusega, lülita selle rakenduse kaitse välja ja <annotation type="report_issues_link">esita aruanne.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Kas sul on probleeme?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Kuva kõik rakendused</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Siin ilmuvad äsja blokeeritud jälgimiskatsetega rakendused</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Soovitatavad süsteemiseaded</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Veendu, et VPN oleks alati SEES</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Android seadetes luba Alati sees, et App Tracking Protection lubataks pärast VPN-ühenduse katkestusi automaatselt uuesti</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Luba rakenduse piiramatu akukasutus</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Luba rakenduse akuseadetes piiramatu kasutus, et Android ei keelaks taustal App Tracking Protectionit</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Rakenduse akukasutus on piiramatu</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Rakenduse akuseadetes takistab see Androidil App Tracking Protectioni väljalülitamist taustal</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Kas keelata ja kustutada andmed?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Teata probleemist</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Mitte praegu</string>
     <string name="atp_ActivityRecentActivityHeader">Tegevus</string>
-    <string name="atp_ActivityManageProtectionLabel">Kas sul on rakendusega probleeme?</string>
+    <string name="atp_ActivityManageProtectionLabel">Kas sul on probleeme?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beetaversioonis on mõne rakenduse kaitse automaatselt välja lülitatud. <annotation type="app_settings_link">Kuva rakendused</annotation></string>
     <string name="atp_ActivityDescription">Siin kuvatakse blokeeritud jälgimiskatsed</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

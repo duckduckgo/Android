@@ -112,7 +112,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Kā tas darbojas?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Lietotņu pretizsekošanas aizsardzība <b>atklāj un bloķē citu uzņēmumu lietotņu izsekotājus</b>, piemēram, Facebook, kad tas mēģina izsekot tevi veselības lietotnē.\n\n<b>Tā ir bezmaksas</b>, un tu vari izmantot savas lietotnes kā parasti. Tā darbojas fonā un palīdz <b>aizsargāt tevi dienu un nakti.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kas redz tavus datus?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Lietotņu pretizsekošanas aizsardzība nav VPN.</b> Tomēr tava ierīce to atpazīs kā tādu. Tas ir tāpēc, ka tās darbībai tiek izmantots vietējs VPN savienojums.\n\nLietotņu pretizsekošanas aizsardzība darbojas citādāk.<b> Tā nekad nenovirza lietotņu datus caur ārēju serveri.</b>\n\n<annotation type="learn_more_link"><b>Uzzināt vairāk</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection nav VPN.</b> Tomēr tava ierīce to atpazīs kā tādu. Tas ir tāpēc, ka tās darbībai tiek izmantots vietējs VPN savienojums.\n\nApp Tracking Protection darbojas citādi.<b> Tā nekad nenovirza lietotņu datus caur ārēju serveri.</b>\n\n<annotation type="learn_more_link"><b>Uzzināt vairāk</b></annotation></string>
     <string name="atp_FAQCta">Bieži uzdotie jautājumi par Lietotņu pretizsekošanas aizsardzību</string>
     <string name="atp_OnboardingContinue">Turpināt</string>
     <string name="atp_OnboardingMaybeLater">Varbūt vēlāk</string>
@@ -196,7 +196,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Kas ir lietotņu izsekotāji?</string>
     <string name="atp_ActivityReportProblem">Ziņojiet par problēmu ar lietotni</string>
     <string name="atp_ActivityBetaInstructions">Beta versijas norādījumi</string>
-    <string name="atp_ActivityManageProtection">Problēmas ar kādu lietotni?</string>
+    <string name="atp_ActivityManageProtection">Radušās problēmas?</string>
+    <string name="atp_RecentAppActivity">Nesen veiktās lietotņu darbības</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Bloķēts 1 izsekošanas mēģinājums no 1 uzņēmuma lietotnē <b>%1$s</b>]]>
@@ -363,10 +364,17 @@
     <string name="atp_VpnConflictDialogGotIt">Sapratu</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Ja rodas problēmas ar lietotni (piemēram, netiek ielādēts saturs), pamēģini atspējot šīs lietotnes aizsardzību un <annotation type="report_issues_link">iesniedz ziņojumu.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nesen veiktās lietotņu darbības</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Ja joprojām rodas problēmas ar kādu konkrētu lietotni, atspējo šīs lietotnes aizsardzību un <annotation type="report_issues_link">iesniedz ziņojumu.</annotation>.</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Radušās problēmas?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Rādīt visas lietotnes</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Šeit parādīsies lietotnes ar nesen bloķētiem izsekošanas mēģinājumiem</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Ieteicamie sistēmas iestatījumi</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Pārliecinies, ka VPN ir Vienmēr ieslēgts</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Android iestatījumos atļauj opciju Vienmēr ieslēgts, lai pēc VPN savienojuma pārtraukumiem automātiski atkārtoti iespējotu App Tracking Protection</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Atļaut neierobežotu lietotņu akumulatora lietošanu</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Lietotnes akumulatora iestatījumos atļauj opciju Neierobežota lietošana, lai novērstu to, ka operētājsistēma Android atspējo App Tracking Protection lietošanu fona režīmā</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Lietotnes akumulatora lietojums ir neierobežots</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Lietotņu akumulatora iestatījumos tas neļauj operētājsistēmai Android atspējot App Tracking Protection lietošanu fonā</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Atspējot un dzēst datus?</string>
@@ -394,7 +402,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Ziņot par problēmu</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ne tagad</string>
     <string name="atp_ActivityRecentActivityHeader">Darbības</string>
-    <string name="atp_ActivityManageProtectionLabel">Problēmas ar kādu lietotni?</string>
+    <string name="atp_ActivityManageProtectionLabel">Radušās problēmas?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beta versijas stadijā dažu lietotņu aizsardzība ir automātiski atspējota. <annotation type="app_settings_link">Skatīt lietotnes</annotation></string>
     <string name="atp_ActivityDescription">Šeit tiks parādīti bloķētie izsekošanas mēģinājumi</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

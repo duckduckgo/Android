@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Ako to funguje?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Ochrana pred sledovaním aplikácií <b>detekuje a blokuje sledovacie aplikácie iných spoločností</b>, napríklad keď sa vás Facebook pokúša sledovať v zdravotnej aplikácii.\n\n<b> Je to zadarmo </b> a môžete si užívať svoje aplikácie ako zvyčajne. Pracuje na pozadí a pomáha <b> vás chrániť vo dne aj v noci. </b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kto vidí vaše údaje?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b> Ochrana pred sledovaním aplikácií nie je sieť VPN. </b> Vaše zariadenie ho však rozpozná ako jeden. Je to preto, že na prácu používa miestne pripojenie VPN.\n\nOchrana pred sledovaním aplikácií je iná. <b> Nikdy nesmeruje údaje aplikácie cez externý server.</b>\n\n<annotation type="learn_more_link"><b>Zistite viac</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Ochrana pred sledovaním aplikácií nie je VPN.</b> Vaše zariadenie ho však ako VPN rozpozná. Je to preto, že na prácu používa miestne pripojenie VPN.\n\nOchrana pred sledovaním aplikácií je iná.<b> Nikdy nesmeruje údaje aplikácie cez externý server.</b>\n\n<annotation type="learn_more_link"><b>Zistite viac</b></annotation></string>
     <string name="atp_FAQCta">Ochrana pred sledovaním činnosti v aplikáciách</string>
     <string name="atp_OnboardingContinue">Pokračovať</string>
     <string name="atp_OnboardingMaybeLater">Možno neskôr</string>
@@ -200,7 +200,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Čo sú sledovače aplikácií?</string>
     <string name="atp_ActivityReportProblem">Nahlásenie problému s aplikáciou</string>
     <string name="atp_ActivityBetaInstructions">Pokyny pre beta verziu</string>
-    <string name="atp_ActivityManageProtection">Máte problémy s aplikáciou?</string>
+    <string name="atp_ActivityManageProtection">Máte problémy?</string>
+    <string name="atp_RecentAppActivity">Nedávna aktivita aplikácie</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[Bol zablokovaný 1 pokus o sledovanie od 1 spoločnosti v aplikácii <b>%1$s</b>]]>
@@ -371,10 +372,17 @@
     <string name="atp_VpnConflictDialogGotIt">Mám to</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Ak máte problémy s aplikáciou (napríklad sa nenačítava obsah), skúste pre danú aplikáciu vypnúť ochranu a <annotation type="report_issues_link"> odošlite hlásenie. </annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nedávna aktivita aplikácie</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Ak máte stále problémy s konkrétnou aplikáciou, vypnite pre ňu ochranu a <annotation type="report_issues_link">pošlite správu.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Máte problémy?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Zobraziť všetky aplikácie</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Tu sa zobrazia aplikácie s nedávno zablokovanými pokusmi o sledovanie</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Odporúčané nastavenia systému</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Uistite sa, že VPN je vždy ZAPNUTÁ</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">V nastaveniach systému Android povoľte funkciu Vždy zapnuté, aby sa ochrana pred sledovaním aplikácií automaticky obnovila po prerušení pripojenia k sieti VPN.</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Povoliť aplikácii neobmedzené používanie batérie </string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">V Nastaveniach aplikácie pre batériu povoľte možnosť Neobmedzené používanie, aby ste zabránili systému Android vypnúť ochranu pred sledovaním aplikácií na pozadí.</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Použitie batérie je pre aplikáciu neobmedzené</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">V Nastaveniach batérie pre aplikáciu toto zabráni systému Android vypnúť ochranu sledovania aplikácií na pozadí.</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Zakázať a odstrániť údaje?</string>
@@ -402,7 +410,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Nahlásiť problém</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Teraz nie</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivita</string>
-    <string name="atp_ActivityManageProtectionLabel">Máte problémy s aplikáciou?</string>
+    <string name="atp_ActivityManageProtectionLabel">Máte problémy?</string>
     <string name="atp_ActivityEnabledBannerLabel">Pri používaní beta verzie je ochrana niektorých aplikácií automaticky vypnutá. <annotation type="app_settings_link">Zobraziť aplikácie</annotation></string>
     <string name="atp_ActivityDescription">Tu sa zobrazia zablokované pokusy o sledovanie</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

@@ -731,7 +731,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Dozvole web lokacija</string>
-    <string name="sitePermissionsSettingsDescription">Web-lokacije koje posjećujete mogu tražiti pristup lokaciji vašeg uređaja, kamere ili mikrofona. Neće im moći pristupiti osim ako im za to izričito ne date dopuštenje.</string>
+    <string name="sitePermissionsSettingsDescription">Stranice koje posjećuješ mogu tražiti pristup lokaciji tvog uređaja, fotoaparatu, mikrofonu ili DRM (Digital Rights Management) softveru. Neće im moći pristupiti osim ako im za to izričito ne daš dopuštenje.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Dopusti svim web-lokacijama da zatraže:</string>
     <string name="sitePermissionsSettingsLocation">Lokacija</string>
     <string name="sitePermissionsSettingsCamera">Kamera</string>
