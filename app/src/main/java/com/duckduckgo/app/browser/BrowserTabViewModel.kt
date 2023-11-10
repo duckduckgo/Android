@@ -144,6 +144,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import okhttp3.internal.publicsuffix.PublicSuffixDatabase
 import timber.log.Timber
 
 @ContributesViewModel(FragmentScope::class)
@@ -202,6 +203,7 @@ class BrowserTabViewModel @Inject constructor(
     ViewModel(),
     NavigationHistoryListener {
 
+    private val publicSuffixDatabase = PublicSuffixDatabase()
     private var buildingSiteFactoryJob: Job? = null
 
     sealed class GlobalLayoutViewState {
@@ -1510,7 +1512,7 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (site?.domainMatchesUrl(origin) == false) {
+        if (!sameEffectiveTldPlusOne(site, origin)) {
             onSiteLocationPermissionAlwaysDenied()
             return
         }
@@ -1537,6 +1539,18 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun sameEffectiveTldPlusOne(site: Site?, origin: String): Boolean {
+        val siteDomain = site?.domain
+        val originDomain = origin.toUri().domain()
+
+        if (siteDomain == null || originDomain == null) return false
+
+        val siteETldPlusOne = publicSuffixDatabase.getEffectiveTldPlusOne(siteDomain)
+        val originETldPlusOne = publicSuffixDatabase.getEffectiveTldPlusOne(originDomain)
+
+        return siteETldPlusOne == originETldPlusOne
     }
 
     fun onSiteLocationPermissionSelected(
@@ -1588,12 +1602,14 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onSiteLocationPermissionAlwaysDenied() {
         locationPermission?.let { locationPermission ->
+            println("AAAAAAAAAAAAAAAAAAA onSiteLocationPermissionAlwaysDenied")
             geoLocationPermissions.clear(locationPermission.origin)
             locationPermission.callback.invoke(locationPermission.origin, false, false)
         }
     }
 
     private suspend fun onDeviceLocationDisabled() {
+        println("AAAAAAAAAAAAAAAAAAA onDeviceLocationDisabled clear permissions")
         geoLocationPermissions.clearAll()
     }
 
