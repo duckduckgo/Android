@@ -120,6 +120,7 @@ dependencies {
     implementation AndroidX.work.rxJava2
 
     implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Square.okHttp3.okHttp
 
     implementation "com.github.bumptech.glide:glide:_"
