@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Nasıl çalışır?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Uygulama İzleme Koruması, sizi bir sağlık uygulamasında izleme girişiminde bulunan Facebook gibi <b>diğer şirketlere ait uygulama izleyicileri tespit eder ve engeller</b>.\n\n<b>Ücretsizdir</b> ve uygulamalarınızı alışılageldiği gibi keyifle kullanmaya devam edebilirsiniz. Arka planda çalışarak <b>gece gündüz korunmanızı</b> sağlar.</string>
     <string name="atp_OnboardingLastPageThreeTitle">Verilerinizi kimler görür?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Uygulama İzleme Koruması bir VPN değildir.</b> Ancak cihazınız onu bir VPN olarak algılayacaktır. Bunun nedeni, çalışmak için yerel bir VPN bağlantısı kullanmasıdır.\n\nUygulama İzleme Koruması farklıdır.<b> Uygulama verilerini asla haricî bir sunucu üzerinden yönlendirmez.</b>\n\n<annotation type="learn_more_link"><b>Daha fazla bilgi edinin</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection bir VPN değildir.</b> Ancak cihazınız bunu bir VPN olarak tanıyacaktır. Bunun nedeni, çalışmak için yerel bir VPN bağlantısı kullanmasıdır.\n\nApp Tracking Protection farklıdır.<b> Uygulama verilerini asla harici bir sunucu üzerinden yönlendirmez.</b>\n\n<annotation type="learn_more_link"><b>Daha fazla bilgi edinin</b></annotation></string>
     <string name="atp_FAQCta">Uygulama İzleme Koruması Hakkında SSS</string>
     <string name="atp_OnboardingContinue">Devam et</string>
     <string name="atp_OnboardingMaybeLater">Belki Sonra</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Uygulama izleyici nedir?</string>
     <string name="atp_ActivityReportProblem">Bir Uygulamayla İlgili Sorun Bildir</string>
     <string name="atp_ActivityBetaInstructions">Beta Talimatları</string>
-    <string name="atp_ActivityManageProtection">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
+    <string name="atp_ActivityManageProtection">Sorun mu yaşıyorsunuz?</string>
+    <string name="atp_RecentAppActivity">Son Uygulama Etkinliği</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[<b>%1$s</b> uygulamasında 1 şirket tarafından 1 izleme girişimi engellendi]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Anladım</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Bir uygulamayla ilgili sorun yaşıyorsanız (içeriğin yüklenmemesi gibi), bu uygulama için korumayı devre dışı bırakmayı deneyin ve <annotation type="report_issues_link">bir rapor gönderin.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Son Uygulama Etkinliği</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Belirli bir uygulamayla ilgili sorun yaşamaya devam ediyorsanız, bu uygulama için korumayı devre dışı bırakın ve <annotation type="report_issues_link">bir rapor gönderin.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Sorun mu yaşıyorsunuz?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Tüm Uygulamaları Göster</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Yakın zamanda izleme girişimleri engellenen uygulamalar burada gösterilir</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Önerilen Sistem Ayarları</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">VPN\'in Her Zaman AÇIK Olduğundan Emin Olun</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Android Ayarları\'nda VPN bağlantısı kesintilerinden sonra App Tracking Protection\'ı otomatik olarak yeniden etkinleştirmek için Her Zaman Açık seçeneğine izin verin</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Sınırsız Uygulama Pil Kullanımına İzin Ver</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Uygulama Pil Ayarlarında Android\'in arka planda App Tracking Protection\'ı devre dışı bırakmasını önlemek için Sınırsız kullanıma izin verin</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Uygulama Pil Kullanımı Sınırsızdır</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Uygulama Pili Ayarları\'nda bu, Android\'in arka planda App Tracking Protection\'ı devre dışı bırakmasını engeller</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Veriler devre dışı bırakılsın ve silinsin mi?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Sorun Bildir</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Şimdi Değil</string>
     <string name="atp_ActivityRecentActivityHeader">Etkinlik</string>
-    <string name="atp_ActivityManageProtectionLabel">Bir uygulamayla ilgili sorun mu yaşıyorsunuz?</string>
+    <string name="atp_ActivityManageProtectionLabel">Sorun mu yaşıyorsunuz?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beta sırasında bazı uygulamalar için koruma otomatik olarak devre dışı bırakılır. <annotation type="app_settings_link">Uygulamaları Görüntüle</annotation></string>
     <string name="atp_ActivityDescription">Engellenen izleme girişimleri burada görünecek</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
