@@ -56,6 +56,11 @@ class AppDatabaseBookmarksMigrationCallback(
             cleanUpTables()
         }
 
+        val needsOldFavouritesMigration = needsOldFavouritesMigration()
+        if (needsOldFavouritesMigration) {
+            runOldFavouritesMigration()
+        }
+
         // To be removed once internals update the app too FormFactorSpecificFavorites
         if (appBuildConfig.isInternalBuild()) {
             val foldersAdded = createFavoritesFormFactorFolders()
@@ -186,6 +191,36 @@ class AppDatabaseBookmarksMigrationCallback(
                     findFolderRelation(it.id, folderMap)
                 }
             }
+        }
+    }
+
+    private fun needsOldFavouritesMigration(): Boolean {
+        // https://app.asana.com/0/0/1204697337057464/f
+        // during the initial migration of favourites we didn't properly add them to bookmarks
+        // users might have fixed this, so we only do something if there is a favourite that is not in the bookmarks folder
+        // for all favourites, check if there is a bookmark with the same url
+        // if there isn't, we add it to the bookmarks root
+        with(appDatabase.get()) {
+            val favourites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
+            val bookmarks = syncEntitiesDao().allBookmarks()
+            val needRelation = favourites.filterNot { rootFavorite ->
+                bookmarks.contains(rootFavorite)
+            }
+            return needRelation.isNotEmpty()
+        }
+    }
+
+    private fun runOldFavouritesMigration() {
+        with(appDatabase.get()) {
+            val favouriteMigration = mutableListOf<Relation>()
+            val favourites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
+            favourites.forEach {
+                val notAsBookmark = syncRelationsDao().relationByEntityId(it.entityId) == null
+                if (notAsBookmark) {
+                    favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId))
+                }
+            }
+            syncRelationsDao().insertList(favouriteMigration)
         }
     }
 
