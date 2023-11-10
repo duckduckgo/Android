@@ -129,7 +129,6 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
@@ -188,7 +187,6 @@ class BrowserTabViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
-    private val sitePermissionsManager: SitePermissionsManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
@@ -1479,10 +1477,7 @@ class BrowserTabViewModel @Inject constructor(
         sitePermissionsAllowedToAsk: Array<String>,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            val sitePermissionsToAsk = sitePermissionsManager.getSitePermissionsForUserToHandle(tabId, request)
-            if (sitePermissionsToAsk.isNotEmpty()) {
-                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
-            }
+            command.postValue(ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request))
         }
     }
 

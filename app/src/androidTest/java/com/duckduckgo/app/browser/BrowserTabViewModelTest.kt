@@ -142,7 +142,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -326,9 +325,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAdClickManager: AdClickManager
 
     @Mock
-    private lateinit var mockSitePermissionsManager: SitePermissionsManager
-
-    @Mock
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
@@ -498,7 +494,6 @@ class BrowserTabViewModelTest {
             voiceSearchPixelLogger = voiceSearchPixelLogger,
             settingsDataStore = mockSettingsDataStore,
             adClickManager = mockAdClickManager,
-            sitePermissionsManager = mockSitePermissionsManager,
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
