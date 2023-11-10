@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Sisselogimise kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="managementDisabledModeTitle">Sisselogimise salvestamiseks kaitske oma seadet</string>
 
-    <string name="saveLoginDialogButtonSave">Salvesta sisselogimisandmed</string>
+    <string name="saveLoginDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Ära salvesta</string>
-    <string name="saveLoginDialogSubtitle">Logisid hoitakse turvaliselt sinu seadmes logide menüüs.</string>
-    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu sisselogimisandmed?</string>
+    <string name="saveLoginDialogSubtitle">Paroole hoitakse turvaliselt sinu seadmes sisselogimisandmete menüüs.</string>
+    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu parooli?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
-    <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud sisselogimisandmeid?</string>
+    <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud parooli?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Saidi %1$s parool</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Saidi parool</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Sellelt veebisaidilt</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Värskenda kasutajanime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Kas värskendada kasutajanime \n%1$s parooli?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo värskendab need salvestatud sisselogimisandmed sinu seadmes.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo värskendab selle salvestatud parooli sinu seadmes.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulge automaatse täitmise dialoog</string>
 
