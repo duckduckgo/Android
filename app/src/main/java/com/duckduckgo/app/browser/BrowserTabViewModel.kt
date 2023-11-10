@@ -1602,14 +1602,12 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onSiteLocationPermissionAlwaysDenied() {
         locationPermission?.let { locationPermission ->
-            println("AAAAAAAAAAAAAAAAAAA onSiteLocationPermissionAlwaysDenied")
             geoLocationPermissions.clear(locationPermission.origin)
             locationPermission.callback.invoke(locationPermission.origin, false, false)
         }
     }
 
     private suspend fun onDeviceLocationDisabled() {
-        println("AAAAAAAAAAAAAAAAAAA onDeviceLocationDisabled clear permissions")
         geoLocationPermissions.clearAll()
     }
 
