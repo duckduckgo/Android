@@ -50,28 +50,30 @@ class ExceptionListsSettingStoreTest {
      */
     private val testJson = """
         {
-            "appTrackerAllowList": [
-                {
-                    "domain": "api.apptentive.com",
-                    "defaultTTL": 1,
-                    "packageNames": [
-                        {
-                            "packageName": "com.subway.mobile.subwayapp03",
-                            "allowTTL": 2,
-                            "randomNote": "note"
-                        }
-                    ]
-                }
-            ],
-            "unprotectedApps": [
-                {
-                    "packageName": "com.android.chrome",
-                    "reason": "Loads websites"
-                }
-            ],
-            "unhideSystemApps": [
-                "com.android.vending"
-            ]
+            "exceptionLists": { 
+                "appTrackerAllowList": [
+                    {
+                        "domain": "api.apptentive.com",
+                        "defaultTTL": 1,
+                        "packageNames": [
+                            {
+                                "packageName": "com.subway.mobile.subwayapp03",
+                                "allowTTL": 2,
+                                "randomNote": "note"
+                            }
+                        ]
+                    }
+                ],
+                "unprotectedApps": [
+                    {
+                        "packageName": "com.android.chrome",
+                        "reason": "Loads websites"
+                    }
+                ],
+                "unhideSystemApps": [
+                    "com.android.vending"
+                ]
+            }
         }
     """
 
