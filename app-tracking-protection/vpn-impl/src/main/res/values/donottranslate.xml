@@ -35,16 +35,4 @@
     <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for Network Protection.</string>
     <string name="vpn_LockdownNotificationTextWithNetPAndAppTPEnabled">Action required! Change an Android setting to use Network Protection and App Tracking Protection.</string>
 
-    <!--  App Tracking Protection Activity -->
-    <string name="atp_RecentAppActivity">Recent App Activity</string>
-
-    <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionSectionTitle">Recommended System Settings</string>
-    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Set Always ON</string>
-    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">In Android Settings, set Always On to allow the VPN to automatically restore your connection after interruption.</string>
-    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Set App Battery Usage to Unrestricted</string>
-    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">In App Battery Settings, set usage to unrestricted to prevent the VPN from being turned off in the background.</string>
-    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">App Battery Usage is setup correctly</string>
-    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">This prevents Android from turning off the VPN in the background.</string>
-
 </resources>

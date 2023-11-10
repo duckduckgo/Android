@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Sivuston käyttöoikeudet</string>
-    <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää laitteesi sijainnin, kameran tai mikrofonin käyttöoikeutta. Ne eivät voi käyttää niitä, ellet myönnä tällaista käyttöoikeutta.</string>
+    <string name="sitePermissionsSettingsDescription">Käyttämäsi sivustot saattavat pyytää pääsyä laitteesi sijaintiin, kameraan, mikrofoniin tai DRM-ohjelmistoon (Digital Rights Management). Ne eivät voi käyttää tietoja, ellet myönnä niille erillistä käyttöoikeutta.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Salli kaikkien sivustojen pyytää:</string>
     <string name="sitePermissionsSettingsLocation">Sijainti</string>
     <string name="sitePermissionsSettingsCamera">Kamera</string>

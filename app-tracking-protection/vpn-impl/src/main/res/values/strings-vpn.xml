@@ -192,6 +192,7 @@
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
     <string name="atp_ActivityManageProtection">Having Issues?</string>
+    <string name="atp_RecentAppActivity">Recent App Activity</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"
         instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -362,6 +363,13 @@
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Having Issues?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Show All Apps</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Apps with recently blocked tracking attempts will appear here</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Recommended System Settings</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Make Sure VPN Is Always ON</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">In Android Settings, allow Always On to automatically re-enable App Tracking Protection after VPN connection interruptions</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Allow Unrestricted App Battery Usage</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">In App Battery Settings, allow Unrestricted usage to prevent Android from disabling App Tracking Protection in the background</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">App Battery Usage Is Unrestricted</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">In App Battery Settings, this prevents Android from disabling App Tracking Protection in the background</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Disable and delete data?</string>

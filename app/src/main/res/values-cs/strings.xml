@@ -731,7 +731,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Oprávnění webu</string>
-    <string name="sitePermissionsSettingsDescription">Navštívené weby můžou žádat o přístup k poloze, fotoaparátu nebo mikrofonu tvého zařízení. Přístup mít nebudou, pokud jim ho výslovně nepovolíš.</string>
+    <string name="sitePermissionsSettingsDescription">Stránky, které navštívíš, můžou žádat o přístup k fotoaparátu, mikrofonu, softwaru DRM (Digital Rights Management) nebo k poloze tvého zařízení. Přístup mít nebudou, pokud jim ho výslovně nepovolíš.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Povolit všem webům, aby žádaly o:</string>
     <string name="sitePermissionsSettingsLocation">Poloha</string>
     <string name="sitePermissionsSettingsCamera">Fotoaparát</string>

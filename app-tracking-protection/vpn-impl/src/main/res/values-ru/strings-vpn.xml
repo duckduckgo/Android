@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Как это работает?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Защита от слежки <b>блокирует трекеры сторонних компаний</b> (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье».\n\n<b>Это бесплатная функция</b>, которая никак не влияет на работу других приложений. Работая в фоновом режиме, она <b>обеспечивает круглосуточную защиту</b>.</string>
     <string name="atp_OnboardingLastPageThreeTitle">Кто видит ваши данные?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Защита от слежки не относится к VPN</b>, хотя ваше устройство определит ее как таковую, так как она использует локальное VPN-соединение.\n\nОднако при блокировке <b>данные приложения не отсылаются через внешний сервер.</b>\n\n<annotation type="learn_more_link"><b>Подробнее...</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection не VPN-сервис.</b> Но ваше устройство примет эту функцию именно за VPN, а всё потому, что она использует локальное VPN-соединение. Однако App Tracking Protection работает иначе<b> и ни в коем случае не направляет данные приложения через внешний сервер</b>.\n\n<annotation type="learn_more_link"><b>Подробнее...</b></annotation></string>
     <string name="atp_FAQCta">Защита от слежки — вопросы и ответы</string>
     <string name="atp_OnboardingContinue">Продолжить</string>
     <string name="atp_OnboardingMaybeLater">Позже</string>
@@ -200,7 +200,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Что такое трекеры в приложениях?</string>
     <string name="atp_ActivityReportProblem">Сообщить о проблеме с приложением</string>
     <string name="atp_ActivityBetaInstructions">Инструкции к бета-версии</string>
-    <string name="atp_ActivityManageProtection">Проблемы с приложением?</string>
+    <string name="atp_ActivityManageProtection">Возникли проблемы?</string>
+    <string name="atp_RecentAppActivity">Недавняя активность приложений</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[В приложении <b>%1$s</b> пресечена 1 попытка отслеживания 1 компанией]]>
@@ -371,10 +372,17 @@
     <string name="atp_VpnConflictDialogGotIt">Понятно</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Если вы столкнулись со сбоями в приложении (например, не грузится содержимое), попробуйте отключить его защиту и <annotation type="report_issues_link">сообщите нам о проблеме</annotation>.</string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Недавняя активность приложений</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Если у вас по-прежнему возникают проблемы с работой того или иного приложения, отключите его защиту и <annotation type="report_issues_link">отправьте нам жалобу</annotation>.</string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Возникли проблемы?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Показать все приложения</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Здесь будут отображаться приложения, недавно пытавшиеся отследить ваши действия</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Рекомендуемые системные настройки</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">VPN всегда ВКЛЮЧЕН</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">В настройках Android разрешите всегда автоматически заново включать функцию App Tracking Protection после прерывания VPN-соединения.</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Неограниченное использование батареи</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Чтобы Android не отключил блокировку отслеживания приложениями в фоновом режиме, в настройках батареи разрешите приложениям пользоваться зарядом без ограничений.</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Неограниченное пользование батареей</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Задается в настройках батареи и не позволяет Android отключить функцию App Tracking Protection в фоновом режиме.</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Отключить и удалить данные?</string>
@@ -402,7 +410,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Сообщить о проблеме</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сейчас</string>
     <string name="atp_ActivityRecentActivityHeader">Активность</string>
-    <string name="atp_ActivityManageProtectionLabel">Проблемы с приложением?</string>
+    <string name="atp_ActivityManageProtectionLabel">Возникли проблемы?</string>
     <string name="atp_ActivityEnabledBannerLabel">Защита некоторых приложений автоматически отключается на время бета-тестирования. <annotation type="app_settings_link">Просмотреть приложения</annotation></string>
     <string name="atp_ActivityDescription">Заблокированные попытки отслеживания будут отображаться здесь</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

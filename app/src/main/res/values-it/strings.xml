@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Autorizzazioni del sito</string>
-    <string name="sitePermissionsSettingsDescription">I siti che visiti potrebbero richiedere l\'accesso alla posizione, alla videocamera o al microfono del tuo dispositivo. Non potranno accedervi finché non darai il consenso esplicito.</string>
+    <string name="sitePermissionsSettingsDescription">I siti che visiti potrebbero richiedere l\'accesso al software di localizzazione, videocamera, microfono o DRM (Digital Rights Management) del tuo dispositivo. Non potranno accedervi finché non darai il consenso esplicito.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Consenti a tutti i siti di richiedere:</string>
     <string name="sitePermissionsSettingsLocation">Posizione</string>
     <string name="sitePermissionsSettingsCamera">Fotocamera</string>

@@ -727,7 +727,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Vietnes atļaujas</string>
-    <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var prasīt piekļuvi tavas ierīces atrašanās vietai, kamerai vai mikrofonam. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
+    <string name="sitePermissionsSettingsDescription">Apmeklētās vietnes var pieprasīt piekļuvi tavas ierīces atrašanās vietai, kamerai, mikrofonam vai DRM (digitālā satura tiesību pārvaldības) programmatūrai. Tās nevarēs tiem piekļūt, ja vien īpaši nedosi attiecīgo atļauju.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Ļaut visām vietnēm prasīt:</string>
     <string name="sitePermissionsSettingsLocation">Atrašanās vieta</string>
     <string name="sitePermissionsSettingsCamera">Kamera</string>

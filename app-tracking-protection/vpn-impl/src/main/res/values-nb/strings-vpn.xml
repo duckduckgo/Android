@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Hva er appsporere?</string>
     <string name="atp_ActivityReportProblem">Rapporter et problem med en app</string>
     <string name="atp_ActivityBetaInstructions">Beta-instruksjoner</string>
-    <string name="atp_ActivityManageProtection">Har du problemer med en app?</string>
+    <string name="atp_ActivityManageProtection">Har du problemer?</string>
+    <string name="atp_RecentAppActivity">Nylig appaktivitet</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 sporingsforsøk blokkert fra 1 selskap i <b>%1$s</b>-appen]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Den er grei</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Hvis du har problemer med en app (for eksempel innhold som ikke lastes), kan du prøve å deaktivere beskyttelsen for den appen og <annotation type="report_issues_link">sende inn en rapport.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Nylig appaktivitet</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Hvis du fremdeles har problemer med en bestemt app, kan du deaktivere beskyttelse for den appen og <annotation type="report_issues_link">sende inn en rapport.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Har du problemer?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Vis alle apper</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Apper med nylig blokkerte sporingsforsøk vises her</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Anbefalte systeminnstillinger</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Sørg for at VPN alltid er PÅ</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">I Android-innstillinger må du tillate at Alltid på automatisk gjenaktiverer App Tracking Protection etter avbrytelser i VPN-tilkoblingen</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Tillat ubegrenset appbatteribruk</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">I appbatteriinnstillingene må du tillate Ubegrenset bruk for å forhindre Android i å deaktivere App Tracking Protection i bakgrunnen</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Appbatteribruk er ubegrenset</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">I appbatteriinnstillingene forhindrer dette at Android deaktiverer App Tracking Protection i bakgrunnen</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Vil du deaktivere og slette data?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Rapporter problem</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ikke nå</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivitet</string>
-    <string name="atp_ActivityManageProtectionLabel">Har du problemer med en app?</string>
+    <string name="atp_ActivityManageProtectionLabel">Har du problemer?</string>
     <string name="atp_ActivityEnabledBannerLabel">Under beta er beskyttelsen for enkelte apper automatisk deaktivert. <annotation type="app_settings_link">Vis apper</annotation></string>
     <string name="atp_ActivityDescription">Blokkerte sporingsforsøk vises her</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
