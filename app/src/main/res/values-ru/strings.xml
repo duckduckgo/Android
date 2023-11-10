@@ -731,7 +731,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения для сайтов</string>
-    <string name="sitePermissionsSettingsDescription">Сайты, которые вы посещаете, могут запрашивать доступ к геопозиции, камере или микрофону вашего устройства. Доступ предоставляется только с вашего разрешения.</string>
+    <string name="sitePermissionsSettingsDescription">Посещаемые вами сайты могут запрашивать доступ к геопозиции, камере, микрофону или программам DRM (защиты авторских прав) вашего устройства. Доступ предоставляется только с вашего разрешения.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешить всем сайтам запрашивать:</string>
     <string name="sitePermissionsSettingsLocation">Геопозиция</string>
     <string name="sitePermissionsSettingsCamera">Камера</string>
