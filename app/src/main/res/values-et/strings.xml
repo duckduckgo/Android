@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Saidi load</string>
-    <string name="sitePermissionsSettingsDescription">Külastatavad saidid võivad küsida juurdepääsu seadme asukohale, kaamerale või mikrofonile. Need ei pääse neile juurde enne, kui oled selleks andnud selgesõnalise loa.</string>
+    <string name="sitePermissionsSettingsDescription">Külastatavad veebisaidid võivad küsida juurdepääsu sinu seadme asukohale, kaamerale, mikrofonile või DRM-i (Digital Rights Management) tarkvarale. Need ei saa juurdepääsu enne, kui oled selleks andnud selgesõnalise loa.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Luba kõigil saitidel küsida järgmist.</string>
     <string name="sitePermissionsSettingsLocation">Asukoht</string>
     <string name="sitePermissionsSettingsCamera">Kaamera</string>
