@@ -21,8 +21,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.connectivity.VpnConnectivityLossListenerPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -48,7 +47,7 @@ import logcat.logcat
 class AppTPVpnConnectivityLossListener @Inject constructor(
     private val networkProtectionState: NetworkProtectionState,
     private val appTrackingProtection: AppTrackingProtection,
-    private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val appTpRemoteFeatures: AppTpRemoteFeatures,
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
 ) : VpnConnectivityLossListenerPlugin, VpnServiceCallbacks {
@@ -87,7 +86,7 @@ class AppTPVpnConnectivityLossListener @Inject constructor(
 
     private suspend fun isActive(): Boolean = withContext(dispatcherProvider.io()) {
         fun isFeatureEnabled(): Boolean {
-            return appTpFeatureConfig.isEnabled(AppTpSetting.RestartOnConnectivityLoss)
+            return appTpRemoteFeatures.restartOnConnectivityLoss().isEnabled()
         }
 
         return@withContext isFeatureEnabled() && appTrackingProtection.isEnabled() && !networkProtectionState.isEnabled()

@@ -20,7 +20,6 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerSystemAppsOverridesDao
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
@@ -29,7 +28,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -38,9 +36,9 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class ExceptionListsSettingsPluginTest {
+class ExceptionListsSettingStoreTest {
 
-    private lateinit var exceptionListsSettingPlugin: ExceptionListsSettingPlugin
+    private lateinit var exceptionListsSettingStore: ExceptionListsSettingStore
 
     private val mockVpnFeaturesRegistry: VpnFeaturesRegistry = mock()
     private val mockVpnDatabase: VpnDatabase = mock()
@@ -79,21 +77,21 @@ class ExceptionListsSettingsPluginTest {
 
     @Before
     fun setup() {
-        exceptionListsSettingPlugin = ExceptionListsSettingPlugin(mockVpnDatabase, TestScope(), mockVpnFeaturesRegistry)
+        exceptionListsSettingStore = ExceptionListsSettingStore(mockVpnDatabase, TestScope(), mockVpnFeaturesRegistry)
 
         whenever(mockVpnDatabase.vpnAppTrackerBlockingDao()).thenReturn(mockVpnAppTrackerBlockingDao)
         whenever(mockVpnDatabase.vpnSystemAppsOverridesDao()).thenReturn(mockVpnAppTrackerSystemAppsOverridesDao)
     }
 
     @Test
-    fun whenWrongNameReturnsDefaultValue() {
-        assertTrue(exceptionListsSettingPlugin.store(AppTpSetting.ExceptionLists, ""))
+    fun whenEmptyJsonStoreNothing() {
+        exceptionListsSettingStore.store("")
         verifyNoInteractions(mockVpnDatabase)
     }
 
     @Test
     fun whenValidJSONUpdatesDB() = runTest {
-        exceptionListsSettingPlugin = ExceptionListsSettingPlugin(mockVpnDatabase, this, mockVpnFeaturesRegistry)
+        exceptionListsSettingStore = ExceptionListsSettingStore(mockVpnDatabase, this, mockVpnFeaturesRegistry)
 
         val packageNames = listOf("com.subway.mobile.subwayapp03")
         val trackerExceptionRules = ArrayList<AppTrackerExceptionRule>(1)
@@ -105,7 +103,7 @@ class ExceptionListsSettingsPluginTest {
         val systemOverrides = ArrayList<AppTrackerSystemAppOverridePackage>(1)
         systemOverrides.add(AppTrackerSystemAppOverridePackage("com.android.vending"))
 
-        assertTrue(exceptionListsSettingPlugin.store(AppTpSetting.ExceptionLists, testJson))
+        exceptionListsSettingStore.store(testJson)
         verify(mockVpnAppTrackerBlockingDao).updateTrackerExceptionRules(trackerExceptionRules)
         verify(mockVpnAppTrackerBlockingDao).updateExclusionList(excludedApps)
         verify(mockVpnAppTrackerSystemAppsOverridesDao).upsertSystemAppOverrides(systemOverrides)

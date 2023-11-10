@@ -19,9 +19,9 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle
 
-class FakeAppTpLocalFeatureFactory private constructor() {
+class FakeFeatureToggleFactory {
     companion object {
-        fun create(): AppTpLocalFeature {
+        fun <T> create(toggles: Class<T>): T {
             return FeatureToggles.Builder()
                 .store(
                     object : Toggle.Store {
@@ -36,9 +36,9 @@ class FakeAppTpLocalFeatureFactory private constructor() {
                         }
                     },
                 )
-                .featureName("fakeAppTpLocalFeature")
+                .featureName("fakeFeature")
                 .build()
-                .create(AppTpLocalFeature::class.java)
+                .create(toggles)
         }
     }
 }
