@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Как это работает?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Защита от слежки <b>блокирует трекеры сторонних компаний</b> (например, Facebook) при попытке следить за вами в таких приложениях как «Здоровье».\n\n<b>Это бесплатная функция</b>, которая никак не влияет на работу других приложений. Работая в фоновом режиме, она <b>обеспечивает круглосуточную защиту</b>.</string>
     <string name="atp_OnboardingLastPageThreeTitle">Кто видит ваши данные?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Защита от слежки не относится к VPN</b>, хотя ваше устройство определит ее как таковую, так как она использует локальное VPN-соединение.\n\nОднако при блокировке <b>данные приложения не отсылаются через внешний сервер.</b>\n\n<annotation type="learn_more_link"><b>Подробнее...</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection не VPN-сервис.</b> Но ваше устройство примет эту функцию именно за VPN, а всё потому, что она использует локальное VPN-соединение. Однако App Tracking Protection работает иначе<b> и ни в коем случае не направляет данные приложения через внешний сервер</b>.\n\n<annotation type="learn_more_link"><b>Подробнее...</b></annotation></string>
     <string name="atp_FAQCta">Защита от слежки — вопросы и ответы</string>
     <string name="atp_OnboardingContinue">Продолжить</string>
     <string name="atp_OnboardingMaybeLater">Позже</string>

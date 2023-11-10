@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Hogyan működik?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Az alkalmazáskövetés elleni védelem <b>észleli és blokkolja más cégek alkalmazáskövetőit,</b> például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban.\n\n<b>Ingyenes</b>, és az alkalmazásokat a szokásos módon használhatod. A háttérben dolgozva <b>véd meg éjjel és nappal.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Ki látja az adataidat?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Az alkalmazáskövetés elleni védelem nem VPN.</b> A készüléked azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ.\n\nAz alkalmazáskövetés elleni védelem más.<b> Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül.</b>\n\n<annotation type="learn_more_link"><b>További információk</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Az alkalmazáskövetés elleni védelem nem VPN.</b> Az eszközöd azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ.\n\nAz alkalmazáskövetés elleni védelem más.<b> Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül.</b>\n\n<annotation type="learn_more_link"><b>További információk</b></annotation></string>
     <string name="atp_FAQCta">Alkalmazáskövetés elleni védelem GYIK</string>
     <string name="atp_OnboardingContinue">Folytatás</string>
     <string name="atp_OnboardingMaybeLater">Talán később</string>

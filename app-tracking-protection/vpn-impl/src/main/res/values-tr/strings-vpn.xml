@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Nasıl çalışır?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Uygulama İzleme Koruması, sizi bir sağlık uygulamasında izleme girişiminde bulunan Facebook gibi <b>diğer şirketlere ait uygulama izleyicileri tespit eder ve engeller</b>.\n\n<b>Ücretsizdir</b> ve uygulamalarınızı alışılageldiği gibi keyifle kullanmaya devam edebilirsiniz. Arka planda çalışarak <b>gece gündüz korunmanızı</b> sağlar.</string>
     <string name="atp_OnboardingLastPageThreeTitle">Verilerinizi kimler görür?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Uygulama İzleme Koruması bir VPN değildir.</b> Ancak cihazınız onu bir VPN olarak algılayacaktır. Bunun nedeni, çalışmak için yerel bir VPN bağlantısı kullanmasıdır.\n\nUygulama İzleme Koruması farklıdır.<b> Uygulama verilerini asla haricî bir sunucu üzerinden yönlendirmez.</b>\n\n<annotation type="learn_more_link"><b>Daha fazla bilgi edinin</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection bir VPN değildir.</b> Ancak cihazınız bunu bir VPN olarak tanıyacaktır. Bunun nedeni, çalışmak için yerel bir VPN bağlantısı kullanmasıdır.\n\nApp Tracking Protection farklıdır.<b> Uygulama verilerini asla harici bir sunucu üzerinden yönlendirmez.</b>\n\n<annotation type="learn_more_link"><b>Daha fazla bilgi edinin</b></annotation></string>
     <string name="atp_FAQCta">Uygulama İzleme Koruması Hakkında SSS</string>
     <string name="atp_OnboardingContinue">Devam et</string>
     <string name="atp_OnboardingMaybeLater">Belki Sonra</string>

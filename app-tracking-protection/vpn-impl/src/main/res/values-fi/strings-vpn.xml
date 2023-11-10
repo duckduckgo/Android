@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Kuinka se toimii?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>havaitsee ja estää muiden yritysten seurantalaitteet</b>, esimerkiksi kun Facebook yrittää seurata sinua terveyssovelluksessa.\n\n<b>Se on ilmainen</b>, ja voit käyttää sovelluksiasi tavalliseen tapaan. Se toimii taustalla ja auttaa <b>suojaamaan sinua yötä päivää.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kuka näkee tietosi?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection ei ole VPN.</b> Laitteesi kuitenkin tunnistaa sen sellaiseksi. Tämä johtuu siitä, että se käyttää toimiakseen paikallista VPN-yhteyttä.\n\nApp Tracking Protection on erilainen.<b> Se ei koskaan reititä sovellustietoja ulkoisen palvelimen kautta.</b>\n\n<annotation type="learn_more_link"><b>Lue lisää</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection ei ole VPN.</b> Laitteesi kuitenkin tunnistaa sen sellaiseksi. Tämä johtuu siitä, että se käyttää toimiakseen paikallista VPN-yhteyttä.\n\nApp Tracking Protection on jotain muuta.<b> Se ei koskaan reititä sovellustietoja ulkoisen palvelimen kautta.</b>\n\n<annotation type="learn_more_link"><b>Lue lisää</b></annotation></string>
     <string name="atp_FAQCta">App Tracking Protection - Usein kysyttyä</string>
     <string name="atp_OnboardingContinue">Jatka</string>
     <string name="atp_OnboardingMaybeLater">Ehkä myöhemmin</string>

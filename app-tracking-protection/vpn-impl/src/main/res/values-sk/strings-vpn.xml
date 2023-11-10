@@ -116,7 +116,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Ako to funguje?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Ochrana pred sledovaním aplikácií <b>detekuje a blokuje sledovacie aplikácie iných spoločností</b>, napríklad keď sa vás Facebook pokúša sledovať v zdravotnej aplikácii.\n\n<b> Je to zadarmo </b> a môžete si užívať svoje aplikácie ako zvyčajne. Pracuje na pozadí a pomáha <b> vás chrániť vo dne aj v noci. </b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kto vidí vaše údaje?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b> Ochrana pred sledovaním aplikácií nie je sieť VPN. </b> Vaše zariadenie ho však rozpozná ako jeden. Je to preto, že na prácu používa miestne pripojenie VPN.\n\nOchrana pred sledovaním aplikácií je iná. <b> Nikdy nesmeruje údaje aplikácie cez externý server.</b>\n\n<annotation type="learn_more_link"><b>Zistite viac</b></annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Ochrana pred sledovaním aplikácií nie je VPN.</b> Vaše zariadenie ho však ako VPN rozpozná. Je to preto, že na prácu používa miestne pripojenie VPN.\n\nOchrana pred sledovaním aplikácií je iná.<b> Nikdy nesmeruje údaje aplikácie cez externý server.</b>\n\n<annotation type="learn_more_link"><b>Zistite viac</b></annotation></string>
     <string name="atp_FAQCta">Ochrana pred sledovaním činnosti v aplikáciách</string>
     <string name="atp_OnboardingContinue">Pokračovať</string>
     <string name="atp_OnboardingMaybeLater">Možno neskôr</string>
