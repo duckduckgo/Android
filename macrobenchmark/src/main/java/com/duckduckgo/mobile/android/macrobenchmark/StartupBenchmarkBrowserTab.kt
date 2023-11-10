@@ -42,16 +42,136 @@ class StartupBenchmarkBrowserTab {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
+    //region AMP tests
     @Test
-    fun startupBrowserTab() = startupBenchmark(
-        setupBlock = {
-            launchBrowserTab()
-            pressHome()
-        }
-    )
+    fun loadGoogleVoxAmpSite() {
+        loadSite("https://www.google.com/amp/s/www.vox.com/platform/amp/identities/22530103/asians-americans-wealth-income-gap-crazy-rich-model-minority")
+    }
 
     @Test
-    fun startupBrowserTabAndLoadDuckDuckGo() = startupBenchmark(
+    fun loadGoogleNyTimesAmpSite() {
+        loadSite("https://www.google.com/amp/s/www.nytimes.com/2021/09/20/business/jeff-bezos-earth-fund.amp.html")
+    }
+
+    @Test
+    fun loadGoogleAmpSite() {
+        loadSite("https://www.google.fr/amp/s/www.brookings.edu/research/reforming-global-fossil-fuel-subsidies-how-the-united-states-can-restart-international-cooperation/?amp")
+    }
+
+    @Test
+    fun loadAmpProjectSite() {
+        loadSite("https://www-wpxi-com.cdn.ampproject.org/v/s/www.wpxi.com/news/top-stories/pihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie/G2RP5FZA3ZDYRLFSWGDGQH2MY4/?amp_js_v=a6&_gsa=1&outputType=amp&usqp=mq331AQKKAFQArABIIACAw%3D%3D&referrer=https%3A%2F%2Fwww.google.com&_tf=From%20%251%24s&ampshare=https%3A%2F%2Fwww.wpxi.com%2Fnews%2Ftop-stories%2Fpihl-bans-armstrong-student-section-hockey-games-after-vulgar-chants-directed-female-goalie%2FG2RP5FZA3ZDYRLFSWGDGQH2MY4%2F")
+    }
+
+    @Test
+    fun loadDotAmpSite() {
+        loadSite("https://www.bbc.com/news/world-asia-china-19432800.amp")
+    }
+
+    @Test
+    fun loadAmpDotSite() {
+        loadSite("https://amp.theguardian.com/environment/2021/nov/05/british-firm-to-unveil-technology-for-zero-carbon-emission-flights-at-cop26/world-asia-china-19432800.amp")
+    }
+
+    @Test
+    fun loadQuestionMarkAmpSite() {
+        loadSite("https://www.independent.co.uk/news/world/americas/us-politics/fauci-dog-tests-congress-letter-b1944407.html?amp")
+    }
+    
+    //endregion
+
+    //region other tests
+
+    @Test
+    fun loadGeeksHubsAcademyWithQueryParams() {
+        loadSite("https://geekshubsacademy.com/producto/tech-management-leadership/?utm_source=facebook&utm_medium=socialmedia-publicidad&utm_campaign=tml_2023&hsa_acc=332045313873526&hsa_cam=23850586615090327&hsa_grp=23851051149020327&hsa_ad=23852254380910327&hsa_src=ig&hsa_net=facebook&hsa_ver=3&fbclid=PAAablhGBkv9-h05KZiQsx0FCHf3nsjUqZfU66j_BEmT9gQlCe5TbhOL8IEiI")
+    }
+
+    @Test
+    fun loadTwitchHttp() {
+        loadSite("http://twitch.tv")
+    }
+
+
+    @Test
+    fun loadWhatfinger() {
+        loadSite("https://www.whatfinger.com/home2/")
+    }
+
+    @Test
+    fun loadAnsa() {
+        loadSite("www.ansa.it")
+    }
+
+    @Test
+    fun loadTwitter() {
+        loadSite("https://twitter.com/")
+    }
+
+    @Test
+    fun startAndLoadNYTimes() {
+        loadSite("https://www.nytimes.com/")
+    }
+    
+    //endregion
+
+
+    //region tests from previous performance tests
+
+    @Test
+    fun loadTwitchMobile() {
+        loadSite("https://m.twitch.tv/")
+    }
+
+    @Test
+    fun loadWeather() {
+        loadSite("https://weather.com/")
+    }
+
+    @Test
+    fun loadAmazon() {
+        loadSite("https://www.amazon.com/")
+    }
+
+    @Test
+    fun loadBBC() {
+        loadSite("https://www.bbc.com/")
+    }
+
+    @Test
+    fun loadEBay() {
+        loadSite("https://www.ebay.com/")
+    }
+
+    @Test
+    fun loadESPN() {
+        loadSite("https://www.espn.com/")
+    }
+
+    @Test
+    fun loadReddit() {
+        loadSite("https://www.reddit.com/")
+    }
+
+    @Test
+    fun loadTripAdvisor() {
+        loadSite("https://www.tripadvisor.com/")
+    }
+
+    @Test
+    fun loadWallmart() {
+        loadSite("https://www.walmart.com/")
+    }
+
+    @Test
+    fun loadWikipedia() {
+        loadSite("https://www.wikipedia.org/")
+    }
+    
+    //endregion
+
+
+    private fun loadSite(site: String) = startupBenchmark(
         setupBlock = {
             launchBrowserTab()
             pressHome()
@@ -62,10 +182,7 @@ class StartupBenchmarkBrowserTab {
             val selector = UiSelector()
                 .className("android.widget.EditText")
                 .instance(0)
-            // [ANA] TEMP: Tested the below 3 websites in individual benchmark runs.
-            device.findObject(selector).text = "https://www.duckduckgo.com"
-//            device.findObject(selector).text = "https://www.wikipedia.org"
-//            device.findObject(selector).text = "https://www.bbc.com"
+            device.findObject(selector).text = site
             device.pressEnter()
 
             device.waitForIdle(TIMEOUT_MS)
@@ -107,31 +224,6 @@ class StartupBenchmarkBrowserTab {
             StartupTimingMetric(),
             FrameTimingMetric(),
             TraceSectionMetric("LOAD_PAGE_START_TO_FINISH"),
-            TraceSectionMetric("LOAD_PAGE_ON_PAGE_STARTED"),
-            TraceSectionMetric("LOAD_PAGE_ON_PAGE_FINISHED"),
-            TraceSectionMetric("LOAD_PAGE_SHOULD_OVERRIDE_URL_LOADING"),
-            TraceSectionMetric("LOAD_PAGE_SHOULD_INTERCEPT_REQUEST"),
-            TraceSectionMetric("LOAD_PAGE_ON_RENDER_PROCESS_GONE"),
-            TraceSectionMetric("LOAD_PAGE_ON_RENDER_PROCESS_GONE"),
-            TraceSectionMetric("LOAD_PAGE_ON_RECEIVED_SSL_ERROR"),
-            TraceSectionMetric("LOAD_PAGE_ON_RECEIVED_SSL_ERROR"),
-            TraceSectionMetric("TRACKER_DETECTOR_EVALUATE"),
-            TraceSectionMetric("CLOAKED_CNAME_DETECTOR_DETECT"),
-            TraceSectionMetric("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("DOM_LOGIN_DETECTOR_LOGIN_FORM_EVENTS_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("BLOB_CONVERTER_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("DOM_URL_EXTRACTOR_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("EMAIL_INJECTOR_INJECT_ADDRESS_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("EMAIL_INJECTOR_NOTIFY_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("AUTOCONSENT_INJECT_AUTOCONSENT_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("AUTOCONSENT_OPT_OUT_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("EVAL_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("INIT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("OPT_OUT_AUTOCONSENT_MESSAGE_HANDLER_PROCESS_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("INLINE_BROWSER_AUTOFILL_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("REAL_MESSAGING_CSS_INJECT_CSS_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("REAL_MESSAGING_CSS_SEND_MESSAGE_EVALUATE_JAVASCRIPT"),
-            TraceSectionMetric("PRIVACY_DASHBOARD_RENDER_EVALUATE_JAVASCRIPT"),
         ),
         iterations = ITERATIONS,
         startupMode = startupMode,
