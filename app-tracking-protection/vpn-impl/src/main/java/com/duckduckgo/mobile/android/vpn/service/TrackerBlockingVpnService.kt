@@ -610,9 +610,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
      */
     private fun notifyVpnStart(): Boolean {
         val emptyNotification = VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
-        val vpnNotification: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent =
-            vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin()?.getInitialContent()
-                ?: emptyNotification
+        var vpnNotification: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent = emptyNotification
+        for (retries in 1..20) {
+            vpnNotification =
+                vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin()?.getInitialContent()
+                    ?: emptyNotification
+
+            if (vpnNotification != emptyNotification) {
+                logcat { "Notification in retry: $retries" }
+                break
+            }
+        }
 
         startForeground(
             VPN_FOREGROUND_SERVICE_ID,
