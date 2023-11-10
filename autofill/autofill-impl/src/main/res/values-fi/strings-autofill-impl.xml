@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Kirjautumistietojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="managementDisabledModeTitle">Suojaa laitteesi kirjautumistietojen tallentamiseksi</string>
 
-    <string name="saveLoginDialogButtonSave">Tallenna kirjautumistiedot</string>
+    <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginDialogNotNow">Älä tallenna</string>
-    <string name="saveLoginDialogSubtitle">Kirjautumistiedot tallennetaan turvallisesti laitteellesi kirjautumistiedot-valikkoon.</string>
-    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa kirjautumistietosi?</string>
+    <string name="saveLoginDialogSubtitle">Salasanat tallennetaan turvallisesti laitteellesi kirjautumistiedot-valikkoon.</string>
+    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa salasanasi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
-    <string name="useSavedLoginDialogTitle">Käytä tallennettuja kirjautumistietoja?</string>
+    <string name="useSavedLoginDialogTitle">Käytetäänkö tallennettua salasanaa?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Sivuston %1$s salasana</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Sivuston salasana</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Tältä sivustolta</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Päivitä käyttäjätunnus</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Päivitä käyttäjän \n%1$s salasana?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän laitteellesi tallennetun kirjautumistiedon.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän tallennetun salasanan laitteellesi.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulje automaattisen täytön valintaikkuna</string>
 
