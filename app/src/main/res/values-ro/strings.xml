@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat</string>
     <string name="brokenSitesCategoriesHint">Descrie ce s-a întâmplat</string>
     <string name="brokenSiteSubmitButton">Trimite raportul</string>
-    <string name="brokenSiteDescription">Trimiterea unui raport anonim despre un site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
 
     <string name="brokenSiteCategoryBlocked">Site-ul era blocat sau nu s-a încărcat</string>
     <string name="brokenSiteCategoryLayout">Aspectul site-ului era defectuos</string>

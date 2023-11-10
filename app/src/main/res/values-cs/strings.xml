@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Popište, co se stalo</string>
     <string name="brokenSitesCategoriesHint">Popište, co se stalo</string>
     <string name="brokenSiteSubmitButton">Poslat zprávu</string>
-    <string name="brokenSiteDescription">Odeslání anonymní zprávy o nefunkčním webu nám pomůže tyto problémy řešit a vylepšovat aplikaci.</string>
 
     <string name="brokenSiteCategoryBlocked">Stránka je zablokovaná nebo se nenačetla</string>
     <string name="brokenSiteCategoryLayout">Stránka má rozbité rozvržení</string>

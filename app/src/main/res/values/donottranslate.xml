@@ -42,6 +42,7 @@
     <!-- Broken Sites-->
     <string name="brokenSitesLoginHint">What site are you signing in to? (required)</string>
     <string name="brokenSitesLoginSmallHint">Site name (required)</string>
+    <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us improve the app.</string>
 
     <!-- DRM -->
     <string name="sitePermissionsSettingsDRM">DRM</string>

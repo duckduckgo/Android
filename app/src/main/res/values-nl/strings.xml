@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Beschrijf wat er is gebeurd</string>
     <string name="brokenSitesCategoriesHint">Beschrijf wat er is gebeurd</string>
     <string name="brokenSiteSubmitButton">Verzend Rapport</string>
-    <string name="brokenSiteDescription">Als je een anoniem rapport voor een defecte site indient, kunnen we deze problemen oplossen en de app verbeteren.</string>
 
     <string name="brokenSiteCategoryBlocked">Site geblokkeerd of niet geladen</string>
     <string name="brokenSiteCategoryLayout">Site wordt niet goed vormgegeven</string>

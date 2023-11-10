@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Opisz, co się stało</string>
     <string name="brokenSitesCategoriesHint">Opisz, co się stało</string>
     <string name="brokenSiteSubmitButton">Wyślij raport</string>
-    <string name="brokenSiteDescription">Przesłanie anonimowego raportu o uszkodzonej witrynie pomaga nam debugować te problemy i ulepszać aplikację.</string>
 
     <string name="brokenSiteCategoryBlocked">Witryna zablokowana lub nie została załadowana</string>
     <string name="brokenSiteCategoryLayout">Uszkodzony układ witryny</string>

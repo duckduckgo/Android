@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Aprašykite, kas atsitiko</string>
     <string name="brokenSitesCategoriesHint">Aprašykite, kas atsitiko</string>
     <string name="brokenSiteSubmitButton">Siųsti ataskaitą</string>
-    <string name="brokenSiteDescription">Pateikdami anoniminę sugadintos svetainės ataskaitą, galime padėti išspręsti šias problemas ir patobulinti programėlę.</string>
 
     <string name="brokenSiteCategoryBlocked">Svetainė užblokuota arba neįkelta</string>
     <string name="brokenSiteCategoryLayout">Svetainės išdėstymas sugadintas</string>

@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Beskriv hva som skjedde</string>
     <string name="brokenSitesCategoriesHint">Beskriv hva som skjedde</string>
     <string name="brokenSiteSubmitButton">Send rapport</string>
-    <string name="brokenSiteDescription">Når du sender inn en anonym rapport om nettstedfeil, hjelper det oss med å feilsøke disse problemene og forbedre appen.</string>
 
     <string name="brokenSiteCategoryBlocked">Nettstedet er blokkert eller ble ikke lastet</string>
     <string name="brokenSiteCategoryLayout">Nettstedets layout er ødelagt</string>

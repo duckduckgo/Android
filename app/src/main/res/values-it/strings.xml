@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Descrivi cosa è successo</string>
     <string name="brokenSitesCategoriesHint">Descrivi cosa è successo</string>
     <string name="brokenSiteSubmitButton">Invia il rapporto</string>
-    <string name="brokenSiteDescription">L\'invio di un rapporto anonimo su un sito non funzionante ci consente di eseguire il debug di questi problemi e migliorare l\'app.</string>
 
     <string name="brokenSiteCategoryBlocked">Sito bloccato o non caricato</string>
     <string name="brokenSiteCategoryLayout">Layout del sito interrotto</string>

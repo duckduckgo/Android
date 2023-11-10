@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Décrivez ce qui s\'est passé</string>
     <string name="brokenSitesCategoriesHint">Décrivez ce qui s\'est passé</string>
     <string name="brokenSiteSubmitButton">Envoyer un rapport</string>
-    <string name="brokenSiteDescription">La soumission d\'un rapport anonyme pour signaler le mauvais fonctionnement du site nous aide à déboguer ces problèmes et à améliorer l\'application.</string>
 
     <string name="brokenSiteCategoryBlocked">Le site est bloqué ou le chargement de la page a échoué</string>
     <string name="brokenSiteCategoryLayout">Problème de mise en page du site</string>

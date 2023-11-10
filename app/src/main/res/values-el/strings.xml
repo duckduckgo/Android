@@ -215,7 +215,6 @@
     <string name="brokenSitesCategoriesTitle">Περιγράψτε τι συνέβη</string>
     <string name="brokenSitesCategoriesHint">Περιγράψτε τι συνέβη</string>
     <string name="brokenSiteSubmitButton">Αποστολή Αναφοράς</string>
-    <string name="brokenSiteDescription">Η υποβολή μιας ανώνυμης αναφοράς για σπασμένους συνδεσμους μας βοηθά να πραγματοποιήσουμε επανόρθωση των εντοπισμένων σφαλμάτων και προβλημάτων αυτών των ζητημάτων και να βελτιώσουμε την εφαρμογή.</string>
 
     <string name="brokenSiteCategoryBlocked">Ο ιστότοπος αποκλείστηκε ή δεν φορτώθηκε</string>
     <string name="brokenSiteCategoryLayout">Η διάταξη του ιστότοπου δεν λειτουργεί σωστά</string>
