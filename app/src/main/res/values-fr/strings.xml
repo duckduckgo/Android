@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Autorisations du site</string>
-    <string name="sitePermissionsSettingsDescription">Les sites que vous visitez peuvent demander l\'accès à la localisation, à l\'appareil photo ou au micro de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
+    <string name="sitePermissionsSettingsDescription">Les sites que vous visitez sont susceptibles de demander l\'accès à la localisation, à l\'appareil photo, au micro ou au logiciel DRM (gestion des droits numériques) de votre appareil. Ils ne pourront y accéder que si vous leur en donnez explicitement la permission.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Autoriser tous les sites à demander :</string>
     <string name="sitePermissionsSettingsLocation">Localisation</string>
     <string name="sitePermissionsSettingsCamera">Appareil photo</string>

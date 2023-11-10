@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Разрешения за сайтове</string>
-    <string name="sitePermissionsSettingsDescription">Сайтовете, които посещавате, може да поискат достъп до местоположението, камерата или микрофона на устройството. Те няма да имат достъп до тях, освен ако не им дадете изрично разрешение.</string>
+    <string name="sitePermissionsSettingsDescription">Сайтовете, които посещавате, може да поискат достъп до местоположението, камерата, микрофона или софтуера за управление на цифровите права (DRM) на устройството. Те няма да имат достъп до тях, освен ако не им дадете изрично разрешение.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Разрешаване на всички сайтове да искат:</string>
     <string name="sitePermissionsSettingsLocation">Местоположение</string>
     <string name="sitePermissionsSettingsCamera">Камера</string>

@@ -731,7 +731,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Svetainės leidimai</string>
-    <string name="sitePermissionsSettingsDescription">Svetainėse, kuriose lankotės, gali būti prašoma prieigos prie jūsų įrenginio vietos, kameros arba mikrofono. Jos negalės prie jų prisijungti, nebent aiškiai suteiksite joms leidimą.</string>
+    <string name="sitePermissionsSettingsDescription">Svetainėse, kuriose lankotės, gali būti prašoma prieigos prie jūsų įrenginio buvimo vietos, kameros, mikrofono arba DRM (skaitmeninių teisių valdymo) programinės įrangos. Jos negalės prie jų prisijungti, nebent aiškiai suteiksite joms leidimą.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Leisti visoms svetainėms prašyti:</string>
     <string name="sitePermissionsSettingsLocation">Vieta</string>
     <string name="sitePermissionsSettingsCamera">Fotoaparatas</string>
