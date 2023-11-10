@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Τι είναι οι εφαρμογές παρακολούθησης;</string>
     <string name="atp_ActivityReportProblem">Αναφορά προβλήματος με μια εφαρμογή</string>
     <string name="atp_ActivityBetaInstructions">Οδηγίες Beta</string>
-    <string name="atp_ActivityManageProtection">Έχετε προβλήματα με μια εφαρμογή;</string>
+    <string name="atp_ActivityManageProtection">Αντιμετωπίζετε προβλήματα;</string>
+    <string name="atp_RecentAppActivity">Πρόσφατη δραστηριότητα εφαρμογών</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 προσπάθεια παρακολούθησης αποκλείστηκε από 1 εταιρεία στην εφαρμογή <b>%1$s</b>]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Το έπιασα</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Εάν αντιμετωπίζετε προβλήματα με μια εφαρμογή (όπως για παράδειγμα μη φόρτωση περιεχομένου), προσπαθήστε να απενεργοποιήσετε την προστασία για την εν λόγω εφαρμογή και <annotation type="report_issues_link">υποβάλετε μια αναφορά.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Πρόσφατη δραστηριότητα εφαρμογών</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Εάν εξακολουθείτε να αντιμετωπίζετε προβλήματα με μια συγκεκριμένη εφαρμογή, απενεργοποιήστε την προστασία για την εν λόγω εφαρμογή και <annotation type="report_issues_link">υποβάλετε μια αναφορά.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Αντιμετωπίζετε προβλήματα;</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Εμφάνιση όλων των εφαρμογών</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Οι εφαρμογές με προσπάθειες παρακολούθησης που αποκλείστηκαν πρόσφατα θα εμφανίζονται εδώ</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Προτεινόμενες ρυθμίσεις συστήματος</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Βεβαιωθείτε ότι το VPN είναι πάντα ενεργό</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Στις Ρυθμίσεις Android, επιτρέψτε στο Πάντα σε λειτουργία, για να ενεργοποιηθεί ξανά η λειτουργία App Tracking Protection μετά από διακοπές σύνδεσης VPN</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Να επιτρέπεται απεριόριστη χρήση μπαταρίας για εφαρμογές</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Στις Ρυθμίσεις μπαταρίας των εφαρμογών, επιτρέψτε Απεριόριστη χρήση για να αποτρέψετε απενεργοποίηση της λειτουργίας App Tracking Protection στο παρασκήνιο από το Android</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Η χρήση μπαταρίας για εφαρμογές είναι απεριόριστη</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Στις Ρυθμίσεις μπαταρίας των εφαρμογών, αυτό εμποδίζει το Android να απενεργοποιήσει τη λειτουργία App Tracking Protection στο παρασκήνιο</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Απενεργοποίηση και διαγραφή δεδομένων;</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Αναφορά προβλήματος</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Όχι τώρα</string>
     <string name="atp_ActivityRecentActivityHeader">Δραστηριότητα</string>
-    <string name="atp_ActivityManageProtectionLabel">Έχετε προβλήματα με μια εφαρμογή;</string>
+    <string name="atp_ActivityManageProtectionLabel">Αντιμετωπίζετε προβλήματα;</string>
     <string name="atp_ActivityEnabledBannerLabel">Κατά τη διάρκεια της έκδοσης beta, η προστασία για ορισμένες εφαρμογές απενεργοποιείται αυτόματα. <annotation type="app_settings_link">Προβολή εφαρμογών</annotation></string>
     <string name="atp_ActivityDescription">Οι αποκλεισμένες προσπάθειες παρακολούθησης θα εμφανίζονται εδώ</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">
