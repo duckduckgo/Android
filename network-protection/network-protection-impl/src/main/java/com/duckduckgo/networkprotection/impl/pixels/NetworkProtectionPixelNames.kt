@@ -98,4 +98,7 @@ enum class NetworkProtectionPixelNames(
     NETP_GEOSWITCHING_NO_AVAILABLE_LOCATIONS_DAILY("m_netp_ev_geoswitching_no_locations_d"),
     NETP_PRIVATE_DNS_SET_DAILY("m_netp_ev_private_dns_set_d", enqueue = true),
     NETP_PRIVATE_DNS_SET_VPN_START_FAILED_DAILY("m_netp_ev_private_dns_set_vpn_start_failed_d", enqueue = true),
+    NETP_ENABLE_ATTEMPT("m_netp_ev_enable_attempt_c", enqueue = true),
+    NETP_ENABLE_ATTEMPT_SUCCESS("m_netp_ev_enable_attempt_success_c", enqueue = true),
+    NETP_ENABLE_ATTEMPT_FAILURE("m_netp_ev_enable_attempt_failure_c", enqueue = true),
 }

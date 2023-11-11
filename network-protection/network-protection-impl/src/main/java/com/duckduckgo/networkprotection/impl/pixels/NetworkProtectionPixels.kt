@@ -269,6 +269,21 @@ interface NetworkProtectionPixels {
      * This fun will fire just daily pixel whenever private DNS is set by the user and VPN start fails
      */
     fun reportPrivateDnsSetOnVpnStartFail()
+
+    /**
+     * Fires count pixel every time the VPN is attempting to get enabled
+     */
+    fun reportEnableAttempt()
+
+    /**
+     * Fires count pixel upon VPN enable attempt success
+     */
+    fun reportEnableAttemptSuccess()
+
+    /**
+     * Fires count pixel upon VPN enable attempt failure
+     */
+    fun reportEnableAttemptFailure()
 }
 
 @ContributesBinding(AppScope::class)
@@ -460,6 +475,18 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun reportPrivateDnsSetOnVpnStartFail() {
         tryToFireDailyPixel(NETP_PRIVATE_DNS_SET_VPN_START_FAILED_DAILY)
+    }
+
+    override fun reportEnableAttempt() {
+        firePixel(NETP_ENABLE_ATTEMPT)
+    }
+
+    override fun reportEnableAttemptSuccess() {
+        firePixel(NETP_ENABLE_ATTEMPT_SUCCESS)
+    }
+
+    override fun reportEnableAttemptFailure() {
+        firePixel(NETP_ENABLE_ATTEMPT_FAILURE)
     }
 
     private fun firePixel(

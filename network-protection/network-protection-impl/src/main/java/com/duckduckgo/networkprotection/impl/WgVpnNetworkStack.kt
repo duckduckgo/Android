@@ -71,13 +71,15 @@ class WgVpnNetworkStack @Inject constructor(
         }
 
         return try {
+            netpPixels.get().reportEnableAttempt()
+
             wgTunnelData = wgTunnelLazy.get().establish()
             logcat { "Received config from BE: $wgTunnelData" }
 
             if (wgTunnelData == null) {
                 logcat(LogPriority.ERROR) { "Unable to construct wgTunnelData" }
                 netpPixels.get().reportErrorInRegistration()
-                return Result.failure(java.lang.IllegalStateException("Unable to construct wgTunnelData"))
+                throw java.lang.IllegalStateException("Unable to construct wgTunnelData") // will be catch later on
             }
 
             networkProtectionRepository.get().run {
@@ -107,12 +109,16 @@ class WgVpnNetworkStack @Inject constructor(
         } catch (e: Throwable) {
             logcat(LogPriority.ERROR) { "onPrepareVpn failed due to ${e.asLog()}" }
             Result.failure(e)
+        }.onFailure {
+            netpPixels.get().reportEnableAttemptFailure()
         }
     }
 
     override fun onStartVpn(tunfd: ParcelFileDescriptor): Result<Unit> {
         logcat { "onStartVpn called." }
         return turnOnNative(tunfd.detachFd())
+            .onSuccess { netpPixels.get().reportEnableAttemptSuccess() }
+            .onFailure { netpPixels.get().reportEnableAttemptFailure() }
     }
 
     override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
