@@ -32,7 +32,8 @@ enum class NetworkProtectionPixelNames(
     override val pixelName: String,
     val enqueue: Boolean = false,
 ) : Pixel.PixelName {
-    NETP_ENABLE_DAILY("m_netp_ev_enabled_d"),
+    NETP_ENABLE_DAILY("m_netp_ev_enabled_d", enqueue = true),
+    NETP_ENABLE_UNIQUE("m_netp_ev_enabled_u", enqueue = true),
     NETP_DISABLE_DAILY("m_netp_ev_disabled_d"),
     NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED("m_netp_ev_backend_api_error_device_registration_failed_c", enqueue = true),
     NETP_BACKEND_API_ERROR_DEVICE_REGISTRATION_FAILED_DAILY("m_netp_ev_backend_api_error_device_registration_failed_d", enqueue = true),

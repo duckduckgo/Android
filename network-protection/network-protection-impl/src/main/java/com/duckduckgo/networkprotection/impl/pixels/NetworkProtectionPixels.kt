@@ -21,6 +21,7 @@ import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.*
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -275,6 +276,7 @@ interface NetworkProtectionPixels {
 class RealNetworkProtectionPixel @Inject constructor(
     private val pixel: Pixel,
     private val vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
+    private val cohortStore: NetpCohortStore,
 ) : NetworkProtectionPixels {
 
     private val preferences: SharedPreferences by lazy {
@@ -301,7 +303,8 @@ class RealNetworkProtectionPixel @Inject constructor(
     }
 
     override fun reportEnabled() {
-        tryToFireDailyPixel(NETP_ENABLE_DAILY)
+        tryToFireDailyPixel(NETP_ENABLE_DAILY, mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
+        tryToFireUniquePixel(NETP_ENABLE_UNIQUE, payload = mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
     }
 
     override fun reportDisabled() {

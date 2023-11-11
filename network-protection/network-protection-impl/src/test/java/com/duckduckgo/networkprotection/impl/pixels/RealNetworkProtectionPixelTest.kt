@@ -19,6 +19,8 @@ package com.duckduckgo.networkprotection.impl.pixels
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.networkprotection.impl.cohort.NetpCohortStore
+import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixelNames.NETP_ENABLE_UNIQUE
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -27,6 +29,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.threeten.bp.LocalDate
 
 class RealNetworkProtectionPixelTest {
     @Mock
@@ -34,17 +37,21 @@ class RealNetworkProtectionPixelTest {
 
     @Mock
     private lateinit var vpnSharedPreferencesProvider: VpnSharedPreferencesProvider
+    private lateinit var fakeNetpCohortStore: FakeNetpCohortStore
 
     private lateinit var testee: RealNetworkProtectionPixel
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
+        fakeNetpCohortStore = FakeNetpCohortStore().apply {
+            cohortLocalDate = LocalDate.now()
+        }
         val prefs = InMemorySharedPreferences()
         whenever(
             vpnSharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.networkprotection.pixels.v1"), eq(true), eq(false)),
         ).thenReturn(prefs)
-        testee = RealNetworkProtectionPixel(pixel, vpnSharedPreferencesProvider)
+        testee = RealNetworkProtectionPixel(pixel, vpnSharedPreferencesProvider, fakeNetpCohortStore)
     }
 
     @Test
@@ -79,7 +86,8 @@ class RealNetworkProtectionPixelTest {
         testee.reportEnabled()
         testee.reportEnabled()
 
-        verify(pixel).fire("m_netp_ev_enabled_d")
+        verify(pixel).enqueueFire("m_netp_ev_enabled_d", mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty()))
+        verify(pixel).enqueueFire(NETP_ENABLE_UNIQUE, mapOf("cohort" to fakeNetpCohortStore.cohortLocalDate?.toString().orEmpty()))
     }
 
     @Test
@@ -250,3 +258,7 @@ class RealNetworkProtectionPixelTest {
         verify(pixel, times(2)).fire("m_netp_imp_faqs_c")
     }
 }
+
+private class FakeNetpCohortStore(
+    override var cohortLocalDate: LocalDate? = null,
+) : NetpCohortStore
