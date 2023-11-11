@@ -284,6 +284,16 @@ interface NetworkProtectionPixels {
      * Fires count pixel upon VPN enable attempt failure
      */
     fun reportEnableAttemptFailure()
+
+    /**
+     * Fires daily and count pixels when a tunnel failure (handshake with egress) happens
+     */
+    fun reportTunnelFailure()
+
+    /**
+     * Fires count pixel when a tunnel failure (handshake with egress) is recovered on its own before VPN is disabled
+     */
+    fun reportTunnelFailureRecovered()
 }
 
 @ContributesBinding(AppScope::class)
@@ -487,6 +497,15 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun reportEnableAttemptFailure() {
         firePixel(NETP_ENABLE_ATTEMPT_FAILURE)
+    }
+
+    override fun reportTunnelFailure() {
+        firePixel(NETP_TUNNEL_FAILURE)
+        tryToFireDailyPixel(NETP_TUNNEL_FAILURE_DAILY)
+    }
+
+    override fun reportTunnelFailureRecovered() {
+        firePixel(NETP_TUNNEL_FAILURE_RECOVERED)
     }
 
     private fun firePixel(

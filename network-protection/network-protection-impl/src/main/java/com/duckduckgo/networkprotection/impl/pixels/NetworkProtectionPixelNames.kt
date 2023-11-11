@@ -101,4 +101,7 @@ enum class NetworkProtectionPixelNames(
     NETP_ENABLE_ATTEMPT("m_netp_ev_enable_attempt_c", enqueue = true),
     NETP_ENABLE_ATTEMPT_SUCCESS("m_netp_ev_enable_attempt_success_c", enqueue = true),
     NETP_ENABLE_ATTEMPT_FAILURE("m_netp_ev_enable_attempt_failure_c", enqueue = true),
+    NETP_TUNNEL_FAILURE_DAILY("m_netp_ev_tunnel_failure_d", enqueue = true),
+    NETP_TUNNEL_FAILURE("m_netp_ev_tunnel_failure_c", enqueue = true),
+    NETP_TUNNEL_FAILURE_RECOVERED("m_netp_ev_tunnel_failure_recovered_c", enqueue = true),
 }
