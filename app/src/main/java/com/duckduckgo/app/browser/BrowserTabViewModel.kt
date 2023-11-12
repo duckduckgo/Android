@@ -1330,9 +1330,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
-        val privacyProtectionEnabled = isPrivacyProtectionDisabled(domain)
+        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionEnabled)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled)
         }
     }
 
