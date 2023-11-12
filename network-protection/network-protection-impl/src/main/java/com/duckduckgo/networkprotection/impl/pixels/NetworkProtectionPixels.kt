@@ -80,15 +80,29 @@ interface NetworkProtectionPixels {
     fun reportWireguardLibraryLoadFailed()
 
     /**
-     * This fun will fire one pixel
+     * This fun will fire one pixel when the latency running average is terrible
      */
-    fun reportLatency(metadata: Map<String, String>)
+    fun reportTerribleLatency()
 
     /**
-     * This fun will fire one pixels
-     * daily -> fire only once a day no matter how many times we call this fun
+     * This fun will fire one pixel when the latency running average is poor
      */
     fun reportPoorLatency()
+
+    /**
+     * This fun will fire one pixel when the latency running average is moderate
+     */
+    fun reportModerateLatency()
+
+    /**
+     * This fun will fire one pixel when the latency running average is good
+     */
+    fun reportGoodLatency()
+
+    /**
+     * This fun will fire one pixel when the latency running average is excellent
+     */
+    fun reportExcellentLatency()
 
     /**
      * This fun will fire one pixel
@@ -351,12 +365,24 @@ class RealNetworkProtectionPixel @Inject constructor(
         firePixel(NETP_WG_ERROR_FAILED_TO_LOAD_WG_LIBRARY)
     }
 
-    override fun reportLatency(metadata: Map<String, String>) {
-        firePixel(NETP_LATENCY_REPORT, metadata)
+    override fun reportTerribleLatency() {
+        firePixel(NETP_REPORT_TERRIBLE_LATENCY)
     }
 
     override fun reportPoorLatency() {
-        tryToFireDailyPixel(NETP_REPORT_POOR_LATENCY_DAILY)
+        firePixel(NETP_REPORT_POOR_LATENCY)
+    }
+
+    override fun reportModerateLatency() {
+        firePixel(NETP_REPORT_MODERATE_LATENCY)
+    }
+
+    override fun reportGoodLatency() {
+        firePixel(NETP_REPORT_GOOD_LATENCY)
+    }
+
+    override fun reportExcellentLatency() {
+        firePixel(NETP_REPORT_EXCELLENT_LATENCY)
     }
 
     override fun reportLatencyMeasurementError() {
