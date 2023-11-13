@@ -29,13 +29,13 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.FavoritesDelegateImpl
+import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.RealSavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.RealSavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.SavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncDataProvider
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncMigration
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncMigrationImpl
 import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncStore
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkEntry
 import com.duckduckgo.savedsites.impl.sync.SyncBookmarkPage
@@ -73,7 +73,7 @@ class SavedSitesSyncDataProviderTest {
     private lateinit var syncRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
-    private lateinit var savedSitesSyncMigration: SavedSitesSyncMigration
+    private lateinit var savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration
     private lateinit var store: SavedSitesSyncStore
 
     private lateinit var parser: SavedSitesSyncDataProvider
@@ -101,7 +101,7 @@ class SavedSitesSyncDataProviderTest {
         savedSitesRelationsDao = db.syncRelationsDao()
 
         val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
-        val favoritesDelegate = FavoritesDelegateImpl(
+        val favoritesDelegate = RealFavoritesDelegate(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesSettingsRepository,
@@ -117,8 +117,12 @@ class SavedSitesSyncDataProviderTest {
         )
         store = RealSavedSitesSyncStore(InstrumentationRegistry.getInstrumentation().context)
 
-        savedSitesSyncMigration = SavedSitesSyncMigrationImpl(savedSitesEntitiesDao, savedSitesRelationsDao, savedSitesSettingsRepository)
-        parser = SavedSitesSyncDataProvider(repository, syncRepository, store, FakeCrypto(), savedSitesSyncMigration)
+        savedSitesFormFactorSyncMigration = RealSavedSitesFormFactorSyncMigration(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            savedSitesSettingsRepository,
+        )
+        parser = SavedSitesSyncDataProvider(repository, syncRepository, store, FakeCrypto(), savedSitesFormFactorSyncMigration)
 
         favoritesFolder = repository.insert(favoritesFolder)
         bookmarksRootFolder = repository.insert(bookmarksRootFolder)

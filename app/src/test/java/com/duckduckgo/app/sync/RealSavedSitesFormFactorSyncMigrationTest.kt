@@ -24,7 +24,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.FavoritesDisplayModeSettingsRepository
-import com.duckduckgo.savedsites.impl.sync.SavedSitesSyncMigrationImpl
+import com.duckduckgo.savedsites.impl.sync.RealSavedSitesFormFactorSyncMigration
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
 import com.duckduckgo.savedsites.store.EntityType.FOLDER
@@ -42,7 +42,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class SavedSitesSyncMigrationImplTest {
+class RealSavedSitesFormFactorSyncMigrationTest {
 
     @get:Rule
     @Suppress("unused")
@@ -55,7 +55,7 @@ class SavedSitesSyncMigrationImplTest {
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
 
-    private lateinit var testee: SavedSitesSyncMigrationImpl
+    private lateinit var testee: RealSavedSitesFormFactorSyncMigration
 
     @Before
     fun before() {
@@ -65,7 +65,7 @@ class SavedSitesSyncMigrationImplTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
-        testee = SavedSitesSyncMigrationImpl(
+        testee = RealSavedSitesFormFactorSyncMigration(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSiteSettingsRepository,
@@ -79,7 +79,7 @@ class SavedSitesSyncMigrationImplTest {
 
     @Test
     fun whenSyncEnabledThenFormFactorFavoriteFoldersCreated() {
-        testee.onSyncEnabled()
+        testee.onFormFactorFavouritesEnabled()
 
         assertNotNull(savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_ROOT))
         assertNotNull(savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT))
@@ -91,7 +91,7 @@ class SavedSitesSyncMigrationImplTest {
         val entities = givenEntitiesWithIds("Entity1", "Entity2", "Entity3")
         givenEntitiesStoredIn(entities, SavedSitesNames.FAVORITES_ROOT)
 
-        testee.onSyncEnabled()
+        testee.onFormFactorFavouritesEnabled()
 
         val rootRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_ROOT).first()
         val nativeRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_MOBILE_ROOT).first()
@@ -109,7 +109,7 @@ class SavedSitesSyncMigrationImplTest {
         givenEntitiesStoredIn(nativeEntities + desktopEntities, SavedSitesNames.FAVORITES_ROOT)
         savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.NATIVE
 
-        testee.onSyncDisabled()
+        testee.onFormFactorFavouritesDisabled()
 
         val desktopRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_DESKTOP_ROOT).first()
         val nativeRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_MOBILE_ROOT).first()
@@ -129,7 +129,7 @@ class SavedSitesSyncMigrationImplTest {
         givenEntitiesStoredIn(nativeEntities + desktopEntities, SavedSitesNames.FAVORITES_ROOT)
         savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.UNIFIED
 
-        testee.onSyncDisabled()
+        testee.onFormFactorFavouritesDisabled()
 
         val desktopRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_DESKTOP_ROOT).first()
         val nativeRelations = savedSitesRelationsDao.relations(SavedSitesNames.FAVORITES_MOBILE_ROOT).first()
@@ -144,7 +144,7 @@ class SavedSitesSyncMigrationImplTest {
     fun whenSyncDisabledAndDisplayModeUnifiedThenNewDisplayModeIsNative() {
         savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.UNIFIED
 
-        testee.onSyncDisabled()
+        testee.onFormFactorFavouritesDisabled()
 
         assertEquals(FavoritesDisplayMode.NATIVE, savedSiteSettingsRepository.favoritesDisplayMode)
     }
@@ -153,7 +153,7 @@ class SavedSitesSyncMigrationImplTest {
     fun whenSyncDisabledAndDisplayModeNativeThenNewDisplayModeIsNative() {
         savedSiteSettingsRepository.favoritesDisplayMode = FavoritesDisplayMode.NATIVE
 
-        testee.onSyncDisabled()
+        testee.onFormFactorFavouritesDisabled()
 
         assertEquals(FavoritesDisplayMode.NATIVE, savedSiteSettingsRepository.favoritesDisplayMode)
     }
@@ -170,7 +170,7 @@ class SavedSitesSyncMigrationImplTest {
             Entity(entityId = SavedSitesNames.FAVORITES_DESKTOP_ROOT, url = "", title = SavedSitesNames.FAVORITES_DESKTOP_NAME, type = FOLDER),
         )
 
-        testee.onSyncDisabled()
+        testee.onFormFactorFavouritesDisabled()
 
         assertNotNull(savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_ROOT))
         assertNull(savedSitesEntitiesDao.entityById(SavedSitesNames.FAVORITES_MOBILE_ROOT))

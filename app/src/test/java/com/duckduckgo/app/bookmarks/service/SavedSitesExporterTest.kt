@@ -32,7 +32,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
-import com.duckduckgo.savedsites.impl.FavoritesDelegateImpl
+import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
@@ -75,7 +75,7 @@ class SavedSitesExporterTest {
         savedSitesRelationsDao = db.syncRelationsDao()
 
         val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
-        val favoritesDelegate = FavoritesDelegateImpl(
+        val favoritesDelegate = RealFavoritesDelegate(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             savedSitesSettingsRepository,

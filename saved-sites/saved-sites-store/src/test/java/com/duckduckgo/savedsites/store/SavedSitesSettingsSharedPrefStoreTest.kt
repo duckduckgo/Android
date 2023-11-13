@@ -40,12 +40,12 @@ class SavedSitesSettingsSharedPrefStoreTest {
     fun whenGetFavoritesDisplayModeThenReturnStoredValue() = runTest {
         prefs.edit().putString(KEY_FAVORITES_DISPLAY_MODE, NATIVE.value).commit()
 
-        assertEquals(NATIVE, testee.favoritesFavoritesDisplayMode)
+        assertEquals(NATIVE, testee.favoritesDisplayMode)
     }
 
     @Test
     fun whenNoValueThenReturnNative() = runTest {
-        assertEquals(NATIVE, testee.favoritesFavoritesDisplayMode)
+        assertEquals(NATIVE, testee.favoritesDisplayMode)
     }
 
     @Test
@@ -53,7 +53,7 @@ class SavedSitesSettingsSharedPrefStoreTest {
         prefs.edit().putString(KEY_FAVORITES_DISPLAY_MODE, NATIVE.value).commit()
         testee.favoritesFormFactorModeFlow().test {
             assertEquals(NATIVE, awaitItem())
-            testee.favoritesFavoritesDisplayMode = FavoritesDisplayMode.UNIFIED
+            testee.favoritesDisplayMode = FavoritesDisplayMode.UNIFIED
             assertEquals(FavoritesDisplayMode.UNIFIED, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }

@@ -34,7 +34,7 @@ import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
-import com.duckduckgo.savedsites.impl.FavoritesDelegateImpl
+import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.store.Entity
 import com.duckduckgo.savedsites.store.EntityType.BOOKMARK
@@ -81,7 +81,7 @@ class SavedSitesRepositoryTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
         val favoritesDisplayModeSettings = FakeDisplayModeSettingsRepository()
-        val favoritesDelegate = FavoritesDelegateImpl(
+        val favoritesDelegate = RealFavoritesDelegate(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             favoritesDisplayModeSettings,

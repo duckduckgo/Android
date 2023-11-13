@@ -45,7 +45,7 @@ interface FavoritesDelegate {
 }
 
 @ContributesBinding(AppScope::class)
-class FavoritesDelegateImpl @Inject constructor(
+class RealFavoritesDelegate @Inject constructor(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val favoritesDisplayModeSetting: FavoritesDisplayModeSettingsRepository,

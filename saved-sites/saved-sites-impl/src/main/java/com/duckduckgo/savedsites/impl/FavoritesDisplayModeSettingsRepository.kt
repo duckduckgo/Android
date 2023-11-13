@@ -72,10 +72,10 @@ class RealFavoritesDisplayModeSettingsRepository @Inject constructor(
     }
 
     override var favoritesDisplayMode: FavoritesDisplayMode
-        get() = savedSitesSettingsStore.favoritesFavoritesDisplayMode
+        get() = savedSitesSettingsStore.favoritesDisplayMode
         set(value) {
-            if (savedSitesSettingsStore.favoritesFavoritesDisplayMode == value) return
-            savedSitesSettingsStore.favoritesFavoritesDisplayMode = value
+            if (savedSitesSettingsStore.favoritesDisplayMode == value) return
+            savedSitesSettingsStore.favoritesDisplayMode = value
             syncableSetting.onSettingChanged()
         }
 
@@ -93,7 +93,7 @@ class RealFavoritesDisplayModeSettingsRepository @Inject constructor(
     override fun getQueryFolder(): String {
         return when (syncEnabled) {
             false -> SavedSitesNames.FAVORITES_ROOT
-            true -> return getFavoriteDisplayModeFolder(savedSitesSettingsStore.favoritesFavoritesDisplayMode)
+            true -> return getFavoriteDisplayModeFolder(savedSitesSettingsStore.favoritesDisplayMode)
         }
     }
 
@@ -107,7 +107,7 @@ class RealFavoritesDisplayModeSettingsRepository @Inject constructor(
     override fun getInsertFolder(): List<String> {
         return when (syncEnabled) {
             false -> listOf(SavedSitesNames.FAVORITES_ROOT)
-            true -> return getInsertDisplayModeFolder(savedSitesSettingsStore.favoritesFavoritesDisplayMode)
+            true -> return getInsertDisplayModeFolder(savedSitesSettingsStore.favoritesDisplayMode)
         }
     }
 
@@ -121,7 +121,7 @@ class RealFavoritesDisplayModeSettingsRepository @Inject constructor(
     override fun getDeleteFolder(entityId: String): List<String> {
         return when (syncEnabled) {
             false -> listOf(SavedSitesNames.FAVORITES_ROOT)
-            true -> getDeleteDisplayModeFolder(entityId, savedSitesSettingsStore.favoritesFavoritesDisplayMode)
+            true -> getDeleteDisplayModeFolder(entityId, savedSitesSettingsStore.favoritesDisplayMode)
         }
     }
 

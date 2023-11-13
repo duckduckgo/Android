@@ -30,14 +30,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class FavoritesDelegateImplTest {
+class RealFavoritesDelegateTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
-    private lateinit var testee: FavoritesDelegateImpl
+    private lateinit var testee: RealFavoritesDelegate
     private val syncDisabledFavoritesSettings = FakeDisplayModeSettingsRepository()
     private val favoritesDisplayModeSettings = FakeFavoritesDisplayModeSettingsRepository(NATIVE)
     private lateinit var db: AppDatabase
@@ -411,7 +411,7 @@ class FavoritesDelegateImplTest {
     }
 
     private fun givenFavoriteDelegate(displayModeSettingsRepository: FavoritesDisplayModeSettingsRepository) {
-        testee = FavoritesDelegateImpl(
+        testee = RealFavoritesDelegate(
             savedSitesEntitiesDao,
             savedSitesRelationsDao,
             displayModeSettingsRepository,

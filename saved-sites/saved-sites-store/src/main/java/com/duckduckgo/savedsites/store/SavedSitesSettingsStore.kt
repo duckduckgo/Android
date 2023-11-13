@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 interface SavedSitesSettingsStore {
-    var favoritesFavoritesDisplayMode: FavoritesDisplayMode
+    var favoritesDisplayMode: FavoritesDisplayMode
     fun favoritesFormFactorModeFlow(): Flow<FavoritesDisplayMode>
 }
 
@@ -46,13 +46,13 @@ class SavedSitesSettingsSharedPrefStore(
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            favoritesFavoritesDisplayModeFlow.emit(favoritesFavoritesDisplayMode)
+            favoritesFavoritesDisplayModeFlow.emit(favoritesDisplayMode)
         }
     }
 
     override fun favoritesFormFactorModeFlow(): Flow<FavoritesDisplayMode> = favoritesFavoritesDisplayModeFlow
 
-    override var favoritesFavoritesDisplayMode: FavoritesDisplayMode
+    override var favoritesDisplayMode: FavoritesDisplayMode
         get() {
             val storedValue = preferences.getString(
                 KEY_FAVORITES_DISPLAY_MODE,
@@ -60,16 +60,16 @@ class SavedSitesSettingsSharedPrefStore(
             )
             return FavoritesDisplayMode.values().firstOrNull { it.value == storedValue } ?: NATIVE
         }
-        set(formFactorMode) {
+        set(favouritesDisplayMode) {
             preferences.edit(commit = true) {
-                putString(KEY_FAVORITES_DISPLAY_MODE, formFactorMode.value)
+                putString(KEY_FAVORITES_DISPLAY_MODE, favouritesDisplayMode.value)
             }
             emitNewValue()
         }
 
     private fun emitNewValue() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            favoritesFavoritesDisplayModeFlow.emit(favoritesFavoritesDisplayMode)
+            favoritesFavoritesDisplayModeFlow.emit(favoritesDisplayMode)
         }
     }
 

@@ -39,13 +39,13 @@ class SavedSitesSyncDataProvider @Inject constructor(
     private val syncSavedSitesRepository: SyncSavedSitesRepository,
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val syncCrypto: SyncCrypto,
-    private val savedSitesSyncMigration: SavedSitesSyncMigration,
+    private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
 ) : SyncableDataProvider {
 
     override fun getChanges(): SyncChangesRequest {
         savedSitesSyncStore.startTimeStamp = DatabaseDateFormatter.iso8601()
         val updates = if (savedSitesSyncStore.serverModifiedSince == "0") {
-            savedSitesSyncMigration.onSyncEnabled()
+            savedSitesFormFactorSyncMigration.onFormFactorFavouritesEnabled()
             allContent()
         } else {
             changesSince(savedSitesSyncStore.clientModifiedSince)

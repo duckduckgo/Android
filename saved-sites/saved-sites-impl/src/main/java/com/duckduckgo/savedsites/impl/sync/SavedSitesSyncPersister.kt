@@ -41,7 +41,7 @@ class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val algorithm: SavedSitesSyncPersisterAlgorithm,
-    private val savedSitesSyncMigration: SavedSitesSyncMigration,
+    private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
 ) : SyncableDataPersister {
 
     override fun persist(
@@ -62,7 +62,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesSyncStore.serverModifiedSince = "0"
         savedSitesSyncStore.clientModifiedSince = "0"
         savedSitesSyncStore.startTimeStamp = "0"
-        savedSitesSyncMigration.onSyncDisabled()
+        savedSitesFormFactorSyncMigration.onFormFactorFavouritesDisabled()
     }
 
     fun process(

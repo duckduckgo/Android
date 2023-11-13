@@ -117,7 +117,7 @@ class RealFavoritesDisplayModeSettingsRepositoryTest {
             assertEquals(SavedSitesNames.FAVORITES_ROOT, awaitItem())
             syncStateFlow.value = SyncState.READY
             assertEquals(SavedSitesNames.FAVORITES_MOBILE_ROOT, awaitItem())
-            savedSitesSettingsStore.favoritesFavoritesDisplayMode = UNIFIED
+            savedSitesSettingsStore.favoritesDisplayMode = UNIFIED
             assertEquals(SavedSitesNames.FAVORITES_ROOT, awaitItem())
         }
     }
@@ -125,14 +125,14 @@ class RealFavoritesDisplayModeSettingsRepositoryTest {
     @Test
     fun whenSyncEnabledAndNativeModeThenQueryFolderIsMobileRoot() = runTest {
         syncStateFlow.value = SyncState.READY
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = NATIVE
+        savedSitesSettingsStore.favoritesDisplayMode = NATIVE
         assertEquals(SavedSitesNames.FAVORITES_MOBILE_ROOT, testee.getQueryFolder())
     }
 
     @Test
     fun whenSyncEnabledAndUnifiedModeThenQueryFolderIsMobileRoot() = runTest {
         syncStateFlow.value = SyncState.READY
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = UNIFIED
+        savedSitesSettingsStore.favoritesDisplayMode = UNIFIED
         assertEquals(SavedSitesNames.FAVORITES_ROOT, testee.getQueryFolder())
     }
 
@@ -145,7 +145,7 @@ class RealFavoritesDisplayModeSettingsRepositoryTest {
     @Test
     fun whenSyncEnabledAndNativeModeThenInsertFolderIsMobileAndFavoritesRoot() = runTest {
         syncStateFlow.value = SyncState.READY
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = NATIVE
+        savedSitesSettingsStore.favoritesDisplayMode = NATIVE
         assertTrue(testee.getInsertFolder().size == 2)
         assertTrue(testee.getInsertFolder().contains(SavedSitesNames.FAVORITES_ROOT))
         assertTrue(testee.getInsertFolder().contains(SavedSitesNames.FAVORITES_MOBILE_ROOT))
@@ -154,7 +154,7 @@ class RealFavoritesDisplayModeSettingsRepositoryTest {
     @Test
     fun whenSyncEnabledAndUnifiedModeThenInsertFolderIsMobileAndFavoritesRoot() = runTest {
         syncStateFlow.value = SyncState.READY
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = UNIFIED
+        savedSitesSettingsStore.favoritesDisplayMode = UNIFIED
         assertTrue(testee.getInsertFolder().size == 2)
         assertTrue(testee.getInsertFolder().contains(SavedSitesNames.FAVORITES_ROOT))
         assertTrue(testee.getInsertFolder().contains(SavedSitesNames.FAVORITES_MOBILE_ROOT))
@@ -169,7 +169,7 @@ class RealFavoritesDisplayModeSettingsRepositoryTest {
     @Test
     fun whenSyncEnabledAndNativeModeThenDeleteFolderIsMobileAndFavoritesRoot() = runTest {
         syncStateFlow.value = SyncState.READY
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = NATIVE
+        savedSitesSettingsStore.favoritesDisplayMode = NATIVE
         assertTrue(testee.getDeleteFolder("entityId").size == 2)
         assertTrue(testee.getDeleteFolder("entityId").contains(SavedSitesNames.FAVORITES_ROOT))
         assertTrue(testee.getDeleteFolder("entityId").contains(SavedSitesNames.FAVORITES_MOBILE_ROOT))
@@ -179,7 +179,7 @@ class RealFavoritesDisplayModeSettingsRepositoryTest {
     fun whenSyncEnabledAndNativeModeAndFavoriteIsDesktopThenDeleteFolderIsMobile() = runTest {
         savedSitesRelationsDao.insert(Relation(folderId = SavedSitesNames.FAVORITES_DESKTOP_ROOT, entityId = "entityId"))
         syncStateFlow.value = SyncState.READY
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = NATIVE
+        savedSitesSettingsStore.favoritesDisplayMode = NATIVE
 
         assertTrue(testee.getDeleteFolder("entityId").size == 1)
         assertTrue(testee.getDeleteFolder("entityId").contains(SavedSitesNames.FAVORITES_MOBILE_ROOT))
@@ -188,7 +188,7 @@ class RealFavoritesDisplayModeSettingsRepositoryTest {
     @Test
     fun whenSyncEnabledAndUnifiedModeThenDeleteFolderIsAllFolders() = runTest {
         syncStateFlow.value = SyncState.READY
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = UNIFIED
+        savedSitesSettingsStore.favoritesDisplayMode = UNIFIED
         assertTrue(testee.getDeleteFolder("entityId").size == 3)
         assertTrue(testee.getDeleteFolder("entityId").contains(SavedSitesNames.FAVORITES_ROOT))
         assertTrue(testee.getDeleteFolder("entityId").contains(SavedSitesNames.FAVORITES_MOBILE_ROOT))
@@ -204,7 +204,7 @@ class FakeSavedSitesSettingsStore(
     private val coroutineScope: CoroutineScope,
 ) : SavedSitesSettingsStore {
     val flow = MutableStateFlow(NATIVE)
-    override var favoritesFavoritesDisplayMode: FavoritesDisplayMode
+    override var favoritesDisplayMode: FavoritesDisplayMode
         get() = flow.value
         set(value) {
             coroutineScope.launch {

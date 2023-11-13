@@ -28,7 +28,7 @@ class FakeSavedSitesSettingsStore(
     private val coroutineScope: CoroutineScope,
 ) : SavedSitesSettingsStore {
     val flow = MutableStateFlow(NATIVE)
-    override var favoritesFavoritesDisplayMode: FavoritesDisplayMode
+    override var favoritesDisplayMode: FavoritesDisplayMode
         get() = flow.value
         set(value) {
             coroutineScope.launch {

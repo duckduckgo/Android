@@ -27,18 +27,18 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import timber.log.Timber
 
-interface SavedSitesSyncMigration {
-    fun onSyncEnabled()
-    fun onSyncDisabled()
+interface SavedSitesFormFactorSyncMigration {
+    fun onFormFactorFavouritesEnabled()
+    fun onFormFactorFavouritesDisabled()
 }
 
 @ContributesBinding(AppScope::class)
-class SavedSitesSyncMigrationImpl @Inject constructor(
+class RealSavedSitesFormFactorSyncMigration @Inject constructor(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val favoritesFormFactorSettings: FavoritesDisplayModeSettingsRepository,
-) : SavedSitesSyncMigration {
-    override fun onSyncEnabled() {
+) : SavedSitesFormFactorSyncMigration {
+    override fun onFormFactorFavouritesEnabled() {
         Timber.d("Sync-Bookmarks: syncEnabled creating FFS folders")
         savedSitesEntitiesDao.createFormFactorFavoriteFolders()
         savedSitesRelationsDao.cloneFolder(
@@ -47,7 +47,7 @@ class SavedSitesSyncMigrationImpl @Inject constructor(
         )
     }
 
-    override fun onSyncDisabled() {
+    override fun onFormFactorFavouritesDisabled() {
         Timber.d("Sync-Bookmarks: syncDisabled removing FFS folders and migrating favorites")
         when (favoritesFormFactorSettings.favoritesDisplayMode) {
             NATIVE -> {

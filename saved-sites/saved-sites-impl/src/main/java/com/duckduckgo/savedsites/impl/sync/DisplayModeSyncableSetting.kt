@@ -38,14 +38,14 @@ class DisplayModeSyncableSetting @Inject constructor(
     override val key: String = "favorites_display_mode"
 
     override fun getValue(): String? {
-        return savedSitesSettingsStore.favoritesFavoritesDisplayMode.value
+        return savedSitesSettingsStore.favoritesDisplayMode.value
     }
 
     override fun save(value: String?): Boolean {
         Timber.i("Sync-Settings-Display-Mode: save, value received $value")
         val displayMode = FavoritesDisplayMode.values().firstOrNull { it.value == value } ?: return false
         Timber.i("Sync-Settings-Display-Mode: save, storing($displayMode)")
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = displayMode
+        savedSitesSettingsStore.favoritesDisplayMode = displayMode
         listener.invoke()
         return true
     }
@@ -54,7 +54,7 @@ class DisplayModeSyncableSetting @Inject constructor(
         Timber.i("Sync-Settings-Display-Mode: deduplicate, value received $value")
         val displayMode = FavoritesDisplayMode.values().firstOrNull { it.value == value } ?: return false
         Timber.i("Sync-Settings-Display-Mode: deduplicate, storing ($displayMode)")
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = displayMode
+        savedSitesSettingsStore.favoritesDisplayMode = displayMode
         listener.invoke()
         return true
     }

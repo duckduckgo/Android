@@ -30,7 +30,7 @@ class DisplayModeSyncableSettingTest {
 
     @Test
     fun whenGetValueThenReturnStoredValue() = runTest {
-        savedSitesSettingsStore.favoritesFavoritesDisplayMode = FavoritesDisplayMode.NATIVE
+        savedSitesSettingsStore.favoritesDisplayMode = FavoritesDisplayMode.NATIVE
         assertEquals(FavoritesDisplayMode.NATIVE.value, testee.getValue())
     }
 
