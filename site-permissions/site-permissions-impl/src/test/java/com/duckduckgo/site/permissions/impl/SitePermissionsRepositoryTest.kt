@@ -19,6 +19,7 @@ package com.duckduckgo.site.permissions.impl
 import android.webkit.PermissionRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.privacy.config.api.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
@@ -50,6 +51,7 @@ class SitePermissionsRepositoryTest {
     private val mockSitePermissionsDao: SitePermissionsDao = mock()
     private val mockSitePermissionsAllowedDao: SitePermissionsAllowedDao = mock()
     private val mockSitePermissionsPreferences: SitePermissionsPreferences = mock()
+    private val mockDrmBlock: DrmBlock = mock()
 
     private val repository = SitePermissionsRepositoryImpl(
         mockSitePermissionsDao,
@@ -57,6 +59,7 @@ class SitePermissionsRepositoryTest {
         mockSitePermissionsPreferences,
         coroutineRule.testScope,
         coroutineRule.testDispatcherProvider,
+        mockDrmBlock,
     )
 
     private val url = "https://domain.com/whatever"
@@ -102,6 +105,26 @@ class SitePermissionsRepositoryTest {
         val permission = PermissionRequest.RESOURCE_VIDEO_CAPTURE
 
         assertFalse(repository.isDomainAllowedToAsk(url, permission))
+    }
+
+    @Test
+    fun whenNoSitePermissionSettingAndDrmBlockedThenDomainIsNotAllowedToAsk() {
+        val permission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
+
+        whenever(mockDrmBlock.isDrmBlockedForUrl(url)).thenReturn(true)
+
+        assertFalse(repository.isDomainAllowedToAsk(url, permission))
+    }
+
+    @Test
+    fun whenSitePermissionSettingIsAskAndDrmBlockedThenDomainIsAllowedToAsk() {
+        val testEntity = SitePermissionsEntity(domain, askDrmSetting = SitePermissionAskSettingType.ASK_EVERY_TIME.name)
+        setInitialSettings(sitePermissionEntity = testEntity)
+        val permission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
+
+        whenever(mockDrmBlock.isDrmBlockedForUrl(url)).thenReturn(true)
+
+        assertTrue(repository.isDomainAllowedToAsk(url, permission))
     }
 
     @Test
@@ -242,10 +265,12 @@ class SitePermissionsRepositoryTest {
     private fun setInitialSettings(
         cameraEnabled: Boolean = true,
         micEnabled: Boolean = true,
+        drmEnabled: Boolean = true,
         sitePermissionEntity: SitePermissionsEntity? = null,
     ) {
         whenever(mockSitePermissionsPreferences.askCameraEnabled).thenReturn(cameraEnabled)
         whenever(mockSitePermissionsPreferences.askMicEnabled).thenReturn(micEnabled)
+        whenever(mockSitePermissionsPreferences.askDrmEnabled).thenReturn(drmEnabled)
         whenever(mockSitePermissionsDao.getSitePermissionsByDomain(domain)).thenReturn(sitePermissionEntity)
     }
 

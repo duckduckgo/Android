@@ -31,6 +31,7 @@ dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':browser-api')
     implementation project(path: ':site-permissions-api')
+    implementation project(path: ':privacy-config-api')
     api project(path: ':site-permissions-store')
 
     anvil project(path: ':anvil-compiler')

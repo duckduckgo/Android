@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.DrmBlock
 import com.duckduckgo.site.permissions.store.SitePermissionsPreferences
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionAskSettingType
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsDao
@@ -61,6 +62,7 @@ class SitePermissionsRepositoryImpl @Inject constructor(
     private val sitePermissionsPreferences: SitePermissionsPreferences,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val drmBlock: DrmBlock,
 ) : SitePermissionsRepository {
 
     override var askCameraEnabled: Boolean
@@ -99,10 +101,12 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                 isAskMicDisabled && !isAskMicSettingDenied
             }
             PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
+                // Check config - per-site user permissions will take precedence over it:
+                val isDrmBlockedByConfig = sitePermissionsForDomain == null && drmBlock.isDrmBlockedForUrl(url)
                 val isAskDrmSettingDenied = sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
                 val isAskDrmDisabled =
                     askDrmEnabled || sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
-                isAskDrmDisabled && !isAskDrmSettingDenied
+                isAskDrmDisabled && !isAskDrmSettingDenied && !isDrmBlockedByConfig
             }
             else -> false
         }
