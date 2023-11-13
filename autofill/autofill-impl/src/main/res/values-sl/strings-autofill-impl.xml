@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Za zaščito prijav je potreben vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
     <string name="managementDisabledModeTitle">Zavarujte svojo napravo, če želite shraniti prijave</string>
 
-    <string name="saveLoginDialogButtonSave">Shrani prijavo</string>
+    <string name="saveLoginDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginDialogNotNow">Ne shrani</string>
-    <string name="saveLoginDialogSubtitle">Prijave so varno shranjene v vaši napravi v meniju Prijave.</string>
-    <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
+    <string name="saveLoginDialogSubtitle">Gesla so varno shranjena v napravi v meniju Prijave.</string>
+    <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vaše geslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Želite uporabiti shranjene podatke za prijavo?</string>
+    <string name="useSavedLoginDialogTitle">Želite uporabiti shranjeno geslo?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Geslo za spletno mesto %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Geslo za spletno mesto</string>
     <string name="useSavedLoginDialogGroupThisWebsite">S tega spletnega mesta</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Posodobi uporabniško ime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Želite posodobiti geslo za \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bo posodobil to shranjeno prijavo v vaši napravi.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bo posodobil to shranjeno geslo v vaši napravi.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zapri pogovorno okno za samodejno izpolnjevanje</string>
 

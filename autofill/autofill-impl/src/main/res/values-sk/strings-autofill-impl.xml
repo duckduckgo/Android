@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Na ochranu vašich prihlasovacích údajov sa vyžaduje vzor uzamknutia zariadenia, kód PIN alebo biometrické údaje.</string>
     <string name="managementDisabledModeTitle">Zabezpečte svoje zariadenie a uložte prihlasovacie údaje</string>
 
-    <string name="saveLoginDialogButtonSave">Uložiť prihlasovacie údaje</string>
+    <string name="saveLoginDialogButtonSave">Uložiť heslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložiť heslo</string>
     <string name="saveLoginDialogNotNow">Neukladať</string>
-    <string name="saveLoginDialogSubtitle">Prihlasovacie údaje sú bezpečne uložené v zariadení v ponuke Prihlásenia.</string>
-    <string name="saveLoginDialogTitle">Chcete, aby DuckDuckGo uložil vaše prihlasovacie údaje?</string>
+    <string name="saveLoginDialogSubtitle">Heslá sú bezpečne uložené na vašom zariadení v ponuke Prihlásenia.</string>
+    <string name="saveLoginDialogTitle">Chcete, aby DuckDuckGo uložil vaše heslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Ďalšie možnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Použiť uložené prihlasovacie údaje?</string>
+    <string name="useSavedLoginDialogTitle">Použiť uložené heslo?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Heslo pre %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Heslo pre lokalitu</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z tejto webovej lokality</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovať používateľské meno</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aktualizovať heslo pre \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bude aktualizovať tieto uložené prihlasovacie údaje vo vašom zariadení.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aktualizuje toto uložené heslo vo vašom zariadení.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zavrieť dialógové okno automatického vypĺňania</string>
 

@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Για προστασία των «Συνδέσεών» σας απαιτείται μοτίβο κλειδώματος συσκευής, PIN ή βιομετρικά στοιχεία.</string>
     <string name="managementDisabledModeTitle">Ασφαλίστε τη συσκευή σας για να αποθηκεύετε τις «Συνδέσεις»</string>
 
-    <string name="saveLoginDialogButtonSave">Αποθήκευση σύνδεσης</string>
+    <string name="saveLoginDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Αποθήκευση κωδικού πρόσβασης</string>
     <string name="saveLoginDialogNotNow">Να μην αποθηκευτεί</string>
-    <string name="saveLoginDialogSubtitle">Οι συνδέσεις αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
-    <string name="saveLoginDialogTitle">Θέλετε να αποθηκεύσει το DuckDuckGo τη σύνδεσή σας;</string>
+    <string name="saveLoginDialogSubtitle">Οι κωδικοί πρόσβασης αποθηκεύονται με ασφάλεια στη συσκευή σας στο μενού Συνδέσεις.</string>
+    <string name="saveLoginDialogTitle">Θέλετε το DuckDuckGo να αποθηκεύσει τον κωδικό πρόσβασής σας;</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Περισσότερες επιλογές</string>
 
-    <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένων στοιχείων σύνδεσης;</string>
+    <string name="useSavedLoginDialogTitle">Χρήση αποθηκευμένου κωδικού πρόσβασης;</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Κωδικός πρόσβασης για %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Κωδικός πρόσβασης για τον ιστότοπο</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Από αυτόν τον ιστότοπο</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Ενημέρωση ονόματος χρήστη</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Ενημέρωση κωδικού πρόσβασης για \n%1$s;</string>
-    <string name="updateLoginUpdatePasswordExplanation">Το DuckDuckGo θα ενημερώσει αυτήν την αποθηκευμένη σύνδεση στη συσκευή σας.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Το DuckDuckGo θα ενημερώσει αυτόν τον αποθηκευμένο κωδικό πρόσβασης στη συσκευή σας.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Κλείσιμο διαλόγου αυτόματης συμπλήρωσης</string>
 

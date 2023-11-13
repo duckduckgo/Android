@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">A bejelentkezések védelméhez az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
     <string name="managementDisabledModeTitle">Tedd biztonságossá a készülékedet a bejelentkezések mentéséhez</string>
 
-    <string name="saveLoginDialogButtonSave">Bejelentkezés mentése</string>
+    <string name="saveLoginDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Jelszó mentése</string>
     <string name="saveLoginDialogNotNow">Mentés mellőzése</string>
-    <string name="saveLoginDialogSubtitle">A rendszer biztonságosan tárolja az eszköz Bejelentkezés menüjében elérhető bejelentkezési adatokat.</string>
-    <string name="saveLoginDialogTitle">A DuckDuckGo mentse a bejelentkezést?</string>
+    <string name="saveLoginDialogSubtitle">A rendszer biztonságosan tárolja az eszköz Bejelentkezés menüjében elérhető jelszavakat.</string>
+    <string name="saveLoginDialogTitle">A DuckDuckGo mentse a jelszót?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">További lehetőségek</string>
 
-    <string name="useSavedLoginDialogTitle">Mentett bejelentkezés használata?</string>
+    <string name="useSavedLoginDialogTitle">Mentett jelszót használsz?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">%1$s jelszava</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Webhely jelszava</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Erről a webhelyről</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Felhasználónév frissítése</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Frissíted \n%1$s jelszavát?</string>
-    <string name="updateLoginUpdatePasswordExplanation">A DuckDuckGo frissíti az eszközödön ezt a tárolt bejelentkezést.</string>
+    <string name="updateLoginUpdatePasswordExplanation">A DuckDuckGo frissíti az eszközödön ezt a tárolt jelszót.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Automatikus kitöltési párbeszédablak bezárása</string>
 

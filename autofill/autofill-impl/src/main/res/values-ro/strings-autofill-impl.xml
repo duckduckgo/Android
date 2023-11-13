@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Este necesar un model de blocare a dispozitivului, un cod PIN sau date biometrice pentru a-ți proteja conectările.</string>
     <string name="managementDisabledModeTitle">Securizează-ți dispozitivul pentru a salva conectările</string>
 
-    <string name="saveLoginDialogButtonSave">Salvează autentificarea</string>
+    <string name="saveLoginDialogButtonSave">Salvează parola</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu salva</string>
-    <string name="saveLoginDialogSubtitle">Conexiunile sunt stocate în siguranță pe dispozitivul dvs. în meniul Conectări.</string>
-    <string name="saveLoginDialogTitle">Vrei ca DuckDuckGo să îți salveze datele de conectare?</string>
+    <string name="saveLoginDialogSubtitle">Parolele sunt stocate în siguranță pe dispozitivul dvs. în meniul Autentificări.</string>
+    <string name="saveLoginDialogTitle">Dorești ca DuckDuckGo să-ți salveze parola?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
-    <string name="useSavedLoginDialogTitle">Folosești datele de conectare salvate?</string>
+    <string name="useSavedLoginDialogTitle">Folosești o parolă salvată?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Parola pentru %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Parola pentru site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">De pe acest site web</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Actualizează numele de utilizator</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Actualizezi parola pentru \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo va actualiza aceste date de conectare stocate pe dispozitivul tău.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo va actualiza această parolă stocată pe dispozitivul tău.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Închide dialogul de completare automată</string>
 

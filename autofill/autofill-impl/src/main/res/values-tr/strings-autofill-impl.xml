@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
     <string name="managementDisabledModeTitle">Giriş bilgilerini kaydetmek için cihazınızın güvenliğini sağlayın</string>
 
-    <string name="saveLoginDialogButtonSave">Girişi Kaydet</string>
+    <string name="saveLoginDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Kaydetme</string>
-    <string name="saveLoginDialogSubtitle">Giriş bilgileri cihazınızdaki Giriş Bilgileri menüsünde güvenli bir şekilde saklanır.</string>
-    <string name="saveLoginDialogTitle">DuckDuckGo\'nun Girişinizi kaydetmesini istiyor musunuz?</string>
+    <string name="saveLoginDialogSubtitle">Şifreler cihazınızdaki Oturum Açma menüsünde güvenli bir şekilde saklanır.</string>
+    <string name="saveLoginDialogTitle">DuckDuckGo\'nun şifrenizi kaydetmesini istiyor musunuz?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
-    <string name="useSavedLoginDialogTitle">Kayıtlı Giriş kullanılsın mı?</string>
+    <string name="useSavedLoginDialogTitle">Kayıtlı bir şifre mi kullanıyorsunuz?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">%1$s şifresi</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Site şifresi</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Bu Web Sitesinden</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Kullanıcı Adını Güncelle</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">%1$s için şifre güncellensin mi?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo, cihazınızdaki bu kayıtlı Giriş bilgisini güncelleyecektir.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bu kayıtlı şifreyi cihazınızda güncelleyecektir.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Otomatik Doldurma İletişim Kutusunu Kapat</string>
 

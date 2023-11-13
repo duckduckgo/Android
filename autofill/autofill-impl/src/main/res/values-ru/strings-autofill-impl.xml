@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Для защиты логинов требуются биометрические данные, графический ключ или ПИН-код.</string>
     <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы сохранять логины</string>
 
-    <string name="saveLoginDialogButtonSave">Сохранить логин</string>
+    <string name="saveLoginDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginDialogNotNow">Не сохранять</string>
-    <string name="saveLoginDialogSubtitle">Учетные данные надежно хранятся на вашем устройстве в меню «Логины».</string>
-    <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
+    <string name="saveLoginDialogSubtitle">Пароли надежно хранятся на вашем устройстве в меню «Логины».</string>
+    <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил ваш пароль?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
-    <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>
+    <string name="useSavedLoginDialogTitle">Использовать сохраненный пароль?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Пароль для %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Пароль для сайта</string>
     <string name="useSavedLoginDialogGroupThisWebsite">С этого сайта</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Обновить имя пользователя</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Обновить пароль \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo обновит логин, сохраненный на вашем устройстве.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo обновит пароль, сохраненный на вашем устройстве.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Закрыть диалоговое окно автозаполнения</string>
 

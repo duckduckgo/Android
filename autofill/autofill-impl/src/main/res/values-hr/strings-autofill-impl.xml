@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Uzorak za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu vaših prijava.</string>
     <string name="managementDisabledModeTitle">Osigurajte svoj uređaj da biste spremili prijave</string>
 
-    <string name="saveLoginDialogButtonSave">Spremi prijavu</string>
+    <string name="saveLoginDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Nemoj spremiti</string>
-    <string name="saveLoginDialogSubtitle">Prijave su sigurno pohranjene na tvom uređaju u izborniku Prijave.</string>
-    <string name="saveLoginDialogTitle">Želiš li da DuckDuckGo spremi tvoju prijavu?</string>
+    <string name="saveLoginDialogSubtitle">Lozinke su sigurno pohranjene na tvom uređaju u izborniku Prijava.</string>
+    <string name="saveLoginDialogTitle">Želiš li da DuckDuckGo spremi tvoju lozinku?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Koristiti spremljene podatke za prijavu?</string>
+    <string name="useSavedLoginDialogTitle">Koristiti spremljenu lozinku?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Lozinka za %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Lozinka za web lokaciju</string>
     <string name="useSavedLoginDialogGroupThisWebsite">S ove web lokacije</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Ažuriraj korisničko ime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Želiš li ažurirati lozinku za korisnika \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo će ažurirati ovu spremljenu prijavu na tvom uređaju.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo će ažurirati ovu pohranjenu lozinku na tvom uređaju.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zatvori dijaloški okvir za automatsko popunjavanje</string>
 
