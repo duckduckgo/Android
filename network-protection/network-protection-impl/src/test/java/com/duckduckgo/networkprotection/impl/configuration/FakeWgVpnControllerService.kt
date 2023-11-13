@@ -22,10 +22,14 @@ import com.squareup.moshi.Types
 
 class FakeWgVpnControllerService : WgVpnControllerService {
     private val moshi: Moshi = Moshi.Builder().build()
-    private val configAdapter: JsonAdapter<List<RegisteredServerInfo>> = moshi.adapter(
+    private val serverConfigAdapter: JsonAdapter<List<RegisteredServerInfo>> = moshi.adapter(
         Types.newParameterizedType(List::class.java, RegisteredServerInfo::class.java),
     )
-    private val servers = configAdapter.fromJson(SERVERS_JSON) ?: emptyList()
+    private val locationConfigAdapter: JsonAdapter<List<EligibleLocation>> = moshi.adapter(
+        Types.newParameterizedType(List::class.java, EligibleLocation::class.java),
+    )
+    private val servers = serverConfigAdapter.fromJson(SERVERS_JSON) ?: emptyList()
+    private val serverLocations = locationConfigAdapter.fromJson(SERVER_LOCATIONS_JSON) ?: emptyList()
 
     override suspend fun redeemCode(code: NetPRedeemCodeRequest): NetPRedeemCodeResponse {
         return NetPRedeemCodeResponse("fake token")
@@ -33,6 +37,10 @@ class FakeWgVpnControllerService : WgVpnControllerService {
 
     override suspend fun getServers(): List<RegisteredServerInfo> {
         return servers
+    }
+
+    override suspend fun getEligibleLocations(): List<EligibleLocation> {
+        return serverLocations
     }
 
     override suspend fun registerKey(registerKeyBody: RegisterKeyBody): List<EligibleServerInfo> {
@@ -59,6 +67,33 @@ class FakeWgVpnControllerService : WgVpnControllerService {
         )
     }
 }
+
+private val SERVER_LOCATIONS_JSON = """
+    [
+      {
+        "country": "nl",
+        "cities": [
+          {
+            "name": "Rotterdam"
+          }
+        ]
+      },
+      {
+        "country": "us",
+        "cities": [
+          {
+            "name": "Newark"
+          },
+          {
+            "name": "El Segundo"
+          },
+          {
+            "name": "Des Moines"
+          }
+        ]
+      }
+    ]
+""".trimIndent()
 
 private val SERVERS_JSON = """
             [

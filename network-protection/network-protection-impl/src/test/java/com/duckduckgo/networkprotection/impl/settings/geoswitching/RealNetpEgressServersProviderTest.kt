@@ -66,7 +66,7 @@ class RealNetpEgressServersProviderTest {
             NetPGeoswitchingLocation(
                 countryCode = "us",
                 countryName = "United States",
-                cities = listOf("Des Moines", "El Segundo", "Newark"),
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
             ),
         )
         verify(netPGeoswitchingRepository).replaceLocations(expectedResult)
@@ -79,7 +79,7 @@ class RealNetpEgressServersProviderTest {
                 NetPGeoswitchingLocation(
                     countryCode = "se",
                     countryName = "Sweden",
-                    cities = listOf("Gothenburg", "Malmo", "Stockholm"),
+                    cities = listOf("Malmo", "Gothenburg", "Stockholm"),
                 ),
             ),
         )
