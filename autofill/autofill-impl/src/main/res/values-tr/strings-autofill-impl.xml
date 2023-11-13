@@ -23,7 +23,7 @@
     <string name="managementDisabledModeSubtitle">Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
     <string name="managementDisabledModeTitle">Giriş bilgilerini kaydetmek için cihazınızın güvenliğini sağlayın</string>
 
-    <string name="saveLoginDialogButtonSave">Şifre Kaydet</string>
+    <string name="saveLoginDialogButtonSave">Şifreyi Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginDialogNotNow">Kaydetme</string>
     <string name="saveLoginDialogSubtitle">Şifreler cihazınızdaki Oturum Açma menüsünde güvenli bir şekilde saklanır.</string>
