@@ -120,6 +120,7 @@ dependencies {
     implementation AndroidX.work.rxJava2
 
     implementation Square.retrofit2.converter.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation Square.okHttp3.okHttp
 
     implementation "com.github.bumptech.glide:glide:_"
@@ -129,6 +130,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.lifecycle.runtime.testing
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(':common-test')

@@ -731,7 +731,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Dovoljenja za spletno mesto</string>
-    <string name="sitePermissionsSettingsDescription">Spletna mesta, ki jih obiščete, lahko zahtevajo dostop do lokacije, kamere ali mikrofona vaše naprave. Do njih ne bodo mogli dostopati, razen če jim to izrecno dovolite.</string>
+    <string name="sitePermissionsSettingsDescription">Spletna mesta, ki jih obiščete, lahko zahtevajo dostop do lokacije, kamere, mikrofona ali programske opreme DRM (Digital Rights Management) vaše naprave. Do njih ne bodo mogla dostopati, razen če jim to izrecno dovolite.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Dovoli vsem mestom, da zahtevajo:</string>
     <string name="sitePermissionsSettingsLocation">Lokacija</string>
     <string name="sitePermissionsSettingsCamera">Kamera</string>

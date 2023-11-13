@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,7 +46,7 @@ class VpnFeaturesRegistryImplTest {
     @Before
     fun setup() {
         val prefs = InMemorySharedPreferences()
-        vpnServiceWrapper = TestVpnServiceWrapper()
+        vpnServiceWrapper = TestVpnServiceWrapper(coroutineTestRule.testDispatcherProvider)
 
         whenever(
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.vpn.feature.registry.v1"), eq(true), eq(false)),
@@ -164,7 +165,9 @@ class VpnFeaturesRegistryImplTest {
         BAR("BAR"),
     }
 
-    private class TestVpnServiceWrapper : VpnServiceWrapper(InstrumentationRegistry.getInstrumentation().context) {
+    private class TestVpnServiceWrapper constructor(
+        dispatcher: DispatcherProvider,
+    ) : VpnServiceWrapper(InstrumentationRegistry.getInstrumentation().context, dispatcher) {
         private var isRunning = false
         var restartCount = 0
 

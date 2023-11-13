@@ -111,6 +111,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                             return %T.Builder()
                                 .store(toggleStore)
                                 .appVersionProvider({ appBuildConfig.versionCode })
+                                .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
                                 .build()
                                 .create(%T::class.java)
@@ -888,6 +889,16 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                 "All functions in ${boundType.fqName} must be annotated with [Toggle.DefaultValue]",
                 element = vmClass.clazz.identifyingElement,
             )
+        }
+
+        // validate single DefaultValue annotation is present
+        boundType.declaredFunctions().forEach { f ->
+            if (f.annotations.count { it.fqName == Toggle.DefaultValue::class.fqName } > 1) {
+                throw AnvilCompilationException(
+                    "All functions in ${boundType.fqName} must be annotated with single [Toggle.DefaultValue]",
+                    element = vmClass.clazz.identifyingElement,
+                )
+            }
         }
 
         // validate function self() must be present

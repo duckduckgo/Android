@@ -222,7 +222,7 @@
                             "site-that-tracks.com"
                         ],
                         "types": [
-                            "image"
+                            "script"
                         ]
                     },
                     "surrogate": "tracker"

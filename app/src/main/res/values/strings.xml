@@ -722,7 +722,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Site Permissions</string>
-    <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, or microphone. They won’t be able to access these unless you explicitly give them permission.</string>
+    <string name="sitePermissionsSettingsDescription">Sites you visit may ask for access to your device’s location, camera, microphone, or DRM (Digital Rights Management) software. They won’t be able to access these unless you explicitly give them permission.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Allow all sites to ask for:</string>
     <string name="sitePermissionsSettingsLocation">Location</string>
     <string name="sitePermissionsSettingsCamera">Camera</string>

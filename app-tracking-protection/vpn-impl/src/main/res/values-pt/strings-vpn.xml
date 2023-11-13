@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Como isso funciona?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">A App Tracking Protection <b>deteta e bloqueia os rastreadores de aplicações de outras empresas</b>, por exemplo, quando o Facebook tenta rastrear-te numa aplicação de saúde.\n\n<b>É grátis</b>, e podes desfrutar das aplicações como farias normalmente. Trabalha em segundo plano e ajuda a <b>proteger-te em todos os momentos.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Quem vê os teus dados?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>A App Tracking Protection não é uma VPN.</b> No entanto, utiliza uma ligação VPN local, pelo que o teu dispositivo vai reconhecer esta funcionalidade como uma VPN.\n\nA App Tracking Protection é diferente.<b> Nunca encaminha os dados das aplicações através de um servidor externo. </b><annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>A App Tracking Protection não é uma VPN.</b> No entanto, utiliza uma ligação VPN local, pelo que o teu dispositivo vai reconhecer esta funcionalidade como uma VPN.\n\nA App Tracking Protection é diferente.<b> Nunca encaminha os dados das aplicações através de um servidor externo.</b>\n\n<annotation type="learn_more_link"><b>Sabe mais</b></annotation></string>
     <string name="atp_FAQCta">Perguntas frequentes sobre a App Tracking Protection</string>
     <string name="atp_OnboardingContinue">Continuar</string>
     <string name="atp_OnboardingMaybeLater">Talvez mais tarde</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">O que são os rastreadores de aplicações?</string>
     <string name="atp_ActivityReportProblem">Comunicar um problema com uma aplicação</string>
     <string name="atp_ActivityBetaInstructions">Instruções beta</string>
-    <string name="atp_ActivityManageProtection">Estás a ter problemas com uma aplicação?</string>
+    <string name="atp_ActivityManageProtection">Tens problemas?</string>
+    <string name="atp_RecentAppActivity">Atividade recente das aplicações</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 tentativa de rastreamento bloqueada de 1 empresa em <b>%1$s</b> aplicação]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Entendi</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Se tiveres problemas com uma aplicação (por exemplo, conteúdo que não é carregado), experimenta desativar a proteção para essa aplicação e <annotation type="report_issues_link">enviar um relatório.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Atividade recente das aplicações</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Se ainda tiveres problemas com uma aplicação específica, desativa a proteção para essa aplicação e <annotation type="report_issues_link">envia um relatório.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Tens problemas?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Mostrar todas as aplicações</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">As aplicações com tentativas de rastreamento bloqueadas recentemente aparecem aqui</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Definições do sistema recomendadas</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Certifica-te de que a VPN está sempre ligada</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Nas definições do Android, permite \"Sempre ativa\" para reativar automaticamente a App Tracking Protection após interrupções da ligação VPN</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Permite que a aplicação use a bateria sem restrições</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Nas definições da bateria da aplicação, permite utilização sem restrições para impedir que o Android desative a App Tracking Protection em segundo plano</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">A aplicação pode usar a bateria sem restrições</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Nas definições da bateria da aplicação, isto impede que o Android desative a App Tracking Protection em segundo plano</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Desativar e eliminar os dados?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Comunicar problema</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Agora não</string>
     <string name="atp_ActivityRecentActivityHeader">Atividade</string>
-    <string name="atp_ActivityManageProtectionLabel">Estás a ter problemas com uma aplicação?</string>
+    <string name="atp_ActivityManageProtectionLabel">Tens problemas?</string>
     <string name="atp_ActivityEnabledBannerLabel">Durante a versão beta, a proteção de algumas aplicações é desativada automaticamente. <annotation type="app_settings_link">Ver aplicações</annotation></string>
     <string name="atp_ActivityDescription">As tentativas de rastreamento bloqueadas aparecem aqui</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Hogyan működik?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">Az alkalmazáskövetés elleni védelem <b>észleli és blokkolja más cégek alkalmazáskövetőit,</b> például amikor a Facebook megpróbál nyomon követni egy egészségügyi alkalmazásban.\n\n<b>Ingyenes</b>, és az alkalmazásokat a szokásos módon használhatod. A háttérben dolgozva <b>véd meg éjjel és nappal.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Ki látja az adataidat?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Az alkalmazáskövetés elleni védelem nem VPN.</b> A készüléked azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ.\n\nAz alkalmazáskövetés elleni védelem más.<b> Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül. </b><annotation type="learn_more_link">További információk</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>Az alkalmazáskövetés elleni védelem nem VPN.</b> Az eszközöd azonban ekként ismeri fel. Ez azért van, mert a működéshez helyi VPN-kapcsolatot használ.\n\nAz alkalmazáskövetés elleni védelem más.<b> Soha nem irányítja át az alkalmazásadatokat külső szerveren keresztül.</b>\n\n<annotation type="learn_more_link"><b>További információk</b></annotation></string>
     <string name="atp_FAQCta">Alkalmazáskövetés elleni védelem GYIK</string>
     <string name="atp_OnboardingContinue">Folytatás</string>
     <string name="atp_OnboardingMaybeLater">Talán később</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Mik az alkalmazáskövetők?</string>
     <string name="atp_ActivityReportProblem">Alkalmazással kapcsolatos probléma bejelentése</string>
     <string name="atp_ActivityBetaInstructions">Béta utasítások</string>
-    <string name="atp_ActivityManageProtection">Problémáid vannak egy alkalmazással?</string>
+    <string name="atp_ActivityManageProtection">Problémáid vannak?</string>
+    <string name="atp_RecentAppActivity">Legutóbbi alkalmazástevékenység</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 követési kísérlet blokkolva 1 cégtől a(z)<b>%1$s</b> alkalmazásban]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Értem</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Ha problémád van egy alkalmazással (például a tartalom nem töltődik be), próbáld meg kikapcsolni az adott alkalmazás védelmét, és <annotation type="report_issues_link">küldj jelentést.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Legutóbbi alkalmazástevékenység</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Ha továbbra is problémáid vannak egy alkalmazással, kapcsold ki a védelmet az adott alkalmazásnál, és <annotation type="report_issues_link">küldj be jelentést.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Problémáid vannak?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Összes alkalmazás megjelenítése</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Itt jelennek meg a nemrég blokkolt nyomkövetéssel próbálkozó alkalmazások</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Ajánlott rendszerbeállítások</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Győződj meg arról, hogy a VPN mindig BE van kapcsolva</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Az Android beállításaiban engedélyezd a Mindig be kapcsolva funkciót, hogy a VPN-kapcsolat megszakadása után automatikusan újra bekapcsold az alkalmazáskövetés elleni védelmet</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Alkalmazás korlátlan akkumulátorhasználatának engedélyezése</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Az Alkalmazás akkumulátorhasználata menüpontban engedélyezd a Korlátlan használat lehetőséget, hogy az Android ne tiltsa le a háttérben az App Tracking Protection funkciót</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Alkalmazás akkumulátorhasználata korlátlan</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Ez az Alkalmazás akkumulátor-beállításaiban megakadályozza, hogy az Android letiltsa a háttérben az Alkalmazáskövetés elleni védelem funkciót</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Letiltod és törlöd az adatokat?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Probléma jelentése</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Most nem</string>
     <string name="atp_ActivityRecentActivityHeader">Tevékenység</string>
-    <string name="atp_ActivityManageProtectionLabel">Problémáid vannak egy alkalmazással?</string>
+    <string name="atp_ActivityManageProtectionLabel">Problémáid vannak?</string>
     <string name="atp_ActivityEnabledBannerLabel">A béta verzióban egyes alkalmazások védelme automatikusan le van tiltva. <annotation type="app_settings_link">Alkalmazások megtekintése</annotation></string>
     <string name="atp_ActivityDescription">Itt jelennek meg a blokkolt nyomkövetési kísérletek</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

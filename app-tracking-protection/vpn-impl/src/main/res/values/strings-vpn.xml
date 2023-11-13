@@ -107,7 +107,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">How does it work?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>detects and blocks app trackers from other companies</b>, like when Facebook attempts to track you in a health app.\n\n<b>It\'s free</b>, and you can enjoy your apps as you normally would. Working in the background, it helps <b>protect you night and day.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Who sees your data?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local VPN connection to work.\n\nApp Tracking Protection is different.<b> It never routes app data through an external server. </b><annotation type="learn_more_link">Learn more</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local VPN connection to work.\n\nApp Tracking Protection is different.<b> It never routes app data through an external server.</b>\n\n<annotation type="learn_more_link"><b>Learn more</b></annotation></string>
     <string name="atp_FAQCta">App Tracking Protection FAQ</string>
     <string name="atp_OnboardingContinue">Continue</string>
     <string name="atp_OnboardingMaybeLater">Maybe Later</string>
@@ -191,7 +191,8 @@
     <string name="atp_ActivityAppTrackersFAQ">What are app trackers?</string>
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
-    <string name="atp_ActivityManageProtection">Having Issues with an app?</string>
+    <string name="atp_ActivityManageProtection">Having Issues?</string>
+    <string name="atp_RecentAppActivity">Recent App Activity</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany"
         instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
@@ -358,10 +359,17 @@
     <string name="atp_VpnConflictDialogGotIt">Got it</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">If you’re having problems with an app (such as content not loading), try disabling protection for that app and <annotation type="report_issues_link">submit a report.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Recent App Activity</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">If you still have issues with a specific app, disable protection for that app and <annotation type="report_issues_link">submit a report.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Having Issues?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Show All Apps</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Apps with recently blocked tracking attempts will appear here</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Recommended System Settings</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Make Sure VPN Is Always ON</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">In Android Settings, allow Always On to automatically re-enable App Tracking Protection after VPN connection interruptions</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Allow Unrestricted App Battery Usage</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">In App Battery Settings, allow Unrestricted usage to prevent Android from disabling App Tracking Protection in the background</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">App Battery Usage Is Unrestricted</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">In App Battery Settings, this prevents Android from disabling App Tracking Protection in the background</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Disable and delete data?</string>
@@ -389,7 +397,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Report Issue</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Not Now</string>
     <string name="atp_ActivityRecentActivityHeader">Activity</string>
-    <string name="atp_ActivityManageProtectionLabel">Having issues with an app?</string>
+    <string name="atp_ActivityManageProtectionLabel">Having Issues?</string>
     <string name="atp_ActivityEnabledBannerLabel">During beta, protection for some apps is automatically disabled. <annotation type="app_settings_link">View apps</annotation></string>
     <string name="atp_ActivityDescription">Blocked tracking attempts will appear here</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Webbplatsbehörigheter</string>
-    <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera eller mikrofon. De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
+    <string name="sitePermissionsSettingsDescription">Webbplatser som du besöker kan begära åtkomst till din enhets plats, kamera, mikrofon eller DRM-programvara (Digital Rights Management). De kan inte komma åt dessa om du inte uttryckligen tillåter det.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tillåt alla webbplatser att be om:</string>
     <string name="sitePermissionsSettingsLocation">Plats</string>
     <string name="sitePermissionsSettingsCamera">Kamera</string>

@@ -55,14 +55,16 @@
                 android:orientation="vertical"
         >
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-                    android:id="@+id/vpn_notification_enabled"
+            <com.duckduckgo.mobile.android.ui.notifyme.NotifyMeView
+                    android:id="@+id/vpn_notification_settings_notify_me"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:primaryText="@string/netpVpnSettingNotificationEnabled"
-                    app:secondaryText="@string/netpVpnSettingNotificationEnabledByline"
-                    app:showSwitch="true"
-            />
+                    android:visibility="gone"
+                    app:primaryText="@string/netpVpnNotifyMeTitle"
+                    app:secondaryText="@string/netpVpnNotifyMeByLine"
+                    app:dismissIcon="false"
+                    app:contentOrientation="center"
+                    app:sharedPrefsKeyForDismiss="key_component_dismissed_in_vpn_notif_settings" />
 
             <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
                     android:id="@+id/vpn_notification_alerts"

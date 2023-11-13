@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Как работи?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>открива и блокира тракери на други компании в приложенията</b>, например когато Facebook се опитва да Ви следи в приложение за здраве.\n\n<b>Защитата е безплатна</b> и можете да използвате приложенията както обикновено. Тя работи във фонов режим и Ви осигурява <b>денонощна защита.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Кой вижда Вашите данни?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection не е VPN услуга.</b> Въпреки това, Вашето устройство ще я разпознае като такава. Това е така, защото използва локална VPN връзка, за да работи.\n\nApp Tracking Protection е различна.<b> Тя никога не маршрутизира данни от приложението през външен сървър. </b><annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection не е VPN услуга.</b> Въпреки това, Вашето устройство ще я разпознае като такава. Това е така, защото използва локална VPN връзка, за да работи.\n\nApp Tracking Protection е различна.<b> Тя никога не маршрутизира данни от приложението през външен сървър.</b>\n\n<annotation type="learn_more_link"><b>Научете повече</b></annotation></string>
     <string name="atp_FAQCta">Често задавани въпроси за App Tracking Protection</string>
     <string name="atp_OnboardingContinue">Продължи</string>
     <string name="atp_OnboardingMaybeLater">Може би по-късно</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Какво представляват тракерите в приложенията?</string>
     <string name="atp_ActivityReportProblem">Докладвайте за проблем с приложение</string>
     <string name="atp_ActivityBetaInstructions">Инструкции за бета версията</string>
-    <string name="atp_ActivityManageProtection">Имате проблеми с някое приложение?</string>
+    <string name="atp_ActivityManageProtection">Имате проблеми?</string>
+    <string name="atp_RecentAppActivity">Последна активност на приложенията</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 блокиран опит за проследяване от 1 компания в приложението <b>%1$s</b>]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Разбрах</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Ако имате проблеми с някое приложение (например съдържанието не се зарежда), опитайте да деактивирате защитата за това приложение и <annotation type="report_issues_link">докладвайте проблема.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Последна активност на приложенията</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Ако все още имате проблеми с някое приложение, деактивирайте защитата за това приложение и <annotation type="report_issues_link">докладвайте проблема.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Имате проблеми?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Показване на всички приложения</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Тук се показват приложенията с наскоро блокирани опити за проследяване</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Препоръчителни системни настройки</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Уверете се, че VPN е винаги ВКЛ.</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">В Настройки на Android задайте Винаги включено, за да може App Tracking Protection да се активира отново автоматично след прекъсване на VPN връзката</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Разрешаване на неограничено използване на батерията за приложението</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">В Настройки на батерията за приложението задайте Неограничена употреба, за не позволите на Android да деактивира App Tracking Protection във фонов режим</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Използването на батерията за приложението е неограничено</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Тази опция в Настройки на батерията за приложението не позволява на Android да деактивира App Tracking Protection във фонов режим</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Деактивиране и изтриване на данните?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Докладване на проблем</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Не сега</string>
     <string name="atp_ActivityRecentActivityHeader">Дейност</string>
-    <string name="atp_ActivityManageProtectionLabel">Имате проблеми с някое приложение?</string>
+    <string name="atp_ActivityManageProtectionLabel">Имате проблеми?</string>
     <string name="atp_ActivityEnabledBannerLabel">В бета версията защитата на някои приложения се деактивира автоматично. <annotation type="app_settings_link">Преглед на приложенията</annotation></string>
     <string name="atp_ActivityDescription">Блокираните опити за проследяване се показват тук</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

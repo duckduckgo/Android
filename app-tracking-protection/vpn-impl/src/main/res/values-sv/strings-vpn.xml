@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Hur fungerar det?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>upptäcker och blockerar appspårare från andra företag</b>, till exempel när Facebook försöker spåra dig i en hälsoapp.\n\n<b>Skyddet är gratis</b>, och du kan använda dina appar som vanligt. Funktionen körs i bakgrunden och hjälper till att <b>skydda dig dag som natt.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Vem ser dina data?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection är inte ett VPN.</b> Din enhet kommer dock att uppfatta funktionen som det. Det beror på att den använder en lokal VPN-anslutning för att fungera.\n\nApp Tracking Protection är annorlunda.<b> Funktionen dirigerar aldrig appdata genom en extern server. </b><annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection är inte ett VPN.</b> Din enhet kommer dock att uppfatta funktionen som det. Det beror på att den använder en lokal VPN-anslutning för att fungera.\n\nApp Tracking Protection är annorlunda.<b> Funktionen dirigerar aldrig appdata genom en extern server.</b>\n\n<annotation type="learn_more_link"><b>Läs mer</b></annotation></string>
     <string name="atp_FAQCta">App Tracking Protection</string>
     <string name="atp_OnboardingContinue">Fortsätt</string>
     <string name="atp_OnboardingMaybeLater">Kanske senare</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Vad är appspårare?</string>
     <string name="atp_ActivityReportProblem">Rapportera ett problem med en app</string>
     <string name="atp_ActivityBetaInstructions">Betainstruktioner</string>
-    <string name="atp_ActivityManageProtection">Har du problem med en app?</string>
+    <string name="atp_ActivityManageProtection">Har du problem?</string>
+    <string name="atp_RecentAppActivity">Senaste appaktivitet</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 spårningsförsök av 1 företag blockerades i appen <b>%1$s</b>]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Jag fattar</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Om du har problem med en app (t.ex. innehåll som inte läses in) kan du prova med att inaktivera skyddet för den appen och <annotation type="report_issues_link">skicka in en rapport.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Senaste appaktivitet</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Om du fortfarande har problem med en viss app kan du inaktivera skyddet för den appen och <annotation type="report_issues_link">skicka in en rapport.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Har du problem?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Visa alla appar</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Appar med nyligen blockerade spårningsförsök visas här</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Rekommenderade systeminställningar</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Se till att VPN alltid är PÅ</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">I Android-inställningarna ska du tillåta Alltid på att automatiskt återaktivera App Tracking Protection efter avbrott i VPN-anslutningen</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Tillåt obegränsad batteriförbrukning för appen</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">I batteriinställningarna för appen ska du tillåta obegränsad användning för att förhindra att Android inaktiverar App Tracking Protection i bakgrunden</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Appens batteriförbrukning är obegränsad</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Det här alternativet i batteriinställningarna förhindrar att Android inaktiverar App Tracking Protection i bakgrunden</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Inaktivera och radera data?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Rapportera problem</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Inte nu</string>
     <string name="atp_ActivityRecentActivityHeader">Aktivitet</string>
-    <string name="atp_ActivityManageProtectionLabel">Har du problem med en app?</string>
+    <string name="atp_ActivityManageProtectionLabel">Har du problem?</string>
     <string name="atp_ActivityEnabledBannerLabel">Under betaperioden inaktiveras skyddet för vissa appar automatiskt. <annotation type="app_settings_link">Visa appar</annotation></string>
     <string name="atp_ActivityDescription">Blockerade spårningsförsök visas här</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

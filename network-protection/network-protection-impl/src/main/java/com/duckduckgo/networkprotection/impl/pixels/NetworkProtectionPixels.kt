@@ -225,9 +225,7 @@ interface NetworkProtectionPixels {
     fun waitlistNotificationCancelled()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire daily -> fire only once a day no matter how many times we call this fun
      *
      * The pixels fire when the waitlist beta is enabled for th user. This is gated by a remote feature flag
      */
@@ -260,6 +258,16 @@ interface NetworkProtectionPixels {
      * This fun will fire one pixel
      */
     fun reportGeoswitchingNoLocations()
+
+    /**
+     * This fun will fire just daily pixel whenever private DNS is set by the user
+     */
+    fun reportPrivateDnsSet()
+
+    /**
+     * This fun will fire just daily pixel whenever private DNS is set by the user and VPN start fails
+     */
+    fun reportPrivateDnsSetOnVpnStartFail()
 }
 
 @ContributesBinding(AppScope::class)
@@ -422,7 +430,6 @@ class RealNetworkProtectionPixel @Inject constructor(
 
     override fun waitlistBetaIsEnabled() {
         tryToFireDailyPixel(NETP_WAITLIST_BETA_ENABLED_DAILY)
-        firePixel(NETP_WAITLIST_BETA_ENABLED)
     }
 
     override fun reportGeoswitchingScreenShown() {
@@ -442,6 +449,14 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportGeoswitchingNoLocations() {
         tryToFireDailyPixel(NETP_GEOSWITCHING_NO_AVAILABLE_LOCATIONS_DAILY)
         firePixel(NETP_GEOSWITCHING_NO_AVAILABLE_LOCATIONS)
+    }
+
+    override fun reportPrivateDnsSet() {
+        tryToFireDailyPixel(NETP_PRIVATE_DNS_SET_DAILY)
+    }
+
+    override fun reportPrivateDnsSetOnVpnStartFail() {
+        tryToFireDailyPixel(NETP_PRIVATE_DNS_SET_VPN_START_FAILED_DAILY)
     }
 
     private fun firePixel(

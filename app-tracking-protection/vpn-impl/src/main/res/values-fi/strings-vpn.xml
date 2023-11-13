@@ -108,7 +108,7 @@
     <string name="atp_OnboardingLastPageTwoTitle">Kuinka se toimii?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>havaitsee ja estää muiden yritysten seurantalaitteet</b>, esimerkiksi kun Facebook yrittää seurata sinua terveyssovelluksessa.\n\n<b>Se on ilmainen</b>, ja voit käyttää sovelluksiasi tavalliseen tapaan. Se toimii taustalla ja auttaa <b>suojaamaan sinua yötä päivää.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Kuka näkee tietosi?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection ei ole VPN.</b> Laitteesi kuitenkin tunnistaa sen sellaiseksi. Tämä johtuu siitä, että se käyttää toimiakseen paikallista VPN-yhteyttä.\n\nApp Tracking Protection on erilainen.<b> Se ei koskaan reititä sovellustietoja ulkoisen palvelimen kautta. </b><annotation type="learn_more_link">Lue lisää</annotation></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection ei ole VPN.</b> Laitteesi kuitenkin tunnistaa sen sellaiseksi. Tämä johtuu siitä, että se käyttää toimiakseen paikallista VPN-yhteyttä.\n\nApp Tracking Protection on jotain muuta.<b> Se ei koskaan reititä sovellustietoja ulkoisen palvelimen kautta.</b>\n\n<annotation type="learn_more_link"><b>Lue lisää</b></annotation></string>
     <string name="atp_FAQCta">App Tracking Protection - Usein kysyttyä</string>
     <string name="atp_OnboardingContinue">Jatka</string>
     <string name="atp_OnboardingMaybeLater">Ehkä myöhemmin</string>
@@ -192,7 +192,8 @@
     <string name="atp_ActivityAppTrackersFAQ">Mitä ovat sovellusten seurantalaitteet?</string>
     <string name="atp_ActivityReportProblem">Ilmoita ongelmasta sovelluksessa</string>
     <string name="atp_ActivityBetaInstructions">Beetaohjeet</string>
-    <string name="atp_ActivityManageProtection">Onko sinulla ongelmia sovelluksen kanssa?</string>
+    <string name="atp_ActivityManageProtection">Onko sinulla ongelmia?</string>
+    <string name="atp_RecentAppActivity">Viimeaikainen sovellustoiminta</string>
 
     <string name="atp_ActivityTrackersCompanyBlockedOnetimeOneCompany" instruction="Placeholder %1$s is the name of the app doing the tracking. Example: 1 tracking attempt blocked from 1 company in Venmo app.">
         <![CDATA[1 seurantayritys estetty 1 yritykseltä sovelluksessa <b>%1$s</b>]]>
@@ -355,10 +356,17 @@
     <string name="atp_VpnConflictDialogGotIt">Selvä</string>
 
     <!-- Manage Recent Apps Protection -->
-    <string name="atp_ManageRecentAppsProtectionReportIssues">Jos sinulla on ongelmia sovelluksen kanssa (sisältö ei esimerkiksi lataudu), yritä poistaa kyseisen sovelluksen suojaus käytöstä ja <annotation type="report_issues_link">lähettää raportti.</annotation></string>
-    <string name="atp_ManageRecentAppsProtectionActivityTitle">Viimeaikainen sovellustoiminta</string>
+    <string name="atp_ManageRecentAppsProtectionReportIssues">Jos sinulla on edelleen ongelmia jonkin tietyn sovelluksen kanssa, poista kyseisen sovelluksen suojaus käytöstä ja <annotation type="report_issues_link">lähetä raportti.</annotation></string>
+    <string name="atp_ManageRecentAppsProtectionActivityTitle">Onko sinulla ongelmia?</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Näytä kaikki sovellukset</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">Täällä näkyvät sovellukset, joiden seurantayritykset on estetty hiljattain</string>
+    <string name="atp_ManageRecentAppsProtectionSectionTitle">Suositellut järjestelmäasetukset</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnTitle">Varmista, että VPN on aina PÄÄLLÄ</string>
+    <string name="atp_ManageRecentAppsProtectionAlwaysOnByline">Androidin asetuksien Aina päällä -toiminto käynnistää App Tracking Protectionin automaattisesti uudelleen VPN-yhteyden katkeamisen jälkeen.</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattTitle">Salli sovelluksen akun rajoittamaton käyttö</string>
+    <string name="atp_ManageRecentAppsProtectionAllowUnrestrictedBattByline">Salli rajoittamaton käyttö sovelluksen akkuasetuksissa välttääksesi Androidia poistamasta App Tracking Protectionia käytöstä taustalla</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattTitle">Sovelluksen akun käyttöä ei ole rajoitettu</string>
+    <string name="atp_ManageRecentAppsProtectionUnrestrictedBattByline">Sovelluksen akkuasetuksissa tämä estää Androidia poistamasta App Tracking Protectionia käytöstä taustalla</string>
 
     <!--  App Tracking Protection Remove Feature Dialog -->
     <string name="atp_RemoveFeatureDialogTitle">Poistetaanko tiedot käytöstä ja poistetaan?</string>
@@ -386,7 +394,7 @@
     <string name="atp_ExcludeAppsManuallyCTAReportIssue">Ilmoita ongelmasta</string>
     <string name="atp_ExcludeAppsManuallyCTANotNow">Ei nyt</string>
     <string name="atp_ActivityRecentActivityHeader">Toiminta</string>
-    <string name="atp_ActivityManageProtectionLabel">Onko sinulla ongelmia sovelluksen kanssa?</string>
+    <string name="atp_ActivityManageProtectionLabel">Onko sinulla ongelmia?</string>
     <string name="atp_ActivityEnabledBannerLabel">Beetaversion aikana joidenkin sovellusten suojaus poistetaan käytöstä automaattisesti. <annotation type="app_settings_link">Näytä sovellukset</annotation></string>
     <string name="atp_ActivityDescription">Estetyt seurantayritykset näkyvät täällä</string>
     <plurals name="atp_ActivityProtectedApps" instruction="Placeholder is the number of apps that are protected">

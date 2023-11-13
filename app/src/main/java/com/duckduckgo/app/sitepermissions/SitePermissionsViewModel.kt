@@ -61,6 +61,7 @@ class SitePermissionsViewModel @Inject constructor(
         val askLocationEnabled: Boolean = true,
         val askCameraEnabled: Boolean = false,
         val askMicEnabled: Boolean = true,
+        val askDrmEnabled: Boolean = true,
         val sitesPermissionsAllowed: List<SitePermissionsEntity> = listOf(),
         val locationPermissionsAllowed: List<LocationPermissionEntity> = listOf(),
     )
@@ -78,6 +79,7 @@ class SitePermissionsViewModel @Inject constructor(
             askLocationEnabled = settingsDataStore.appLocationPermission,
             askCameraEnabled = sitePermissionsRepository.askCameraEnabled,
             askMicEnabled = sitePermissionsRepository.askMicEnabled,
+            askDrmEnabled = sitePermissionsRepository.askDrmEnabled,
         )
     }
 
@@ -119,6 +121,10 @@ class SitePermissionsViewModel @Inject constructor(
             R.string.sitePermissionsSettingsMicrophone -> {
                 sitePermissionsRepository.askMicEnabled = isChecked
                 _viewState.value = _viewState.value.copy(askMicEnabled = isChecked)
+            }
+            R.string.sitePermissionsSettingsDRM -> {
+                sitePermissionsRepository.askDrmEnabled = isChecked
+                _viewState.value = _viewState.value.copy(askDrmEnabled = isChecked)
             }
         }
     }

@@ -16,12 +16,14 @@
 
 package com.duckduckgo.app.referencetests.brokensites
 
+import android.net.Uri
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
@@ -37,6 +39,7 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLEncoder
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
@@ -77,6 +80,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockPrivacyConfig: PrivacyConfig = mock()
 
+    private val mockUserAllowListRepository: UserAllowListRepository = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
@@ -100,6 +105,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+        whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
         testee = BrokenSiteSubmitter(
             mockStatisticsDataStore,
             mockVariantManager,
@@ -111,6 +117,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             mockAppBuildConfig,
             coroutineRule.testDispatcherProvider,
             mockPrivacyConfig,
+            mockUserAllowListRepository,
             mock(),
             mock(),
             mock(),
@@ -131,6 +138,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             PrivacyConfigData(version = testCase.remoteConfigVersion ?: "v", eTag = testCase.remoteConfigEtag ?: "e"),
         )
 
+        val url = Uri.parse(testCase.siteURL).host
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(url)).thenReturn(!testCase.protectionsEnabled)
+
         val brokenSite = BrokenSite(
             category = testCase.category,
             description = testCase.providedDescription,
@@ -146,6 +156,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             consentSelfTestFailed = testCase.consentSelfTestFailed.toBoolean(),
             errorCodes = "",
             httpErrorCodes = "",
+            loginSite = null,
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
@@ -187,6 +198,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val model: String?,
         val os: String?,
         val gpcEnabled: Boolean = false,
+        val protectionsEnabled: Boolean = true,
         val expectReportURLPrefix: String,
         val expectReportURLParams: List<UrlParam>,
         val exceptPlatforms: List<String>,

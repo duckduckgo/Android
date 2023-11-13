@@ -68,8 +68,11 @@
                     android:id="@+id/always_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:primaryText="@string/netpVpnSettingAlwaysOn"
                     app:secondaryText="@string/netpVpnSettingAlwaysOnByline"
+                    app:trailingIcon="@drawable/ic_open_in_24"
                     app:showSwitch="false"
             />
 
@@ -82,21 +85,14 @@
                     app:showSwitch="true"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-                    android:id="@+id/vpnSettingsDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-                    android:id="@+id/vpnSettingsDns"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/keyline_4"
-                    android:layout_marginBottom="@dimen/keyline_2"
-                    android:text="@string/netpVpnSettingDnsLeak"
-                    app:textType="secondary"
-                    app:typography="body2" />
-
+            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+                android:id="@+id/secure_dns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/netpVpnSettingSecureDNS"
+                app:secondaryText="@string/netpVpnSettingSecureDNSByLine"
+                app:showSwitch="true"
+                />
 
         </LinearLayout>
     </ScrollView>

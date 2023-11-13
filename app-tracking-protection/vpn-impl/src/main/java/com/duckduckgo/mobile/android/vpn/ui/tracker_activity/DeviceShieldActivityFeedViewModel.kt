@@ -131,7 +131,9 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     fun trackerListDisplayed(viewState: TrackerFeedViewState) {
         viewModelScope.launch {
             if (viewState.trackers.isNotEmpty() && viewState.trackers.first() != TrackerLoadingSkeleton) {
-                command.send(Command.TrackerListDisplayed(viewState.trackers.size))
+                command.send(
+                    Command.TrackerListDisplayed(viewState.trackers.count { it is TrackerFeedItem.TrackerFeedData }),
+                )
             }
         }
     }

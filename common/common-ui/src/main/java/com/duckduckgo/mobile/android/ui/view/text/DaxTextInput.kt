@@ -58,6 +58,7 @@ interface TextInput {
 
     fun addTextChangedListener(textWatcher: TextWatcher)
     fun removeTextChangedListener(textWatcher: TextWatcher)
+    fun addFocusChangedListener(listener: OnFocusChangeListener)
     fun setEndIcon(
         @DrawableRes endIconRes: Int,
         contentDescription: String? = null,
@@ -85,6 +86,7 @@ class DaxTextInput @JvmOverloads constructor(
     private var isPassword: Boolean = false
     private var isPasswordShown: Boolean = false
     private var isClickable: Boolean = false
+    private var internalFocusChangedListener: OnFocusChangeListener? = null
 
     init {
         context.obtainStyledAttributes(
@@ -136,7 +138,8 @@ class DaxTextInput @JvmOverloads constructor(
     }
 
     private fun setFocusListener() {
-        binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+        binding.internalEditText.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+            internalFocusChangedListener?.onFocusChange(view, hasFocus)
             if (hasFocus) {
                 if (isPassword) {
                     showPassword()
@@ -205,6 +208,10 @@ class DaxTextInput @JvmOverloads constructor(
 
     override fun removeTextChangedListener(textWatcher: TextWatcher) {
         binding.internalEditText.removeTextChangedListener(textWatcher)
+    }
+
+    override fun addFocusChangedListener(listener: OnFocusChangeListener) {
+        internalFocusChangedListener = listener
     }
 
     override fun setEndIcon(

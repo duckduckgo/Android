@@ -34,4 +34,5 @@
     <!-- Lockdown notification -->
     <string name="vpn_LockdownNotificationTextWithNetPOnlyEnabled">Action required! An Android setting needs to be changed for Network Protection.</string>
     <string name="vpn_LockdownNotificationTextWithNetPAndAppTPEnabled">Action required! Change an Android setting to use Network Protection and App Tracking Protection.</string>
+
 </resources>

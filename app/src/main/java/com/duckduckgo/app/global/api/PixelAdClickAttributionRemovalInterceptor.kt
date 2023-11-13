@@ -16,63 +16,21 @@
 
 package com.duckduckgo.app.global.api
 
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.adclick.impl.pixels.AdClickPixelName
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import okhttp3.Interceptor
-import okhttp3.Response
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class,
-)
-class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : Interceptor, PixelInterceptorPlugin {
+@ContributesMultibinding(scope = AppScope::class)
+class PixelAdClickAttributionRemovalInterceptor @Inject constructor() : PixelParamRemovalPlugin {
 
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-        val pixel = chain.request().url.pathSegments.last()
-        val pixelName = getPixelName(pixel)
-
-        val url = if (PIXELS_SET_NO_ATB.contains(pixelName)) {
-            chain.request().url.newBuilder()
-                .removeAllQueryParameters(AppUrl.ParamKey.ATB)
-                .build()
-        } else if (PIXELS_SET_NO_ATB_AND_VERSION.contains(pixelName)) {
-            chain.request().url.newBuilder()
-                .removeAllQueryParameters(AppUrl.ParamKey.ATB)
-                .removeAllQueryParameters(APP_VERSION_PARAM)
-                .build()
-        } else {
-            chain.request().url
-        }
-
-        return chain.proceed(request.url(url).build())
-    }
-
-    override fun getInterceptor(): Interceptor = this
-
-    private fun getPixelName(pixel: String): String {
-        val suffixIndex = pixel.indexOf(PIXEL_PLATFORM_SUFFIX).takeIf { it > 0 } ?: 0
-        return pixel.substring(0, suffixIndex)
-    }
-
-    companion object {
-        private const val PIXEL_PLATFORM_SUFFIX = "_android"
-        private const val APP_VERSION_PARAM = "appVersion"
-
-        @VisibleForTesting
-        internal val PIXELS_SET_NO_ATB = setOf(
-            AdClickPixelName.AD_CLICK_DETECTED.pixelName,
-            AdClickPixelName.AD_CLICK_ACTIVE.pixelName,
-        )
-
-        @VisibleForTesting
-        internal val PIXELS_SET_NO_ATB_AND_VERSION = setOf(
-            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName,
+    override fun names(): List<Pair<String, Set<PixelParameter>>> {
+        return listOf(
+            AdClickPixelName.AD_CLICK_DETECTED.pixelName to PixelParameter.removeAtb(),
+            AdClickPixelName.AD_CLICK_ACTIVE.pixelName to PixelParameter.removeAtb(),
+            AdClickPixelName.AD_CLICK_PAGELOADS_WITH_AD_ATTRIBUTION.pixelName to PixelParameter.removeAll(),
         )
     }
 }

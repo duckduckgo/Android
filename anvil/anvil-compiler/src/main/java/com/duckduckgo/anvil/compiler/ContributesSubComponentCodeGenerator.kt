@@ -66,6 +66,17 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         val generatedPackage = vmClass.packageFqName.toString()
         val subcomponentFactoryClassName = vmClass.subComponentName()
         val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
+        val delayed: Boolean = (
+            vmClass.annotations.first {
+                it.fqName == InjectWith::class.fqName
+            }.argumentAt("delayGeneration", 2)?.value() as Boolean?
+            ) ?: false
+        if (delayed && scope.fqName.getParentScope(module) != appScopeFqName) {
+            throw AnvilCompilationException(
+                "${vmClass.fqName}: 'delayGeneration = true' can only be used in scopes with 'AppScope' as direct parent.",
+                element = vmClass.clazz.identifyingElement,
+            )
+        }
 
         val content = FileSpec.buildFile(generatedPackage, subcomponentFactoryClassName) {
             addType(
@@ -75,7 +86,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                             .builder(singleInstanceAnnotationFqName.asClassName(module)).addMember("scope = %T::class", scope.asClassName())
                             .build(),
                     )
-                    .addAnnotation(scope.fqName.subComponentAnnotation(module))
+                    .addAnnotation(scope.fqName.subComponentAnnotation(module, delayed))
                     .addSuperinterface(duckduckgoAndroidInjectorFqName.asClassName(module).parameterizedBy(vmClass.asClassName()))
                     .addType(
                         TypeSpec.interfaceBuilder("Factory")
@@ -84,7 +95,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                                     .nestedClass("Factory")
                                     .parameterizedBy(vmClass.asClassName(), FqName(subcomponentFactoryClassName).asClassName(module)),
                             )
-                            .addAnnotation(scope.fqName.subComponentFactoryAnnotation(module))
+                            .addAnnotation(scope.fqName.subComponentFactoryAnnotation(module, delayed))
                             .addFunction(
                                 // This function should follow the [AndroidInjector.Factory.create] signature
                                 FunSpec.builder("create")
@@ -166,8 +177,8 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
     }
 
-    private fun FqName.subComponentAnnotation(module: ModuleDescriptor): AnnotationSpec {
-        return if (this == vpnScopeFqName) {
+    private fun FqName.subComponentAnnotation(module: ModuleDescriptor, delayGeneration: Boolean): AnnotationSpec {
+        return if (this == vpnScopeFqName || delayGeneration) {
             AnnotationSpec.builder(ContributesSubcomponent::class)
                 .addMember("scope = %T::class", this.asClassName(module))
                 .addMember("parentScope = %T::class", getParentScope(module).asClassName(module))
@@ -177,8 +188,8 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         }
     }
 
-    private fun FqName.subComponentFactoryAnnotation(module: ModuleDescriptor): AnnotationSpec {
-        return if (this == vpnScopeFqName) {
+    private fun FqName.subComponentFactoryAnnotation(module: ModuleDescriptor, delayGeneration: Boolean): AnnotationSpec {
+        return if (this == vpnScopeFqName || delayGeneration) {
             AnnotationSpec.builder(ContributesSubcomponent.Factory::class).build()
         } else {
             AnnotationSpec.builder(Subcomponent.Factory::class).build()

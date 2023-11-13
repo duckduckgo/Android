@@ -1361,6 +1361,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
         assertTrue(browserViewState().isDesktopBrowsingMode)
+        val site = testee.siteLiveData.value
+        assertTrue(site?.isDesktopMode == true)
     }
 
     @Test
@@ -1370,6 +1372,8 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
         assertFalse(browserViewState().isDesktopBrowsingMode)
+        val site = testee.siteLiveData.value
+        assertFalse(site?.isDesktopMode == true)
     }
 
     @Test
@@ -4058,7 +4062,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4068,7 +4072,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserPressedBack()
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4077,7 +4081,7 @@ class BrowserTabViewModelTest {
 
         loadUrl("https://test.com")
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4086,7 +4090,7 @@ class BrowserTabViewModelTest {
 
         testee.onOmnibarInputStateChanged("www.fb.com", true, hasQueryChanged = false)
 
-        assertTrue(omnibarViewState().showVoiceSearch)
+        assertTrue(browserViewState().showVoiceSearch)
     }
 
     @Test
@@ -4355,7 +4359,7 @@ class BrowserTabViewModelTest {
 
         testee.voiceSearchDisabled()
 
-        assertFalse(omnibarViewState().showVoiceSearch)
+        assertFalse(browserViewState().showVoiceSearch)
     }
 
     private fun aCredential(): LoginCredentials {

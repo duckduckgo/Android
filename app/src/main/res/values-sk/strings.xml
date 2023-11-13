@@ -731,7 +731,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Oprávnenia na lokalitu</string>
-    <string name="sitePermissionsSettingsDescription">Lokality, ktoré navštívite, môžu žiadať o prístup k polohe, fotoaparátu alebo mikrofónu vášho zariadenia. Nebudú mať k nim prístup, pokiaľ im to výslovne nepovolíte.</string>
+    <string name="sitePermissionsSettingsDescription">Stránky, ktoré navštívite, môžu požiadať o prístup k polohe vášho zariadenia, fotoaparátu, mikrofónu alebo softvéru DRM (Digital Rights Management). Nebudú mať k nim prístup, pokiaľ im to výslovne nepovolíte.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Povoliť všetkým lokalitám žiadať o:</string>
     <string name="sitePermissionsSettingsLocation">Poloha</string>
     <string name="sitePermissionsSettingsCamera">Kamera</string>

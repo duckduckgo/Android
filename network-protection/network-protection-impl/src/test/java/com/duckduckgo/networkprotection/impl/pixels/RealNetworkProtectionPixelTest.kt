@@ -122,8 +122,8 @@ class RealNetworkProtectionPixelTest {
         testee.reportRekeyCompleted()
         testee.reportRekeyCompleted()
 
-        verify(pixel).fire("m_netp_ev_rekey_completed_d")
-        verify(pixel, times(2)).fire("m_netp_ev_rekey_completed_c")
+        verify(pixel).enqueueFire("m_netp_ev_rekey_completed_d")
+        verify(pixel, times(2)).enqueueFire("m_netp_ev_rekey_completed_c")
     }
 
     @Test

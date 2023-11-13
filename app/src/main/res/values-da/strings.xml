@@ -723,7 +723,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Tilladelser til webstedet</string>
-    <string name="sitePermissionsSettingsDescription">De websteder, du besøger, kan bede om adgang til din enheds placering, kamera eller mikrofon. De vil ikke kunne få adgang til disse, medmindre du udtrykkeligt giver dem tilladelse.</string>
+    <string name="sitePermissionsSettingsDescription">Websteder, du besøger, kan bede om adgang til din enheds placering, kamera, mikrofon eller DRM-software (Digital Rights Management). De vil ikke kunne få adgang til disse, medmindre du udtrykkeligt giver dem tilladelse.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Tillad, at alle websteder beder om:</string>
     <string name="sitePermissionsSettingsLocation">Placering</string>
     <string name="sitePermissionsSettingsCamera">Kamera</string>

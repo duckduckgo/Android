@@ -32,12 +32,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfigImpl
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
-import com.duckduckgo.mobile.android.vpn.feature.FakeToggleConfigDao
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.remote_config.VpnConfigTogglesDao
-import com.duckduckgo.mobile.android.vpn.remote_config.VpnRemoteConfigDatabase
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -66,30 +61,18 @@ class AppTPCPUMonitorTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private lateinit var config: AppTpFeatureConfigImpl
-    private lateinit var toggleDao: VpnConfigTogglesDao
     private lateinit var workManager: WorkManager
     private lateinit var testDriver: TestDriver
 
     private val mockDeviceShieldPixels: DeviceShieldPixels = mock()
     private val mockCPUUsageReader: CPUUsageReader = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
-    private val mockVpnRemoteConfigDatabase: VpnRemoteConfigDatabase = mock()
     private val appBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun setup() {
-        toggleDao = FakeToggleConfigDao()
         whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        whenever(mockVpnRemoteConfigDatabase.vpnConfigTogglesDao()).thenReturn(toggleDao)
         whenever(appBuildConfig.applicationId).thenReturn("")
-
-        config = AppTpFeatureConfigImpl(
-            TestScope(),
-            mockAppBuildConfig,
-            mockVpnRemoteConfigDatabase,
-            coroutineRule.testDispatcherProvider,
-        )
 
         val workManagerConfig = Configuration.Builder()
             .setMinimumLoggingLevel(Log.DEBUG)
@@ -101,7 +84,7 @@ class AppTPCPUMonitorTest {
         workManager = WorkManager.getInstance(context)
         testDriver = WorkManagerTestInitHelper.getTestDriver(context)!!
 
-        cpuMonitor = AppTPCPUMonitor(workManager, config, appBuildConfig)
+        cpuMonitor = AppTPCPUMonitor(workManager, appBuildConfig)
     }
 
     @After
@@ -112,16 +95,6 @@ class AppTPCPUMonitorTest {
     @Test
     fun whenConfigEnabledStartWorker() {
         assertStartWorker()
-    }
-
-    @Test
-    fun whenConfigDisabledDontStartWorker() {
-        assertWorkerNotRunning()
-
-        config.setEnabled(AppTpSetting.CPUMonitoring, false)
-        cpuMonitor.onVpnStarted(TestScope())
-
-        assertWorkerNotRunning()
     }
 
     @Test
@@ -188,7 +161,6 @@ class AppTPCPUMonitorTest {
 
     private fun assertStartWorker() {
         assertWorkerNotRunning()
-        config.setEnabled(AppTpSetting.CPUMonitoring, true)
         cpuMonitor.onVpnStarted(TestScope())
         assertWorkerRunning()
     }

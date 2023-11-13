@@ -132,12 +132,18 @@
     <string name="netpVpnSettingDnsLeak">Network Protection prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver.</string>
     <string name="netpVpnSettingGeoswitching">Preferred Location</string>
     <string name="netpVpnSettingGeoswitchingDefault">Nearest Available</string>
+    <string name="netpVpnSettingSecureDNS">Secure DNS</string>
+    <string name="netpVpnSettingSecureDNSByLine">Prevents DNS leaks to your Internet Service Provider by routing DNS queries though the VPN tunnel to our own resolver. For your security, this feature cannot be disabled.</string>
 
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsage">Unrestricted Battery Usage</string>
+    <string name="netpVpnSettingExcludeLocalNetworksBatteryUsageByline">Prevents Android from stopping the VPN.</string>
     <!-- VPN Notification settings -->
     <string name="netpVpnSettingNotificationEnabled">VPN Enabled</string>
     <string name="netpVpnSettingNotificationEnabledByline">Display a persistent notification when the VPN is active</string>
     <string name="netpVpnSettingNotificationAlert">VPN Alerts</string>
     <string name="netpVpnSettingNotificationAlertByline">Get notified if your connection drops or VPN status changes</string>
+    <string name="netpVpnNotifyMeTitle">Notifications are disabled</string>
+    <string name="netpVpnNotifyMeByLine">Get notified of VPN events</string>
 
     <!-- Exclusion list -->
     <string name="netpExclusionListTitle">Manage Apps</string>
@@ -194,6 +200,7 @@
     <string name="netpFaqAnswerEight">Yes, both Network Protection and App Tracking Protection can be on at the same time. No other VPNs are compatible with DuckDuckGo App Tracking Protection.</string>
     <string name="netpFaqQuestionNine">Is Network Protection free to use?</string>
     <string name="netpFaqAnswerNine">Network Protection is free to use while in beta. Eventually it will be offered as a paid service.</string>
+
 
     <!-- Terms -->
     <string name="netpTermsAgreeAndClose">Agree and Enable VPN</string>

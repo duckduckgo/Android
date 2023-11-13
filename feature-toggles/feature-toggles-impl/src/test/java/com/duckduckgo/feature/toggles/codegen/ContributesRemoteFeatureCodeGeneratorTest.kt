@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.*
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.feature.toggles.api.FeatureSettings
@@ -48,15 +48,17 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
     private lateinit var testFeature: TestTriggerFeature
     private val appBuildConfig: AppBuildConfig = mock()
-    private lateinit var versionProvider: FakeAppVersionProvider
+//    private lateinit var provider: FakeProvider
 
     @Before
     fun setup() {
-        versionProvider = FakeAppVersionProvider()
+//        provider = FakeProvider(appBuildConfig)
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
         testFeature = FeatureToggles.Builder(
             FakeToggleStore(),
             featureName = "testFeature",
-            appVersionProvider = { versionProvider.version },
+            appVersionProvider = { appBuildConfig.versionCode },
+            flavorNameProvider = { appBuildConfig.flavor.name },
         ).build().create(TestTriggerFeature::class.java)
     }
 
@@ -178,6 +180,170 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
         assertTrue(testFeature.self().isEnabled())
         assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test internal always enabled annotation`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "internalDefaultFalse": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertFalse(testFeature.self().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(FDROID)
+        assertFalse(testFeature.self().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+    }
+
+    @Test // see https://app.asana.com/0/0/1205806409373059/1205806409373112/f
+    fun `test internal always enabled truth table`() {
+        val feature = generatedFeatureNewInstance()
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // Order mattesr, we need to start with the config that does not have any features
+        var jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {}
+                }
+        """.trimIndent()
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertTrue(testFeature.defaultTrue().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertTrue(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "internalDefaultTrue": {
+                            "state": "enabled"
+                        }, 
+                        "defaultTrue": {
+                            "state": "enabled"
+                        },
+                        "internalDefaultFalse": {
+                            "state": "enabled"
+                        }, 
+                        "defaultFalse": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertTrue(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertTrue(testFeature.defaultFalse().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertTrue(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertTrue(testFeature.defaultFalse().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "internalDefaultTrue": {
+                            "state": "disabled"
+                        }, 
+                        "defaultTrue": {
+                            "state": "disabled"
+                        },
+                        "internalDefaultFalse": {
+                            "state": "disabled"
+                        }, 
+                        "defaultFalse": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "internalDefaultTrue": {
+                            "state": "internal"
+                        }, 
+                        "defaultTrue": {
+                            "state": "internal"
+                        },
+                        "internalDefaultFalse": {
+                            "state": "internal"
+                        }, 
+                        "defaultFalse": {
+                            "state": "internal"
+                        }
+                    }
+                }
+        """.trimIndent()
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertTrue(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertTrue(testFeature.defaultFalse().isEnabled())
     }
 
     @Test
@@ -485,7 +651,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     fun `re-enable a previously disabled incremental rollout`() {
-        versionProvider.version = 1
+        whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -571,7 +737,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     fun `full feature lifecycle`() {
-        versionProvider.version = 1
+        whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -781,7 +947,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
 
         // resume rollout and update app version
-        versionProvider.version = 2
+        whenever(appBuildConfig.versionCode).thenReturn(2)
         assertTrue(
             privacyPlugin.store(
                 "testFeature",
@@ -908,8 +1074,4 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     private fun Toggle.rolloutStep(): Int? {
         return getRawStoredState()?.rolloutStep
     }
-}
-
-private class FakeAppVersionProvider {
-    var version = Int.MAX_VALUE
 }

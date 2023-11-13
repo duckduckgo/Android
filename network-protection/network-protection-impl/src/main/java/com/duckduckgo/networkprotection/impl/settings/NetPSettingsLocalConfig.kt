@@ -46,6 +46,12 @@ interface NetPSettingsLocalConfig {
 
     @Toggle.DefaultValue(true)
     fun vpnNotificationAlerts(): Toggle
+
+    /**
+     * When `true` the VPN routes will exclude local networks
+     */
+    @Toggle.DefaultValue(true)
+    fun vpnExcludeLocalNetworkRoutes(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

@@ -30,6 +30,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -38,6 +39,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -62,6 +64,7 @@ class BrokenSiteSubmitter @Inject constructor(
     private val userAllowListRepository: UserAllowListRepository,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val contentBlocking: ContentBlocking,
+    private val brokenSiteLastSentReport: BrokenSiteLastSentReport,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -75,7 +78,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName.value) &&
                 !contentBlocking.isAnException(brokenSite.siteUrl)
 
-            val params = mapOf(
+            val params = mutableMapOf(
                 CATEGORY_KEY to brokenSite.category.orEmpty(),
                 DESCRIPTION_KEY to brokenSite.description.orEmpty(),
                 SITE_URL_KEY to absoluteUrl,
@@ -97,16 +100,31 @@ class BrokenSiteSubmitter @Inject constructor(
                 REMOTE_CONFIG_ETAG to privacyConfig.privacyConfigData()?.eTag.orEmpty(),
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
-                PROTECTIONS_STATE to protectionsState.toBinaryString(),
+                PROTECTIONS_STATE to protectionsState.toString(),
             )
+
+            val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
+            if (lastSentDay != null) {
+                params[LAST_SENT_DAY] = lastSentDay
+            }
+
+            if (appBuildConfig.deviceLocale.language == Locale.ENGLISH.language) {
+                params[LOGIN_SITE] = brokenSite.loginSite.orEmpty()
+            }
+
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
                 SURROGATES_KEY to brokenSite.surrogates,
             )
             runCatching {
-                pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
+                pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params.toMap(), encodedParams)
             }
-                .onSuccess { Timber.v("Feedback submission succeeded") }
+                .onSuccess {
+                    Timber.v("Feedback submission succeeded")
+                    if (!domain.isNullOrEmpty()) {
+                        brokenSiteLastSentReport.setLastSentDay(domain)
+                    }
+                }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
         }
     }
@@ -140,6 +158,8 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val ERROR_CODES_KEY = "errorDescriptions"
         private const val HTTP_ERROR_CODES_KEY = "httpErrorCodes"
         private const val PROTECTIONS_STATE = "protectionsState"
+        private const val LAST_SENT_DAY = "lastSentDay"
+        private const val LOGIN_SITE = "loginSite"
     }
 }
 

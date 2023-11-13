@@ -731,7 +731,7 @@
 
     <!-- Site Permissions Settings -->
     <string name="settingsSitePermissions">Uprawnienia witryny</string>
-    <string name="sitePermissionsSettingsDescription">Strony, które odwiedzasz, mogą prosić o dostęp do lokalizacji Twojego urządzenia, kamery lub mikrofonu. Nie będą miały do nich dostępu, jeśli nie udzielisz im zgody.</string>
+    <string name="sitePermissionsSettingsDescription">Strony, które odwiedzasz, mogą prosić o dostęp do lokalizacji urządzenia, kamery, mikrofonu lub oprogramowania DRM (Digital Rights Management). Nie będą miały do nich dostępu, jeśli nie udzielisz im zgody.</string>
     <string name="sitePermissionsSettingsEnablePermissionTitle">Pozwól wszystkim stronom prosić o:</string>
     <string name="sitePermissionsSettingsLocation">Lokalizacja</string>
     <string name="sitePermissionsSettingsCamera">Aparat</string>

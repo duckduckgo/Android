@@ -23,6 +23,10 @@
     <string name="netpSystemAppsExclusionList">Manage System Apps Exclusion</string>
     <string name="netpEnvironmentSetting">Change NetP Environment</string>
     <string name="netpExcludeAllSystemApps">Exclude All System Apps</string>
+    <string name="netpSnoozeWhileCalling">Snooze VPN while calling</string>
+    <string name="netpSnoozeWhileCallingByline">Detects when the phone is making a call and temporarily snoozes the VPN.</string>
+    <string name="netpGrantPhonePermissionByline">Please grant PHONE permission.</string>
+    <string name="netpGrantPhonePermissionAction">Grant Permission</string>
     <string name="netpMtuSize">MTU Size</string>
     <string name="netpDevSettingInternalIP">Internal IP</string>
     <string name="netpDevSettingConnectionQuality">Connection Quality</string>

@@ -39,7 +39,7 @@
         android:id="@+id/onboarding_close"
         android:layout_width="?attr/actionBarSize"
         android:layout_height="?attr/actionBarSize"
-        android:background="?selectableItemBackground"
+        android:background="?actionBarItemBackground"
         android:src="@drawable/ic_close_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

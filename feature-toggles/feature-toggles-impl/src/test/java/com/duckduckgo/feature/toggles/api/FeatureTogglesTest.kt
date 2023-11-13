@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import java.lang.IllegalStateException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -29,16 +30,17 @@ import org.junit.Test
 class FeatureTogglesTest {
 
     private lateinit var feature: TestFeature
-    private lateinit var versionProvider: FakeAppVersionProvider
+    private lateinit var provider: FakeProvider
     private lateinit var toggleStore: FakeToggleStore
 
     @Before
     fun setup() {
-        versionProvider = FakeAppVersionProvider()
+        provider = FakeProvider()
         toggleStore = FakeToggleStore()
         feature = FeatureToggles.Builder()
             .store(toggleStore)
-            .appVersionProvider { versionProvider.version }
+            .appVersionProvider { provider.version }
+            .flavorNameProvider { provider.flavorName }
             .featureName("test")
             .build()
             .create(TestFeature::class.java)
@@ -78,16 +80,52 @@ class FeatureTogglesTest {
 
     @Test
     fun whenNotAllowedMinVersionThenReturnDisabled() {
-        versionProvider.version = 10
+        provider.version = 10
         feature.enabledByDefault().setEnabled(Toggle.State(enable = true, minSupportedVersion = 11))
         assertFalse(feature.enabledByDefault().isEnabled())
     }
 
     @Test
     fun whenAllowedMinVersionThenReturnDisabled() {
-        versionProvider.version = 10
+        provider.version = 10
         feature.enabledByDefault().setEnabled(Toggle.State(enable = true, minSupportedVersion = 9))
         assertTrue(feature.enabledByDefault().isEnabled())
+    }
+
+    @Test
+    fun testInternalAlwaysEnabledAnnotation() {
+        assertFalse(feature.internal().isEnabled())
+
+        provider.flavorName = BuildFlavor.PLAY.name
+        assertFalse(feature.internal().isEnabled())
+
+        provider.flavorName = BuildFlavor.FDROID.name
+        assertFalse(feature.internal().isEnabled())
+
+        provider.flavorName = BuildFlavor.INTERNAL.name
+        assertTrue(feature.internal().isEnabled())
+
+        // enable the feature
+        val enabledState = Toggle.State(
+            remoteEnableState = true,
+            rollout = null,
+            rolloutStep = null,
+        )
+        feature.internal().setEnabled(enabledState)
+        provider.flavorName = BuildFlavor.PLAY.name
+        assertTrue(feature.internal().isEnabled())
+        provider.flavorName = BuildFlavor.FDROID.name
+        assertTrue(feature.internal().isEnabled())
+        provider.flavorName = BuildFlavor.INTERNAL.name
+        assertTrue(feature.internal().isEnabled())
+
+        feature.internal().setEnabled(enabledState.copy(remoteEnableState = false))
+        provider.flavorName = BuildFlavor.PLAY.name
+        assertFalse(feature.internal().isEnabled())
+        provider.flavorName = BuildFlavor.FDROID.name
+        assertFalse(feature.internal().isEnabled())
+        provider.flavorName = BuildFlavor.INTERNAL.name
+        assertTrue(feature.internal().isEnabled())
     }
 
     @Test(expected = java.lang.IllegalArgumentException::class)
@@ -104,7 +142,7 @@ class FeatureTogglesTest {
     fun whenValidFeatureAndMissingFeatureNameBuilderParameterThenThrow() {
         FeatureToggles.Builder()
             .store(FakeToggleStore())
-            .appVersionProvider { versionProvider.version }
+            .appVersionProvider { provider.version }
             .build()
             .create(TestFeature::class.java)
             .self()
@@ -114,7 +152,7 @@ class FeatureTogglesTest {
     fun whenValidFeatureAndMissingStoreBuilderParameterThenThrow() {
         FeatureToggles.Builder()
             .featureName("test")
-            .appVersionProvider { versionProvider.version }
+            .appVersionProvider { provider.version }
             .build()
             .create(TestFeature::class.java)
             .self()
@@ -206,7 +244,7 @@ class FeatureTogglesTest {
 
     @Test
     fun whenDisabledWithValidRolloutStepsAndNotSupportedVersionThenReturnDisabled() {
-        versionProvider.version = 10
+        provider.version = 10
         val state = Toggle.State(
             enable = false,
             rollout = listOf(1.0, 10.0, 20.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0),
@@ -325,8 +363,13 @@ interface TestFeature {
 
     @Toggle.DefaultValue(true)
     suspend fun suspendFun(): Toggle
+
+    @Toggle.DefaultValue(false)
+    @Toggle.InternalAlwaysEnabled
+    fun internal(): Toggle
 }
 
-private class FakeAppVersionProvider {
+private class FakeProvider {
     var version = Int.MAX_VALUE
+    var flavorName = ""
 }

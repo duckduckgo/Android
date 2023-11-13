@@ -20,21 +20,29 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
+import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -44,6 +52,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     private val viewModel: BrokenSiteViewModel by bindViewModel()
 
     @Inject lateinit var webViewVersionProvider: WebViewVersionProvider
+
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -76,6 +86,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val params = intent.getStringArrayExtra(BOOLEAN_PARAMS).orEmpty()
         val errorCodes = intent.getStringArrayExtra(ERROR_CODES).orEmpty()
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
+        val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -88,6 +99,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             params = params,
             errorCodes = errorCodes,
             httpErrorCodes = httpErrorCodes,
+            isDesktopMode = isDesktopMode,
         )
     }
 
@@ -123,10 +135,35 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             if (!submitted) {
                 val webViewVersion = webViewVersionProvider.getFullVersion()
                 val description = brokenSites.brokenSiteFormFeedbackInput.text
-                viewModel.onSubmitPressed(webViewVersion, description)
+                val loginSite = brokenSites.brokenSiteFormLoginInput.text
+                viewModel.onSubmitPressed(webViewVersion, description, loginSite)
                 submitted = true
             }
         }
+
+        brokenSites.brokenSiteFormLoginInput.addFocusChangedListener { _, hasFocus ->
+            if (hasFocus) {
+                brokenSites.brokenSiteFormLoginInput.hint = getString(R.string.brokenSitesLoginSmallHint)
+            } else {
+                brokenSites.brokenSiteFormLoginInput.hint = getString(R.string.brokenSitesLoginHint)
+            }
+        }
+
+        brokenSites.brokenSiteFormLoginInput.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    // NOOP
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    // NOOP
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                    runValidation()
+                }
+            },
+        )
     }
 
     private fun configureObservers() {
@@ -165,6 +202,25 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }.orEmpty()
         brokenSites.categoriesSelection.text = category
         brokenSites.submitButton.isEnabled = viewState.submitAllowed
+
+        if (appBuildConfig.deviceLocale.language == Locale.ENGLISH.language) {
+            if (viewState.categorySelected?.key == BrokenSiteCategory.LOGIN_CATEGORY_KEY) {
+                brokenSites.brokenSiteFormLoginInput.show()
+                brokenSites.submitButton.isEnabled = false
+                runValidation()
+            } else {
+                brokenSites.brokenSiteFormLoginInput.gone()
+                brokenSites.submitButton.isEnabled = true
+            }
+        }
+    }
+
+    private fun runValidation() {
+        if (brokenSites.brokenSiteFormLoginInput.isVisible) {
+            brokenSites.submitButton.isEnabled = brokenSites.brokenSiteFormLoginInput.text.isNotEmpty()
+        } else {
+            brokenSites.submitButton.isEnabled = true
+        }
     }
 
     companion object {
@@ -180,6 +236,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val BOOLEAN_PARAMS = "BOOLEAN_PARAMS"
         private const val ERROR_CODES = "ERROR_CODES"
         private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
+        private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
 
         fun intent(
             context: Context,
@@ -197,6 +254,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(BOOLEAN_PARAMS, data.params.toTypedArray())
             intent.putExtra(ERROR_CODES, data.errorCodes.toTypedArray())
             intent.putExtra(HTTP_ERROR_CODES, data.httpErrorCodes)
+            intent.putExtra(IS_DESKTOP_MODE, data.isDesktopMode)
             return intent
         }
     }

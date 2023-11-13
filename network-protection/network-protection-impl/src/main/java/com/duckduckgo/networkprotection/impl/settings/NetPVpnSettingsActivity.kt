@@ -16,17 +16,14 @@
 
 package com.duckduckgo.networkprotection.impl.settings
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.extensions.launchAlwaysOnSystemSettings
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -78,31 +75,27 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         val geoSwitchingSubtitle = viewState.preferredLocation ?: getString(R.string.netpVpnSettingGeoswitchingDefault)
         binding.geoswitching.setSecondaryText(geoSwitchingSubtitle)
+        binding.excludeLocalNetworks.quietlySetIsChecked(viewState.excludeLocalNetworks) { _, isChecked ->
+            viewModel.onExcludeLocalRoutes(isChecked)
+        }
     }
 
     private fun setupUiElements() {
-        binding.excludeLocalNetworks.quietlySetIsChecked(true, null)
-        binding.excludeLocalNetworks.showSwitch()
-        binding.excludeLocalNetworks.setSwitchEnabled(false)
+        binding.excludeLocalNetworks.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onExcludeLocalRoutes(isChecked)
+        }
+
+        binding.secureDns.quietlySetIsChecked(true, null)
+        binding.secureDns.showSwitch()
+        binding.secureDns.setSwitchEnabled(false)
 
         binding.alwaysOn.setOnClickListener {
-            openVPNSettings()
+            this.launchAlwaysOnSystemSettings(appBuildConfig.sdkInt)
         }
 
         binding.geoswitching.setOnClickListener {
             globalActivityStarter.start(this, NetpGeoswitchingScreenNoParams)
         }
-    }
-
-    @SuppressLint("InlinedApi")
-    private fun openVPNSettings() {
-        val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
-            Intent(Settings.ACTION_VPN_SETTINGS)
-        } else {
-            Intent("android.net.vpn.SETTINGS")
-        }
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
     }
 }
 

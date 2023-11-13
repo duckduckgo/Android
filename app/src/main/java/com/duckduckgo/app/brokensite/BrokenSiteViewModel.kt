@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.brokensite
 
-import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,7 +25,6 @@ import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -82,6 +80,7 @@ class BrokenSiteViewModel @Inject constructor(
     private var params: Array<out String> = emptyArray()
     private var errorCodes: Array<out String> = emptyArray()
     private var httpErrorCodes: String = ""
+    private var isDesktopMode: Boolean = false
 
     var shuffledCategories = mutableListOf<BrokenSiteCategory>()
 
@@ -102,6 +101,7 @@ class BrokenSiteViewModel @Inject constructor(
         params: Array<out String>,
         errorCodes: Array<out String>,
         httpErrorCodes: String,
+        isDesktopMode: Boolean,
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
@@ -114,9 +114,10 @@ class BrokenSiteViewModel @Inject constructor(
         this.params = params
         this.errorCodes = errorCodes
         this.httpErrorCodes = httpErrorCodes
+        this.isDesktopMode = isDesktopMode
     }
 
-    fun setCategories(categoryList: List<BrokenSiteCategory>): MutableList<BrokenSiteCategory> {
+    private fun setCategories(categoryList: List<BrokenSiteCategory>): MutableList<BrokenSiteCategory> {
         val categories = categoryList.map { it }.toMutableList()
         val shuffledCategories = categories.slice(0..7).shuffled().toMutableList()
         shuffledCategories.add(categories[8])
@@ -138,15 +139,21 @@ class BrokenSiteViewModel @Inject constructor(
         )
     }
 
-    fun onSubmitPressed(webViewVersion: String, description: String?) {
+    fun onSubmitPressed(webViewVersion: String, description: String?, loginSite: String?) {
         viewState.value?.submitAllowed = false
         if (url.isNotEmpty()) {
             val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
 
-            val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
-                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion, description)
+            val loginSiteFinal = if (shuffledCategories.elementAtOrNull(viewValue.indexSelected)?.key == BrokenSiteCategory.LOGIN_CATEGORY_KEY) {
+                loginSite
             } else {
-                getBrokenSite(url, webViewVersion, description)
+                ""
+            }
+
+            val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
+                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion, description, loginSiteFinal)
+            } else {
+                getBrokenSite(url, webViewVersion, description, loginSiteFinal)
             }
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
@@ -173,6 +180,7 @@ class BrokenSiteViewModel @Inject constructor(
         urlString: String,
         webViewVersion: String,
         description: String?,
+        loginSite: String?,
     ): BrokenSite {
         val category = shuffledCategories.elementAtOrNull(viewValue.indexSelected)
         return BrokenSite(
@@ -183,13 +191,14 @@ class BrokenSiteViewModel @Inject constructor(
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
             webViewVersion = webViewVersion,
-            siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE,
+            siteType = if (isDesktopMode) DESKTOP_SITE else MOBILE_SITE,
             urlParametersRemoved = urlParametersRemoved,
             consentManaged = consentManaged,
             consentOptOutFailed = consentOptOutFailed,
             consentSelfTestFailed = consentSelfTestFailed,
             errorCodes = jsonStringListAdapter.toJson(errorCodes.toList()).toString(),
             httpErrorCodes = httpErrorCodes,
+            loginSite = loginSite,
         )
     }
 

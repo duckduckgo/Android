@@ -311,6 +311,10 @@ dependencies {
     implementation project(':settings-api')
     implementation project(':settings-impl')
 
+    implementation project(':broken-site-api')
+    implementation project(':broken-site-impl')
+    implementation project(':broken-site-store')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
