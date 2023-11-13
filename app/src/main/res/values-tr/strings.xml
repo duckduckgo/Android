@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Ne olduğunu açıklayın</string>
     <string name="brokenSitesCategoriesHint">Ne olduğunu açıklayın</string>
     <string name="brokenSiteSubmitButton">Rapor gönder</string>
+    <string name="brokenSiteDescription">Anonim bir hatalı site raporunun gönderilmesi uygulamayı geliştirmemize yardımcı olur.</string>
 
     <string name="brokenSiteCategoryBlocked">Site engellendi veya yüklenmedi</string>
     <string name="brokenSiteCategoryLayout">Sitede düzen hatalı</string>

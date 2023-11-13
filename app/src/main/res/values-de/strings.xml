@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Beschreiben, was passiert ist</string>
     <string name="brokenSitesCategoriesHint">Beschreiben, was passiert ist</string>
     <string name="brokenSiteSubmitButton">Bericht senden</string>
+    <string name="brokenSiteDescription">Das Senden eines anonymen Berichts über fehlerhafte Webseiten hilft uns, die App zu verbessern.</string>
 
     <string name="brokenSiteCategoryBlocked">Webseite blockiert oder nicht geladen</string>
     <string name="brokenSiteCategoryLayout">Website-Layout fehlerhaft</string>

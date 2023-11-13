@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Descrever o que aconteceu</string>
     <string name="brokenSitesCategoriesHint">Descrever o que aconteceu</string>
     <string name="brokenSiteSubmitButton">Enviar relatório</string>
+    <string name="brokenSiteDescription">O envio de um relatório anónimo de site com problemas ajuda-nos a melhorar a aplicação.</string>
 
     <string name="brokenSiteCategoryBlocked">Site bloqueado ou que não foi carregado</string>
     <string name="brokenSiteCategoryLayout">Disposição do site com problemas</string>

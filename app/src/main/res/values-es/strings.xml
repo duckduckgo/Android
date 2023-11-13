@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Describe qué ha pasado</string>
     <string name="brokenSitesCategoriesHint">Describe qué pasó</string>
     <string name="brokenSiteSubmitButton">Enviar informe</string>
+    <string name="brokenSiteDescription">Enviar un informe anónimo de sitio dañado nos ayuda a mejorar la aplicación.</string>
 
     <string name="brokenSiteCategoryBlocked">Sitio bloqueado o no cargado</string>
     <string name="brokenSiteCategoryLayout">Diseño del sitio dañado</string>

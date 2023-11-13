@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Berätta vad som hände:</string>
     <string name="brokenSitesCategoriesHint">Berätta vad som hände:</string>
     <string name="brokenSiteSubmitButton">Skicka anmälan</string>
+    <string name="brokenSiteDescription">Genom att skicka in en anonym anmälan om att webbplatsen inte fungerar hjälper du oss att förbättra appen.</string>
 
     <string name="brokenSiteCategoryBlocked">Webbplatsen är blockerad eller lästes inte in</string>
     <string name="brokenSiteCategoryLayout">Webbplatsens layout är trasig</string>

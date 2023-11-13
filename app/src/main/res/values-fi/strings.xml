@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Kuvaile mitä tapahtui</string>
     <string name="brokenSitesCategoriesHint">Kuvaile mitä tapahtui</string>
     <string name="brokenSiteSubmitButton">Lähetä raportti</string>
+    <string name="brokenSiteDescription">Anonyymin raportin lähettäminen toimimattomasta sivustosta auttaa meitä parantamaan sovellusta.</string>
 
     <string name="brokenSiteCategoryBlocked">Sivusto estetty tai ei latautunut</string>
     <string name="brokenSiteCategoryLayout">Sivuston asettelu rikki</string>

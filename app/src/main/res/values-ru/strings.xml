@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Опишите, что случилось</string>
     <string name="brokenSitesCategoriesHint">Опишите, что случилось</string>
     <string name="brokenSiteSubmitButton">Отправить жалобу</string>
+    <string name="brokenSiteDescription">Ваша анонимная жалоба на проблемы с сайтом поможет нам улучшить приложение.</string>
 
     <string name="brokenSiteCategoryBlocked">Сайт блокируется или не грузится</string>
     <string name="brokenSiteCategoryLayout">Нарушена структура сайта</string>

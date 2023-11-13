@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Opiši što se dogodilo</string>
     <string name="brokenSitesCategoriesHint">Opišite što se dogodilo</string>
     <string name="brokenSiteSubmitButton">Pošalji izvješće</string>
+    <string name="brokenSiteDescription">Podnošenje anonimnog izvješća o neispravnoj web-lokaciji pomaže nam poboljšati aplikaciju.</string>
 
     <string name="brokenSiteCategoryBlocked">Stranica je blokirana ili se nije učitala</string>
     <string name="brokenSiteCategoryLayout">Stranica ne izgleda ispravno</string>

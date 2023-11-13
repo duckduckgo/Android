@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Az esemény leírása</string>
     <string name="brokenSitesCategoriesHint">Az esemény leírása</string>
     <string name="brokenSiteSubmitButton">Jelentés küldése</string>
+    <string name="brokenSiteDescription">Egy hibás webhelyről szóló névtelen bejelentés segít bennünket az alkalmazás fejlesztésében.</string>
 
     <string name="brokenSiteCategoryBlocked">A webhely blokkolva van vagy nem töltődött be</string>
     <string name="brokenSiteCategoryLayout">A webhely megjelenítési elrendezése hibás</string>

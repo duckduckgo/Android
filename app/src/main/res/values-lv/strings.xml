@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Aprakstiet notikušo</string>
     <string name="brokenSitesCategoriesHint">Apraksti notikušo</string>
     <string name="brokenSiteSubmitButton">Nosūtīt ziņojumu</string>
+    <string name="brokenSiteDescription">Anonīma ziņošana par vietni, kurā ir darbības traucējumi, palīdz mums uzlabot lietotni.</string>
 
     <string name="brokenSiteCategoryBlocked">Vietne ir bloķēta vai netika ielādēta</string>
     <string name="brokenSiteCategoryLayout">Vietnes izkārtojums ir bojāts</string>

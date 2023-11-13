@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Kirjelda toimunut</string>
     <string name="brokenSitesCategoriesHint">Kirjeldage toimunut</string>
     <string name="brokenSiteSubmitButton">Saada aruanne</string>
+    <string name="brokenSiteDescription">Anonüümne katkise saidi aruande esitamine aitab meil rakendust täiustada.</string>
 
     <string name="brokenSiteCategoryBlocked">Sait on blokeeritud või seda ei laaditud</string>
     <string name="brokenSiteCategoryLayout">Saidi paigutus on katki</string>

@@ -215,6 +215,7 @@
     <string name="brokenSitesCategoriesTitle">Опишете проблема</string>
     <string name="brokenSitesCategoriesHint">Опишете проблема</string>
     <string name="brokenSiteSubmitButton">Изпращане на доклад</string>
+    <string name="brokenSiteDescription">Изпращането на анонимен доклад за неработещ сайт ни помага да подобрим приложението.</string>
 
     <string name="brokenSiteCategoryBlocked">Сайтът блокира или не се зарежда</string>
     <string name="brokenSiteCategoryLayout">Оформлението на сайта не е както трябва</string>
