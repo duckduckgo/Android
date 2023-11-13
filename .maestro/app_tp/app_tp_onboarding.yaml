@@ -49,6 +49,6 @@ tags:
 - assertVisible: "What are app trackers?"
 - assertVisible: "App Tracking Protection FAQ"
 - assertVisible: "MANAGE"
-- assertVisible: "Having issues?"
+- assertVisible: "Having Issues?"
 - assertVisible: "View Apps"
 - assertVisible: "Disable and Delete Data"
