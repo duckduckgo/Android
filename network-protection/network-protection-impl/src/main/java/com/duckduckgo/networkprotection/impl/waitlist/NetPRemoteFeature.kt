@@ -39,10 +39,4 @@ interface NetPRemoteFeature {
      */
     @Toggle.DefaultValue(true)
     fun waitlistBetaActive(): Toggle
-
-    /**
-     * Whenever `true`, NetP will
-     */
-    @Toggle.DefaultValue(false)
-    fun retryOnConnectivityLoss(): Toggle
 }
