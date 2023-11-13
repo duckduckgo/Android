@@ -266,15 +266,6 @@ class RealSavedSitesSyncPersisterAlgorithm @Inject constructor(
                     processFavourite(conflictResolution, favourite, favoriteFolder)
                 }
             }
-            Timber.d("Sync-Bookmarks: comparing local favourites vs remote ones")
-            val storedFavourites = syncSavedSitesRepository.getFavoritesSync(favoriteFolder)
-            storedFavourites.forEach {
-                if (!favourites.contains(it.id)) {
-                    Timber.d("Sync-Bookmarks: stored favourite ${it.id} no longer exists in remote, removing it")
-                    // syncSavedSitesRepository.delete(it, favoriteFolder)
-                    // TODO: we should remove relations instead
-                }
-            }
         }
     }
 
