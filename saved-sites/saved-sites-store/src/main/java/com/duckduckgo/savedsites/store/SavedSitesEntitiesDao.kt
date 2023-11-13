@@ -135,6 +135,9 @@ interface SavedSitesEntitiesDao {
     @Query("select * from entities where deleted = 1")
     fun allDeleted(): List<Entity>
 
+    @Query("select * from entities inner join relations on entities.entityId = relations.entityId and relations.folderId <> :favoritesRoot")
+    fun allBookmarks(favoritesRoot: String = SavedSitesNames.FAVORITES_ROOT): List<Entity>
+
     @Transaction
     fun createFormFactorFavoriteFolders() {
         val rootFolder = entityById(SavedSitesNames.FAVORITES_ROOT)
