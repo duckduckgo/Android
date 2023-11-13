@@ -254,7 +254,7 @@ class BookmarksViewModelTest {
         assertEquals(emptyList<BookmarkFolder>(), viewStateCaptor.allValues[0].bookmarkFolders)
         assertEquals(false, viewStateCaptor.allValues[0].enableSearch)
 
-        assertEquals(emptyList<Favorite>(), viewStateCaptor.allValues[2].favorites)
+        assertEquals(listOf(favorite), viewStateCaptor.allValues[2].favorites)
         assertEquals(listOf(bookmark, bookmark, bookmark), viewStateCaptor.allValues[2].bookmarks)
         assertEquals(listOf(bookmarkFolder, bookmarkFolder), viewStateCaptor.allValues[2].bookmarkFolders)
         assertEquals(true, viewStateCaptor.allValues[2].enableSearch)

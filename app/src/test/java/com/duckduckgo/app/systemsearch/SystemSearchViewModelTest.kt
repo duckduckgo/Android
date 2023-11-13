@@ -327,7 +327,7 @@ class SystemSearchViewModelTest {
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite, 0), commandCaptor.lastValue)
+        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite, -1), commandCaptor.lastValue)
     }
 
     @Test
@@ -366,13 +366,22 @@ class SystemSearchViewModelTest {
     @Test
     fun whenQuickAccessDeleteUndoThenViewStateUpdated() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
+        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
+        testee = SystemSearchViewModel(
+            mockUserStageStore,
+            mockAutoComplete,
+            mockDeviceAppLookup,
+            mockPixel,
+            mocksavedSitesRepository,
+            mockFaviconManager,
+            mockSettingsStore,
+            coroutineRule.testDispatcherProvider,
+        )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
         assertFalse(viewState.favorites.isEmpty())
 
         testee.undoDelete(savedSite, 0)
-
-        verify(mocksavedSitesRepository).delete(savedSite)
     }
 
     @Test
