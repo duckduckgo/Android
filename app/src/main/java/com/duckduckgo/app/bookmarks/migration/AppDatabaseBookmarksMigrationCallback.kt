@@ -57,8 +57,8 @@ class AppDatabaseBookmarksMigrationCallback(
         }
 
         val needsOldFavouritesMigration = needsOldFavouritesMigration()
-        if (needsOldFavouritesMigration) {
-            runOldFavouritesMigration()
+        if (needsOldFavouritesMigration.isNotEmpty()) {
+            runOldFavouritesMigration(needsOldFavouritesMigration)
         }
 
         // To be removed once internals update the app too FormFactorSpecificFavorites
@@ -194,26 +194,22 @@ class AppDatabaseBookmarksMigrationCallback(
         }
     }
 
-    private fun needsOldFavouritesMigration(): Boolean {
+    private fun needsOldFavouritesMigration(): List<Entity> {
         // https://app.asana.com/0/0/1204697337057464/f
         // during the initial migration of favourites we didn't properly add them to bookmarks
         // users might have fixed this, so we only do something if there is a favourite that is not in the bookmarks folder
-        // for all favourites, check if there is a bookmark with the same url
-        // if there isn't, we add it to the bookmarks root
         with(appDatabase.get()) {
             val favourites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
             val bookmarks = syncEntitiesDao().allBookmarks()
-            val needRelation = favourites.filterNot { rootFavorite ->
+            return favourites.filterNot { rootFavorite ->
                 bookmarks.contains(rootFavorite)
             }
-            return needRelation.isNotEmpty()
         }
     }
 
-    private fun runOldFavouritesMigration() {
+    private fun runOldFavouritesMigration(favourites: List<Entity>) {
         with(appDatabase.get()) {
             val favouriteMigration = mutableListOf<Relation>()
-            val favourites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
             favourites.forEach {
                 val notAsBookmark = syncRelationsDao().relationByEntityId(it.entityId) == null
                 if (notAsBookmark) {
