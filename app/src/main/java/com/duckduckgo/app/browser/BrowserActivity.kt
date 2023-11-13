@@ -39,7 +39,6 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.SAVED_SITE_UR
 import com.duckduckgo.app.bookmarks.ui.BookmarksScreenNoParams
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
-import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -419,7 +418,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         Timber.i("Processing command: $command")
         when (command) {
             is Query -> currentTab?.submitQuery(command.query)
-            is Refresh -> currentTab?.onRefreshRequested()
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
@@ -437,9 +435,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         currentTab?.tabId?.let {
             val params = PrivacyDashboardHybridWithTabIdParam(it)
             val intent = globalActivityStarter.startIntent(this, params)
-            intent?.let {
-                startActivityForResult(it, DASHBOARD_REQUEST_CODE)
-            }
+            intent?.let { startActivity(it) }
         }
     }
 
@@ -505,18 +501,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         startActivity(DownloadsActivity.intent(this))
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        if (requestCode == DASHBOARD_REQUEST_CODE) {
-            viewModel.receivedDashboardResult(resultCode)
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
     private fun configureOnBackPressedListener() {
         onBackPressedDispatcher.addCallback(
             this,
@@ -576,7 +560,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 
-        private const val DASHBOARD_REQUEST_CODE = 100
         private const val MAX_ACTIVE_TABS = 40
     }
 

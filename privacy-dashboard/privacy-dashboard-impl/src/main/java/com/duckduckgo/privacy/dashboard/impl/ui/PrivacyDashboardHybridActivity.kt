@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Bundle
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
@@ -40,7 +39,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import com.duckduckgo.privacy.dashboard.impl.databinding.ActivityPrivacyHybridDashboardBinding
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command
@@ -85,7 +83,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         rendererFactory.createRenderer(
             RendererViewHolder.WebviewRenderer(
                 holder = webView,
-                onPrivacyProtectionSettingChanged = { userChangedValues -> updateActivityResult(userChangedValues) },
+                onPrivacyProtectionSettingChanged = { userChangedValues -> if (userChangedValues) finish() },
                 onPrivacyProtectionsClicked = { newValue ->
                     viewModel.onPrivacyProtectionsClicked(newValue)
                 },
@@ -199,15 +197,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                     binding.loadingIndicator.hide()
                     dashboardRenderer.render(it)
                 }
-        }
-    }
-
-    private fun updateActivityResult(shouldClose: Boolean) {
-        if (shouldClose) {
-            setResult(RELOAD_RESULT_CODE)
-            finish()
-        } else {
-            setResult(Activity.RESULT_OK)
         }
     }
 
