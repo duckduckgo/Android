@@ -14,97 +14,145 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".AutofillInternalSettingsActivity"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".AutofillInternalSettingsActivity">
+    android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
-
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/autofillLoginsSectionTitle"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_marginTop="20dp"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsLoginsSectionTitle" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/addSampleLoginsButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsAddSampleLogins"
-        app:secondaryText="@string/autofillDevSettingsAddSampleLoginsSubtitle" />
+        <include
+            android:id="@+id/includeToolbar"
+            layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/addSampleLoginsContainingDuplicatesSameDomainButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsAddSampleLoginsSameSubdomain"
-        app:secondaryText="@string/autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/autofillLoginsSectionTitle"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsLoginsSectionTitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/addSampleLoginsContainingDuplicatesAcrossSubdomainsButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsAddSampleLoginsMultipleSubdomains"
-        app:secondaryText="@string/autofillDevSettingsAddSampleLoginsMultipleSubdomainsSubtitle" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/addSampleLoginsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsAddSampleLogins"
+            app:secondaryText="@string/autofillDevSettingsAddSampleLoginsSubtitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/clearAllSavedLoginsButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsClearLogins"
-        tools:secondaryText="@string/autofillDevSettingsClearLoginsSubtitle" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/addSampleLoginsContainingDuplicatesSameDomainButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsAddSampleLoginsSameSubdomain"
+            app:secondaryText="@string/autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/viewSavedLoginsButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsViewSavedLogins" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/addSampleLoginsContainingDuplicatesAcrossSubdomainsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsAddSampleLoginsMultipleSubdomains"
+            app:secondaryText="@string/autofillDevSettingsAddSampleLoginsMultipleSubdomainsSubtitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/clearAllSavedLoginsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsClearLogins"
+            tools:secondaryText="@string/autofillDevSettingsClearLoginsSubtitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-        android:id="@+id/emailProtectionInContextSectionTitle"
-        android:layout_width="match_parent"
-        android:layout_marginTop="20dp"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsEmailProtectionTitle" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:id="@+id/viewSavedLoginsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsViewSavedLogins" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/emailProtectionClearNeverAskAgainButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsClearNeverAskAgainSettingButton" />
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/configureDaysFromInstallValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:secondaryText="@string/autofillDevSettingsOverrideTapToChange" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/emailProtectionInContextSectionTitle"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsEmailProtectionTitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
-        android:id="@+id/emailProtectionDaysSinceInstallValue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Days since install: 4" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:id="@+id/emailProtectionClearNeverAskAgainButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsClearNeverAskAgainSettingButton" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
-        android:id="@+id/emailProtectionSignOutButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/autofillDevSettingsEmailProtectionSignOutButton" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/configureDaysFromInstallValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:secondaryText="@string/autofillDevSettingsOverrideTapToChange" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            android:id="@+id/emailProtectionDaysSinceInstallValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Days since install: 4" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/emailProtectionSignOutButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="@string/autofillDevSettingsEmailProtectionSignOutButton" />
+
+        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            android:id="@+id/autofillRemoteConfigSectionTitle"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            app:primaryText="Remote config" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/autofillTopLevelFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Autofill top-level feature" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/autofillOnByDefaultFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="onByDefault" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canSaveCredentialsFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="canSaveCredentials" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canInjectCredentialsFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="canInjectCredentials" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canGeneratePasswordsFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="canGeneratePasswords" />
+
+        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            android:id="@+id/canAccessCredentialManagementFeature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="canAccessCredentialManagement" />
 
 
-</LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

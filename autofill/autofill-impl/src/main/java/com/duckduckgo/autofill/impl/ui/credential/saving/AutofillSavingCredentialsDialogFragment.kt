@@ -140,7 +140,6 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         credentials: LoginCredentials,
     ) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        configureSiteDetails(binding, credentials)
         configureCloseButtons(binding)
         configureSaveButton(binding)
     }
@@ -197,26 +196,6 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun animateClosed() {
         (dialog as BottomSheetDialog).animateClosed()
-    }
-
-    private fun configureSiteDetails(
-        binding: ContentAutofillSaveNewCredentialsBinding,
-        credentials: LoginCredentials,
-    ) {
-        val originalUrl = getOriginalUrl()
-        val url = originalUrl.extractDomain() ?: originalUrl
-
-        binding.siteName.text = url
-        val placeholder = initialExtractor.extractInitial(credentials)
-
-        lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalWithPlaceholder(
-                tabId = getTabId(),
-                url = originalUrl,
-                view = binding.favicon,
-                placeholder = placeholder,
-            )
-        }
     }
 
     private fun pixelNameDialogEvent(dialogEvent: DialogEvent): AutofillPixelNames? {

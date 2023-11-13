@@ -29,6 +29,8 @@ import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFILL_PRESSED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
@@ -520,6 +522,25 @@ class AutofillSettingsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Responsible for sending pixels which were previously managed in the app module.
+     *
+     * There are multiple ways to launch this screen, which should map to existing pixels where they exist.
+     */
+    fun sendLaunchPixel(launchedFromBrowser: Boolean, directLinkToCredentials: Boolean) {
+        // no existing pixel for this scenario; don't want it to inflate other existing pixels
+        if (directLinkToCredentials) return
+
+        // map scenario onto existing pixels
+        val pixelName = if (launchedFromBrowser) {
+            MENU_ACTION_AUTOFILL_PRESSED
+        } else {
+            SETTINGS_AUTOFILL_MANAGEMENT_OPENED
+        }
+
+        pixel.fire(pixelName)
     }
 
     data class ViewState(
