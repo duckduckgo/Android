@@ -32,6 +32,8 @@ enum class NetworkProtectionPixelNames(
     override val pixelName: String,
     val enqueue: Boolean = false,
 ) : Pixel.PixelName {
+    NETP_ENABLE_ON_SEARCH_DAILY("m_netp_ev_enabled_on_search_d"),
+    NETP_ENABLE_ON_SEARCH("m_netp_ev_enabled_on_search_c"),
     NETP_ENABLE_DAILY("m_netp_ev_enabled_d", enqueue = true),
     NETP_ENABLE_UNIQUE("m_netp_ev_enabled_u", enqueue = true),
     NETP_DISABLE_DAILY("m_netp_ev_disabled_d"),

@@ -54,6 +54,7 @@ interface NetworkProtectionPixels {
 
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
     fun reportEnabled()
+    fun reportEnabledOnSearch()
 
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
     fun reportDisabled()
@@ -344,6 +345,11 @@ class RealNetworkProtectionPixel @Inject constructor(
     override fun reportEnabled() {
         tryToFireDailyPixel(NETP_ENABLE_DAILY, mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
         tryToFireUniquePixel(NETP_ENABLE_UNIQUE, payload = mapOf("cohort" to cohortStore.cohortLocalDate?.toString().orEmpty()))
+    }
+
+    override fun reportEnabledOnSearch() {
+        tryToFireDailyPixel(NETP_ENABLE_ON_SEARCH_DAILY)
+        firePixel(NETP_ENABLE_ON_SEARCH)
     }
 
     override fun reportDisabled() {
