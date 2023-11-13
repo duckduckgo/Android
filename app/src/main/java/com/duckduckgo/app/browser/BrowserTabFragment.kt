@@ -2595,6 +2595,9 @@ class BrowserTabFragment :
 
     fun onBackPressed(): Boolean {
         if (!isAdded) return false
+        if (errorView.errorLayout.visibility == VISIBLE) {
+            showBrowser()
+        }
         return viewModel.onUserPressedBack()
     }
 
