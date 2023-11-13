@@ -22,12 +22,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.RealSyncSavedSitesRepository
+import com.duckduckgo.savedsites.impl.sync.SyncSavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.RealSavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateFinder
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult
@@ -53,6 +57,7 @@ class SavedSitesDuplicateFinderTest {
 
     private lateinit var db: AppDatabase
     private lateinit var repository: SavedSitesRepository
+    private lateinit var syncRepository: SyncSavedSitesRepository
     private lateinit var savedSitesEntitiesDao: SavedSitesEntitiesDao
     private lateinit var savedSitesRelationsDao: SavedSitesRelationsDao
 
@@ -67,8 +72,22 @@ class SavedSitesDuplicateFinderTest {
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
 
-        repository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
-        duplicateFinder = RealSavedSitesDuplicateFinder(repository)
+        val favoritesDelegate = RealFavoritesDelegate(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            FakeDisplayModeSettingsRepository(),
+            coroutinesTestRule.testDispatcherProvider,
+        )
+
+        syncRepository = RealSyncSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+        repository = RealSavedSitesRepository(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            favoritesDelegate,
+            coroutinesTestRule.testDispatcherProvider,
+        )
+
+        duplicateFinder = RealSavedSitesDuplicateFinder(repository, syncRepository)
     }
 
     @Test
@@ -172,7 +191,7 @@ class SavedSitesDuplicateFinderTest {
         val favourite = Favorite("bookmark1", "title", "www.example.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.findFavouriteDuplicate(favourite)
+        val result = duplicateFinder.findFavouriteDuplicate(favourite, SavedSitesNames.FAVORITES_ROOT)
 
         Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(favourite.id))
     }
@@ -183,7 +202,7 @@ class SavedSitesDuplicateFinderTest {
         val updatedFavourite = Favorite("bookmark2", "title", "www.example.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite)
+        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite, SavedSitesNames.FAVORITES_ROOT)
 
         Assert.assertTrue(result == SavedSitesDuplicateResult.Duplicate(favourite.id))
     }
@@ -194,7 +213,7 @@ class SavedSitesDuplicateFinderTest {
         val updatedFavourite = Favorite("bookmark1", "title", "www.examples.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite)
+        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite, SavedSitesNames.FAVORITES_ROOT)
 
         Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
@@ -205,16 +224,26 @@ class SavedSitesDuplicateFinderTest {
         val updatedFavourite = Favorite("bookmark1", "title1", "www.example.com", "timestamp", 0)
         repository.insert(favourite)
 
-        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite)
+        val result = duplicateFinder.findFavouriteDuplicate(updatedFavourite, SavedSitesNames.FAVORITES_ROOT)
 
         Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }
 
     @Test
-    fun whenFavouriteNotPresentThenDuplicateIsFound() {
+    fun whenFavouriteExistsButInDifferentFolderThenDuplicateIsNotFound() {
+        val favourite = Favorite("bookmark1", "title", "www.example.com", "timestamp", 0)
+        repository.insert(favourite)
+
+        val result = duplicateFinder.findFavouriteDuplicate(favourite, SavedSitesNames.FAVORITES_DESKTOP_ROOT)
+
+        Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
+    }
+
+    @Test
+    fun whenFavouriteNotPresentThenDuplicateIsNotFound() {
         val favourite = Favorite("bookmark1", "title", "www.example.com", "timestamp", 0)
 
-        val result = duplicateFinder.findFavouriteDuplicate(favourite)
+        val result = duplicateFinder.findFavouriteDuplicate(favourite, SavedSitesNames.FAVORITES_ROOT)
 
         Assert.assertTrue(result is SavedSitesDuplicateResult.NotDuplicate)
     }

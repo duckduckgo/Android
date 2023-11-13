@@ -99,15 +99,6 @@ class BookmarksViewModelTest {
     fun before() = runTest {
         whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf())
 
-        whenever(savedSitesRepository.getFolderContent(anyString())).thenReturn(
-            flowOf(
-                Pair(
-                    listOf(bookmark),
-                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder),
-                ),
-            ),
-        )
-
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
             flowOf(
                 SavedSites(

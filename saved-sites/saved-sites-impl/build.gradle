@@ -29,6 +29,7 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':sync-api')
+    implementation project(path: ':sync-settings-api')
     implementation project(path: ':browser-api')
     api project(path: ':saved-sites-store')
 
@@ -37,10 +38,13 @@ dependencies {
 
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation AndroidX.appCompat
+    implementation Google.android.material
     implementation JakeWharton.timber
     implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
     implementation 'org.jsoup:jsoup:_'
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"

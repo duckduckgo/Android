@@ -57,4 +57,10 @@ interface SyncableSetting {
      * When called means that the user changed the setting value, and needs to be synced.
      */
     fun onSettingChanged()
+
+    /**
+     * Sync Feature has been disabled / device has been removed
+     * This is an opportunity for Features to do some local cleanup if needed
+     */
+    fun onSyncDisabled()
 }

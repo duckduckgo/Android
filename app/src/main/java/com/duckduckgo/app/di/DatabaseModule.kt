@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.appbuildconfig.api.*
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Lazy
 import dagger.Module
@@ -43,8 +44,9 @@ object DatabaseModule {
     @Provides
     fun provideAppDatabaseBookmarksMigrationCallbackProvider(
         appDatabase: Lazy<AppDatabase>,
+        appBuildConfig: AppBuildConfig,
     ): AppDatabaseBookmarksMigrationCallbackProvider {
-        return AppDatabaseBookmarksMigrationCallbackProvider(appDatabase)
+        return AppDatabaseBookmarksMigrationCallbackProvider(appDatabase, appBuildConfig)
     }
 
     @Provides

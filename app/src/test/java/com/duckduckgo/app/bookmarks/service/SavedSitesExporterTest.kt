@@ -23,6 +23,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.sync.FakeDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.FolderBranch
@@ -31,6 +32,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.models.TreeNode
 import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
+import com.duckduckgo.savedsites.impl.RealFavoritesDelegate
 import com.duckduckgo.savedsites.impl.RealSavedSitesRepository
 import com.duckduckgo.savedsites.impl.service.FolderTreeItem
 import com.duckduckgo.savedsites.impl.service.RealSavedSitesExporter
@@ -71,7 +73,21 @@ class SavedSitesExporterTest {
             .build()
         savedSitesEntitiesDao = db.syncEntitiesDao()
         savedSitesRelationsDao = db.syncRelationsDao()
-        savedSitesRepository = RealSavedSitesRepository(savedSitesEntitiesDao, savedSitesRelationsDao)
+
+        val savedSitesSettingsRepository = FakeDisplayModeSettingsRepository()
+        val favoritesDelegate = RealFavoritesDelegate(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            savedSitesSettingsRepository,
+            coroutinesTestRule.testDispatcherProvider,
+        )
+
+        savedSitesRepository = RealSavedSitesRepository(
+            savedSitesEntitiesDao,
+            savedSitesRelationsDao,
+            favoritesDelegate,
+            coroutinesTestRule.testDispatcherProvider,
+        )
 
         filesDir = context.filesDir
         exporter = RealSavedSitesExporter(context.contentResolver, savedSitesRepository, RealSavedSitesParser())

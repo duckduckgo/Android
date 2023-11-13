@@ -48,12 +48,13 @@ class SavedSitesSyncPersisterTest {
     private val repository: SavedSitesRepository = mock()
     private val store: SavedSitesSyncStore = mock()
     private val persisterAlgorithm: SavedSitesSyncPersisterAlgorithm = mock()
+    private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration = mock()
 
     private lateinit var syncPersister: SavedSitesSyncPersister
 
     @Before
     fun setup() {
-        syncPersister = SavedSitesSyncPersister(repository, store, persisterAlgorithm)
+        syncPersister = SavedSitesSyncPersister(repository, store, persisterAlgorithm, savedSitesFormFactorSyncMigration)
     }
 
     @Test
