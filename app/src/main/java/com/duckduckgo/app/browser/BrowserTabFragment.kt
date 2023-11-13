@@ -1123,7 +1123,7 @@ class BrowserTabFragment :
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
-            is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
+            is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite, it.position)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
@@ -1964,7 +1964,7 @@ class BrowserTabFragment :
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
-            { viewModel.onDeleteQuickAccessItemRequested(it.favorite) },
+            { viewModel.hide(it.favorite) },
         )
     }
 
@@ -2402,18 +2402,33 @@ class BrowserTabFragment :
         addBookmarkDialog.deleteBookmarkListener = viewModel
     }
 
-    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
+    private fun confirmDeleteSavedSite(savedSite: SavedSite, position: Int) {
         val message = when (savedSite) {
             is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
             is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
         }
-        viewModel.deleteQuickAccessItem(savedSite)
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertQuickAccessItem(savedSite)
-        }.show()
+            viewModel.undoDelete(savedSite, position)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        // when snackbar is not dismissed because of an action we want to
+                        // actually delete the saved site
+                        Timber.d("Bookmark: dismissed with $event")
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.delete(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
