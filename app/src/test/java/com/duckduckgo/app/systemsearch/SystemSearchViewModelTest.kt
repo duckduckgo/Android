@@ -31,6 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -326,7 +327,7 @@ class SystemSearchViewModelTest {
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
+        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite, 0), commandCaptor.lastValue)
     }
 
     @Test
@@ -339,21 +340,48 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = runTest {
+    fun whenQuickAccessDeleteRequestedThenFavouriteDeletedFromViewState() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
+        whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(savedSite)))
+        testee = SystemSearchViewModel(
+            mockUserStageStore,
+            mockAutoComplete,
+            mockDeviceAppLookup,
+            mockPixel,
+            mocksavedSitesRepository,
+            mockFaviconManager,
+            mockSettingsStore,
+            coroutineRule.testDispatcherProvider,
+        )
+
+        val viewState = testee.resultsViewState.value as QuickAccessItems
+        assertFalse(viewState.favorites.isEmpty())
 
         testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))
+
+        val newViewState = testee.resultsViewState.value as QuickAccessItems
+        assertTrue(newViewState.favorites.isEmpty())
+    }
+
+    @Test
+    fun whenQuickAccessDeleteUndoThenViewStateUpdated() = runTest {
+        val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
+
+        val viewState = testee.resultsViewState.value as QuickAccessItems
+        assertFalse(viewState.favorites.isEmpty())
+
+        testee.undoDelete(savedSite, 0)
 
         verify(mocksavedSitesRepository).delete(savedSite)
     }
 
     @Test
-    fun whenQuickAccessInsertedThenRepositoryUpdated() {
+    fun whenQuickAccessDeletedThenRepositoryDeletesSavedSite() = runTest {
         val savedSite = Favorite("favorite1", "title", "http://example.com", "timestamp", 0)
 
-        testee.insertQuickAccessItem(savedSite)
+        testee.deleteQuickAccessItem(savedSite)
 
-        verify(mocksavedSitesRepository).insert(savedSite)
+        verify(mocksavedSitesRepository).delete(savedSite)
     }
 
     @Test

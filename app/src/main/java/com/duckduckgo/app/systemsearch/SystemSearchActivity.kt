@@ -61,8 +61,10 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -178,6 +180,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                     is SystemSearchViewModel.Suggestions.SystemSearchResultsViewState -> {
                         renderResultsViewState(it)
                     }
+
                     is SystemSearchViewModel.Suggestions.QuickAccessItems -> {
                         renderQuickAccessItems(it)
                     }
@@ -358,30 +361,39 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 omnibarTextInput.addTextChangedListener(textChangeWatcher)
                 updateVoiceSearchVisibility()
             }
+
             is LaunchDuckDuckGo -> {
                 launchDuckDuckGo()
             }
+
             is LaunchBrowser -> {
                 launchBrowser(command)
             }
+
             is LaunchDeviceApplication -> {
                 launchDeviceApp(command)
             }
+
             is ShowAppNotFoundMessage -> {
                 Toast.makeText(this, R.string.systemSearchAppNotFound, LENGTH_SHORT).show()
             }
+
             is DismissKeyboard -> {
                 omnibarTextInput.hideKeyboard()
             }
+
             is EditQuery -> {
                 editQuery(command.query)
             }
+
             is LaunchEditDialog -> {
                 showEditSavedSiteDialog(command.savedSite)
             }
+
             is DeleteSavedSiteConfirmation -> {
-                confirmDeleteSavedSite(command.savedSite)
+                confirmDeleteSavedSite(command.savedSite, command.position)
             }
+
             is UpdateVoiceSearch -> {
                 updateVoiceSearchVisibility()
             }
@@ -393,15 +405,34 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         omnibarTextInput.setSelection(query.length)
     }
 
-    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
+    private fun confirmDeleteSavedSite(
+        savedSite: SavedSite,
+        oldPosition: Int,
+    ) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
         Snackbar.make(
             binding.root,
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.insertQuickAccessItem(savedSite)
-        }.show()
+            viewModel.undoDelete(savedSite, oldPosition)
+        }
+            .addCallback(
+                object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    override fun onDismissed(
+                        transientBottomBar: Snackbar?,
+                        event: Int,
+                    ) {
+                        // when snackbar is not dismissed because of an action we want to
+                        // actually delete the saved site
+                        Timber.d("Bookmark: dismissed with $event")
+                        if (event != DISMISS_EVENT_ACTION) {
+                            viewModel.deleteQuickAccessItem(savedSite)
+                        }
+                    }
+                },
+            )
+            .show()
     }
 
     private fun launchDuckDuckGo() {
