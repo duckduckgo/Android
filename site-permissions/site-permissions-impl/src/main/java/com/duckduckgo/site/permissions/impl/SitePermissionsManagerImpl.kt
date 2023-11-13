@@ -21,6 +21,7 @@ import android.webkit.PermissionRequest
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
@@ -42,10 +43,11 @@ class SitePermissionsManagerImpl @Inject constructor(
             .filter { sitePermissionsRepository.isDomainGranted(url, tabId, it) }
             .toTypedArray()
 
-    override suspend fun getSitePermissionsForUserToHandle(
+    override suspend fun getSitePermissions(
         tabId: String,
         request: PermissionRequest,
-    ): Array<String> {
+    ): SitePermissions {
+        val autoAccept = mutableListOf<String>()
         val url = request.origin.toString()
         val sitePermissionsAllowedToAsk = request.resources
             .filter { isPermissionSupported(it) && isHardwareSupported(it) }
@@ -55,17 +57,23 @@ class SitePermissionsManagerImpl @Inject constructor(
         val sitePermissionsGranted = getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
         if (sitePermissionsGranted.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
-                request.grant(sitePermissionsGranted)
+                autoAccept.addAll(sitePermissionsGranted)
             }
         }
-        val finalList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
-        if (finalList.isEmpty() && sitePermissionsGranted.isEmpty()) {
+        val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
+        if (userList.isEmpty() && sitePermissionsGranted.isEmpty()) {
             withContext(dispatcherProvider.main()) {
                 request.deny()
             }
         }
+        if (userList.isEmpty() && autoAccept.isNotEmpty()) {
+            withContext(dispatcherProvider.main()) {
+                request.grant(autoAccept.toTypedArray())
+                autoAccept.clear()
+            }
+        }
 
-        return finalList
+        return SitePermissions(autoAccept = autoAccept, userHandled = userList)
     }
 
     override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {

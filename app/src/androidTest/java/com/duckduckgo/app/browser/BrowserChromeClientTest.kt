@@ -33,6 +33,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -74,7 +75,7 @@ class BrowserChromeClientTest {
         mockFileChooserParams = mock()
         testee.webViewClientListener = mockWebViewClientListener
         webView = TestWebView(getInstrumentation().targetContext)
-        mockSitePermissionsManager.stub { onBlocking { getSitePermissionsForUserToHandle(any(), any()) }.thenReturn(arrayOf()) }
+        mockSitePermissionsManager.stub { onBlocking { getSitePermissions(any(), any()) }.thenReturn(SitePermissions(emptyList(), emptyList())) }
     }
 
     @Test
@@ -184,12 +185,15 @@ class BrowserChromeClientTest {
     @ExperimentalCoroutinesApi
     @Test
     fun whenOnMediaPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
-        val permissions = arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID)
+        val permissions = SitePermissions(
+            userHandled = listOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID),
+            autoAccept = emptyList(),
+        )
         val mockPermission: PermissionRequest = mock()
         whenever(mockWebViewClientListener.getCurrentTabId()).thenReturn("id")
-        whenever(mockPermission.resources).thenReturn(permissions)
+        whenever(mockPermission.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID))
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
-        whenever(mockSitePermissionsManager.getSitePermissionsForUserToHandle(any(), any())).thenReturn(permissions)
+        whenever(mockSitePermissionsManager.getSitePermissions(any(), any())).thenReturn(permissions)
         testee.onPermissionRequest(mockPermission)
 
         verify(mockWebViewClientListener).onSitePermissionRequested(mockPermission, permissions)
@@ -198,12 +202,15 @@ class BrowserChromeClientTest {
     @ExperimentalCoroutinesApi
     @Test
     fun whenOnCameraPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
-        val permissions = arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+        val permissions = SitePermissions(
+            userHandled = listOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE),
+            autoAccept = emptyList(),
+        )
         val mockRequest: PermissionRequest = mock()
         whenever(mockWebViewClientListener.getCurrentTabId()).thenReturn("id")
-        whenever(mockRequest.resources).thenReturn(permissions)
+        whenever(mockRequest.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
         whenever(mockRequest.origin).thenReturn("https://www.example.com".toUri())
-        whenever(mockSitePermissionsManager.getSitePermissionsForUserToHandle(any(), any())).thenReturn(permissions)
+        whenever(mockSitePermissionsManager.getSitePermissions(any(), any())).thenReturn(permissions)
 
         testee.onPermissionRequest(mockRequest)
 
@@ -213,12 +220,15 @@ class BrowserChromeClientTest {
     @ExperimentalCoroutinesApi
     @Test
     fun whenOnMicPermissionRequestIfDomainIsAllowToAskThenRequestPermission() = runTest {
-        val permissions = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val permissions = SitePermissions(
+            userHandled = listOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE),
+            autoAccept = emptyList(),
+        )
         val mockRequest: PermissionRequest = mock()
         whenever(mockWebViewClientListener.getCurrentTabId()).thenReturn("id")
-        whenever(mockRequest.resources).thenReturn(permissions)
+        whenever(mockRequest.resources).thenReturn(arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE))
         whenever(mockRequest.origin).thenReturn("https://www.example.com".toUri())
-        whenever(mockSitePermissionsManager.getSitePermissionsForUserToHandle(any(), any())).thenReturn(permissions)
+        whenever(mockSitePermissionsManager.getSitePermissions(any(), any())).thenReturn(permissions)
 
         testee.onPermissionRequest(mockRequest)
 
@@ -227,13 +237,13 @@ class BrowserChromeClientTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun whenNotSitePermissionsAreRequestedThenCallonSitePermissionRequested() = runTest {
-        val permissions = arrayOf<String>()
+    fun whenNotSitePermissionsAreRequestedThenCallOnSitePermissionRequested() = runTest {
+        val permissions = SitePermissions(emptyList(), emptyList())
         val mockRequest: PermissionRequest = mock()
         whenever(mockWebViewClientListener.getCurrentTabId()).thenReturn("id")
-        whenever(mockRequest.resources).thenReturn(permissions)
+        whenever(mockRequest.resources).thenReturn(arrayOf())
         whenever(mockRequest.origin).thenReturn("https://www.example.com".toUri())
-        whenever(mockSitePermissionsManager.getSitePermissionsForUserToHandle(any(), any())).thenReturn(permissions)
+        whenever(mockSitePermissionsManager.getSitePermissions(any(), any())).thenReturn(permissions)
 
         testee.onPermissionRequest(mockRequest)
 

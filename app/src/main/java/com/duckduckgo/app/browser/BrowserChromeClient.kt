@@ -138,8 +138,8 @@ class BrowserChromeClient @Inject constructor(
     override fun onPermissionRequest(request: PermissionRequest) {
         webViewClientListener?.getCurrentTabId()?.let { tabId ->
             appCoroutineScope.launch(coroutineDispatcher.io()) {
-                val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissionsForUserToHandle(tabId, request)
-                if (permissionsAllowedToAsk.isNotEmpty()) {
+                val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissions(tabId, request)
+                if (permissionsAllowedToAsk.userHandled.isNotEmpty()) {
                     webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
                 }
             }

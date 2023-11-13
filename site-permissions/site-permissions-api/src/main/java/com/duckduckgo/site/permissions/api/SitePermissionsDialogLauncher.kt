@@ -3,6 +3,7 @@ package com.duckduckgo.site.permissions.api
 import android.app.Activity
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
 /** Public interface for requesting microphone and/or camera permissions when website requests it */
 interface SitePermissionsDialogLauncher {
@@ -22,8 +23,7 @@ interface SitePermissionsDialogLauncher {
      * @param activity where this method is called from
      * @param url URL taken from the permissions request object
      * @param tabId id from the tab where this method is called from
-     * @param permissionsRequested array of permissions that need to be asked filtered by user permissions settings. *Note: This could
-     * be different from `request.getResources()`
+     * @param permissionsRequested maps of permissions where keys are the type [PermissionsKey] and have a list of [String] as values.
      * @param request from onPermissionRequest callback in BrowserChromeClient. It is needed to grant site permissions.
      * @param permissionsGrantedListener interface that fragment or activity needs to implement to handle special cases when granting permissions
      */
@@ -31,7 +31,7 @@ interface SitePermissionsDialogLauncher {
         activity: Activity,
         url: String,
         tabId: String,
-        permissionsRequested: Array<String>,
+        permissionsRequested: SitePermissions,
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
     )

@@ -142,6 +142,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -4305,6 +4306,21 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showVoiceSearch)
     }
 
+    @Test
+    fun whenOnSitePermissionRequestedThenSendCommand() = runTest {
+        val request: PermissionRequest = mock()
+        val sitePermissions = SitePermissions(
+            autoAccept = listOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE),
+            userHandled = listOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE),
+        )
+        whenever(request.origin).thenReturn("https://example.com".toUri())
+        testee.onSitePermissionRequested(request, sitePermissions)
+        assertCommandIssued<Command.ShowSitePermissionsDialog> {
+            assertEquals(request, this.request)
+            assertEquals(sitePermissions, this.permissionsToRequest)
+        }
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -4372,11 +4388,6 @@ class BrowserTabViewModelTest {
         permission: LocationPermissionType,
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
-    }
-
-    private fun givenSitePermissionsRequestFromDomain(request: PermissionRequest) {
-        whenever(request.origin).thenReturn("https://example.com".toUri())
-        testee.onSitePermissionRequested(request, arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE))
     }
 
     class StubPermissionCallback : GeolocationPermissions.Callback {

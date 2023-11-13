@@ -56,7 +56,7 @@ class SitePermissionsManagerTest {
     }
 
     @Test
-    fun givenListOfPermissionsThenFilterGranted() = runTest {
+    fun givenListOfPermissionsThenPermissionsReturnedCorrectly() = runTest {
         val tabId = "tabId"
         val resources = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
@@ -68,9 +68,30 @@ class SitePermissionsManagerTest {
         whenever(permissionRequest.origin).thenReturn(url.toUri())
         whenever(permissionRequest.resources).thenReturn(resources)
 
-        val permissions = testee.getSitePermissionsForUserToHandle(tabId, permissionRequest)
-        assertEquals(1, permissions.size)
-        assertEquals(PermissionRequest.RESOURCE_VIDEO_CAPTURE, permissions.first())
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+        assertEquals(1, permissions.autoAccept.size)
+        assertEquals(1, permissions.userHandled.size)
+        assertEquals(PermissionRequest.RESOURCE_AUDIO_CAPTURE, permissions.autoAccept.first())
+        assertEquals(PermissionRequest.RESOURCE_VIDEO_CAPTURE, permissions.userHandled.first())
+    }
+
+    @Test
+    fun givenListOfPermissionsShouldAutoAcceptThenGrantAndClearAutoHandlePermissions() = runTest {
+        val tabId = "tabId"
+        val resources = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
+        whenever(mockSitePermissionsRepository.isDomainGranted(url, tabId, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
+
+        val permissionRequest: PermissionRequest = mock()
+        whenever(permissionRequest.origin).thenReturn(url.toUri())
+        whenever(permissionRequest.resources).thenReturn(resources)
+
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+        assertEquals(0, permissions.autoAccept.size)
+        assertEquals(0, permissions.userHandled.size)
+        verify(permissionRequest).grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE))
     }
 
     @Test
@@ -86,13 +107,14 @@ class SitePermissionsManagerTest {
         whenever(permissionRequest.origin).thenReturn(url.toUri())
         whenever(permissionRequest.resources).thenReturn(resources)
 
-        val permissions = testee.getSitePermissionsForUserToHandle(tabId, permissionRequest)
-        assertEquals(1, permissions.size)
-        assertEquals(PermissionRequest.RESOURCE_VIDEO_CAPTURE, permissions.first())
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+        assertEquals(1, permissions.userHandled.size)
+        assertEquals(0, permissions.autoAccept.size)
+        assertEquals(PermissionRequest.RESOURCE_VIDEO_CAPTURE, permissions.userHandled.first())
     }
 
     @Test
-    fun givenListOfPermissionsNoHardwareCameraThenFilterNotSupportedAnThenDenyPermissions() = runTest {
+    fun givenListOfPermissionsNoHardwareCameraThenFilterNotSupportedAndThenDenyPermissions() = runTest {
         val tabId = "tabId"
         val resources =
             arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
@@ -104,8 +126,9 @@ class SitePermissionsManagerTest {
         whenever(permissionRequest.origin).thenReturn(url.toUri())
         whenever(permissionRequest.resources).thenReturn(resources)
 
-        val permissions = testee.getSitePermissionsForUserToHandle(tabId, permissionRequest)
-        assertEquals(0, permissions.size)
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+        assertEquals(0, permissions.userHandled.size)
+        assertEquals(0, permissions.autoAccept.size)
         verify(permissionRequest).deny()
     }
 
@@ -121,8 +144,9 @@ class SitePermissionsManagerTest {
         whenever(permissionRequest.origin).thenReturn(url.toUri())
         whenever(permissionRequest.resources).thenReturn(resources)
 
-        val permissions = testee.getSitePermissionsForUserToHandle(tabId, permissionRequest)
-        assertEquals(0, permissions.size)
+        val permissions = testee.getSitePermissions(tabId, permissionRequest)
+        assertEquals(0, permissions.userHandled.size)
+        assertEquals(0, permissions.autoAccept.size)
         verify(permissionRequest).deny()
     }
 

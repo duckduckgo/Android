@@ -129,6 +129,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
@@ -448,7 +449,7 @@ class BrowserTabViewModel @Inject constructor(
         class NavigateToHistory(val historyStackIndex: Int) : Command()
         object EmailSignEvent : Command()
         class ShowSitePermissionsDialog(
-            val permissionsToRequest: Array<String>,
+            val permissionsToRequest: SitePermissions,
             val request: PermissionRequest,
         ) : Command()
 
@@ -1474,7 +1475,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onSitePermissionRequested(
         request: PermissionRequest,
-        sitePermissionsAllowedToAsk: Array<String>,
+        sitePermissionsAllowedToAsk: SitePermissions,
     ) {
         viewModelScope.launch(dispatchers.io()) {
             command.postValue(ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request))

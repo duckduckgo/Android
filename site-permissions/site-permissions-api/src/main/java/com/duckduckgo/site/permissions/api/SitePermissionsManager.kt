@@ -25,9 +25,9 @@ interface SitePermissionsManager {
      *
      * @param tabId the tab where the request was originated
      * @param request original permission request
-     * @return array of strings with the permissions the user needs to handle
+     * @return map where keys are the type [PermissionsKey] and have a list of [String] as values
      */
-    suspend fun getSitePermissionsForUserToHandle(tabId: String, request: PermissionRequest): Array<String>
+    suspend fun getSitePermissions(tabId: String, request: PermissionRequest): SitePermissions
 
     /**
      * Deletes all site permissions but the ones that are fireproof
@@ -35,4 +35,9 @@ interface SitePermissionsManager {
      * @param fireproofDomains list of domains that are fireproof
      */
     suspend fun clearAllButFireproof(fireproofDomains: List<String>)
+
+    data class SitePermissions(
+        val autoAccept: List<String>,
+        val userHandled: List<String>,
+    )
 }
