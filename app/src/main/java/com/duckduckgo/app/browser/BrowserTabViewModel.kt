@@ -1930,7 +1930,6 @@ class BrowserTabViewModel @Inject constructor(
             val favorite = currentBrowserViewState().favorite
             if (favorite != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
-                // removeFavoriteSite(favorite)
                 hide(favorite)
             } else {
                 val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
@@ -2815,12 +2814,6 @@ class BrowserTabViewModel @Inject constructor(
 
                 browserViewState.value = currentBrowserViewState().copy(favorite = quickAccessFavorite?.favorite, bookmark = savedSite)
             }
-        }
-    }
-
-    fun insertQuickAccessItem(savedSite: SavedSite) {
-        viewModelScope.launch(dispatchers.io()) {
-            savedSitesRepository.insert(savedSite)
         }
     }
 

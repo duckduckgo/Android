@@ -669,11 +669,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkDeletedThenFaviconDeletedAndRepositoryIsUpdated() = runTest {
+    fun whenBookmarkDeleteRequestedThenViewStateUpdated() = runTest {
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
 
         testee.onSavedSiteDeleted(bookmark)
+
+        assertTrue(browserViewState().bookmark == null)
+        assertTrue(browserViewState().favorite == null)
+    }
+
+    @Test
+    fun whenBookmarkDeletionConfirmedThenFaviconDeletedAndRepositoryIsUpdated() = runTest {
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
+
+        testee.delete(bookmark)
 
         verify(mockFaviconManager).deletePersistedFavicon(bookmark.url)
         verify(mockSavedSitesRepository).delete(bookmark)
@@ -725,36 +736,18 @@ class BrowserTabViewModelTest {
     fun whenDeleteQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() = runTest {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
 
-        testee.deleteQuickAccessItem(savedSite)
+        testee.delete(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
-    }
-
-    @Test
-    fun whenInsertQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() {
-        val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
-
-        testee.insertQuickAccessItem(savedSite)
-
-        verify(mockSavedSitesRepository).insert(savedSite)
     }
 
     @Test
     fun whenDeleteQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() = runTest {
         val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
 
-        testee.deleteQuickAccessItem(savedSite)
+        testee.delete(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
-    }
-
-    @Test
-    fun whenInsertQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() {
-        val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
-
-        testee.insertQuickAccessItem(savedSite)
-
-        verify(mockSavedSitesRepository).insert(savedSite)
     }
 
     @Test
@@ -3756,13 +3749,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRemoveFavoriteRequestedThenRepositoryDeleteIsCalledForThatSite() = runTest {
+    fun whenRemoveFavoriteRequestedThenViewStateUpdated() = runTest {
         val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
         whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
-        verify(mockSavedSitesRepository, atLeastOnce()).delete(favoriteSite)
+
+        assertTrue(browserViewState().favorite == null)
     }
 
     @Test
@@ -3783,6 +3777,36 @@ class BrowserTabViewModelTest {
         val command = commandCaptor.lastValue as Command.DeleteSavedSiteConfirmation
         assertEquals("www.example.com", command.savedSite.url)
         assertEquals("title", command.savedSite.title)
+    }
+
+    @Test
+    fun whenRemoveFavoriteUndoThenViewStateUpdated() = runTest {
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
+        whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+        testee.onFavoriteMenuClicked()
+
+        assertTrue(browserViewState().favorite == null)
+
+        testee.undoDelete(favoriteSite, 0)
+
+        assertTrue(browserViewState().favorite == favoriteSite)
+    }
+
+    @Test
+    fun whenDeleteFavoriteUndoThenViewStateUpdated() = runTest {
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
+
+        testee.onSavedSiteDeleted(bookmark)
+
+        assertTrue(browserViewState().bookmark == null)
+        assertTrue(browserViewState().favorite == null)
+
+        testee.undoDelete(bookmark, 0)
+
+        assertTrue(browserViewState().bookmark == bookmark)
     }
 
     @Test
