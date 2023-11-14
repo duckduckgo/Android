@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.UriString
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.UriString
 
 class TrustedSites {
 

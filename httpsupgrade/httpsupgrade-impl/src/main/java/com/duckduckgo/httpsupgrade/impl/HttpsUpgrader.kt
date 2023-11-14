@@ -19,9 +19,9 @@ package com.duckduckgo.httpsupgrade.impl
 import android.net.Uri
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.isHttps
+import com.duckduckgo.common.utils.toHttps
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader

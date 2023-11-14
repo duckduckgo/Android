@@ -17,8 +17,8 @@
 package com.duckduckgo.app.global
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.UriString.Companion.isWebUrl
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import com.duckduckgo.common.utils.UriString.Companion.isWebUrl
+import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

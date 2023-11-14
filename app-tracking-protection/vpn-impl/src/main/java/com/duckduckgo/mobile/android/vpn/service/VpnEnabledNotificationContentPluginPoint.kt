@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 
 @ContributesPluginPoint(

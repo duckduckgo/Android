@@ -16,7 +16,6 @@
 
 package com.duckduckgo.sync.impl.stats
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter.Companion.timestamp
 import com.duckduckgo.sync.impl.engine.SyncStateRepository
 import com.duckduckgo.sync.store.model.SyncAttempt
 import com.duckduckgo.sync.store.model.SyncAttemptState.FAIL

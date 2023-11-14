@@ -17,10 +17,10 @@
 package com.duckduckgo.autofill.impl.urlmatcher
 
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.extractDomain
-import com.duckduckgo.app.global.normalizeScheme
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
+import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.normalizeScheme
 import javax.inject.Inject
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import timber.log.Timber

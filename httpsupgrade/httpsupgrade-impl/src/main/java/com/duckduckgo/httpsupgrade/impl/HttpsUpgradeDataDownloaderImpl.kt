@@ -16,7 +16,7 @@
 
 package com.duckduckgo.httpsupgrade.impl
 
-import com.duckduckgo.app.global.extensions.isCached
+import com.duckduckgo.common.utils.extensions.isCached
 import com.duckduckgo.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpec

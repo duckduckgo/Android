@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.cookies.db
 
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.UriString
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.UriString
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 

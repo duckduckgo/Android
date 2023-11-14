@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.tabpreview
 import android.graphics.Bitmap
 import android.webkit.WebView
 import androidx.core.view.drawToBitmap
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.withContext
 
 interface WebViewPreviewGenerator {

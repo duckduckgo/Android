@@ -16,7 +16,7 @@
 
 package com.duckduckgo.fingerprintprotection.store.seed
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionSeedEntity
 import java.util.*

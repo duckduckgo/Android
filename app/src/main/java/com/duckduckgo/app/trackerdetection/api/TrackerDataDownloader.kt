@@ -17,11 +17,11 @@
 package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.extensions.extractETag
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.common.utils.extensions.extractETag
+import com.duckduckgo.common.utils.store.BinaryDataStore
 import io.reactivex.Completable
 import java.io.IOException
 import javax.inject.Inject

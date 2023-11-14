@@ -20,7 +20,7 @@ import android.content.Context
 import android.text.Spanned
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
-import com.duckduckgo.app.global.extensions.html
+import com.duckduckgo.common.utils.extensions.html
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
 import kotlin.coroutines.CoroutineContext

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.global.file
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.File
 import kotlinx.coroutines.withContext
 

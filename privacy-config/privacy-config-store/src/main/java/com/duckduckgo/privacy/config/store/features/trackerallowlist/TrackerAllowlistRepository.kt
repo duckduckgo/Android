@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.trackerallowlist
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import java.util.concurrent.CopyOnWriteArrayList

@@ -30,8 +30,6 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
-import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -47,6 +45,8 @@ import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.extensions.html
 
 interface DialogCta {
     fun createCta(context: Context, daxDialogListener: DaxDialogListener): DialogFragment

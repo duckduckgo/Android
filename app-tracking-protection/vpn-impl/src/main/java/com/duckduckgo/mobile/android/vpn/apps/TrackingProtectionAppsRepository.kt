@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository.ProtectionState.PROTECTED

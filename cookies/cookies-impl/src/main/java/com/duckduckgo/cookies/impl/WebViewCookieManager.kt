@@ -16,8 +16,8 @@
 
 package com.duckduckgo.cookies.impl
 
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy

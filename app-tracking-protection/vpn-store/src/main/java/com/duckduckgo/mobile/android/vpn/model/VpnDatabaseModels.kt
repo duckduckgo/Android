@@ -19,7 +19,7 @@
 package com.duckduckgo.mobile.android.vpn.model
 
 import androidx.room.*
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 

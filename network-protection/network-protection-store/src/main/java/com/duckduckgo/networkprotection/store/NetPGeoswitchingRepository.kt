@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.store
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPreferredLocation
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingDao
 import com.duckduckgo.networkprotection.store.db.NetPGeoswitchingLocation

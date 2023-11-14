@@ -17,10 +17,7 @@
 package com.duckduckgo.privacy.dashboard.impl.ui
 
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.withScheme
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.AD_ALLOWED
@@ -30,6 +27,9 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SAME_ENTITY_ALLOW
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.SITE_BREAKAGE_ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus.USER_ALLOWED
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.AllowedReasons
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.DetectedRequest

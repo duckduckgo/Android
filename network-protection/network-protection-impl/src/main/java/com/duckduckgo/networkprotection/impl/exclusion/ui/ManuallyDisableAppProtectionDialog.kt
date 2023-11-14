@@ -22,7 +22,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
+import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.networkprotection.impl.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 

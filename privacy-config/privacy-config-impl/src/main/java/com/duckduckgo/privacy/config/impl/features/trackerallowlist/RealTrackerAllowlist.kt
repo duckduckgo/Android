@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.UriString
+import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName

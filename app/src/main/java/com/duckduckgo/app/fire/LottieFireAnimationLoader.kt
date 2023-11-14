@@ -20,9 +20,9 @@ import android.content.Context
 import androidx.annotation.UiThread
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.lottie.LottieCompositionFactory
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

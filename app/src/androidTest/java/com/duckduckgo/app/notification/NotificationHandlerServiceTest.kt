@@ -19,11 +19,11 @@ package com.duckduckgo.app.notification
 import android.content.Intent
 import android.os.Bundle
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock

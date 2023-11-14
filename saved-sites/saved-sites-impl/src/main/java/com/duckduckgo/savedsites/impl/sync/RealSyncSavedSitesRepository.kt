@@ -16,15 +16,11 @@
 
 package com.duckduckgo.savedsites.impl.sync
 
-import com.duckduckgo.app.di.*
-import com.duckduckgo.app.global.*
-import com.duckduckgo.app.global.formatters.time.*
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.savedsites.impl.*
 import com.duckduckgo.savedsites.store.*
 import java.util.*
-import kotlinx.coroutines.*
 import timber.log.*
 
 class RealSyncSavedSitesRepository(

@@ -18,10 +18,10 @@ package com.duckduckgo.mobile.android.vpn.health
 
 import android.content.Context
 import android.os.PowerManager
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extensions.isAirplaneModeOn
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.isAirplaneModeOn
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
