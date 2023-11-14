@@ -36,7 +36,7 @@ class RealSystemAutofillServiceSuppressor @Inject constructor(
 
     @SuppressLint("NewApi")
     override fun suppressAutofill(webView: WebView?) {
-        if (appBuildConfig.versionCode >= Build.VERSION_CODES.O) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
             webView?.context?.getSystemService(AutofillManager::class.java)?.cancel()
         }
     }
