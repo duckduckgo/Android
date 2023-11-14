@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl
 
 import android.annotation.SuppressLint
 import android.os.Build
-import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Type.DESKTOP
 import com.duckduckgo.sync.impl.Type.MOBILE

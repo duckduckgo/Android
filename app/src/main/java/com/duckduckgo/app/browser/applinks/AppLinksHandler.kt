@@ -17,9 +17,9 @@
 package com.duckduckgo.app.browser.applinks
 
 import android.os.Build
-import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

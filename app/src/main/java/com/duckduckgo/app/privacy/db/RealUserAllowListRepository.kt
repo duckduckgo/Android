@@ -19,8 +19,8 @@ package com.duckduckgo.app.privacy.db
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.domain
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.domain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

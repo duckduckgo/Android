@@ -27,7 +27,7 @@ import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.mobile.android.R as CommonR
 import java.io.File
 import java.util.*

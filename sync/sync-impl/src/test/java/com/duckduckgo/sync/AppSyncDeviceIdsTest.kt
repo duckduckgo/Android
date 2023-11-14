@@ -17,7 +17,7 @@
 package com.duckduckgo.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.sync.impl.AppSyncDeviceIds
 import com.duckduckgo.sync.impl.Type
 import com.duckduckgo.sync.store.SyncStore

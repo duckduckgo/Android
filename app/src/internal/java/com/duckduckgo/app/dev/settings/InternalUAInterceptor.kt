@@ -18,7 +18,7 @@ package com.duckduckgo.app.dev.settings
 
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
-import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding

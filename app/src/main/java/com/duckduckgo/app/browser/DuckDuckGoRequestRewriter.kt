@@ -17,11 +17,11 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import com.duckduckgo.app.global.AppUrl.ParamKey
-import com.duckduckgo.app.global.AppUrl.ParamValue
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.utils.AppUrl.ParamKey
+import com.duckduckgo.common.utils.AppUrl.ParamValue
 import timber.log.Timber
 
 interface RequestRewriter {

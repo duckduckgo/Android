@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.location.data
 
-import com.duckduckgo.app.global.extensions.asLocationPermissionOrigin
+import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import org.junit.Assert
 import org.junit.Test
 

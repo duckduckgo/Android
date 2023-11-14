@@ -59,14 +59,14 @@ class NoHardcodedCoroutineDispatcherDetector : Detector(), SourceCodeScanner {
         const val ERROR_DESCRIPTION = "Hardcoded coroutine dispatcher"
 
         private val EXCLUDED_SOURCE_FILES = listOf(
-            "com.duckduckgo.app.global.DispatcherProvider",
+            "com.duckduckgo.common.utils.DispatcherProvider",
             "com.duckduckgo.common.test.CoroutineTestRule"
         )
 
         val NO_HARCODED_COROUTINE_DISPATCHER = Issue.create(
             ERROR_ID,
             ERROR_DESCRIPTION,
-            "Inject com.duckduckgo.app.global.DispatcherProvider instead.",
+            "Inject com.duckduckgo.common.utils.DispatcherProvider instead.",
             Category.CORRECTNESS, 10, ERROR,
             Implementation(NoHardcodedCoroutineDispatcherDetector::class.java, EnumSet.of(JAVA_FILE, TEST_SOURCES))
         )

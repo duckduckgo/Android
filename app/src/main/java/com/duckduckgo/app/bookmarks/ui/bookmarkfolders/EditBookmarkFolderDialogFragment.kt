@@ -20,7 +20,7 @@ import android.os.Bundle
 import android.view.View
 import com.duckduckgo.app.bookmarks.ui.SavedSiteDialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.extensions.html
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 
 class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {

@@ -24,7 +24,7 @@ import androidx.work.Data
 import androidx.work.Data.MAX_DATA_BYTES
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader

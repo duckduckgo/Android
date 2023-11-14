@@ -20,7 +20,7 @@ import android.app.Activity
 import android.content.Context
 import com.android.billingclient.api.ProductDetails
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsData.*
 import com.duckduckgo.subscriptions.impl.auth.AuthService

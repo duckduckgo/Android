@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.impl.email.incontext.availability
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

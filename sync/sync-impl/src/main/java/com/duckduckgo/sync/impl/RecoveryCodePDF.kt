@@ -23,8 +23,8 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.databinding.ViewRecoveryCodeBinding
 import com.squareup.anvil.annotations.ContributesBinding

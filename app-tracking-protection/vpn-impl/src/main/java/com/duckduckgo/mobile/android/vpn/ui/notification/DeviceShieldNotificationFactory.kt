@@ -20,8 +20,8 @@ import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.annotation.VisibleForTesting
 import androidx.core.text.HtmlCompat
-import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
-import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
+import com.duckduckgo.common.utils.formatters.time.model.dateOfLastDay
+import com.duckduckgo.common.utils.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker

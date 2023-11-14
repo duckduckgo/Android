@@ -16,7 +16,7 @@
 
 package com.duckduckgo.cookies.store.contentscopescripts
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.store.CookieEntity
 import com.duckduckgo.cookies.store.CookiesDatabase
 import kotlinx.coroutines.CoroutineScope

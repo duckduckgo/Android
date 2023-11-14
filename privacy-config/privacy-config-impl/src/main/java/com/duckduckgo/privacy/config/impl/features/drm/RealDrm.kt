@@ -17,8 +17,8 @@
 package com.duckduckgo.privacy.config.impl.features.drm
 
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Drm

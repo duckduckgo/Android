@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.global.api
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
-import com.duckduckgo.app.global.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.APP_VERSION
+import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter.ATB
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before

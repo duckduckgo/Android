@@ -18,7 +18,7 @@ package com.duckduckgo.site.permissions.impl
 
 import android.content.pm.PackageManager
 import android.webkit.PermissionRequest
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions

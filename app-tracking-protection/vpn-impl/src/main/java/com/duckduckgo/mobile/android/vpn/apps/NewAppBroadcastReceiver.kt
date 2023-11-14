@@ -22,7 +22,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature

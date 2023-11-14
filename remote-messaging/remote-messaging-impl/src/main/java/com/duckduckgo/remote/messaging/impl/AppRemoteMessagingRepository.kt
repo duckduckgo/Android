@@ -16,10 +16,10 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isAskForDefaultBrowserMoreThanOnceExperimentEnabled
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.mappers.MessageMapper

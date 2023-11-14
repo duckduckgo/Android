@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.gpc
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.store.GpcContentScopeConfigEntity

@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.connectionclass
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import javax.inject.Inject
 import kotlinx.coroutines.withContext

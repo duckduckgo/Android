@@ -16,12 +16,12 @@
 
 package com.duckduckgo.autofill.impl.email.incontext.availability
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.impl.AutofillGlobalCapabilityChecker
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupFeature
 import com.duckduckgo.autofill.impl.email.remoteconfig.EmailProtectionInContextExceptions
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.*

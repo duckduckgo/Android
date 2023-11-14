@@ -20,8 +20,8 @@ import android.content.Context
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides

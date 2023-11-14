@@ -18,12 +18,12 @@ package com.duckduckgo.user.agent.impl
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.DefaultPolicy.CLOSEST
 import com.duckduckgo.privacy.config.api.DefaultPolicy.DDG

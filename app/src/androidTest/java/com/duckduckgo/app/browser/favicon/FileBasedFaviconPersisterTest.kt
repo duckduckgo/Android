@@ -22,8 +22,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.file.FileDeleter
-import com.duckduckgo.app.global.sha256
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.sha256
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.ExperimentalCoroutinesApi

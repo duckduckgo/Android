@@ -19,7 +19,6 @@ package com.duckduckgo.app.integration
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.getDaggerComponent
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.RefreshRetentionAtbPlugin
@@ -30,6 +29,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule

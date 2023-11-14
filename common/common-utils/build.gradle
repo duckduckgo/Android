@@ -32,7 +32,7 @@ android {
             includeAndroidResources = true
         }
     }
-    namespace 'com.duckduckgo.app.global'
+    namespace 'com.duckduckgo.common.utils'
 }
 
 dependencies {

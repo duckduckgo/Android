@@ -18,8 +18,8 @@ package com.duckduckgo.app.flipper
 
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.core.FlipperPlugin

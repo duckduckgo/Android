@@ -20,9 +20,6 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.absoluteString
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.VariantManager
@@ -31,6 +28,9 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.absoluteString
+import com.duckduckgo.common.utils.domain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
