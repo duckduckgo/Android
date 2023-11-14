@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.traces
+package com.duckduckgo.traces.impl
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.traces.api.StartupTraces
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ class RealStartupTraces @Inject constructor(
         }
 
     companion object {
-        private const val FILENAME = "com.duckduckgo.app.traces.preference"
-        private const val ENABLE_KEY = "com.duckduckgo.app.traces.preference.enable"
+        private const val FILENAME = "com.duckduckgo.traces.preference"
+        private const val ENABLE_KEY = "com.duckduckgo.traces.preference.enable"
     }
 }
