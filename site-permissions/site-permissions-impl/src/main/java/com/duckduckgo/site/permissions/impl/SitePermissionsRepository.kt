@@ -47,6 +47,7 @@ interface SitePermissionsRepository {
     fun sitePermissionsAllowedFlow(): Flow<List<SitePermissionAllowedEntity>>
     fun getDrmForSession(domain: String): Boolean?
     fun saveDrmForSession(domain: String, allowed: Boolean)
+    fun isDrmBlockedForUrlByConfig(url: String): Boolean
     suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>)
     suspend fun deleteAll()
     suspend fun getSitePermissionsForWebsite(url: String): SitePermissionsEntity?
@@ -101,12 +102,10 @@ class SitePermissionsRepositoryImpl @Inject constructor(
                 isAskMicDisabled && !isAskMicSettingDenied
             }
             PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID -> {
-                // Check config - per-site user permissions will take precedence over it:
-                val isDrmBlockedByConfig = sitePermissionsForDomain == null && drmBlock.isDrmBlockedForUrl(url)
                 val isAskDrmSettingDenied = sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.DENY_ALWAYS.name
                 val isAskDrmDisabled =
                     askDrmEnabled || sitePermissionsForDomain?.askDrmSetting == SitePermissionAskSettingType.ALLOW_ALWAYS.name
-                isAskDrmDisabled && !isAskDrmSettingDenied && !isDrmBlockedByConfig
+                isAskDrmDisabled && !isAskDrmSettingDenied
             }
             else -> false
         }
@@ -169,6 +168,10 @@ class SitePermissionsRepositoryImpl @Inject constructor(
 
     override fun saveDrmForSession(domain: String, allowed: Boolean) {
         drmSessions[domain] = allowed
+    }
+
+    override fun isDrmBlockedForUrlByConfig(url: String): Boolean {
+        return drmBlock.isDrmBlockedForUrl(url)
     }
 
     override suspend fun undoDeleteAll(sitePermissions: List<SitePermissionsEntity>, allowedSites: List<SitePermissionAllowedEntity>) {
