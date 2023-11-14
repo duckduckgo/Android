@@ -56,6 +56,11 @@ class AppDatabaseBookmarksMigrationCallback(
             cleanUpTables()
         }
 
+        val needsOldFavouritesMigration = needsOldFavouritesMigration()
+        if (needsOldFavouritesMigration.isNotEmpty()) {
+            runOldFavouritesMigration(needsOldFavouritesMigration)
+        }
+
         // To be removed once internals update the app too FormFactorSpecificFavorites
         if (appBuildConfig.isInternalBuild()) {
             val foldersAdded = createFavoritesFormFactorFolders()
@@ -186,6 +191,29 @@ class AppDatabaseBookmarksMigrationCallback(
                     findFolderRelation(it.id, folderMap)
                 }
             }
+        }
+    }
+
+    private fun needsOldFavouritesMigration(): List<Entity> {
+        // https://app.asana.com/0/0/1204697337057464/f
+        // during the initial migration of favourites we didn't properly add them to bookmarks
+        // users might have fixed this, so we only do something if there is a favourite that is not in the bookmarks folder
+        with(appDatabase.get()) {
+            val favourites = syncEntitiesDao().allEntitiesInFolderSync(SavedSitesNames.FAVORITES_ROOT)
+            val bookmarks = syncEntitiesDao().allBookmarks()
+            return favourites.filterNot { rootFavorite ->
+                bookmarks.contains(rootFavorite)
+            }
+        }
+    }
+
+    private fun runOldFavouritesMigration(favourites: List<Entity>) {
+        with(appDatabase.get()) {
+            val favouriteMigration = mutableListOf<Relation>()
+            favourites.forEach {
+                favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId))
+            }
+            syncRelationsDao().insertList(favouriteMigration)
         }
     }
 
