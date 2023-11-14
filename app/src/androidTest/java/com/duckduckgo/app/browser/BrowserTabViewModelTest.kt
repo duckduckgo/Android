@@ -123,7 +123,6 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
@@ -141,7 +140,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -322,9 +321,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAdClickManager: AdClickManager
 
     @Mock
-    private lateinit var mockSitePermissionsManager: SitePermissionsManager
-
-    @Mock
     private lateinit var mockUserAllowListRepository: UserAllowListRepository
 
     @Mock
@@ -380,8 +376,6 @@ class BrowserTabViewModelTest {
     private val remoteMessageFlow = Channel<RemoteMessage>()
 
     private val favoriteListFlow = Channel<List<Favorite>>()
-
-    private val mockAutofillStore: AutofillStore = mock()
 
     private val mockAppTheme: AppTheme = mock()
 
@@ -506,9 +500,7 @@ class BrowserTabViewModelTest {
             voiceSearchAvailability = voiceSearchAvailability,
             voiceSearchPixelLogger = voiceSearchPixelLogger,
             settingsDataStore = mockSettingsDataStore,
-            autofillStore = mockAutofillStore,
             adClickManager = mockAdClickManager,
-            sitePermissionsManager = mockSitePermissionsManager,
             autofillCapabilityChecker = autofillCapabilityChecker,
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
@@ -4172,54 +4164,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenPermissionsAlreadyGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.GrantSitePermissionRequest> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
-        }
-    }
-
-    @Test
-    fun givenPermissionNeverGrantedWhenWebsiteRequestsSitePermissionThenGrantItAutomatically() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf<String>()
-        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.ShowSitePermissionsDialog> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
-        }
-    }
-
-    @Test
-    fun whenOnePermissionIsGrantedAndOtherNeedsToBeRequestedThenBothCommandsAreCalled() = runTest {
-        val request: PermissionRequest = mock()
-        val permissionsGranted = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE)
-        val permissionsToAsk = arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        whenever(mockSitePermissionsManager.getSitePermissionsGranted(any(), any(), any())).thenReturn(permissionsGranted)
-
-        givenSitePermissionsRequestFromDomain(request)
-
-        assertCommandIssued<Command.GrantSitePermissionRequest> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.sitePermissionsToGrant, permissionsGranted)
-        }
-        assertCommandIssued<Command.ShowSitePermissionsDialog> {
-            assertEquals(this.request, request)
-            assertArrayEquals(this.permissionsToRequest, permissionsToAsk)
-        }
-    }
-
-    @Test
     fun whenNotEditingUrlBarAndNotCancelledThenCanAutomaticallyShowAutofillPrompt() {
         configureOmnibarNotEditing()
         assertTrue(testee.canAutofillSelectCredentialsDialogCanAutomaticallyShow())
@@ -4366,6 +4310,21 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showVoiceSearch)
     }
 
+    @Test
+    fun whenOnSitePermissionRequestedThenSendCommand() = runTest {
+        val request: PermissionRequest = mock()
+        val sitePermissions = SitePermissions(
+            autoAccept = listOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE),
+            userHandled = listOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE),
+        )
+        whenever(request.origin).thenReturn("https://example.com".toUri())
+        testee.onSitePermissionRequested(request, sitePermissions)
+        assertCommandIssued<Command.ShowSitePermissionsDialog> {
+            assertEquals(request, this.request)
+            assertEquals(sitePermissions, this.permissionsToRequest)
+        }
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
@@ -4433,11 +4392,6 @@ class BrowserTabViewModelTest {
         permission: LocationPermissionType,
     ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
-    }
-
-    private fun givenSitePermissionsRequestFromDomain(request: PermissionRequest) {
-        whenever(request.origin).thenReturn("https://example.com".toUri())
-        testee.onSitePermissionRequested(request, arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE))
     }
 
     class StubPermissionCallback : GeolocationPermissions.Callback {

@@ -115,7 +115,6 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
-import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.di.scopes.FragmentScope
@@ -130,7 +129,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
-import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
@@ -187,10 +186,8 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
-    private val autofillStore: AutofillStore,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val adClickManager: AdClickManager,
-    private val sitePermissionsManager: SitePermissionsManager,
     private val autofillFireproofDialogSuppressor: AutofillFireproofDialogSuppressor,
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
@@ -452,12 +449,7 @@ class BrowserTabViewModel @Inject constructor(
         class NavigateToHistory(val historyStackIndex: Int) : Command()
         object EmailSignEvent : Command()
         class ShowSitePermissionsDialog(
-            val permissionsToRequest: Array<String>,
-            val request: PermissionRequest,
-        ) : Command()
-
-        class GrantSitePermissionRequest(
-            val sitePermissionsToGrant: Array<String>,
+            val permissionsToRequest: SitePermissions,
             val request: PermissionRequest,
         ) : Command()
 
@@ -733,6 +725,8 @@ class BrowserTabViewModel @Inject constructor(
                     )
             }.launchIn(viewModelScope)
     }
+
+    override fun getCurrentTabId(): String = tabId
 
     fun onMessageProcessed() {
         showBrowser()
@@ -1496,18 +1490,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun onSitePermissionRequested(
         request: PermissionRequest,
-        sitePermissionsAllowedToAsk: Array<String>,
+        sitePermissionsAllowedToAsk: SitePermissions,
     ) {
         viewModelScope.launch(dispatchers.io()) {
-            val url = request.origin.toString()
-            val sitePermissionsGranted = sitePermissionsManager.getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
-            val sitePermissionsToAsk = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }.toTypedArray()
-            if (sitePermissionsGranted.isNotEmpty()) {
-                command.postValue(GrantSitePermissionRequest(sitePermissionsGranted, request))
-            }
-            if (sitePermissionsToAsk.isNotEmpty()) {
-                command.postValue(ShowSitePermissionsDialog(sitePermissionsToAsk, request))
-            }
+            command.postValue(ShowSitePermissionsDialog(sitePermissionsAllowedToAsk, request))
         }
     }
 

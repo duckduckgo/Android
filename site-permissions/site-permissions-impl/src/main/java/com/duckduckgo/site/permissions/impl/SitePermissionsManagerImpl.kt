@@ -18,15 +18,23 @@ package com.duckduckgo.site.permissions.impl
 
 import android.content.pm.PackageManager
 import android.webkit.PermissionRequest
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
+// Cannot be a Singleton
+@ContributesBinding(AppScope::class)
 class SitePermissionsManagerImpl @Inject constructor(
     private val packageManager: PackageManager,
     private val sitePermissionsRepository: SitePermissionsRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SitePermissionsManager {
 
-    override suspend fun getSitePermissionsGranted(
+    private fun getSitePermissionsGranted(
         url: String,
         tabId: String,
         resources: Array<String>,
@@ -35,14 +43,38 @@ class SitePermissionsManagerImpl @Inject constructor(
             .filter { sitePermissionsRepository.isDomainGranted(url, tabId, it) }
             .toTypedArray()
 
-    override suspend fun getSitePermissionsAllowedToAsk(
-        url: String,
-        resources: Array<String>,
-    ): Array<String> =
-        resources
+    override suspend fun getSitePermissions(
+        tabId: String,
+        request: PermissionRequest,
+    ): SitePermissions {
+        val autoAccept = mutableListOf<String>()
+        val url = request.origin.toString()
+        val sitePermissionsAllowedToAsk = request.resources
             .filter { isPermissionSupported(it) && isHardwareSupported(it) }
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
+
+        val sitePermissionsGranted = getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
+        if (sitePermissionsGranted.isNotEmpty()) {
+            withContext(dispatcherProvider.main()) {
+                autoAccept.addAll(sitePermissionsGranted)
+            }
+        }
+        val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
+        if (userList.isEmpty() && sitePermissionsGranted.isEmpty()) {
+            withContext(dispatcherProvider.main()) {
+                request.deny()
+            }
+        }
+        if (userList.isEmpty() && autoAccept.isNotEmpty()) {
+            withContext(dispatcherProvider.main()) {
+                request.grant(autoAccept.toTypedArray())
+                autoAccept.clear()
+            }
+        }
+
+        return SitePermissions(autoAccept = autoAccept, userHandled = userList)
+    }
 
     override suspend fun clearAllButFireproof(fireproofDomains: List<String>) {
         sitePermissionsRepository.sitePermissionsForAllWebsites().forEach { permission ->

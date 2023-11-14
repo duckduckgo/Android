@@ -225,6 +225,7 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -1273,7 +1274,6 @@ class BrowserTabFragment :
 
             is Command.PrintLink -> launchPrint(it.url, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
-            is Command.GrantSitePermissionRequest -> grantSitePermissionRequest(it.sitePermissionsToGrant, it.request)
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation -> showAuthenticationSavedOrUpdatedSnackbar(
                 loginCredentials = it.credentials,
                 messageResourceId = it.messageResourceId,
@@ -3644,7 +3644,7 @@ class BrowserTabFragment :
     }
 
     private fun showSitePermissionsDialog(
-        permissionsToRequest: Array<String>,
+        permissionsToRequest: SitePermissions,
         request: PermissionRequest,
     ) {
         if (!isActiveTab) {
@@ -3655,13 +3655,6 @@ class BrowserTabFragment :
         activity?.let {
             sitePermissionsDialogLauncher.askForSitePermission(it, request.origin.toString(), tabId, permissionsToRequest, request, this)
         }
-    }
-
-    private fun grantSitePermissionRequest(
-        sitePermissionsToGrant: Array<String>,
-        request: PermissionRequest,
-    ) {
-        request.grant(sitePermissionsToGrant)
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {

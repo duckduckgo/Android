@@ -28,6 +28,7 @@ import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
 interface WebViewClientListener {
 
@@ -39,7 +40,7 @@ interface WebViewClientListener {
 
     fun onSitePermissionRequested(
         request: PermissionRequest,
-        sitePermissionsAllowedToAsk: Array<String>,
+        sitePermissionsAllowedToAsk: SitePermissions,
     )
 
     fun onSiteLocationPermissionRequested(
@@ -97,4 +98,6 @@ interface WebViewClientListener {
     fun onReceivedError(errorType: WebViewErrorResponse, url: String)
     fun recordErrorCode(error: String, url: String)
     fun recordHttpErrorCode(statusCode: Int, url: String)
+
+    fun getCurrentTabId(): String
 }
