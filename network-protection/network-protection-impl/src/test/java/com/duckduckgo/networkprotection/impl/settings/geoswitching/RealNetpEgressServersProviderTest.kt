@@ -79,7 +79,7 @@ class RealNetpEgressServersProviderTest {
                 NetPGeoswitchingLocation(
                     countryCode = "se",
                     countryName = "Sweden",
-                    cities = listOf("Malmo", "Gothenburg", "Stockholm"),
+                    cities = listOf("Gothenburg", "Malmo", "Stockholm"),
                 ),
             ),
         )

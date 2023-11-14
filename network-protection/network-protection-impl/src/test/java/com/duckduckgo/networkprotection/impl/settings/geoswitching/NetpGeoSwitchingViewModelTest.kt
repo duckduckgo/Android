@@ -108,7 +108,7 @@ class NetpGeoSwitchingViewModelTest {
                         countryCode = "us",
                         countryEmoji = "🇺🇸",
                         countryName = "United States",
-                        cities = listOf("Chicago", "El Segundo", "Newark", "Atlanta"),
+                        cities = listOf("Atlanta", "Chicago", "El Segundo", "Newark"),
                     ),
                 )
             }

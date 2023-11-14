@@ -65,8 +65,8 @@ class RealNetpEgressServersProvider @Inject constructor(
             ServerLocation(
                 countryCode = it.countryCode,
                 countryName = it.countryName,
-                cities = it.cities.sorted(),
+                cities = it.cities,
             )
-        }.sortedBy { it.countryName }
+        }
     }
 }

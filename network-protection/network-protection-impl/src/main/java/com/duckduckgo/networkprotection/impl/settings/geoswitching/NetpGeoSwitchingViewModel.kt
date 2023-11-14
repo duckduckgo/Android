@@ -73,9 +73,9 @@ class NetpGeoSwitchingViewModel @Inject constructor(
                     countryEmoji = getEmojiForCountryCode(it.countryCode),
                     countryCode = it.countryCode,
                     countryName = it.countryName,
-                    cities = it.cities,
+                    cities = it.cities.sorted(),
                 )
-            }
+            }.sortedBy { it.countryName }
 
             val completeList = mutableListOf(
                 HeaderItem(R.string.netpGeoswitchingHeaderRecommended),
