@@ -211,10 +211,8 @@ class AppDatabaseBookmarksMigrationCallback(
         with(appDatabase.get()) {
             val favouriteMigration = mutableListOf<Relation>()
             favourites.forEach {
-                val notAsBookmark = syncRelationsDao().relationByEntityId(it.entityId) == null
-                if (notAsBookmark) {
-                    favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId))
-                }
+                favouriteMigration.add(Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId))
+
             }
             syncRelationsDao().insertList(favouriteMigration)
         }
