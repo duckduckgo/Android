@@ -20,18 +20,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/netpManagementAboutHeader" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/about_vpn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/netpManagementAboutItemInfoVpn" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/about_faq"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

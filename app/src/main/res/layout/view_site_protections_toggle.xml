@@ -23,7 +23,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/background_site_protections_toggle">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/protectionsSwitchLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
         app:layout_constraintVertical_bias="0"
         tools:text="@string/brokenSiteProtectionsOn" />
 
-    <com.duckduckgo.mobile.android.ui.view.SwitchView
+    <com.duckduckgo.common.ui.view.SwitchView
         android:id="@+id/protectionsSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
         app:layout_constraintTop_toBottomOf="@+id/protectionsSwitchLabel"
         tools:visibility="visible">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/protectionsBannerMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

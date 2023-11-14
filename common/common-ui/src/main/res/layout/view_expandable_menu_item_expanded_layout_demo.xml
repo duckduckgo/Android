@@ -22,7 +22,7 @@
     android:orientation="vertical"
     android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/daxExpandableMenuItemSecondaryText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         app:textType="secondary"
         app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/daxExpandableMenuItemPrimaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
         android:text="Primary"
         app:buttonSize="small" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/daxExpandableMenuItemSecondaryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

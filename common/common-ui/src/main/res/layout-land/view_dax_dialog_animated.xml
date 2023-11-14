@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/daxColorDim"
             app:layout_constraintTop_toTopOf="parent" tools:layout_editor_absoluteX="0dp"/>
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/hideText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/titleText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
@@ -96,7 +96,7 @@
                     android:scaleType="centerCrop"
                     app:lottie_loop="false" />
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/descriptionText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -108,7 +108,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+                    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
                         android:id="@+id/secondaryCta"
                         android:layout_weight="1"
                         android:layout_width="match_parent"
@@ -118,7 +118,7 @@
                         app:buttonSize="large"
                         tools:ignore="RtlHardcoded" />
 
-                    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                         android:id="@+id/primaryCta"
                         android:layout_weight="1"
                         android:layout_gravity="center"

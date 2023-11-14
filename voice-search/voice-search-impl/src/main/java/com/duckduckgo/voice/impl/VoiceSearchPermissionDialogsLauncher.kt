@@ -17,8 +17,8 @@
 package com.duckduckgo.voice.impl
 
 import android.content.Context
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 

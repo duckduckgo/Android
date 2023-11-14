@@ -27,7 +27,7 @@
         android:orientation="vertical"
         android:paddingVertical="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.InfoPanel
+        <com.duckduckgo.common.ui.view.InfoPanel
             android:id="@+id/notSignedIntoDuckAddressInfoPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
             app:panelDrawable="@drawable/ic_info_panel_info"
             tools:panelText="This is a Tooltip Info Panel, interesting information can be shown here" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/domainTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             android:hint="@string/credentialManagementEditLoginTitleHint"
             app:editable="true" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/usernameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
             app:endIcon="@drawable/ic_copy"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/duckAddressManagementLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
             app:showSwitch="true"
             android:visibility="gone" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/duckAddressManagementUnavailable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
             android:visibility="gone" />
 
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
             app:type="password" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/domainEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
             android:inputType="textUri|textNoSuggestions"
             app:editable="false" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/notesEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -117,7 +117,7 @@
             android:hint="@string/credentialManagementEditNotesHint"
             app:editable="false" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/lastUpdatedView"
             app:typography="caption"
             app:textType="secondary"

@@ -30,7 +30,7 @@
       android:visibility="gone"
       tools:ignore="ContentDescription" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
       android:id="@+id/label_text_view"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

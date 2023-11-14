@@ -26,7 +26,7 @@
         android:layout_gravity="center_vertical"
         tools:ignore="ContentDescription" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

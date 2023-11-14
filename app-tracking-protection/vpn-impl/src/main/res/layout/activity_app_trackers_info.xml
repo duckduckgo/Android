@@ -50,7 +50,7 @@
                 app:lottie_rawRes="@raw/device_shield_tracker_count"
                 app:lottie_autoPlay="true"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/trackerProfilingInfoHeader"
                 app:typography="h2"
                 android:layout_width="match_parent"
@@ -59,7 +59,7 @@
                 android:paddingEnd="@dimen/keyline_6"
                 android:text="@string/atp_ProfilingInfoTitle"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/trackerProfilingInfoFirstContent"
                 app:typography="body1"
                 app:textType="secondary"

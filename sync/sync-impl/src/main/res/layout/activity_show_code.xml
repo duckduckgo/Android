@@ -26,7 +26,7 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/recoveryCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,12 +37,12 @@
         tools:text="eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyeV9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ=="
     />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/copyCodeTopDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/copyCodeButton"
@@ -51,12 +51,12 @@
         app:leadingIconSize="medium"
         app:primaryText="@string/sync_show_code_copy"/>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/copyCodeBottomDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/copyCodeHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -46,7 +46,7 @@
         tools:ignore="SpeakableTextPresentCheck"/>
 
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/onboarding_next_cta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

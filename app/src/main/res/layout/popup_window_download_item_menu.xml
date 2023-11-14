@@ -22,19 +22,19 @@
               android:orientation="vertical"
               android:background="@drawable/popup_menu_bg">
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
             android:id="@+id/share"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/downloadsItemMenuShare" />
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
             android:id="@+id/delete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/downloadsItemMenuDelete" />
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
             android:id="@+id/cancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

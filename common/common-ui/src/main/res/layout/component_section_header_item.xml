@@ -21,13 +21,13 @@
     android:clipToPadding="false"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/sectionHeaderItemTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="Section Header" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/sectionHeaderWithOverflow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

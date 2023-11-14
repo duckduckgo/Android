@@ -42,7 +42,7 @@
         android:src="@drawable/ic_globe_gray_16dp"
     />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/deviceShieldInstalledAppEntryName"
             app:typography="body1"
             android:layout_width="0dp"
