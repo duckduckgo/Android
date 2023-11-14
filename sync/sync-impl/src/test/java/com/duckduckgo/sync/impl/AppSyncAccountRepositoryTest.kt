@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
@@ -58,6 +59,7 @@ import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.pixels.*
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -87,7 +89,8 @@ class AppSyncAccountRepositoryTest {
 
     @Before
     fun before() {
-        syncRepo = AppSyncAccountRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine, syncPixels)
+        syncRepo =
+            AppSyncAccountRepository(syncDeviceIds, nativeLib, syncApi, syncStore, syncEngine, syncPixels, TestScope(), DefaultDispatcherProvider())
     }
 
     @Test
