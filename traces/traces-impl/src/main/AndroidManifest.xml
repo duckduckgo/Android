@@ -19,7 +19,7 @@
 
     <application>
         <provider
-            android:name=".AppStartUpTracer"
+            android:name="com.duckduckgo.traces.impl.AppStartUpTracer"
             android:authorities="${applicationId}.appStartProvider"
             android:initOrder="2147483647"
             android:exported="false" />
