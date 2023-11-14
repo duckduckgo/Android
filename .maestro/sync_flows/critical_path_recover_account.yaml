@@ -16,8 +16,6 @@ tags:
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/sync_recovery_code_cta"
 - tapOn: "Navigate up"
-- tapOn: "Navigate up"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-- tapOn: "Bookmarks"
-- assertVisible: "NFL.com | Official Site of the National Football League"
+- tapOn: "Sync & Backup"
+- assertVisible:
+    id: "com.duckduckgo.mobile.android:id/qrCodeImageView"
