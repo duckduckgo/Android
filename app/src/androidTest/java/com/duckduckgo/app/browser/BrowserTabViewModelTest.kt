@@ -439,8 +439,8 @@ class BrowserTabViewModelTest {
 
         val siteFactory = SiteFactoryImpl(
             mockEntityLookup,
-            mockUserAllowListRepository,
             mockContentBlocking,
+            mockUserAllowListRepository,
             coroutineRule.testScope,
             coroutineRule.testDispatcherProvider,
         )
