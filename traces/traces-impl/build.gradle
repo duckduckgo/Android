@@ -26,7 +26,7 @@ android {
     anvil {
         generateDaggerFactories = true // default is false
     }
-    namespace 'com.duckduckgo.app.traces'
+    namespace 'com.duckduckgo.traces.impl'
 }
 
 dependencies {
