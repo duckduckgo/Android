@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos_impl
+package com.duckduckgo.macos.impl
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -29,10 +29,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
-import com.duckduckgo.macos_impl.MacOsViewModel.Command
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
-import com.duckduckgo.macos_impl.databinding.ActivityMacosBinding
+import com.duckduckgo.macos.impl.MacOsViewModel.Command
+import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings
+import com.duckduckgo.macos.impl.MacOsViewModel.Command.ShareLink
+import com.duckduckgo.macos.impl.R.string
+import com.duckduckgo.macos.impl.databinding.ActivityMacosBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
@@ -90,8 +91,8 @@ class MacOsActivity : DuckDuckGoActivity() {
     private fun launchSharePageChooser() {
         val share = Intent(Intent.ACTION_SEND).apply {
             type = "text/html"
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.macos_share_text))
-            putExtra(Intent.EXTRA_TITLE, getString(R.string.macos_share_title))
+            putExtra(Intent.EXTRA_TEXT, getString(string.macos_share_text))
+            putExtra(Intent.EXTRA_TITLE, getString(string.macos_share_title))
         }
 
         val pi = PendingIntent.getBroadcast(
@@ -101,7 +102,7 @@ class MacOsActivity : DuckDuckGoActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
         try {
-            startActivity(Intent.createChooser(share, getString(R.string.macos_share_title), pi.intentSender))
+            startActivity(Intent.createChooser(share, getString(string.macos_share_title), pi.intentSender))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }

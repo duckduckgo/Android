@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos_impl
+package com.duckduckgo.macos.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 

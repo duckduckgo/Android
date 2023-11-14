@@ -14,17 +14,16 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.macos_impl">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application android:supportsRtl="true">
         <activity
-            android:name=".MacOsActivity"
+            android:name="com.duckduckgo.macos.impl.MacOsActivity"
             android:exported="false"
             android:label="@string/macos_app"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <receiver
-            android:name=".MacOsLinkShareBroadcastReceiver"
+            android:name="com.duckduckgo.macos.impl.MacOsLinkShareBroadcastReceiver"
             android:exported="false" />
     </application>
 </manifest>
