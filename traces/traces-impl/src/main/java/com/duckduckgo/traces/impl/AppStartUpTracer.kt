@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.traces
+package com.duckduckgo.traces.impl
 
 import android.content.ContentProvider
 import android.content.ContentValues
@@ -23,8 +23,8 @@ import android.net.Uri
 import android.os.Debug
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.traces.api.StartupTraces
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.text.SimpleDateFormat
 import java.util.Date
