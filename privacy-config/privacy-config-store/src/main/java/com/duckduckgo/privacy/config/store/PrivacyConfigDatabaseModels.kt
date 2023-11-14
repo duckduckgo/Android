@@ -62,13 +62,6 @@ fun DrmExceptionEntity.toFeatureException(): FeatureException {
     return FeatureException(domain = this.domain, reason = this.reason)
 }
 
-@Entity(tableName = "drm_block_exceptions")
-data class DrmBlockExceptionEntity(@PrimaryKey val domain: String)
-
-fun DrmBlockExceptionEntity.toFeatureException(): FeatureException {
-    return FeatureException(domain = this.domain, reason = null)
-}
-
 @Entity(tableName = "unprotected_temporary")
 data class UnprotectedTemporaryEntity(
     @PrimaryKey val domain: String,

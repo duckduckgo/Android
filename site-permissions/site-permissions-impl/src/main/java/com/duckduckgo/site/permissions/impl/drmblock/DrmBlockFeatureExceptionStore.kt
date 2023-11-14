@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.drm
+package com.duckduckgo.site.permissions.impl.drmblock
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
-import com.duckduckgo.privacy.config.store.DrmBlockExceptionEntity
-import com.duckduckgo.privacy.config.store.features.drm.DrmBlockRepository
+import com.duckduckgo.site.permissions.store.drmblock.DrmBlockExceptionEntity
+import com.duckduckgo.site.permissions.store.drmblock.DrmBlockRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 

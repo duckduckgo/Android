@@ -38,6 +38,8 @@ android {
 
 dependencies {
     implementation AndroidX.room.ktx
+    implementation project(path: ':common-utils')
+    implementation project(path: ':feature-toggles-api')
     ksp AndroidX.room.compiler
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     implementation Google.dagger

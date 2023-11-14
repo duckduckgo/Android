@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.drm
+package com.duckduckgo.site.permissions.store.drmblock
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import com.duckduckgo.privacy.config.store.DrmBlockExceptionEntity
-import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.toFeatureException
+import com.duckduckgo.site.permissions.store.SitePermissionsDatabase
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -31,7 +29,7 @@ interface DrmBlockRepository {
 }
 
 class RealDrmBlockRepository(
-    val database: PrivacyConfigDatabase,
+    val database: SitePermissionsDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
 ) : DrmBlockRepository {

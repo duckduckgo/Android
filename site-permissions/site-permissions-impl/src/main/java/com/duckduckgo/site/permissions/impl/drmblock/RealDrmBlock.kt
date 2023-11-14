@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.drm
+package com.duckduckgo.site.permissions.impl.drmblock
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.DrmBlock
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.drm.DrmBlockRepository
+import com.duckduckgo.site.permissions.api.DrmBlock
+import com.duckduckgo.site.permissions.store.drmblock.DrmBlockRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject

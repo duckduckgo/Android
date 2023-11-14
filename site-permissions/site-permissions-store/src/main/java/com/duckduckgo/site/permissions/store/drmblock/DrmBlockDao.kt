@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.drm
+package com.duckduckgo.site.permissions.store.drmblock
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.privacy.config.store.DrmBlockExceptionEntity
 
 @Dao
 abstract class DrmBlockDao {

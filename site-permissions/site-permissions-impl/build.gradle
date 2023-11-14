@@ -32,6 +32,7 @@ dependencies {
     implementation project(path: ':browser-api')
     implementation project(path: ':site-permissions-api')
     implementation project(path: ':privacy-config-api')
+    implementation project(path: ':feature-toggles-api')
     api project(path: ':site-permissions-store')
 
     anvil project(path: ':anvil-compiler')
@@ -43,6 +44,7 @@ dependencies {
     implementation Google.dagger
     implementation AndroidX.room.ktx
     implementation Google.android.material
+    implementation Square.retrofit2.converter.moshi
 
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine

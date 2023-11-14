@@ -23,7 +23,6 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksDao
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingDao
-import com.duckduckgo.privacy.config.store.features.drm.DrmBlockDao
 import com.duckduckgo.privacy.config.store.features.drm.DrmDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcContentScopeConfigDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcExceptionsDao
@@ -42,7 +41,7 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentVersionsD
 )
 @Database(
     exportSchema = true,
-    version = 18,
+    version = 17,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -52,7 +51,6 @@ import com.duckduckgo.privacy.config.store.features.useragent.UserAgentVersionsD
         GpcContentScopeConfigEntity::class,
         ContentBlockingExceptionEntity::class,
         DrmExceptionEntity::class,
-        DrmBlockExceptionEntity::class,
         PrivacyConfig::class,
         AmpLinkFormatEntity::class,
         AmpKeywordEntity::class,
@@ -75,7 +73,6 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun contentBlockingDao(): ContentBlockingDao
     abstract fun privacyConfigDao(): PrivacyConfigDao
     abstract fun drmDao(): DrmDao
-    abstract fun drmBlockDao(): DrmBlockDao
     abstract fun ampLinksDao(): AmpLinksDao
     abstract fun trackingParametersDao(): TrackingParametersDao
     abstract fun userAgentDao(): UserAgentDao

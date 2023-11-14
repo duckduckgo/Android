@@ -34,9 +34,7 @@ import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.duckduckgo.privacy.config.store.features.amplinks.RealAmpLinksRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
-import com.duckduckgo.privacy.config.store.features.drm.DrmBlockRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
-import com.duckduckgo.privacy.config.store.features.drm.RealDrmBlockRepository
 import com.duckduckgo.privacy.config.store.features.drm.RealDrmRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcDataStore
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
@@ -161,16 +159,6 @@ object DatabaseModule {
         dispatcherProvider: DispatcherProvider,
     ): DrmRepository {
         return RealDrmRepository(database, appCoroutineScope, dispatcherProvider)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideDrmBlockRepository(
-        database: PrivacyConfigDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider,
-    ): DrmBlockRepository {
-        return RealDrmBlockRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
