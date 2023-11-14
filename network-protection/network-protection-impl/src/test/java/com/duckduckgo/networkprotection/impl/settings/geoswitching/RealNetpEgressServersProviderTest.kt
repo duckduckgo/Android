@@ -66,7 +66,7 @@ class RealNetpEgressServersProviderTest {
             NetPGeoswitchingLocation(
                 countryCode = "us",
                 countryName = "United States",
-                cities = listOf("Des Moines", "El Segundo", "Newark"),
+                cities = listOf("Newark", "El Segundo", "Des Moines"),
             ),
         )
         verify(netPGeoswitchingRepository).replaceLocations(expectedResult)

@@ -25,14 +25,14 @@ class FakeNetpEgressServersProvider : NetpEgressServersProvider {
     override suspend fun getServerLocations(): List<ServerLocation> {
         return listOf(
             ServerLocation(
+                countryCode = "us",
+                countryName = "United States",
+                cities = listOf("El Segundo", "Chicago", "Atlanta", "Newark"),
+            ),
+            ServerLocation(
                 countryCode = "uk",
                 countryName = "UK",
                 cities = emptyList(),
-            ),
-            ServerLocation(
-                countryCode = "us",
-                countryName = "United States",
-                cities = listOf("Chicago", "El Segundo", "Newark", "Atlanta"),
             ),
         )
     }

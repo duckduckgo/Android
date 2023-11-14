@@ -110,6 +110,9 @@ interface WgVpnControllerService {
     suspend fun registerKey(
         @Body registerKeyBody: RegisterKeyBody,
     ): List<EligibleServerInfo>
+
+    @GET("$NETP_ENVIRONMENT_URL/locations")
+    suspend fun getEligibleLocations(): List<EligibleLocation>
 }
 
 const val NETP_ENVIRONMENT_URL = "https://controller.netp.duckduckgo.com"
@@ -154,4 +157,13 @@ data class Server(
     val hostnames: List<String>,
     val ips: List<String>,
     val port: Long,
+)
+
+data class EligibleLocation(
+    val country: String,
+    val cities: List<EligibleCity>,
+)
+
+data class EligibleCity(
+    val name: String,
 )

@@ -68,6 +68,7 @@ class WgVpnControllerRequestInterceptor @Inject constructor(
         private val ENDPOINTS_PATTERN_MATCHER = listOf(
             "netp.duckduckgo.com/servers",
             "netp.duckduckgo.com/register",
+            "netp.duckduckgo.com/locations",
         )
     }
 }
