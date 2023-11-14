@@ -144,7 +144,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import okhttp3.internal.publicsuffix.PublicSuffixDatabase
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
 @ContributesViewModel(FragmentScope::class)
@@ -203,7 +203,6 @@ class BrowserTabViewModel @Inject constructor(
     ViewModel(),
     NavigationHistoryListener {
 
-    private val publicSuffixDatabase = PublicSuffixDatabase()
     private var buildingSiteFactoryJob: Job? = null
 
     sealed class GlobalLayoutViewState {
@@ -1542,13 +1541,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun sameEffectiveTldPlusOne(site: Site?, origin: String): Boolean {
-        val siteDomain = site?.domain
-        val originDomain = origin.toUri().domain()
+        val siteDomain = site?.url?.toHttpUrlOrNull() ?: return false
+        val originDomain = origin.toUri().toString().toHttpUrlOrNull() ?: return false
 
-        if (siteDomain == null || originDomain == null) return false
-
-        val siteETldPlusOne = publicSuffixDatabase.getEffectiveTldPlusOne(siteDomain)
-        val originETldPlusOne = publicSuffixDatabase.getEffectiveTldPlusOne(originDomain)
+        val siteETldPlusOne = siteDomain.topPrivateDomain()
+        val originETldPlusOne = originDomain.topPrivateDomain()
 
         return siteETldPlusOne == originETldPlusOne
     }
