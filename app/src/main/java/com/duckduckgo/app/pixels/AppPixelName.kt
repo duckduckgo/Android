@@ -29,6 +29,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     BROKEN_SITE_REPORTED("m_bsr"),
     BROKEN_SITE_REPORT("epbf"),
+    BROKEN_SITE_ALLOWLIST_ADD("m_broken_site_allowlist_add"),
+    BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
 
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),

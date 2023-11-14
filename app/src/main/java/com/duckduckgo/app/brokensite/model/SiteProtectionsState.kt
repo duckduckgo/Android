@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.db
+package com.duckduckgo.app.brokensite.model
 
-import android.net.Uri
-import kotlinx.coroutines.flow.Flow
-
-interface UserAllowListRepository {
-    fun isUrlInUserAllowList(url: String): Boolean
-    fun isUriInUserAllowList(uri: Uri): Boolean
-    fun isDomainInUserAllowList(domain: String?): Boolean
-    fun domainsInUserAllowList(): List<String>
-    fun domainsInUserAllowListFlow(): Flow<List<String>>
-    suspend fun addDomainToUserAllowList(domain: String)
-    suspend fun removeDomainFromUserAllowList(domain: String)
+enum class SiteProtectionsState {
+    ENABLED,
+    DISABLED,
+    DISABLED_BY_REMOTE_CONFIG,
 }

@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Kirjelda toimunut</string>
     <string name="brokenSitesCategoriesHint">Kirjeldage toimunut</string>
     <string name="brokenSiteSubmitButton">Saada aruanne</string>
-    <string name="brokenSiteDescription">Anonüümse katkise saidi aruande esitamine aitab meil neid probleeme siluda ja rakendust täiustada.</string>
+    <string name="brokenSiteDescription">Anonüümne katkise saidi aruande esitamine aitab meil rakendust täiustada.</string>
 
-    <string name="brokenSiteCategoryImages">Pilte ei laaditud</string>
-    <string name="brokenSiteCategoryPaywall">Sait palus mul välja lülitada</string>
-    <string name="brokenSiteCategoryComments">Kommentaare ei laaditud</string>
-    <string name="brokenSiteCategoryVideos">Videot ei esitatud</string>
-    <string name="brokenSiteCategoryLinks">Lingid või nupud ei töötanud</string>
-    <string name="brokenSiteCategoryContent">Sisu puudub</string>
-    <string name="brokenSiteCategoryLogin">Ma ei saa sisse logida</string>
-    <string name="brokenSiteCategoryUnsupported">Brauser ei ühildu</string>
+    <string name="brokenSiteCategoryBlocked">Sait on blokeeritud või seda ei laaditud</string>
+    <string name="brokenSiteCategoryLayout">Saidi paigutus on katki</string>
+    <string name="brokenSiteCategoryEmptySpaces">Sait sisaldab suuri tühje alasid</string>
+    <string name="brokenSiteCategoryShopping">Ei saa maksta, ostu vormistada või ostelda</string>
+    <string name="brokenSiteCategoryPaywall">Sait palus mul reklaamiblokeerija keelata</string>
+    <string name="brokenSiteCategoryComments">Kommentaare, arvustusi või vestlusi ei laaditud</string>
+    <string name="brokenSiteCategoryVideos">Videot ei esitatud või laaditud</string>
+    <string name="brokenSiteCategoryLogin">Ei saa sisse logida / registreeruda</string>
     <string name="brokenSiteCategoryOther">Midagi muud</string>
     <string name="brokenSiteDescriptionTextInputHint">Kirjelda üksikasjalikumalt (soovi korral)</string>
+    <string name="brokenSiteDescriptionCaption">Mis juhtus? Mis oleks pidanud juhtuma? Kas kaitsefunktsioonide väljalülitamine aitas?</string>
+
+    <string name="brokenSiteProtectionsOn">Sellel saidil on kaitsefunktsioonid <b>SISSE</b> lülitatud</string>
+    <string name="brokenSiteProtectionsOff">Sellel saidil on kaitsefunktsioonid <b>VÄLJA</b> lülitatud</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Abi võib olla kaitsefunktsioonide väljalülitamisest.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Lülitasime privaatsuskaitse ajutiselt välja, sest näib, et see häirib selle saidi tööd.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Järjehoidjad</string>

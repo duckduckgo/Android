@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Berätta vad som hände:</string>
     <string name="brokenSitesCategoriesHint">Berätta vad som hände:</string>
     <string name="brokenSiteSubmitButton">Skicka anmälan</string>
-    <string name="brokenSiteDescription">Om du skickar in en anonym anmälan om att webbplatsen inte fungerar hjälper det oss att åtgärda problemet och förbättra appen.</string>
+    <string name="brokenSiteDescription">Genom att skicka in en anonym anmälan om att webbplatsen inte fungerar hjälper du oss att förbättra appen.</string>
 
-    <string name="brokenSiteCategoryImages">Bilderna kunde inte laddas</string>
-    <string name="brokenSiteCategoryPaywall">Webbplatsen bad mig att avaktivera</string>
-    <string name="brokenSiteCategoryComments">Inlägg kunde inte laddas</string>
-    <string name="brokenSiteCategoryVideos">Videon kunde inte spelas upp</string>
-    <string name="brokenSiteCategoryLinks">Länkar eller knappar fungerar inte</string>
-    <string name="brokenSiteCategoryContent">Innehåll saknas</string>
-    <string name="brokenSiteCategoryLogin">Jag kan inte logga in</string>
-    <string name="brokenSiteCategoryUnsupported">Webbläsaren är inte kompatibel</string>
+    <string name="brokenSiteCategoryBlocked">Webbplatsen är blockerad eller lästes inte in</string>
+    <string name="brokenSiteCategoryLayout">Webbplatsens layout är trasig</string>
+    <string name="brokenSiteCategoryEmptySpaces">Webbplatsen innehåller stora tomma fält</string>
+    <string name="brokenSiteCategoryShopping">Det går inte att betala, gå till kassan eller shoppa</string>
+    <string name="brokenSiteCategoryPaywall">Webbplatsen bad mig att inaktivera annonsblockeraren</string>
+    <string name="brokenSiteCategoryComments">Kommentarer, recensioner eller chattar lästes inte in</string>
+    <string name="brokenSiteCategoryVideos">Videon spelades inte upp eller lästes inte in</string>
+    <string name="brokenSiteCategoryLogin">Det går inte att logga in/registrera sig</string>
     <string name="brokenSiteCategoryOther">Övrigt</string>
     <string name="brokenSiteDescriptionTextInputHint">Berätta mer (valfritt)</string>
+    <string name="brokenSiteDescriptionCaption">Vad hände? Vad borde ha hänt? Hjälpte det att stänga av skydd?</string>
+
+    <string name="brokenSiteProtectionsOn">Skydd är <b>PÅ</b> för den här webbplatsen</string>
+    <string name="brokenSiteProtectionsOff">Skydd är <b>AV</b> för den här webbplatsen</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Det kan hjälpa att stänga av skyddet.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Vi har tillfälligt stängt av integritetsskydd eftersom det verkade göra att denna webbplats inte fungerade.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmärken</string>

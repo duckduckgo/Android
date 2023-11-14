@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat</string>
     <string name="brokenSitesCategoriesHint">Descrie ce s-a întâmplat</string>
     <string name="brokenSiteSubmitButton">Trimite raportul</string>
-    <string name="brokenSiteDescription">Trimiterea unui raport anonim despre un site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
+    <string name="brokenSiteDescription">Trimiterea unui raport anonim privind un site nefuncțional ne ajută să îmbunătățim aplicația.</string>
 
-    <string name="brokenSiteCategoryImages">Imaginile nu s-au încărcat</string>
-    <string name="brokenSiteCategoryPaywall">Site-ul mi-a cerut să dezactivez</string>
-    <string name="brokenSiteCategoryComments">Comentariile nu s-au încărcat</string>
-    <string name="brokenSiteCategoryVideos">Videoclipul nu a funcționat</string>
-    <string name="brokenSiteCategoryLinks">Linkurile sau butoanele nu funcționează</string>
-    <string name="brokenSiteCategoryContent">Conținutul lipsește</string>
-    <string name="brokenSiteCategoryLogin">Nu mă pot conecta</string>
-    <string name="brokenSiteCategoryUnsupported">Browserul este incompatibil</string>
+    <string name="brokenSiteCategoryBlocked">Site-ul era blocat sau nu s-a încărcat</string>
+    <string name="brokenSiteCategoryLayout">Aspectul site-ului era defectuos</string>
+    <string name="brokenSiteCategoryEmptySpaces">Site-ul conține spații goale mari</string>
+    <string name="brokenSiteCategoryShopping">Nu pot plăti sau nu pot face cumpărături</string>
+    <string name="brokenSiteCategoryPaywall">Site-ul mi-a solicitat să dezactivez funcția de blocare a reclamelor</string>
+    <string name="brokenSiteCategoryComments">Comentariile, recenziile sau mesajele chat nu s-au încărcat</string>
+    <string name="brokenSiteCategoryVideos">Videoclipul nu a fost redat sau nu s-a încărcat</string>
+    <string name="brokenSiteCategoryLogin">Nu pot să mă conectez/înregistrez</string>
     <string name="brokenSiteCategoryOther">Altceva</string>
     <string name="brokenSiteDescriptionTextInputHint">Distribuie mai multe detalii (opțional)</string>
+    <string name="brokenSiteDescriptionCaption">Ce s-a întâmplat? Ce ar fi trebuit să se întâmple? Dezactivarea protecțiilor a fost utilă?</string>
+
+    <string name="brokenSiteProtectionsOn">Protecțiile sunt <b>ACTIVATE</b> pentru acest site</string>
+    <string name="brokenSiteProtectionsOff">Protecțiile sunt <b>DEZACTIVATE</b> pentru acest site</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Dezactivarea protecțiilor ar putea fi de ajutor.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Am dezactivat temporar Elementele de protecție a confidențialității, deoarece par să creeze disfuncții pe acest site.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcaje</string>

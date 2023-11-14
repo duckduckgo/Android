@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Décrivez ce qui s\'est passé</string>
     <string name="brokenSitesCategoriesHint">Décrivez ce qui s\'est passé</string>
     <string name="brokenSiteSubmitButton">Envoyer un rapport</string>
-    <string name="brokenSiteDescription">La soumission d\'un rapport anonyme pour signaler le mauvais fonctionnement du site nous aide à déboguer ces problèmes et à améliorer l\'application.</string>
+    <string name="brokenSiteDescription">La soumission d\'un rapport anonyme pour signaler le mauvais fonctionnement du site nous aide à améliorer l\'application.</string>
 
-    <string name="brokenSiteCategoryImages">Les images ne se sont pas chargées</string>
-    <string name="brokenSiteCategoryPaywall">Le site m\'a demandé de désactiver</string>
-    <string name="brokenSiteCategoryComments">Les commentaires n\'ont pas été chargés</string>
-    <string name="brokenSiteCategoryVideos">La vidéo n\'a pas été lue</string>
-    <string name="brokenSiteCategoryLinks">Les liens ou les boutons ne fonctionnent pas</string>
-    <string name="brokenSiteCategoryContent">Le contenu est manquant</string>
-    <string name="brokenSiteCategoryLogin">Je ne peux pas me connecter</string>
-    <string name="brokenSiteCategoryUnsupported">Le navigateur est incompatible</string>
+    <string name="brokenSiteCategoryBlocked">Le site est bloqué ou le chargement de la page a échoué</string>
+    <string name="brokenSiteCategoryLayout">Problème de mise en page du site</string>
+    <string name="brokenSiteCategoryEmptySpaces">Le site contient de grands espaces vides</string>
+    <string name="brokenSiteCategoryShopping">Impossible de payer, de passer au paiement ou d\'acheter</string>
+    <string name="brokenSiteCategoryPaywall">Le site m\'a demandé de désactiver le bloqueur de publicités</string>
+    <string name="brokenSiteCategoryComments">Les commentaires, les avis ou les chats n\'ont pas été chargés</string>
+    <string name="brokenSiteCategoryVideos">La vidéo n\'a pas été lue ou chargée</string>
+    <string name="brokenSiteCategoryLogin">Impossible de se connecter/s\'inscrire</string>
     <string name="brokenSiteCategoryOther">Autre</string>
     <string name="brokenSiteDescriptionTextInputHint">Fournir plus de détails (facultatif)</string>
+    <string name="brokenSiteDescriptionCaption">Que s\'est-il passé ? Qu\'aurait-il dû se passer ?Est-ce que la désactivation des protections a aidé ?</string>
+
+    <string name="brokenSiteProtectionsOn">Les protections sont <b>ACTIVÉES</b> sur ce site</string>
+    <string name="brokenSiteProtectionsOff">Les protections sont <b>DÉSACTIVÉES</b> sur ce site</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">La désactivation des protections pourrait aider.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Nous avons temporairement désactivé les protections de confidentialité car elles semblent perturber ce site.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>

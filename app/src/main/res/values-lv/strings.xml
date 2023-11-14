@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Aprakstiet notikušo</string>
     <string name="brokenSitesCategoriesHint">Apraksti notikušo</string>
     <string name="brokenSiteSubmitButton">Nosūtīt ziņojumu</string>
-    <string name="brokenSiteDescription">Ja iesniegsi anonīmu ziņojumu par bojātu vietni, mēs varēsim atkļūdot šīs problēmas un uzlabot lietotni.</string>
+    <string name="brokenSiteDescription">Anonīma ziņošana par vietni, kurā ir darbības traucējumi, palīdz mums uzlabot lietotni.</string>
 
-    <string name="brokenSiteCategoryImages">Attēli netika ielādēti</string>
-    <string name="brokenSiteCategoryPaywall">Vietne pieprasīja atspējošanu</string>
-    <string name="brokenSiteCategoryComments">Komentāri netika ielādēti</string>
-    <string name="brokenSiteCategoryVideos">Video netika demonstrēts</string>
-    <string name="brokenSiteCategoryLinks">Saites vai pogas nedarbojas</string>
-    <string name="brokenSiteCategoryContent">Trūkst satura</string>
-    <string name="brokenSiteCategoryLogin">Es nevaru pierakstīties</string>
-    <string name="brokenSiteCategoryUnsupported">Pārlūks nav saderīgs</string>
+    <string name="brokenSiteCategoryBlocked">Vietne ir bloķēta vai netika ielādēta</string>
+    <string name="brokenSiteCategoryLayout">Vietnes izkārtojums ir bojāts</string>
+    <string name="brokenSiteCategoryEmptySpaces">Vietnē ir lielas tukšas vietas</string>
+    <string name="brokenSiteCategoryShopping">Nevar norēķināties vai iepirkties</string>
+    <string name="brokenSiteCategoryPaywall">Vietne man lūdza atspējot reklāmu bloķētāju</string>
+    <string name="brokenSiteCategoryComments">Komentāri, atsauksmes vai tērzēšana netika ielādēta</string>
+    <string name="brokenSiteCategoryVideos">Video netika atskaņots vai ielādēts</string>
+    <string name="brokenSiteCategoryLogin">Nevar pierakstīties/reģistrēties</string>
     <string name="brokenSiteCategoryOther">Kaut kas cits</string>
     <string name="brokenSiteDescriptionTextInputHint">Sniedz sīkāku informāciju (neobligāti)</string>
+    <string name="brokenSiteDescriptionCaption">Kas notika? Kam bija jānotiek? Vai aizsardzības izslēgšana palīdzēja?</string>
+
+    <string name="brokenSiteProtectionsOn">Aizsardzība šai vietnei ir <b>IESLĒGTA</b></string>
+    <string name="brokenSiteProtectionsOff">Aizsardzība šai vietnei ir <b>IZSLĒGTA</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Aizsardzības IZSLĒGŠANA var palīdzēt.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Mēs uz laiku esam izslēguši privātuma aizsardzību, jo šķiet, ka tā traucē šīs vietnes darbību.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>

@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Опишете проблема</string>
     <string name="brokenSitesCategoriesHint">Опишете проблема</string>
     <string name="brokenSiteSubmitButton">Изпращане на доклад</string>
-    <string name="brokenSiteDescription">Изпращането на анонимен доклад за неработещ сайт ни помага да отстраним грешките и да подобрим приложението.</string>
+    <string name="brokenSiteDescription">Изпращането на анонимен доклад за неработещ сайт ни помага да подобрим приложението.</string>
 
-    <string name="brokenSiteCategoryImages">Изображенията не се зареждат</string>
-    <string name="brokenSiteCategoryPaywall">Сайтът ме помоли да деактивирам</string>
-    <string name="brokenSiteCategoryComments">Коментарите не се зареждат</string>
-    <string name="brokenSiteCategoryVideos">Видеото не се възпроизвежда</string>
-    <string name="brokenSiteCategoryLinks">Връзките или бутоните не работят</string>
-    <string name="brokenSiteCategoryContent">Липсва съдържание</string>
-    <string name="brokenSiteCategoryLogin">Не мога да вляза</string>
-    <string name="brokenSiteCategoryUnsupported">Браузърът е несъвместим</string>
+    <string name="brokenSiteCategoryBlocked">Сайтът блокира или не се зарежда</string>
+    <string name="brokenSiteCategoryLayout">Оформлението на сайта не е както трябва</string>
+    <string name="brokenSiteCategoryEmptySpaces">Сайтът съдържа големи празни пространства</string>
+    <string name="brokenSiteCategoryShopping">Не мога да платя, да завърша покупката или да пазарувам</string>
+    <string name="brokenSiteCategoryPaywall">Сайтът иска да деактивирам инструмента за блокиране на реклами</string>
+    <string name="brokenSiteCategoryComments">Коментарите, отзивите или чатовете не се зареждат</string>
+    <string name="brokenSiteCategoryVideos">Видеото не се възпроизвежда или не се зарежда</string>
+    <string name="brokenSiteCategoryLogin">Не мога да вляза/да се регистрирам</string>
     <string name="brokenSiteCategoryOther">Нещо друго</string>
     <string name="brokenSiteDescriptionTextInputHint">Споделете повече подробности (по избор)</string>
+    <string name="brokenSiteDescriptionCaption">Какво се случи? Какво е трябваше да се случи? Изключването на защитите помогна ли?</string>
+
+    <string name="brokenSiteProtectionsOn">Защитите за този сайт са <b>ВКЛЮЧЕНИ</b></string>
+    <string name="brokenSiteProtectionsOff">Защитите за този сайт са <b>ИЗКЛЮЧЕНИ</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Изключването на защитите може да помогне.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Изключихме временно защитите на поверителността, защото изглежда, че пречат на зареждането на този сайт.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Отметки</string>

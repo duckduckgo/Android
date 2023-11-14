@@ -25,7 +25,7 @@ import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -41,7 +41,7 @@ class SiteMonitor(
     url: String,
     override var title: String?,
     override var upgradedHttps: Boolean = false,
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val appCoroutineScope: CoroutineScope,
 ) : Site {
@@ -161,7 +161,7 @@ class SiteMonitor(
 
     @WorkerThread
     private fun isAllowListed(domain: String): Boolean {
-        return userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
+        return userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)
     }
 
     override var urlParametersRemoved: Boolean = false

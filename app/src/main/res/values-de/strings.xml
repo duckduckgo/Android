@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Beschreiben, was passiert ist</string>
     <string name="brokenSitesCategoriesHint">Beschreiben, was passiert ist</string>
     <string name="brokenSiteSubmitButton">Bericht senden</string>
-    <string name="brokenSiteDescription">Das Senden eines anonymen Berichts über fehlerhafte Websites hilft uns, diese Probleme zu beheben und die App zu verbessern.</string>
+    <string name="brokenSiteDescription">Das Senden eines anonymen Berichts über fehlerhafte Webseiten hilft uns, die App zu verbessern.</string>
 
-    <string name="brokenSiteCategoryImages">Bilder wurden nicht geladen</string>
-    <string name="brokenSiteCategoryPaywall">Die Seite hat mich aufgefordert, zu deaktivieren</string>
-    <string name="brokenSiteCategoryComments">Kommentare wurden nicht geladen</string>
-    <string name="brokenSiteCategoryVideos">Video wurde nicht abgespielt</string>
-    <string name="brokenSiteCategoryLinks">Links oder Schaltflächen funktionieren nicht</string>
-    <string name="brokenSiteCategoryContent">Inhalt fehlt</string>
-    <string name="brokenSiteCategoryLogin">Ich kann mich nicht anmelden</string>
-    <string name="brokenSiteCategoryUnsupported">Der Browser ist nicht kompatibel</string>
+    <string name="brokenSiteCategoryBlocked">Webseite blockiert oder nicht geladen</string>
+    <string name="brokenSiteCategoryLayout">Website-Layout fehlerhaft</string>
+    <string name="brokenSiteCategoryEmptySpaces">Die Webseite enthält große leere Flächen</string>
+    <string name="brokenSiteCategoryShopping">Bezahlen, Auschecken oder Einkaufen nicht möglich</string>
+    <string name="brokenSiteCategoryPaywall">Webseite hat mich aufgefordert, den Werbeblocker zu deaktivieren</string>
+    <string name="brokenSiteCategoryComments">Kommentare, Bewertungen oder Chats konnten nicht geladen werden</string>
+    <string name="brokenSiteCategoryVideos">Video konnte nicht abgespielt oder geladen werden</string>
+    <string name="brokenSiteCategoryLogin">Anmeldung/Registrierung nicht möglich</string>
     <string name="brokenSiteCategoryOther">Etwas anderes</string>
     <string name="brokenSiteDescriptionTextInputHint">Weitere Details teilen (optional)</string>
+    <string name="brokenSiteDescriptionCaption">Was ist passiert? Was hätte passieren sollen? Hat das Ausschalten der Schutzfunktionen geholfen?</string>
+
+    <string name="brokenSiteProtectionsOn">Der Schutz ist für diese Website ist <b>AKTIVIERT</b></string>
+    <string name="brokenSiteProtectionsOff">Der Schutz für diese Website ist <b>DEAKTIVIERT</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Das AUSschalten der Schutzfunktionen könnte helfen.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Wir haben den Datenschutz vorübergehend deaktiviert, da es den Anschein hat, dass die Seite dadurch gestört wird.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Lesezeichen</string>

@@ -106,7 +106,7 @@ class BrowserPopupMenu(
             binding.privacyProtectionMenuItem.isVisible = viewState.canChangePrivacyProtection
             binding.privacyProtectionMenuItem.label {
                 context.getText(
-                    if (viewState.isPrivacyProtectionEnabled) {
+                    if (viewState.isPrivacyProtectionDisabled) {
                         R.string.enablePrivacyProtection
                     } else {
                         R.string.disablePrivacyProtection
@@ -114,7 +114,7 @@ class BrowserPopupMenu(
                 ).toString()
             }
             binding.privacyProtectionMenuItem.setIcon(
-                if (viewState.isPrivacyProtectionEnabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
+                if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
             )
             binding.brokenSiteMenuItem.isVisible = viewState.canReportSite
 

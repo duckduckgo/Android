@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Περιγράψτε τι συνέβη</string>
     <string name="brokenSitesCategoriesHint">Περιγράψτε τι συνέβη</string>
     <string name="brokenSiteSubmitButton">Αποστολή Αναφοράς</string>
-    <string name="brokenSiteDescription">Η υποβολή μιας ανώνυμης αναφοράς για σπασμένους συνδεσμους μας βοηθά να πραγματοποιήσουμε επανόρθωση των εντοπισμένων σφαλμάτων και προβλημάτων αυτών των ζητημάτων και να βελτιώσουμε την εφαρμογή.</string>
+    <string name="brokenSiteDescription">Η υποβολή ανώνυμης αναφοράς μη λειτουργίας ιστότοπου μας βοηθά να βελτιώσουμε την εφαρμογή.</string>
 
-    <string name="brokenSiteCategoryImages">Οι εικόνες δεν φορτώθηκαν</string>
-    <string name="brokenSiteCategoryPaywall">Ο ιστότοπος μου ζήτησε να απενεργοποιήσω</string>
-    <string name="brokenSiteCategoryComments">Τα σχόλια δεν φορτώθηκαν</string>
-    <string name="brokenSiteCategoryVideos">Το βίντεο δεν έπαιξε</string>
-    <string name="brokenSiteCategoryLinks">Οι σύνδεσμοι ή τα κουμπιά δεν λειτουργούν</string>
-    <string name="brokenSiteCategoryContent">Το περιεχόμενο λείπει</string>
-    <string name="brokenSiteCategoryLogin">Δεν μπορώ να συνδεθώ</string>
-    <string name="brokenSiteCategoryUnsupported">Το πρόγραμμα περιήγησης είναι ασύμβατο</string>
+    <string name="brokenSiteCategoryBlocked">Ο ιστότοπος αποκλείστηκε ή δεν φορτώθηκε</string>
+    <string name="brokenSiteCategoryLayout">Η διάταξη του ιστότοπου δεν λειτουργεί σωστά</string>
+    <string name="brokenSiteCategoryEmptySpaces">Ο ιστότοπος περιέχει μεγάλους κενούς χώρους</string>
+    <string name="brokenSiteCategoryShopping">Δεν είναι δυνατή η πληρωμή ή η ολοκλήρωση μιας αγοράς</string>
+    <string name="brokenSiteCategoryPaywall">Ο ιστότοπος μου ζήτησε να απενεργοποιήσω το πρόγραμμα αποκλεισμού διαφημίσεων</string>
+    <string name="brokenSiteCategoryComments">Τα σχόλια, οι κριτικές ή οι συνομιλίες δεν φορτώθηκαν</string>
+    <string name="brokenSiteCategoryVideos">Δεν έγινε αναπαραγωγή ή φόρτωση του βίντεο</string>
+    <string name="brokenSiteCategoryLogin">Δεν είναι δυνατή η σύνδεση/εγγραφή</string>
     <string name="brokenSiteCategoryOther">Κάτι άλλο</string>
     <string name="brokenSiteDescriptionTextInputHint">Μοιραστείτε περισσότερες λεπτομέρειες (προαιρετικό)</string>
+    <string name="brokenSiteDescriptionCaption">Τι συνέβη; Τι έπρεπε να είχε συμβεί; Βοήθησε η απενεργοποίηση της προστασίας;</string>
+
+    <string name="brokenSiteProtectionsOn">Οι επιλογές προστασίας είναι <b>ΕΝΕΡΓΕΣ</b> για τον συγκεκριμένο ιστότοπο</string>
+    <string name="brokenSiteProtectionsOff">Οι επιλογές προστασίας είναι <b>ΑΝΕΝΕΡΓΕΣ</b> για τον συγκεκριμένο ιστότοπο</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Η απενεργοποίηση της προστασίας μπορεί να βοηθήσει.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Απενεργοποιήσαμε προσωρινά τις Προστασίες προσωπικών δεδομένων καθώς φαίνεται ότι διακόπτουν τη λειτουργία του ιστότοπου.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Σελιδοδείκτες</string>

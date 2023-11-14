@@ -164,6 +164,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 }
             },
         )
+
+        brokenSites.protectionsToggle.setOnProtectionsToggledListener(viewModel::onProtectionsToggled)
     }
 
     private fun configureObservers() {
@@ -212,6 +214,13 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                 brokenSites.brokenSiteFormLoginInput.gone()
                 brokenSites.submitButton.isEnabled = true
             }
+        }
+
+        if (viewState.protectionsState != null) {
+            brokenSites.protectionsToggle.isVisible = true
+            brokenSites.protectionsToggle.setState(viewState.protectionsState)
+        } else {
+            brokenSites.protectionsToggle.isVisible = false
         }
     }
 

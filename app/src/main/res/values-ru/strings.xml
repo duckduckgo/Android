@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Опишите, что случилось</string>
     <string name="brokenSitesCategoriesHint">Опишите, что случилось</string>
     <string name="brokenSiteSubmitButton">Отправить жалобу</string>
-    <string name="brokenSiteDescription">Анонимная жалоба на неработающий сайт поможет нам устранить недостатки и улучшить приложение.</string>
+    <string name="brokenSiteDescription">Ваша анонимная жалоба на проблемы с сайтом поможет нам улучшить приложение.</string>
 
-    <string name="brokenSiteCategoryImages">Не загружаются изображения</string>
-    <string name="brokenSiteCategoryPaywall">Сайт попросил меня отключить</string>
-    <string name="brokenSiteCategoryComments">Не загружаются комментарии</string>
-    <string name="brokenSiteCategoryVideos">Не воспроизводится видео</string>
-    <string name="brokenSiteCategoryLinks">Не работают ссылки или кнопки</string>
-    <string name="brokenSiteCategoryContent">Отсутствует содержимое</string>
-    <string name="brokenSiteCategoryLogin">Не могу войти</string>
-    <string name="brokenSiteCategoryUnsupported">Несовместимость браузера</string>
+    <string name="brokenSiteCategoryBlocked">Сайт блокируется или не грузится</string>
+    <string name="brokenSiteCategoryLayout">Нарушена структура сайта</string>
+    <string name="brokenSiteCategoryEmptySpaces">Крупные пустые пространства</string>
+    <string name="brokenSiteCategoryShopping">Не получается провести оплату или оформить заказ/покупку</string>
+    <string name="brokenSiteCategoryPaywall">Сайт просит отключить блокировку рекламы</string>
+    <string name="brokenSiteCategoryComments">Не грузятся комментарии, отзывы или чат</string>
+    <string name="brokenSiteCategoryVideos">Не воспроизводится или не грузится видео</string>
+    <string name="brokenSiteCategoryLogin">Невозможно войти/зарегистрироваться</string>
     <string name="brokenSiteCategoryOther">Что-то другое</string>
     <string name="brokenSiteDescriptionTextInputHint">Предоставьте дополнительную информацию (необязательно)</string>
+    <string name="brokenSiteDescriptionCaption">Что случилось? Что должно было произойти? Помогло ли отключение защиты?</string>
+
+    <string name="brokenSiteProtectionsOn">На этом сайте <b>ВКЛЮЧЕНЫ</b> функции защиты</string>
+    <string name="brokenSiteProtectionsOff">На этом сайте <b>ВЫКЛЮЧЕНЫ</b> функции защиты</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Попробуйте отключить защиту.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Мы временно отключили защиту конфиденциальности, так как она нарушала работу этого сайта.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Закладки</string>

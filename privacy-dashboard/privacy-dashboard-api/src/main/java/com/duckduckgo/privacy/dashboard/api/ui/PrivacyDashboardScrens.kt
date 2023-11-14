@@ -24,12 +24,4 @@ interface PrivacyDashboardHybridScreen {
      * @param tabId The tab ID
      */
     data class PrivacyDashboardHybridWithTabIdParam(val tabId: String) : GlobalActivityStarter.ActivityParams
-
-    companion object {
-        /**
-         * When launching the [PrivacyDashboardHybridWithTabIdParam] for result, the activity will return either [RELOAD_RESULT_CODE] or [RESULT_OK]
-         * [RELOAD_RESULT_CODE] when reload is required, [RELOAD_OK] otherwise
-         */
-        const val RELOAD_RESULT_CODE = 100
-    }
 }

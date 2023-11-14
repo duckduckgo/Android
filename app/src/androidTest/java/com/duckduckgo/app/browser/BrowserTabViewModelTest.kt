@@ -101,10 +101,8 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.model.UserAllowListedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -262,9 +260,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
-
-    @Mock
-    private lateinit var mockUserAllowListDao: UserAllowListDao
 
     @Mock
     private lateinit var mockContentBlocking: ContentBlocking
@@ -431,7 +426,7 @@ class BrowserTabViewModelTest {
             surveyDao = mockSurveyDao,
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
-            userAllowListDao = mockUserAllowListDao,
+            userAllowListRepository = mockUserAllowListRepository,
             settingsDataStore = mockSettingsStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
@@ -442,7 +437,7 @@ class BrowserTabViewModelTest {
             surveyRepository = mockSurveyRepository,
         )
 
-        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockUserAllowListDao, mockContentBlocking, TestScope())
+        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockContentBlocking, mockUserAllowListRepository, TestScope())
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
@@ -452,7 +447,8 @@ class BrowserTabViewModelTest {
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockTabRepository.childClosedTabs).thenReturn(childClosedTabsFlow)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockUserAllowListDao.contains(anyString())).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList(anyString())).thenReturn(false)
+        whenever(mockUserAllowListRepository.domainsInUserAllowListFlow()).thenReturn(flowOf(emptyList()))
         whenever(mockContentBlocking.isAnException(anyString())).thenReturn(false)
         whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
@@ -462,7 +458,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetectorImpl(),
             siteFactory = siteFactory,
             tabRepository = mockTabRepository,
-            userAllowListDao = mockUserAllowListDao,
+            userAllowListRepository = mockUserAllowListRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
@@ -1669,17 +1665,16 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenSiteAddedToAllowListAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserAllowListDao).insert(UserAllowListedDomain("www.example.com"))
+        verify(mockUserAllowListRepository).addDomainToUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
-        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
     fun whenPrivacyProtectionMenuClickedAndSiteNotInAllowListThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(false)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
@@ -1689,17 +1684,16 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenSiteRemovedFromAllowListAndPixelSentAndPageRefreshed() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
-        verify(mockUserAllowListDao).delete(UserAllowListedDomain("www.example.com"))
+        verify(mockUserAllowListRepository).removeDomainFromUserAllowList("www.example.com")
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
-        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
     fun whenPrivacyProtectionMenuClickedForAllowListedSiteThenShowDisabledConfirmationMessage() = runTest {
-        whenever(mockUserAllowListDao.contains("www.example.com")).thenReturn(true)
+        whenever(mockUserAllowListRepository.isDomainInUserAllowList("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
         assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
@@ -3673,10 +3667,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsAllowListedIsTrue() {
+    fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsPrivacyProtectionDisabledIsTrue() {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
-        assertTrue(browserViewState().isPrivacyProtectionEnabled)
+        assertTrue(browserViewState().isPrivacyProtectionDisabled)
     }
 
     @Test

@@ -215,18 +215,24 @@
     <string name="brokenSitesCategoriesTitle">Opisz, co się stało</string>
     <string name="brokenSitesCategoriesHint">Opisz, co się stało</string>
     <string name="brokenSiteSubmitButton">Wyślij raport</string>
-    <string name="brokenSiteDescription">Przesłanie anonimowego raportu o uszkodzonej witrynie pomaga nam debugować te problemy i ulepszać aplikację.</string>
+    <string name="brokenSiteDescription">Przesłanie anonimowego raportu o uszkodzonej witrynie pomaga nam ulepszać aplikację.</string>
 
-    <string name="brokenSiteCategoryImages">Obrazy nie zostały załadowane</string>
-    <string name="brokenSiteCategoryPaywall">Witryna poprosiła mnie o wyłączenie</string>
-    <string name="brokenSiteCategoryComments">Komentarze nie zostały załadowane</string>
-    <string name="brokenSiteCategoryVideos">Film nie został odtworzony</string>
-    <string name="brokenSiteCategoryLinks">Linki lub przyciski nie działają</string>
-    <string name="brokenSiteCategoryContent">Brakuje treści</string>
-    <string name="brokenSiteCategoryLogin">Nie mogę się zalogować</string>
-    <string name="brokenSiteCategoryUnsupported">Przeglądarka jest niezgodna</string>
+    <string name="brokenSiteCategoryBlocked">Witryna zablokowana lub nie została załadowana</string>
+    <string name="brokenSiteCategoryLayout">Uszkodzony układ witryny</string>
+    <string name="brokenSiteCategoryEmptySpaces">Witryna zawiera duże puste przestrzenie</string>
+    <string name="brokenSiteCategoryShopping">Nie mogę zapłacić, finalizować ani zrobić zakupów</string>
+    <string name="brokenSiteCategoryPaywall">Witryna poprosiła mnie o wyłączenie blokady reklam</string>
+    <string name="brokenSiteCategoryComments">Komentarze, recenzje lub czaty nie zostały załadowane</string>
+    <string name="brokenSiteCategoryVideos">Film nie został odtworzony lub załadowany</string>
+    <string name="brokenSiteCategoryLogin">Nie mogę się zalogować/zarejestrować</string>
     <string name="brokenSiteCategoryOther">Coś innego</string>
     <string name="brokenSiteDescriptionTextInputHint">Udostępnij więcej szczegółów (opcjonalnie)</string>
+    <string name="brokenSiteDescriptionCaption">Co się stało? Co powinno się wydarzyć? Czy wyłączenie zabezpieczeń pomaga?</string>
+
+    <string name="brokenSiteProtectionsOn">Zabezpieczenia są <b>WŁĄCZONE</b> dla tej witryny</string>
+    <string name="brokenSiteProtectionsOff">Zabezpieczenia są <b>WYŁĄCZONE</b> dla tej witryny</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">WYŁĄCZENIE zabezpieczeń może pomóc.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zakładki</string>

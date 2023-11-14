@@ -98,7 +98,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.UserAllowListDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -153,7 +153,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
-    private val userAllowListDao: UserAllowListDao,
+    private val userAllowListRepository: UserAllowListRepository,
     private val contentBlocking: ContentBlocking,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val savedSitesRepository: SavedSitesRepository,
@@ -242,7 +242,7 @@ class BrowserTabViewModel @Inject constructor(
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val canChangePrivacyProtection: Boolean = false,
-        val isPrivacyProtectionEnabled: Boolean = false,
+        val isPrivacyProtectionDisabled: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false,
@@ -550,6 +550,7 @@ class BrowserTabViewModel @Inject constructor(
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
+    private var allowlistRefreshTriggerJob: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1249,7 +1250,7 @@ class BrowserTabViewModel @Inject constructor(
             showPrivacyShield = true,
             canReportSite = domain != null,
             canChangePrivacyProtection = domain != null,
-            isPrivacyProtectionEnabled = false,
+            isPrivacyProtectionDisabled = false,
             showSearchIcon = false,
             showClearButton = false,
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url),
@@ -1267,6 +1268,14 @@ class BrowserTabViewModel @Inject constructor(
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updatePrivacyProtectionState(domain) } }
+
+        allowlistRefreshTriggerJob?.cancel()
+        if (domain != null) {
+            allowlistRefreshTriggerJob = isDomainInUserAllowlist(domain)
+                .drop(count = 1) // skip current state - we're only interested in change events
+                .onEach { command.postValue(NavigationCommand.Refresh) }
+                .launchIn(viewModelScope)
+        }
 
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
@@ -1321,24 +1330,30 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
-        val isAllowListed = isAllowListed(domain)
+        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !isAllowListed)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !privacyProtectionDisabled)
         }
     }
 
     private suspend fun updatePrivacyProtectionState(domain: String) {
-        val isAllowListed = isAllowListed(domain)
+        val privacyProtectionDisabled = isPrivacyProtectionDisabled(domain)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = isAllowListed)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = privacyProtectionDisabled)
         }
     }
 
-    private suspend fun isAllowListed(domain: String): Boolean {
+    private suspend fun isPrivacyProtectionDisabled(domain: String): Boolean {
         return withContext(dispatchers.io()) {
-            userAllowListDao.contains(domain) || contentBlocking.isAnException(domain)
+            userAllowListRepository.isDomainInUserAllowList(domain) || contentBlocking.isAnException(domain)
         }
     }
+
+    private fun isDomainInUserAllowlist(domain: String): Flow<Boolean> =
+        userAllowListRepository
+            .domainsInUserAllowListFlow()
+            .map { allowlistedDomains -> domain in allowlistedDomains }
+            .distinctUntilChanged()
 
     private suspend fun updateBookmarkAndFavoriteState(url: String) {
         val bookmark = getBookmark(url)
@@ -2096,54 +2111,29 @@ class BrowserTabViewModel @Inject constructor(
     fun onPrivacyProtectionMenuClicked() {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
-            if (isAllowListed(domain)) {
+            if (isPrivacyProtectionDisabled(domain)) {
                 removeFromAllowList(domain)
             } else {
                 addToAllowList(domain)
             }
-            command.postValue(NavigationCommand.Refresh)
         }
     }
 
     private suspend fun addToAllowList(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_ADD)
-        withContext(dispatchers.io()) {
-            userAllowListDao.insert(domain)
-        }
+        userAllowListRepository.addDomainToUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
-            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = true)
         }
     }
 
     private suspend fun removeFromAllowList(domain: String) {
         pixel.fire(AppPixelName.BROWSER_MENU_ALLOWLIST_REMOVE)
-        withContext(dispatchers.io()) {
-            userAllowListDao.delete(domain)
-        }
+        userAllowListRepository.removeDomainFromUserAllowList(domain)
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
-            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
-        }
-    }
-
-    fun onDisablePrivacyProtectionSnackbarUndoClicked(domain: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            userAllowListDao.insert(domain)
-            withContext(dispatchers.main()) {
-                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
-                command.value = NavigationCommand.Refresh
-            }
-        }
-    }
-
-    fun onEnablePrivacyProtectionSnackbarUndoClicked(domain: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            userAllowListDao.delete(domain)
-            withContext(dispatchers.main()) {
-                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
-                command.value = NavigationCommand.Refresh
-            }
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionDisabled = false)
         }
     }
 
