@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
