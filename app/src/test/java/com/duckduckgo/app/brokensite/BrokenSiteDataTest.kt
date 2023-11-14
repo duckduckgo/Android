@@ -17,6 +17,7 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -26,14 +27,19 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class BrokenSiteDataTest {
+
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     private val mockAllowListRepository: UserAllowListRepository = mock()
 
@@ -190,7 +196,15 @@ class BrokenSiteDataTest {
         url: String,
         httpsUpgraded: Boolean = false,
     ): Site {
-        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded, mockAllowListRepository, mockContentBlocking, TestScope())
+        return SiteMonitor(
+            url,
+            "",
+            upgradedHttps = httpsUpgraded,
+            mockAllowListRepository,
+            mockContentBlocking,
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     companion object {

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
@@ -29,17 +30,21 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SiteMonitorTest {
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     companion object {
         private const val document = "http://example.com"
@@ -71,7 +76,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
@@ -83,7 +89,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -95,7 +102,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
@@ -108,7 +116,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(HttpsStatus.NONE, testee.https)
     }
@@ -120,7 +129,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(document, testee.url)
     }
@@ -132,7 +142,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(0, testee.trackerCount)
     }
@@ -144,7 +155,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -189,7 +201,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -234,7 +247,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -279,7 +293,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -302,7 +317,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -325,7 +341,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -359,7 +376,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertFalse(testee.upgradedHttps)
     }
@@ -371,7 +389,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         assertEquals(0, testee.surrogates.size)
     }
@@ -383,7 +402,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
@@ -396,7 +416,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -441,7 +462,8 @@ class SiteMonitorTest {
             title = null,
             userAllowListRepository = mockAllowListRepository,
             contentBlocking = mockContentBlocking,
-            appCoroutineScope = TestScope(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
         testee.trackerDetected(
             TrackingEvent(
@@ -562,7 +584,8 @@ class SiteMonitorTest {
         upgradedHttps = upgradedHttps,
         userAllowListRepository = mockAllowListRepository,
         contentBlocking = mockContentBlocking,
-        appCoroutineScope = TestScope(),
+        appCoroutineScope = coroutineRule.testScope,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     fun givenSitePrivacyData(

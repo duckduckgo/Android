@@ -66,7 +66,7 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
             statsRepository
                 .getTrackersForAppFromDate(date, packageName)
                 .map { aggregateDataPerApp(it, packageName) }
-                .flowOn(dispatchers.default())
+                .flowOn(dispatchers.io())
                 .collectLatest { state ->
                     viewStateFlow.emit(state)
                 }
@@ -150,7 +150,7 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
         checked: Boolean,
         packageName: String,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.io()) {
                 if (checked) {
                     deviceShieldPixels.didEnableAppProtectionFromDetail()

@@ -54,10 +54,10 @@ object CookiesModule {
     @Provides
     fun provideCookiesRepository(
         database: CookiesDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): CookiesRepository {
-        return RealCookieRepository(database, coroutineScope, dispatcherProvider)
+        return RealCookieRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -76,9 +76,9 @@ object CookiesModule {
     @Provides
     fun provideContentScopeScriptsCookieRepository(
         database: CookiesDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): ContentScopeScriptsCookieRepository {
-        return RealContentScopeScriptsCookieRepository(database, coroutineScope, dispatcherProvider)
+        return RealContentScopeScriptsCookieRepository(database, appCoroutineScope, dispatcherProvider)
     }
 }

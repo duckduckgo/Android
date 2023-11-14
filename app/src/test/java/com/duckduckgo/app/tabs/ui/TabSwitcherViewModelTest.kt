@@ -84,7 +84,12 @@ class TabSwitcherViewModelTest {
             whenever(mockTabRepository.liveTabs)
                 .thenReturn(tabs)
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            testee = TabSwitcherViewModel(mockTabRepository, mockWebViewSessionStorage, mockAdClickManager)
+            testee = TabSwitcherViewModel(
+                mockTabRepository,
+                mockWebViewSessionStorage,
+                mockAdClickManager,
+                coroutinesTestRule.testDispatcherProvider,
+            )
             testee.command.observeForever(mockCommandObserver)
         }
     }

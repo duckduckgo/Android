@@ -49,9 +49,9 @@ object RuntimeChecksModule {
     @Provides
     fun provideRuntimeChecksRepository(
         database: RuntimeChecksDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): RuntimeChecksRepository {
-        return RealRuntimeChecksRepository(database, coroutineScope, dispatcherProvider)
+        return RealRuntimeChecksRepository(database, appCoroutineScope, dispatcherProvider)
     }
 }

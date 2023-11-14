@@ -48,7 +48,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             isNetPEnabled.set(networkProtectionState.isEnabled())
             if (isNetPEnabled.get()) {
                 cancelDisabledNotification()
@@ -65,7 +65,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason,
     ) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
                 VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
@@ -89,7 +89,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        coroutineScope.launch(dispatcherProvider.io()) {
             val reconfiguredNetPState = networkProtectionState.isEnabled()
             if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState) {
                 if (!reconfiguredNetPState) {

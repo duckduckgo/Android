@@ -2027,7 +2027,7 @@ class BrowserTabFragment :
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatchers.io()) {
             viewModel.fireAutocompletePixel(suggestion)
             withContext(dispatchers.main()) {
                 val origin = when (suggestion) {

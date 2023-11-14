@@ -143,14 +143,14 @@ constructor(
         this.primaryKey = primaryKey
         this.secretKey = secretKey
 
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(true)
         }
     }
 
     override fun clearAll() {
         encryptedPreferences?.edit(commit = true) { clear() }
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(false)
         }
     }

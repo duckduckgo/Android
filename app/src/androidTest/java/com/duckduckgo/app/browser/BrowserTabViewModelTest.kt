@@ -437,9 +437,19 @@ class BrowserTabViewModelTest {
             surveyRepository = mockSurveyRepository,
         )
 
-        val siteFactory = SiteFactoryImpl(mockEntityLookup, mockContentBlocking, mockUserAllowListRepository, TestScope())
+        val siteFactory = SiteFactoryImpl(
+            mockEntityLookup,
+            mockContentBlocking,
+            mockUserAllowListRepository,
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+        )
 
-        accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
+        accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(
+            context,
+            coroutineRule.testDispatcherProvider,
+            coroutineRule.testScope,
+        )
 
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any())).thenReturn("duckduckgo.com")
         whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)

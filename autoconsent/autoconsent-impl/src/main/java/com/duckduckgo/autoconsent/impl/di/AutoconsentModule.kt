@@ -53,10 +53,10 @@ object AutoconsentModule {
     @Provides
     fun provideAutoconsentRepository(
         database: AutoconsentDatabase,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): AutoconsentRepository {
-        return RealAutoconsentRepository(database, coroutineScope, dispatcherProvider)
+        return RealAutoconsentRepository(database, appCoroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

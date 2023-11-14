@@ -265,10 +265,10 @@ class BrowserModule {
         dataUriDownloader: DataUriDownloader,
         callback: FileDownloadCallback,
         workManager: WorkManager,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
     ): FileDownloader {
-        return AndroidFileDownloader(dataUriDownloader, callback, workManager, coroutineScope, dispatcherProvider)
+        return AndroidFileDownloader(dataUriDownloader, callback, workManager, appCoroutineScope, dispatcherProvider)
     }
 
     @Provides
