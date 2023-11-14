@@ -262,9 +262,7 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-        jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url)
-        }
+
         url?.let {
             autoconsent.injectAutoconsent(webView, url)
             adClickManager.detectAdDomain(url)
@@ -280,6 +278,9 @@ class BrowserWebViewClient @Inject constructor(
         }
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
+        jsPlugins.getPlugins().forEach {
+            it.onPageStarted(webView, url)
+        }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
