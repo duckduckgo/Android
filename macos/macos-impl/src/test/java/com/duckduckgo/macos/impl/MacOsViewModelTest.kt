@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos_impl.waitlist.ui
+package com.duckduckgo.macos.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
-import com.duckduckgo.macos_impl.MacOsViewModel
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.GoToWindowsClientSettings
-import com.duckduckgo.macos_impl.MacOsViewModel.Command.ShareLink
+import com.duckduckgo.macos.impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
+import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSettings
+import com.duckduckgo.macos.impl.MacOsViewModel.Command.ShareLink
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*

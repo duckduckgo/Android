@@ -20,7 +20,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context=".MacOsActivity">
+              tools:context="com.duckduckgo.macos.impl.MacOsActivity">
 
     <include
             android:id="@+id/includeToolbar"

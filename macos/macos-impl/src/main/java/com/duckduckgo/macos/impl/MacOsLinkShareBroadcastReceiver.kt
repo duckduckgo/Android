@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.macos_impl
+package com.duckduckgo.macos.impl
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -22,7 +22,7 @@ import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_SHARED
+import com.duckduckgo.macos.impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_SHARED
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 

@@ -23,7 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    namespace 'com.duckduckgo.macos_impl'
+    namespace 'com.duckduckgo.macos.impl'
 }
 
 dependencies {
