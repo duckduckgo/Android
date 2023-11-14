@@ -36,10 +36,9 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dagger.*
 import dagger.SingleInstanceIn
+import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.*
 import timber.log.Timber
 
 interface SyncAccountRepository {
@@ -70,7 +69,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val syncEngine: SyncEngine,
     private val syncPixels: SyncPixels,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : SyncAccountRepository {
 
     override fun createAccount(): Result<Boolean> {
