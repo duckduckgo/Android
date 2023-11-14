@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
@@ -3782,20 +3783,26 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRemoveFavoriteUndoThenViewStateUpdated() = runTest {
         val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
+        val quickAccessFavorites = listOf(FavoritesQuickAccessAdapter.QuickAccessFavorite(favoriteSite))
+
         whenever(mockSavedSitesRepository.getFavorite("www.example.com")).thenReturn(favoriteSite)
         favoriteListFlow.send(listOf(favoriteSite))
         loadUrl("www.example.com", isBrowserShowing = true)
         testee.onFavoriteMenuClicked()
 
         assertTrue(browserViewState().favorite == null)
+        assertTrue(autoCompleteViewState().favorites.isEmpty())
+        assertTrue(ctaViewState().favorites.isEmpty())
 
         testee.undoDelete(favoriteSite, 0)
 
         assertTrue(browserViewState().favorite == favoriteSite)
+        assertTrue(autoCompleteViewState().favorites == quickAccessFavorites)
+        assertTrue(ctaViewState().favorites == quickAccessFavorites)
     }
 
     @Test
-    fun whenDeleteFavoriteUndoThenViewStateUpdated() = runTest {
+    fun whenDeleteBookmarkUndoThenViewStateUpdated() = runTest {
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
 

@@ -2777,7 +2777,7 @@ class BrowserTabViewModel @Inject constructor(
 
             ctaViewState.value = currentCtaViewState().copy(favorites = quickAccessFavorites)
             browserViewState.value = currentBrowserViewState().copy(favorite = null)
-
+            autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = quickAccessFavorites)
             index
         } else {
             browserViewState.value = currentBrowserViewState().copy(bookmark = null, favorite = null)
@@ -2806,6 +2806,7 @@ class BrowserTabViewModel @Inject constructor(
 
                 ctaViewState.value = currentCtaViewState().copy(favorites = quickAccessFavorites)
                 browserViewState.value = currentBrowserViewState().copy(favorite = savedSite)
+                autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = quickAccessFavorites)
             }
 
             is Bookmark -> {
