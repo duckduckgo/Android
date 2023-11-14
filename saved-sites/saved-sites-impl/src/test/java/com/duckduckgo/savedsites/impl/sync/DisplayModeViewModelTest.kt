@@ -2,7 +2,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.savedsites.impl.FavoritesDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.impl.RealFavoritesDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.impl.sync.DisplayModeViewModel.ViewState

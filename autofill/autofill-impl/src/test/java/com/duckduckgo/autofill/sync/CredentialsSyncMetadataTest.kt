@@ -19,9 +19,9 @@ package com.duckduckgo.autofill.sync
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.store.AutofillDatabase
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals

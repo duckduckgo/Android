@@ -24,7 +24,7 @@ import com.duckduckgo.adclick.impl.RealAdClickAttribution
 import com.duckduckgo.adclick.store.AdClickAttributionAllowlistEntity
 import com.duckduckgo.adclick.store.AdClickAttributionDetectionEntity
 import com.duckduckgo.adclick.store.AdClickAttributionRepository
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi

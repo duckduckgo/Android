@@ -1,6 +1,6 @@
 package com.duckduckgo.networkprotection.impl.connectionclass
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.prefs.FakeVpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

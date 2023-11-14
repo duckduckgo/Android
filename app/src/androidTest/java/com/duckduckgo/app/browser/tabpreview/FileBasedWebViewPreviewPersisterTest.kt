@@ -19,8 +19,8 @@
 package com.duckduckgo.app.browser.tabpreview
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.common.test.CoroutineTestRule
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

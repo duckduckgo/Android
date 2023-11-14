@@ -19,7 +19,7 @@ package com.duckduckgo.fingerprintprotection
 import android.content.Context
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.fingerprintprotection.impl.FingerprintProtectionSeedWorker
 import com.duckduckgo.fingerprintprotection.store.seed.FingerprintProtectionSeedRepository
 import kotlinx.coroutines.test.runTest

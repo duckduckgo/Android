@@ -16,7 +16,7 @@
 
 package com.duckduckgo.fingerprintprotection.store.features.fingerprintingcanvas
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintingCanvasEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi

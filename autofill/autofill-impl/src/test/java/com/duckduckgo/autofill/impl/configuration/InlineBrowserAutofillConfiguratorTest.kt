@@ -17,9 +17,9 @@
 package com.duckduckgo.autofill.impl.configuration
 
 import android.webkit.WebView
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

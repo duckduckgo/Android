@@ -2,8 +2,8 @@ package com.duckduckgo.mobile.android.vpn.feature
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider

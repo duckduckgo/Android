@@ -20,7 +20,7 @@ import android.content.pm.PackageManager
 import android.webkit.PermissionRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEntity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock

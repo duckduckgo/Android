@@ -16,9 +16,9 @@
 
 package com.duckduckgo.networkprotection.impl.waitlist
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.impl.state.NetPFeatureRemover
 import kotlinx.coroutines.ExperimentalCoroutinesApi

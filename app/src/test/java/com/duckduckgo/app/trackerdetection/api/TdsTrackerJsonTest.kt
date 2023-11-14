@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.FileUtilities.loadText
 import com.duckduckgo.app.trackerdetection.model.Action.BLOCK
 import com.duckduckgo.app.trackerdetection.model.Action.UNSUPPORTED
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
+import com.duckduckgo.common.test.FileUtilities.loadText
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals

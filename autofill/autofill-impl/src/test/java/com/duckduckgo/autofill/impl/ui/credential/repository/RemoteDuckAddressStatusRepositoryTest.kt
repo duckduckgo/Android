@@ -16,11 +16,11 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.repository
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementService
 import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementService.DuckAddressGetStatusResponse
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.*
+import com.duckduckgo.common.test.CoroutineTestRule
 import java.io.IOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult
@@ -34,6 +33,7 @@ import com.duckduckgo.autofill.store.LastUpdatedTimeProvider
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
 import com.duckduckgo.autofill.sync.SyncCredentialsListener
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials

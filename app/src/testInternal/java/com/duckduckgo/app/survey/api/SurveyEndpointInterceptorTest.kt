@@ -1,6 +1,6 @@
 package com.duckduckgo.app.survey.api
 
-import com.duckduckgo.app.global.api.FakeChain
+import com.duckduckgo.common.test.api.FakeChain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

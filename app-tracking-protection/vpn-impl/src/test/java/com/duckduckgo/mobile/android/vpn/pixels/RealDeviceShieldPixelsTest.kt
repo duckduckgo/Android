@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import java.util.*
 import org.junit.Before

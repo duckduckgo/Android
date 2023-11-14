@@ -16,8 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl.plugins
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.api
+package com.duckduckgo.common.test.api
 
 import java.util.concurrent.TimeUnit
 import okhttp3.*

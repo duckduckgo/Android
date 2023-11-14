@@ -17,7 +17,6 @@
 package com.duckduckgo.autofill.sync.persister
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures.amazonCredentials
@@ -33,6 +32,7 @@ import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
 import com.duckduckgo.autofill.sync.credentialsSyncEntries
 import com.duckduckgo.autofill.sync.inMemoryAutofillDatabase
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

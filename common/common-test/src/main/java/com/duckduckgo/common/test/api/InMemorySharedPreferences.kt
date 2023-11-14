@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.api
+package com.duckduckgo.common.test.api
 
 import android.content.SharedPreferences
 

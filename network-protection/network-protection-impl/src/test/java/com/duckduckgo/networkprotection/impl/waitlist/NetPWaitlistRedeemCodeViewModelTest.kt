@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.waitlist
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.impl.waitlist.NetPWaitlistRedeemCodeViewModel.ViewState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

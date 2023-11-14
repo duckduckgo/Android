@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app
+package com.duckduckgo.common.test
 
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.CoroutineDispatcher

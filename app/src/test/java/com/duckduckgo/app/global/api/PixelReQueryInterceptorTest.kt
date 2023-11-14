@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.api
 
+import com.duckduckgo.common.test.api.FakeChain
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Before
