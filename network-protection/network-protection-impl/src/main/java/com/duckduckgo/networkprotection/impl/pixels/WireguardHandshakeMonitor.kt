@@ -57,7 +57,6 @@ class WireguardHandshakeMonitor @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch {
-            failureReported.set(false)
             startHandShakeMonitoring()
         }
     }
@@ -78,6 +77,7 @@ class WireguardHandshakeMonitor @Inject constructor(
 
     private suspend fun startHandShakeMonitoring() = withContext(dispatcherProvider.io()) {
         if (networkProtectionState.isEnabled()) {
+            failureReported.set(false)
             currentNetworkState.start()
 
             while (isActive && networkProtectionState.isEnabled()) {
@@ -93,7 +93,7 @@ class WireguardHandshakeMonitor @Inject constructor(
                         } else {
                             logcat { "Last handshake was already reported, skipping" }
                         }
-                    } else {
+                    } else if (diff.seconds.inWholeMinutes <= REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES) {
                         if (failureReported.getAndSet(false)) {
                             logcat(WARN) { "Recovered from tunnel failure" }
                             pixels.reportTunnelFailureRecovered()
@@ -106,7 +106,11 @@ class WireguardHandshakeMonitor @Inject constructor(
     }
 
     companion object {
+        // WG handshakes happen every 2min, this means we'd miss 2+ handshakes
         private const val REPORT_TUNNEL_FAILURE_IN_THRESHOLD_MINUTES = 5
+
+        // WG handshakes happen every 2min
+        private const val REPORT_TUNNEL_FAILURE_RECOVERY_THRESHOLD_MINUTES = 2
     }
 }
 
