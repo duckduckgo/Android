@@ -46,7 +46,7 @@
         android:hint="@string/findInPageHint"
         tools:text="Search term"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         app:typography="body2"
         app:textType="secondary"
         android:id="@+id/findInPageMatches"

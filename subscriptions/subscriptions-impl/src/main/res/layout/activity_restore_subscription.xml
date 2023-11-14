@@ -45,7 +45,7 @@
                     app:srcCompat="@drawable/ic_sync_desktop"
                     tools:ignore="ContentDescription" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                     android:text="@string/restoreSubscriptionTitle"
                     tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
                     android:text="@string/restoreSubscriptionDescription"
                     tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu
+            <com.duckduckgo.common.ui.view.expand.DaxExpandableMenu
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_5"
@@ -78,7 +78,7 @@
                     android:background="@drawable/background_expandable_menu"
                     android:orientation="vertical">
 
-                <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
                         android:id="@+id/googlePlay"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -88,13 +88,13 @@
                         app:secondaryText="@string/restoreSubscriptionGooglePlayDescription"
                         app:primaryButtonText="@string/restoreSubscriptionGooglePlayButton"/>
 
-                <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:fullWidth="false"
                         app:defaultPadding="false"/>
 
-                <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+                <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
                         app:secondaryText="@string/restoreSubscriptionEmailDescription"
                         app:primaryButtonText="@string/restoreSubscriptionEmailButton"/>
 
-            </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
+            </com.duckduckgo.common.ui.view.expand.DaxExpandableMenu>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

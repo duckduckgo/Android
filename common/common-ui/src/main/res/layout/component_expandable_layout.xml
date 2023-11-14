@@ -25,13 +25,13 @@
     android:clipChildren="false"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/expandableLayout"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:primaryText="Expandable Layout"/>
 
-    <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu
+    <com.duckduckgo.common.ui.view.expand.DaxExpandableMenu
         android:id="@+id/expandableMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
         android:background="@drawable/background_expandable_menu"
         android:orientation="vertical">
 
-        <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+        <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
             android:id="@+id/expandable1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,13 +50,13 @@
             app:leadingIconSize="small"
             app:secondaryText="Expandable Menu Item with a text."/>
 
-        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:fullWidth="false"
             app:defaultPadding="false"/>
 
-        <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+        <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
             android:id="@+id/expandable2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,13 +66,13 @@
             app:secondaryText="Expandable Menu Item with a text and button"
             app:primaryButtonText="Add Email"/>
 
-        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:fullWidth="false"
             app:defaultPadding="false"/>
 
-        <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+        <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
             android:id="@+id/expandable3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,13 +81,13 @@
             app:leadingIconSize="small"
             app:expandedLayout="@layout/view_expandable_menu_item_expanded_layout_demo" />
 
-        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:fullWidth="false"
             app:defaultPadding="false"/>
 
-        <com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenuItem
+        <com.duckduckgo.common.ui.view.expand.DaxExpandableMenuItem
             android:id="@+id/expandable4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -95,9 +95,9 @@
             app:leadingIcon="@drawable/ic_globe_gray_16dp"
             app:leadingIconSize="small" />
 
-    </com.duckduckgo.mobile.android.ui.view.expand.DaxExpandableMenu>
+    </com.duckduckgo.common.ui.view.expand.DaxExpandableMenu>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/expandableItemLayout"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"

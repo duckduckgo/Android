@@ -21,7 +21,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.vpn.internal.databinding.ExceptionRuleAppViewBinding
 
 class RuleAppView @JvmOverloads constructor(

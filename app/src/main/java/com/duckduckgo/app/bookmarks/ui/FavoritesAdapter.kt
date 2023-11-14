@@ -31,9 +31,9 @@ import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import kotlinx.coroutines.launch
 

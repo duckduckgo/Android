@@ -29,7 +29,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listItem="@layout/view_bookmark_entry" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/emptyBookmarks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

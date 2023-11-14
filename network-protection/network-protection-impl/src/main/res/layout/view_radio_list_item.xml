@@ -26,7 +26,7 @@
     android:paddingTop="@dimen/oneLineItemVerticalPadding"
     android:paddingBottom="@dimen/oneLineItemVerticalPadding">
 
-    <com.duckduckgo.mobile.android.ui.view.button.RadioButton
+    <com.duckduckgo.common.ui.view.button.RadioButton
         android:id="@+id/radioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
         app:layout_constraintStart_toEndOf="@+id/radioButton"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/leadingIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
 
     </FrameLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/primaryText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
         tools:ignore="InvalidColorAttribute"
         tools:text="Title" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/secondaryText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

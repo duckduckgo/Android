@@ -41,7 +41,7 @@
         app:layout_constraintTop_toBottomOf="@+id/includeToolbar"
         app:srcCompat="@drawable/we_hatched"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/statusTitle"
         app:typography="h1"
         android:layout_width="match_parent"
@@ -83,7 +83,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/redeemButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

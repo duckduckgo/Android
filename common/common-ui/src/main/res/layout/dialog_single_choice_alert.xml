@@ -24,7 +24,7 @@
     android:orientation="vertical"
     style="@style/Widget.DuckDuckGo.Dialog.Content">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/radioListDialogTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
         app:textType="primary"
         app:typography="h2"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/radioListDialogMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
             app:layout_constraintTop_toBottomOf="@+id/radioListDialogMessage"/>
     </ScrollView>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/radioListDialogPositiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioListDialogContent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
         android:id="@+id/radioListDialogDestructivePositiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioListDialogContent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/radioListDialogNegativeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
         app:layout_constraintEnd_toStartOf="@+id/radioListDialogPositiveButton"
         app:layout_constraintTop_toBottomOf="@+id/radioListDialogContent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/radioListDestructiveDialogNegativeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

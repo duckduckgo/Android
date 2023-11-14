@@ -26,7 +26,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.macos.impl.MacOsViewModel.Command
@@ -34,7 +35,6 @@ import com.duckduckgo.macos.impl.MacOsViewModel.Command.GoToWindowsClientSetting
 import com.duckduckgo.macos.impl.MacOsViewModel.Command.ShareLink
 import com.duckduckgo.macos.impl.R.string
 import com.duckduckgo.macos.impl.databinding.ActivityMacosBinding
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject

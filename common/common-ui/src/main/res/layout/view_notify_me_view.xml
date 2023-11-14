@@ -38,7 +38,7 @@
             android:paddingEnd="@dimen/keyline_2"
             android:paddingBottom="10dp">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/notifyMeMessageTitle"
                 android:layout_width="@dimen/keyline_empty"
                 android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/notifyMeMessageSubtitle"
                 android:layout_width="@dimen/keyline_empty"
                 android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
                 app:typography="body2"
                 tools:text="Get a notification when downloads complete." />
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/notifyMeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -42,7 +42,7 @@
                 android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
                 app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
-            <com.duckduckgo.mobile.android.ui.view.SearchBarView
+            <com.duckduckgo.common.ui.view.SearchBarView
                 android:id="@+id/search_bar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

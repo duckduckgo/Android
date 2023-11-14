@@ -21,19 +21,19 @@
     android:background="@drawable/popup_menu_bg"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/exclusion_list_filter_all"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/netpExclusionListFilterMenuAllLabel" />
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/exclusion_list_filter_protected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/netpExclusionListFilterMenuProtectedLabel" />
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/exclusion_list_filter_unprotected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

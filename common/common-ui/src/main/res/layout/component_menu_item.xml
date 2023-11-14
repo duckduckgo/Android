@@ -19,7 +19,7 @@
     android:layout_height="wrap_content"
     android:clipToPadding="false">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.MenuItemView
+    <com.duckduckgo.common.ui.view.MenuItemView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="This is a Test"

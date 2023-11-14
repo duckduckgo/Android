@@ -27,7 +27,7 @@
     android:paddingTop="8dp"
     android:paddingEnd="16dp">
 
-    <com.duckduckgo.mobile.android.ui.view.SkeletonView
+    <com.duckduckgo.common.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_imageView"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -35,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.mobile.android.ui.view.SkeletonView
+    <com.duckduckgo.common.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_top_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.mobile.android.ui.view.SkeletonView
+    <com.duckduckgo.common.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_second_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_top_text" />
 
-    <com.duckduckgo.mobile.android.ui.view.SkeletonView
+    <com.duckduckgo.common.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_first_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"
@@ -66,7 +66,7 @@
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_imageView"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
 
-    <com.duckduckgo.mobile.android.ui.view.SkeletonView
+    <com.duckduckgo.common.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_second_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"
@@ -76,7 +76,7 @@
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_first_tracker"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
 
-    <com.duckduckgo.mobile.android.ui.view.SkeletonView
+    <com.duckduckgo.common.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_third_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"
@@ -86,7 +86,7 @@
         app:layout_constraintStart_toEndOf="@+id/tracker_entry_skeleton_one_second_tracker"
         app:layout_constraintTop_toBottomOf="@+id/tracker_entry_skeleton_one_second_text" />
 
-    <com.duckduckgo.mobile.android.ui.view.SkeletonView
+    <com.duckduckgo.common.ui.view.SkeletonView
         android:id="@+id/tracker_entry_skeleton_one_fourth_tracker"
         android:layout_width="20dp"
         android:layout_height="20dp"

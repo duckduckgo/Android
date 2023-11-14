@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+            <com.duckduckgo.common.ui.view.InfoPanel
                 android:id="@+id/exclusionListAppsWithIssuesLabel"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/info_panel_alert_background"

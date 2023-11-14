@@ -158,7 +158,7 @@
                 tools:itemCount="4"
                 tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/deviceLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

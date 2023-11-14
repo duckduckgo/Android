@@ -41,7 +41,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_ManageRecentAppsProtectionSectionTitle"
@@ -49,7 +49,7 @@
             />
 
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/always_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                     app:trailingIcon="@drawable/ic_open_in_24"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/unrestricted_battery_usage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,19 +71,19 @@
                     app:trailingIcon="@drawable/ic_open_in_24"
             />
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     app:defaultPadding="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/keyline_4"
                     android:layout_marginBottom="@dimen/keyline_4"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="@string/atp_RecentAppActivity" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/manageRecentAppsReportIssues"
                     app:typography="body2"
                     app:textType="secondary"
@@ -131,7 +131,7 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/manageRecentAppsEmptyView"
                 app:typography="body1"
                 android:layout_width="match_parent"
@@ -144,7 +144,7 @@
                 android:text="@string/atp_ManageRecentAppsProtectionEmpty"
                 app:drawableStartCompat="@drawable/ic_green_key"/>
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/manageRecentAppsDivider"
                 android:layout_marginStart="72dp"
                 app:defaultPadding="false"
@@ -152,7 +152,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/manageRecentAppsShowAll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

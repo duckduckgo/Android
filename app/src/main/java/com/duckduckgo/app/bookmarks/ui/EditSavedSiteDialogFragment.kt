@@ -24,8 +24,8 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFr
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.extensions.html
 import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.text.DaxTextInput
+import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite

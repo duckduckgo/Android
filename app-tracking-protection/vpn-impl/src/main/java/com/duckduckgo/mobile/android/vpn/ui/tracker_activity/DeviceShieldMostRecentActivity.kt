@@ -20,9 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldAllTracerActivityBinding
 
 @InjectWith(ActivityScope::class)

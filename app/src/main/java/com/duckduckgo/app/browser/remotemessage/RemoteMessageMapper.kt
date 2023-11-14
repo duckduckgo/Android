@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.browser.remotemessage
 
+import com.duckduckgo.common.ui.view.MessageCta.Message
+import com.duckduckgo.common.ui.view.MessageCta.MessageType
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
-import com.duckduckgo.mobile.android.ui.view.MessageCta.MessageType
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium

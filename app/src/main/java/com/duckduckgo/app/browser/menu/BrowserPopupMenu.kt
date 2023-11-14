@@ -24,9 +24,9 @@ import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.R.dimen
 import com.duckduckgo.mobile.android.R.drawable
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 
 class BrowserPopupMenu(
     context: Context,

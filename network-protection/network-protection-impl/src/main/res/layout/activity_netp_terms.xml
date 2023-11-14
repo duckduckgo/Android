@@ -129,7 +129,7 @@
                 app:question="@string/netpTermQuestionEight" />
         </LinearLayout>
     </ScrollView>
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/termsAgreeAndClose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -39,7 +39,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.button.IconButton
+    <com.duckduckgo.common.ui.view.button.IconButton
         android:id="@+id/internal_password_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -49,7 +49,7 @@
             android:paddingTop="@dimen/actionBottomSheetVerticalPadding"
             android:paddingBottom="@dimen/actionBottomSheetVerticalPadding">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/clearAllOption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 app:primaryText="@string/fireClearAll"
                 app:primaryTextColorOverlay="?attr/daxColorDestructive" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/cancelOption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

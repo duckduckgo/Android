@@ -152,7 +152,7 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:lottie_loop="false" />
 
-                    <com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
+                    <com.duckduckgo.common.ui.view.KeyboardAwareEditText
                         android:id="@+id/omnibarTextInput"
                         style="@style/Base.V7.Widget.AppCompat.EditText"
                         android:layout_width="0dp"

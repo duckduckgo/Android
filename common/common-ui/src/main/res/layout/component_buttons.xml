@@ -27,119 +27,119 @@
               android:paddingEnd="@dimen/keyline_4"
               android:gravity="center">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:primaryText="Dax Buttons"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/dax_button_primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Primary Small"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/dax_button_primary_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:icon="@drawable/ic_add_16"
         android:text="Primary Small"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/dax_button_primary_large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:buttonSize="large"
         android:text="Primary Large"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/dax_button_primary_disabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="Primary Disabled"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/dax_button_secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Secondary Small"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/dax_button_secondary_large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:buttonSize="large"
         android:text="Secondary Large"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/dax_button_secondary_disabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="Secondary Disabled"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
         android:id="@+id/dax_button_destructive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Destructive Small"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
         android:id="@+id/dax_button_destructive_large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:buttonSize="large"
         android:text="Destructive Large"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
         android:id="@+id/dax_button_destructive_disabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="Destructive Disabled"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/dax_button_ghost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ghost Small"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/dax_button_ghost_large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:buttonSize="large"
         android:text="Ghost Large"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/dax_button_ghost_disabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="Ghost Disabled"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhostDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
         android:id="@+id/dax_button_ghost_destructive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ghost Destructive Small"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhostDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
         android:id="@+id/dax_button_ghost_destructive_large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:buttonSize="large"
         android:text="Ghost Destructive Large"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhostDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhostDestructive
         android:id="@+id/dax_button_ghost_destructive_disabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="Ghost Destructive Disabled"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -147,7 +147,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.IconButton
+    <com.duckduckgo.common.ui.view.button.IconButton
         android:layout_gravity="center"
         android:id="@+id/getIconButton"
         android:layout_width="wrap_content"

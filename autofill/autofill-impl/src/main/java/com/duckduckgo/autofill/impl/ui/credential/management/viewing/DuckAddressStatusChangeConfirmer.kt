@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.ui.credential.management.viewing
 
 import android.content.Context
 import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.dialog.TextAlertDialogBuilder
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 

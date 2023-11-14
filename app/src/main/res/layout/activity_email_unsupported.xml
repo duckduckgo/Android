@@ -40,7 +40,7 @@
             android:layout_marginTop="32dp"
             app:srcCompat="@drawable/contact_us" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/statusTitle"
             app:typography="h2"
             android:layout_width="match_parent"
@@ -49,7 +49,7 @@
             android:text="@string/emailNotSupported"
             android:textAlignment="center"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/emailPrivacyDescription"
             app:typography="body2"
             app:textType="secondary"

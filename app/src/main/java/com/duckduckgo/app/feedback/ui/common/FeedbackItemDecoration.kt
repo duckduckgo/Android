@@ -21,7 +21,7 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.mobile.android.ui.view.toPx
+import com.duckduckgo.common.ui.view.toPx
 
 class FeedbackItemDecoration(private val divider: Drawable) : RecyclerView.ItemDecoration() {
 
