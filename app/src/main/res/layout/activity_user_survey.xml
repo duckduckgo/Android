@@ -27,7 +27,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/survey_background">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
@@ -92,7 +92,7 @@
             app:layout_constraintTop_toBottomOf="@id/title"
             app:layout_constraintVertical_bias="0.34">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -101,7 +101,7 @@
                 android:textColor="?daxColorWhite"
                 app:typography="h1" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/surveyLoadingErrorText"

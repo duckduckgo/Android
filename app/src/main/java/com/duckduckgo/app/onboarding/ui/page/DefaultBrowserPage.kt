@@ -36,9 +36,9 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.button.DaxButton
-import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
 import timber.log.Timber
 

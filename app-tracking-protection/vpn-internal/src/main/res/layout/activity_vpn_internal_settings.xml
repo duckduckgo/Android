@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+            <com.duckduckgo.common.ui.view.InfoPanel
                     android:id="@+id/settings_info"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
                     android:layout_margin="@dimen/keyline_4"
@@ -46,78 +46,78 @@
                     app:panelText="Turn AppTP ON to be able to configure this settings"/>
 
             <!-- Section Trackers -->
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/sectionTrackersTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Trackers"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/exceptionRules"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="App/Tracker exception rules"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/delete_tracking_history"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Delete Tracking History"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/force_update_blocklist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="🔄 Force Update Blocklist"/>
 
             <!-- Section Protection -->
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/sectionAppProtection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="App Protections"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/protectAllApps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Protect all apps"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/unprotectAllApps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Unprotect all apps" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/restoreDefaultAppProtections"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Restore default protections"/>
 
             <!-- Section Logging -->
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/sectionTrackersLogging"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Logging"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/debug_logging_toggle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -125,18 +125,18 @@
                     app:showSwitch="true"/>
 
             <!-- Section Diagnostics -->
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingBottom="0dp"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:id="@+id/sectionDiagnosticsTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Diagnostics"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/apptp_bugreport"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -27,16 +27,17 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetPAppExclusionListNoParams
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import com.duckduckgo.networkprotection.impl.R
+import com.duckduckgo.networkprotection.impl.R.layout
 import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpAppExclusionBinding
 import com.duckduckgo.networkprotection.impl.exclusion.ui.AppExclusionListAdapter.ExclusionListListener
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -182,7 +183,7 @@ class NetpAppExclusionListActivity :
     }
 
     private fun showFilterPopupMenu(anchor: View) {
-        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_exclusion_list_filter)
+        val popupMenu = PopupMenu(layoutInflater, layout.popup_exclusion_list_filter)
         val view = popupMenu.contentView
         val allItemView = view.findViewById<View>(R.id.exclusion_list_filter_all)
         val protectedItemView = view.findViewById<View>(R.id.exclusion_list_filter_protected)

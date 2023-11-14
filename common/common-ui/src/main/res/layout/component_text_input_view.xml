@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             app:endIcon="@drawable/ic_copy"
             app:type="single_line" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             app:endIcon="@drawable/ic_copy"
             app:type="multi_line" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext40"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
             app:endIcon="@drawable/ic_copy"
             app:type="form_mode" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext30"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
             app:endIcon="@drawable/ic_copy"
             app:type="single_line" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext31"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
             app:clickable="true"
             app:type="single_line" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext32"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
             app:singleLineTextTruncated="true"
             app:endIcon="@drawable/ic_copy" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext33"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
             app:singleLineTextTruncated="true"
             app:type="single_line"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
             android:text="This is not editable."
             app:editable="false" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
             android:text="This is not editable and has no icon. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
             app:editable="false" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -133,7 +133,7 @@
             android:text="Loremipsumolor"
             app:type="password" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext9"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -142,7 +142,7 @@
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
             app:type="password" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext8"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -152,7 +152,7 @@
             app:editable="false"
             app:type="password" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/outlinedinputtext20"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

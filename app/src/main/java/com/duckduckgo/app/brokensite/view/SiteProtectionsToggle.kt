@@ -23,7 +23,7 @@ import androidx.core.view.isVisible
 import com.duckduckgo.app.brokensite.model.SiteProtectionsState
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewSiteProtectionsToggleBinding
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 
 class SiteProtectionsToggle @JvmOverloads constructor(
     context: Context,

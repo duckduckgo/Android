@@ -20,19 +20,19 @@
               android:background="@drawable/popup_menu_bg"
               android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/allApps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/atp_ExcludedAppsFilterMenuAllLabel" />
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/protectedApps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:primaryText="@string/atp_ExcludedAppsFilterMenuProtectedLabel" />
 
-    <com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/unprotectedApps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

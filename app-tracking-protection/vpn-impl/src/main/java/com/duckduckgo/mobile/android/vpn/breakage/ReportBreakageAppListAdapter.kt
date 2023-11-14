@@ -21,7 +21,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldReportAppBreakageEntryBinding
 
 class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerView.Adapter<ReportBreakageAppListViewHolder>() {

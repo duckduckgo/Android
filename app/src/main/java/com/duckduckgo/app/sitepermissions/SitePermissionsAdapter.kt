@@ -45,11 +45,11 @@ import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.HEADER
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITES_EMPTY
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.SITE_ALLOWED_ITEM
 import com.duckduckgo.app.sitepermissions.SitePermissionsListViewType.TOGGLE
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.PopupMenuItemView
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
+import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.mobile.android.databinding.RowOneLineListItemBinding
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.PopupMenuItemView
-import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
 import kotlinx.coroutines.launch
 
 class SitePermissionsAdapter(

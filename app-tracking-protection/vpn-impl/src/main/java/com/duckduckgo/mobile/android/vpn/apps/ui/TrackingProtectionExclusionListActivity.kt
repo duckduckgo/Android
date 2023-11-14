@@ -30,17 +30,18 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.browser.api.ui.WebViewActivityWithParams
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.getColorFromAttr
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.R as commonR
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature.APPTP_VPN
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.R.layout
 import com.duckduckgo.mobile.android.vpn.R.string
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.apps.Command
@@ -269,7 +270,7 @@ class TrackingProtectionExclusionListActivity :
     }
 
     private fun showFilterPopupMenu(anchor: View) {
-        val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_exclusion_list_filter_item_menu)
+        val popupMenu = PopupMenu(layoutInflater, layout.popup_window_exclusion_list_filter_item_menu)
         val view = popupMenu.contentView
         val allItemView = view.findViewById<View>(R.id.allApps)
         val protectedItemView = view.findViewById<View>(R.id.protectedApps)

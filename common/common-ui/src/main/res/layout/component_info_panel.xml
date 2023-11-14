@@ -26,7 +26,7 @@
   android:paddingStart="@dimen/keyline_4"
   android:paddingEnd="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/label"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.InfoPanel
+    <com.duckduckgo.common.ui.view.InfoPanel
         android:id="@+id/info_panel_tooltip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/label"
         tools:layout_editor_absoluteX="@dimen/keyline_4"/>
 
-    <com.duckduckgo.mobile.android.ui.view.InfoPanel
+    <com.duckduckgo.common.ui.view.InfoPanel
         android:id="@+id/info_panel_alert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

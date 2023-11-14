@@ -21,7 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:padding="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/savedSiteEmptyHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

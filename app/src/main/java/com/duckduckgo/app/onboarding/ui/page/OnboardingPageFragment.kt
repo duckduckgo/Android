@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import androidx.annotation.LayoutRes
-import com.duckduckgo.app.global.DuckDuckGoFragment
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
+import com.duckduckgo.common.ui.DuckDuckGoFragment
 
 abstract class OnboardingPageFragment(@LayoutRes contentLayoutId: Int = 0) : DuckDuckGoFragment(contentLayoutId) {
 

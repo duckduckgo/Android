@@ -23,10 +23,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.ui.view.setEnabledOpacity
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.quietlySetIsChecked
+import com.duckduckgo.common.ui.view.setEnabledOpacity
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType

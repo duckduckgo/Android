@@ -47,7 +47,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialG
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitle
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.menu.PopupMenu
 import kotlinx.coroutines.launch
 
 class AutofillManagementRecyclerAdapter(

@@ -40,7 +40,7 @@
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:orientation="vertical" >
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
         </LinearLayout>

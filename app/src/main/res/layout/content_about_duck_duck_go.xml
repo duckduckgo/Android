@@ -43,7 +43,7 @@
             android:contentDescription="@string/duckDuckGoLogoDescription"
             app:srcCompat="@drawable/logo_full" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
@@ -52,7 +52,7 @@
             android:textAlignment="center"
             app:typography="h3" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/aboutSeparator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
             tools:text="..."
             tools:ignore="HardcodedText" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/aboutText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,24 +78,24 @@
             app:typography="body1"
             tools:text="Long description would go here\n\nLots and lots of words" />
 
-        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/aboutPrivacyPolicy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/settingsPrivacyPolicyDuckduckgo" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/aboutVersion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/settingsVersion"
             tools:secondaryText="123.43.5456" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
             android:id="@+id/aboutProvideFeedback"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -26,7 +26,7 @@
     android:paddingBottom="8dp"
     android:gravity="center">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tracker_domain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

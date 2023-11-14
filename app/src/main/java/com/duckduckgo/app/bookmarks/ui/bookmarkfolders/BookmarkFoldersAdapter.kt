@@ -25,9 +25,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import com.duckduckgo.mobile.android.databinding.ViewSectionHeaderBinding
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import timber.log.Timber

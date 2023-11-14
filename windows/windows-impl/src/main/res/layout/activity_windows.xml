@@ -47,7 +47,7 @@
                 app:srcCompat="@drawable/ic_computer_win"
                 tools:ignore="ContentDescription" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/statusTitle"
                 android:layout_width="@dimen/keyline_empty"
                 android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/headerImage"
                 app:typography="h1" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/waitlistDescription"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                 app:typography="body1"
                 app:layout_constraintWidth_max="420dp" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/windowsDescriptionLink"
                 android:layout_width="@dimen/keyline_empty"
                 android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"
                 app:typography="body1_bold" />
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/windowsShareButton"
                 android:layout_width="@dimen/keyline_empty"
                 android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
                 app:layout_constraintVertical_bias="0.0"
                 app:layout_constraintWidth_max="420dp" />
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
                 android:id="@+id/lookingForMacVersionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

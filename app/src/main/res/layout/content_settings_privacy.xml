@@ -21,7 +21,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/settingsPrivacyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

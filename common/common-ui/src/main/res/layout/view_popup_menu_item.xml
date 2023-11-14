@@ -19,7 +19,7 @@
        xmlns:tools="http://schemas.android.com/tools"
        tools:parentTag="android.widget.LinearLayout">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

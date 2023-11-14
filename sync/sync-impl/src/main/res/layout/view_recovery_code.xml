@@ -35,7 +35,7 @@
         android:layout_gravity="center_horizontal"
         tools:ignore="ContentDescription"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/pdf_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
         app:typography="body1_bold"
         android:text="@string/sync_pdf_title"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/pdf_hint"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
         android:padding="@dimen/keyline_2"
         android:orientation="vertical">
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -86,7 +86,7 @@
             android:textColor="?attr/daxColorWhite"
             android:text="@string/sync_code_box_title"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -114,7 +114,7 @@
             android:layout_height="96dp"
             tools:ignore="ContentDescription"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/recoveryCodeText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -124,7 +124,7 @@
             tools:text="dfaslkñdfjañl añsdafjlsdañjfñlkjñklasjdf ñlk asdñfjadñdslj a ñafdkjfñalsdjkfñlajskdfñlkdajñldsajf"/>
     </LinearLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/questions_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -160,7 +160,7 @@
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4">
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center_horizontal"
@@ -171,7 +171,7 @@
                 android:background="@drawable/circled_accent_background"
                 android:text="1" tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
@@ -188,7 +188,7 @@
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4">
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="36dp"
                 android:layout_height="36sp"
                 android:layout_gravity="center_horizontal"
@@ -199,7 +199,7 @@
                 android:background="@drawable/circled_accent_background"
                 android:text="2" tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
@@ -216,7 +216,7 @@
             android:layout_weight="1"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginEnd="@dimen/keyline_4">
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="36dp"
                 android:layout_height="36sp"
                 android:layout_gravity="center_horizontal"
@@ -227,7 +227,7 @@
                 android:background="@drawable/circled_accent_background"
                 android:text="3" tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_2"
@@ -239,7 +239,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/horizontal_divider"
         android:layout_width="288dp"
         android:layout_height="1dp"

@@ -37,7 +37,7 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/keyline_5">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/autoconsentDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
                 app:textType="secondary"
                 app:typography="body2" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/autoconsentToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

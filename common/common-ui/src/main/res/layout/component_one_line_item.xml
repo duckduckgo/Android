@@ -20,7 +20,7 @@
     android:clipToPadding="false"
     android:paddingTop="@dimen/keyline_5">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/oneLineListTitle"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@id/oneLineListTitle"
         app:primaryText="This is a simple item " />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithSmallImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Small Leading Image " />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithMediumImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Medium Leading Image " />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLargeImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
         app:leadingIcon="@drawable/ic_dax_icon"
         app:primaryText="Item with Large Leading Image " />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithTrailingIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
         app:primaryText="Item With Trailing Icon"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLeadingAndTrailingIcons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
         app:primaryText="Item With Leading and Trailing Icons"
         app:trailingIcon="@drawable/ic_menu_vertical_24" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
         app:primaryText="Item with Switch Item"
         app:showSwitch="true" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListSwitchItemWithLeadingIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -122,7 +122,7 @@
         app:primaryText="Item With Switch and Leading Icon"
         app:showSwitch="true" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemSmallImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -133,7 +133,7 @@
         app:leadingIconSize="small"
         app:primaryText="Item disabled" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemDisabled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -143,7 +143,7 @@
         app:layout_constraintTop_toBottomOf="@id/oneLineListSwitchItemWithLeadingIcon"
         app:primaryText="Item disabled" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemCustomTextColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -154,7 +154,7 @@
         app:primaryText="Item with custom text color"
         app:primaryTextColorOverlay="@color/red_text_color_selector" />
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLongText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -164,7 +164,7 @@
         app:layout_constraintTop_toBottomOf="@id/oneLineListItemCustomTextColor"
         app:primaryText="Item with custom text color asdasda sd asda sdasda s"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/oneLineListItemWithLongTextTruncated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

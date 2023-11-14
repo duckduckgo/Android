@@ -24,8 +24,8 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.*
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.*
-import com.duckduckgo.mobile.android.ui.viewbinding.*
 import com.duckduckgo.saved.sites.impl.databinding.*
 import com.duckduckgo.savedsites.impl.sync.DisplayModeViewModel.ViewState
 import dagger.android.support.*

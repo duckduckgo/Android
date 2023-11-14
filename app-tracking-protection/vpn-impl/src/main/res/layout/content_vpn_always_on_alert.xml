@@ -54,7 +54,7 @@
         android:paddingEnd="@dimen/keyline_6"
         android:paddingBottom="@dimen/keyline_6"
     >
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/alwaysOnModalHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             android:text="@string/atp_AlwaysOnModalHeading"
         />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/alwaysOnModalDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
             android:text="@string/atp_AlwaysOnModalBody"
         />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/goToSettingsButton"
             app:buttonSize="large"
             android:layout_width="match_parent"
@@ -83,7 +83,7 @@
             android:text="@string/atp_PromoteAlwaysOnDialogSettings"
         />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/notNowButton"
             app:buttonSize="large"
             android:layout_width="match_parent"

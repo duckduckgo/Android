@@ -41,7 +41,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/trackingProtectionRestoreDefaultsTitle"
                     app:typography="h2"
                     android:layout_width="0dp"
@@ -53,7 +53,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/trackingProtectionRestoreDefaultsMessage"
                     app:typography="body2"
                     app:textType="secondary"
@@ -66,7 +66,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsTitle" />
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/trackingProtectionRestoreDefaultsRestore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                     app:layout_constraintStart_toEndOf="@id/trackingProtectionRestoreDefaultsCancel"
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsMessage" />
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
                     android:id="@+id/trackingProtectionRestoreDefaultsCancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionRestoreDefaultsMessage" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/trackingProtectionRestoreDefaultsDisclaimer"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

@@ -20,12 +20,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.duckduckgo.mobile.android.ui.view.button.RadioButton
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.listitem.DaxListItem.ImageBackground
-import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.common.ui.view.button.RadioButton
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ViewRadioListItemBinding
 

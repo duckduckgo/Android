@@ -20,7 +20,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
-    <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
         android:id="@+id/localSyncDevice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         android:visibility="gone"
         app:trailingIcon="@drawable/ic_menu_vertical_24"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/remoteSyncDevice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

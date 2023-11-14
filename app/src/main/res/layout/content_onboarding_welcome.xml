@@ -51,7 +51,7 @@
                 android:layout_marginTop="80dp"
                 app:srcCompat="@drawable/ic_dax_icon"/>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/welcomeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

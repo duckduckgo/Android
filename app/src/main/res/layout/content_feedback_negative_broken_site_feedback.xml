@@ -38,7 +38,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
             app:layout_constraintTop_toBottomOf="@id/emoticonImage"
             app:typography="h1" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/subtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
             app:layout_constraintTop_toBottomOf="@id/title"
             app:typography="body1" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/brokenSiteInput"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
             app:layout_constraintTop_toBottomOf="@id/subtitle"
             app:type="multi_line" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/openEndedFeedback"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
             app:layout_constraintTop_toBottomOf="@id/brokenSiteInput"
             app:type="multi_line" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/submitFeedbackButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -48,7 +48,7 @@
                 app:srcCompat="@drawable/private_search_header_image"
                 tools:ignore="ContentDescription" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/privateSearchTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                 app:typography="h2" />
 
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/privateSearchDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,17 +73,17 @@
                 app:textType="secondary"
                 app:typography="body2" />
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privateSearchHeadingSearchSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/privateSearchHeadingSearchSettings" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/privateSearchAutocompleteToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                 app:primaryText="@string/privateSearchAutocompleteToggle"
                 app:showSwitch="true" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/privateSearchMoreSearchSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

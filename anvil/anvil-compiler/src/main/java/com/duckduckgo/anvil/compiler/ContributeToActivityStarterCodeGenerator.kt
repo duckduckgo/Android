@@ -131,6 +131,6 @@ class ContributeToActivityStarterCodeGenerator : CodeGenerator {
         private val paramToActivityMapperFqName = FqName("com.duckduckgo.navigation.api.GlobalActivityStarter.ParamToActivityMapper")
         private val activityParamsFqName = FqName("com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams")
         private val appCompatActivityFqName = FqName("androidx.appcompat.app.AppCompatActivity")
-        private val duckduckgoActivityFqName = FqName("com.duckduckgo.app.global.DuckDuckGoActivity")
+        private val duckduckgoActivityFqName = FqName("com.duckduckgo.common.ui.DuckDuckGoActivity")
     }
 }

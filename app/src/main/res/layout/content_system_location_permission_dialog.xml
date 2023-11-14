@@ -36,14 +36,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/systemPermissionDialogTitle"
         app:typography="h2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/preciseLocationSystemDialogTitle"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/systemPermissionDialogSubtitle"
         app:typography="body1"
         android:layout_width="match_parent"
@@ -58,19 +58,19 @@
         android:gravity="end"
         android:orientation="vertical">
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/allowLocationPermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/preciseLocationSystemDialogAllow"/>
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/denyLocationPermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/preciseLocationSystemDialogDeny"/>
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
             android:id="@+id/neverAllowLocationPermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

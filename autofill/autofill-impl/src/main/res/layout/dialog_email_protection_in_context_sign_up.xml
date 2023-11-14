@@ -59,7 +59,7 @@
                 android:importantForAccessibility="no"
                 app:srcCompat="@drawable/ic_dax_icon" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/emailProtectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
 
         </LinearLayout>
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/dialogTitle"
@@ -83,7 +83,7 @@
             app:typography="h2" />
 
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/onboardingSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -95,7 +95,7 @@
             app:layout_constraintStart_toStartOf="@id/protectMyEmailButton"
             app:layout_constraintTop_toBottomOf="@id/dialogTitle" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/protectMyEmailButton"
             android:layout_width="0dp"
             app:buttonSize="large"
@@ -110,7 +110,7 @@
             app:layout_constraintWidth_max="300dp"
             app:layout_constraintWidth_percent="0.8" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
             android:id="@+id/doNotShowAgainButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

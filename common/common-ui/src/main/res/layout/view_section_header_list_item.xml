@@ -23,7 +23,7 @@
     android:minHeight="@dimen/sectionHeaderListItemHeight"
     android:orientation="horizontal">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/sectionHeaderText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         app:typography="h4"
         tools:text="Title Text" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.IconButton
+    <com.duckduckgo.common.ui.view.button.IconButton
         android:id="@+id/sectionHeaderOverflowIcon"
         android:layout_width="@dimen/sectionHeaderListItemImageSize"
         android:layout_height="@dimen/sectionHeaderListItemImageSize"

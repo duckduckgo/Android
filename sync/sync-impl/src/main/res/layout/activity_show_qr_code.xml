@@ -52,7 +52,7 @@
 
     </LinearLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/showQRCodeHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
         android:layout_margin="@dimen/keyline_4"
         android:text="@string/sync_connect_scan_qr_hint"/>
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/copyCodeButton"
         app:layout_constraintTop_toBottomOf="@+id/showQRCodeHint"
         android:layout_width="match_parent"

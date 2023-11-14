@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+<com.duckduckgo.common.ui.view.text.DaxTextInput
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/customDialogTextInput"
     android:layout_width="wrap_content"
