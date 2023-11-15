@@ -328,7 +328,7 @@ class BrokenSiteViewModelTest {
             consentManaged = false,
             consentOptOutFailed = false,
             consentSelfTestFailed = false,
-            params = arrayOf("dashboard_highlighted_toggle"),
+            params = emptyArray(),
             errorCodes = emptyArray(),
             httpErrorCodes = "",
             isDesktopMode = false,
@@ -340,7 +340,6 @@ class BrokenSiteViewModelTest {
             AppPixelName.BROKEN_SITE_REPORTED,
             mapOf(
                 "url" to trackingUrl,
-                "dashboard_highlighted_toggle" to true.toString(),
             ),
         )
     }
