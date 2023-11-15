@@ -58,6 +58,7 @@ jobs:
         id: sync-recovery-code
         with:
             debug: true
+            no-teardown: true
 
       - name: Sync Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.6.0
