@@ -16,6 +16,10 @@ tags:
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/sync_recovery_code_cta"
 - tapOn: "Navigate up"
+- scrollUntilVisible:
+    element:
+      text: "Sync & Backup"
+    direction: UP
 - tapOn: "Sync & Backup"
 - assertVisible:
     id: "com.duckduckgo.mobile.android:id/qrCodeImageView"
