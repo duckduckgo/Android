@@ -155,7 +155,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
         // No session-based setting --> check if DRM blocked by config
         if (sitePermissionsRepository.isDrmBlockedForUrlByConfig(url)) {
-            request.deny()
+            denyPermissions()
             return
         }
 
