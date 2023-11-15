@@ -83,24 +83,13 @@ class StartupBenchmarkBrowserTab {
     //region other tests
 
     @Test
-    fun loadGeeksHubsAcademyWithQueryParams() {
-        loadSite("https://geekshubsacademy.com/producto/tech-management-leadership/?utm_source=facebook&utm_medium=socialmedia-publicidad&utm_campaign=tml_2023&hsa_acc=332045313873526&hsa_cam=23850586615090327&hsa_grp=23851051149020327&hsa_ad=23852254380910327&hsa_src=ig&hsa_net=facebook&hsa_ver=3&fbclid=PAAablhGBkv9-h05KZiQsx0FCHf3nsjUqZfU66j_BEmT9gQlCe5TbhOL8IEiI")
+    fun loadLegoWithQueryParams() {
+        loadSite("https://www.lego.com/es-es/product/christmas-tree-40573?cmp=PSO-FBIG-EMEA-EN-RE-FIS-CV-Masterbrand_Occasion-SHOP-CvLL-LkAd-LL-Primary_Campaign-Conversion-Ads_Manager-Standard_Creative-ChristmasTree40573_GEEL&fbclid=PAAaZOw6rQAvD6B9VFf1E2LiPIOFOFFZfkZ8OJp_LhIibg08u477xskJm2LKI_aem_AZHUEcjd4BE_ubDCykquVV_o-TrG-Osf11-0PFviN-wOZFEeE6w_NDC4Qj97JZx5He54XOL5VBliKIpodp-YfNR8&external_browser_redirect=true")
     }
 
     @Test
     fun loadTwitchHttp() {
         loadSite("http://twitch.tv")
-    }
-
-
-    @Test
-    fun loadWhatfinger() {
-        loadSite("https://www.whatfinger.com/home2/")
-    }
-
-    @Test
-    fun loadAnsa() {
-        loadSite("www.ansa.it")
     }
 
     @Test
@@ -179,11 +168,13 @@ class StartupBenchmarkBrowserTab {
         measureBlock = {
             startActivityAndWait()
 
-            val selector = UiSelector()
-                .className("android.widget.EditText")
-                .instance(0)
+            val selector = By.text("Search or type URL")
+            device.findObject(selector).click()
             device.findObject(selector).text = site
             device.pressEnter()
+            val pageLoadingIndicatorSelector = By.res(packageName, "pageLoadingIndicator")
+            device.wait(Until.hasObject(pageLoadingIndicatorSelector), TIMEOUT_MS)
+            device.wait(Until.gone(pageLoadingIndicatorSelector), 5_000L)
 
             device.waitForIdle(TIMEOUT_MS)
         }
@@ -211,6 +202,21 @@ class StartupBenchmarkBrowserTab {
         }
 
         device.wait(Until.hasObject(By.text("Next,")), TIMEOUT_MS)
+        val tabSwitcher = device.findObject(By.res(packageName, "tabsMenu"))
+        tabSwitcher?.run {
+            click()
+            device.wait(Until.hasObject(By.res(packageName, "fire")), TIMEOUT_MS)
+            val fire = device.findObject(By.res(packageName, "fire"))
+            fire?.run {
+                click()
+                device.wait(Until.hasObject(By.text("Clear All Tabs And Data")), TIMEOUT_MS)
+                val clear = device.findObject(By.text("Clear All Tabs And Data"))
+                clear?.run {
+                    click()
+                    device.wait(Until.hasObject(By.text("Search or type URL")), TIMEOUT_MS)
+                }
+            }
+        }
     }
 
     @OptIn(ExperimentalMetricApi::class)
@@ -221,8 +227,6 @@ class StartupBenchmarkBrowserTab {
     ) = benchmarkRule.measureRepeated(
         packageName = TARGET_PACKAGE_NAME,
         metrics = listOf(
-            StartupTimingMetric(),
-            FrameTimingMetric(),
             TraceSectionMetric("LOAD_PAGE_START_TO_FINISH"),
         ),
         iterations = ITERATIONS,
