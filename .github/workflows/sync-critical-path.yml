@@ -31,7 +31,6 @@ jobs:
         id: sync-recovery-code
         with:
           debug: true
-          no-teardown: true
 
       - name: Create folder
         if: always()
@@ -54,7 +53,7 @@ jobs:
       - name: Assemble internal release APK
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleInternalRelease -Pforce-default-variant
+          arguments: assembleInternalRelease -Pforce-default-variant -x lint
 
       - name: Move APK to new folder
         if: always()
