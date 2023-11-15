@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
+import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
@@ -28,6 +29,10 @@ class FakeSyncableDataPersister(private val orphans: Boolean = false) : Syncable
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         return SyncMergeResult.Success(orphans)
+    }
+
+    override fun onError(error: SyncErrorResponse) {
+        // no-op
     }
 
     override fun onSyncDisabled() {

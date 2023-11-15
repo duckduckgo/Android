@@ -22,6 +22,8 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
+import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
+import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
@@ -44,17 +46,25 @@ class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
 ) : SyncableDataPersister {
 
-    override fun persist(
+    override fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         return if (changes.type == BOOKMARKS) {
+            savedSitesSyncStore.limitExceeded = false
             Timber.d("Sync-Bookmarks: received remote changes $changes, merging with resolution $conflictResolution")
             val result = process(changes, conflictResolution)
             Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
             result
         } else {
             Success(false)
+        }
+    }
+
+    override fun onError(error: SyncErrorResponse) {
+        when (error.featureSyncError) {
+            COLLECTION_LIMIT_REACHED -> savedSitesSyncStore.limitExceeded = true
+            else -> { /* no-op */ }
         }
     }
 

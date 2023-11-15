@@ -174,6 +174,9 @@ class RealSyncEngine @Inject constructor(
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
+                persisterPlugins.getPlugins().forEach {
+                    it.onError(SyncErrorResponse(changes.type, result.getError()))
+                }
             }
 
             is Success -> {

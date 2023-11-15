@@ -28,6 +28,11 @@ interface SyncableDataPersister {
     ): SyncMergeResult
 
     /**
+     * Syncing data failed due to an error related to this feature
+     */
+    fun onError(error: SyncErrorResponse)
+
+    /**
      * Sync Feature has been disabled / device has been removed
      * This is an opportunity for Features to do some local cleanup if needed
      */

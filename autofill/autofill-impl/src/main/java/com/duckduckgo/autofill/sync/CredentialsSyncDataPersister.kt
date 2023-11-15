@@ -25,6 +25,7 @@ import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
+import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import com.duckduckgo.sync.api.engine.SyncableDataPersister
@@ -59,6 +60,10 @@ class CredentialsSyncDataPersister @Inject constructor(
         } else {
             Success(false)
         }
+    }
+
+    override fun onError(error: SyncErrorResponse) {
+        TODO("Not yet implemented")
     }
 
     private fun process(

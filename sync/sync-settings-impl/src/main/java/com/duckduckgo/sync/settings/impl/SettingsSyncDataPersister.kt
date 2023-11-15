@@ -58,6 +58,10 @@ class SettingsSyncDataPersister @Inject constructor(
         return Success()
     }
 
+    override fun onError(error: SyncErrorResponse) {
+        TODO("Not yet implemented")
+    }
+
     private suspend fun process(
         changes: SyncChangesResponse,
         syncableSettings: Collection<SyncableSetting>,

@@ -28,6 +28,7 @@ interface SavedSitesSyncStore {
     var serverModifiedSince: String
     var startTimeStamp: String
     var clientModifiedSince: String
+    var limitExceeded: Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -43,6 +44,9 @@ class RealSavedSitesSyncStore @Inject constructor(private val context: Context) 
     override var clientModifiedSince: String
         get() = preferences.getString(KEY_CLIENT_MODIFIED_SINCE, "0") ?: "0"
         set(value) = preferences.edit(true) { putString(KEY_CLIENT_MODIFIED_SINCE, value) }
+    override var limitExceeded: Boolean
+        get() = preferences.getBoolean(KEY_CLIENT_LIMIT_EXCEEDED, false) ?: false
+        set(value) = preferences.edit(true) { putBoolean(KEY_CLIENT_LIMIT_EXCEEDED, value) }
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -52,5 +56,6 @@ class RealSavedSitesSyncStore @Inject constructor(private val context: Context) 
         private const val KEY_SERVER_MODIFIED_SINCE = "KEY_SERVER_MODIFIED_SINCE"
         private const val KEY_START_TIMESTAMP = "KEY_START_TIMESTAMP"
         private const val KEY_CLIENT_MODIFIED_SINCE = "KEY_CLIENT_MODIFIED_SINCE"
+        private const val KEY_CLIENT_LIMIT_EXCEEDED = "KEY_CLIENT_LIMIT_EXCEEDED"
     }
 }
