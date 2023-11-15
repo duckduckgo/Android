@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">É necessário um padrão de bloqueio de dispositivo, PIN ou biometria para proteger os teus inícios de sessão.</string>
     <string name="managementDisabledModeTitle">Proteger o dispositivo para guardar inícios de sessão</string>
 
-    <string name="saveLoginDialogButtonSave">Guardar início de sessão</string>
+    <string name="saveLoginDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Guardar palavra-passe</string>
     <string name="saveLoginDialogNotNow">Não guardar</string>
-    <string name="saveLoginDialogSubtitle">Os dados de início de sessão são armazenados de forma segura no teu dispositivo no menu Inícios de sessão.</string>
-    <string name="saveLoginDialogTitle">Queres que o DuckDuckGo guarde o teu início de sessão?</string>
+    <string name="saveLoginDialogSubtitle">As palavras-passe são armazenadas de forma segura no teu dispositivo no menu Inícios de sessão.</string>
+    <string name="saveLoginDialogTitle">Queres que o DuckDuckGo guarde a tua palavra-passe?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mais opções</string>
 
-    <string name="useSavedLoginDialogTitle">Utilizar um início de sessão guardado?</string>
+    <string name="useSavedLoginDialogTitle">Usar uma palavra-passe guardada?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Palavra-passe de %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Palavra-passe do site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Deste site</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Atualizar nome de utilizador</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atualizar palavra-passe de \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">O DuckDuckGo vai atualizar este início de sessão armazenado no teu dispositivo.</string>
+    <string name="updateLoginUpdatePasswordExplanation">O DuckDuckGo vai atualizar esta palavra-passe armazenada no teu dispositivo.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Fechar caixa de diálogo de preenchimento automático</string>
 

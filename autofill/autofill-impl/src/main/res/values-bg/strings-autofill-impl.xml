@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">За защита на данните за вход е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
     <string name="managementDisabledModeTitle">Защитете устройството, за да можете да запазвате данни за вход</string>
 
-    <string name="saveLoginDialogButtonSave">Запазване на данните за вход</string>
+    <string name="saveLoginDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не записвай</string>
-    <string name="saveLoginDialogSubtitle">Данните за вход се съхраняват на сигурно място в менюто Данни за вход на Вашето устройство.</string>
-    <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази данните за вход?</string>
+    <string name="saveLoginDialogSubtitle">Паролите се съхраняват на сигурно място в менюто Данни за вход на Вашето устройство.</string>
+    <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази Вашата парола?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
-    <string name="useSavedLoginDialogTitle">Да се използват ли запазените данни за вход?</string>
+    <string name="useSavedLoginDialogTitle">Използване на запазена парола?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Парола за %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Парола за сайта</string>
     <string name="useSavedLoginDialogGroupThisWebsite">От този уебсайт</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Актуализиране на потребителското име</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Актуализиране на паролата за \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo ще актуализира запазените данни за вход във Вашето устройство.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo ще актуализира запазената парола във Вашето устройство.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Затваряне на диалоговия прозорец за автоматично попълване</string>
 

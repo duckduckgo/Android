@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Logins.</string>
     <string name="managementDisabledModeTitle">Secure your device to save Logins</string>
 
-    <string name="saveLoginDialogButtonSave">Save Login</string>
+    <string name="saveLoginDialogButtonSave">Save Password</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Save Password</string>
     <string name="saveLoginDialogNotNow">Don\'t Save</string>
-    <string name="saveLoginDialogSubtitle">Logins are stored securely on your device in the Logins menu.</string>
-    <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your Login?</string>
+    <string name="saveLoginDialogSubtitle">Passwords are stored securely on your device in the Logins menu.</string>
+    <string name="saveLoginDialogTitle">Do you want DuckDuckGo to save your password?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">More Options</string>
 
-    <string name="useSavedLoginDialogTitle">Use a saved Login?</string>
+    <string name="useSavedLoginDialogTitle">Use a saved password?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Password for %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Password for site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">From This Website</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Update Username</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user's username for this site">Update password for \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation" >DuckDuckGo will update this stored Login on your device.</string>
+    <string name="updateLoginUpdatePasswordExplanation" >DuckDuckGo will update this stored password on your device.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Close Autofill Dialog</string>
 

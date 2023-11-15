@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine logins.</string>
     <string name="managementDisabledModeTitle">Beskyt din enhed for at gemme logins</string>
 
-    <string name="saveLoginDialogButtonSave">Gem login</string>
+    <string name="saveLoginDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginDialogNotNow">Gem ikke</string>
-    <string name="saveLoginDialogSubtitle">Logins gemmes sikkert på din enhed i menuen Logins.</string>
-    <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme dit login?</string>
+    <string name="saveLoginDialogSubtitle">Adgangskoder gemmes sikkert på din enhed i menuen Logins.</string>
+    <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme din adgangskode?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
-    <string name="useSavedLoginDialogTitle">Vil du bruge et gemt login?</string>
+    <string name="useSavedLoginDialogTitle">Brug en gemt adgangskode?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Adgangskode til %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Adgangskode til websted</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette websted</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Opdater brugernavn</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Opdater adgangskode for \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo opdaterer dette gemte login på din enhed.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo opdaterer denne gemte adgangskode på din enhed.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Luk dialogboksen for automatisk udfyldning</string>
 

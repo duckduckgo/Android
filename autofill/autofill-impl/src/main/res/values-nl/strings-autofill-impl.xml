@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Een vergrendelingspatroon, pincode of biometrische gegevens zijn noodzakelijk om je aanmeldgegevens te beschermen.</string>
     <string name="managementDisabledModeTitle">Beveilig je apparaat om aanmeldgegevens op te slaan</string>
 
-    <string name="saveLoginDialogButtonSave">Login opslaan</string>
+    <string name="saveLoginDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginDialogNotNow">Niet opslaan</string>
-    <string name="saveLoginDialogSubtitle">Aanmeldgegevens worden veilig opgeslagen op je apparaat in het menu \'Aanmeldingen\'.</string>
-    <string name="saveLoginDialogTitle">Wil je dat DuckDuckGo je login opslaat?</string>
+    <string name="saveLoginDialogSubtitle">Wachtwoorden worden veilig opgeslagen op je apparaat in het menu \'Aanmeldingen\'.</string>
+    <string name="saveLoginDialogTitle">Wil je dat DuckDuckGo je wachtwoord opslaat?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
-    <string name="useSavedLoginDialogTitle">Opgeslagen aanmeldgegevens gebruiken?</string>
+    <string name="useSavedLoginDialogTitle">Een opgeslagen wachtwoord gebruiken?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Wachtwoord voor %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Wachtwoord voor website</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Van deze website</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Gebruikersnaam bijwerken</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Wachtwoord bijwerken voor \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo werkt deze opgeslagen aanmeldgegevens op je apparaat bij.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo werkt dit opgeslagen wachtwoord op je apparaat bij.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Dialoogvenster Automatisch invullen sluiten</string>
 

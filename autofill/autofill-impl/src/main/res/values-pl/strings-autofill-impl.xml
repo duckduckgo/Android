@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Aby chronić dane logowania, korzystaj z blokady urządzenia za pomocą wzoru, kodu PIN lub danych biometrycznych.</string>
     <string name="managementDisabledModeTitle">Zabezpiecz urządzenie, aby chronić dane logowania</string>
 
-    <string name="saveLoginDialogButtonSave">Zapisz logowanie</string>
+    <string name="saveLoginDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginDialogNotNow">Nie zapisuj</string>
-    <string name="saveLoginDialogSubtitle">Loginy są bezpiecznie przechowywane na Twoim urządzeniu w menu Loginy.</string>
-    <string name="saveLoginDialogTitle">Czy chcesz zapisać dane logowania w DuckDuckGo?</string>
+    <string name="saveLoginDialogSubtitle">Hasła są bezpiecznie przechowywane na Twoim urządzeniu w menu Loginy.</string>
+    <string name="saveLoginDialogTitle">Czy chcesz zapisać hasło w DuckDuckGo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
-    <string name="useSavedLoginDialogTitle">Czy chcesz użyć zapisanego loginu?</string>
+    <string name="useSavedLoginDialogTitle">Użyć zapisanego hasła?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Hasło do witryny %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Hasło do witryny</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z tej strony</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Zaktualizuj nazwę użytkownika</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Zaktualizować hasło \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje ten zapisany login na Twoim urządzeniu.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje to zapisane hasło na Twoim urządzeniu.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zamknij okno dialogowe autouzupełniania</string>
 

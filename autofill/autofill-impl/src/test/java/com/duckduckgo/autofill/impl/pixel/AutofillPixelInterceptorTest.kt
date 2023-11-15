@@ -1,9 +1,9 @@
 package com.duckduckgo.autofill.impl.pixel
 
-import com.duckduckgo.app.global.api.FakeChain
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SAVE_LOGIN_PROMPT_SHOWN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelParameters.AUTOFILL_DEFAULT_STATE
 import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.common.test.api.FakeChain
 import okhttp3.HttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

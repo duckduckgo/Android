@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos identifiants.</string>
     <string name="managementDisabledModeTitle">Sécurisez votre appareil pour enregistrer des identifiants</string>
 
-    <string name="saveLoginDialogButtonSave">Enregistrer l\'identifiant</string>
+    <string name="saveLoginDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Ne pas enregistrer</string>
-    <string name="saveLoginDialogSubtitle">Les identifiants de connexion sont stockés en toute sécurité sur votre appareil dans le menu Identifiants.</string>
-    <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre identifiant ?</string>
+    <string name="saveLoginDialogSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil dans le menu Identifiants.</string>
+    <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre mot de passe ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
-    <string name="useSavedLoginDialogTitle">Utiliser un identifiant enregistré ?</string>
+    <string name="useSavedLoginDialogTitle">Utiliser un mot de passe enregistré ?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Mot de passe pour %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Mot de passe du site</string>
     <string name="useSavedLoginDialogGroupThisWebsite">À partir de ce site Web</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Modifier le nom d\'utilisateur</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Mettre à jour le mot de passe pour \n%1$s ?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo mettra à jour cet identifiant enregistré sur votre appareil.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo mettra à jour ce mot de passe enregistré sur votre appareil.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Fermer la boîte de dialogue de saisie automatique</string>
 

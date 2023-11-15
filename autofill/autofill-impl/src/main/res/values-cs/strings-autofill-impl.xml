@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Na ochranu přihlašovacích údajů se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
     <string name="managementDisabledModeTitle">Zabezpeč si zařízení, ať si můžeš ukládat přihlašovací údaje</string>
 
-    <string name="saveLoginDialogButtonSave">Uložit přihlašovací údaje</string>
+    <string name="saveLoginDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Neukládat</string>
-    <string name="saveLoginDialogSubtitle">Přihlašovací údaje jsou bezpečně uložené v zařízení v nabídce Přihlášení.</string>
-    <string name="saveLoginDialogTitle">Má DuckDuckGo uložit přihlašovací údaje?</string>
+    <string name="saveLoginDialogSubtitle">Hesla jsou bezpečně uložená v zařízení v nabídce Přihlášení.</string>
+    <string name="saveLoginDialogTitle">Má DuckDuckGo uložit heslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Použít uložené přihlášení?</string>
+    <string name="useSavedLoginDialogTitle">Použít uložené heslo?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Heslo pro %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Heslo pro web</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Z této webové stránky</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovat uživatelské jméno</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aktualizovat heslo pro \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje toto uložené přihlášení ve tvém zařízení.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aktualizuje tohle uložené heslo ve tvém zařízení.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 

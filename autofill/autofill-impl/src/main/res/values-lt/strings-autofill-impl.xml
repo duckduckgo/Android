@@ -23,14 +23,14 @@
     <string name="managementDisabledModeSubtitle">Prisijungimams apsaugoti reikia naudoti prietaiso užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad išsaugotumėte prisijungimus</string>
 
-    <string name="saveLoginDialogButtonSave">Išsaugoti prisijungimą</string>
+    <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Neišsaugokite</string>
-    <string name="saveLoginDialogSubtitle">Prisijungimai saugiai saugomi jūsų įrenginio meniu „Prisijungimai“.</string>
-    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų prisijungimą?</string>
+    <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginio meniu „Prisijungimai“.</string>
+    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų slaptažodį?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
-    <string name="useSavedLoginDialogTitle">Naudoti išsaugotą prisijungimą?</string>
+    <string name="useSavedLoginDialogTitle">Naudoti išsaugotą slaptažodį?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">„%1$s“ slaptažodis</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Svetainės slaptažodis</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Iš šios svetainės</string>
@@ -43,7 +43,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Atnaujinti naudotojo vardą</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atnaujinti \n%1$s slaptažodį?</string>
-    <string name="updateLoginUpdatePasswordExplanation">„DuckDuckGo“ atnaujins šį jūsų įrenginyje įrašytą prisijungimą.</string>
+    <string name="updateLoginUpdatePasswordExplanation">„DuckDuckGo“ atnaujins šį jūsų įrenginyje išsaugotą slaptažodį.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Uždaryti automatinio pildymo dialogo langą</string>
 

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.autofill.impl.pixel
 
-import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_DISABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_KEEP_USING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SHOWN
@@ -41,6 +40,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.MENU_ACTION_AUTOFIL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.SETTINGS_AUTOFILL_MANAGEMENT_OPENED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelParameters.AUTOFILL_DEFAULT_STATE
 import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
