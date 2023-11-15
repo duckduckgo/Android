@@ -58,7 +58,7 @@ class DeviceShieldTileService : TileService() {
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
     private var deviceShieldStatePollingJob = ConflatedJob()
-    private val serviceScope = CoroutineScope(dispatcherProvider.io())
+    private val serviceScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
