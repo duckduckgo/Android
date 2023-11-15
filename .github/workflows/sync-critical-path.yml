@@ -26,6 +26,13 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
+      - name: Create test account for Sync and return the recovery code
+        uses: duckduckgo/sync_crypto/action@main
+        id: sync-recovery-code
+        with:
+          debug: true
+          no-teardown: true
+
       - name: Create folder
         if: always()
         run: mkdir apk
@@ -52,13 +59,6 @@ jobs:
       - name: Move APK to new folder
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
-
-      - name: Create test account for Sync and return the recovery code
-        uses: duckduckgo/sync_crypto/action@main
-        id: sync-recovery-code
-        with:
-            debug: true
-            no-teardown: true
 
       - name: Sync Flows
         uses: mobile-dev-inc/action-maestro-cloud@v1.6.0
