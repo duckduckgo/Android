@@ -44,7 +44,7 @@
                 android:layout_marginTop="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
                     android:id="@+id/categoriesSelection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/appBreakageFormHeading"
                     app:typography="body2"
                     app:textType="secondary"
@@ -63,7 +63,7 @@
                     android:layout_marginTop="@dimen/keyline_4"
                     android:text="@string/atp_ReportBreakageFormWhatHappenedText"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
                     android:id="@+id/appBreakageFormFeedbackInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                     app:editable="true"
                     app:type="form_mode" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/appBreakageFormDisclaimer"
                     app:typography="body2"
                     app:textType="secondary"
@@ -85,7 +85,7 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/appBreakageFormConfirmationCheckbox"
             app:typography="body1"
             android:layout_width="match_parent"
@@ -95,11 +95,11 @@
             android:layout_marginTop="@dimen/keyline_4"
             android:text="@string/atp_ReportBreakageFormCheckboxText"/>
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/ctaNextFormSubmit"
             app:buttonSize="large"
             android:layout_width="match_parent"

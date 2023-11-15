@@ -17,7 +17,6 @@
 package com.duckduckgo.app.brokensite
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -26,6 +25,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*

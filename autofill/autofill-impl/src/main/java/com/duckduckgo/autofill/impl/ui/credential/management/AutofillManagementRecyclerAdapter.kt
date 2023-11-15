@@ -27,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
@@ -47,7 +46,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialG
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.extractTitle
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.launch
 
 class AutofillManagementRecyclerAdapter(

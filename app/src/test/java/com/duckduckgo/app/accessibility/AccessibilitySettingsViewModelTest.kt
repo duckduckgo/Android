@@ -17,8 +17,8 @@
 package com.duckduckgo.app.accessibility
 
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import kotlin.time.ExperimentalTime

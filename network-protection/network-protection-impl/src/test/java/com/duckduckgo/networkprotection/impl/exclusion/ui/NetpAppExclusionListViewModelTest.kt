@@ -19,7 +19,7 @@ package com.duckduckgo.networkprotection.impl.exclusion.ui
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.exclusion.SystemAppOverridesProvider
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
 import com.duckduckgo.mobile.android.vpn.ui.OpenVpnBreakageCategoryWithBrokenApp

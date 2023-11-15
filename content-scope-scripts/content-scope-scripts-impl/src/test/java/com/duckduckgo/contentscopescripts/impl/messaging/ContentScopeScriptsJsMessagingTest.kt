@@ -17,7 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper

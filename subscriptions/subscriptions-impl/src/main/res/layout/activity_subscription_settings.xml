@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -47,48 +47,48 @@
                     android:text="Your monthly subscription renews on April 20, 2027."
                     tools:ignore="HardcodedText"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     app:primaryText="Manage Devices" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/addDevice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Add to Another Device" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/removeDevice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Remove From This Device" />
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     app:primaryText="Manage Plan" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/changePlan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryText="Change Plan or Billing" />
 
-            <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     app:primaryText="Help and Support" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/faq"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

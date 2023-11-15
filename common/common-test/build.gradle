@@ -5,6 +5,10 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    namespace 'com.duckduckgo.common.test'
+}
+
 dependencies {
 
     // Dependencies for this Module

@@ -19,11 +19,11 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.utils.AppUrl.ParamKey
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

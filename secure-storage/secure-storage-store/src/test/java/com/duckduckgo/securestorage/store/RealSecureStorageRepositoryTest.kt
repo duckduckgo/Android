@@ -19,7 +19,7 @@ package com.duckduckgo.securestorage.store
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsDao
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity

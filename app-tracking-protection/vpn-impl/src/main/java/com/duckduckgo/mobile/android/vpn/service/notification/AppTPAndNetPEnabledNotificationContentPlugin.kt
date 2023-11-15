@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.core.text.HtmlCompat
-import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
+import com.duckduckgo.common.utils.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R

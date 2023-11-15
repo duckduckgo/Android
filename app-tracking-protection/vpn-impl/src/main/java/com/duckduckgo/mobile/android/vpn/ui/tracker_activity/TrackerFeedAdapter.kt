@@ -29,17 +29,16 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
-import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
-import com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
-import com.duckduckgo.mobile.android.ui.view.gone
-import com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.common.ui.recyclerviewext.StickyHeaders
+import com.duckduckgo.common.ui.view.divider.HorizontalDivider
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerFeedData
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.AppsProtectionStateView
 import com.duckduckgo.mobile.android.vpn.ui.util.TextDrawable
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -143,8 +142,8 @@ class TrackerFeedAdapter @Inject constructor(
         }
 
         val context: Context = view.context
-        val today = context.getString(com.duckduckgo.app.global.R.string.common_Today)
-        val yesterday = context.getString(com.duckduckgo.app.global.R.string.common_Yesterday)
+        val today = context.getString(com.duckduckgo.common.utils.R.string.common_Today)
+        val yesterday = context.getString(com.duckduckgo.common.utils.R.string.common_Yesterday)
 
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
             if (item.timestamp == today || item.timestamp == yesterday) {

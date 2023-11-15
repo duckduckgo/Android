@@ -34,7 +34,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogImage"
         app:textType="primary" app:typography="h2"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/textAlertDialogMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
         app:textType="secondary"
         app:typography="body1"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/textAlertDialogPositiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonDestructive
+    <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
         android:id="@+id/textAlertDialogPositiveDestructiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/textAlertDialogCancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
         app:layout_constraintEnd_toStartOf="@+id/textAlertDialogPositiveButton"
         app:layout_constraintTop_toBottomOf="@+id/textAlertDialogMessage"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/textAlertDialogCancelDestructiveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

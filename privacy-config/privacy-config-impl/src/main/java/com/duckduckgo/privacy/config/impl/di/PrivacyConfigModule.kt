@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase

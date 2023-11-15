@@ -17,9 +17,9 @@
 package com.duckduckgo.networkprotection.impl.pixels
 
 import android.content.Context
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
-import com.duckduckgo.app.global.extensions.isPrivateDnsActive
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.getPrivateDnsServerName
+import com.duckduckgo.common.utils.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason

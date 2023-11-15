@@ -16,7 +16,7 @@
 
 package com.duckduckgo.fingerprintprotection.store.features.fingerprintingscreensize
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
 import com.duckduckgo.fingerprintprotection.store.FingerprintingScreenSizeEntity
 import kotlinx.coroutines.CoroutineScope

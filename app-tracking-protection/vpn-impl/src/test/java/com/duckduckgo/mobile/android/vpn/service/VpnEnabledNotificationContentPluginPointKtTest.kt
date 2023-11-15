@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

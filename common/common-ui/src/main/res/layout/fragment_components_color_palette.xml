@@ -28,12 +28,12 @@
         android:paddingEnd="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_5">
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             app:primaryText="Base Palette"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
@@ -43,7 +43,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -53,7 +53,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -63,7 +63,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -73,7 +73,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -83,7 +83,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -93,7 +93,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -103,7 +103,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -113,7 +113,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -123,7 +123,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -133,7 +133,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"
@@ -143,7 +143,7 @@
             app:colorStrokeColor="?attr/daxColorBackgroundInverted"
             tools:ignore="HardcodedText"/>
 
-        <com.duckduckgo.mobile.android.themepreview.ui.widget.ColorAttributeView
+        <com.duckduckgo.common.ui.themepreview.ui.widget.ColorAttributeView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_2"

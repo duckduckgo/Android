@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

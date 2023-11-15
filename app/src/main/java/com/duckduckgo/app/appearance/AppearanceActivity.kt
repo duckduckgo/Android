@@ -25,12 +25,12 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.sendThemeChangedBroadcast
+import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
-import com.duckduckgo.mobile.android.ui.view.dialog.RadioListAlertDialogBuilder
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber

@@ -16,12 +16,12 @@
 
 package com.duckduckgo.autofill.sync
 
-import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsSyncDataPersister.Adapters.Companion.updatesAdapter
 import com.duckduckgo.autofill.sync.persister.CredentialsMergeStrategy
+import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncChangesResponse

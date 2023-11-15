@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/trackingProtectionTitle"
         app:typography="h2"
         android:layout_width="0dp"
@@ -45,7 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppIcon"
         tools:text="Facebook may experience issues if App Tracking Protection is enabled" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/trackingProtectionExcludeAppDialogEnable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
         app:layout_constraintStart_toEndOf="@id/trackingProtectionExcludeAppDialogSkip"
         app:layout_constraintTop_toBottomOf="@id/trackingProtectionTitle" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/trackingProtectionExcludeAppDialogSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/trackingProtectionAppIcon"
         app:layout_constraintEnd_toEndOf="@+id/trackingProtectionAppIcon" app:srcCompat="@drawable/ic_apptp_alert"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/trackingProtectionEnableProtectionDisclaimer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

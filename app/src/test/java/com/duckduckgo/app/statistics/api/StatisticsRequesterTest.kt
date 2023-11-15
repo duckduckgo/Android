@@ -16,13 +16,13 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.autofill.api.email.EmailManager
+import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import org.junit.Before

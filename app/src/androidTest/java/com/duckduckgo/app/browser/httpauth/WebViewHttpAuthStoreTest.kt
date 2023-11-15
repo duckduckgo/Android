@@ -21,11 +21,11 @@ import android.webkit.WebViewDatabase
 import androidx.lifecycle.LifecycleOwner
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.fire.AuthDatabaseLocator
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

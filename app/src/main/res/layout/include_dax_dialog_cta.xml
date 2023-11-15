@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_dax_icon" />
 
-    <com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView
+    <com.duckduckgo.common.ui.view.shape.DaxBubbleCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/hiddenTextCta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 tools:text="@string/onboardingDaxText"
                 tools:visibility="visible" />
 
-            <com.duckduckgo.mobile.android.ui.view.TypeAnimationTextView
+            <com.duckduckgo.common.ui.view.TypeAnimationTextView
                 android:id="@+id/dialogTextCta"
                 style="@style/Typography.DuckDuckGo.Body1"
                 android:layout_width="match_parent"
@@ -67,9 +67,9 @@
                 android:textColor="?attr/daxColorPrimaryText" />
 
         </FrameLayout>
-    </com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
+    </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/primaryCta"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

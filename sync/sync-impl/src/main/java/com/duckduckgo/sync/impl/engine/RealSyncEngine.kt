@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger

@@ -29,7 +29,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.mobile.android.ui.view.setAllParentsClip
+import com.duckduckgo.common.ui.view.setAllParentsClip
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecycleObserver {

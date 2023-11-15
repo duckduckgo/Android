@@ -19,9 +19,9 @@ package com.duckduckgo.app.tabs.ui
 import android.content.Context
 import android.net.Uri
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.isBlank
+import com.duckduckgo.common.utils.AppUrl
 
 fun TabEntity.displayTitle(context: Context): String {
     if (isBlank) {

@@ -25,10 +25,10 @@ import android.view.View
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.widget.WidgetPreferences
 import com.duckduckgo.widget.WidgetTheme

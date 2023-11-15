@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import java.util.UUID

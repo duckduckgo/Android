@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import androidx.room.Room
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry

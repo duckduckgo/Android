@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.contentblocking
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase

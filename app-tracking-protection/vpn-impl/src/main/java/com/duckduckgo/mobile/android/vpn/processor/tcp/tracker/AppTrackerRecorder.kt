@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks

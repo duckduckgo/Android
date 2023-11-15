@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
@@ -41,6 +40,7 @@ import com.duckduckgo.autofill.store.feature.email.incontext.ALL_MIGRATIONS as E
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextDatabase
 import com.duckduckgo.autofill.store.feature.email.incontext.EmailProtectionInContextFeatureRepository
 import com.duckduckgo.autofill.store.feature.email.incontext.RealEmailProtectionInContextFeatureRepository
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module

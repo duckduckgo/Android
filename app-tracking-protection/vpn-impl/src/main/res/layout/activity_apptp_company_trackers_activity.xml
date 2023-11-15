@@ -39,7 +39,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+            <com.duckduckgo.common.ui.view.InfoPanel
                 android:id="@+id/app_disabled_info_panel"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/info_panel_alert_background"
@@ -50,7 +50,7 @@
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"/>
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/tracking_attempts"
                 android:layout_marginTop="@dimen/keyline_4"
                 android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
                 android:paddingBottom="@dimen/keyline_5"
                 app:layout_constraintStart_toStartOf="parent"/>
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/tracking_learn_more"
                 app:typography="body2"
                 app:textType="secondary"

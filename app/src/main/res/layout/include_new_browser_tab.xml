@@ -64,7 +64,7 @@
                     app:srcCompat="@drawable/logo_full"
                     android:visibility="gone" />
 
-                <com.duckduckgo.mobile.android.ui.view.MessageCta
+                <com.duckduckgo.common.ui.view.MessageCta
                     android:id="@+id/messageCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

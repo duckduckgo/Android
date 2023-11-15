@@ -22,7 +22,7 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/netpVerifySubsStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

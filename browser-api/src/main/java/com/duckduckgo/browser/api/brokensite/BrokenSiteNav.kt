@@ -19,9 +19,9 @@ package com.duckduckgo.browser.api.brokensite
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
+import com.duckduckgo.common.utils.baseHost
 
 interface BrokenSiteNav {
     fun navigate(context: Context, data: BrokenSiteData): Intent

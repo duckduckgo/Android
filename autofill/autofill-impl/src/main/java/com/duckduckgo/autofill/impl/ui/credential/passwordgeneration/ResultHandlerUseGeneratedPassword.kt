@@ -20,7 +20,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
@@ -28,6 +27,7 @@ import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

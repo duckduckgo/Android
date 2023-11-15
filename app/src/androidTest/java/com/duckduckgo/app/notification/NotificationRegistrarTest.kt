@@ -18,8 +18,6 @@ package com.duckduckgo.app.notification
 
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
@@ -28,6 +26,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before

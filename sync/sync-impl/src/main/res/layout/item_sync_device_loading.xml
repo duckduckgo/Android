@@ -26,14 +26,14 @@
         android:orientation="horizontal"
         android:minHeight="@dimen/twoLineItemHeight">
 
-        <com.duckduckgo.mobile.android.ui.view.SkeletonView
+        <com.duckduckgo.common.ui.view.SkeletonView
             android:id="@+id/leadingIconBackground"
             android:layout_width="@dimen/listItemImageContainerSize"
             android:layout_height="@dimen/listItemImageContainerSize"
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_gravity="center_vertical"/>
 
-        <com.duckduckgo.mobile.android.ui.view.SkeletonView
+        <com.duckduckgo.common.ui.view.SkeletonView
             android:id="@+id/primaryText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

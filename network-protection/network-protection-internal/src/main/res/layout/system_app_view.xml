@@ -25,7 +25,7 @@
     android:paddingBottom="@dimen/keyline_2"
     android:gravity="center">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.OneLineListItem
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/system_app_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

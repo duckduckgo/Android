@@ -19,7 +19,7 @@ package com.duckduckgo.savedsites.store
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import java.util.UUID
 
 @Entity(tableName = "entities", primaryKeys = ["entityId"])

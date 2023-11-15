@@ -16,6 +16,9 @@
 
 package com.duckduckgo.app.global
 
+import com.duckduckgo.common.utils.sha1
+import com.duckduckgo.common.utils.sha256
+import com.duckduckgo.common.utils.verifySha256
 import org.junit.Assert.*
 import org.junit.Test
 

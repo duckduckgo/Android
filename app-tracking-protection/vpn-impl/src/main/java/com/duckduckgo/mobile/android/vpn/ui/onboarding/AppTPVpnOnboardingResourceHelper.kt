@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.TRACKERS_COUNT

@@ -20,9 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LifecycleOwner
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.RxPixelSenderTest.TestPixels.TEST
@@ -32,6 +30,8 @@ import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.test.InstantSchedulersRule
+import com.duckduckgo.common.utils.device.DeviceInfo
 import io.reactivex.Completable
 import java.util.concurrent.TimeoutException
 import org.junit.After

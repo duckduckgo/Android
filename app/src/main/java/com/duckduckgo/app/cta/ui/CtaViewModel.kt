@@ -25,7 +25,6 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
@@ -40,8 +39,9 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import dagger.SingleInstanceIn
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean

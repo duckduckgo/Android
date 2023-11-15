@@ -16,7 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import java.io.File

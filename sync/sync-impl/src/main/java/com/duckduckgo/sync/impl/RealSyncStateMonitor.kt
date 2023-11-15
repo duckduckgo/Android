@@ -16,9 +16,9 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncState.FAILED

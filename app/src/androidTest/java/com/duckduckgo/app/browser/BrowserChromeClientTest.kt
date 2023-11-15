@@ -30,8 +30,8 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import junit.framework.TestCase.assertTrue

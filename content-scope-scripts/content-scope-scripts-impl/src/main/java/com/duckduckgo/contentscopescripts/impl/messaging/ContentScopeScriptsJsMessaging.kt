@@ -19,7 +19,7 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.JsMessage

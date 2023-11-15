@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover

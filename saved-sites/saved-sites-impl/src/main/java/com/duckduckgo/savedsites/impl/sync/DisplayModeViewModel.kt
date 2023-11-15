@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.sync
 
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.*
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.savedsites.impl.FavoritesDisplayModeSettingsRepository
 import com.duckduckgo.savedsites.store.FavoritesDisplayMode
 import javax.inject.*

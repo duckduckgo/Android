@@ -20,14 +20,14 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/keyline_4">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/exclusion_item_header_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:textType="secondary"
         app:typography="body2" />
 
-    <com.duckduckgo.mobile.android.ui.view.InfoPanel
+    <com.duckduckgo.common.ui.view.InfoPanel
         android:id="@+id/exclusion_item_header_banner"
         style="@style/Widget.DuckDuckGo.InfoPanel"
         app:panelBackground="@drawable/info_panel_alert_background"

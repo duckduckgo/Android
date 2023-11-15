@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.sync
 
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.sync.api.SyncCrypto
 import javax.inject.Inject
 

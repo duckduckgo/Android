@@ -17,8 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import java.util.concurrent.TimeUnit

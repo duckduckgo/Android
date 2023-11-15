@@ -1,10 +1,10 @@
 package com.duckduckgo.autofill.sharedcreds
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.impl.sharedcreds.AppleSharedCredentialsParser
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialJsonReader
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.SharedCredentialConfig
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

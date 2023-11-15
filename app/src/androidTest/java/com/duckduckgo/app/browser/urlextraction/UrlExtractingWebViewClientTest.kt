@@ -20,11 +20,11 @@ import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope

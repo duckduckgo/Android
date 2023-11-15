@@ -16,11 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.api.FakeChain
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.FakeChain
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import org.junit.Assert

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE

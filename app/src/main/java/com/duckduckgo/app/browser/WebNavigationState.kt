@@ -18,9 +18,8 @@ package com.duckduckgo.app.browser
 
 import android.webkit.WebBackForwardList
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.WebNavigationStateChange.Unchanged
 import com.duckduckgo.app.browser.history.NavigationHistoryEntry
-import com.duckduckgo.app.global.isHttpsVersionOfUri
+import com.duckduckgo.common.utils.isHttpsVersionOfUri
 
 interface WebNavigationState {
     val originalUrl: String?

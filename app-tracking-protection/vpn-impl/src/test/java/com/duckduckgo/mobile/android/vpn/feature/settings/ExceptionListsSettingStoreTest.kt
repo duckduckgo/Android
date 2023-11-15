@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnAppTrackerBlockingDao

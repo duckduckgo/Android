@@ -16,7 +16,7 @@
 
 package com.duckduckgo.cookies.store
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_MAX_AGE
 import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_THRESHOLD
 import kotlinx.coroutines.test.TestScope

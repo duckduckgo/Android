@@ -22,7 +22,7 @@
     android:paddingTop="@dimen/keyline_2"
     android:orientation="vertical">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/country_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4">
-        <com.duckduckgo.mobile.android.ui.view.button.RadioButton
+        <com.duckduckgo.common.ui.view.button.RadioButton
             android:id="@+id/recommended_city_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

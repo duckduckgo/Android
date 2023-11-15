@@ -19,7 +19,6 @@ package com.duckduckgo.app.trackerdetection
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.trackerdetection.Client.ClientType.BLOCKING
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
@@ -27,6 +26,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.common.utils.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist

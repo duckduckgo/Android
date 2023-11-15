@@ -22,11 +22,11 @@ import android.database.sqlite.SQLiteDatabase
 import android.os.Build
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.fire.FireproofRepository
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.cookies.impl.DefaultCookieManagerProvider
 import com.duckduckgo.cookies.impl.SQLCookieRemover
 import com.duckduckgo.cookies.impl.features.CookiesFeature
@@ -41,7 +41,6 @@ import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacy.config.store.toFeatureException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.Locale

@@ -29,11 +29,11 @@ import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.app.utils.checkMainThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.checkMainThread
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao

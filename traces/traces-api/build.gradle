@@ -27,5 +27,5 @@ dependencies {
     implementation KotlinX.coroutines.core
 }
 android {
-  namespace 'com.duckduckgo.app.traces.api'
+  namespace 'com.duckduckgo.traces.api'
 }

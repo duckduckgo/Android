@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.settings.geoswitching
 
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.WgVpnControllerService
 import com.duckduckgo.networkprotection.impl.di.ProtectedVpnControllerService

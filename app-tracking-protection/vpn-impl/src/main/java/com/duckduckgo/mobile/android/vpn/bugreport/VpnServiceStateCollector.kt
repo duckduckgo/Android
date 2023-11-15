@@ -17,8 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import android.content.Context
-import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
-import com.duckduckgo.app.global.extensions.isPrivateDnsActive
+import com.duckduckgo.common.utils.extensions.getPrivateDnsServerName
+import com.duckduckgo.common.utils.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin

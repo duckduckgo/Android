@@ -1,6 +1,6 @@
 package com.duckduckgo.networkprotection.impl.pixels
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking

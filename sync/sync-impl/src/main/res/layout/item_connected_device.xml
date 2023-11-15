@@ -21,7 +21,7 @@
               android:layout_height="wrap_content"
               android:orientation="horizontal">
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/deviceName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
         android:maxLines="1"
         android:textAlignment="textStart"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+    <com.duckduckgo.common.ui.view.button.DaxButtonGhost
         android:id="@+id/logoutButton"
         android:layout_width="0dp"
         android:layout_weight="1"

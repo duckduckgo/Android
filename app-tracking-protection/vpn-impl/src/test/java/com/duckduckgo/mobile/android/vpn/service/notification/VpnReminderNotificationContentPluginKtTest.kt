@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service.notification
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.service.FakeVpnReminderNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin.NotificationPriority.HIGH

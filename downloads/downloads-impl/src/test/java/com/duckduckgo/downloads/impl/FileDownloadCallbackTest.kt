@@ -18,8 +18,8 @@ package com.duckduckgo.downloads.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadFailedMessage
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadStartedMessage
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadSuccessMessage

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics.api
 
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
@@ -25,6 +24,7 @@ import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding

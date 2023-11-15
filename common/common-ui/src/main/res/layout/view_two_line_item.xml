@@ -44,7 +44,7 @@
 
     </FrameLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/primaryText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
         app:layout_constraintStart_toEndOf="@id/primaryText"
         app:layout_constraintTop_toTopOf="@id/primaryText" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/secondaryText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
         app:barrierDirection="start"
         app:constraint_referenced_ids="trailingSwitch,trailingIconContainer" />
 
-    <com.duckduckgo.mobile.android.ui.view.SwitchView
+    <com.duckduckgo.common.ui.view.SwitchView
         android:id="@+id/trailingSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

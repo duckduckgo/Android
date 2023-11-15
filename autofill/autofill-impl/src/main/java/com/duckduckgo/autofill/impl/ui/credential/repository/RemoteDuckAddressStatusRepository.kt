@@ -16,11 +16,11 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.repository
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.service.DuckAddressStatusManagementService
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult
 import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRepository.ActivationStatusResult.*
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

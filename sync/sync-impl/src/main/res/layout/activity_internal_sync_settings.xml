@@ -32,12 +32,12 @@
             android:id="@+id/includeToolbar"
             layout="@layout/include_default_toolbar" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/sync_internal_environment_header" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.TwoLineListItem
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
             android:id="@+id/sync_internal_environment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
             app:primaryText="@string/sync_internal_environment_title"
             tools:secondaryText="@string/sync_internal_environment_subtitle_prod" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextInput
+        <com.duckduckgo.common.ui.view.text.DaxTextInput
             android:id="@+id/sync_recovery_code"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             app:editable="true"
             app:type="single_line" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/sync_recovery_code_cta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,11 +62,11 @@
             app:buttonSize="large"
             android:text="@string/sync_internal_recovery_code_cta"/>
 
-        <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+        <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:primaryText="@string/sync_internal_account_header" />
@@ -77,13 +77,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/userIdSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/userIdSectionHeader" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/userIdTextView"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -91,13 +91,13 @@
                 android:layout_height="wrap_content"
                 app:typography="body1" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/deviceIdSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/deviceIdSectionHeader" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/deviceIdTextView"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -105,13 +105,13 @@
                 android:layout_height="wrap_content"
                 app:typography="body1" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/deviceNameSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/deviceNameSectionHeader" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/deviceNameTextView"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -119,13 +119,13 @@
                 android:layout_height="wrap_content"
                 app:typography="body1" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/primaryKeySectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Primary key" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/primaryKeyTextView"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -133,13 +133,13 @@
                 android:layout_height="wrap_content"
                 app:typography="body1" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/secretKeySectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Secret key" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/secretKeyTextView"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -147,13 +147,13 @@
                 android:layout_height="wrap_content"
                 app:typography="body1" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/tokenSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="Latest token" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/tokenTextView"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_marginEnd="@dimen/keyline_4"
@@ -163,7 +163,7 @@
                 android:layout_height="wrap_content"
                 app:typography="body1" />
 
-            <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/connectedDevicesSectionHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -182,14 +182,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                 android:id="@+id/createAccountButton"
                 android:layout_width="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_height="wrap_content"
                 android:text="Create account" />
 
-            <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+            <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/accountStateTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -200,28 +200,28 @@
                 app:typography="body1" />
         </LinearLayout>
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/readQRButton"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Read QR code" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/showQRCode"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Show QR code" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/readConnectQRCode"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Connect (read QR)" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/connectQRCode"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
@@ -236,21 +236,21 @@
             android:visibility="gone"
             tools:ignore="ContentDescription" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/logoutButton"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="Logout" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/deleteAccountButton"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"
             android:layout_height="wrap_content"
             android:text="DeleteAccount" />
 
-        <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/resetButton"
             android:layout_width="wrap_content"
             android:layout_margin="10dp"

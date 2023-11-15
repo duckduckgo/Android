@@ -16,8 +16,9 @@
 
 package com.duckduckgo.savedsites.impl
 
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.formatters.time.*
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.formatters.time.*
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.savedsites.api.models.*
 import com.duckduckgo.savedsites.impl.sync.*

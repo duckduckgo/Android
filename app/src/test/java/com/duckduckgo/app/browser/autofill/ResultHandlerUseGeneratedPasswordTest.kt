@@ -20,7 +20,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.UseGeneratedPasswordDialog.Companion.KEY_ACCEPTED
@@ -32,6 +31,7 @@ import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonito
 import com.duckduckgo.autofill.api.store.AutofillStore
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.ResultHandlerUseGeneratedPassword
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

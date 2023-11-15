@@ -21,11 +21,11 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
-import com.duckduckgo.app.traces.api.StartupTraces
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.traces.api.StartupTraces
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow

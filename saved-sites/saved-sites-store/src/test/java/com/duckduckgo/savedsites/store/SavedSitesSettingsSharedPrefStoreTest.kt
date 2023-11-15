@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.savedsites.store.FavoritesDisplayMode.NATIVE
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore.Companion.FILENAME
 import com.duckduckgo.savedsites.store.SavedSitesSettingsSharedPrefStore.Companion.KEY_FAVORITES_DISPLAY_MODE

@@ -23,7 +23,7 @@ import android.widget.FrameLayout
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toHtml
 import androidx.core.text.toSpanned
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.databinding.ItemAboutQaBinding
 

@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.serviceworker
 
 import android.webkit.WebResourceRequest
 import androidx.test.filters.SdkSuppress
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.RequestInterceptor
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

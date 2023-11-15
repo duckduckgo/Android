@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.settings.impl
 
-import com.duckduckgo.app.global.plugins.*
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.sync.settings.api.SyncableSetting
 
 class SyncableSettingsPluginPoint(

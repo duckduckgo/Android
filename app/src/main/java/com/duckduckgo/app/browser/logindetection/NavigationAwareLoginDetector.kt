@@ -22,8 +22,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.WebNavigationStateChange
 import com.duckduckgo.app.fire.fireproofwebsite.ui.AutomaticFireproofSetting
-import com.duckduckgo.app.global.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.ValidUrl
+import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.common.utils.getValidUrl
 import kotlinx.coroutines.*
 import timber.log.Timber
 

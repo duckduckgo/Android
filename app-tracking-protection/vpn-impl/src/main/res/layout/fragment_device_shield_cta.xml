@@ -43,7 +43,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/deviceShieldCtaHeader"
         app:typography="body2"
         android:layout_width="0dp"
@@ -58,7 +58,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="App Tracking Protection is enabled and blocking tracking attempts across your apps" />
 
-    <com.duckduckgo.mobile.android.ui.view.divider.HorizontalDivider
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
         android:id="@+id/deviceShieldCtaSplitter"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

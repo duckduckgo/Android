@@ -26,12 +26,12 @@ import android.widget.RadioGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.ui.view.button.RadioButton
+import com.duckduckgo.common.ui.view.text.DaxTextView.TextType
+import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
+import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.H4
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.button.RadioButton
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.TextType
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography
-import com.duckduckgo.mobile.android.ui.view.text.DaxTextView.Typography.H4
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.configuration.WgServerDebugProvider
 import com.duckduckgo.networkprotection.impl.databinding.DialogGeoswitchingCityBinding

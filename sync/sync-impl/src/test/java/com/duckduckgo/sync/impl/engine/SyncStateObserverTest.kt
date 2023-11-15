@@ -1,6 +1,7 @@
 package com.duckduckgo.sync.impl.engine
 
 import com.duckduckgo.app.*
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.store.*
 import kotlinx.coroutines.*

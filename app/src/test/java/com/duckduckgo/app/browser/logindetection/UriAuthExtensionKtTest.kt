@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.logindetection
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.ValidUrl
-import com.duckduckgo.app.global.getValidUrl
+import com.duckduckgo.common.utils.ValidUrl
+import com.duckduckgo.common.utils.getValidUrl
 import java.lang.IllegalArgumentException
 import org.junit.Assert.*
 import org.junit.Test

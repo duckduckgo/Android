@@ -160,7 +160,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
     }
 
     companion object {
-        private val pluginPointFqName = FqName("com.duckduckgo.app.global.plugins.PluginPoint")
+        private val pluginPointFqName = FqName("com.duckduckgo.common.utils.plugins.PluginPoint")
         private val kotlinCollectionFqName = FqName("kotlin.collections.Collection")
         private val daggerSetFqName = FqName("com.duckduckgo.di.DaggerSet")
     }

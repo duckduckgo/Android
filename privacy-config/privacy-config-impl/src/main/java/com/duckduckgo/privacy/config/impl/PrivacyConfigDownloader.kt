@@ -17,7 +17,7 @@
 package com.duckduckgo.privacy.config.impl
 
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.extensions.extractETag
+import com.duckduckgo.common.utils.extensions.extractETag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Error
 import com.duckduckgo.privacy.config.impl.ConfigDownloadResult.Success

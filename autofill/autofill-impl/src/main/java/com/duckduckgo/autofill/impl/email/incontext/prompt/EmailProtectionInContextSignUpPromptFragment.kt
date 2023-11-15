@@ -28,13 +28,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.DialogEmailProtectionInContextSignUpBinding
 import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInContextSignUpPromptViewModel.Command.FinishWithResult
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.privacy.config.impl.referencetests.gpc
 
-import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.GpcException

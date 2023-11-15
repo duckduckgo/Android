@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.sync.persister
 
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.sync.*
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution
 import com.squareup.anvil.annotations.ContributesTo

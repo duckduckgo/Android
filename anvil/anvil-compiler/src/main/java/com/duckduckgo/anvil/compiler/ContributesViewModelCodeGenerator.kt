@@ -126,7 +126,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
     }
 
     companion object {
-        private val duckduckgoViewModelFactoryPluginFqName = FqName("com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin")
+        private val duckduckgoViewModelFactoryPluginFqName = FqName("com.duckduckgo.common.utils.plugins.view_model.ViewModelFactoryPlugin")
         private val singleInstanceAnnotationFqName = FqName("dagger.SingleInstanceIn")
     }
 

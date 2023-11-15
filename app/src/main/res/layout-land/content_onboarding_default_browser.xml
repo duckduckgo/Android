@@ -33,7 +33,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/browserProtectionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         app:layout_constraintVertical_chainStyle="packed"
         app:typography="h2"/>
 
-    <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+    <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/browserProtectionSubtitle"
         android:layout_width="282dp"
         android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
         app:layout_constraintStart_toStartOf="@+id/browserProtectionTitle" app:layout_constraintTop_toBottomOf="@+id/browserProtectionTitle"
         app:typography="body1"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
         android:id="@+id/launchSettingsButton"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
         app:layout_constraintStart_toStartOf="@+id/browserProtectionSubtitle"
         app:layout_constraintTop_toBottomOf="@+id/browserProtectionSubtitle"/>
 
-    <com.duckduckgo.mobile.android.ui.view.button.DaxButtonSecondary
+    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
         android:id="@+id/continueButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

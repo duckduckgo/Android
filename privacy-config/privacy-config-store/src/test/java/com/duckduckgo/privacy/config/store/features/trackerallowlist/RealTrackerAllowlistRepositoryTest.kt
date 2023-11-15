@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.store.features.trackerallowlist
 
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity

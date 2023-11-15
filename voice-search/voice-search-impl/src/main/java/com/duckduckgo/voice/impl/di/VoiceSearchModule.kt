@@ -19,7 +19,7 @@ package com.duckduckgo.voice.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
 import com.duckduckgo.voice.impl.remoteconfig.RealVoiceSearchFeatureRepository

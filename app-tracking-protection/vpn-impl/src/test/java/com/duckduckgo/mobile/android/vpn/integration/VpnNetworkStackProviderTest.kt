@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.integration
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.FakeVpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.VpnFeature

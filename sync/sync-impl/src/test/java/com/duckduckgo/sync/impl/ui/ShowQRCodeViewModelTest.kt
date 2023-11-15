@@ -18,7 +18,7 @@ package com.duckduckgo.sync.impl.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.TestSyncFixtures.jsonConnectKeyEncoded
 import com.duckduckgo.sync.TestSyncFixtures.qrBitmap
 import com.duckduckgo.sync.impl.Clipboard

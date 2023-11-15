@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.R.string
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.AppInfoType
 import com.duckduckgo.mobile.android.vpn.apps.AppsProtectionType.FilterType

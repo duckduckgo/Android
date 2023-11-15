@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.engine
 
-import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.sync.TestSyncFixtures
 import com.duckduckgo.sync.api.engine.ModifiedSince.FirstSync
 import com.duckduckgo.sync.api.engine.SyncChangesRequest

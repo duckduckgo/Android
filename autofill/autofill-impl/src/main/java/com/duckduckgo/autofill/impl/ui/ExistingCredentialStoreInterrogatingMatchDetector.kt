@@ -16,10 +16,10 @@
 
 package com.duckduckgo.autofill.impl.ui
 
-import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.autofill.api.ExistingCredentialMatchDetector
 import com.duckduckgo.autofill.api.store.AutofillStore
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject

@@ -27,7 +27,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.*
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationPlugin
@@ -36,6 +35,8 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

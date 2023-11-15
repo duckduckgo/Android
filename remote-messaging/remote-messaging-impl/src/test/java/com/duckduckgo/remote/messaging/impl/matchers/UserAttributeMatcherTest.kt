@@ -17,7 +17,7 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.remote.messaging.impl.models.*
 import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi

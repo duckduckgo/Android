@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.global.rating
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

@@ -1,7 +1,6 @@
 package com.duckduckgo.autofill.sharedcreds
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.autofill.impl.encoding.TestUrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.sharedcreds.RealShareableCredentialsUrlGenerator
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser
@@ -10,6 +9,7 @@ import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.SharedCr
 import com.duckduckgo.autofill.impl.sharedcreds.SharedCredentialsParser.UnidirectionalRule
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher.ExtractedUrlParts
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

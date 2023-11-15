@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.duckduckgo.mobile.android.ui.view.listitem.SectionHeaderListItem
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:id="@+id/sitePermissionsSectionHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

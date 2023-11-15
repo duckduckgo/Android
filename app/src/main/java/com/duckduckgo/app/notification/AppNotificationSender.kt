@@ -18,11 +18,11 @@ package com.duckduckgo.app.notification
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import timber.log.Timber
 
 class AppNotificationSender(

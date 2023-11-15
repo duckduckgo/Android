@@ -34,7 +34,7 @@
             android:background="?attr/daxColorDim"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+        <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/hideText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
             app:layout_constraintStart_toStartOf="@id/cardView"
             app:srcCompat="@drawable/ic_dax_icon" />
 
-        <com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView
+        <com.duckduckgo.common.ui.view.shape.DaxBubbleCardView
             android:id="@+id/cardView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/titleText"
                     app:typography="body1"
                     android:layout_width="match_parent"
@@ -90,20 +90,20 @@
                     android:scaleType="centerCrop"
                     app:lottie_loop="false" />
 
-                <com.duckduckgo.mobile.android.ui.view.text.DaxTextView
+                <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/descriptionText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="@dimen/daxDialogButtonSpacing"/>
 
-                <com.duckduckgo.mobile.android.ui.view.button.DaxButtonPrimary
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:buttonSize="large"
                     android:layout_marginTop="@dimen/daxDialogButtonSpacing" />
 
-                <com.duckduckgo.mobile.android.ui.view.button.DaxButtonGhost
+                <com.duckduckgo.common.ui.view.button.DaxButtonGhost
                     android:id="@+id/secondaryCta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -111,6 +111,6 @@
                     android:layout_marginTop="@dimen/keyline_1"/>
 
             </LinearLayout>
-        </com.duckduckgo.mobile.android.ui.view.shape.DaxBubbleCardView>
+        </com.duckduckgo.common.ui.view.shape.DaxBubbleCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

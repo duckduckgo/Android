@@ -16,9 +16,9 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle

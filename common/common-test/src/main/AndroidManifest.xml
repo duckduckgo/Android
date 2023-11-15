@@ -15,12 +15,11 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.app.test">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <instrumentation
         android:name="androidx.test.runner.AndroidJUnitRunner"
-        android:targetPackage="com.duckduckgo.app.test"
+        android:targetPackage="com.duckduckgo.common.test"
         android:label="Test for common"
         />
 

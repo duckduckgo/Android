@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.duckduckgo.mobile.android.ui.view.button.IconButton
+        <com.duckduckgo.common.ui.view.button.IconButton
             android:id="@+id/upAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
 
     </FrameLayout>
 
-    <com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
+    <com.duckduckgo.common.ui.view.KeyboardAwareEditText
         android:id="@+id/omnibarTextInput"
         style="@style/Base.V7.Widget.AppCompat.EditText"
         android:layout_width="0dp"
@@ -62,7 +62,7 @@
         app:layout_goneMarginEnd="@dimen/keyline_2"
         tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
 
-    <com.duckduckgo.mobile.android.ui.view.button.IconButton
+    <com.duckduckgo.common.ui.view.button.IconButton
         android:id="@+id/clearTextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
