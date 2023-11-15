@@ -24,7 +24,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.voice.api.VoiceSearchStatusListener
 import com.duckduckgo.voice.impl.remoteconfig.RealVoiceSearchFeatureRepository
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
-import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchSetting
 import com.duckduckgo.voice.store.ALL_MIGRATIONS
 import com.duckduckgo.voice.store.RealVoiceSearchRepository
 import com.duckduckgo.voice.store.SharedPreferencesVoiceSearchDataStore
@@ -32,9 +31,6 @@ import com.duckduckgo.voice.store.VoiceSearchDataStore
 import com.duckduckgo.voice.store.VoiceSearchDatabase
 import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -72,12 +68,5 @@ object VoiceSearchModule {
         dispatcherProvider: DispatcherProvider,
     ): VoiceSearchFeatureRepository {
         return RealVoiceSearchFeatureRepository(database, appCoroutineScope, dispatcherProvider)
-    }
-
-    @SingleInstanceIn(AppScope::class)
-    @Provides
-    fun provideVoiceSearchJsonAdapter(): JsonAdapter<VoiceSearchSetting> {
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        return moshi.adapter(VoiceSearchSetting::class.java)
     }
 }
