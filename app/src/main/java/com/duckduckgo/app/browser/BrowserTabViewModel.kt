@@ -149,6 +149,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
 @ContributesViewModel(FragmentScope::class)
@@ -1517,7 +1518,7 @@ class BrowserTabViewModel @Inject constructor(
             return
         }
 
-        if (site?.domainMatchesUrl(origin) == false) {
+        if (!sameEffectiveTldPlusOne(site, origin)) {
             onSiteLocationPermissionAlwaysDenied()
             return
         }
@@ -1544,6 +1545,16 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun sameEffectiveTldPlusOne(site: Site?, origin: String): Boolean {
+        val siteDomain = site?.url?.toHttpUrlOrNull() ?: return false
+        val originDomain = origin.toUri().toString().toHttpUrlOrNull() ?: return false
+
+        val siteETldPlusOne = siteDomain.topPrivateDomain()
+        val originETldPlusOne = originDomain.topPrivateDomain()
+
+        return siteETldPlusOne == originETldPlusOne
     }
 
     fun onSiteLocationPermissionSelected(
