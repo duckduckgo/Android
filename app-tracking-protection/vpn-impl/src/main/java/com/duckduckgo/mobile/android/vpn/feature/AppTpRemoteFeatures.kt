@@ -71,11 +71,13 @@ class AppTpRemoteFeaturesStore @Inject constructor(
     private val stateAdapter: JsonAdapter<State> = moshi.newBuilder().add(KotlinJsonAdapterFactory()).build().adapter(State::class.java)
     private val listener = OnSharedPreferenceChangeListener { preferences, key ->
         coroutineScope.launch(dispatcherProvider.io()) {
-            val state = preferences.load(key)
-            if (state == null) {
-                togglesCache.remove(key)
-            } else {
-                togglesCache[key] = state
+            key?.let {
+                val state = preferences.load(key)
+                if (state == null) {
+                    togglesCache.remove(key)
+                } else {
+                    togglesCache[key] = state
+                }
             }
         }
     }

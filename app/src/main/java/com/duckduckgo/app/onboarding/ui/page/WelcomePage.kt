@@ -39,7 +39,6 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -71,8 +70,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimationFinished = false
 
-    // we use a BroadcastChannel because we don't want to emit the last value upon subscription
-    private val events = BroadcastChannel<WelcomePageView.Event>(1)
+    private val events = MutableSharedFlow<WelcomePageView.Event>(replay = 1)
 
     private val welcomePageViewModel: WelcomePageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
@@ -91,7 +89,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
         setSkipAnimationListener()
 
         lifecycleScope.launch {
-            events.asFlow()
+            events
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .flowOn(dispatcherProvider.io())
                 .collect(::render)
@@ -121,7 +119,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome) 
 
     private fun event(event: WelcomePageView.Event) {
         lifecycleScope.launch(dispatcherProvider.io()) {
-            events.send(event)
+            events.emit(event)
         }
     }
 
