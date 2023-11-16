@@ -17,7 +17,7 @@
 package com.duckduckgo.sync.impl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedFailDupUser
 import com.duckduckgo.sync.TestSyncFixtures.accountCreatedSuccess
 import com.duckduckgo.sync.TestSyncFixtures.accountKeys
