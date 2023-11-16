@@ -19,6 +19,9 @@ package com.duckduckgo.app.brokensite.api
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.brokensite.model.ReportFlow
+import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
+import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -101,6 +104,7 @@ class BrokenSiteSubmitter @Inject constructor(
                 ERROR_CODES_KEY to brokenSite.errorCodes,
                 HTTP_ERROR_CODES_KEY to brokenSite.httpErrorCodes,
                 PROTECTIONS_STATE to protectionsState.toString(),
+                REPORT_FLOW to brokenSite.reportFlow.toStringValue(),
             )
 
             val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
@@ -160,7 +164,13 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val PROTECTIONS_STATE = "protectionsState"
         private const val LAST_SENT_DAY = "lastSentDay"
         private const val LOGIN_SITE = "loginSite"
+        private const val REPORT_FLOW = "reportFlow"
     }
 }
 
 fun Boolean.toBinaryString(): String = if (this) "1" else "0"
+
+private fun ReportFlow.toStringValue(): String = when (this) {
+    DASHBOARD -> "dashboard"
+    MENU -> "menu"
+}

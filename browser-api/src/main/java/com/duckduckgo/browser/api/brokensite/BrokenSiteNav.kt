@@ -39,9 +39,12 @@ data class BrokenSiteData(
     val errorCodes: List<String>,
     val httpErrorCodes: String,
     val isDesktopMode: Boolean,
+    val reportFlow: ReportFlow,
 ) {
+    enum class ReportFlow { MENU, DASHBOARD }
+
     companion object {
-        fun fromSite(site: Site?): BrokenSiteData {
+        fun fromSite(site: Site?, reportFlow: ReportFlow): BrokenSiteData {
             val events = site?.trackingEvents
             val blockedTrackers = events?.filter { it.status == TrackerStatus.BLOCKED }
                 ?.map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
@@ -68,6 +71,7 @@ data class BrokenSiteData(
                 errorCodes = errorCodes,
                 httpErrorCodes = httErrorCodes,
                 isDesktopMode = isDesktopMode,
+                reportFlow = reportFlow,
             )
         }
     }

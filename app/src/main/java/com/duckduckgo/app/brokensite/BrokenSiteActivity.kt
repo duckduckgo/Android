@@ -34,12 +34,14 @@ import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.extensions.getSerializableExtra
 import com.duckduckgo.di.scopes.ActivityScope
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
@@ -86,6 +88,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val errorCodes = intent.getStringArrayExtra(ERROR_CODES).orEmpty()
         val httpErrorCodes = intent.getStringExtra(HTTP_ERROR_CODES).orEmpty()
         val isDesktopMode = intent.getBooleanExtra(IS_DESKTOP_MODE, false)
+        val reportFlow = intent.getSerializableExtra<ReportFlow>(REPORT_FLOW)!!
         viewModel.setInitialBrokenSite(
             url = url,
             blockedTrackers = blockedTrackers,
@@ -98,6 +101,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             errorCodes = errorCodes,
             httpErrorCodes = httpErrorCodes,
             isDesktopMode = isDesktopMode,
+            reportFlow = reportFlow,
         )
     }
 
@@ -243,6 +247,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val ERROR_CODES = "ERROR_CODES"
         private const val HTTP_ERROR_CODES = "HTTP_ERROR_CODES"
         private const val IS_DESKTOP_MODE = "IS_DESKTOP_MODE"
+        private const val REPORT_FLOW = "report_flow"
 
         fun intent(
             context: Context,
@@ -260,6 +265,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(ERROR_CODES, data.errorCodes.toTypedArray())
             intent.putExtra(HTTP_ERROR_CODES, data.httpErrorCodes)
             intent.putExtra(IS_DESKTOP_MODE, data.isDesktopMode)
+            intent.putExtra(REPORT_FLOW, data.reportFlow)
             return intent
         }
     }
