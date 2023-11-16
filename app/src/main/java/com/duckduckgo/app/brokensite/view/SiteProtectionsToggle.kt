@@ -43,7 +43,9 @@ class SiteProtectionsToggle @JvmOverloads constructor(
 
     fun setOnProtectionsToggledListener(listener: (Boolean) -> Unit) {
         binding.protectionsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            listener.invoke(isChecked)
+            if (isChecked != areProtectionsEnabled()) {
+                listener.invoke(isChecked)
+            }
         }
     }
 
@@ -79,5 +81,12 @@ class SiteProtectionsToggle @JvmOverloads constructor(
                 protectionsBannerMessageContainer.setBackgroundResource(R.drawable.background_site_protections_toggle_banner_alert)
             }
         }
+    }
+
+    private fun areProtectionsEnabled(): Boolean = when (state) {
+        SiteProtectionsState.ENABLED -> true
+        SiteProtectionsState.DISABLED,
+        SiteProtectionsState.DISABLED_BY_REMOTE_CONFIG,
+        -> false
     }
 }
