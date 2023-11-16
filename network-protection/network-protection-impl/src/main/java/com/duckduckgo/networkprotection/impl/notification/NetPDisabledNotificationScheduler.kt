@@ -27,6 +27,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.waitlist.NetPRemoteFeature
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -43,6 +44,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    private val netPRemoteFeature: NetPRemoteFeature,
 ) : VpnServiceCallbacks {
 
     private var isNetPEnabled: AtomicReference<Boolean> = AtomicReference(false)
@@ -77,7 +79,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
 
     private suspend fun shouldShowImmediateNotification(): Boolean {
         // When VPN is stopped and if AppTP has been enabled AND user has been onboarded, then we show the disabled notif
-        return isNetPEnabled.get() && networkProtectionState.isOnboarded()
+        return isNetPEnabled.get() && networkProtectionState.isOnboarded() && netPRemoteFeature.waitlistBetaActive().isEnabled()
     }
 
     private suspend fun onVPNManuallyStopped() {
@@ -91,7 +93,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     override fun onVpnReconfigured(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
             val reconfiguredNetPState = networkProtectionState.isEnabled()
-            if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState) {
+            if (isNetPEnabled.getAndSet(reconfiguredNetPState) != reconfiguredNetPState && netPRemoteFeature.waitlistBetaActive().isEnabled()) {
                 if (!reconfiguredNetPState) {
                     logcat { "VPN has been reconfigured, showing disabled notification for NetP" }
                     showDisabledNotification()
