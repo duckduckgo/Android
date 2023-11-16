@@ -153,6 +153,7 @@
         <item name="daxColorPrimaryInvertedText">@color/black84</item>
         <item name="daxColorSecondaryText">@color/white60</item>
         <item name="daxColorSecondaryInvertedText">@color/black60</item>
+        <item name="daxColorTertiaryText">@color/white48</item>
         <item name="daxColorPrimaryIcon">@color/white84</item>
         <item name="daxColorDestructive">@color/alertRedOnDarkDefault</item>
         <item name="daxColorIconDisabled">@color/white40</item>
@@ -225,6 +226,7 @@
         <item name="daxColorPrimaryInvertedText">@color/white84</item>
         <item name="daxColorSecondaryText">@color/black60</item>
         <item name="daxColorSecondaryInvertedText">@color/white60</item>
+        <item name="daxColorTertiaryText">@color/black48</item>
         <item name="daxColorPrimaryIcon">@color/black84</item>
         <item name="daxColorIconDisabled">@color/black40</item>
         <item name="daxColorDestructive">@color/alertRedOnLightDefault</item>

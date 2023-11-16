@@ -51,7 +51,7 @@ class SectionHeaderListItem @JvmOverloads constructor(
         ).apply {
             primaryText = getString(R.styleable.SectionHeaderListItem_primaryText).orEmpty()
             binding.sectionHeaderText.text = primaryText
-            binding.sectionHeaderText.setTextColor(ContextCompat.getColorStateList(context, R.color.accent_blue_text_color_selector))
+            binding.sectionHeaderText.setTextColor(ContextCompat.getColorStateList(context, R.color.tertiary_text_color_selector))
 
             val showOverflowMenuIcon = getBoolean(R.styleable.SectionHeaderListItem_showOverflowMenu, false)
             if (showOverflowMenuIcon) {
