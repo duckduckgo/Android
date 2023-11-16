@@ -133,6 +133,7 @@ import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
+import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.DaxDialogCta.*
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -416,6 +417,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
+
+    @Inject
+    lateinit var webContentDebugging: WebContentDebugging
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2124,9 +2128,7 @@ class BrowserTabFragment :
             )
         }
 
-        if (appBuildConfig.isDebug) {
-            WebView.setWebContentsDebuggingEnabled(true)
-        }
+        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {

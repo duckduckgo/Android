@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
+import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
@@ -39,12 +40,17 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.internal.PrivacyConfigInternalSettingsActivity
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
 class DevSettingsActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var webContentDebuggingFeature: WebContentDebuggingFeature
 
     private val binding: ActivityDevSettingsBinding by viewBinding()
 
@@ -81,6 +87,9 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
+        binding.enableWebContentDebugging.quietlySetIsChecked(webContentDebuggingFeature.webContentDebugging().isEnabled()) { _, isChecked ->
+            webContentDebuggingFeature.webContentDebugging().setEnabled(Toggle.State(enable = isChecked))
+        }
         binding.triggerAnr.setOnClickListener {
             Handler(Looper.getMainLooper()).post {
                 Thread.sleep(10000)

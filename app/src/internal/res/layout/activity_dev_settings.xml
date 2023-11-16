@@ -58,6 +58,15 @@
                 app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/enableWebContentDebugging"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryText="@string/devEnableWebContentDebuggingTitle"
+                    app:secondaryText="@string/devEnableWebContentDebuggingByline"
+                    app:showSwitch="true"
+            />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/triggerAnr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
