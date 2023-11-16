@@ -1,0 +1,30 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - securityTest
+---
+# Test 1
+- doubleTapOn:
+    id: "omnibarTextInput"
+- pressKey: Backspace
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-download-url.html"
+- pressKey: Enter
+- tapOn: "Start"
+# Download Acceptance Flow:
+- extendedWaitUntil:
+    visible: "Save to Downloads"
+    timeout: 10000
+- tapOn: "Save to Downloads"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "Search or type URL"} # Downloads should occur in empty origin.
+- pressKey: Back
+# Download Cancel Flow:
+- tapOn: "Start"
+- extendedWaitUntil:
+    visible: "Cancel"  
+    timeout: 10000
+- tapOn: "Cancel"
+# Should redirect back to the last page.
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-download-url.html"} 
