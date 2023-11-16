@@ -30,7 +30,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -105,20 +104,6 @@ class PrivacyDashboardHybridViewModelTest {
 
     @Test
     fun whenOnPrivacyProtectionClickedThenUpdateViewState() = runTest {
-        testee.onSiteChanged(site(siteAllowed = false))
-        testee.onPrivacyProtectionsClicked(enabled = false)
-
-        testee.viewState.test {
-            awaitItem()
-            val viewState = awaitItem()
-            assertTrue(viewState!!.userChangedValues)
-            assertFalse(viewState.protectionStatus.allowlisted)
-            verify(pixel).fire(PRIVACY_DASHBOARD_OPENED)
-        }
-    }
-
-    @Test
-    fun whenOnPrivacyProtectionClickedThenUpdateViewStateWithParam() = runTest {
         testee.onSiteChanged(site(siteAllowed = false))
         testee.onPrivacyProtectionsClicked(enabled = false)
 

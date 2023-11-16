@@ -221,16 +221,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         this.site.value = site
     }
 
-    private suspend fun createRemoteFeatureSettingsViewState() = withContext(dispatcher.io()) {
-        return@withContext RemoteFeatureSettingsViewState(
-            primaryScreen = PrimaryScreenSettings(
-                layout = LayoutType.DEFAULT.value,
-            ),
-        )
-    }
-
     private suspend fun updateSite(site: Site) {
-        val remoteFeatureSettings = createRemoteFeatureSettingsViewState()
         withContext(dispatcher.main()) {
             viewState.emit(
                 ViewState(
@@ -238,7 +229,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                     requestData = requestDataViewStateMapper.mapFromSite(site),
                     protectionStatus = protectionStatusViewStateMapper.mapFromSite(site),
                     cookiePromptManagementStatus = autoconsentStatusViewStateMapper.mapFromSite(site),
-                    remoteFeatureSettings = remoteFeatureSettings,
                 ),
             )
         }
