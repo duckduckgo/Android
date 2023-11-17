@@ -19,6 +19,7 @@ package com.duckduckgo.app.referencetests.brokensites
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -169,6 +170,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 errorCodes = "",
                 httpErrorCodes = "",
                 loginSite = null,
+                reportFlow = ReportFlow.MENU,
             )
 
             testee.submitBrokenSiteFeedback(brokenSite)

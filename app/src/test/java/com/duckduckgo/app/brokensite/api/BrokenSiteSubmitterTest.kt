@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
+import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
@@ -258,6 +259,7 @@ class BrokenSiteSubmitterTest {
             errorCodes = "",
             httpErrorCodes = "",
             loginSite = null,
+            reportFlow = ReportFlow.MENU,
         )
     }
 }
