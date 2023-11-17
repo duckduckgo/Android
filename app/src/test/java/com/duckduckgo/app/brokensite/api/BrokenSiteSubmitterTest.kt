@@ -4,6 +4,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.ReportFlow
+import com.duckduckgo.app.brokensite.model.ReportFlow.DASHBOARD
+import com.duckduckgo.app.brokensite.model.ReportFlow.MENU
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.model.Atb
@@ -239,6 +241,34 @@ class BrokenSiteSubmitterTest {
         val params = paramsCaptor.firstValue
 
         assertFalse(params.containsKey("loginSite"))
+    }
+
+    @Test
+    fun whenReportFlowIsMenuThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(reportFlow = MENU)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any())
+        val params = paramsCaptor.firstValue
+
+        assertEquals("menu", params["reportFlow"])
+    }
+
+    @Test
+    fun whenReportFlowIsDashboardThenIncludeParam() {
+        val brokenSite = getBrokenSite()
+            .copy(reportFlow = DASHBOARD)
+
+        testee.submitBrokenSiteFeedback(brokenSite)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), any())
+        val params = paramsCaptor.firstValue
+
+        assertEquals("dashboard", params["reportFlow"])
     }
 
     private fun getBrokenSite(): BrokenSite {
