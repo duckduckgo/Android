@@ -38,6 +38,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import logcat.logcat
+import java.util.concurrent.TimeUnit
 
 @ContributesBinding(AppScope::class)
 class RealVpnStateMonitor @Inject constructor(
@@ -110,7 +111,7 @@ class RealVpnStateMonitor @Inject constructor(
             ENABLING -> VpnRunningState.ENABLING
             ENABLED -> VpnRunningState.ENABLED
             DISABLED -> VpnRunningState.DISABLED()
-            SNOOZED -> VpnRunningState.DISABLED(10_000)
+            SNOOZED -> VpnRunningState.DISABLED(TimeUnit.MINUTES.toMillis(20))
             null, INVALID -> VpnRunningState.INVALID
         }
         val alwaysOnState = when (lastState?.alwaysOnState) {

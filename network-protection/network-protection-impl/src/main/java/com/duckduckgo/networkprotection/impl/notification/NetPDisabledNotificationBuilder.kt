@@ -32,7 +32,6 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_DESCRIPTION
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_ID
 import com.duckduckgo.networkprotection.impl.alerts.RealNetPAlertNotiticationBuilder.Companion.NETP_ALERTS_CHANNEL_NAME
-import com.duckduckgo.networkprotection.impl.notification.NetPEnableReceiver.Companion.ACTION_NETP_ENABLE
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import org.threeten.bp.Instant
@@ -42,7 +41,11 @@ import org.threeten.bp.ZoneId
 interface NetPDisabledNotificationBuilder {
     fun buildDisabledNotification(context: Context): Notification
 
-    fun buildSnoozeNotification(context: Context, triggerAtMillis: Long): Notification
+    fun buildSnoozeNotification(
+        context: Context,
+        triggerAtMillis: Long,
+    ): Notification
+
     fun buildDisabledByVpnNotification(context: Context): Notification
 }
 
@@ -82,29 +85,39 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             .build()
     }
 
-    override fun buildSnoozeNotification(context: Context, triggerAtMillis: Long): Notification {
+    override fun buildSnoozeNotification(
+        context: Context,
+        triggerAtMillis: Long,
+    ): Notification {
         fun getAction(): NotificationCompat.Action {
             return NotificationCompat.Action(
                 R.drawable.ic_baseline_feedback_24,
-                "End Snooze",
+                context.getString(R.string.netpNotificationCTAEnableVpn),
                 PendingIntent.getBroadcast(
                     context,
                     0,
-                    Intent(context, NetPEnableReceiver::class.java).apply {
-                        action = ACTION_NETP_ENABLE
+                    Intent(context, VpnActionReceiver::class.java).apply {
+                        action = VpnActionReceiver.ACTION_VPN_ENABLE
                     },
                     PendingIntent.FLAG_IMMUTABLE,
                 ),
             )
         }
         registerChannel(context)
+        val instant = LocalDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli() + triggerAtMillis), ZoneId.systemDefault())
+        val formatterTime = "${instant.hour}:${instant.minute.toString().padStart(2, '0')}"
 
-        val instant = LocalDateTime.ofInstant(Instant.ofEpochMilli(Instant.now().toEpochMilli() + 10_000), ZoneId.systemDefault())
-        val formatterTime = "${instant.hour}:${instant.minute.toString().padStart(2, '0')}:${instant.second.toString().padStart(2, '0')}"
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setContentTitle("VPN is snoozed")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("VPN will connect at $formatterTime"))
+            .setContentTitle(context.getString(R.string.netpNotificationSnoozeTitle))
+            .setStyle(
+                NotificationCompat.BigTextStyle().bigText(
+                    String.format(
+                        context.getString(R.string.netpNotificationSnoozeBody),
+                        formatterTime,
+                    ),
+                ),
+            )
             .setContentIntent(getPendingIntent(context))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
