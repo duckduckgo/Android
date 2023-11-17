@@ -206,8 +206,15 @@ class BrowserTabViewModel @Inject constructor(
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
     private val device: DeviceInfo,
+<<<<<<< HEAD
     private val sitePermissionsManager: SitePermissionsManager,
+=======
+<<<<<<< HEAD
+>>>>>>> d45f57d18 (Sync: Align platform triggers)
     private val syncEngine: SyncEngine,
+=======
+    private val syncEngine: SyncEngine
+>>>>>>> be957a35f (Sync: Align platform triggers)
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2457,6 +2464,13 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onNewTabFavouritesShown() {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        Timber.d("Sync-Favourites: New Tab screen opened, triggering sync")
+=======
+>>>>>>> be957a35f (Sync: Align platform triggers)
+>>>>>>> d45f57d18 (Sync: Align platform triggers)
         viewModelScope.launch(dispatchers.io()) {
             syncEngine.triggerSync(FEATURE_READ)
         }
