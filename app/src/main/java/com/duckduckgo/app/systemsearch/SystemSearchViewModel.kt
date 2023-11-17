@@ -23,8 +23,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -49,7 +51,13 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 data class SystemSearchResult(
@@ -64,7 +72,6 @@ class SystemSearchViewModel @Inject constructor(
     private val deviceAppLookup: DeviceAppLookup,
     private val pixel: Pixel,
     private val savedSitesRepository: SavedSitesRepository,
-    private val faviconManager: FaviconManager,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
@@ -88,7 +95,7 @@ class SystemSearchViewModel @Inject constructor(
         object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchEditDialog(val savedSite: SavedSite) : Command()
-        data class DeleteSavedSiteConfirmation(val savedSite: SavedSite, val position: Int) : Command()
+        data class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
         object DismissKeyboard : Command()
@@ -106,18 +113,31 @@ class SystemSearchViewModel @Inject constructor(
     private var resultsDisposable: Disposable? = null
     private var latestQuickAccessItems: Suggestions.QuickAccessItems = Suggestions.QuickAccessItems(emptyList())
 
+    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+
+    data class HiddenBookmarksIds(val favorites: List<String> = emptyList())
+
     private var appsJob: Job? = null
 
     init {
         resetViewState()
         configureResults()
         refreshAppList()
-        viewModelScope.launch {
-            savedSitesRepository.getFavorites().collect { favorite ->
-                latestQuickAccessItems = Suggestions.QuickAccessItems(favorite.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
-                resultsViewState.postValue(latestQuickAccessItems)
+
+        savedSitesRepository.getFavorites()
+            .flowOn(dispatchers.io())
+            .combine(hiddenIds) { favorites, hiddenIds ->
+                favorites.filter { it.id !in hiddenIds.favorites }
             }
-        }
+            .onEach { filteredFavourites ->
+                withContext(dispatchers.main()) {
+                    latestQuickAccessItems =
+                        Suggestions.QuickAccessItems(filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) })
+                    resultsViewState.postValue(latestQuickAccessItems)
+                }
+            }
+            .flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
@@ -306,8 +326,8 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     fun onDeleteQuickAccessItemRequested(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
-        val position = hideQuickAccessItem(it)
-        command.value = Command.DeleteSavedSiteConfirmation(it.favorite, position)
+        hideQuickAccessItem(it)
+        command.value = Command.DeleteSavedSiteConfirmation(it.favorite)
     }
 
     companion object {
@@ -342,26 +362,19 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    private fun hideQuickAccessItem(quickAccessFavourite: FavoritesQuickAccessAdapter.QuickAccessFavorite): Int {
-        val quickAccessItems = resultsViewState.value as QuickAccessItems
-        val favourites = quickAccessItems.favorites.toMutableList()
-        val index = favourites.indexOf(quickAccessFavourite)
-        favourites.remove(quickAccessFavourite)
-
-        latestQuickAccessItems = QuickAccessItems(favourites)
-        resultsViewState.postValue(latestQuickAccessItems)
-        return index
+    private fun hideQuickAccessItem(quickAccessFavourite: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+        viewModelScope.launch(dispatchers.io()) {
+            hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + quickAccessFavourite.favorite.id))
+        }
     }
 
-    fun undoDelete(savedSite: SavedSite, oldPosition: Int) {
-        if (savedSite is Favorite) {
-            val quickAccessItems = resultsViewState.value as QuickAccessItems
-            val favourites = quickAccessItems.favorites.toMutableList()
-            val restoredFavourite = FavoritesQuickAccessAdapter.QuickAccessFavorite(savedSite)
-            favourites.add(oldPosition, restoredFavourite)
-
-            latestQuickAccessItems = QuickAccessItems(favourites)
-            resultsViewState.postValue(latestQuickAccessItems)
+    fun undoDelete(savedSite: SavedSite) {
+        viewModelScope.launch(dispatchers.io()) {
+            hiddenIds.emit(
+                hiddenIds.value.copy(
+                    favorites = hiddenIds.value.favorites - savedSite.id,
+                ),
+            )
         }
     }
 

@@ -700,24 +700,6 @@ class BrowserTabViewModel @Inject constructor(
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
-        // savedSitesRepository.getFavorites().map { favoriteSites ->
-        //     val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
-        //     ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
-        //     autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
-        //     val favorite = favoriteSites.firstOrNull { it.url == url }
-        //     browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
-        // }
-        //     .launchIn(viewModelScope)
-
-        // savedSitesRepository.getBookmarks()
-        //     .flowOn(dispatchers.io())
-        //     .map { bookmarks ->
-        //         val bookmark = bookmarks.firstOrNull { it.url == url }
-        //         browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
-        //     }
-        //     .flowOn(dispatchers.main())
-        //     .launchIn(viewModelScope)
-
         viewModelScope.launch(dispatchers.io()) {
             remoteMessagingModel.get().activeMessages
                 .combine(ctaChangedTicker.asStateFlow(), ::Pair)

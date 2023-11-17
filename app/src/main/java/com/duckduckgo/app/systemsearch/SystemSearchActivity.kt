@@ -391,7 +391,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
 
             is DeleteSavedSiteConfirmation -> {
-                confirmDeleteSavedSite(command.savedSite, command.position)
+                confirmDeleteSavedSite(command.savedSite)
             }
 
             is UpdateVoiceSearch -> {
@@ -405,17 +405,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         omnibarTextInput.setSelection(query.length)
     }
 
-    private fun confirmDeleteSavedSite(
-        savedSite: SavedSite,
-        oldPosition: Int,
-    ) {
+    private fun confirmDeleteSavedSite(savedSite: SavedSite) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(this)
         Snackbar.make(
             binding.root,
             message,
             Snackbar.LENGTH_LONG,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.undoDelete(savedSite, oldPosition)
+            viewModel.undoDelete(savedSite)
         }
             .addCallback(
                 object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
