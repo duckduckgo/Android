@@ -73,6 +73,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
         vpnStopReason: VpnStopReason,
     ) {
         coroutineScope.launch(dispatcherProvider.io()) {
+            logcat { "KLDIMSUM onVpnStopped" }
             when (vpnStopReason) {
                 VpnStopReason.RESTART -> {} // no-op
                 VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
@@ -88,8 +89,11 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     private suspend fun onVPNManuallyStopped() {
+        logcat { "KLDIMSUM onVPNManuallyStopped " }
         if (shouldShowImmediateNotification()) {
             logcat { "VPN Manually stopped, showing disabled notification for NetP" }
+
+            logcat { "KLDIMSUM onVPNManuallyStopped shouldShowImmediateNotification" }
             showDisabledOrSnoozeNotification()
             isNetPEnabled.set(false)
         }
@@ -112,7 +116,7 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     private fun showDisabledOrSnoozeNotification() {
         fun showSnoozedNotification(triggerAtMillis: Long) {
             coroutineScope.launch(dispatcherProvider.io()) {
-                logcat { "Showing snooze notification for NetP" }
+                logcat { "KLDIMSUM Showing snooze notification for NetP" }
                 if (!netPSettingsLocalConfig.vpnNotificationAlerts().isEnabled()) return@launch
                 notificationManager.notify(
                     NETP_REMINDER_NOTIFICATION_ID,
@@ -123,14 +127,15 @@ class NetPDisabledNotificationScheduler @Inject constructor(
 
         coroutineScope.launch(dispatcherProvider.io()) {
             // FIXME drop to skip the default value
+            logcat { "KLDIMSUM launch showDisabledOrSnoozeNotification" }
             val snoozeTrigger = vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN).drop(1).firstOrNull()
-            logcat { "aitor snooze snoozeTrigger $snoozeTrigger" }
+            logcat { "KLDIMSUM snooze snoozeTrigger $snoozeTrigger" }
             snoozeTrigger?.let { vpnState ->
                 if (vpnState.state is VpnStateMonitor.VpnRunningState.DISABLED) {
                     val state = vpnState.state as VpnStateMonitor.VpnRunningState.DISABLED
-                    logcat { "aitor snooze state $state" }
+                    logcat { "KLDIMSUM snooze state $state" }
                     state.snoozedTriggerAtMillis?.let { triggerAtMillis ->
-                        logcat { "aitor snooze" }
+                        logcat { "KLDIMSUM snooze" }
                         showSnoozedNotification(triggerAtMillis)
                     } ?: showDisabledNotification()
                 } else {
@@ -152,7 +157,9 @@ class NetPDisabledNotificationScheduler @Inject constructor(
     }
 
     private suspend fun onVPNRevoked() {
+        logcat { "KLDIMSUM onVPNRevoked " }
         if (shouldShowImmediateNotification()) {
+            logcat { "KLDIMSUM onVPNRevoked shouldShowImmediateNotification" }
             logcat { "VPN has been revoked, showing revoked notification for NetP" }
             showRevokedNotification()
             isNetPEnabled.set(false)
