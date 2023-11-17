@@ -99,7 +99,7 @@ class DeviceShieldActivityFeedViewModelTest {
     @Test
     fun whenGetMostRecentTrackersCalledStartWithSkeleton() = runBlocking {
         viewModel.getMostRecentTrackers(timeWindow, config).test {
-            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED(), ERROR)), awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -113,7 +113,7 @@ class DeviceShieldActivityFeedViewModelTest {
         getAppsAndProtectionInfoReturnsEmptyList()
 
         viewModel.getMostRecentTrackers(timeWindow, config).test {
-            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED(), ERROR)), awaitItem())
             assertEquals(
                 TrackerFeedViewState(
                     listOf(
@@ -137,7 +137,7 @@ class DeviceShieldActivityFeedViewModelTest {
             assertEquals(
                 TrackerFeedViewState(
                     listOf(TrackerLoadingSkeleton),
-                    vpnState = VpnState(state = DISABLED, stopReason = ERROR),
+                    vpnState = VpnState(state = DISABLED(), stopReason = ERROR),
                 ),
                 awaitItem(),
             )
@@ -153,7 +153,7 @@ class DeviceShieldActivityFeedViewModelTest {
         val boundedConfig = config.copy(maxRows = 5)
 
         viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
-            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED(), ERROR)), awaitItem())
             assertEquals(
                 TrackerFeedViewState(
                     listOf(
@@ -189,13 +189,13 @@ class DeviceShieldActivityFeedViewModelTest {
         val boundedConfig = config.copy(maxRows = 5)
 
         viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
-            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED(), ERROR)), awaitItem())
             assertEquals(
                 TrackerFeedViewState(
                     listOf(
                         TrackerFeedItem.TrackerDescriptionFeed,
                     ),
-                    vpnState = VpnState(state = DISABLED, stopReason = UNKNOWN),
+                    vpnState = VpnState(state = DISABLED(), stopReason = UNKNOWN),
                 ),
                 awaitItem(),
             )
@@ -215,7 +215,7 @@ class DeviceShieldActivityFeedViewModelTest {
         val boundedConfig = config.copy(maxRows = 2)
 
         viewModel.getMostRecentTrackers(timeWindow, boundedConfig).test {
-            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED, ERROR)), awaitItem())
+            assertEquals(TrackerFeedViewState(listOf(TrackerLoadingSkeleton), VpnState(DISABLED(), ERROR)), awaitItem())
             assertEquals(
                 TrackerFeedViewState(
                     listOf(
@@ -240,7 +240,7 @@ class DeviceShieldActivityFeedViewModelTest {
     }
 
     private fun mockVpnDisabled() {
-        whenever(mockVpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(flowOf(VpnState(DISABLED, UNKNOWN)))
+        whenever(mockVpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN)).thenReturn(flowOf(VpnState(DISABLED(), UNKNOWN)))
     }
 
     companion object {

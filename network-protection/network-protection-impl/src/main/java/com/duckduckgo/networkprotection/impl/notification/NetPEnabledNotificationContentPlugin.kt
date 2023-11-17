@@ -19,8 +19,10 @@ package com.duckduckgo.networkprotection.impl.notification
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
+import androidx.core.app.NotificationCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import com.duckduckgo.di.scopes.VpnScope
@@ -47,12 +49,40 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
     private val resources: Resources,
     private val networkProtectionState: NetworkProtectionState,
     private val appTrackingProtection: AppTrackingProtection,
-    private val netPNotificationActions: NetPNotificationActions,
     netPIntentProvider: IntentProvider,
 ) : VpnEnabledNotificationContentPlugin {
 
     private val onPressIntent by lazy { netPIntentProvider.getOnPressNotificationIntent() }
     override fun getInitialContent(): VpnEnabledNotificationContent? {
+        fun getActions(): List<NotificationCompat.Action> {
+            return listOf(
+                NotificationCompat.Action(
+                    R.drawable.ic_baseline_feedback_24,
+                    context.getString(R.string.netpNotificationCTASnoozeVpn),
+                    PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, VpnActionReceiver::class.java).apply {
+                            action = VpnActionReceiver.ACTION_VPN_SNOOZE
+                        },
+                        PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                ),
+                NotificationCompat.Action(
+                    R.drawable.ic_baseline_feedback_24,
+                    context.getString(R.string.netpNotificationCTADisableVpn),
+                    PendingIntent.getBroadcast(
+                        context,
+                        1,
+                        Intent(context, VpnActionReceiver::class.java).apply {
+                            action = VpnActionReceiver.ACTION_VPN_DISABLE
+                        },
+                        PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                ),
+            )
+        }
+
         return if (isActive()) {
             val title = networkProtectionState.serverLocation()?.run {
                 HtmlCompat.fromHtml(resources.getString(R.string.netpEnabledNotificationTitle, this), FROM_HTML_MODE_LEGACY)
@@ -61,7 +91,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = onPressIntent,
-                notificationActions = listOf(netPNotificationActions.getReportIssueNotificationAction(context)),
+                notificationActions = getActions(),
             )
         } else {
             null

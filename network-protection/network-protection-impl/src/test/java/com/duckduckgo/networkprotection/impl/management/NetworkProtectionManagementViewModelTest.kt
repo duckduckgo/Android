@@ -235,7 +235,7 @@ class NetworkProtectionManagementViewModelTest {
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
-                    state = DISABLED,
+                    state = DISABLED(),
                 ),
             ),
         )
@@ -372,7 +372,7 @@ class NetworkProtectionManagementViewModelTest {
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
                 VpnState(
-                    state = DISABLED,
+                    state = DISABLED(),
                 ),
             ),
         )
@@ -444,12 +444,12 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenVpnStateIsDisabledAndReconnectingThenAlertStateIsShowReconnectingFailed() {
-        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, Reconnecting, null, AlwaysOnState.DEFAULT))
+        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED(), Reconnecting, null, AlwaysOnState.DEFAULT))
     }
 
     @Test
     fun whenVpnStateIsDisabledAndReconnectingFailedThenAlertStateIsShowReconnectingFailed() {
-        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED, ReconnectingFailed, UNKNOWN, AlwaysOnState.DEFAULT))
+        assertEquals(ShowReconnectingFailed, testee.getAlertState(DISABLED(), ReconnectingFailed, UNKNOWN, AlwaysOnState.DEFAULT))
     }
 
     @Test
@@ -469,12 +469,12 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenNotReconnectingThenAlertStateIsNone() {
-        assertEquals(None, testee.getAlertState(DISABLED, NotReconnecting, UNKNOWN, AlwaysOnState.DEFAULT))
+        assertEquals(None, testee.getAlertState(DISABLED(), NotReconnecting, UNKNOWN, AlwaysOnState.DEFAULT))
     }
 
     @Test
     fun whenStopReasonIsRevokedAndNotReconnectingThenAlertStateIsShowRevoked() {
-        assertEquals(ShowRevoked, testee.getAlertState(DISABLED, NotReconnecting, REVOKED, AlwaysOnState.DEFAULT))
+        assertEquals(ShowRevoked, testee.getAlertState(DISABLED(), NotReconnecting, REVOKED, AlwaysOnState.DEFAULT))
     }
 
     @Test
