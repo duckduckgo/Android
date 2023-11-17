@@ -3,7 +3,6 @@ package com.duckduckgo.app.brokensite.api
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.ReportFlow
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -212,7 +211,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        val brokenSite = getBrokenSite(BrokenSiteCategory.LOGIN_CATEGORY_KEY)
+        val brokenSite = getBrokenSite()
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -230,7 +229,7 @@ class BrokenSiteSubmitterTest {
         whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        val brokenSite = getBrokenSite(BrokenSiteCategory.LOGIN_CATEGORY_KEY)
+        val brokenSite = getBrokenSite()
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
@@ -242,7 +241,7 @@ class BrokenSiteSubmitterTest {
         assertFalse(params.containsKey("loginSite"))
     }
 
-    private fun getBrokenSite(category: String = "category"): BrokenSite {
+    private fun getBrokenSite(): BrokenSite {
         return BrokenSite(
             category = "category",
             description = "description",
