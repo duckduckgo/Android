@@ -43,6 +43,7 @@ import com.duckduckgo.autofill.impl.ui.credential.repository.DuckAddressStatusRe
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -92,6 +93,10 @@ class AutofillSettingsViewModelTest {
     @Before
     fun setup() {
         whenever(webUrlIdentifier.isLikelyAUrl(anyOrNull())).thenReturn(true)
+
+        runTest {
+            whenever(mockStore.getAllCredentials()).thenReturn(emptyFlow())
+        }
     }
 
     @Test

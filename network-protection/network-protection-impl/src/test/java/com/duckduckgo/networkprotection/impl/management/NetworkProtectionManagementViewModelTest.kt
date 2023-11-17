@@ -104,7 +104,12 @@ class NetworkProtectionManagementViewModelTest {
         MockitoAnnotations.openMocks(this)
         vpnFeaturesRegistry = FakeVpnFeaturesRegistry()
 
-        whenever(networkProtectionRepository.reconnectStatus).thenReturn(NotReconnecting)
+        runTest {
+            whenever(networkProtectionRepository.reconnectStatus).thenReturn(NotReconnecting)
+            whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
+            whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(false)
+        }
+
         testee = NetworkProtectionManagementViewModel(
             vpnStateMonitor,
             vpnFeaturesRegistry,

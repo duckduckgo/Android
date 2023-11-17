@@ -46,6 +46,7 @@ import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -86,6 +87,8 @@ class SyncActivityViewModelTest {
             syncStateMonitor = syncStateMonitor,
             recoveryCodePDF = recoveryPDF,
         )
+
+        whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
     }
 
     @Test

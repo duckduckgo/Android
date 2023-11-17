@@ -67,6 +67,7 @@ internal class FireButtonViewModelTest {
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
+        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
 
         testee = FireButtonViewModel(
             mockAppSettingsDataStore,
@@ -200,9 +201,11 @@ internal class FireButtonViewModelTest {
     fun whenNewFireAnimationSelectedThenUpdateViewState() = runTest {
         val expectedAnimation = FireAnimation.HeroWater
 
-        testee.onFireAnimationSelected(expectedAnimation)
-
         testee.viewState().test {
+            // expect HeroFire as a default which will happen when view state flow is created
+            assertEquals(FireAnimation.HeroFire, awaitItem().selectedFireAnimation)
+
+            testee.onFireAnimationSelected(expectedAnimation)
             assertEquals(expectedAnimation, awaitItem().selectedFireAnimation)
 
             cancelAndConsumeRemainingEvents()
