@@ -1440,6 +1440,9 @@ class BrowserTabViewModel @Inject constructor(
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
+        } else if (url.contains("@")) {
+            // Strip out the basic auth credentials from the address bar to prevent spoofing
+            url.split("@")[1]
         } else {
             url
         }
