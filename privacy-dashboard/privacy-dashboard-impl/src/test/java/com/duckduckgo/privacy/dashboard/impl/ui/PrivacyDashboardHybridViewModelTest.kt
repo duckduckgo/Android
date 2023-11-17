@@ -27,10 +27,8 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
-import com.duckduckgo.privacy.dashboard.impl.pixels.FakePrivacyDashboardRemoteFeatureFactory
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVACY_DASHBOARD_ALLOWLIST_ADD
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.nhaarman.mockitokotlin2.mock
@@ -69,7 +67,6 @@ class PrivacyDashboardHybridViewModelTest {
     private val unprotectedTemporary = mock<UnprotectedTemporary>()
 
     private val pixel = mock<Pixel>()
-    private val mockRemoteFeatures = FakePrivacyDashboardRemoteFeatureFactory.create()
 
     private val testee: PrivacyDashboardHybridViewModel by lazy {
         PrivacyDashboardHybridViewModel(
@@ -81,7 +78,6 @@ class PrivacyDashboardHybridViewModelTest {
             protectionStatusViewStateMapper = AppProtectionStatusViewStateMapper(contentBlocking, unprotectedTemporary),
             privacyDashboardPayloadAdapter = mock(),
             autoconsentStatusViewStateMapper = CookiePromptManagementStatusViewStateMapper(),
-            privacyDashboardRemoteFeature = mockRemoteFeatures,
         )
     }
 
@@ -117,22 +113,6 @@ class PrivacyDashboardHybridViewModelTest {
             assertTrue(viewState!!.userChangedValues)
             assertFalse(viewState.protectionStatus.allowlisted)
             verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD)
-        }
-    }
-
-    @Test
-    fun whenOnPrivacyProtectionClickedThenUpdateViewStateWithParam() = runTest {
-        mockRemoteFeatures.highlightedProtectionsToggle().setEnabled(Toggle.State(enable = true))
-
-        testee.onSiteChanged(site(siteAllowed = false))
-        testee.onPrivacyProtectionsClicked(enabled = false)
-
-        testee.viewState.test {
-            awaitItem()
-            val viewState = awaitItem()
-            assertTrue(viewState!!.userChangedValues)
-            assertFalse(viewState.protectionStatus.allowlisted)
-            verify(pixel).fire(PRIVACY_DASHBOARD_ALLOWLIST_ADD, mapOf("dashboard_highlighted_toggle" to true.toString()))
         }
     }
 

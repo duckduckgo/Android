@@ -99,7 +99,6 @@ class BrokenSiteViewModel @Inject constructor(
     private var consentManaged: Boolean = false
     private var consentOptOutFailed: Boolean = false
     private var consentSelfTestFailed: Boolean = false
-    private var params: Array<out String> = emptyArray()
     private var errorCodes: Array<out String> = emptyArray()
     private var httpErrorCodes: String = ""
     private var isDesktopMode: Boolean = false
@@ -120,7 +119,6 @@ class BrokenSiteViewModel @Inject constructor(
         consentManaged: Boolean,
         consentOptOutFailed: Boolean,
         consentSelfTestFailed: Boolean,
-        params: Array<out String>,
         errorCodes: Array<out String>,
         httpErrorCodes: String,
         isDesktopMode: Boolean,
@@ -133,7 +131,6 @@ class BrokenSiteViewModel @Inject constructor(
         this.consentManaged = consentManaged
         this.consentOptOutFailed = consentOptOutFailed
         this.consentSelfTestFailed = consentSelfTestFailed
-        this.params = params
         this.errorCodes = errorCodes
         this.httpErrorCodes = httpErrorCodes
         this.isDesktopMode = isDesktopMode
@@ -196,18 +193,9 @@ class BrokenSiteViewModel @Inject constructor(
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
 
-            val pixelParams = mutableMapOf(
-                Pixel.PixelParameter.URL to brokenSite.siteUrl,
-            )
-
-            // add any additional params - for example, from the privacy dashboard
-            params.forEach {
-                pixelParams[it] = true.toString()
-            }
-
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
-                pixelParams,
+                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
             )
         }
         command.value = Command.ConfirmAndFinish

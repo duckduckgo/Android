@@ -36,13 +36,12 @@ data class BrokenSiteData(
     val consentManaged: Boolean,
     val consentOptOutFailed: Boolean,
     val consentSelfTestFailed: Boolean,
-    val params: List<String>,
     val errorCodes: List<String>,
     val httpErrorCodes: String,
     val isDesktopMode: Boolean,
 ) {
     companion object {
-        fun fromSite(site: Site?, params: List<String> = emptyList()): BrokenSiteData {
+        fun fromSite(site: Site?): BrokenSiteData {
             val events = site?.trackingEvents
             val blockedTrackers = events?.filter { it.status == TrackerStatus.BLOCKED }
                 ?.map { Uri.parse(it.trackerUrl).baseHost.orEmpty() }
@@ -66,7 +65,6 @@ data class BrokenSiteData(
                 consentManaged = consentManaged,
                 consentOptOutFailed = consentOptOutFailed,
                 consentSelfTestFailed = consentSelfTestFailed,
-                params = params,
                 errorCodes = errorCodes,
                 httpErrorCodes = httErrorCodes,
                 isDesktopMode = isDesktopMode,
