@@ -32,6 +32,8 @@ import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels.PRIVA
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenSettings
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.Command.OpenURL
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -48,8 +50,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class PrivacyDashboardHybridViewModel @Inject constructor(
@@ -210,8 +210,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     fun onReportBrokenSiteSelected() {
         viewModelScope.launch(dispatcher.io()) {
-            // when the broken site form is opened from the dashboard, send
-            // along a list of params to be sent with the `m_bsr` pixel
             val siteData = BrokenSiteData.fromSite(site.value)
             command.send(LaunchReportBrokenSite(siteData))
         }

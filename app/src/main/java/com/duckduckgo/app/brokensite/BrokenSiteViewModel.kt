@@ -195,7 +195,7 @@ class BrokenSiteViewModel @Inject constructor(
 
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
-                mutableMapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
+                mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl),
             )
         }
         command.value = Command.ConfirmAndFinish
