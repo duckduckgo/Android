@@ -41,6 +41,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Canceled
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.Purchased
@@ -295,16 +296,6 @@ class RealBillingClientWrapper @Inject constructor(
             )
             .setObfuscatedAccountId(finalId)
             .setObfuscatedProfileId(finalId)
-    }
-
-    companion object {
-        // List of subscriptions
-        const val BASIC_SUBSCRIPTION = "ddg_privacy_pro"
-        private val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
-
-        // List of plans
-        const val YEARLY_PLAN = "ddg-privacy-pro-sandbox-yearly-renews-us"
-        const val MONTHLY_PLAN = "ddg-privacy-pro-sandbox-monthly-renews-us"
     }
 }
 
