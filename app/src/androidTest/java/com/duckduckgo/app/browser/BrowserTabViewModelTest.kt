@@ -3802,6 +3802,44 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDeleteBookmarkUndoThenViewStateUpdated() = runTest {
+        val bookmark =
+            Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
+
+        bookmarksListFlow.send(listOf(bookmark))
+
+        loadUrl(bookmark.url, isBrowserShowing = true)
+
+        testee.onSavedSiteDeleted(bookmark)
+
+        assertTrue(browserViewState().bookmark == null)
+        assertTrue(browserViewState().favorite == null)
+
+        testee.undoDelete(bookmark)
+
+        assertTrue(browserViewState().bookmark == bookmark)
+    }
+
+    @Test
+    fun whenDeleteFavouriteUndoThenViewStateUpdated() = runTest {
+        val favourite =
+            Favorite(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp", 0)
+
+        favoriteListFlow.send(listOf(favourite))
+
+        loadUrl(favourite.url, isBrowserShowing = true)
+
+        testee.onSavedSiteDeleted(favourite)
+
+        assertTrue(browserViewState().bookmark == null)
+        assertTrue(browserViewState().favorite == null)
+
+        testee.undoDelete(favourite)
+
+        assertTrue(browserViewState().favorite == favourite)
+    }
+
+    @Test
     fun whenPageChangedThenUpdatePreviousUrlAndUserQueryStateSetToFalse() {
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         verify(mockAppLinksHandler).updatePreviousUrl("www.example.com")
