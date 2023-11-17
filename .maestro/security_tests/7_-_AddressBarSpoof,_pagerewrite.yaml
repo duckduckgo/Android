@@ -1,0 +1,16 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - securityTest
+---
+# Test 1
+- doubleTapOn:
+    id: "omnibarTextInput"
+- pressKey: Backspace
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html"
+- pressKey: Enter
+- tapOn: "Start"
+# Now check the address bar hasn't been updated too early resulting in spoofed content
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-js-page-rewrite.html"}
+- assertNotVisible: "DDG." 

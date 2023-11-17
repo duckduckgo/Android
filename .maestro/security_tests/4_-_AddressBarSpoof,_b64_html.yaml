@@ -1,0 +1,18 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - securityTest
+---
+# Test 1
+- doubleTapOn:
+    id: "omnibarTextInput"
+- pressKey: Backspace
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-open-b64-html.html"
+- pressKey: Enter
+- tapOn: "Start"
+# This test is expected to open a new tab with empty origin ("about:blank") and then prompt to open the link in another app
+- assertVisible: "Open in another app"
+- tapOn: "Cancel"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "about:blank"}
+- pressKey: Back

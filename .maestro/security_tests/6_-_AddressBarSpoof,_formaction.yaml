@@ -1,0 +1,15 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - securityTest
+---
+# Test 1
+- doubleTapOn:
+    id: "omnibarTextInput"
+- pressKey: Backspace
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"
+- pressKey: Enter
+- tapOn: "run"
+# Should do nothing - the navigation should be prevented.
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-form-action.html"}

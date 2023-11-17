@@ -1,0 +1,26 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - securityTest
+---
+# Test 1
+- doubleTapOn:
+    id: "omnibarTextInput"
+- pressKey: Backspace
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-application-scheme.html"
+- pressKey: Enter
+- tapOn: "Start"
+# This test should reject trying to load
+# This test is expected to load duckduckgo.com, not remain on the current page with spoofed content.
+- assertVisible: "Privacy, simplified." # DuckDuckGo home page
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "https://duckduckgo.com/"} # DuckDuckGo home page
+- tapOn:
+    id: "omnibarTextInput"
+# Test 2
+- inputText: "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"
+- pressKey: Enter
+- tapOn: "Start"
+- copyTextFrom:
+    id: "omnibarTextInput"
+- assertTrue: ${maestro.copiedText == "https://privacy-test-pages.site/security/address-bar-spoofing/spoof-unsupported-scheme.html"}
