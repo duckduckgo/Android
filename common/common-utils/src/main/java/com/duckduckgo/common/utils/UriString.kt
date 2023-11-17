@@ -17,9 +17,11 @@
 package com.duckduckgo.common.utils
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.core.util.PatternsCompat
 import java.lang.IllegalArgumentException
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 
 class UriString {
@@ -33,6 +35,16 @@ class UriString {
 
         fun host(uriString: String): String? {
             return Uri.parse(uriString).baseHost
+        }
+
+        fun sameEffectiveTldPlusOne(child: String, parent: String): Boolean {
+            val childDomain = child.toUri().withScheme().toString().toHttpUrlOrNull() ?: return false
+            val parentDomain = parent.toUri().withScheme().toString().toHttpUrlOrNull() ?: return false
+
+            val childETldPlusOne = childDomain.topPrivateDomain()
+            val parentETldPlusOne = parentDomain.topPrivateDomain()
+
+            return childETldPlusOne == parentETldPlusOne
         }
 
         fun sameOrSubdomain(
