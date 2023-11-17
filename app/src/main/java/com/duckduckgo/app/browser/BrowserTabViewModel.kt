@@ -140,6 +140,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
@@ -205,6 +207,7 @@ class BrowserTabViewModel @Inject constructor(
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
     private val device: DeviceInfo,
     private val sitePermissionsManager: SitePermissionsManager,
+    private val syncEngine: SyncEngine
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -2450,6 +2453,12 @@ class BrowserTabViewModel @Inject constructor(
         val cta = ctaViewState.value?.cta ?: return
         viewModelScope.launch(dispatchers.io()) {
             ctaViewModel.onCtaShown(cta)
+        }
+    }
+
+    fun onNewTabFavouritesShown() {
+        viewModelScope.launch(dispatchers.io()) {
+            syncEngine.triggerSync(FEATURE_READ)
         }
     }
 
