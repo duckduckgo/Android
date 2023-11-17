@@ -35,20 +35,15 @@ class RealUserAgent @Inject constructor(
 ) : UserAgent {
 
     override fun isAnApplicationException(url: String): Boolean {
-        return userAgentRepository.omitApplicationExceptions.any { UriString.sameEffectiveTldPlusOne(url, it.domain) }
+        return userAgentRepository.omitApplicationExceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     override fun isAVersionException(url: String): Boolean {
-        return userAgentRepository.omitVersionExceptions.any { UriString.sameEffectiveTldPlusOne(url, it.domain) }
+        return userAgentRepository.omitVersionExceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     override fun isADefaultException(url: String): Boolean {
-        return unprotectedTemporary.isAnException(url) || userAgentRepository.defaultExceptions.any {
-            UriString.sameEffectiveTldPlusOne(
-                url,
-                it.domain,
-            )
-        }
+        return unprotectedTemporary.isAnException(url) || userAgentRepository.defaultExceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     override fun defaultPolicy(): DefaultPolicy {
@@ -61,11 +56,11 @@ class RealUserAgent @Inject constructor(
     }
 
     override fun isADdgDefaultSite(url: String): Boolean {
-        return userAgentRepository.ddgDefaultSites.any { UriString.sameEffectiveTldPlusOne(url, it.domain) }
+        return userAgentRepository.ddgDefaultSites.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     override fun isADdgFixedSite(url: String): Boolean {
-        return userAgentRepository.ddgFixedSites.any { UriString.sameEffectiveTldPlusOne(url, it.domain) }
+        return userAgentRepository.ddgFixedSites.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
     override fun closestUserAgentEnabled(): Boolean {
