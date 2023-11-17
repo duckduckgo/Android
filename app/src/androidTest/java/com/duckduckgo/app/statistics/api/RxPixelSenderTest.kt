@@ -32,6 +32,7 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.experiments.api.VariantManager
 import io.reactivex.Completable
+import java.util.concurrent.TimeoutException
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -40,7 +41,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.kotlin.*
-import java.util.concurrent.TimeoutException
 
 class RxPixelSenderTest {
 

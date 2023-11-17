@@ -30,6 +30,10 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.experiments.api.VariantManager
 import com.squareup.moshi.Moshi
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.Proxy
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import okhttp3.OkHttpClient
@@ -46,10 +50,6 @@ import org.mockito.kotlin.whenever
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.net.InetAddress
-import java.net.InetSocketAddress
-import java.net.Proxy
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 class StatisticsRequesterJsonTest {

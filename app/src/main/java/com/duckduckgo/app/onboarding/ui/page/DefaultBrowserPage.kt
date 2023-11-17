@@ -38,8 +38,8 @@ import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class DefaultBrowserPage : OnboardingPageFragment(R.layout.content_onboarding_default_browser) {

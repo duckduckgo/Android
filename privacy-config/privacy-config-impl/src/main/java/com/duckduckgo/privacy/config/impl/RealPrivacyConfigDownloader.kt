@@ -25,8 +25,8 @@ import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownload
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader.ConfigDownloadResult.Success
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 /** Public interface for download remote privacy config */
 interface PrivacyConfigDownloader {
