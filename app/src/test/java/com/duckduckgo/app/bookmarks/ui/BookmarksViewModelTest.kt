@@ -29,6 +29,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSites
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
@@ -127,7 +128,7 @@ class BookmarksViewModelTest {
     @Test
     fun whenBookmarkDeleteThenRepositoryUpdated() = runTest {
         testee.onDeleteSavedSiteRequested(bookmark)
-        testee.delete(bookmark)
+        testee.onDeleteSavedSiteSnackbarDismissed(bookmark)
 
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
         verify(savedSitesRepository).delete(bookmark)
@@ -154,7 +155,7 @@ class BookmarksViewModelTest {
     @Test
     fun whenFavoriteDeleteThenRepositoryUpdated() = runTest {
         testee.onDeleteSavedSiteRequested(favorite)
-        testee.delete(favorite)
+        testee.onDeleteSavedSiteSnackbarDismissed(favorite)
 
         verify(savedSitesRepository).delete(favorite)
         verify(faviconManager, never()).deletePersistedFavicon(favorite.url)
@@ -323,7 +324,7 @@ class BookmarksViewModelTest {
         whenever(savedSitesRepository.deleteFolderBranch(any())).thenReturn(folderBranch)
 
         testee.onDeleteBookmarkFolderRequested(bookmarkFolder)
-        testee.delete(bookmarkFolder)
+        testee.onDeleteBookmarkFolderSnackbarDismissed(bookmarkFolder)
 
         verify(savedSitesRepository).deleteFolderBranch(bookmarkFolder)
 
