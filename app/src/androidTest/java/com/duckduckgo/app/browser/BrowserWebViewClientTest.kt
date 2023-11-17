@@ -172,14 +172,14 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenEventSentToLoginDetector() = runTest {
+    fun whenOnPageStartedCalledThenEventSentToLoginDetector() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenInjectJsCode() = runTest {
+    fun whenOnPageStartedCalledThenInjectJsCode() {
         assertEquals(0, jsPlugins.plugin.countStarted)
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         assertEquals(1, jsPlugins.plugin.countStarted)
@@ -195,7 +195,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenInjectAutoconsentCalled() = runTest {
+    fun whenOnPageStartedCalledThenInjectAutoconsentCalled() {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(autoconsent).injectAutoconsent(webView, EXAMPLE_URL)
     }
@@ -436,7 +436,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = runTest {
+    fun whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.ExtractedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -447,7 +447,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAmpLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
+    fun whenAmpLinkDetectedAndIsNotForMainFrameThenReturnFalse() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.ExtractedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
@@ -482,7 +482,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameThenReturnTrueAndLoadCleanedUrl() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameThenReturnTrueAndLoadCleanedUrl() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -499,7 +499,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
+    fun whenTrackingParametersDetectedAndIsNotForMainFrameThenReturnFalse() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
@@ -525,13 +525,13 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledAndIsOpenedInNewTabThenReturnTrueAndLoadCleanedUrl() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledAndIsOpenedInNewTabThenReturnTrueAndLoadCleanedUrl() {
         whenever(listener.linkOpenedInNewTab()).thenReturn(true)
         whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledThenReturnTrueAndLoadCleanedUrl()
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledThenReturnFalseAndLoadCleanedUrl() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledThenReturnFalseAndLoadCleanedUrl() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
@@ -552,7 +552,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkThenReturnTrueAndLoadExtractedUrl() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkThenReturnTrueAndLoadExtractedUrl() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val ampLink = SpecialUrlDetector.UrlType.ExtractedAmpLink(extractedUrl = EXAMPLE_URL)
