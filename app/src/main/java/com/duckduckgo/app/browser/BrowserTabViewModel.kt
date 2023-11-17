@@ -353,10 +353,7 @@ class BrowserTabViewModel @Inject constructor(
 
         class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
-        class DeleteSavedSiteConfirmation(
-            val savedSite: SavedSite,
-            val position: Int,
-        ) : Command()
+        class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
 
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
@@ -520,6 +517,12 @@ class BrowserTabViewModel @Inject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
     private var ctaChangedTicker = MutableStateFlow("")
+    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+
+    data class HiddenBookmarksIds(
+        val favorites: List<String> = emptyList(),
+        val bookmarks: List<String> = emptyList()
+    )
 
     /*
       Used to prevent autofill credential picker from automatically showing
@@ -668,22 +671,52 @@ class BrowserTabViewModel @Inject constructor(
 
         observeAccessibilitySettings()
 
-        savedSitesRepository.getFavorites().map { favoriteSites ->
-            val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
-            ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
-            autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
-            val favorite = favoriteSites.firstOrNull { it.url == url }
-            browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
-        }.launchIn(viewModelScope)
+        savedSitesRepository.getFavorites()
+            .flowOn(dispatchers.io())
+            .combine(hiddenIds) { favorites, hiddenIds ->
+                favorites.filter { it.id !in hiddenIds.favorites }
+            }
+            .onEach { filteredFavourites ->
+                withContext(dispatchers.main()) {
+                    val favorites = filteredFavourites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
+                    ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
+                    autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
+                    val favorite = filteredFavourites.firstOrNull { it.url == url }
+                    browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
+                }
+            }
+            .flowOn(dispatchers.main())
+            .launchIn(viewModelScope)
 
         savedSitesRepository.getBookmarks()
             .flowOn(dispatchers.io())
+            .combine(hiddenIds) { bookmarks, hiddenIds ->
+                bookmarks.filter { it.id !in hiddenIds.bookmarks }
+            }
             .map { bookmarks ->
                 val bookmark = bookmarks.firstOrNull { it.url == url }
                 browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
             }
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
+
+        // savedSitesRepository.getFavorites().map { favoriteSites ->
+        //     val favorites = favoriteSites.map { FavoritesQuickAccessAdapter.QuickAccessFavorite(it) }
+        //     ctaViewState.value = currentCtaViewState().copy(favorites = favorites)
+        //     autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
+        //     val favorite = favoriteSites.firstOrNull { it.url == url }
+        //     browserViewState.value = currentBrowserViewState().copy(favorite = favorite)
+        // }
+        //     .launchIn(viewModelScope)
+
+        // savedSitesRepository.getBookmarks()
+        //     .flowOn(dispatchers.io())
+        //     .map { bookmarks ->
+        //         val bookmark = bookmarks.firstOrNull { it.url == url }
+        //         browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+        //     }
+        //     .flowOn(dispatchers.main())
+        //     .launchIn(viewModelScope)
 
         viewModelScope.launch(dispatchers.io()) {
             remoteMessagingModel.get().activeMessages
@@ -1567,7 +1600,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun sameEffectiveTldPlusOne(site: Site?, origin: String): Boolean {
+    private fun sameEffectiveTldPlusOne(
+        site: Site?,
+        origin: String
+    ): Boolean {
         val siteDomain = site?.url?.toHttpUrlOrNull() ?: return false
         val originDomain = origin.toUri().toString().toHttpUrlOrNull() ?: return false
 
@@ -1930,7 +1966,7 @@ class BrowserTabViewModel @Inject constructor(
             val favorite = currentBrowserViewState().favorite
             if (favorite != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_REMOVE_FAVORITE_PRESSED.pixelName)
-                hide(favorite)
+                onDeleteSavedSiteRequested(favorite)
             } else {
                 val buttonHighlighted = currentBrowserViewState().addFavorite.isHighlighted()
                 pixel.fire(
@@ -1972,6 +2008,13 @@ class BrowserTabViewModel @Inject constructor(
                 }
             }
             favorite?.let {
+                withContext(dispatchers.io()) {
+                    hiddenIds.emit(
+                        hiddenIds.value.copy(
+                            favorites = hiddenIds.value.favorites - favorite.id,
+                        ),
+                    )
+                }
                 withContext(dispatchers.main()) {
                     command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(it, null))
                 }
@@ -2081,7 +2124,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onSavedSiteDeleted(savedSite: SavedSite) {
-        hide(savedSite)
+        onDeleteSavedSiteRequested(savedSite)
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
@@ -2759,7 +2802,11 @@ class BrowserTabViewModel @Inject constructor(
         fileDownloader.enqueueDownload(pendingFileDownload)
     }
 
-    fun delete(savedSite: SavedSite) {
+    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
+        delete(savedSite)
+    }
+
+    private fun delete(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io() + NonCancellable) {
             if (savedSite is Bookmark) {
                 faviconManager.deletePersistedFavicon(savedSite.url)
@@ -2768,53 +2815,40 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun hide(savedSite: SavedSite): Int {
-        val oldPosition = if (savedSite is Favorite) {
-            val quickAccessFavorite = FavoritesQuickAccessAdapter.QuickAccessFavorite(savedSite)
-            val quickAccessFavorites = currentCtaViewState().favorites.toMutableList()
-            val index = quickAccessFavorites.indexOf(quickAccessFavorite)
-            quickAccessFavorites.remove(quickAccessFavorite)
-
-            ctaViewState.value = currentCtaViewState().copy(favorites = quickAccessFavorites)
-            browserViewState.value = currentBrowserViewState().copy(favorite = null)
-            autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = quickAccessFavorites)
-            index
-        } else {
-            browserViewState.value = currentBrowserViewState().copy(bookmark = null, favorite = null)
-            0
-        }
-
-        viewModelScope.launch {
-            withContext(dispatchers.main()) {
-                command.value = DeleteSavedSiteConfirmation(savedSite, oldPosition)
-            }
-        }
-
-        return oldPosition
+    fun onDeleteSavedSiteRequested(savedSite: SavedSite){
+        hide(savedSite)
     }
 
-    fun undoDelete(
-        savedSite: SavedSite,
-        position: Int,
-    ) {
-        when (savedSite) {
-            is Favorite -> {
-                val quickAccessFavorite = FavoritesQuickAccessAdapter.QuickAccessFavorite(savedSite)
-                val quickAccessFavorites = currentCtaViewState().favorites.toMutableList()
+    private fun hide(savedSite: SavedSite) {
+        viewModelScope.launch(dispatchers.io()) {
+            when (savedSite) {
+                is Bookmark -> {
+                    hiddenIds.emit(
+                        hiddenIds.value.copy(
+                            bookmarks = hiddenIds.value.bookmarks + savedSite.id,
+                            favorites = hiddenIds.value.favorites + savedSite.id,
+                        ),
+                    )
+                }
 
-                quickAccessFavorites.add(position, quickAccessFavorite)
-
-                ctaViewState.value = currentCtaViewState().copy(favorites = quickAccessFavorites)
-                browserViewState.value = currentBrowserViewState().copy(favorite = savedSite)
-                autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = quickAccessFavorites)
+                is Favorite -> {
+                    hiddenIds.emit(hiddenIds.value.copy(favorites = hiddenIds.value.favorites + savedSite.id))
+                }
             }
-
-            is Bookmark -> {
-                val quickAccessFavorites = currentCtaViewState().favorites.toMutableList()
-                val quickAccessFavorite = quickAccessFavorites.find { it.favorite.id == savedSite.id }
-
-                browserViewState.value = currentBrowserViewState().copy(favorite = quickAccessFavorite?.favorite, bookmark = savedSite)
+            withContext(dispatchers.main()) {
+                command.value = DeleteSavedSiteConfirmation(savedSite)
             }
+        }
+    }
+
+    fun undoDelete(savedSite: SavedSite) {
+        viewModelScope.launch(dispatchers.io()) {
+            hiddenIds.emit(
+                hiddenIds.value.copy(
+                    favorites = hiddenIds.value.favorites - savedSite.id,
+                    bookmarks = hiddenIds.value.bookmarks - savedSite.id,
+                ),
+            )
         }
     }
 
