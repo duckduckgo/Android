@@ -206,7 +206,7 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenDeviceIsEnglishAndLoginReportThenIncludeLoginSite() {
+    fun whenDeviceIsEnglishThenIncludeLoginSite() {
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.ENGLISH)
         whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
@@ -224,7 +224,7 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenDeviceIsNotEnglishAndLoginReportThenIncludeLoginSite() {
+    fun whenDeviceIsNotEnglishThenDoNotIncludeLoginSite() {
         whenever(mockAppBuildConfig.deviceLocale).thenReturn(Locale.FRANCE)
         whenever(mockContentBlocking.isAnException(any())).thenReturn(false)
         whenever(mockUserAllowListRepository.isDomainInUserAllowList(any())).thenReturn(false)
