@@ -521,7 +521,7 @@ class BrowserTabViewModel @Inject constructor(
 
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
-        val bookmarks: List<String> = emptyList()
+        val bookmarks: List<String> = emptyList(),
     )
 
     /*
@@ -1584,7 +1584,7 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun sameEffectiveTldPlusOne(
         site: Site?,
-        origin: String
+        origin: String,
     ): Boolean {
         val siteDomain = site?.url?.toHttpUrlOrNull() ?: return false
         val originDomain = origin.toUri().toString().toHttpUrlOrNull() ?: return false
@@ -2797,7 +2797,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteSavedSiteRequested(savedSite: SavedSite){
+    fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
         hide(savedSite)
     }
 

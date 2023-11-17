@@ -22,7 +22,6 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -61,7 +60,6 @@ class SystemSearchViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
     private val mocksavedSitesRepository: SavedSitesRepository = mock()
-    private val mockFaviconManager: FaviconManager = mock()
     private val mockPixel: Pixel = mock()
     private val mockSettingsStore: SettingsDataStore = mock()
 
@@ -84,7 +82,6 @@ class SystemSearchViewModelTest {
             mockDeviceAppLookup,
             mockPixel,
             mocksavedSitesRepository,
-            mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
         )
@@ -327,7 +324,7 @@ class SystemSearchViewModelTest {
         testee.onDeleteQuickAccessItemRequested(quickAccessItem)
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite, -1), commandCaptor.lastValue)
+        assertEquals(Command.DeleteSavedSiteConfirmation(quickAccessItem.favorite), commandCaptor.lastValue)
     }
 
     @Test
@@ -349,7 +346,6 @@ class SystemSearchViewModelTest {
             mockDeviceAppLookup,
             mockPixel,
             mocksavedSitesRepository,
-            mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
         )
@@ -373,7 +369,6 @@ class SystemSearchViewModelTest {
             mockDeviceAppLookup,
             mockPixel,
             mocksavedSitesRepository,
-            mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
         )
@@ -381,7 +376,7 @@ class SystemSearchViewModelTest {
         val viewState = testee.resultsViewState.value as QuickAccessItems
         assertFalse(viewState.favorites.isEmpty())
 
-        testee.undoDelete(savedSite, 0)
+        testee.undoDelete(savedSite)
     }
 
     @Test
@@ -413,7 +408,6 @@ class SystemSearchViewModelTest {
             mockDeviceAppLookup,
             mockPixel,
             mocksavedSitesRepository,
-            mockFaviconManager,
             mockSettingsStore,
             coroutineRule.testDispatcherProvider,
         )

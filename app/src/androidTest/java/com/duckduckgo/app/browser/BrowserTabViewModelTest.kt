@@ -685,7 +685,7 @@ class BrowserTabViewModelTest {
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
 
-        testee.delete(bookmark)
+        testee.onDeleteSavedSiteSnackbarDismissed(bookmark)
 
         verify(mockFaviconManager).deletePersistedFavicon(bookmark.url)
         verify(mockSavedSitesRepository).delete(bookmark)
@@ -737,7 +737,7 @@ class BrowserTabViewModelTest {
     fun whenDeleteQuickAccessItemCalledWithFavoriteThenRepositoryUpdated() = runTest {
         val savedSite = Favorite(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp", 0)
 
-        testee.delete(savedSite)
+        testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
     }
@@ -746,7 +746,7 @@ class BrowserTabViewModelTest {
     fun whenDeleteQuickAccessItemCalledWithBookmarkThenRepositoryUpdated() = runTest {
         val savedSite = Bookmark(UUID.randomUUID().toString(), "title", "http://example.com", lastModified = "timestamp")
 
-        testee.delete(savedSite)
+        testee.onDeleteSavedSiteSnackbarDismissed(savedSite)
 
         verify(mockSavedSitesRepository).delete(savedSite)
     }
@@ -3794,7 +3794,7 @@ class BrowserTabViewModelTest {
         assertTrue(autoCompleteViewState().favorites.isEmpty())
         assertTrue(ctaViewState().favorites.isEmpty())
 
-        testee.undoDelete(favoriteSite, 0)
+        testee.undoDelete(favoriteSite)
 
         assertTrue(browserViewState().favorite == favoriteSite)
         assertTrue(autoCompleteViewState().favorites == quickAccessFavorites)
@@ -3806,12 +3806,14 @@ class BrowserTabViewModelTest {
         val bookmark =
             Bookmark(id = UUID.randomUUID().toString(), title = "A title", url = "www.example.com", lastModified = "timestamp")
 
+        bookmarksListFlow.send(listOf(bookmark))
+
         testee.onSavedSiteDeleted(bookmark)
 
         assertTrue(browserViewState().bookmark == null)
         assertTrue(browserViewState().favorite == null)
 
-        testee.undoDelete(bookmark, 0)
+        testee.undoDelete(bookmark)
 
         assertTrue(browserViewState().bookmark == bookmark)
     }

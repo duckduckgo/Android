@@ -131,7 +131,7 @@ class BookmarksViewModel @Inject constructor(
         hide(savedSite)
     }
 
-    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite){
+    fun onDeleteSavedSiteSnackbarDismissed(savedSite: SavedSite) {
         delete(savedSite)
     }
 
@@ -245,7 +245,7 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteBookmarkFolderSnackbarDismissed(bookmarkFolder: BookmarkFolder){
+    fun onDeleteBookmarkFolderSnackbarDismissed(bookmarkFolder: BookmarkFolder) {
         delete(bookmarkFolder)
     }
 

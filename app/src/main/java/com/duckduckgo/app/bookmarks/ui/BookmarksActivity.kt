@@ -63,7 +63,6 @@ import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(BookmarksScreenNoParams::class)
