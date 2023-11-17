@@ -221,7 +221,7 @@ class RealPrivacyConfigPersisterTest {
             readme = "readme",
             features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
             unprotectedTemporary = unprotectedTemporaryList,
-            variantManager = VARIANT_MANAGER_JSON,
+            experimentalVariants = VARIANT_MANAGER_JSON,
         )
     }
 
@@ -256,7 +256,7 @@ class RealPrivacyConfigPersisterTest {
             return true
         }
 
-        override val featureName = "variantManager"
+        override val featureName = "experimentalVariants"
     }
 
     class FakeFakePrivacyConfigCallbackPluginPoint(

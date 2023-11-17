@@ -92,7 +92,7 @@ class RealPrivacyConfigDownloaderTest {
                     readme = "readme",
                     features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
                     unprotectedTemporary = unprotectedTemporaryList,
-                    variantManager = VARIANT_MANAGER_JSON,
+                    experimentalVariants = VARIANT_MANAGER_JSON,
                 ),
             )
         }

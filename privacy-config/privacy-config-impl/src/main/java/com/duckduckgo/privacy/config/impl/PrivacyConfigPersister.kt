@@ -109,7 +109,7 @@ class RealPrivacyConfigPersister @Inject constructor(
                 }
                 unprotectedTemporaryRepository.updateAll(unProtectedExceptions)
                 // First store the variants...
-                jsonPrivacyConfig.variantManager?.let { jsonObject ->
+                jsonPrivacyConfig.experimentalVariants?.let { jsonObject ->
                     variantManagerPlugin.store(VARIANT_MANAGER_FEATURE_NAME, jsonObject.toString())
                 }
                 // Then feature flags

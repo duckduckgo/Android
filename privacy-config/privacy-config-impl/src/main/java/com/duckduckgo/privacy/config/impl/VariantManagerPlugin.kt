@@ -55,7 +55,7 @@ internal class VariantManagerPlugin constructor(
     override val featureName = VARIANT_MANAGER_FEATURE_NAME
 
     companion object {
-        const val VARIANT_MANAGER_FEATURE_NAME = "variantManager"
+        const val VARIANT_MANAGER_FEATURE_NAME = "experimentalVariants"
     }
 }
 

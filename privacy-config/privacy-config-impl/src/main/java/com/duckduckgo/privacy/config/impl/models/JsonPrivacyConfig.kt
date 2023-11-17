@@ -24,5 +24,5 @@ data class JsonPrivacyConfig(
     val readme: String,
     val features: Map<String, JSONObject?>,
     val unprotectedTemporary: List<FeatureException>,
-    val variantManager: JSONObject?,
+    val experimentalVariants: JSONObject?,
 )
