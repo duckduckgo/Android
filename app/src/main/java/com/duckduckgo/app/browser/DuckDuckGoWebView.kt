@@ -19,13 +19,10 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.util.SparseArray
 import android.view.MotionEvent
-import android.view.autofill.AutofillValue
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.WebView
-import androidx.core.util.isNotEmpty
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
@@ -51,8 +48,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var nestedOffsetY: Int = 0
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
     private val helper = CoordinatorLayoutHelper()
-
-    var systemAutofillListener: SystemAutofillListener? = null
 
     constructor(context: Context) : this(context, null)
     constructor(
@@ -265,13 +260,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
     }
 
-    override fun autofill(values: SparseArray<AutofillValue>) {
-        super.autofill(values)
-        if (values.isNotEmpty()) {
-            systemAutofillListener?.systemAutofillPerformed()
-        }
-    }
-
     companion object {
 
         /*
@@ -280,8 +268,4 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
          */
         private const val IME_FLAG_NO_PERSONALIZED_LEARNING = 0x1000000
     }
-}
-
-interface SystemAutofillListener {
-    fun systemAutofillPerformed()
 }

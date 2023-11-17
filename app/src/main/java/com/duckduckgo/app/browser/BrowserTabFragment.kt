@@ -190,7 +190,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.autofill.api.store.AutofillStore.ContainsCredentialsResult.*
-import com.duckduckgo.autofill.api.systemautofill.SystemAutofillUsageMonitor
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -259,8 +258,7 @@ class BrowserTabFragment :
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
     AutofillEventListener,
-    EmailProtectionUserPromptListener,
-    SystemAutofillListener {
+    EmailProtectionUserPromptListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -414,9 +412,6 @@ class BrowserTabFragment :
     @Inject
     @Named("ContentScopeScripts")
     lateinit var contentScopeScripts: JsMessaging
-
-    @Inject
-    lateinit var systemAutofillUsageMonitor: SystemAutofillUsageMonitor
 
     @Inject
     lateinit var webContentDebugging: WebContentDebugging
@@ -2147,8 +2142,6 @@ class BrowserTabFragment :
                 }
             }
         }
-
-        it.systemAutofillListener = this
     }
 
     private fun injectAutofillCredentials(
@@ -3688,9 +3681,5 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
-    }
-
-    override fun systemAutofillPerformed() {
-        systemAutofillUsageMonitor.onSystemAutofillUsed()
     }
 }
