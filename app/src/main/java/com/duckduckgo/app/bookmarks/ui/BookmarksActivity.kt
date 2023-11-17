@@ -29,9 +29,13 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.ViewState
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
@@ -60,6 +64,7 @@ import com.duckduckgo.savedsites.api.service.ExportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -171,24 +176,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel(parentId: String) {
-        viewModel.viewState.observe(
-            this,
-        ) { viewState ->
-            viewState?.let { state ->
-                if (parentId == SavedSitesNames.BOOKMARKS_ROOT) {
-                    favoritesAdapter?.setItems(state.favorites.filter { it.deleted == null }.map { FavoritesAdapter.FavoriteItem(it) })
-                }
-                bookmarksAdapter.setItems(
-                    state.bookmarks.filter { it.deleted == null }.map { BookmarksAdapter.BookmarkItem(it) },
-                    state.bookmarkFolders.isEmpty(),
-                )
-                bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.filter { it.deleted == null }.map {
-                    BookmarkFoldersAdapter.BookmarkFolderItem(
-                        it,
-                    )
-                }
-                setSearchMenuItemVisibility()
-            }
+        lifecycleScope.launch {
+            viewModel.viewState
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { renderViewState(parentId, it) }
         }
 
         viewModel.command.observe(
@@ -206,6 +197,25 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder)
             }
         }
+    }
+
+    private fun renderViewState(
+        parentId: String,
+        state: ViewState
+    ) {
+        if (parentId == SavedSitesNames.BOOKMARKS_ROOT) {
+            favoritesAdapter?.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
+        }
+        bookmarksAdapter.setItems(
+            state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) },
+            state.bookmarkFolders.isEmpty(),
+        )
+        bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map {
+            BookmarkFoldersAdapter.BookmarkFolderItem(
+                it,
+            )
+        }
+        setSearchMenuItemVisibility()
     }
 
     private fun showImportedSavedSites(result: ImportSavedSitesResult) {
@@ -376,7 +386,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                         // actually delete the saved site
                         Timber.d("Bookmark: dismissed with $event")
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.delete(savedSite)
+                            viewModel.onDeleteSavedSiteSnackbarDismissed(savedSite)
                         }
                     }
                 },
@@ -405,7 +415,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                         // actually delete the saved site
                         Timber.d("Bookmark: dismissed with $event")
                         if (event != DISMISS_EVENT_ACTION) {
-                            viewModel.delete(bookmarkFolder)
+                            viewModel.onDeleteFolderSnackbarDismissed(bookmarkFolder)
                         }
                     }
                 },
@@ -434,7 +444,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.hide(bookmarkFolder)
+                        viewModel.onDeleteBookmarkFolderConfirmed(bookmarkFolder)
                     }
                 },
             )

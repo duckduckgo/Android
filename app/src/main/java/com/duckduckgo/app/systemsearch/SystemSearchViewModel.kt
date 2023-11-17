@@ -33,11 +33,8 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
-<<<<<<< HEAD
 import com.duckduckgo.common.utils.DispatcherProvider
-=======
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
->>>>>>> 741191fa3 (added undo to system search)
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
