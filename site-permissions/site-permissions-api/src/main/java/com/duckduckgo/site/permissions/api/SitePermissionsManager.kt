@@ -36,6 +36,17 @@ interface SitePermissionsManager {
      */
     suspend fun clearAllButFireproof(fireproofDomains: List<String>)
 
+    /**
+     * Returns the proper response for a permissions.query JavaScript API call - see
+     * https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
+     *
+     * @param url website querying the permission
+     * @param tabId the tab where the query was originated
+     * @param queriedPermission permission being queried (note: this is different from WebView permissions, check link above)
+     * @return state of the permission as expected by the API: 'granted', 'prompt', or 'denied'
+     */
+    fun getPermissionsQueryResponse(url: String?, tabId: String?, queriedPermission: String): String
+
     data class SitePermissions(
         val autoAccept: List<String>,
         val userHandled: List<String>,

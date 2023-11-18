@@ -84,6 +84,27 @@ class SitePermissionsManagerImpl @Inject constructor(
         }
     }
 
+    override fun getPermissionsQueryResponse(
+        url: String?,
+        tabId: String?,
+        queriedPermission: String,
+    ): String {
+        if (url == null || tabId == null) {
+            return PERMISSION_QUERY_STATE_DENIED
+        }
+
+        getAndroidPermission(queriedPermission)?.let { androidPermission ->
+            if (sitePermissionsRepository.isDomainGranted(url, tabId, androidPermission)) {
+                return PERMISSION_QUERY_STATE_GRANTED
+            } else if (isHardwareSupported(androidPermission) && sitePermissionsRepository.isDomainAllowedToAsk(url, androidPermission)) {
+                return PERMISSION_QUERY_STATE_PROMPT
+            }
+            return PERMISSION_QUERY_STATE_DENIED
+        }
+
+        return PERMISSION_QUERY_STATE_DENIED
+    }
+
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE ||
             permission == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID
@@ -95,5 +116,19 @@ class SitePermissionsManagerImpl @Inject constructor(
         else -> {
             true
         }
+    }
+
+    private fun getAndroidPermission(webQueryPermission: String): String? {
+        return when (webQueryPermission) {
+            "camera" -> PermissionRequest.RESOURCE_VIDEO_CAPTURE
+            "microphone" -> PermissionRequest.RESOURCE_AUDIO_CAPTURE
+            else -> null
+        }
+    }
+
+    companion object {
+        private const val PERMISSION_QUERY_STATE_GRANTED = "granted"
+        private const val PERMISSION_QUERY_STATE_PROMPT = "prompt"
+        private const val PERMISSION_QUERY_STATE_DENIED = "denied"
     }
 }

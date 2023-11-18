@@ -2111,6 +2111,7 @@ class BrowserTabFragment :
                     override fun process(featureName: String, method: String, id: String, data: JSONObject) {
                         when (method) {
                             "webShare" -> webShare(featureName, method, id, data)
+                            "permissionsQuery" -> permissionsQuery(featureName, method, id, data)
                             else -> {
                                 // NOOP
                             }
@@ -2125,6 +2126,22 @@ class BrowserTabFragment :
 
     private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
         webShareRequest.launch(JsCallbackData(data, featureName, method, id))
+    }
+
+    private fun permissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
+        val url = runBlocking(dispatchers.main()) {
+            webView?.url
+        }
+
+        val permissionState = webChromeClient.getPermissionsQueryResponse(url, tabId, data.getString("name"))
+        val response = JsCallbackData(
+            JSONObject("""{ "state":"$permissionState"}"""),
+            featureName,
+            method,
+            id,
+        )
+
+        contentScopeScripts.onResponse(response)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
