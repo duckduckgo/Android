@@ -49,6 +49,7 @@ class SitePermissionsManagerTest {
     private val testee = SitePermissionsManagerImpl(mockPackageManager, mockSitePermissionsRepository, coroutineRule.testDispatcherProvider)
 
     private val url = "https://domain.com/whatever"
+    private val tabId = "tabId"
 
     @Before
     fun before() {
@@ -57,7 +58,6 @@ class SitePermissionsManagerTest {
 
     @Test
     fun givenListOfPermissionsThenPermissionsReturnedCorrectly() = runTest {
-        val tabId = "tabId"
         val resources = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
@@ -77,7 +77,6 @@ class SitePermissionsManagerTest {
 
     @Test
     fun givenListOfPermissionsShouldAutoAcceptThenGrantAndClearAutoHandlePermissions() = runTest {
-        val tabId = "tabId"
         val resources = arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE, PermissionRequest.RESOURCE_VIDEO_CAPTURE)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_AUDIO_CAPTURE)).thenReturn(true)
@@ -96,7 +95,6 @@ class SitePermissionsManagerTest {
 
     @Test
     fun givenListOfPermissionsThenFilterNotSupportedAndReturnOnlyPermissionsAllowedToAsk() = runTest {
-        val tabId = "tabId"
         val resources =
             arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
@@ -115,7 +113,6 @@ class SitePermissionsManagerTest {
 
     @Test
     fun givenListOfPermissionsNoHardwareCameraThenFilterNotSupportedAndThenDenyPermissions() = runTest {
-        val tabId = "tabId"
         val resources =
             arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(true)
@@ -134,7 +131,6 @@ class SitePermissionsManagerTest {
 
     @Test
     fun whenPermissionsShouldAutoDenyThenDeny() = runTest {
-        val tabId = "tabId"
         val resources =
             arrayOf(PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         whenever(mockSitePermissionsRepository.isDomainAllowedToAsk(url, PermissionRequest.RESOURCE_VIDEO_CAPTURE)).thenReturn(false)
@@ -170,5 +166,10 @@ class SitePermissionsManagerTest {
 
         testee.clearAllButFireproof(testFireproofList)
         verify(mockSitePermissionsRepository).deletePermissionsForSite(domain)
+    }
+
+    @Test
+    fun whenUrlNullThenGetPermissionsQueryResponseReturnsDenied() {
+        assertEquals("denied", testee.getPermissionsQueryResponse(url, tabId, "some_permission"))
     }
 }
