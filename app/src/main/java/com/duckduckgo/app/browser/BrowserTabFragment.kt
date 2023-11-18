@@ -1283,6 +1283,7 @@ class BrowserTabFragment :
             )
 
             is Command.WebViewError -> showError(it.errorType, it.url)
+            is Command.OnPermissionsQueryResponse -> contentScopeScripts.onResponse(it.jsCallbackData)
             else -> {
                 // NO OP
             }
@@ -2129,19 +2130,7 @@ class BrowserTabFragment :
     }
 
     private fun permissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
-        val url = runBlocking(dispatchers.main()) {
-            webView?.url
-        }
-
-        val permissionState = webChromeClient.getPermissionsQueryResponse(url, tabId, data.getString("name"))
-        val response = JsCallbackData(
-            JSONObject("""{ "state":"$permissionState"}"""),
-            featureName,
-            method,
-            id,
-        )
-
-        contentScopeScripts.onResponse(response)
+        viewModel.onPermissionsQuery(featureName, method, id, data)
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {

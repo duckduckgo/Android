@@ -206,8 +206,4 @@ class BrowserChromeClient @Inject constructor(
     ) {
         webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
     }
-
-    fun getPermissionsQueryResponse(url: String?, tabId: String?, queriedPermission: String): String {
-        return sitePermissionsManager.getPermissionsQueryResponse(url, tabId, queriedPermission)
-    }
 }

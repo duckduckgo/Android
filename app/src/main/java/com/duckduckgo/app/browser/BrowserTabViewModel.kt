@@ -129,6 +129,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -136,6 +137,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -151,6 +153,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import org.json.JSONObject
 import timber.log.Timber
 
 @ContributesViewModel(FragmentScope::class)
@@ -200,6 +203,7 @@ class BrowserTabViewModel @Inject constructor(
     private val automaticSavedLoginsMonitor: AutomaticSavedLoginsMonitor,
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
     private val device: DeviceInfo,
+    private val sitePermissionsManager: SitePermissionsManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -468,7 +472,6 @@ class BrowserTabViewModel @Inject constructor(
         object LaunchAutofillSettings : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-        class NavigateToHistory(val historyStackIndex: Int) : Command()
         object EmailSignEvent : Command()
         class ShowSitePermissionsDialog(
             val permissionsToRequest: SitePermissions,
@@ -485,6 +488,8 @@ class BrowserTabViewModel @Inject constructor(
             val errorType: WebViewErrorResponse,
             val url: String,
         ) : Command()
+        
+        class OnPermissionsQueryResponse(val jsCallbackData: JsCallbackData) : Command()
     }
 
     sealed class NavigationCommand : Command() {
@@ -2981,6 +2986,21 @@ class BrowserTabViewModel @Inject constructor(
         browserViewState.value = currentBrowserViewState().copy(
             showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(urlLoaded = url ?: ""),
         )
+    }
+
+    fun onPermissionsQuery(featureName: String, method: String, id: String, data: JSONObject) {
+        val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url, tabId, data.getString("name"))
+
+        val response = JsCallbackData(
+            JSONObject("""{ "state":"$permissionState"}"""),
+            featureName,
+            method,
+            id,
+        )
+
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = OnPermissionsQueryResponse(response)
+        }
     }
 
     companion object {
