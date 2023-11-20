@@ -10,7 +10,7 @@ buildscript {
         gradle_plugin = '8.1.2' // When updating, also update lint_version
         lint_version = '31.1.2' // This value must always be gradle_plugin + 23
         min_sdk = 23
-        target_sdk = 34
+        target_sdk = 33
         compile_sdk = 34
         fladle_version = '0.17.4'
         kotlinter_version = '3.12.0'
