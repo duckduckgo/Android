@@ -30,7 +30,6 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.VpnActionReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
-import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions.None
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions.VPNActions
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions.VPNFeatureActions
 
@@ -72,7 +71,6 @@ class VpnEnabledNotificationBuilder {
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .addNotificationActions(context, vpnEnabledNotificationContent.notificationActions)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()
@@ -108,7 +106,6 @@ class VpnEnabledNotificationBuilder {
             when (notificationActions) {
                 is VPNActions -> getVpnActions(context)
                 is VPNFeatureActions -> notificationActions.actions.take(2)
-                is None -> emptyList()
             }.onEach { action ->
                 addAction(action)
             }

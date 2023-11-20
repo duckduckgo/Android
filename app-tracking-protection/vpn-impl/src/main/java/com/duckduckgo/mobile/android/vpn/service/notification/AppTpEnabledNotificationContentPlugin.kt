@@ -60,7 +60,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 onNotificationPressIntent = notificationPendingIntent,
-                notificationActions = NotificationActions.None,
+                notificationActions = NotificationActions.VPNFeatureActions(emptyList()),
             )
         } else {
             null

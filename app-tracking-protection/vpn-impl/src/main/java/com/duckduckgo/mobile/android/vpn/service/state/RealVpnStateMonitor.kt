@@ -111,7 +111,7 @@ class RealVpnStateMonitor @Inject constructor(
             ENABLING -> VpnRunningState.ENABLING
             ENABLED -> VpnRunningState.ENABLED
             DISABLED -> VpnRunningState.DISABLED()
-            SNOOZED -> VpnRunningState.DISABLED(TimeUnit.MINUTES.toMillis(20))
+            SNOOZED -> VpnRunningState.DISABLED(TimeUnit.MINUTES.toMillis(20)) // TODO - remove hardcoded time
             null, INVALID -> VpnRunningState.INVALID
         }
         val alwaysOnState = when (lastState?.alwaysOnState) {

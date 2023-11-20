@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.service
 import android.app.PendingIntent
 import android.text.SpannableStringBuilder
 import androidx.core.app.NotificationCompat
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions.VPNFeatureActions
 import kotlinx.coroutines.flow.Flow
 
 interface VpnEnabledNotificationContentPlugin {
@@ -65,7 +66,7 @@ interface VpnEnabledNotificationContentPlugin {
             val EMPTY = VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(),
                 onNotificationPressIntent = null,
-                notificationActions = NotificationActions.None,
+                notificationActions = VPNFeatureActions(emptyList()),
             )
         }
     }
@@ -80,6 +81,5 @@ interface VpnEnabledNotificationContentPlugin {
     sealed class NotificationActions {
         object VPNActions : NotificationActions()
         data class VPNFeatureActions(val actions: List<NotificationCompat.Action>) : NotificationActions()
-        object None : NotificationActions()
     }
 }

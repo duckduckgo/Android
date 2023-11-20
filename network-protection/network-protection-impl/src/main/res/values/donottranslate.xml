@@ -256,7 +256,7 @@
     <string name="netpNotificationDisabledByVpn">A VPN app on your device disabled Network Protection. Tap to re-enable.</string>
     <string name="netpNotificationCTAEnableVpn">Enable VPN</string>
     <string name="netpNotificationSnoozeTitle">VPN is snoozed</string>
-    <string name="netpNotificationSnoozeBody">VPN will reconnect in %1$s</string>
+    <string name="netpNotificationSnoozeBody" instruction="Placeholder is time in hh:mm format">VPN will reconnect in %1$s</string>
 
     <!-- Geoswitching -->
     <string name="netpGeoswitchingTitle">VPN Location</string>
