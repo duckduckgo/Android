@@ -33,22 +33,27 @@ import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
 import okio.ByteString.Companion.encodeUtf8
+import timber.log.Timber
 
 fun ImageView.loadFavicon(
     file: File,
     domain: String,
     placeholder: String? = null,
 ) {
-    val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
-    Glide.with(context).clear(this@loadFavicon)
-    Glide.with(context)
-        .load(file)
-        .diskCacheStrategy(DiskCacheStrategy.NONE)
-        .skipMemoryCache(true)
-        .transform(RoundedCorners(10))
-        .placeholder(defaultDrawable)
-        .error(defaultDrawable)
-        .into(this)
+    runCatching {
+        val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
+        Glide.with(context).clear(this@loadFavicon)
+        Glide.with(context)
+            .load(file)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .skipMemoryCache(true)
+            .transform(RoundedCorners(10))
+            .placeholder(defaultDrawable)
+            .error(defaultDrawable)
+            .into(this)
+    }.onFailure {
+        Timber.e(it, "Error loading favicon")
+    }
 }
 
 fun ImageView.loadFavicon(
@@ -56,20 +61,28 @@ fun ImageView.loadFavicon(
     domain: String,
     placeholder: String? = null,
 ) {
-    val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
-    Glide.with(context).clear(this)
-    Glide.with(context)
-        .load(bitmap)
-        .diskCacheStrategy(DiskCacheStrategy.NONE)
-        .skipMemoryCache(true)
-        .transform(RoundedCorners(10))
-        .placeholder(defaultDrawable)
-        .error(defaultDrawable)
-        .into(this)
+    runCatching {
+        val defaultDrawable = generateDefaultDrawable(this.context, domain, placeholder)
+        Glide.with(context).clear(this)
+        Glide.with(context)
+            .load(bitmap)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .skipMemoryCache(true)
+            .transform(RoundedCorners(10))
+            .placeholder(defaultDrawable)
+            .error(defaultDrawable)
+            .into(this)
+    }.onFailure {
+        Timber.e(it, "Error loading favicon")
+    }
 }
 
 fun ImageView.loadDefaultFavicon(domain: String) {
-    this.setImageDrawable(generateDefaultDrawable(this.context, domain))
+    runCatching {
+        this.setImageDrawable(generateDefaultDrawable(this.context, domain))
+    }.onFailure {
+        Timber.e(it, "Error loading default favicon")
+    }
 }
 
 /**
