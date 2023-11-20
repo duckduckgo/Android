@@ -209,7 +209,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageFinishedCalledThenInjectJsCode() = runTest {
+    fun whenOnPageFinishedCalledThenInjectJsCode() {
         assertEquals(0, jsPlugins.plugin.countFinished)
         testee.onPageFinished(webView, EXAMPLE_URL)
         assertEquals(1, jsPlugins.plugin.countFinished)
@@ -227,7 +227,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenShouldInterceptRequestThenEventSentToLoginDetector() = runTest {
+    fun whenShouldInterceptRequestThenEventSentToLoginDetector() {
         val webResourceRequest = mock<WebResourceRequest>()
         testee.shouldInterceptRequest(webView, webResourceRequest)
         verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
@@ -297,7 +297,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenShouldOverrideThrowsExceptionThenRecordException() = runTest {
+    fun whenShouldOverrideThrowsExceptionThenRecordException() {
         val exception = RuntimeException()
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenThrow(exception)
         testee.shouldOverrideUrlLoading(webView, "")
@@ -305,7 +305,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAppLinkDetectedAndIsHandledThenReturnTrue() = runTest {
+    fun whenAppLinkDetectedAndIsHandledThenReturnTrue() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -318,7 +318,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() = runTest {
+    fun whenAppLinkDetectedAndIsNotHandledThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -331,7 +331,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAppLinkDetectedAndListenerIsNullThenReturnFalse() = runTest {
+    fun whenAppLinkDetectedAndListenerIsNullThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
                 .thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL))
@@ -342,7 +342,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() = runTest {
+    fun whenNonHttpAppLinkDetectedAndIsHandledThenReturnTrue() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -355,7 +355,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsNotForMainframeThenOnlyReturnTrue() = runTest {
+    fun whenNonHttpAppLinkDetectedAndIsNotForMainframeThenOnlyReturnTrue() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -368,7 +368,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsHandledOnApiLessThan24ThenReturnTrue() = runTest {
+    fun whenNonHttpAppLinkDetectedAndIsHandledOnApiLessThan24ThenReturnTrue() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -380,7 +380,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() = runTest {
+    fun whenNonHttpAppLinkDetectedAndIsNotHandledThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -393,7 +393,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndIsNotHandledOnApiLessThan24ThenReturnFalse() = runTest {
+    fun whenNonHttpAppLinkDetectedAndIsNotHandledOnApiLessThan24ThenReturnFalse() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL)
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
@@ -404,7 +404,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() = runTest {
+    fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(
                 SpecialUrlDetector.UrlType.NonHttpAppLink(
@@ -420,7 +420,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenNonHttpAppLinkDetectedAndListenerIsNullOnApiLessThan24ThenReturnTrue() = runTest {
+    fun whenNonHttpAppLinkDetectedAndListenerIsNullOnApiLessThan24ThenReturnTrue() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(
                 SpecialUrlDetector.UrlType.NonHttpAppLink(
@@ -458,13 +458,13 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenAmpLinkDetectedAndIsForMainFrameAndIsOpenedInNewTabThenReturnTrueAndLoadExtractedUrl() = runTest {
+    fun whenAmpLinkDetectedAndIsForMainFrameAndIsOpenedInNewTabThenReturnTrueAndLoadExtractedUrl() {
         whenever(listener.linkOpenedInNewTab()).thenReturn(true)
         whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl()
     }
 
     @Test
-    fun whenCloakedAmpLinkDetectedAndIsForMainFrameThenHandleCloakedAmpLink() = runTest {
+    fun whenCloakedAmpLinkDetectedAndIsForMainFrameThenHandleCloakedAmpLink() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.CloakedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
@@ -473,7 +473,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenCloakedAmpLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
+    fun whenCloakedAmpLinkDetectedAndIsNotForMainFrameThenReturnFalse() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.CloakedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
@@ -493,7 +493,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsOpenedInNewTabThenReturnTrueAndLoadCleanedUrl() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsOpenedInNewTabThenReturnTrueAndLoadCleanedUrl() {
         whenever(listener.linkOpenedInNewTab()).thenReturn(true)
         whenTrackingParametersDetectedAndIsForMainFrameThenReturnTrueAndLoadCleanedUrl()
     }
@@ -510,7 +510,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledThenReturnTrueAndLoadCleanedUrl() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledThenReturnTrueAndLoadCleanedUrl() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
@@ -546,7 +546,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParamsDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledAndIsOpenedInNewTabThenReturnFalseAndLoadCleanedUrl() = runTest {
+    fun whenTrackingParamsDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledAndIsOpenedInNewTabThenReturnFalseAndLoadCleanedUrl() {
         whenever(listener.linkOpenedInNewTab()).thenReturn(true)
         whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledThenReturnFalseAndLoadCleanedUrl()
     }
@@ -565,13 +565,13 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkAndIsOpenedInNewTabThenReturnTrueAndLoadExtractedUrl() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkAndIsOpenedInNewTabThenReturnTrueAndLoadExtractedUrl() {
         whenever(listener.linkOpenedInNewTab()).thenReturn(true)
         whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkThenReturnTrueAndLoadExtractedUrl()
     }
 
     @Test
-    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndListenerIsNullThenReturnFalse() = runTest {
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndListenerIsNullThenReturnFalse() {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any()))
             .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
