@@ -43,7 +43,7 @@ class SettingsSyncDataPersister @Inject constructor(
     val syncCrypto: SyncCrypto,
     private val dispatchers: DispatcherProvider,
 ) : SyncableDataPersister {
-    override fun persist(
+    override fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
@@ -59,7 +59,7 @@ class SettingsSyncDataPersister @Inject constructor(
     }
 
     override fun onError(error: SyncErrorResponse) {
-        TODO("Not yet implemented")
+        // no-op
     }
 
     private suspend fun process(

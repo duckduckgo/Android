@@ -121,4 +121,5 @@
     <string name="sync_camera_permission_required_description">Please go to your device\'s settings and grant permission for this app to access your camera.</string>
     <string name="sync_go_to_settings">Go to Settings</string>
     <string name="sync_general_error">Something went wrong</string>
+    <string name="sync_notification_channel_name">Sync</string>
 </resources>

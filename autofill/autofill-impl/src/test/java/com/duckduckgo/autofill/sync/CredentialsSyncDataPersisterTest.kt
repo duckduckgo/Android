@@ -82,7 +82,7 @@ internal class CredentialsSyncDataPersisterTest {
     fun whenValidatingCorruptedDataThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_invalid_data.json")
         val corruptedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
-        val result = syncPersister.persist(corruptedChanges, TIMESTAMP)
+        val result = syncPersister.onSuccess(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Error)
     }
@@ -91,7 +91,7 @@ internal class CredentialsSyncDataPersisterTest {
     fun whenValidatingNullEntriesThenResultIsError() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_null_entries.json")
         val corruptedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
-        val result = syncPersister.persist(corruptedChanges, TIMESTAMP)
+        val result = syncPersister.onSuccess(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Error)
     }
@@ -100,7 +100,7 @@ internal class CredentialsSyncDataPersisterTest {
     fun whenProcessingDataInEmptyDBThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_first_get.json")
         val validChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
-        val result = syncPersister.persist(validChanges, DEDUPLICATION)
+        val result = syncPersister.onSuccess(validChanges, DEDUPLICATION)
 
         assertTrue(result is Success)
     }
@@ -109,7 +109,7 @@ internal class CredentialsSyncDataPersisterTest {
     fun whenMergingEmptyEntriesThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_empty_entries.json")
         val corruptedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
-        val result = syncPersister.persist(corruptedChanges, TIMESTAMP)
+        val result = syncPersister.onSuccess(corruptedChanges, TIMESTAMP)
 
         assertTrue(result is Success)
     }
@@ -118,14 +118,14 @@ internal class CredentialsSyncDataPersisterTest {
     fun whenMergingWithDeletedDataThenResultIsSuccess() {
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_deleted_entries.json")
         val deletedChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
-        val result = syncPersister.persist(deletedChanges, TIMESTAMP)
+        val result = syncPersister.onSuccess(deletedChanges, TIMESTAMP)
 
         assertTrue(result is Success)
     }
 
     @Test
     fun whenPersistWithAnotherTypeThenReturnFalse() {
-        val result = syncPersister.persist(
+        val result = syncPersister.onSuccess(
             SyncChangesResponse(BOOKMARKS, ""),
             DEDUPLICATION,
         )
@@ -140,7 +140,7 @@ internal class CredentialsSyncDataPersisterTest {
 
         val updatesJSON = FileUtilities.loadText(javaClass.classLoader!!, "json/sync/merger_first_get.json")
         val validChanges = SyncChangesResponse(CREDENTIALS, updatesJSON)
-        val result = syncPersister.persist(validChanges, DEDUPLICATION)
+        val result = syncPersister.onSuccess(validChanges, DEDUPLICATION)
 
         assertTrue(result is Success)
         assertNull(dao.getSyncMetadata(1L))

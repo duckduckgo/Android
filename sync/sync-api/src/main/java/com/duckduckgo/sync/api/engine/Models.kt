@@ -60,7 +60,7 @@ data class SyncChangesResponse(
     }
 }
 
-data class SyncErrorResponse (
+data class SyncErrorResponse(
     val type: SyncableType,
     val featureSyncError: FeatureSyncError,
 )
@@ -95,7 +95,6 @@ sealed class SyncMergeResult {
     }
 }
 
-//this can be removed from here, only used by saved sites?
 sealed class SyncDataValidationResult<out R> {
 
     data class Success<out T>(val data: T) : SyncDataValidationResult<T>()

@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.engine
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
+import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
@@ -31,6 +32,7 @@ import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResoluti
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.LOCAL_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.REMOTE_WINS
 import com.duckduckgo.sync.api.engine.SyncableDataPersister.SyncConflictResolution.TIMESTAMP
+import com.duckduckgo.sync.impl.API_CODE
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.engine.SyncOperation.DISCARD
@@ -174,9 +176,11 @@ class RealSyncEngine @Inject constructor(
         return when (val result = syncApiClient.patch(changes)) {
             is Error -> {
                 syncPixels.fireSyncAttemptErrorPixel(changes.type.toString(), result)
+                val featureError = result.featureError() ?: return
                 persisterPlugins.getPlugins().forEach {
-                    it.onError(SyncErrorResponse(changes.type, result.getError()))
+                    it.onError(SyncErrorResponse(changes.type, featureError))
                 }
+                return
             }
 
             is Success -> {
@@ -212,7 +216,7 @@ class RealSyncEngine @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ) {
         persisterPlugins.getPlugins().map {
-            when (val result = it.persist(remoteChanges, conflictResolution)) {
+            when (val result = it.onSuccess(remoteChanges, conflictResolution)) {
                 is SyncMergeResult.Success -> {
                     if (result.orphans) {
                         syncPixels.fireOrphanPresentPixel(remoteChanges.type.toString())
@@ -229,6 +233,14 @@ class RealSyncEngine @Inject constructor(
         syncStateRepository.clearAll()
         persisterPlugins.getPlugins().map {
             it.onSyncDisabled()
+        }
+    }
+
+    private fun Error.featureError(): FeatureSyncError? {
+        return when (code) {
+            API_CODE.COUNT_LIMIT.code -> COLLECTION_LIMIT_REACHED
+            API_CODE.CONTENT_TOO_LARGE.code -> COLLECTION_LIMIT_REACHED
+            else -> null
         }
     }
 }

@@ -171,6 +171,4 @@ enum class API_CODE(val code: Int) {
     NOT_MODIFIED(304),
     COUNT_LIMIT(409),
     CONTENT_TOO_LARGE(413),
-    BAD_REQUEST(400),
-    TOO_MANY_REQUESTS(429),
 }

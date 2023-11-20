@@ -22,7 +22,6 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesSyncPersisterAlgorithm
 import com.duckduckgo.sync.api.engine.SyncChangesResponse
 import com.duckduckgo.sync.api.engine.SyncDataValidationResult
-import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.api.engine.SyncErrorResponse
 import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
@@ -44,6 +43,7 @@ class SavedSitesSyncPersister @Inject constructor(
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val algorithm: SavedSitesSyncPersisterAlgorithm,
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
+    private val savedSitesSyncState: SavedSitesSyncFeatureListener,
 ) : SyncableDataPersister {
 
     override fun onSuccess(
@@ -51,8 +51,8 @@ class SavedSitesSyncPersister @Inject constructor(
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
         return if (changes.type == BOOKMARKS) {
-            savedSitesSyncStore.limitExceeded = false
             Timber.d("Sync-Bookmarks: received remote changes $changes, merging with resolution $conflictResolution")
+            savedSitesSyncState.onSuccess(changes)
             val result = process(changes, conflictResolution)
             Timber.d("Sync-Bookmarks: merging bookmarks finished with $result")
             result
@@ -62,9 +62,8 @@ class SavedSitesSyncPersister @Inject constructor(
     }
 
     override fun onError(error: SyncErrorResponse) {
-        when (error.featureSyncError) {
-            COLLECTION_LIMIT_REACHED -> savedSitesSyncStore.limitExceeded = true
-            else -> { /* no-op */ }
+        if (error.type == BOOKMARKS) {
+            savedSitesSyncState.onError(error.featureSyncError)
         }
     }
 
@@ -73,6 +72,7 @@ class SavedSitesSyncPersister @Inject constructor(
         savedSitesSyncStore.clientModifiedSince = "0"
         savedSitesSyncStore.startTimeStamp = "0"
         savedSitesFormFactorSyncMigration.onFormFactorFavouritesDisabled()
+        savedSitesSyncState.onSyncDisabled()
     }
 
     fun process(

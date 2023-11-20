@@ -45,7 +45,7 @@ class CredentialsSyncDataPersister @Inject constructor(
     private val strategies: DaggerMap<SyncConflictResolution, CredentialsMergeStrategy>,
     private val appBuildConfig: AppBuildConfig,
 ) : SyncableDataPersister {
-    override fun persist(
+    override fun onSuccess(
         changes: SyncChangesResponse,
         conflictResolution: SyncConflictResolution,
     ): SyncMergeResult {
@@ -63,7 +63,7 @@ class CredentialsSyncDataPersister @Inject constructor(
     }
 
     override fun onError(error: SyncErrorResponse) {
-        TODO("Not yet implemented")
+        // TODO: implement
     }
 
     private fun process(

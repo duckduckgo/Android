@@ -69,7 +69,7 @@ class SettingsSyncDataPersisterTest {
 
     @Test
     fun whenPersistChangesDeduplicationWithdValueThenCallDeduplicateWithValue() {
-        val result = testee.persist(
+        val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
                 jsonString = responseWithValuesObject,
@@ -83,7 +83,7 @@ class SettingsSyncDataPersisterTest {
 
     @Test
     fun whenPersistChangesDeduplicationWithDeletedValueThenCallDeduplicateWithNull() {
-        val result = testee.persist(
+        val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
                 jsonString = responseWithDeletedObject,
@@ -98,7 +98,7 @@ class SettingsSyncDataPersisterTest {
     @Test
     fun whenPersistChangesTimestampAndNoRecentChangeThenCallMergeWithValue() {
         settingSyncStore.startTimeStamp = "2023-08-31T10:06:16.022Z"
-        val result = testee.persist(
+        val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
                 jsonString = responseWithValuesObject,
@@ -112,7 +112,7 @@ class SettingsSyncDataPersisterTest {
 
     @Test
     fun whenPersistChangesTimestampWithDeletedValueThenCallSaveWithNull() {
-        val result = testee.persist(
+        val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
                 jsonString = responseWithDeletedObject,
@@ -135,7 +135,7 @@ class SettingsSyncDataPersisterTest {
             ),
         )
 
-        val result = testee.persist(
+        val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
                 jsonString = responseWithValuesObject,
@@ -151,7 +151,7 @@ class SettingsSyncDataPersisterTest {
     fun whenPersistChangesSucceedsThenUpdateServerAndClientTimestamps() {
         settingSyncStore.startTimeStamp = "2023-08-31T10:06:16.022Z"
 
-        val result = testee.persist(
+        val result = testee.onSuccess(
             changes = SyncChangesResponse(
                 type = SyncableType.SETTINGS,
                 jsonString = responseWithValuesObject,

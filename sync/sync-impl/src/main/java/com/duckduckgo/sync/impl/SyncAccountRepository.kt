@@ -23,7 +23,6 @@ import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_CREATION
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.ACCOUNT_LOGIN
-import com.duckduckgo.sync.api.engine.FeatureSyncError.COLLECTION_LIMIT_REACHED
 import com.duckduckgo.sync.crypto.*
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.pixels.*
@@ -407,15 +406,7 @@ sealed class Result<out R> {
     data class Error(
         val code: Int = -1,
         val reason: String,
-    ) : Result<Nothing>() {
-        fun getError(): FeatureSyncError {
-            return when (code) {
-                API_CODE.COUNT_LIMIT.code -> COLLECTION_LIMIT_REACHED
-                API_CODE.CONTENT_TOO_LARGE.code -> COLLECTION_LIMIT_REACHED
-                else -> FeatureSyncError.GENERIC_ERROR
-            }
-        }
-    }
+    ) : Result<Nothing>()
 
     override fun toString(): String {
         return when (this) {
