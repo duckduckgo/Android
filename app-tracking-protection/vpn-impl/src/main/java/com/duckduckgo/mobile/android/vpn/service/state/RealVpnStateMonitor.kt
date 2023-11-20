@@ -35,10 +35,10 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesBinding
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import logcat.logcat
-import java.util.concurrent.TimeUnit
 
 @ContributesBinding(AppScope::class)
 class RealVpnStateMonitor @Inject constructor(

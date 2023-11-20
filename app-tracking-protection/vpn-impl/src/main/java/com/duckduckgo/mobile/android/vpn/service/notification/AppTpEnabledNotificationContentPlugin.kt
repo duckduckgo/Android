@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.notification.NotificationActionReportIssue
@@ -59,7 +60,7 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(resources.getString(R.string.atp_OnInitialNotification)),
                 onNotificationPressIntent = notificationPendingIntent,
-                notificationActions = emptyList(),
+                notificationActions = NotificationActions.None,
             )
         } else {
             null
@@ -84,8 +85,10 @@ class AppTpEnabledNotificationContentPlugin @Inject constructor(
                 }
                 VpnEnabledNotificationContent(
                     title = SpannableStringBuilder(HtmlCompat.fromHtml(notificationText, HtmlCompat.FROM_HTML_MODE_LEGACY)),
-                    notificationActions = listOf(
-                        NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),
+                    notificationActions = NotificationActions.VPNFeatureActions(
+                        listOf(
+                            NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),
+                        ),
                     ),
                     onNotificationPressIntent = if (isEnabled) notificationPendingIntent else null,
                 )

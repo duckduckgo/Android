@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
+import com.duckduckgo.mobile.android.vpn.Vpn
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.networkprotection.impl.NetPVpnFeature
 import dagger.android.AndroidInjection
@@ -37,6 +38,8 @@ class NetPEnableReceiver : BroadcastReceiver() {
 
     @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
+    @Inject lateinit var vpn: Vpn
+
     override fun onReceive(
         context: Context,
         intent: Intent,
@@ -51,6 +54,11 @@ class NetPEnableReceiver : BroadcastReceiver() {
             goAsync(pendingResult) {
                 vpnFeaturesRegistry.registerFeature(NetPVpnFeature.NETP_VPN)
             }
+        } else if (intent.action == ACTION_VPN_ENABLE) {
+            logcat { "Entire VPN will be enabled because the user asked it" }
+            goAsync(pendingResult) {
+                vpn.start()
+            }
         } else {
             logcat(LogPriority.WARN) { "NetPEnableReceiver: unknown action" }
             pendingResult?.finish()
@@ -59,6 +67,7 @@ class NetPEnableReceiver : BroadcastReceiver() {
 
     companion object {
         internal const val ACTION_NETP_ENABLE = "com.duckduckgo.networkprotection.notification.ACTION_NETP_ENABLE"
+        internal const val ACTION_VPN_ENABLE = "com.duckduckgo.vpn.ACTION_VPN_ENABLE"
     }
 }
 

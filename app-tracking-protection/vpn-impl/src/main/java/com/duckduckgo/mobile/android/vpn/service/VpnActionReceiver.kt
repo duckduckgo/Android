@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.networkprotection.impl.notification
+package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -102,9 +102,9 @@ class VpnActionReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        internal const val ACTION_VPN_ENABLE = "com.duckduckgo.networkprotection.notification.ACTION_VPN_ENABLE"
-        internal const val ACTION_VPN_DISABLE = "com.duckduckgo.networkprotection.notification.ACTION_VPN_DISABLE"
-        internal const val ACTION_VPN_SNOOZE = "com.duckduckgo.networkprotection.notification.ACTION_VPN_SNOOZE"
+        internal const val ACTION_VPN_ENABLE = "com.duckduckgo.vpn.ACTION_VPN_ENABLE"
+        internal const val ACTION_VPN_DISABLE = "com.duckduckgo.vpn.ACTION_VPN_DISABLE"
+        internal const val ACTION_VPN_SNOOZE = "com.duckduckgo.vpn.ACTION_VPN_SNOOZE"
         private val DEFAULT_SNOOZE_LENGTH_IN_MILLIS = TimeUnit.MINUTES.toMillis(20)
     }
 }

@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -74,7 +75,6 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
         appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db, coroutineTestRule.testDispatcherProvider)
 
         plugin = AppTPAndNetPEnabledNotificationContentPlugin(
-            InstrumentationRegistry.getInstrumentation().targetContext.applicationContext,
             resources,
             appTrackerBlockingStatsRepository,
             appTrackingProtection,
@@ -96,7 +96,7 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("Device traffic routing through the VPN. No tracking attempts blocked in apps (past hour).")
-        assertNull(content.notificationActions)
+        assertEquals(NotificationActions.None, content.notificationActions)
     }
 
     @Test
@@ -108,7 +108,7 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
-        assertNull(content.notificationActions)
+        assertEquals(NotificationActions.None, content.notificationActions)
     }
 
     @Test
@@ -135,6 +135,7 @@ class AppTPAndNetPEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("Device traffic routing through Stockholm, SE. No tracking attempts blocked in apps (past hour).")
+            assertTrue(item.notificationActions is NotificationActions.VPNActions)
 
             cancelAndConsumeRemainingEvents()
         }
