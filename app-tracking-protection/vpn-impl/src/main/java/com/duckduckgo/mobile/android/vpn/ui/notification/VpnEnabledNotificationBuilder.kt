@@ -19,13 +19,20 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager.IMPORTANCE_LOW
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.service.VpnActionReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions.None
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions.VPNActions
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions.VPNFeatureActions
 
 class VpnEnabledNotificationBuilder {
 
@@ -65,11 +72,7 @@ class VpnEnabledNotificationBuilder {
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .apply {
-                    vpnEnabledNotificationContent.notificationActions.take(2).forEach { action ->
-                        addAction(action)
-                    }
-                }
+                .addNotificationActions(context, vpnEnabledNotificationContent.notificationActions)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()
@@ -92,14 +95,55 @@ class VpnEnabledNotificationBuilder {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
                 .setOngoing(true)
-                .apply {
-                    vpnNotification.notificationActions.take(2).forEach { action ->
-                        addAction(action)
-                    }
-                }
+                .addNotificationActions(context, vpnNotification.notificationActions)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()
+        }
+
+        private fun NotificationCompat.Builder.addNotificationActions(
+            context: Context,
+            notificationActions: NotificationActions,
+        ): NotificationCompat.Builder {
+            when (notificationActions) {
+                is VPNActions -> getVpnActions(context)
+                is VPNFeatureActions -> notificationActions.actions.take(2)
+                is None -> emptyList()
+            }.onEach { action ->
+                addAction(action)
+            }
+            return this
+        }
+
+        private fun getVpnActions(
+            context: Context,
+        ): List<NotificationCompat.Action> {
+            return listOf(
+                NotificationCompat.Action(
+                    R.drawable.ic_baseline_feedback_24,
+                    context.getString(R.string.vpn_NotificationCTASnoozeVpn),
+                    PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, VpnActionReceiver::class.java).apply {
+                            action = VpnActionReceiver.ACTION_VPN_SNOOZE
+                        },
+                        PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                ),
+                NotificationCompat.Action(
+                    R.drawable.ic_baseline_feedback_24,
+                    context.getString(R.string.vpn_NotificationCTADisableVpn),
+                    PendingIntent.getBroadcast(
+                        context,
+                        1,
+                        Intent(context, VpnActionReceiver::class.java).apply {
+                            action = VpnActionReceiver.ACTION_VPN_DISABLE
+                        },
+                        PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                ),
+            )
         }
     }
 }

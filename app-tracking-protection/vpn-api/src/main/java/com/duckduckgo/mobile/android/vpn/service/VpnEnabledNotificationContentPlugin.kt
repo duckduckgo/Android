@@ -59,13 +59,13 @@ interface VpnEnabledNotificationContentPlugin {
     data class VpnEnabledNotificationContent(
         val title: SpannableStringBuilder,
         val onNotificationPressIntent: PendingIntent?,
-        val notificationActions: List<NotificationCompat.Action>,
+        val notificationActions: NotificationActions,
     ) {
         companion object {
             val EMPTY = VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(),
                 onNotificationPressIntent = null,
-                notificationActions = emptyList(),
+                notificationActions = NotificationActions.None,
             )
         }
     }
@@ -75,5 +75,11 @@ interface VpnEnabledNotificationContentPlugin {
         NORMAL,
         HIGH,
         VERY_HIGH,
+    }
+
+    sealed class NotificationActions {
+        object VPNActions : NotificationActions()
+        data class VPNFeatureActions(val actions: List<NotificationCompat.Action>) : NotificationActions()
+        object None : NotificationActions()
     }
 }

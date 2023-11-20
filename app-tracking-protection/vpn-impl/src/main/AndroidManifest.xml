@@ -137,6 +137,17 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="com.duckduckgo.mobile.android.vpn.service.VpnActionReceiver"
+            android:exported="false"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_ENABLE" />
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_DISABLE" />
+                <action android:name="com.duckduckgo.vpn.ACTION_VPN_SNOOZE" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

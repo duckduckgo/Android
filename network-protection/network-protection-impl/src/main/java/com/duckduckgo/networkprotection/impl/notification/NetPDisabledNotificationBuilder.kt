@@ -96,8 +96,8 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
                 PendingIntent.getBroadcast(
                     context,
                     0,
-                    Intent(context, VpnActionReceiver::class.java).apply {
-                        action = VpnActionReceiver.ACTION_VPN_ENABLE
+                    Intent(context, NetPEnableReceiver::class.java).apply {
+                        action = NetPEnableReceiver.ACTION_VPN_ENABLE
                     },
                     PendingIntent.FLAG_IMMUTABLE,
                 ),

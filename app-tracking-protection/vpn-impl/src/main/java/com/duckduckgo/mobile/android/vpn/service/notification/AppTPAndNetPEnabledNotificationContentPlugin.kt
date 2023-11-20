@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.service.notification
 
-import android.content.Context
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.core.text.HtmlCompat
@@ -26,9 +25,9 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.ui.notification.NotificationActionReportIssue
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -40,7 +39,6 @@ import kotlinx.coroutines.runBlocking
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
 class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
-    private val context: Context,
     private val resources: Resources,
     private val repository: AppTrackerBlockingStatsRepository,
     private val appTrackingProtection: AppTrackingProtection,
@@ -61,7 +59,7 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = notificationPendingIntent,
-                notificationActions = emptyList(),
+                notificationActions = NotificationActions.None,
             )
         } else {
             null
@@ -110,9 +108,7 @@ class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
 
                 VpnEnabledNotificationContent(
                     title = SpannableStringBuilder(notificationText),
-                    notificationActions = listOf(
-                        NotificationActionReportIssue.mangeRecentAppsNotificationAction(context),
-                    ),
+                    notificationActions = NotificationActions.VPNActions,
                     onNotificationPressIntent = notificationPendingIntent,
                 )
             }
