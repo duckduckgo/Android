@@ -69,7 +69,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.load.engine.Engine
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -238,7 +237,6 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
-import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -3567,10 +3565,6 @@ class BrowserTabFragment :
                 quickAccessAdapter.submitList(favorites)
                 quickAccessItems.quickAccessRecyclerView.show()
                 viewModel.onNewTabFavouritesShown()
-<<<<<<< HEAD
-=======
-                viewModel.onNewTabFavouritesShown()
->>>>>>> be957a35f (Sync: Align platform triggers)
             }
 
             newBrowserTab.newTabQuickAccessItemsLayout.show()
