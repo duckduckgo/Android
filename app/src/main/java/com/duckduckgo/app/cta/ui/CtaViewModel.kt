@@ -74,7 +74,7 @@ class CtaViewModel @Inject constructor(
 
     @ExperimentalCoroutinesApi
     @VisibleForTesting
-    val isFireButtonPulseAnimationFlowEnabled = MutableSharedFlow<Boolean>(replay = 1).apply { tryEmit(true) }
+    val isFireButtonPulseAnimationFlowEnabled = MutableStateFlow(true)
 
     @FlowPreview
     @ExperimentalCoroutinesApi
