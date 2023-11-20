@@ -61,11 +61,9 @@ class NetPEnabledNotificationContentPluginTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         plugin = NetPEnabledNotificationContentPlugin(
-            context,
             context.resources,
             networkProtectionState,
             appTrackingProtection,
-            notificationActions,
         ) { null }
     }
 

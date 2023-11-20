@@ -254,8 +254,6 @@
     <string name="netpNotificationCTAReportIssue">Having problems with an app?</string>
     <string name="netpNotificationDisabled">Network Protection is disabled. Tap to continue securing your device traffic.</string>
     <string name="netpNotificationDisabledByVpn">A VPN app on your device disabled Network Protection. Tap to re-enable.</string>
-    <string name="netpNotificationCTASnoozeVpn">Snooze VPN</string>
-    <string name="netpNotificationCTADisableVpn">Disable VPN</string>
     <string name="netpNotificationCTAEnableVpn">Enable VPN</string>
     <string name="netpNotificationSnoozeTitle">VPN is snoozed</string>
     <string name="netpNotificationSnoozeBody">VPN will reconnect in %1$s</string>
@@ -267,6 +265,4 @@
     <string name="netpGeoswitchingDefaultSubtitle">Automatically connect to the nearest server we can find</string>
     <string name="netpGeoswitchingHeaderCustom">Custom</string>
     <string name="netpGeoswitchingHeaderCountrySubtitle" instruction="Placeholder is a number greater than 1">%1$d cities</string>
-
-    <!-- Snooze -->
 </resources>

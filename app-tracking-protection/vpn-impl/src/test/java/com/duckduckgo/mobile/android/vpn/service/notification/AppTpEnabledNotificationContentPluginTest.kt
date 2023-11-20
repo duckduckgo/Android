@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.service.notification
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.core.app.NotificationCompat
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -28,6 +27,7 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin
+import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.NotificationActions
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -97,7 +97,7 @@ class AppTpEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
-        assertEquals(emptyList<NotificationCompat.Action>(), content.notificationActions)
+        assertEquals(NotificationActions.None, content.notificationActions)
     }
 
     @Test
@@ -115,6 +115,8 @@ class AppTpEnabledNotificationContentPluginTest {
             val item = awaitItem()
 
             item.assertTitleEquals("Scanning for tracking activity… beep… boop")
+
+            assertTrue(item.notificationActions is NotificationActions.VPNFeatureActions)
 
             cancelAndConsumeRemainingEvents()
         }
