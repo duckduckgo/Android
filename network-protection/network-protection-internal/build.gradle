@@ -36,7 +36,6 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
 
-    implementation project(':app-tracking-api')
     implementation project(':browser-api')
     implementation project(':network-protection-impl')
     implementation project(':network-protection-api')

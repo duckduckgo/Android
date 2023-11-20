@@ -60,7 +60,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
             return VpnEnabledNotificationContent(
                 title = SpannableStringBuilder(title),
                 onNotificationPressIntent = onPressIntent,
-                notificationActions = NotificationActions.None,
+                notificationActions = NotificationActions.VPNActions,
             )
         } else {
             null
@@ -68,7 +68,7 @@ class NetPEnabledNotificationContentPlugin @Inject constructor(
     }
 
     override fun getUpdatedContent(): Flow<VpnEnabledNotificationContent?> {
-        return flowOf(getInitialContent()?.copy(notificationActions = NotificationActions.VPNActions))
+        return flowOf(getInitialContent())
     }
 
     override fun getPriority(): VpnEnabledNotificationPriority {
