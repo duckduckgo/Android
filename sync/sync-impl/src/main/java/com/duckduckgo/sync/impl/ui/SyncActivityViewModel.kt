@@ -25,6 +25,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.SyncState.OFF
 import com.duckduckgo.sync.api.SyncStateMonitor
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
@@ -54,6 +56,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -61,6 +64,7 @@ class SyncActivityViewModel @Inject constructor(
     private val recoveryCodePDF: RecoveryCodePDF,
     private val syncAccountRepository: SyncAccountRepository,
     private val syncStateMonitor: SyncStateMonitor,
+    private val syncEngine: SyncEngine,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -84,6 +88,8 @@ class SyncActivityViewModel @Inject constructor(
         }.onStart {
             initViewStateThisDeviceState()
             fetchRemoteDevices()
+            Timber.d("Sync-Settings: Sync Settings screen opened, triggering sync")
+            syncEngine.triggerSync(FEATURE_READ)
         }
             .launchIn(viewModelScope)
     }
