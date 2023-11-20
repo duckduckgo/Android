@@ -207,7 +207,7 @@ class BrowserTabViewModel @Inject constructor(
     private val surveyNotificationScheduler: SurveyNotificationScheduler,
     private val device: DeviceInfo,
     private val sitePermissionsManager: SitePermissionsManager,
-    private val syncEngine: SyncEngine
+    private val syncEngine: SyncEngine,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,

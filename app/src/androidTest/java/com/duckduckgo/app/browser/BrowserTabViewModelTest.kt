@@ -144,6 +144,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import dagger.Lazy
@@ -393,6 +395,8 @@ class BrowserTabViewModelTest {
 
     private val mockSitePermissionsManager: SitePermissionsManager = mock()
 
+    private val mockSyncEngine: SyncEngine = mock()
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -511,6 +515,7 @@ class BrowserTabViewModelTest {
             autofillFireproofDialogSuppressor = autofillFireproofDialogSuppressor,
             automaticSavedLoginsMonitor = automaticSavedLoginsMonitor,
             surveyNotificationScheduler = mockSurveyNotificationScheduler,
+            syncEngine = mockSyncEngine,
             device = mockDeviceInfo,
             sitePermissionsManager = mockSitePermissionsManager,
         )
@@ -4396,6 +4401,17 @@ class BrowserTabViewModelTest {
             assertEquals("myMethod", this.jsCallbackData.method)
             assertEquals("myId", this.jsCallbackData.id)
         }
+    }
+
+    @Test
+    fun whenNewTabOpenedAndFavouritesPresentThenSyncTriggered() = runTest {
+        val favoriteSite = Favorite(id = UUID.randomUUID().toString(), title = "", url = "www.example.com", position = 0, lastModified = "timestamp")
+        favoriteListFlow.send(listOf(favoriteSite))
+        loadUrl("www.example.com", isBrowserShowing = true)
+
+        testee.onNewTabFavouritesShown()
+
+        verify(mockSyncEngine).triggerSync(FEATURE_READ)
     }
 
     private fun aCredential(): LoginCredentials {
