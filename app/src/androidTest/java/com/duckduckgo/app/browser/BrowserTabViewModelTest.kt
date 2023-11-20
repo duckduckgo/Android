@@ -515,7 +515,6 @@ class BrowserTabViewModelTest {
     @ExperimentalCoroutinesApi
     @After
     fun after() {
-        ctaViewModel.isFireButtonPulseAnimationFlowEnabled.close()
         dismissedCtaDaoChannel.close()
         bookmarksListFlow.close()
         favoriteListFlow.close()
