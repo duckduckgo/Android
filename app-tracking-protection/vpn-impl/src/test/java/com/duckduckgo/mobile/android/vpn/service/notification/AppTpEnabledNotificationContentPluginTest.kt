@@ -97,7 +97,7 @@ class AppTpEnabledNotificationContentPluginTest {
         val content = plugin.getInitialContent()
 
         content!!.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
-        assertEquals(NotificationActions.None, content.notificationActions)
+        assertEquals(NotificationActions.VPNFeatureActions(emptyList()), content.notificationActions)
     }
 
     @Test
