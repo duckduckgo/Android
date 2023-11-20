@@ -377,12 +377,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenAutofillSettingsClickThenEmitCommandLaunchAutofillSettingsAndPixelFired() = runTest {
+    fun whenAutofillSettingsClickThenEmitCommandLaunchAutofillSettings() = runTest {
         testee.commands().test {
             testee.onAutofillSettingsClick()
 
             assertEquals(Command.LaunchAutofillSettings, awaitItem())
-            verify(mockPixel).fire(AppPixelName.SETTINGS_AUTOFILL_MANAGEMENT_OPENED)
 
             cancelAndConsumeRemainingEvents()
         }

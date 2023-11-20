@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -45,14 +44,12 @@ import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCreden
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Selected
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem
-import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
@@ -107,26 +104,12 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
         (dialog as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
         val originalUrl = getOriginalUrl()
-        configureSiteDetails(originalUrl, binding)
         configureRecyclerView(originalUrl, binding)
         configureCloseButton(binding)
     }
 
     private fun configureCloseButton(binding: ContentAutofillSelectCredentialsTooltipBinding) {
         binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
-    }
-
-    private fun configureSiteDetails(
-        originalUrl: String,
-        binding: ContentAutofillSelectCredentialsTooltipBinding,
-    ) {
-        val url = originalUrl.extractDomain() ?: originalUrl
-
-        binding.siteName.text = url
-
-        lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalWithPlaceholder(url = url, view = binding.favicon)
-        }
     }
 
     private fun configureRecyclerView(

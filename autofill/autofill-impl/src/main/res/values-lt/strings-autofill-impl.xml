@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Prisijungimams apsaugoti reikia naudoti prietaiso užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="managementDisabledModeTitle">Apsaugokite įrenginį, kad išsaugotumėte prisijungimus</string>
 
-    <string name="saveLoginDialogButtonSave">Išsaugoti prisijungimą</string>
+    <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
-    <string name="saveLoginDialogNotNow">Ne dabar</string>
-    <string name="saveLoginDialogSubtitle">Prisijungimai saugiai laikomi tik šiame įrenginyje, o juos galima tvarkyti nustatymuose, prisijungimų meniu.</string>
-    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų prisijungimą?</string>
+    <string name="saveLoginDialogNotNow">Neišsaugokite</string>
+    <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginio meniu „Prisijungimai“.</string>
+    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų slaptažodį?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
-    <string name="useSavedLoginDialogTitle">Naudoti išsaugotą prisijungimą?</string>
+    <string name="useSavedLoginDialogTitle">Naudoti išsaugotą slaptažodį?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">„%1$s“ slaptažodis</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Svetainės slaptažodis</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Iš šios svetainės</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Iš %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Atnaujinti slaptažodį</string>
-    <string name="updateLoginDialogButtonNotNow">Ne dabar</string>
+    <string name="updateLoginDialogButtonNotNow">Neišsaugokite</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Atnaujinti naudotojo vardą?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Atnaujinti naudotojo vardą</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atnaujinti \n%1$s slaptažodį?</string>
-    <string name="updateLoginUpdatePasswordExplanation">„DuckDuckGo“ atnaujins šį jūsų įrenginyje įrašytą prisijungimą.</string>
+    <string name="updateLoginUpdatePasswordExplanation">„DuckDuckGo“ atnaujins šį jūsų įrenginyje išsaugotą slaptažodį.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Uždaryti automatinio pildymo dialogo langą</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Prisijungimas paskutinį kartą atnaujintas %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Išsaugoti ir automatiškai pildyti prisijungimus</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Prisijungimai saugiai laikomi jūsų įrenginyje</string>
     <string name="credentialManagementViewMenuEdit">Redaguoti</string>
     <string name="credentialManagementViewMenuDelete">Trinti</string>
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
     <string name="credentialManagementNoLoginsSavedTitle">Dar nėra išsaugotų prisijungimų</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prisijungimai saugiai laikomi jūsų įrenginyje.</string>
 
     <string name="autofillManagementAddLogin">Pridėti prisijungimą</string>
     <string name="autofillManagementSearchLogins">Ieškoti prisijungimų</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Naudotojo vardas nukopijuotas</string>
     <string name="autofillManagementPasswordCopied">Slaptažodis nukopijuotas</string>
 
-    <string name="autofill_password_generation_offer_title">Naudoti sugeneruotą slaptažodį iš „DuckDuckGo“?</string>
-    <string name="autofill_password_generation_offer_message">Slaptažodis bus išsaugotas prisijungimų lange.</string>
-    <string name="autofill_password_generation_offer_accept">Naudoti sugeneruotą slaptažodį</string>
+    <string name="autofill_password_generation_offer_title">Naudoti stiprų „DuckDuckGo“ slaptažodį?</string>
+    <string name="autofill_password_generation_offer_message">Slaptažodžiai saugiai saugomi jūsų įrenginio meniu „Prisijungimai“.</string>
+    <string name="autofill_password_generation_offer_accept">Naudoti stiprų slaptažodį</string>
     <string name="autofill_password_generation_offer_decline">Sukurti savo</string>
 
     <string name="deviceNotSupportedTitle">Nepalaikomas įrenginys</string>

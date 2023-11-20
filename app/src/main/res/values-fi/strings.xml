@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Oletusarvoisesti käytössä</string>
     <string name="settingsHeadingSettings">Asetukset</string>
     <string name="settingsPermissionsSetting">Käyttöoikeudet</string>
-    <string name="settingsAutofillLoginsSetting">Täytä kirjautumistiedot automaattisesti</string>
+    <string name="settingsAutofillLoginsSetting">Kirjautumistiedot</string>
     <string name="settingsSyncSetting">Synkronoi ja varmuuskopioi</string>
     <string name="settingsFireButton">Fire-painike</string>
 

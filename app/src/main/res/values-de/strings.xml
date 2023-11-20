@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Standardmäßig aktiviert</string>
     <string name="settingsHeadingSettings">Einstellungen</string>
     <string name="settingsPermissionsSetting">Berechtigungen</string>
-    <string name="settingsAutofillLoginsSetting">Anmeldedaten automatisch ausfüllen</string>
+    <string name="settingsAutofillLoginsSetting">Anmeldungen</string>
     <string name="settingsSyncSetting">Synchronisieren und sichern</string>
     <string name="settingsFireButton">Fire Button</string>
 

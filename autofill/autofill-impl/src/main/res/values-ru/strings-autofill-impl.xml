@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Для защиты логинов требуются биометрические данные, графический ключ или ПИН-код.</string>
     <string name="managementDisabledModeTitle">Защитите свое устройство, чтобы сохранять логины</string>
 
-    <string name="saveLoginDialogButtonSave">Сохранить логин</string>
+    <string name="saveLoginDialogButtonSave">Сохранить пароль</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Сохранить пароль</string>
-    <string name="saveLoginDialogNotNow">Не сейчас</string>
-    <string name="saveLoginDialogSubtitle">Учетные данные надежно хранятся на вашем устройстве, а проконтролировать их можно в меню «Логины» в «Настройках».</string>
-    <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил логин?</string>
+    <string name="saveLoginDialogNotNow">Не сохранять</string>
+    <string name="saveLoginDialogSubtitle">Пароли надежно хранятся на вашем устройстве в меню «Логины».</string>
+    <string name="saveLoginDialogTitle">Хотите, чтобы DuckDuckGo сохранил ваш пароль?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Другие параметры</string>
 
-    <string name="useSavedLoginDialogTitle">Использовать сохраненный логин?</string>
+    <string name="useSavedLoginDialogTitle">Использовать сохраненный пароль?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Пароль для %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Пароль для сайта</string>
     <string name="useSavedLoginDialogGroupThisWebsite">С этого сайта</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">С %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Обновить пароль</string>
-    <string name="updateLoginDialogButtonNotNow">Не сейчас</string>
+    <string name="updateLoginDialogButtonNotNow">Не сохранять</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Обновить имя пользователя?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Обновить имя пользователя</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Обновить пароль \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo обновит логин, сохраненный на вашем устройстве.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo обновит пароль, сохраненный на вашем устройстве.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Закрыть диалоговое окно автозаполнения</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последнее обновление логина: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Сохранить и заполнять автоматически</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Учетные данные надежно хранятся на вашем устройстве</string>
     <string name="credentialManagementViewMenuEdit">Редактировать</string>
     <string name="credentialManagementViewMenuDelete">Удалить</string>
 
     <string name="credentialManagementSuggestionsLabel">Рекомендации</string>
     <string name="credentialManagementNoLoginsSavedTitle">Сохраненных логинов пока нет</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Учетные данные сохранены и защищены на вашем устройстве.</string>
 
     <string name="autofillManagementAddLogin">Добавить логин</string>
     <string name="autofillManagementSearchLogins">Поиск логинов</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Имя пользователя скопировано</string>
     <string name="autofillManagementPasswordCopied">Пароль скопирован</string>
 
-    <string name="autofill_password_generation_offer_title">Использовать пароль, сгенерированный DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Пароль будет сохранен в разделе «Логины».</string>
-    <string name="autofill_password_generation_offer_accept">Использовать предложенный</string>
+    <string name="autofill_password_generation_offer_title">Как насчет надежного пароля от DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Пароли надежно хранятся на вашем устройстве в меню «Логины».</string>
+    <string name="autofill_password_generation_offer_accept">Применить надежный пароль</string>
     <string name="autofill_password_generation_offer_decline">Создать собственный</string>
 
     <string name="deviceNotSupportedTitle">Устройство не поддерживается</string>

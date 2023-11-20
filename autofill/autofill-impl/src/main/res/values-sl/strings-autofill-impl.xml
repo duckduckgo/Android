@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Za zaščito prijav je potreben vzorec za zaklepanje naprave, koda PIN ali biometrični podatki.</string>
     <string name="managementDisabledModeTitle">Zavarujte svojo napravo, če želite shraniti prijave</string>
 
-    <string name="saveLoginDialogButtonSave">Shrani prijavo</string>
+    <string name="saveLoginDialogButtonSave">Shrani geslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Shrani geslo</string>
-    <string name="saveLoginDialogNotNow">Ne zdaj</string>
-    <string name="saveLoginDialogSubtitle">Prijave so varno shranjene v tej napravi in jih lahko upravljate v razdelku Prijave v nastavitvah.</string>
-    <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vašo prijavo?</string>
+    <string name="saveLoginDialogNotNow">Ne shrani</string>
+    <string name="saveLoginDialogSubtitle">Gesla so varno shranjena v napravi v meniju Prijave.</string>
+    <string name="saveLoginDialogTitle">Ali želite, da DuckDuckGo shrani vaše geslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Več možnosti</string>
 
-    <string name="useSavedLoginDialogTitle">Želite uporabiti shranjene podatke za prijavo?</string>
+    <string name="useSavedLoginDialogTitle">Želite uporabiti shranjeno geslo?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Geslo za spletno mesto %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Geslo za spletno mesto</string>
     <string name="useSavedLoginDialogGroupThisWebsite">S tega spletnega mesta</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">S spletnega mesta %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Posodobitev gesla</string>
-    <string name="updateLoginDialogButtonNotNow">Ne zdaj</string>
+    <string name="updateLoginDialogButtonNotNow">Ne shrani</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Želite posodobiti uporabniško ime?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Posodobi uporabniško ime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Želite posodobiti geslo za \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bo posodobil to shranjeno prijavo v vaši napravi.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bo posodobil to shranjeno geslo v vaši napravi.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zapri pogovorno okno za samodejno izpolnjevanje</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Prijavni podatki nazadnje posodobljeni %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Shrani in samodejno izpolni prijavne podatke</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Prijave so varno shranjene v vaši napravi.</string>
     <string name="credentialManagementViewMenuEdit">Uredi</string>
     <string name="credentialManagementViewMenuDelete">Izbriši</string>
 
     <string name="credentialManagementSuggestionsLabel">Predlagano</string>
     <string name="credentialManagementNoLoginsSavedTitle">Podatki za prijavo še niso shranjeni</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Prijave so varno shranjene v vaši napravi.</string>
 
     <string name="autofillManagementAddLogin">Dodajanje podatkov za prijavo</string>
     <string name="autofillManagementSearchLogins">Iskanje podatkov za prijavo</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Uporabniško ime je bilo kopirano</string>
     <string name="autofillManagementPasswordCopied">Geslo je bilo kopirano</string>
 
-    <string name="autofill_password_generation_offer_title">Želite uporabiti geslo, ki ga je ustvaril DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Geslo bo shranjeno v razdelku Prijave.</string>
-    <string name="autofill_password_generation_offer_accept">Uporabi ustvarjeno geslo</string>
+    <string name="autofill_password_generation_offer_title">Želite uporabiti močno geslo od DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Gesla so varno shranjena v napravi v meniju Prijave.</string>
+    <string name="autofill_password_generation_offer_accept">Uporabi močno geslo</string>
     <string name="autofill_password_generation_offer_decline">Ustvari svoje</string>
 
     <string name="deviceNotSupportedTitle">Naprava ni podprta</string>

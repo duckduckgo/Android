@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Giriş bilgilerinizin güvenliğini sağlamak için bir cihaz kilidi deseni, PIN veya biyometrik veri gereklidir.</string>
     <string name="managementDisabledModeTitle">Giriş bilgilerini kaydetmek için cihazınızın güvenliğini sağlayın</string>
 
-    <string name="saveLoginDialogButtonSave">Girişi Kaydet</string>
+    <string name="saveLoginDialogButtonSave">Şifre Kaydet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Şifre Kaydet</string>
-    <string name="saveLoginDialogNotNow">Şimdi Değil</string>
-    <string name="saveLoginDialogSubtitle">Giriş bilgileri yalnızca bu cihazda güvenli bir şekilde saklanır ve Ayarlar\'daki Giriş Bilgileri menüsünden yönetilebilir.</string>
-    <string name="saveLoginDialogTitle">DuckDuckGo\'nun Girişinizi kaydetmesini istiyor musunuz?</string>
+    <string name="saveLoginDialogNotNow">Kaydetme</string>
+    <string name="saveLoginDialogSubtitle">Şifreler cihazınızdaki Oturum Açma menüsünde güvenli bir şekilde saklanır.</string>
+    <string name="saveLoginDialogTitle">DuckDuckGo\'nun şifrenizi kaydetmesini istiyor musunuz?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Diğer Seçenekler</string>
 
-    <string name="useSavedLoginDialogTitle">Kayıtlı Giriş kullanılsın mı?</string>
+    <string name="useSavedLoginDialogTitle">Kayıtlı bir şifre mi kullanıyorsunuz?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">%1$s şifresi</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Site şifresi</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Bu Web Sitesinden</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">%1$s adresinden</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Şifreyi Güncelle</string>
-    <string name="updateLoginDialogButtonNotNow">Şimdi Değil</string>
+    <string name="updateLoginDialogButtonNotNow">Kaydetme</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Kullanıcı adı güncellensin mi?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Kullanıcı Adını Güncelle</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">%1$s için şifre güncellensin mi?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo, cihazınızdaki bu kayıtlı Giriş bilgisini güncelleyecektir.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo bu kayıtlı şifreyi cihazınızda güncelleyecektir.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Otomatik Doldurma İletişim Kutusunu Kapat</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Son giriş güncelleme: %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Girişleri Kaydet ve Otomatik Doldur</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Giriş bilgileri cihazınızda güvenli bir şekilde saklanır</string>
     <string name="credentialManagementViewMenuEdit">Düzenle</string>
     <string name="credentialManagementViewMenuDelete">Sil</string>
 
     <string name="credentialManagementSuggestionsLabel">Önerilen</string>
     <string name="credentialManagementNoLoginsSavedTitle">Henüz kaydedilmiş Giriş yok</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Giriş bilgileri cihazınızda güvenli bir şekilde saklanır.</string>
 
     <string name="autofillManagementAddLogin">Giriş Ekle</string>
     <string name="autofillManagementSearchLogins">Giriş ara</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Kullanıcı adı kopyalandı</string>
     <string name="autofillManagementPasswordCopied">Şifre kopyalandı</string>
 
-    <string name="autofill_password_generation_offer_title">DuckDuckGo\'dan oluşturulan şifre kullanılsın mı?</string>
-    <string name="autofill_password_generation_offer_message">Şifre, Girişlere kaydedilecektir.</string>
-    <string name="autofill_password_generation_offer_accept">Oluşturulan Şifreyi Kullan</string>
+    <string name="autofill_password_generation_offer_title">DuckDuckGo\'nun oluşturduğu güçlü bir şifre kullanmak ister misiniz?</string>
+    <string name="autofill_password_generation_offer_message">Şifreler cihazınızdaki Oturum Açma menüsünde güvenli bir şekilde saklanır.</string>
+    <string name="autofill_password_generation_offer_accept">Güçlü Şifre Kullan</string>
     <string name="autofill_password_generation_offer_decline">Kendiminkini Oluştur</string>
 
     <string name="deviceNotSupportedTitle">Cihaz desteklenmiyor</string>

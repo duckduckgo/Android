@@ -150,7 +150,7 @@
     <string name="settingsWebTrackingProtectionDescription">Varsayılan olarak etkinleştirildi</string>
     <string name="settingsHeadingSettings">Ayarlar</string>
     <string name="settingsPermissionsSetting">İzinler</string>
-    <string name="settingsAutofillLoginsSetting">Girişleri Otomatik Doldur</string>
+    <string name="settingsAutofillLoginsSetting">Giriş bilgileri</string>
     <string name="settingsSyncSetting">Senkronizasyon ve Yedekleme</string>
     <string name="settingsFireButton">Fire Button</string>
 

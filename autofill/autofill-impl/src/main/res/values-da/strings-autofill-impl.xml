@@ -23,27 +23,27 @@
     <string name="managementDisabledModeSubtitle">Der kræves et låsemønster, en pinkode eller biometri for at beskytte dine logins.</string>
     <string name="managementDisabledModeTitle">Beskyt din enhed for at gemme logins</string>
 
-    <string name="saveLoginDialogButtonSave">Gem login</string>
+    <string name="saveLoginDialogButtonSave">Gem adgangskode</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Gem adgangskode</string>
-    <string name="saveLoginDialogNotNow">Ikke nu</string>
-    <string name="saveLoginDialogSubtitle">Logins gemmes sikkert på din enhed og kan administreres fra menuen Logins i Indstillinger.</string>
-    <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme dit login?</string>
+    <string name="saveLoginDialogNotNow">Gem ikke</string>
+    <string name="saveLoginDialogSubtitle">Adgangskoder gemmes sikkert på din enhed i menuen Logins.</string>
+    <string name="saveLoginDialogTitle">Skal DuckDuckGo gemme din adgangskode?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere muligheder</string>
 
-    <string name="useSavedLoginDialogTitle">Vil du bruge et gemt login?</string>
+    <string name="useSavedLoginDialogTitle">Brug en gemt adgangskode?</string>
     <string name="useSavedLoginDialogMissingUsernameButtonText" instruction="Placeholder is the name of a website">Adgangskode til %1$s</string>
     <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">Adgangskode til websted</string>
     <string name="useSavedLoginDialogGroupThisWebsite">Fra dette websted</string>
     <string name="useSavedLoginDialogFromDomainLabel" instruction="Placeholder is the URL of a website">Fra %1$s</string>
 
     <string name="updateLoginDialogButtonUpdatePassword">Opdater adgangskode</string>
-    <string name="updateLoginDialogButtonNotNow">Ikke nu</string>
+    <string name="updateLoginDialogButtonNotNow">Gem ikke</string>
 
     <string name="updateLoginDialogTitleUpdateUsername">Opdater brugernavn?</string>
     <string name="updateLoginDialogButtonUpdateUsername">Opdater brugernavn</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Opdater adgangskode for \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo opdaterer dette gemte login på din enhed.</string>
+    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo opdaterer denne gemte adgangskode på din enhed.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Luk dialogboksen for automatisk udfyldning</string>
 
@@ -60,12 +60,12 @@
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Login sidst opdateret %1$s</string>
 
     <string name="credentialManagementAutofillToggleLabel">Gem og udfyld automatisk logins</string>
+    <string name="credentialManagementAutofillToggleSubtitle">Login gemmes sikkert på din enhed</string>
     <string name="credentialManagementViewMenuEdit">Rediger</string>
     <string name="credentialManagementViewMenuDelete">Slet</string>
 
     <string name="credentialManagementSuggestionsLabel">Foreslået</string>
     <string name="credentialManagementNoLoginsSavedTitle">Ingen logins gemt endnu</string>
-    <string name="credentialManagementNoLoginsSavedSubtitle">Login gemmes sikkert på din enhed.</string>
 
     <string name="autofillManagementAddLogin">Tilføj login</string>
     <string name="autofillManagementSearchLogins">Søg logins</string>
@@ -79,9 +79,9 @@
     <string name="autofillManagementUsernameCopied">Brugernavn kopieret</string>
     <string name="autofillManagementPasswordCopied">Adgangskode kopieret</string>
 
-    <string name="autofill_password_generation_offer_title">Brug genereret adgangskode fra DuckDuckGo?</string>
-    <string name="autofill_password_generation_offer_message">Adgangskoden vil blive gemt i logins.</string>
-    <string name="autofill_password_generation_offer_accept">Brug genereret adgangskode</string>
+    <string name="autofill_password_generation_offer_title">Brug en stærk adgangskode fra DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_message">Adgangskoder gemmes sikkert på din enhed i menuen Logins.</string>
+    <string name="autofill_password_generation_offer_accept">Brug en stærk adgangskode</string>
     <string name="autofill_password_generation_offer_decline">Opret min egen</string>
 
     <string name="deviceNotSupportedTitle">Enheden understøttes ikke</string>
